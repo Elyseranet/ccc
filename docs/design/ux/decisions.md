@@ -90,3 +90,5 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | R-7 | Départage devant pourvoir plusieurs places : le gagnant prend la place, **les perdants rejouent** (N−1 côtés, ou 1v1 à deux) jusqu'à ce que toutes les places soient pourvues. |
 | FA-04-seuil | Comparaison visuelle : **1 % de pixels différents par zone** (pixelmatch, seuil couleur 0,1, reduced-motion, polices chargées) **+ relecture humaine de l'image d'écart** par le lead avant merge. |
 | R-8 | Courbe d'évolution ACP / All Time : **commence à la première participation chiffrée** du joueur (pas de points à 0 avant ses débuts, contrairement aux onglets `évo` du classeur dont les zéros sont un effet de formule cumulative). |
+| R-9 | Le **code d'une édition est figé après création** (ex. `2012a`, `2026`) : il sert d'adresse publique `/editions/<code>`. |
+| R-10 | Carte « Matchs » de la synthèse d'édition : libellé explicite — en cours « N programmés, dont M validés » ; archive « N matchs, dont M au résultat inconnu ». |
