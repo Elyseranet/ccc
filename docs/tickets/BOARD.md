@@ -8,7 +8,7 @@ Il n'y a pas de remote : ce fichier fait office de tableau. Il est partagé par 
 
 ## Back
 
-Mis à jour par `backend-lead` le 2026-10-20. Il s'agit d'un **plan** : aucun code applicatif n'est écrit.
+Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. Il s'agit d'un **plan** : aucun code applicatif n'est écrit.
 
 ### Tickets
 
@@ -16,21 +16,21 @@ Mis à jour par `backend-lead` le 2026-10-20. Il s'agit d'un **plan** : aucun co
 |---|---|---|---|---|---|
 | [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | À faire |
 | [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO) | — | À faire |
-| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | A10, A11 sur deux fonctions seulement | À faire |
-| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | A5, A6, A7, A16 (pour la mise en production) | À faire |
+| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | À faire |
+| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | A5 : table `legacy-identity-map.md` à remplir par l'utilisateur (import réel seulement) | À faire |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | À faire |
-| [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | A13 (commentaires de match) | À faire |
-| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | A8 | À faire |
-| [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | **A2**, A4 | Bloqué (A2) |
-| [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | **A3**, A14 | Bloqué (A3) |
+| [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | À faire |
+| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | À faire |
+| [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | À faire |
+| [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | — (fournisseur SMTP de prod : configuration) | À faire |
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | À faire |
-| [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | **A1** | Bloqué (A1) |
-| [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | A15 (correction seulement) | À faire |
-| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | **A1**, **A10**, **A11** | Bloqué (A1, A10, A11) |
+| [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | À faire |
+| [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | — | À faire |
+| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (égalité à 4 et plus : Je ne sais pas) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | **A17** | Bloqué (A17) |
 
-Hors tableau, en attente de décision : **cotes** (RG33 à RG35, arbitrage A12) et **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket n'est ouvert tant que ces décisions ne sont pas rendues.
+Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
 ### Parallélisation
 
@@ -39,7 +39,7 @@ Un `backend-developer` par ticket, chacun dans son worktree `../CCC-B-xx`.
 | Vague | Tickets en parallèle | Nombre de devs |
 |---|---|---|
 | 1 | B-01, B-02, B-03 | **3** |
-| 2 | B-04, B-05, B-06, B-07, et B-08 si A2 est rendu | **4 à 5** |
+| 2 | B-04, B-05, B-06, B-07, B-08 | **5** |
 | 3 | B-09, B-10, B-12 | **3** |
 | 4 | B-11, puis B-13 | 1 ou 2 |
 | 5 | B-14 | 1 |
@@ -51,9 +51,39 @@ Zones de conflit à surveiller :
 
 Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques des fixtures vers les routes réelles. Ils se testent sur des fixtures, sans attendre B-04. En revanche, les données réelles n'existent qu'après B-04.
 
-### Arbitrages à rendre (non tranchés, à poser par le `project-manager`)
+### Arbitrages
 
-Une décision par ligne. L'option recommandée vient en premier.
+**A1 à A16 sont tranchés** par l'utilisateur le 2026-10-20. La décision fait foi dans `docs/design/ux/decisions.md`, section « Arbitrages back », et elle est reportée dans les critères d'acceptation des tickets. Toutes les décisions suivent l'option (a) recommandée.
+
+| # | Décision | Tickets |
+|---|---|---|
+| A1 | Le serveur enregistre le tirage physique, avec un brouillon à chaque affectation | B-11, B-13 |
+| A2 | Session serveur en base et cookie `httpOnly` | B-08 |
+| A3 | SMTP nodemailer, Mailpit en dev ; fournisseur de prod à choisir plus tard | B-09 |
+| A4 | Le participant modifie avatar, téléphone et mot de passe ; pseudo réservé à l'admin | B-08 |
+| A5 | Correspondance nom par nom décidée par l'utilisateur (`legacy-identity-map.md`, **à remplir**) | B-04 |
+| A6 | 2012a et 2012b : N = 16 conservé, « 5 participants non identifiés » | B-04, B-06 |
+| A7 | 2017 : 5,76 conservé, écart signalé | B-04 |
+| A8 | ACP = 5 dernières éditions clôturées | B-03, B-07 |
+| A9 | Tour avant les huitièmes = « Barrages » | B-02, B-04, B-13 |
+| A10 | Poule : victoires → cap's average → confrontation directe ; entre poules : ratio de victoires → cap's average par match | B-03, B-06, B-13 |
+| A11 | « 1v1v1 en 3 » = match à 3 côtés, premier à 3 | B-02, B-03, B-13 |
+| A12 | Cotes hors produit | — |
+| A13 | Commentaires de match importés, visibles par l'admin uniquement | B-02, B-04, B-06 |
+| A14 | Invitation valable 7 jours, renvoi par l'admin qui invalide l'ancien lien | B-09 |
+| A15 | `POST /matchs/{id}/correction` journalisée, 409 si tour suivant engagé | B-12 |
+| A16 | Gabarits vides non importés : 729 matchs, dont 554 avec score ; « 1 414 » est faux | B-04, B-06 |
+
+Questions qui restent ouvertes après ces décisions :
+- **A17** (flux d'activité admin) : voir plus bas, il bloque B-15.
+- Départage à **quatre joueurs ou plus** : RG19 et RG20 disent « trois ou plus », A11 décrit un match à trois côtés. Je ne sais pas comment départager à quatre ; B-03 et B-13 refusent le cas tant que la règle n'est pas écrite.
+- Départage à trois : le vainqueur prend la place ; l'ordre des deux autres (s'il compte pour une place suivante) n'est pas écrit. Je ne sais pas.
+- Définition de « tour suivant engagé » pour la correction (A15) : proposée dans B-12, à confirmer en revue.
+- Commentaires d'**édition** (en-têtes `{code}-0` du classeur, par exemple « 1ère édition #lhistoireestenmarche ») : A13 ne vise que les commentaires de match. Je ne sais pas s'ils sont publics ; en attendant, `editions.comment` est importé mais absent des DTO publics.
+
+#### Historique des options présentées (A1 à A16)
+
+Une décision par ligne. L'option recommandée venait en premier.
 
 | # | Décision | Options et conséquences | Recommandation |
 |---|---|---|---|
@@ -127,7 +157,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-09](F-09.md) | Admin : participants | **aucune** (wireframe) | F-00, maquette | **Bloqué : design** (FA-01b) | `../CCC-F-09` |
 | [F-10](F-10.md) | Compte : connexion, invitation, Mon profil | **aucune** (wireframe) | F-00, maquette (route : FA-06) | **Bloqué : design** (FA-01b) | `../CCC-F-10` |
 
-**Compteur** : 11 tickets front ouverts, 0 fermé ; 4 bloqués par l'absence de maquette ; 11 arbitrages en attente (FA-01b, FA-02, FA-04 à FA-12), FA-01 levé, FA-03 réglé entre leads ; A16 et A17 côté back touchent F-01 et F-07.
+**Compteur** : 11 tickets front ouverts, 0 fermé ; 4 bloqués par l'absence de maquette ; 11 arbitrages en attente (FA-01b, FA-02, FA-04 à FA-12), FA-01 levé, FA-03 réglé entre leads ; A16, A9 et A13 tranchés et intégrés (F-00, F-01, F-03, F-04) ; A17 touche encore F-07.
 
 ### Ordre et parallélisme
 
@@ -184,7 +214,7 @@ Les 8 écarts sont pris en charge par `backend-lead` (section Back, « Écarts d
 
 | # | Besoin front | Réponse back | Ticket front impacté |
 |---|---|---|---|
-| C1 | Compteurs d'archive (accueil) | `GET /stats` → `IArchiveStats`, plus `matchCount` et `scoredMatchCount` dans `IEditionSummary` (B-02, B-06). ⚠️ Le « 1 414 » de la maquette compte des lignes du classeur ; si l'arbitrage back **A16** retient (a), l'API renverra **729 dont 554 avec score**. La fixture garde la valeur de la maquette ; le texte affiché suivra l'API. | F-01 |
+| C1 | Compteurs d'archive (accueil) | `GET /stats` → `IArchiveStats`, plus `matchCount` et `scoredMatchCount` dans `IEditionSummary` (B-02, B-06). **A16 tranché** : 729 matchs, dont 554 avec score (le « 1 414 » de la maquette est faux). Aucun chiffre en dur ; le libellé est à valider avec le chef de projet. | F-01 |
 | C2 | Champion par édition | `IEditionSummary.champion: { competitor, titlesToDate } \| null` (B-02, B-06) | F-01, F-02 |
 | C3 | Avancement et derniers scores validés | `?statut=` et `?tri=validated_at_desc` sur `/editions/{id}/matchs` ; `IRound.matchCount` et `validatedMatchCount` (B-06) | F-01, F-03 |
 | C4 | Colonnes et filtre de l'annuaire | `ICompetitorListItem` et `?edition=` (B-02, B-05). `matchesPlayed` inclut les matchs d'archive sans résultat ; `wins` ne compte que les matchs validés. | F-04 |

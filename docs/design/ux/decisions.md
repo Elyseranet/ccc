@@ -55,3 +55,20 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | A14 | Invitation valable **7 jours**, renvoi par l'admin (invalide l'ancien lien). |
 | A15 | Correction : **`POST /matchs/{id}/correction`** journalisée, 409 si tour suivant engagé. |
 | A16 | Les 685 gabarits vides **ne sont pas importés** : 729 matchs réels, dont 554 avec score. Le chiffre public « 1 414 matchs » est **faux** et doit être remplacé. |
+
+## Arbitrages front (2026-10-20) — cf. `docs/tickets/BOARD.md`
+
+| # | Décision |
+|---|---|
+| FA-01b | Les 4 écrans sans maquette (face-à-face, règles, admin participants, compte) sont **maquettés en HH avant intégration** (conséquence de la règle iso-visuel). |
+| FA-02 | Interfaces/enums du contrat d'API dans **`shared/interfaces/api/` et `shared/enums/`** (alias `#shared`). Exception documentée dans `CLAUDE.md` du projet. |
+| FA-04 | Comparaison visuelle : **mesurer l'écart sur l'en-tête de F-00, puis fixer un seuil** soumis à l'utilisateur avant application. |
+| FA-05 | Écran admin « Poules et matchs » : **`/admin/matchs`**. |
+| FA-06 | Page profil participant : **`/profil`**. |
+| FA-07 | Outillage de test ajouté (Vitest, @nuxt/test-utils, @vue/test-utils, Playwright, axe-core, vue-tsc, @pinia/nuxt), sous réserve `npm ls axios` vide et `npm audit` sans high/critical. |
+| FA-08 | Entrée « Plus » de la barre basse admin : **à maquetter** par l'UI. |
+| FA-09 | **Tirages admin maquetté et ticketé maintenant** ; Bracket, Compétiteurs, Éditions **masqués** de la nav admin jusqu'à leur ticket. |
+| FA-10 | Ordre des onglets d'édition : **celui de la maquette**. |
+| FA-11 | Bracket : slot `connector` vide ; ticket Origam seulement si la mesure de F-03 montre un artefact. |
+| FA-12 | **Pas de ratio** sur la fiche joueur (spec : joués / V / D). Ratio uniquement dans le face-à-face (RG37). |
+| A17 | « Activité récente » admin : **flux dérivé** des validations de match et de tirage, sans table d'audit. |

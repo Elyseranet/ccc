@@ -11,3 +11,7 @@ Complète `~/CLAUDE.md` et `~/.claude/CLAUDE.md`. En cas de conflit sur les poin
 ## Specs
 
 Les specs font foi et vivent dans Obsidian : `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidians/Projects/CCC/` (Spec fonctionnelle, Spec API, Spec technique). Décisions design : `docs/design/ux/decisions.md`.
+
+## Contrat d'API partagé — exception de rangement (décision utilisateur 2026-10-20, FA-02)
+
+Les interfaces et enums **du contrat d'API** (DTO échangés entre `server/` et `app/`) vivent dans `shared/interfaces/api/` et `shared/enums/` (alias Nuxt `#shared`), et **nulle part ailleurs** — pas de copie dans `app/interfaces/`. Les interfaces purement front restent dans `app/interfaces/`, les purement serveur dans `server/`.
