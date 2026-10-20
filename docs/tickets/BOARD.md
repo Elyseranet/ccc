@@ -29,6 +29,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (égalité à 4 et plus : Je ne sais pas) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
+| [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | À faire |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -214,6 +215,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 - F-04 et F-05 : R-5 (V/D sur les matchs avec score uniquement) et `winRatio` à null.
 - F-07 : flux d'activité dérivé (A17), sur fixture jusqu'au merge de B-15.
 - F-09 et F-10 : avatar téléversé et stocké en base (AV-1), via `origam-file-field` limité à 2 Mo ; ils dépendent de **B-16** pour la bascule. F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
+- F-01, F-03, F-04, F-05 : un avatar de joueur public = `ICompetitorPublic.avatarUrl` (route publique B-16, cache immuable par `?v=`), sinon les initiales (`origam-avatar` `text`). Affichage carré, recadré par CSS, avec un `alt` traduit ou `aria-hidden` si le nom est déjà à côté.
 - Tous : tests a11y des formulaires sur le rendu hydraté, à cause de l'id d'input qui change entre serveur et client (Origam #1226).
 
 ### Definition of Done commune (en plus des critères de chaque ticket)
