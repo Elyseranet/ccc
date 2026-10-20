@@ -188,7 +188,7 @@ B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets
 - Travail dans son worktree `../CCC-F-xx`, branche `feature/F-xx-…`. **Jamais de copie de `.env`** : `find ../CCC-F-xx -maxdepth 2 -name ".env"` doit être vide.
 - **Iso-visuel** :
   - captures Playwright de la maquette et de l'app à **1440 et 390 px**, en `reducedMotion: 'reduce'`, jointes côte à côte à la PR ;
-  - écart dans la tolérance FA-04 ;
+  - **écart ≤ 1 % par zone** (FA-04, validé), et image d'écart relue par un humain avant le merge ;
   - fixtures = données de la maquette.
 - `npm run test:run` vert (tests des composables de l'écran) ; `npm run test:a11y` : 0 violation axe sur les routes du ticket ; `npx nuxi typecheck` vert.
 - Origam partout où un composant existe (skill `origam`), sans aucune prop inventée : chaque prop non listée dans `mapping.md` est vérifiée dans `~/Projects/origam/packages/ds/src/interfaces`.
