@@ -12,6 +12,5 @@ export interface IRateLimitResult {
 
 export interface ILoginLimiters<TLimiter> {
   byIp: TLimiter
-  byEmail: TLimiter
   byPasswordChange: TLimiter
 }

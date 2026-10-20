@@ -84,6 +84,7 @@ describe('migration M1', () => {
   })
 
   it('reverts to an empty domain schema then re-applies', async () => {
+    await dataSource.undoLastMigration() // M3 (compteur d'échecs de connexion)
     await dataSource.undoLastMigration() // M2 (identité) : les FK vers users tombent avant M1
     await dataSource.undoLastMigration() // M1
     expect(await tablesPresent()).toEqual([])

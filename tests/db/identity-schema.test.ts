@@ -53,7 +53,8 @@ describe('migration M2', () => {
   })
 
   it('reverts cleanly (tables, FK and enum types) then re-applies', async () => {
-    await dataSource.undoLastMigration()
+    await dataSource.undoLastMigration() // M3, qui dépend de users
+    await dataSource.undoLastMigration() // M2
     expect(await tables()).toEqual([])
     expect(await userForeignKeys()).toEqual([])
     const types: Array<{ typname: string }> = await dataSource.query(
@@ -64,6 +65,31 @@ describe('migration M2', () => {
     await dataSource.runMigrations()
     expect(await tables()).toEqual(['sessions', 'users'])
     expect(await userForeignKeys()).toEqual([...USER_FKS].sort())
+  })
+})
+
+describe('migration M3', () => {
+  const throttleColumns = async (): Promise<string[]> => {
+    const rows: Array<{ column_name: string }> = await dataSource.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name IN ('failed_login_count', 'throttled_until')`
+    )
+    return rows.map((row) => row.column_name).sort()
+  }
+
+  it('adds failed_login_count (default 0) and throttled_until', async () => {
+    expect(await throttleColumns()).toEqual(['failed_login_count', 'throttled_until'])
+    const user = await saveUser('m3@ccc.test')
+    const stored = await dataSource.getRepository(UserEntity).findOneByOrFail({ id: user.id })
+    expect(stored.failedLoginCount).toBe(0)
+    expect(stored.throttledUntil).toBeNull()
+  })
+
+  it('reverts then re-applies without touching users', async () => {
+    await dataSource.undoLastMigration()
+    expect(await throttleColumns()).toEqual([])
+    expect(await tables()).toEqual(['sessions', 'users'])
+    await dataSource.runMigrations()
+    expect(await throttleColumns()).toEqual(['failed_login_count', 'throttled_until'])
   })
 })
 

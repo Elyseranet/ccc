@@ -39,7 +39,6 @@ export default defineNuxtConfig({
       loginRateLimit: {
         windowMs: 900000,
         maxIpAttempts: 20,
-        maxEmailAttempts: 10,
         maxKeys: 10000
       }
     }

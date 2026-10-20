@@ -45,7 +45,7 @@ export const AVATAR_URL_MAX_LENGTH = 2048
 
 export const RATE_LIMIT_AUTH_ROUTE_KEY = {
   LOGIN_IP: 'auth-login-ip',
-  LOGIN_EMAIL: 'auth-login-email',
+  LOGIN_THROTTLED: 'auth-login-throttled',
   CHANGE_PASSWORD: 'auth-change-password'
 } as const
 
@@ -54,3 +54,11 @@ export const FETCH_SITE_SAME_ORIGIN = ['same-origin', 'none'] as const
 
 export const PASSWORD_CHANGE_MAX_ATTEMPTS = 5
 export const AVATAR_ALLOWED_PROTOCOLS = ['https:']
+
+/**
+ * SEC-A2 : ralentissement progressif par compte, sans blocage dur. Aucun délai jusqu'à 5 échecs
+ * consécutifs ; au-delà, 2^(échecs − 5) secondes, plafonné à 300 s (5 minutes).
+ */
+export const LOGIN_FREE_FAILURES = 5
+export const LOGIN_DELAY_BASE_SECONDS = 2
+export const LOGIN_DELAY_MAX_SECONDS = 300

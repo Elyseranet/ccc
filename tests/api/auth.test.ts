@@ -4,6 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
+import { LOGIN_DELAY_MAX_SECONDS } from '../../server/consts/auth.const'
+import { unlockUser } from '../../server/database/scripts/unlock-user.util'
 import { SessionEntity } from '../../server/database/entities/session.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
 import {
@@ -13,7 +15,6 @@ import type { ISeededUser } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 
 const PASSWORD = 'a-long-enough-password'
-const EMAIL_LIMIT = 5
 
 let dataSource: DataSource
 let participant: ISeededUser
@@ -41,7 +42,6 @@ describe('auth (login, logout, /moi, roles)', async () => {
     env: {
       ...env,
       NODE_ENV: 'production',
-      NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_EMAIL_ATTEMPTS: String(EMAIL_LIMIT),
       NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_IP_ATTEMPTS: '1000'
     }
   })
@@ -118,19 +118,82 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect((await getWith('/api/v1/moi', first)).status).toBe(401)
       expect((await getWith('/api/v1/moi', secondCookie)).status).toBe(200)
     })
+  })
 
-    it('answers 429 with Retry-After after the per-email threshold', async () => {
-      const email = 'bruteforce@ccc.test'
-      const statuses: number[] = []
-      for (let attempt = 0; attempt < EMAIL_LIMIT + 1; attempt += 1) {
-        const response = await login(email, 'wrong-password-wrong')
-        statuses.push(response.status)
-        if (response.status === 429) {
-          expect(response.headers.get('retry-after')).toMatch(/^\d+$/)
-          expect((await response.json()).code).toBe(API_ERROR_CODE.RATE_LIMITED)
-        }
+  describe('login throttle per account (SEC-A2)', () => {
+    const newVictim = (): Promise<ISeededUser> =>
+      seedUser(dataSource, { email: nextEmail(), password: PASSWORD, role: USER_ROLE.PARTICIPANT })
+    const stateOf = (id: string): Promise<UserEntity> =>
+      dataSource.getRepository(UserEntity).findOneByOrFail({ id })
+
+    it('has no delay up to 5 failures, then 2 s; during the delay it answers 429 without checking the password', async () => {
+      const victim = await newVictim()
+      for (let attempt = 1; attempt <= 5; attempt += 1) {
+        expect((await login(victim.email, 'wrong-password-wrong')).status).toBe(401)
       }
-      expect(statuses).toEqual([...Array(EMAIL_LIMIT).fill(401), 429])
+      let state = await stateOf(victim.id)
+      expect(state.failedLoginCount).toBe(5)
+      expect(state.throttledUntil).toBeNull()
+
+      expect((await login(victim.email, 'wrong-password-wrong')).status).toBe(401)
+      state = await stateOf(victim.id)
+      expect(state.failedLoginCount).toBe(6)
+      expect(state.throttledUntil!.getTime() - Date.now()).toBeLessThanOrEqual(2000)
+
+      // Même avec le BON mot de passe : 429, et le compteur ne bouge pas (rien n'a été vérifié).
+      const throttled = await login(victim.email, PASSWORD)
+      expect(throttled.status).toBe(429)
+      expect(Number(throttled.headers.get('retry-after'))).toBeGreaterThanOrEqual(1)
+      expect(Number(throttled.headers.get('retry-after'))).toBeLessThanOrEqual(2)
+      expect((await throttled.json()).code).toBe(API_ERROR_CODE.RATE_LIMITED)
+      expect((await stateOf(victim.id)).failedLoginCount).toBe(6)
+
+      await new Promise((resolve) => setTimeout(resolve, 2300))
+      expect((await login(victim.email, PASSWORD)).status).toBe(200)
+      state = await stateOf(victim.id)
+      expect(state.failedLoginCount).toBe(0)
+      expect(state.throttledUntil).toBeNull()
+    })
+
+    it('never delays more than the 300 s cap', async () => {
+      const victim = await newVictim()
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, { failedLoginCount: 40 })
+      expect((await login(victim.email, 'wrong-password-wrong')).status).toBe(401)
+      const state = await stateOf(victim.id)
+      expect(state.failedLoginCount).toBe(41)
+      const delayMs = state.throttledUntil!.getTime() - Date.now()
+      expect(delayMs).toBeGreaterThan(298_000)
+      expect(delayMs).toBeLessThanOrEqual(LOGIN_DELAY_MAX_SECONDS * 1000)
+    })
+
+    it('a third party failing 10 times does not lock the owner out past the delay', async () => {
+      const victim = await newVictim()
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, { failedLoginCount: 9 })
+      expect((await login(victim.email, 'wrong-password-wrong')).status).toBe(401) // 10e échec : délai de 32 s
+      const state = await stateOf(victim.id)
+      expect(state.failedLoginCount).toBe(10)
+      expect(state.throttledUntil!.getTime() - Date.now()).toBeLessThanOrEqual(32_000)
+
+      expect((await login(victim.email, PASSWORD)).status).toBe(429)
+      // Le délai échu (simulé), le titulaire se connecte sans autre intervention.
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, { throttledUntil: new Date(Date.now() - 1000) })
+      expect((await login(victim.email, PASSWORD)).status).toBe(200)
+    })
+
+    it('user:unlock restores access immediately', async () => {
+      const victim = await newVictim()
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, { failedLoginCount: 11 })
+      expect((await login(victim.email, 'wrong-password-wrong')).status).toBe(401)
+      expect((await login(victim.email, PASSWORD)).status).toBe(429)
+
+      expect(await unlockUser(dataSource, victim.email.toUpperCase())).toBe(true)
+      expect((await login(victim.email, PASSWORD)).status).toBe(200)
+      expect(await unlockUser(dataSource, 'nobody@ccc.test')).toBe(false)
+    })
+
+    it('does not create any state for an unknown email (same 401 as before)', async () => {
+      expect((await login('ghost@ccc.test', 'wrong-password-wrong')).status).toBe(401)
+      expect(await dataSource.getRepository(UserEntity).countBy({ email: 'ghost@ccc.test' })).toBe(0)
     })
   })
 

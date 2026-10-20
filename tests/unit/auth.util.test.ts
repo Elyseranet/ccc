@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { PASSWORD_MIN_LENGTH } from '../../server/consts/auth.const'
+import { LOGIN_DELAY_MAX_SECONDS, PASSWORD_MIN_LENGTH } from '../../server/consts/auth.const'
+import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../server/utils/auth/login-throttle.util'
 import { loginSchema, updateMeSchema } from '../../server/schemas/auth.schema'
 import { isCrossSiteWrite, parseAllowedOrigins } from '../../server/utils/auth/csrf.util'
 import { burnPasswordCheck, hashPassword, verifyPassword } from '../../server/utils/auth/password.util'
@@ -16,6 +17,34 @@ import { requireRole, requireUser } from '../../server/utils/auth/require-role.u
 import { normalizeEmail } from '../../shared/utils/email.util'
 
 const OWN = 'https://ccc.example'
+
+describe('login throttle delay (SEC-A2)', () => {
+  it('has no delay up to 5 failures', () => {
+    for (const failures of [0, 1, 2, 3, 4, 5]) {
+      expect(computeLoginDelaySeconds(failures)).toBe(0)
+    }
+  })
+
+  it('grows as 2^(failures - 5) seconds beyond 5', () => {
+    expect([6, 7, 8, 9, 10, 11].map(computeLoginDelaySeconds)).toEqual([2, 4, 8, 16, 32, 64])
+  })
+
+  it('is capped at 300 s and never exceeds it, however many failures', () => {
+    expect(computeLoginDelaySeconds(13)).toBe(256)
+    expect(computeLoginDelaySeconds(14)).toBe(LOGIN_DELAY_MAX_SECONDS)
+    for (const failures of [15, 50, 1000, 1_000_000]) {
+      expect(computeLoginDelaySeconds(failures)).toBe(LOGIN_DELAY_MAX_SECONDS)
+    }
+    expect(LOGIN_DELAY_MAX_SECONDS).toBe(300)
+  })
+
+  it('reports the remaining delay with an injected clock', () => {
+    const now = new Date('2026-10-20T10:00:00Z')
+    expect(remainingThrottleSeconds(null, now)).toBe(0)
+    expect(remainingThrottleSeconds(new Date(now.getTime() - 1), now)).toBe(0)
+    expect(remainingThrottleSeconds(new Date(now.getTime() + 1500), now)).toBe(2)
+  })
+})
 
 describe('password hashing (scrypt)', () => {
   it('verifies the right password and rejects a wrong one', async () => {

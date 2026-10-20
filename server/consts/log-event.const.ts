@@ -7,6 +7,8 @@ export const LOG_EVENT = {
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   AUTH_LOGIN_SUCCEEDED: 'auth_login_succeeded',
   AUTH_LOGIN_FAILED: 'auth_login_failed',
+  AUTH_LOGIN_THROTTLED: 'auth_login_throttled',
+  AUTH_USER_UNLOCKED: 'auth_user_unlocked',
   AUTH_LOGOUT: 'auth_logout',
   AUTH_PASSWORD_CHANGED: 'auth_password_changed',
   AUTH_CROSS_ORIGIN_REFUSED: 'auth_cross_origin_refused',

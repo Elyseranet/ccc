@@ -25,6 +25,14 @@ export class UserEntity extends UuidPrimaryEntity {
   @Column({ type: 'uuid', nullable: true })
   competitorId!: string | null
 
+  /** SEC-A2 : échecs de connexion consécutifs ; remis à zéro par un succès ou par `user:unlock`. */
+  @Column({ type: 'integer', default: 0 })
+  failedLoginCount!: number
+
+  /** Fin du délai imposé après trop d'échecs ; pendant ce délai le login répond 429 sans vérifier le mot de passe. */
+  @Column({ type: 'timestamptz', nullable: true })
+  throttledUntil!: Date | null
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date
 
