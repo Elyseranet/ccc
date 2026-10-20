@@ -1,9 +1,13 @@
 .git
+.claude
 .nuxt
 .output
 .typeorm-dist
 .data
 .cache
+.nitro
+.idea
+.fleet
 node_modules
 coverage
 dist
@@ -12,3 +16,7 @@ dist
 !.env.example
 *.log
 .DS_Store
+docs/tickets/F-00-captures
+Dockerfile
+docker-compose.yml
+.dockerignore

@@ -23,21 +23,68 @@ Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
 
 ## Docker
 
-La commande suivante construit l'application Nuxt et démarre l'application avec PostgreSQL :
+En local, la commande suivante construit l'image et démarre l'application avec PostgreSQL (le compose de production ne publie aucun port ; `docker-compose.local.yml` publie `APP_PORT`, 3000 par défaut) :
 
 ```sh
-docker compose up --build
+docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
 ```
 
-L'application est disponible sur `http://localhost:3000` et PostgreSQL sur le port configuré par `NUXT_DATABASE_PORT` (5432 par défaut). Les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
+`NUXT_DATABASE_PASSWORD` est obligatoire (dans `.env` ou l'environnement) ; sans lui, Compose refuse de démarrer. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur. Les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
 
 Pour arrêter les conteneurs sans supprimer les données :
 
 ```sh
-docker compose down
+docker compose -f docker-compose.yml -f docker-compose.local.yml down
 ```
 
-Compose ne lance pas de migration au démarrage. Ne pas utiliser `docker compose down -v` sauf si la suppression des données PostgreSQL est intentionnelle.
+Ne pas utiliser `down -v` sauf si la suppression des données PostgreSQL est intentionnelle.
+
+## Déploiement Coolify
+
+L'image (`Dockerfile`) est agnostique de l'environnement : aucune valeur n'est cuite dans l'image, et aucun `.env` n'y entre (`.dockerignore`). Toute la configuration vit dans les variables d'environnement de Coolify (`NUXT_*`, lues à l'exécution via `runtimeConfig`).
+
+Deux modes sont utilisables :
+
+- **Application Dockerfile** : Coolify construit le `Dockerfile` à la racine, et PostgreSQL est une ressource Coolify séparée. Renseigner `NUXT_DATABASE_HOST` avec le nom interne de cette ressource.
+- **Docker Compose** : Coolify utilise `docker-compose.yml` (app + PostgreSQL 16 + volume). Aucun port n'est publié : Coolify route le domaine vers le port 3000 du service `app`.
+
+### Prérequis de release
+
+Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01) : il échoue tant qu'un endpoint de `app/consts/api-sources.const.ts` est en `API_SOURCE.FIXTURE`. Ce script arrive avec F-00 ; tant qu'il n'est pas mergé, le build de l'image échoue avec « Missing script: test:release ». C'est volontaire : il n'y a pas de variable pour désactiver la garde.
+
+### Variables d'environnement
+
+| Variable | Obligatoire | Rôle |
+|---|---|---|
+| `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
+| `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
+| `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
+| `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_*`, `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS`, `NUXT_AUTH_*` | non | Arrivent avec la vague 2 back (B-05, B-08) ; voir `.env.example` après leur intégration. |
+
+Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
+
+### Domaine et sonde de santé
+
+- Le domaine est attribué dans Coolify (service `app`, port 3000).
+- La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
+- La route est soumise au limiteur de débit par IP : derrière Traefik, tous les clients partagent l'IP du proxy tant que T-SEC-02 n'est pas fait (`X-Forwarded-For` de confiance, SSL PostgreSQL, variables `NUXT_TRUSTED_PROXIES` et `NUXT_DATABASE_SSL` pressenties, pas encore implémentées). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
+
+### Première mise en route
+
+1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique `migration:run` avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
+2. Ouvrir le terminal du conteneur dans Coolify, ou `docker exec -it <conteneur> ...`, et lancer les commandes d'exploitation avec `ccc-ops` :
+
+| Commande | Rôle | Disponibilité |
+|---|---|---|
+| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration. | image actuelle |
+| `ccc-ops db:seed:legacy` | Charge les archives brutes du classeur. | image actuelle |
+| `ccc-ops db:import:legacy` | Reprise du classeur vers les entités métier. | B-04 |
+| `ccc-ops user:create-admin` | Crée le premier administrateur. | B-08 |
+| `ccc-ops user:unlock` | Déverrouille un compte. | B-08 |
+
+Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
+
+Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n'est nécessaire ni présent.
 
 ## Développement
 
