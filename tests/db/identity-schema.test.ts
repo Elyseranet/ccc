@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
 import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
 import { CompetitorEntity } from '../../server/database/entities/competitor.entity'
+import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
 import { SessionEntity } from '../../server/database/entities/session.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
 import { cleanup, resetSchema } from './helpers/test-database'
@@ -46,7 +47,8 @@ describe('migration M2', () => {
   })
 
   it('reverts cleanly (tables, FK and enum types) then re-applies', async () => {
-    await dataSource.undoLastMigration() // M3, qui dépend de users
+    await dataSource.undoLastMigration() // M4, qui dépend de users
+    await dataSource.undoLastMigration() // M3
     await dataSource.undoLastMigration() // M2
     expect(await tables()).toEqual([])
     expect(await userForeignKeys()).toEqual([])
@@ -78,11 +80,40 @@ describe('migration M3', () => {
   })
 
   it('reverts then re-applies without touching users', async () => {
-    await dataSource.undoLastMigration()
+    await dataSource.undoLastMigration() // M4
+    await dataSource.undoLastMigration() // M3
     expect(await throttleColumns()).toEqual([])
     expect(await tables()).toEqual(['sessions', 'users'])
     await dataSource.runMigrations()
     expect(await throttleColumns()).toEqual(['failed_login_count', 'throttled_until'])
+  })
+})
+
+describe('migration M4', () => {
+  const deviceTables = async (): Promise<string[]> => {
+    const rows: Array<{ table_name: string }> = await dataSource.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'login_devices'`
+    )
+    return rows.map((row) => row.table_name)
+  }
+
+  it('creates login_devices with a unique nonce and a cascade FK to users', async () => {
+    expect(await deviceTables()).toEqual(['login_devices'])
+    const user = await saveUser('m4@ccc.test')
+    const repository = dataSource.getRepository(LoginDeviceEntity)
+    const expiresAt = new Date(Date.now() + 1000)
+    await repository.insert({ userId: user.id, nonce: 'a'.repeat(32), expiresAt })
+    await expect(repository.insert({ userId: user.id, nonce: 'a'.repeat(32), expiresAt })).rejects.toThrow(/uq_login_devices_nonce/)
+    await dataSource.getRepository(UserEntity).delete({ id: user.id })
+    expect(await repository.countBy({ userId: user.id })).toBe(0)
+  })
+
+  it('reverts then re-applies', async () => {
+    await dataSource.undoLastMigration()
+    expect(await deviceTables()).toEqual([])
+    expect(await tables()).toEqual(['sessions', 'users'])
+    await dataSource.runMigrations()
+    expect(await deviceTables()).toEqual(['login_devices'])
   })
 })
 

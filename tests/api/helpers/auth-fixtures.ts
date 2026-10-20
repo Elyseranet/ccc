@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import type { DataSource } from 'typeorm'
 import { fetch } from '@nuxt/test-utils/e2e'
 import { USER_ROLE, USER_STATUS } from '../../../shared/enums/user.enum'
+import { TEST_DEVICE_COOKIE_SECRET } from './test-database'
 import { CompetitorEntity } from '../../../server/database/entities/competitor.entity'
 import { UserEntity } from '../../../server/database/entities/user.entity'
 import { hashPassword } from '../../../server/utils/auth/password.util'
@@ -75,3 +76,21 @@ export const login = (email: string, password: string, cookie?: string): Promise
 
 export const getWith = (path: string, cookie?: string): Promise<Response> =>
   fetch(path, { headers: cookie ? { Cookie: cookie } : {} })
+
+export const DEVICE_COOKIE = '__Host-ccc_device'
+
+/** Secret HMAC de test du cookie d'appareil (ne protège rien : base et serveur jetables). */
+export const TEST_DEVICE_SECRET = TEST_DEVICE_COOKIE_SECRET
+
+/** `Set-Cookie` brut du cookie d'appareil. */
+export const deviceSetCookieOf = (response: Response): string | undefined =>
+  response.headers.getSetCookie().find((entry) => entry.startsWith(`${DEVICE_COOKIE}=`))
+
+/** Valeur `name=value` du cookie d'appareil, à renvoyer dans `Cookie:`. */
+export const deviceCookieHeaderOf = (response: Response): string => {
+  const raw = deviceSetCookieOf(response)
+  if (!raw) {
+    throw new Error('No device cookie in response')
+  }
+  return raw.split(';')[0]!
+}

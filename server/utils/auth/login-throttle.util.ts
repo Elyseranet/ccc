@@ -1,6 +1,8 @@
-import type { DataSource } from 'typeorm'
+import type { DataSource, EntityTarget } from 'typeorm'
 import { LOGIN_DELAY_BASE_SECONDS, LOGIN_DELAY_MAX_SECONDS, LOGIN_FREE_FAILURES } from '../../consts/auth.const'
+import { LoginDeviceEntity } from '../../database/entities/login-device.entity'
 import { UserEntity } from '../../database/entities/user.entity'
+import type { IThrottleCounters } from '../../interfaces/auth.interface'
 import type { TLoginAttemptReservation } from '../../types/login-attempt-reservation.type'
 
 /** Au-delà de cet exposant, 2^n dépasse largement le plafond : on borne pour éviter un nombre démesuré. */
@@ -35,15 +37,16 @@ export const remainingThrottleSeconds = (throttledUntil: Date | null, now: Date)
  * (les concurrents réévaluent le prédicat après l'attente), sans transaction ni aller-retour de plus.
  * Le délai est calculé en SQL à partir des constantes, passées en paramètres liés.
  */
-export const reserveLoginAttempt = async (
+const reserveAttempt = async (
   dataSource: DataSource,
-  userId: string,
-  now = new Date()
+  entity: EntityTarget<IThrottleCounters>,
+  id: string,
+  now: Date
 ): Promise<TLoginAttemptReservation> => {
-  const repository = dataSource.getRepository(UserEntity)
+  const repository = dataSource.getRepository(entity)
   const result = await dataSource
     .createQueryBuilder()
-    .update(UserEntity)
+    .update(entity)
     .set({
       failedLoginCount: () => '"failed_login_count" + 1',
       throttledUntil: () => `CASE WHEN "failed_login_count" + 1 > :free
@@ -51,7 +54,7 @@ export const reserveLoginAttempt = async (
           POWER(CAST(:base AS double precision), LEAST("failed_login_count" + 1 - :free, :maxExponent))))
         ELSE NULL END`
     })
-    .where('id = :id AND ("throttled_until" IS NULL OR "throttled_until" <= CAST(:now AS timestamptz))', { id: userId })
+    .where('id = :id AND ("throttled_until" IS NULL OR "throttled_until" <= CAST(:now AS timestamptz))', { id })
     .setParameters({
       now: now.toISOString(),
       free: LOGIN_FREE_FAILURES,
@@ -66,6 +69,17 @@ export const reserveLoginAttempt = async (
   if (rows.length > 0) {
     return { reserved: true, failedCount: Number(rows[0]!.failed_login_count) }
   }
-  const current = await repository.findOne({ where: { id: userId }, select: { id: true, throttledUntil: true } })
+  const current = await repository.createQueryBuilder('counter')
+    .select('counter.throttledUntil', 'throttledUntil')
+    .where('counter.id = :id', { id })
+    .getRawOne<{ throttledUntil: Date | null }>()
   return { reserved: false, retryAfterSeconds: Math.max(1, remainingThrottleSeconds(current?.throttledUntil ?? null, now)) }
 }
+
+/** Réservation sur le compteur du COMPTE (client non reconnu). */
+export const reserveLoginAttempt = (dataSource: DataSource, userId: string, now = new Date()): Promise<TLoginAttemptReservation> =>
+  reserveAttempt(dataSource, UserEntity, userId, now)
+
+/** Réservation sur le compteur propre à un APPAREIL de confiance (SEC-A4), indépendant de celui du compte. */
+export const reserveDeviceLoginAttempt = (dataSource: DataSource, deviceId: string, now = new Date()): Promise<TLoginAttemptReservation> =>
+  reserveAttempt(dataSource, LoginDeviceEntity, deviceId, now)

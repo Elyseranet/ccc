@@ -2,12 +2,20 @@ import { getCookie, setCookie, setResponseHeader } from 'h3'
 import { USER_STATUS } from '../../../../shared/enums/user.enum'
 import type { IMe } from '../../../../shared/interfaces/api/me.interface'
 import { normalizeEmail } from '../../../../shared/utils/email.util'
-import { RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../consts/auth.const'
+import { PRODUCTION_NODE_ENV, RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../consts/auth.const'
 import { LOG_EVENT } from '../../../consts/log-event.const'
 import { UserEntity } from '../../../database/entities/user.entity'
 import { loginSchema } from '../../../schemas/auth.schema'
+import {
+  buildDeviceCookieOptions,
+  getDeviceCookieName,
+  resolveDeviceCookieSecret,
+  signDeviceCookie,
+  verifyDeviceCookie
+} from '../../../utils/auth/device-cookie.util'
+import { findTrustedDevice, registerDevice, resetDeviceFailures } from '../../../utils/auth/device-store.util'
 import { enforceLoginRateLimit, rejectTooManyRequests } from '../../../utils/auth/login-rate-limit.util'
-import { reserveLoginAttempt } from '../../../utils/auth/login-throttle.util'
+import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../../utils/auth/login-throttle.util'
 import { loadMe } from '../../../utils/auth/me.util'
 import { burnPasswordCheck, verifyPassword } from '../../../utils/auth/password.util'
 import { createSession, purgeExpiredSessions, revokeSessionByToken } from '../../../utils/auth/session-store.util'
@@ -23,19 +31,35 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   const body = await readBodyWithSchema(event, loginSchema)
   const email = normalizeEmail(body.email)
 
+  const isProduction = process.env.NODE_ENV === PRODUCTION_NODE_ENV
+  const deviceSecret = resolveDeviceCookieSecret(String(useRuntimeConfig().auth.deviceCookieSecret))
+  const now = new Date()
+
   const dataSource = await useDataSource()
   const user = await dataSource.getRepository(UserEntity).findOne({
     where: { email },
     select: { id: true, status: true, passwordHash: true }
   })
 
-  // SEC-A2 : la tentative est réservée atomiquement AVANT scrypt. Pendant le délai du compte (ou si une
-  // tentative concurrente a déjà pris la place), 429 sans vérifier le mot de passe. La réservation compte
-  // la tentative comme un échec ; seul un succès remet le compteur à zéro.
+  // SEC-A4 : un appareil de confiance (cookie signé, lié à CE compte, ligne encore présente) n'est pas soumis
+  // au délai du compte et n'a que son propre compteur. Tout le reste est « non reconnu ».
+  const claim = verifyDeviceCookie(getCookie(event, getDeviceCookieName(isProduction)), deviceSecret, Math.floor(now.getTime() / 1000))
+  const trustedDevice = user && claim ? await findTrustedDevice(dataSource, claim, user.id, now) : null
+
+  // SEC-A2 : la tentative est réservée atomiquement AVANT scrypt, sur le compteur de l'appareil de confiance
+  // ou, à défaut, sur celui du compte. Pendant le délai (ou si une tentative concurrente a déjà pris la place),
+  // 429 sans vérifier le mot de passe. La réservation compte la tentative comme un échec ; seul un succès
+  // remet le compteur à zéro.
   if (user) {
-    const reservation = await reserveLoginAttempt(dataSource, user.id)
+    const reservation = trustedDevice
+      ? await reserveDeviceLoginAttempt(dataSource, trustedDevice.id, now)
+      : await reserveLoginAttempt(dataSource, user.id, now)
     if (!reservation.reserved) {
-      logger.warn(LOG_EVENT.AUTH_LOGIN_THROTTLED, { requestId: event.context.requestId, userId: user.id })
+      logger.warn(LOG_EVENT.AUTH_LOGIN_THROTTLED, {
+        requestId: event.context.requestId,
+        userId: user.id,
+        trustedDevice: trustedDevice !== null
+      })
       rejectTooManyRequests(event, RATE_LIMIT_AUTH_ROUTE_KEY.LOGIN_THROTTLED, reservation.retryAfterSeconds * 1000)
     }
   }
@@ -54,18 +78,26 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   }
 
   // Rotation : une session présentée avec la requête est révoquée, le jeton émis est toujours neuf.
-  const previousToken = getCookie(event, getSessionCookieName(process.env.NODE_ENV === 'production'))
+  const previousToken = getCookie(event, getSessionCookieName(isProduction))
   if (isWellFormedSessionToken(previousToken)) {
     await revokeSessionByToken(dataSource, previousToken)
   }
   const token = await createSession(dataSource, user.id)
   await dataSource.getRepository(UserEntity).update(
     { id: user.id },
-    { lastLoginAt: new Date(), failedLoginCount: 0, throttledUntil: null }
+    { lastLoginAt: now, failedLoginCount: 0, throttledUntil: null }
   )
   await purgeExpiredSessions(dataSource)
+  setCookie(event, getSessionCookieName(isProduction), token, buildSessionCookieOptions(isProduction))
 
-  setCookie(event, getSessionCookieName(process.env.NODE_ENV === 'production'), token, buildSessionCookieOptions(process.env.NODE_ENV === 'production'))
-  logger.info(LOG_EVENT.AUTH_LOGIN_SUCCEEDED, { requestId: event.context.requestId, userId: user.id })
+  // Appareil déjà reconnu : son compteur repart de zéro. Sinon, l'appareil devient de confiance.
+  if (trustedDevice) {
+    await resetDeviceFailures(dataSource, trustedDevice.id)
+  } else {
+    const device = await registerDevice(dataSource, user.id, now)
+    setCookie(event, getDeviceCookieName(isProduction), signDeviceCookie(device, deviceSecret), buildDeviceCookieOptions(isProduction))
+  }
+
+  logger.info(LOG_EVENT.AUTH_LOGIN_SUCCEEDED, { requestId: event.context.requestId, userId: user.id, trustedDevice: trustedDevice !== null })
   return loadMe(dataSource, user.id)
 })

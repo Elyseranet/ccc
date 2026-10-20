@@ -5,17 +5,21 @@ import type { DataSource } from 'typeorm'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
 import { LOGIN_DELAY_MAX_SECONDS } from '../../server/consts/auth.const'
+import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
+import { generateDeviceNonce, signDeviceCookie } from '../../server/utils/auth/device-cookie.util'
 import { unlockUser } from '../../server/database/scripts/unlock-user.util'
 import { SessionEntity } from '../../server/database/entities/session.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
 import {
-  cookieHeaderOf, getWith, jsonPatch, jsonPost, login, resetTestDatabase, seedUser, setCookieOf
+  cookieHeaderOf, deviceCookieHeaderOf, deviceSetCookieOf, getWith, jsonPatch, jsonPost, login, resetTestDatabase, seedUser, setCookieOf,
+  TEST_DEVICE_SECRET
 } from './helpers/auth-fixtures'
 import type { ISeededUser } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const PASSWORD = 'a-long-enough-password'
+const DEVICE = '__Host-ccc_device'
 
 let dataSource: DataSource
 let participant: ISeededUser
@@ -44,6 +48,7 @@ describe('auth (login, logout, /moi, roles)', async () => {
     env: {
       ...env,
       NODE_ENV: 'production',
+      NUXT_AUTH_DEVICE_COOKIE_SECRET: TEST_DEVICE_SECRET,
       NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_IP_ATTEMPTS: '1000'
     }
   })
@@ -217,6 +222,130 @@ describe('auth (login, logout, /moi, roles)', async () => {
     it('does not create any state for an unknown email (same 401 as before)', async () => {
       expect((await login('ghost@ccc.test', 'wrong-password-wrong')).status).toBe(401)
       expect(await dataSource.getRepository(UserEntity).countBy({ email: 'ghost@ccc.test' })).toBe(0)
+    })
+  })
+
+  describe('trusted device cookie (SEC-A4)', () => {
+    const WRONG = 'wrong-password-wrong'
+    const newOwner = (): Promise<ISeededUser> =>
+      seedUser(dataSource, { email: nextEmail(), password: PASSWORD, role: USER_ROLE.PARTICIPANT })
+    const deviceOf = async (owner: ISeededUser): Promise<{ cookie: string, raw: string }> => {
+      const response = await login(owner.email, PASSWORD)
+      return { cookie: deviceCookieHeaderOf(response), raw: deviceSetCookieOf(response)! }
+    }
+    const accountOf = (id: string): Promise<UserEntity> => dataSource.getRepository(UserEntity).findOneByOrFail({ id })
+    const throttleAccount = (id: string): Promise<unknown> =>
+      dataSource.getRepository(UserEntity).update({ id }, { failedLoginCount: 8, throttledUntil: new Date(Date.now() + 60_000) })
+
+    it('is issued after a successful login: HttpOnly, SameSite=Lax, Secure, __Host-, 90 days, no Domain', async () => {
+      const owner = await newOwner()
+      const { raw } = await deviceOf(owner)
+      expect(raw).toMatch(/HttpOnly/i)
+      expect(raw).toMatch(/SameSite=Lax/i)
+      expect(raw).toMatch(/Secure/i)
+      expect(raw).toMatch(/Path=\//)
+      expect(raw).not.toMatch(/Domain=/i)
+      expect(raw).toMatch(/Max-Age=7776000/)
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(1)
+    })
+
+    it('is not issued after a failed login', async () => {
+      const owner = await newOwner()
+      expect(deviceSetCookieOf(await login(owner.email, WRONG))).toBeUndefined()
+    })
+
+    it('an attacker without cookie chains failures; the owner with the device cookie logs in at once', async () => {
+      const owner = await newOwner()
+      const { cookie } = await deviceOf(owner)
+
+      for (let attempt = 1; attempt <= 6; attempt += 1) {
+        expect((await login(owner.email, WRONG)).status).toBe(401)
+      }
+      // L'attaquant est maintenant ralenti : même le bon mot de passe, sans cookie, reçoit 429.
+      expect((await login(owner.email, PASSWORD)).status).toBe(429)
+      expect((await accountOf(owner.id)).failedLoginCount).toBe(6)
+
+      // Le titulaire, muni de son cookie, n'attend pas.
+      const response = await login(owner.email, PASSWORD, cookie)
+      expect(response.status).toBe(200)
+    })
+
+    it.each([
+      ['forged signature', (owner: ISeededUser) => `${DEVICE}=${Buffer.from(JSON.stringify({ u: owner.id, n: 'a'.repeat(32), e: 4_102_444_800 })).toString('base64url')}.${'A'.repeat(43)}`],
+      ['signed for another account', (owner: ISeededUser, other: ISeededUser) => `${DEVICE}=${signDeviceCookie({ userId: other.id, nonce: generateDeviceNonce(), expiresAt: 4_102_444_800 }, TEST_DEVICE_SECRET)}`],
+      ['expired', (owner: ISeededUser) => `${DEVICE}=${signDeviceCookie({ userId: owner.id, nonce: generateDeviceNonce(), expiresAt: 1_000_000_000 }, TEST_DEVICE_SECRET)}`]
+    ])('a %s device cookie is "unrecognised": the account delay still applies', async (_label, build) => {
+      const owner = await newOwner()
+      const other = await newOwner()
+      await throttleAccount(owner.id)
+      const response = await login(owner.email, PASSWORD, build(owner, other))
+      expect(response.status).toBe(429)
+    })
+
+    it('a valid cookie that belongs to another account does not bypass the delay either', async () => {
+      const owner = await newOwner()
+      const stranger = await newOwner()
+      const { cookie } = await deviceOf(stranger)
+      await throttleAccount(owner.id)
+      expect((await login(owner.email, PASSWORD, cookie)).status).toBe(429)
+    })
+
+    it('a revoked device (row removed) is unrecognised; so is a row that has expired in database', async () => {
+      const owner = await newOwner()
+      const { cookie } = await deviceOf(owner)
+      await throttleAccount(owner.id)
+
+      await dataSource.getRepository(LoginDeviceEntity).update({ userId: owner.id }, { expiresAt: new Date(Date.now() - 1000) })
+      expect((await login(owner.email, PASSWORD, cookie)).status).toBe(429)
+
+      await dataSource.getRepository(LoginDeviceEntity).delete({ userId: owner.id })
+      expect((await login(owner.email, PASSWORD, cookie)).status).toBe(429)
+    })
+
+    it('a trusted device that fails itself is slowed on its own counter, not on the account', async () => {
+      const owner = await newOwner()
+      const { cookie } = await deviceOf(owner)
+      for (let attempt = 1; attempt <= 6; attempt += 1) {
+        expect((await login(owner.email, WRONG, cookie)).status).toBe(401)
+      }
+      // Compteur de l'appareil : 6 échecs, donc ralenti, même avec le bon mot de passe.
+      const slowed = await login(owner.email, PASSWORD, cookie)
+      expect(slowed.status).toBe(429)
+      expect(Number(slowed.headers.get('retry-after'))).toBeGreaterThanOrEqual(1)
+      const device = await dataSource.getRepository(LoginDeviceEntity).findOneByOrFail({ userId: owner.id })
+      expect(device.failedLoginCount).toBe(6)
+      // Le compteur du compte n'a pas bougé : un client non reconnu n'est pas ralenti par cet appareil.
+      expect((await accountOf(owner.id)).failedLoginCount).toBe(0)
+      expect((await login(owner.email, PASSWORD)).status).toBe(200)
+    })
+
+    it('a successful login on a trusted device resets its own counter', async () => {
+      const owner = await newOwner()
+      const { cookie } = await deviceOf(owner)
+      expect((await login(owner.email, WRONG, cookie)).status).toBe(401)
+      expect((await login(owner.email, PASSWORD, cookie)).status).toBe(200)
+      const device = await dataSource.getRepository(LoginDeviceEntity).findOneByOrFail({ userId: owner.id })
+      expect(device.failedLoginCount).toBe(0)
+    })
+
+    it('user:unlock purges the account devices: their cookies are no longer recognised', async () => {
+      const owner = await newOwner()
+      const { cookie } = await deviceOf(owner)
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(1)
+
+      expect(await unlockUser(dataSource, owner.email)).toBe(true)
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(0)
+
+      await throttleAccount(owner.id)
+      expect((await login(owner.email, PASSWORD, cookie)).status).toBe(429)
+    })
+
+    it('keeps at most 20 devices per account', async () => {
+      const owner = await newOwner()
+      for (let index = 0; index < 22; index += 1) {
+        await login(owner.email, PASSWORD)
+      }
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(20)
     })
   })
 

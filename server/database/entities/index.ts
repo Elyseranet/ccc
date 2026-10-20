@@ -5,6 +5,7 @@ import { DrawEntity } from './draw.entity.js'
 import { EditionEntity } from './edition.entity.js'
 import { LegacyWorkbookImportEntity } from './legacy-workbook-import.entity.js'
 import { LegacyWorkbookRowEntity } from './legacy-workbook-row.entity.js'
+import { LoginDeviceEntity } from './login-device.entity.js'
 import { MatchSideEntity } from './match-side.entity.js'
 import { MatchEntity } from './match.entity.js'
 import { ParticipationEntity } from './participation.entity.js'
@@ -31,5 +32,6 @@ export const ENTITIES = [
   DrawEntity,
   DrawAssignmentEntity,
   UserEntity,
-  SessionEntity
+  SessionEntity,
+  LoginDeviceEntity
 ]

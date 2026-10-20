@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { LOGIN_DELAY_MAX_SECONDS, PASSWORD_MIN_LENGTH } from '../../server/consts/auth.const'
+import {
+  buildDeviceCookieOptions,
+  generateDeviceNonce,
+  getDeviceCookieName,
+  resolveDeviceCookieSecret,
+  signDeviceCookie,
+  verifyDeviceCookie
+} from '../../server/utils/auth/device-cookie.util'
 import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../server/utils/auth/login-throttle.util'
 import { loginSchema, updateMeSchema } from '../../server/schemas/auth.schema'
 import { isCrossSiteWrite, parseAllowedOrigins } from '../../server/utils/auth/csrf.util'
@@ -157,6 +165,52 @@ describe('schemas', () => {
     expect(updateMeSchema.safeParse({ currentPassword: 'old' }).success).toBe(false)
     expect(updateMeSchema.safeParse({ currentPassword: 'old', newPassword: 'a'.repeat(PASSWORD_MIN_LENGTH - 1) }).success).toBe(false)
     expect(updateMeSchema.safeParse({ currentPassword: 'old', newPassword: 'a'.repeat(PASSWORD_MIN_LENGTH) }).success).toBe(true)
+  })
+})
+
+describe('device cookie (SEC-A4)', () => {
+  const SECRET = 'unit-test-device-secret-unit-test-device-secret'
+  const NOW = 1_800_000_000
+  const userId = '11111111-1111-4111-8111-111111111111'
+  const payload = { userId, nonce: generateDeviceNonce(), expiresAt: NOW + 3600 }
+
+  it('round-trips a signed payload bound to the account', () => {
+    expect(verifyDeviceCookie(signDeviceCookie(payload, SECRET), SECRET, NOW)).toEqual(payload)
+  })
+
+  it('treats a forged signature, a wrong secret or a tampered body as unrecognised', () => {
+    const cookie = signDeviceCookie(payload, SECRET)
+    expect(verifyDeviceCookie(cookie, 'another-secret-another-secret-another!', NOW)).toBeNull()
+    expect(verifyDeviceCookie(`${cookie.split('.')[0]}.${'A'.repeat(43)}`, SECRET, NOW)).toBeNull()
+    const forgedBody = Buffer.from(JSON.stringify({ u: '22222222-2222-4222-8222-222222222222', n: payload.nonce, e: payload.expiresAt })).toString('base64url')
+    expect(verifyDeviceCookie(`${forgedBody}.${cookie.split('.')[1]}`, SECRET, NOW)).toBeNull()
+  })
+
+  it('treats an expired cookie as unrecognised', () => {
+    const cookie = signDeviceCookie(payload, SECRET)
+    expect(verifyDeviceCookie(cookie, SECRET, payload.expiresAt - 1)).not.toBeNull()
+    expect(verifyDeviceCookie(cookie, SECRET, payload.expiresAt)).toBeNull()
+  })
+
+  it('treats garbage as unrecognised without throwing', () => {
+    for (const value of [undefined, '', 'x', 'a.b.c', '.', 'e30.e30']) {
+      expect(verifyDeviceCookie(value, SECRET, NOW)).toBeNull()
+    }
+  })
+
+  it('requires a 32+ character secret in production and falls back to an ephemeral one elsewhere', () => {
+    expect(() => resolveDeviceCookieSecret('', 'production')).toThrow(/NUXT_AUTH_DEVICE_COOKIE_SECRET/)
+    expect(() => resolveDeviceCookieSecret('too-short', 'production')).toThrow()
+    expect(resolveDeviceCookieSecret(SECRET, 'production')).toBe(SECRET)
+    expect(resolveDeviceCookieSecret('', 'development').length).toBeGreaterThanOrEqual(32)
+    expect(resolveDeviceCookieSecret('', 'development')).toBe(resolveDeviceCookieSecret('', 'test'))
+  })
+
+  it('cookie: __Host- prefix and Secure in production, HttpOnly, SameSite=Lax, 90 days', () => {
+    expect(getDeviceCookieName(true)).toBe('__Host-ccc_device')
+    expect(getDeviceCookieName(false)).toBe('ccc_device')
+    expect(buildDeviceCookieOptions(true)).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 90 * 24 * 3600 })
+    expect(buildDeviceCookieOptions(false).secure).toBe(false)
   })
 })
 

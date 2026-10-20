@@ -3,8 +3,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
 import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
 import { LOGIN_DELAY_MAX_SECONDS } from '../../server/consts/auth.const'
+import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
-import { reserveLoginAttempt } from '../../server/utils/auth/login-throttle.util'
+import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../server/utils/auth/login-throttle.util'
 import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource
@@ -72,6 +73,21 @@ describe('reserveLoginAttempt (injected clock)', () => {
     expect(results.filter((result) => result.reserved)).toHaveLength(1)
     expect(results.filter((result) => !result.reserved)).toHaveLength(PARALLEL - 1)
     expect((await stored(id)).failedLoginCount).toBe(6)
+  })
+
+  it('device counter is independent from the account counter, with the same rules and the same concurrency guarantee', async () => {
+    const userId = await newUser()
+    const device = await dataSource.getRepository(LoginDeviceEntity).save({
+      userId, nonce: 'b'.repeat(32), expiresAt: new Date(T0.getTime() + 86_400_000), failedLoginCount: 5
+    })
+    const results = await Promise.all(Array.from({ length: PARALLEL }, () => reserveDeviceLoginAttempt(dataSource, device.id, T0)))
+    expect(results.filter((result) => result.reserved)).toHaveLength(1)
+    const storedDevice = await dataSource.getRepository(LoginDeviceEntity).findOneByOrFail({ id: device.id })
+    expect(storedDevice.failedLoginCount).toBe(6)
+    expect(storedDevice.throttledUntil!.getTime() - T0.getTime()).toBe(2000)
+    // Le compteur du compte n'a pas bougé.
+    expect((await stored(userId)).failedLoginCount).toBe(0)
+    expect((await stored(userId)).throttledUntil).toBeNull()
   })
 
   it('concurrency: before the free threshold every simultaneous attempt is counted', async () => {

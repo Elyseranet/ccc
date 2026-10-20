@@ -42,6 +42,8 @@ export default defineNuxtConfig({
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
     auth: {
       allowedOrigins: '',
+      // Secret HMAC du cookie d'appareil (NUXT_AUTH_DEVICE_COOKIE_SECRET), 32 caractères minimum, requis en production.
+      deviceCookieSecret: '',
       loginRateLimit: {
         windowMs: 900000,
         maxIpAttempts: 20,

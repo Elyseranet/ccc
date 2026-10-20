@@ -62,3 +62,17 @@ export const AVATAR_ALLOWED_PROTOCOLS = ['https:']
 export const LOGIN_FREE_FAILURES = 5
 export const LOGIN_DELAY_BASE_SECONDS = 2
 export const LOGIN_DELAY_MAX_SECONDS = 300
+
+/**
+ * SEC-A4 : cookie d'appareil de confiance (OWASP « Slow Down Online Guessing Attacks with Device Cookies »,
+ * https://community.owasp.org/Slow_Down_Online_Guessing_Attacks_with_Device_Cookies).
+ * Signé HMAC-SHA256, lié au compte, valable 90 jours. Un appareil reconnu a son propre compteur d'échecs.
+ */
+export const DEVICE_COOKIE_NAME = 'ccc_device'
+export const DEVICE_COOKIE_NAME_PRODUCTION = `__Host-${DEVICE_COOKIE_NAME}`
+export const DEVICE_COOKIE_TTL_SECONDS = 90 * 24 * 60 * 60
+export const DEVICE_NONCE_BYTES = 16
+export const DEVICE_SECRET_MIN_LENGTH = 32
+export const MAX_DEVICES_PER_USER = 20
+export const DEVICE_COOKIE_SEPARATOR = '.'
+export const PRODUCTION_NODE_ENV = 'production'

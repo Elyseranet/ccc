@@ -25,3 +25,16 @@ export interface ICrossSiteInput {
   allowedOrigins: string[]
 }
 
+/** Compteur d'échecs commun au compte et à l'appareil de confiance. */
+export interface IThrottleCounters {
+  failedLoginCount: number
+  throttledUntil: Date | null
+}
+
+/** Contenu signé du cookie d'appareil : compte, nonce (identifiant de l'appareil), expiration en secondes epoch. */
+export interface IDeviceCookiePayload {
+  userId: string
+  nonce: string
+  expiresAt: number
+}
+
