@@ -31,6 +31,9 @@ export const forbidden = (message = API_ERROR_MESSAGE.FORBIDDEN): H3Error =>
 export const notFound = (message = API_ERROR_MESSAGE.NOT_FOUND): H3Error =>
   buildError(404, API_ERROR_CODE.NOT_FOUND, message)
 
+export const competitorNotFound = (): H3Error =>
+  buildError(404, API_ERROR_CODE.COMPETITOR_NOT_FOUND, API_ERROR_MESSAGE.COMPETITOR_NOT_FOUND)
+
 export const conflict = (message = API_ERROR_MESSAGE.CONFLICT, details?: TApiErrorDetails): H3Error =>
   buildError(409, API_ERROR_CODE.CONFLICT, message, details)
 

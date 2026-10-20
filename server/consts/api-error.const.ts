@@ -9,6 +9,7 @@ export const API_ERROR_MESSAGE = {
   UNAUTHORIZED: 'Authentication required',
   FORBIDDEN: 'Forbidden',
   NOT_FOUND: 'Resource not found',
+  COMPETITOR_NOT_FOUND: 'Competitor not found',
   ROUTE_NOT_FOUND: 'Route not found',
   CONFLICT: 'Conflict',
   GONE: 'Resource is no longer available',
