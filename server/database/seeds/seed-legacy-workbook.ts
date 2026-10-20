@@ -1,23 +1,23 @@
 import 'reflect-metadata'
-import { readFile } from 'node:fs/promises'
+import { readFile, stat } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import dataSource from '../data-source.js'
 import { LegacyWorkbookImportEntity } from '../entities/legacy-workbook-import.entity.js'
 import { LegacyWorkbookRowEntity } from '../entities/legacy-workbook-row.entity.js'
 import { LOG_EVENT } from '../../consts/log-event.const.js'
 import { logger } from '../../utils/logger.util.js'
+import { assertSnapshotShape, assertSnapshotSize } from '../../utils/legacy/legacy-snapshot-guard.util.js'
 import type { ILegacyWorkbookSnapshot, ILegacyWorkbookSheetMetadata } from '../interfaces/legacy-workbook.interface.js'
 
 const BATCH_SIZE = 250
 
 const readSnapshot = async (): Promise<ILegacyWorkbookSnapshot> => {
   const snapshotPath = resolve(process.cwd(), 'server/database/seeds/data/ccc-workbook.json')
+  assertSnapshotSize((await stat(snapshotPath)).size)
   const serializedSnapshot = await readFile(snapshotPath, 'utf8')
   const snapshot = JSON.parse(serializedSnapshot) as ILegacyWorkbookSnapshot
 
-  if (snapshot.formatVersion !== 1 || !/^[a-f0-9]{64}$/.test(snapshot.sourceSha256) || !Array.isArray(snapshot.sheets)) {
-    throw new Error('Le snapshot du classeur historique est invalide.')
-  }
+  assertSnapshotShape(snapshot)
 
   return snapshot
 }

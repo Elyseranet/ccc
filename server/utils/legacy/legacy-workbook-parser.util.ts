@@ -39,6 +39,7 @@ import type { TLegacyCell, TLegacyIdentityMapEntry } from '../../types/legacy-im
 import { targetScore, validateScore } from '../match/score-rules.util.js'
 import { computeParticipationPoints, computeParticipationPointsCents } from '../scoring/points.util.js'
 import { toCents } from '../ranking/ranking.util.js'
+import { parseIdentityMap } from './legacy-identity-map.util.js'
 import { LegacyImportError } from './legacy-import-error.util.js'
 
 const fail = (code: LEGACY_IMPORT_ERROR_CODE, message: string, details: string[] = []): never => {
@@ -225,7 +226,10 @@ function parseRoundLabel(label: string, legacyCode: string): IParsedLabel {
   if (pool) {
     return { kind: ROUND_KIND.POOLS, poolRank: Number(pool[1]) }
   }
-  const kind = LEGACY_ROUND_KIND_BY_LABEL[label as LEGACY_ROUND_LABEL]
+  // hasOwn : « constructor » ou « __proto__ » ne doivent pas franchir le garde via le prototype.
+  const kind = Object.hasOwn(LEGACY_ROUND_KIND_BY_LABEL, label)
+    ? LEGACY_ROUND_KIND_BY_LABEL[label as LEGACY_ROUND_LABEL]
+    : undefined
   if (kind === undefined) {
     return fail(LEGACY_IMPORT_ERROR_CODE.SOURCE_INVALID, `Libellé de tour inconnu : « ${label} » (${legacyCode})`)
   }
@@ -270,7 +274,7 @@ export function parseLegacyWorkbook(input: ILegacyParserInput): ILegacyDomainPla
   const editionByCode = new Map(editions.map((edition) => [edition.code, edition]))
   const { players, points } = parsePlayers(dataRows, editions)
   const dataNames = new Set(players.map((player) => player.name))
-  const identity = indexIdentityMap(input.identityMap, dataNames)
+  const identity = indexIdentityMap(parseIdentityMap(input.identityMap), dataNames)
   const scores = parseScores(input.scoresRows, new Set(editionByCode.keys()))
 
   // Résolution des identités : graphie exacte de Data, sinon fichier de correspondance, sinon refus.

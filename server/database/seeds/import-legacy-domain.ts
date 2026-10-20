@@ -6,18 +6,14 @@ import { LOG_EVENT } from '../../consts/log-event.const.js'
 import { LEGACY_IMPORT_ERROR_CODE } from '../../enums/legacy-import.enum.js'
 import type { ILegacyImportReport } from '../../interfaces/legacy-import.interface.js'
 import type { TLegacyIdentityMapEntry } from '../../types/legacy-import.type.js'
+import { parseIdentityMap } from '../../utils/legacy/legacy-identity-map.util.js'
 import { LegacyImportError } from '../../utils/legacy/legacy-import-error.util.js'
 import { logger } from '../../utils/logger.util.js'
 import dataSource from '../data-source.js'
 import { importLegacyDomain } from './legacy-domain-importer.js'
 
-const readIdentityMap = async (): Promise<TLegacyIdentityMapEntry[]> => {
-  const parsed: unknown = JSON.parse(await readFile(resolve(process.cwd(), LEGACY_IDENTITY_MAP_PATH), 'utf8'))
-  if (!Array.isArray(parsed)) {
-    throw new LegacyImportError(LEGACY_IMPORT_ERROR_CODE.IDENTITY_MAP_INVALID, 'Le fichier de correspondance doit être un tableau')
-  }
-  return parsed as TLegacyIdentityMapEntry[]
-}
+const readIdentityMap = async (): Promise<TLegacyIdentityMapEntry[]> =>
+  parseIdentityMap(JSON.parse(await readFile(resolve(process.cwd(), LEGACY_IDENTITY_MAP_PATH), 'utf8')))
 
 const writeReport = async (report: ILegacyImportReport): Promise<string> => {
   const reportPath = resolve(process.cwd(), LEGACY_REPORT_PATH)

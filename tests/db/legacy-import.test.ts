@@ -232,6 +232,17 @@ describe('reprise legacy : rejouable et sûre', () => {
     }
   })
 
+  it('échoue sans rien écrire si le fichier de correspondance a une clé inattendue', async () => {
+    await loadArchive()
+    const tampered = [...identityMap(), { alias: 'Zed', create: true, extra: 1 }] as never
+    const failure = await importLegacyDomain(dataSource, tampered).catch((error: unknown) => error)
+
+    expect((failure as LegacyImportError).code).toBe(LEGACY_IMPORT_ERROR_CODE.IDENTITY_MAP_INVALID)
+    for (const table of DOMAIN_TABLES) {
+      expect(await count(table)).toBe(0)
+    }
+  })
+
   it('annule la transaction, rapport à l appui, si les classements diffèrent du classeur', async () => {
     // Une cellule Data modifiée sans que la colonne J suive : le classeur et la base divergent.
     await loadArchive((sheet, rowNumber, values) => {

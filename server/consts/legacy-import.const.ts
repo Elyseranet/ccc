@@ -81,3 +81,13 @@ export const NOTE_MERGED_ALIAS =
   'Compétiteur fusionné par A5 : la colonne F du classeur (COUNTIF sur le nom) ne compte pas la graphie fusionnée'
 export const NOTE_FLOAT_TIE =
   'Égalité exacte en centièmes, départagée par le bruit flottant de RANK dans le classeur (somme 8,760000000000002 contre 8,76)'
+
+/**
+ * Plafonds du snapshot du classeur, vérifiés avant toute écriture. Mesures au 2026-10-20 : 3 036 032 octets,
+ * 15 feuilles, 1 431 lignes au plus (onglet `scores`). Marges : 20 Mo (environ 6,6 fois), 30 feuilles (2 fois),
+ * 5 000 lignes par feuille (environ 3,5 fois) ; assez larges pour un classeur qui grandit, trop étroits pour un
+ * fichier détourné.
+ */
+export const LEGACY_SNAPSHOT_MAX_BYTES = 20 * 1024 * 1024
+export const LEGACY_SNAPSHOT_MAX_SHEETS = 30
+export const LEGACY_SNAPSHOT_MAX_ROWS_PER_SHEET = 5000

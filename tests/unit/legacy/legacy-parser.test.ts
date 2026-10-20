@@ -191,8 +191,35 @@ describe('parseLegacyWorkbook : source incohérente', () => {
     badLabel[1] = 'Poulpe'
     expect(importError(() => run(patch(badLabel))).code).toBe(LEGACY_IMPORT_ERROR_CODE.SOURCE_INVALID)
 
+    for (const label of ['constructor', '__proto__', 'toString']) {
+      const proto = [...firstNamed.values]
+      proto[1] = label
+      const error = importError(() => run(patch(proto)))
+      expect(error.code).toBe(LEGACY_IMPORT_ERROR_CODE.SOURCE_INVALID)
+      expect(error.message).toContain('Libellé de tour inconnu')
+    }
+
     const self = [...firstNamed.values]
     self[4] = self[2]!
     expect(importError(() => run(patch(self))).code).toBe(LEGACY_IMPORT_ERROR_CODE.SOURCE_INVALID)
+  })
+})
+
+describe('parseLegacyWorkbook : forme du fichier de correspondance', () => {
+  it.each([
+    ['une clé en trop', { alias: 'Marion Cobra', create: true, extra: 1 }],
+    ['un alias qui n est pas une chaîne', { alias: 42, create: true }],
+    ['un alias vide', { alias: '', create: true }],
+    ['un competitor qui n est pas une chaîne', { alias: 'Z', competitor: 3 }],
+    ['create: false', { alias: 'Z', create: false }],
+    ['competitor et create ensemble', { alias: 'Z', competitor: 'Arthur Vaur', create: true }],
+    ['une entrée qui n est pas un objet', 'Marion Cobra'],
+  ])('refuse %s', (_label, entry) => {
+    const map = [...identityMap().filter((e) => e.alias !== 'Marion Cobra'), entry] as never
+    expect(importError(() => buildPlan(map)).code).toBe(LEGACY_IMPORT_ERROR_CODE.IDENTITY_MAP_INVALID)
+  })
+
+  it('refuse un fichier qui n est pas un tableau', () => {
+    expect(importError(() => buildPlan({ entries: [] } as never)).code).toBe(LEGACY_IMPORT_ERROR_CODE.IDENTITY_MAP_INVALID)
   })
 })
