@@ -1,7 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
+import { resetAndSeedCompetitors } from './helpers/competitor-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 
 const SEARCH_LIMIT = 3
@@ -11,6 +12,17 @@ describe('GET /api/v1/competiteurs?q= rate limit', async () => {
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
     server: true,
     env: { ...requireTestDatabaseEnv(), NUXT_RATE_LIMIT_COMPETITORS_SEARCH_MAX_REQUESTS: String(SEARCH_LIMIT) }
+  })
+
+  let close: () => Promise<void>
+
+  beforeAll(async () => {
+    const seeded = await resetAndSeedCompetitors()
+    close = () => seeded.dataSource.destroy()
+  })
+
+  afterAll(async () => {
+    await close?.()
   })
 
   it('answers 429 with Retry-After beyond the configured threshold, and leaves the plain list alone', async () => {
