@@ -12,6 +12,7 @@ import { EditionEntity } from '../../server/database/entities/edition.entity'
 import { LegacyWorkbookImportEntity } from '../../server/database/entities/legacy-workbook-import.entity'
 import { LegacyWorkbookRowEntity } from '../../server/database/entities/legacy-workbook-row.entity'
 import { importLegacyDomain } from '../../server/database/seeds/legacy-domain-importer'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 const SNAPSHOT_PATH = fileURLToPath(new URL('../../server/database/seeds/data/ccc-workbook.json', import.meta.url))
 const IDENTITY_MAP_PATH = fileURLToPath(new URL('../../server/database/seeds/data/legacy-identity-map.json', import.meta.url))
@@ -58,14 +59,7 @@ const ids = async (table: string): Promise<string[]> =>
   (await dataSource.query(`SELECT id FROM ${table} ORDER BY id`)).map((row: { id: string }) => row.id)
 
 beforeAll(async () => {
-  const databaseName = process.env.NUXT_DATABASE_DATABASE ?? ''
-  if (!databaseName.endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 beforeEach(async () => {
@@ -73,9 +67,7 @@ beforeEach(async () => {
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('reprise legacy : classements identiques au classeur', () => {

@@ -5,6 +5,7 @@ import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
 import { LOGIN_DELAY_MAX_SECONDS } from '../../server/consts/auth.const'
 import { UserEntity } from '../../server/database/entities/user.entity'
 import { reserveLoginAttempt } from '../../server/utils/auth/login-throttle.util'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource
 let counter = 0
@@ -23,19 +24,11 @@ const newUser = async (state: Partial<Pick<UserEntity, 'failedLoginCount' | 'thr
 const stored = (id: string): Promise<UserEntity> => dataSource.getRepository(UserEntity).findOneByOrFail({ id })
 
 beforeAll(async () => {
-  if (!(process.env.NUXT_DATABASE_DATABASE ?? '').endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('reserveLoginAttempt (injected clock)', () => {

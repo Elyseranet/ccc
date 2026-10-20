@@ -6,6 +6,7 @@ import { SESSION_ABSOLUTE_TIMEOUT_SECONDS, SESSION_IDLE_TIMEOUT_SECONDS } from '
 import { SessionEntity } from '../../server/database/entities/session.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
 import { createSession, resolveSession } from '../../server/utils/auth/session-store.util'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource
 let counter = 0
@@ -23,19 +24,11 @@ const newSession = async (): Promise<string> => {
 }
 
 beforeAll(async () => {
-  if (!(process.env.NUXT_DATABASE_DATABASE ?? '').endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('session expiry (SEC-A1, injected clock)', () => {

@@ -5,6 +5,7 @@ import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
 import { CompetitorEntity } from '../../server/database/entities/competitor.entity'
 import { SessionEntity } from '../../server/database/entities/session.entity'
 import { UserEntity } from '../../server/database/entities/user.entity'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource
 
@@ -31,19 +32,11 @@ const saveUser = (email: string, competitorId: string | null = null): Promise<Us
   dataSource.getRepository(UserEntity).save({ email, role: USER_ROLE.PARTICIPANT, status: USER_STATUS.ACTIVE, competitorId })
 
 beforeAll(async () => {
-  if (!(process.env.NUXT_DATABASE_DATABASE ?? '').endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('migration M2', () => {

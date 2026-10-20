@@ -12,6 +12,7 @@ import { MatchSideEntity } from '../../server/database/entities/match-side.entit
 import { MatchEntity } from '../../server/database/entities/match.entity'
 import { ParticipationEntity } from '../../server/database/entities/participation.entity'
 import { RoundEntity } from '../../server/database/entities/round.entity'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 const DOMAIN_TABLES = [
   'competitors',
@@ -60,22 +61,11 @@ const createMatch = async (editionId: string, roundId: string, sequence: number,
   dataSource.getRepository(MatchEntity).save({ editionId, roundId, sequence, targetScore })
 
 beforeAll(async () => {
-  const databaseName = process.env.NUXT_DATABASE_DATABASE ?? ''
-
-  if (!databaseName.endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('migration M1', () => {
