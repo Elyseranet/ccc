@@ -2,6 +2,7 @@ import { send, setResponseHeader, setResponseStatus } from 'h3'
 import { LOG_EVENT } from '../consts/log-event.const'
 import { API_PREFIX } from '../consts/request.const'
 import { toApiError } from '../utils/http/api-error.util'
+import { sanitizeRouteForLog } from '../utils/log-sanitize.util'
 import { logger } from '../utils/logger.util'
 
 export default defineNitroPlugin((nitroApp) => {
@@ -18,9 +19,8 @@ export default defineNitroPlugin((nitroApp) => {
     if (apiError.statusCode >= 500) {
       logger.error(LOG_EVENT.UNHANDLED_ERROR, {
         requestId: event.context.requestId,
-        route: event.path.split('?')[0],
-        errorName: error.name,
-        errorMessage: error.message
+        route: sanitizeRouteForLog(event.path),
+        errorName: error.name
       })
     }
 
@@ -33,7 +33,7 @@ export default defineNitroPlugin((nitroApp) => {
     const startedAt = event.context.requestStartedAt
     logger.info(LOG_EVENT.REQUEST_COMPLETED, {
       requestId: event.context.requestId,
-      route: event.path?.split('?')[0],
+      route: sanitizeRouteForLog(event.path),
       method: event.method,
       statusCode: event.node.res.statusCode,
       durationMs: startedAt === undefined ? undefined : Date.now() - startedAt

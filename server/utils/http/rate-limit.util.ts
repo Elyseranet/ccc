@@ -2,6 +2,7 @@ import { getRequestIP, setResponseHeader } from 'h3'
 import type { H3Event } from 'h3'
 import { LOG_EVENT } from '../../consts/log-event.const'
 import type { IRateLimitOptions, IRateLimitResult } from '../../interfaces/rate-limit.interface'
+import { normalizeIpForRateLimit } from '../ip.util'
 import { logger } from '../logger.util'
 import { tooManyRequests } from './api-error.util'
 
@@ -20,6 +21,10 @@ export class SlidingWindowRateLimiter {
     this.lastSweepAt = now()
   }
 
+  get size(): number {
+    return this.hits.size
+  }
+
   check(key: string): IRateLimitResult {
     const now = this.now()
     this.sweep(now)
@@ -28,13 +33,25 @@ export class SlidingWindowRateLimiter {
     const recent = (this.hits.get(key) ?? []).filter((timestamp) => timestamp > windowStart)
 
     if (recent.length >= this.options.maxRequests) {
-      this.hits.set(key, recent)
+      this.touch(key, recent)
       return { allowed: false, remaining: 0, retryAfterMs: recent[0]! + this.options.windowMs - now }
     }
 
     recent.push(now)
-    this.hits.set(key, recent)
+    this.touch(key, recent)
     return { allowed: true, remaining: this.options.maxRequests - recent.length, retryAfterMs: 0 }
+  }
+
+  /** LRU : une Map garde l'ordre d'insertion, réinsérer la clé la place en dernier. */
+  private touch(key: string, timestamps: number[]): void {
+    this.hits.delete(key)
+    this.hits.set(key, timestamps)
+    if (this.hits.size > this.options.maxKeys) {
+      const oldest = this.hits.keys().next().value
+      if (oldest !== undefined) {
+        this.hits.delete(oldest)
+      }
+    }
   }
 
   /** Purge les clés expirées au plus une fois par fenêtre, pour borner la mémoire. */
@@ -59,7 +76,8 @@ const useRateLimiter = (): SlidingWindowRateLimiter => {
     const { rateLimit } = useRuntimeConfig()
     sharedLimiter = new SlidingWindowRateLimiter({
       windowMs: Number(rateLimit.windowMs),
-      maxRequests: Number(rateLimit.maxRequests)
+      maxRequests: Number(rateLimit.maxRequests),
+      maxKeys: Number(rateLimit.maxKeys)
     })
   }
   return sharedLimiter
@@ -67,7 +85,7 @@ const useRateLimiter = (): SlidingWindowRateLimiter => {
 
 /** À appeler en tête de handler : lève une 429 avec `Retry-After` au dépassement. */
 export const enforceRateLimit = (event: H3Event, routeKey: string): void => {
-  const ip = getRequestIP(event) ?? 'unknown'
+  const ip = normalizeIpForRateLimit(getRequestIP(event) ?? 'unknown')
   const result = useRateLimiter().check(`${ip}:${routeKey}`)
 
   if (!result.allowed) {

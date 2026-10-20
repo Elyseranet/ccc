@@ -1,6 +1,7 @@
 export interface IRateLimitOptions {
   windowMs: number
   maxRequests: number
+  maxKeys: number
 }
 
 export interface IRateLimitResult {
