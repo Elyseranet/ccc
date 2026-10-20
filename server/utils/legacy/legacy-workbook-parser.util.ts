@@ -475,7 +475,8 @@ export function parseLegacyWorkbook(input: ILegacyParserInput): ILegacyDomainPla
       points: null,
       finalStage: null,
       finalStageSource: null,
-      status: PARTICIPATION_STATUS.REGISTERED,
+      // Édition CLOSED, champion connu : le joueur est éliminé, seul le tour est inconnu.
+      status: PARTICIPATION_STATUS.ELIMINATED,
       poolRank: poolByParticipation.get(id) ?? null,
     })
     anomalies.push({

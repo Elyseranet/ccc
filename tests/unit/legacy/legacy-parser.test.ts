@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COMPETITOR_ALIAS_SOURCE } from '../../../shared/enums/competitor.enum'
 import { MATCH_STATUS } from '../../../shared/enums/match.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
+import { FINAL_STAGE, PARTICIPATION_STATUS } from '../../../shared/enums/participation.enum'
 import { ROUND_KIND } from '../../../shared/enums/round.enum'
 import { LEGACY_ANOMALY_CODE, LEGACY_IMPORT_ERROR_CODE } from '../../../server/enums/legacy-import.enum'
 import { LegacyImportError } from '../../../server/utils/legacy/legacy-import-error.util'
@@ -110,6 +110,8 @@ describe('parseLegacyWorkbook : anomalies du ticket', () => {
       '2017 Marion Cobra',
     ])
     expect(unknown.every((entry) => entry.finalStage === null)).toBe(true)
+    expect(unknown.every((entry) => entry.status === PARTICIPATION_STATUS.ELIMINATED)).toBe(true)
+    expect(plan.participations.some((entry) => entry.status === PARTICIPATION_STATUS.REGISTERED)).toBe(false)
   })
 
   it('une cellule 0 devient POOL_ELIMINATED et le barème inverse retrouve chaque stade', () => {

@@ -89,6 +89,7 @@ describe('reprise legacy : classements identiques au classeur', () => {
     expect(report.counts.competitor_aliases).toMatchObject({ read: 158, created: 158 })
     expect(report.counts.matches).toMatchObject({ read: 729, created: 729, ignored: 685 })
     expect(report.matchStatusCounts).toEqual({ VALIDATED: 554, RESULT_UNKNOWN: 175 })
+    expect(await count('participations WHERE status = \'REGISTERED\'')).toBe(0)
     expect(await count('matches')).toBe(729)
     expect(await count('match_sides')).toBe(1458)
     expect(await count('matches WHERE status = \'VALIDATED\'')).toBe(554)
