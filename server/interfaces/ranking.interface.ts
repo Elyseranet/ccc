@@ -1,3 +1,4 @@
+import type { ICompetitorPublic } from '../../shared/interfaces/api/competitor.interface'
 import type { EDITION_STATUS } from '../../shared/enums/edition.enum'
 import type { FINAL_STAGE } from '../../shared/enums/participation.enum'
 
@@ -52,4 +53,25 @@ export interface IEditionEvolution {
   editionId: string
   chronologicalRank: number
   entries: IEvolutionEntry[]
+}
+
+/** Édition telle que la lecture publique des classements en a besoin (évolution : code et année). */
+export interface IRankingEditionInfo extends IRankingEdition {
+  code: string
+  year: number
+}
+
+/** Participation brute lue en base : `points` est null tant que l'issue est inconnue (B-04) ou l'édition non clôturée. */
+export interface IRankingSourceParticipation {
+  playerId: string
+  editionId: string
+  points: number | null
+  finalStage: FINAL_STAGE | null
+}
+
+/** Tout ce que la lecture publique des classements charge en base. */
+export interface IRankingSource {
+  competitors: Map<string, ICompetitorPublic>
+  editions: IRankingEditionInfo[]
+  participations: IRankingSourceParticipation[]
 }

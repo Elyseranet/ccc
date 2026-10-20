@@ -1,6 +1,9 @@
 export const RATE_LIMIT_ROUTE_KEY = {
   HEALTH: 'health',
-  COMPETITORS_SEARCH: 'competitors-search'
+  COMPETITORS_SEARCH: 'competitors-search',
+  RANKING_ACP: 'ranking-acp',
+  RANKING_ALL_TIME: 'ranking-all-time',
+  RANKING_EVOLUTION: 'ranking-evolution'
 } as const
 
 /** Clé de `runtimeConfig.rateLimit` portant les réglages propres à une route (surcharge des défauts). */
