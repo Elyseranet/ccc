@@ -5,6 +5,7 @@ import type { DataSource } from 'typeorm'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { login, resetTestDatabase } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const IP_LIMIT = 3
 
@@ -14,6 +15,7 @@ describe('POST /auth/login rate limit per IP', async () => {
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: { ...env, NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_IP_ATTEMPTS: String(IP_LIMIT) }
   })

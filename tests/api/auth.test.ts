@@ -13,6 +13,7 @@ import {
 } from './helpers/auth-fixtures'
 import type { ISeededUser } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const PASSWORD = 'a-long-enough-password'
 
@@ -38,6 +39,7 @@ describe('auth (login, logout, /moi, roles)', async () => {
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: {
       ...env,
