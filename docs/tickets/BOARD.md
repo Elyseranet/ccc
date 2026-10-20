@@ -209,6 +209,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 
 | Fichier partagé | Règle |
 |---|---|
+| `app/consts/page-delivery.const.ts` (T-OPS-01, après son merge) | Toutes les routes y sont pré-déclarées. Un ticket passe **sa** ligne à `delivered: true` dans le même commit que la bascule LIVE de ses endpoints. |
 | `app/enums/api-endpoint.enum.ts`, `app/consts/api-sources.const.ts` | Clés pré-déclarées par F-00. Un ticket ne change que la valeur FIXTURE → LIVE de ses propres endpoints, au moment de la bascule. |
 | Services | F-09 crée `participant.service.ts`, F-10 crée `auth.service.ts`. F-08 ajoute les écritures dans `match.service.ts`, F-11 dans `draw.service.ts`. Aucun autre ticket ne modifie un service. |
 | Fixtures | Un ticket qui a besoin de nouvelles données crée `app/fixtures/<ticket-feature>.fixture.ts`. Il ne modifie une fixture existante que si c'est **sa** ressource (F-08 : `match`, F-11 : `draw`). |
