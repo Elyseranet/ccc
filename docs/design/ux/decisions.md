@@ -92,3 +92,5 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | R-8 | Courbe d'évolution ACP / All Time : **commence à la première participation chiffrée** du joueur (pas de points à 0 avant ses débuts, contrairement aux onglets `évo` du classeur dont les zéros sont un effet de formule cumulative). |
 | R-9 | Le **code d'une édition est figé après création** (ex. `2012a`, `2026`) : il sert d'adresse publique `/editions/<code>`. |
 | R-10 | Carte « Matchs » de la synthèse d'édition : libellé explicite — en cours « N programmés, dont M validés » ; archive « N matchs, dont M au résultat inconnu ». |
+| SEC-A1 | Session : **expiration après 2 h d'inactivité, durée maximale 12 h** (couvre une soirée de tournoi ; OWASP Session Management : « 15-30 minutes for low risk applications », absolu « between 4 and 8 hours » en exemple — vérifié le 2026-10-20). |
+| SEC-A2 | Échecs de connexion : **ralentissement progressif par compte** (délai exponentiel plafonné après 5 échecs) + limite par IP + commande CLI de déblocage ; **pas de blocage dur** (OWASP Authentication : éviter « locking out other users' accounts »). |

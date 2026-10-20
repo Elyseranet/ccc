@@ -18,7 +18,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | En revue : validé (05da1d8), en attente de l'intégration de la vague 2 |
-| [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | En cours : correctif du test d'API dépendant de l'ordre d'exécution (f17d32c relu, conforme) |
+| [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | En revue : validé (03092f4, avec T-SEC-03), en attente de l'intégration de la vague 2 |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | En revue : validé (8f025ce), en attente de l'intégration de la vague 2 |
 | [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | En revue : validé (e229f35), en attente de l'intégration de la vague 2 |
 | [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | En cours (vague 2) |
@@ -148,7 +148,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 
 | Id | Titre | Maquette HH | Dépend de | Statut | Worktree |
 |---|---|---|---|---|---|
-| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **En revue : corrections demandées** (revue du 2026-10-20 sur 404fd5c : rebase sur 37f4c07, /admin/plus manquant, e2e instable 1/65, écarts visuels ; voir le message à dev-f00), **bloquant** | `../CCC-F-00` |
+| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **En revue : corrections faites** (36aa1c6). Vérifié par le lead : test:run 218 verts, routes ×5 à 65/65, a11y 19/19, visuel 14/14 avec toutes les zones < 1 %, relecture des écarts faite. **En attente** : merge de la vague 2 back (B-05, correctif de type serveur, typecheck rouge d'ici là) et rapport de revue de sécurité. **Bloquant** | `../CCC-F-00` |
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | À faire | `../CCC-F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00 | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
