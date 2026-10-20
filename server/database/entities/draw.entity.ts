@@ -3,6 +3,7 @@ import { DRAW_KIND, DRAW_STATUS } from '../../../shared/enums/draw.enum.js'
 import type { IDrawParameters } from '../../../shared/interfaces/api/draw.interface.js'
 import { EditionEntity } from './edition.entity.js'
 import { RoundEntity } from './round.entity.js'
+import { UserEntity } from './user.entity.js'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
 /**
@@ -34,9 +35,12 @@ export class DrawEntity extends UuidPrimaryEntity {
   @Column({ type: 'jsonb' })
   parameters!: IDrawParameters
 
-  /** FK vers `users` ajoutée par B-08 (migration M2). */
   @Column({ type: 'uuid', nullable: true })
   createdByUserId!: string | null
+
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'created_by_user_id', foreignKeyConstraintName: 'fk_draws_created_by_user' })
+  createdBy!: Relation<UserEntity> | null
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date
@@ -44,9 +48,12 @@ export class DrawEntity extends UuidPrimaryEntity {
   @Column({ type: 'timestamptz', nullable: true })
   validatedAt!: Date | null
 
-  /** FK vers `users` ajoutée par B-08 (migration M2). */
   @Column({ type: 'uuid', nullable: true })
   validatedByUserId!: string | null
+
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'validated_by_user_id', foreignKeyConstraintName: 'fk_draws_validated_by_user' })
+  validatedBy!: Relation<UserEntity> | null
 
   @ManyToOne(() => EditionEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'edition_id', foreignKeyConstraintName: 'fk_draws_edition' })

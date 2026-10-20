@@ -170,3 +170,19 @@ Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les frontières applicatives, inv
 - `/rules`, `/variants` et `/hall-of-fame` — contenu public.
 - `/admin` — tableau de bord prototype.
 - `/admin/competitors`, `/admin/participants`, `/admin/draws`, `/admin/groups`, `/admin/bracket`, `/admin/scores` et `/admin/editions` — vues des modules de gestion.
+
+## Authentification (B-08)
+
+Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké) et cookie `ccc_session` : `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` en production, durée 14 jours.
+
+| Route | Accès | Réponse |
+|---|---|---|
+| `POST /api/v1/auth/login` `{ email, password }` | public, limité par IP et par email | 200 `IMe` + cookie ; 401 `INVALID_CREDENTIALS` identique pour email inconnu et mot de passe faux ; 429 |
+| `POST /api/v1/auth/logout` | public, idempotent | 204, session révoquée, cookie effacé |
+| `GET /api/v1/moi` | authentifié | 200 `IMe` (seule route qui expose `phone`, à son titulaire) |
+| `PATCH /api/v1/moi` | authentifié | liste blanche `avatarUrl`, `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
+| `GET /api/v1/admin/ping` | ADMIN | sonde de `requireRole` : 401 / 403 / 200 |
+
+Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. Mots de passe : scrypt (`node:crypto`), 12 caractères minimum. Le limiteur de débit est en mémoire (une instance).
+
+Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard) crée un compte `INVITED` sans mot de passe ; le lien d'invitation qui lui permet d'en définir un arrive avec B-09.

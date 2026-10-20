@@ -46,6 +46,15 @@ export const unprocessable = (message: string = API_ERROR_MESSAGE.UNPROCESSABLE,
 export const tooManyRequests = (message: string = API_ERROR_MESSAGE.RATE_LIMITED): H3Error =>
   buildError(429, API_ERROR_CODE.RATE_LIMITED, message)
 
+export const invalidCredentials = (): H3Error =>
+  buildError(401, API_ERROR_CODE.INVALID_CREDENTIALS, API_ERROR_MESSAGE.INVALID_CREDENTIALS)
+
+export const invalidCurrentPassword = (): H3Error =>
+  buildError(401, API_ERROR_CODE.INVALID_CURRENT_PASSWORD, API_ERROR_MESSAGE.INVALID_CURRENT_PASSWORD)
+
+export const forbiddenOrigin = (): H3Error =>
+  buildError(403, API_ERROR_CODE.FORBIDDEN_ORIGIN, API_ERROR_MESSAGE.FORBIDDEN_ORIGIN)
+
 /** 5xx : le message est générique, le détail (cause) ne part que dans les logs. */
 export const internalError = (): H3Error =>
   buildError(500, API_ERROR_CODE.INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE)

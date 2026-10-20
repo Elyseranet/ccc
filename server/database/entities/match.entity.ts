@@ -5,6 +5,7 @@ import { EditionEntity } from './edition.entity.js'
 import { MatchSideEntity } from './match-side.entity.js'
 import { PoolEntity } from './pool.entity.js'
 import { RoundEntity } from './round.entity.js'
+import { UserEntity } from './user.entity.js'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
 @Entity({ name: 'matches' })
@@ -49,9 +50,12 @@ export class MatchEntity extends UuidPrimaryEntity {
   @Column({ type: 'timestamptz', nullable: true })
   validatedAt!: Date | null
 
-  /** FK vers `users` ajoutée par B-08 (migration M2). */
   @Column({ type: 'uuid', nullable: true })
   validatedByUserId!: string | null
+
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'validated_by_user_id', foreignKeyConstraintName: 'fk_matches_validated_by_user' })
+  validatedBy!: Relation<UserEntity> | null
 
   @VersionColumn()
   version!: number

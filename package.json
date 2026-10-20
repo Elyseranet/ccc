@@ -18,6 +18,7 @@
     "db:migration:run": "npm run db:typeorm:build && typeorm migration:run -d .typeorm-dist/server/database/data-source.js",
     "db:migration:revert": "npm run db:typeorm:build && typeorm migration:revert -d .typeorm-dist/server/database/data-source.js",
     "test:db": "vitest run -c vitest.db.config.ts",
+    "user:create-admin": "npm run db:typeorm:build && node .typeorm-dist/server/database/scripts/create-admin.js",
     "db:seed:legacy": "npm run db:typeorm:build && node .typeorm-dist/server/database/seeds/seed-legacy-workbook.js",
     "db:import:legacy": "npm run db:typeorm:build && node .typeorm-dist/server/database/seeds/import-legacy-domain.js"
   },

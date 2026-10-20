@@ -79,6 +79,11 @@ export class SlidingWindowRateLimiter {
     return { allowed: true, remaining: this.options.maxRequests - recent.length, retryAfterMs: 0 }
   }
 
+  /** Oublie les tentatives d'une clé (ex. : un login réussi remet à zéro le compteur de l'email). */
+  reset(key: string): void {
+    this.hits.delete(key)
+  }
+
   /** LRU : une Map garde l'ordre d'insertion, réinsérer la clé la place en dernier. */
   private touch(key: string, timestamps: number[]): void {
     this.hits.delete(key)

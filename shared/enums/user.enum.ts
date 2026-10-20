@@ -2,3 +2,8 @@ export enum USER_ROLE {
   ADMIN = 'ADMIN',
   PARTICIPANT = 'PARTICIPANT'
 }
+
+export enum USER_STATUS {
+  INVITED = 'INVITED',
+  ACTIVE = 'ACTIVE'
+}

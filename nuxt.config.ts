@@ -32,6 +32,16 @@ export default defineNuxtConfig({
         windowMs: 60000,
         maxRequests: 30
       }
+    },
+    // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
+    auth: {
+      allowedOrigins: '',
+      loginRateLimit: {
+        windowMs: 900000,
+        maxIpAttempts: 20,
+        maxEmailAttempts: 10,
+        maxKeys: 10000
+      }
     }
   },
   nitro: {

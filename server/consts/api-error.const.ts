@@ -16,6 +16,9 @@ export const API_ERROR_MESSAGE = {
   GONE: 'Resource is no longer available',
   UNPROCESSABLE: 'Unprocessable entity',
   RATE_LIMITED: 'Too many requests',
+  INVALID_CREDENTIALS: 'Invalid email or password',
+  INVALID_CURRENT_PASSWORD: 'Current password is incorrect',
+  FORBIDDEN_ORIGIN: 'Cross-origin request refused',
   UNKNOWN: 'Error'
 } as const
 
