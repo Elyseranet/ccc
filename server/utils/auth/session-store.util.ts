@@ -2,7 +2,7 @@ import { IsNull, LessThan, Not } from 'typeorm'
 import type { DataSource } from 'typeorm'
 import { USER_STATUS } from '../../../shared/enums/user.enum'
 import { SessionEntity } from '../../database/entities/session.entity'
-import { SESSION_PURGE_GRACE_MS, SESSION_TOUCH_INTERVAL_MS, SESSION_TTL_SECONDS } from '../../consts/auth.const'
+import { SESSION_ABSOLUTE_TIMEOUT_SECONDS, SESSION_IDLE_TIMEOUT_SECONDS, SESSION_PURGE_GRACE_MS, SESSION_TOUCH_INTERVAL_MS } from '../../consts/auth.const'
 import type { IAuthUser } from '../../interfaces/auth.interface'
 import { generateSessionToken, hashSessionToken } from './session-token.util'
 
@@ -12,7 +12,7 @@ export const createSession = async (dataSource: DataSource, userId: string, now 
   await dataSource.getRepository(SessionEntity).insert({
     userId,
     tokenHash,
-    expiresAt: new Date(now.getTime() + SESSION_TTL_SECONDS * 1000),
+    expiresAt: new Date(now.getTime() + SESSION_ABSOLUTE_TIMEOUT_SECONDS * 1000),
     lastSeenAt: now
   })
   return token
@@ -24,7 +24,16 @@ export const resolveSession = async (dataSource: DataSource, token: string, now 
     where: { tokenHash: hashSessionToken(token), revokedAt: IsNull() },
     relations: { user: true }
   })
-  if (!session || session.expiresAt.getTime() <= now.getTime() || session.user.status !== USER_STATUS.ACTIVE) {
+  if (!session) {
+    return null
+  }
+  const idleForMs = now.getTime() - session.lastSeenAt.getTime()
+  if (idleForMs > SESSION_IDLE_TIMEOUT_SECONDS * 1000) {
+    // Inactive trop longtemps : la session est révoquée, pas seulement ignorée.
+    await dataSource.getRepository(SessionEntity).update({ id: session.id, revokedAt: IsNull() }, { revokedAt: now })
+    return null
+  }
+  if (session.expiresAt.getTime() <= now.getTime() || session.user.status !== USER_STATUS.ACTIVE) {
     return null
   }
   if (now.getTime() - session.lastSeenAt.getTime() >= SESSION_TOUCH_INTERVAL_MS) {

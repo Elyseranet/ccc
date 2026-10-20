@@ -2,8 +2,9 @@ export const SESSION_COOKIE_NAME = 'ccc_session'
 /** En production : préfixe `__Host-` (OWASP Session Management) qui impose Secure, Path=/ et aucun Domain. */
 export const SESSION_COOKIE_NAME_PRODUCTION = `__Host-${SESSION_COOKIE_NAME}`
 
-/** Durée de vie d'une session : 14 jours, sans prolongation (pas de session éternelle). */
-export const SESSION_TTL_SECONDS = 14 * 24 * 60 * 60
+/** SEC-A1 : expiration à l'inactivité (2 h sans requête authentifiée) et expiration absolue (12 h après la création). */
+export const SESSION_IDLE_TIMEOUT_SECONDS = 2 * 60 * 60
+export const SESSION_ABSOLUTE_TIMEOUT_SECONDS = 12 * 60 * 60
 
 /** `last_seen_at` n'est réécrit qu'au plus une fois par minute, pour ne pas écrire à chaque requête. */
 export const SESSION_TOUCH_INTERVAL_MS = 60 * 1000

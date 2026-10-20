@@ -173,7 +173,7 @@ Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les frontières applicatives, inv
 
 ## Authentification (B-08)
 
-Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké) et cookie : `HttpOnly`, `SameSite=Lax`, `Path=/`, durée 14 jours. En production il s'appelle `__Host-ccc_session` (préfixe qui impose `Secure`, `Path=/` et aucun `Domain`) ; hors production, en HTTP, `ccc_session` sans `Secure`.
+Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké) et cookie : `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age` 12 h. La session expire à l'inactivité après 2 h (`last_seen_at`, réécrit au plus une fois par minute ; une session inactive est refusée en 401 puis révoquée) et de façon absolue 12 h après sa création (`SESSION_IDLE_TIMEOUT_SECONDS`, `SESSION_ABSOLUTE_TIMEOUT_SECONDS`, décision SEC-A1). En production il s'appelle `__Host-ccc_session` (préfixe qui impose `Secure`, `Path=/` et aucun `Domain`) ; hors production, en HTTP, `ccc_session` sans `Secure`.
 
 | Route | Accès | Réponse |
 |---|---|---|
