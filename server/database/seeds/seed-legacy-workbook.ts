@@ -4,6 +4,8 @@ import { resolve } from 'node:path'
 import dataSource from '../data-source.js'
 import { LegacyWorkbookImportEntity } from '../entities/legacy-workbook-import.entity.js'
 import { LegacyWorkbookRowEntity } from '../entities/legacy-workbook-row.entity.js'
+import { LOG_EVENT } from '../../consts/log-event.const.js'
+import { logger } from '../../utils/logger.util.js'
 import type { ILegacyWorkbookSnapshot, ILegacyWorkbookSheetMetadata } from '../interfaces/legacy-workbook.interface.js'
 
 const BATCH_SIZE = 250
@@ -81,18 +83,16 @@ const importWorkbook = async (): Promise<void> => {
     await dataSource.destroy()
   }
 
-  console.info(JSON.stringify({
-    event: 'legacy_workbook_import_completed',
+  logger.info(LOG_EVENT.LEGACY_WORKBOOK_IMPORT_COMPLETED, {
     sheetCount: sheetMetadata.length,
     persistedRowCount,
     formulaCount: sheetMetadata.reduce((total, sheet) => total + sheet.formulaCount, 0)
-  }))
+  })
 }
 
 void importWorkbook().catch((error: unknown) => {
-  console.error(JSON.stringify({
-    event: 'legacy_workbook_import_failed',
+  logger.error(LOG_EVENT.LEGACY_WORKBOOK_IMPORT_FAILED, {
     message: error instanceof Error ? error.message : 'Unknown error'
-  }))
+  })
   process.exitCode = 1
 })
