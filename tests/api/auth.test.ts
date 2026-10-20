@@ -193,6 +193,27 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect(await unlockUser(dataSource, 'nobody@ccc.test')).toBe(false)
     })
 
+    it('20 simultaneous attempts on an account in delay all get 429, even with the right password', async () => {
+      const victim = await newVictim()
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, {
+        failedLoginCount: 8, throttledUntil: new Date(Date.now() + 60_000)
+      })
+      const responses = await Promise.all(Array.from({ length: 20 }, () => login(victim.email, PASSWORD)))
+      expect(responses.map((response) => response.status)).toEqual(Array(20).fill(429))
+      expect(responses.every((response) => setCookieOf(response) === undefined)).toBe(true)
+      expect((await stateOf(victim.id)).failedLoginCount).toBe(8)
+    })
+
+    it('20 simultaneous attempts on an account out of delay at 5 failures: only one reaches the password check', async () => {
+      const victim = await newVictim()
+      await dataSource.getRepository(UserEntity).update({ id: victim.id }, { failedLoginCount: 5 })
+      const responses = await Promise.all(Array.from({ length: 20 }, () => login(victim.email, 'wrong-password-wrong')))
+      const statuses = responses.map((response) => response.status)
+      expect(statuses.filter((status) => status === 401)).toHaveLength(1)
+      expect(statuses.filter((status) => status === 429)).toHaveLength(19)
+      expect((await stateOf(victim.id)).failedLoginCount).toBe(6)
+    })
+
     it('does not create any state for an unknown email (same 401 as before)', async () => {
       expect((await login('ghost@ccc.test', 'wrong-password-wrong')).status).toBe(401)
       expect(await dataSource.getRepository(UserEntity).countBy({ email: 'ghost@ccc.test' })).toBe(0)
@@ -327,6 +348,12 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect(response.status).toBe(403)
       expect((await response.json()).code).toBe(API_ERROR_CODE.FORBIDDEN_ORIGIN)
       expect((await getWith('/api/v1/moi', cookie)).status).toBe(200)
+    })
+
+    it('assigns the request id before auth runs: a refused request still carries its X-Request-Id', async () => {
+      const response = await jsonPost('/api/v1/auth/logout', {}, { Origin: 'https://evil.test', 'X-Request-Id': 'client-request-0002' })
+      expect(response.status).toBe(403)
+      expect(response.headers.get('x-request-id')).toBe('client-request-0002')
     })
 
     it('refuses a cross-site login attempt announced by Sec-Fetch-Site', async () => {

@@ -7,7 +7,7 @@ import { LOG_EVENT } from '../../../consts/log-event.const'
 import { UserEntity } from '../../../database/entities/user.entity'
 import { loginSchema } from '../../../schemas/auth.schema'
 import { enforceLoginRateLimit, rejectTooManyRequests } from '../../../utils/auth/login-rate-limit.util'
-import { recordLoginFailure, remainingThrottleSeconds } from '../../../utils/auth/login-throttle.util'
+import { reserveLoginAttempt } from '../../../utils/auth/login-throttle.util'
 import { loadMe } from '../../../utils/auth/me.util'
 import { burnPasswordCheck, verifyPassword } from '../../../utils/auth/password.util'
 import { createSession, purgeExpiredSessions, revokeSessionByToken } from '../../../utils/auth/session-store.util'
@@ -25,14 +25,18 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   const dataSource = await useDataSource()
   const user = await dataSource.getRepository(UserEntity).findOne({
     where: { email },
-    select: { id: true, status: true, passwordHash: true, throttledUntil: true }
+    select: { id: true, status: true, passwordHash: true }
   })
 
-  // SEC-A2 : pendant le délai du compte, 429 sans même vérifier le mot de passe (ni brûler de scrypt).
-  const waitSeconds = user ? remainingThrottleSeconds(user.throttledUntil, new Date()) : 0
-  if (waitSeconds > 0) {
-    logger.warn(LOG_EVENT.AUTH_LOGIN_THROTTLED, { requestId: event.context.requestId, userId: user?.id })
-    rejectTooManyRequests(event, RATE_LIMIT_AUTH_ROUTE_KEY.LOGIN_THROTTLED, waitSeconds * 1000)
+  // SEC-A2 : la tentative est réservée atomiquement AVANT scrypt. Pendant le délai du compte (ou si une
+  // tentative concurrente a déjà pris la place), 429 sans vérifier le mot de passe. La réservation compte
+  // la tentative comme un échec ; seul un succès remet le compteur à zéro.
+  if (user) {
+    const reservation = await reserveLoginAttempt(dataSource, user.id)
+    if (!reservation.reserved) {
+      logger.warn(LOG_EVENT.AUTH_LOGIN_THROTTLED, { requestId: event.context.requestId, userId: user.id })
+      rejectTooManyRequests(event, RATE_LIMIT_AUTH_ROUTE_KEY.LOGIN_THROTTLED, reservation.retryAfterSeconds * 1000)
+    }
   }
 
   let accepted = false
@@ -43,9 +47,6 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   }
 
   if (!user || !accepted) {
-    if (user) {
-      await recordLoginFailure(dataSource, user.id)
-    }
     // Ni l'email ni le mot de passe ne sont journalisés : un utilisateur tape parfois l'un à la place de l'autre.
     logger.warn(LOG_EVENT.AUTH_LOGIN_FAILED, { requestId: event.context.requestId })
     throw invalidCredentials()

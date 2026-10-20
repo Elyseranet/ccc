@@ -24,3 +24,4 @@ export interface ICrossSiteInput {
   ownOrigin: string
   allowedOrigins: string[]
 }
+
