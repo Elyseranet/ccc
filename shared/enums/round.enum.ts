@@ -1,0 +1,15 @@
+export enum ROUND_KIND {
+  POOLS = 'POOLS',
+  PLAYOFF = 'PLAYOFF',
+  ROUND_OF_16 = 'ROUND_OF_16',
+  QUARTER = 'QUARTER',
+  SEMI = 'SEMI',
+  FINAL = 'FINAL'
+}
+
+export enum ROUND_STATUS {
+  PENDING = 'PENDING',
+  DRAWN = 'DRAWN',
+  PLAYING = 'PLAYING',
+  COMPLETED = 'COMPLETED'
+}
