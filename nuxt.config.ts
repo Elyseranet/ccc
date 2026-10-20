@@ -19,6 +19,26 @@ export default defineNuxtConfig({
       username: '',
       password: '',
       database: ''
+    },
+    rateLimit: {
+      windowMs: 60000,
+      maxRequests: 60,
+      maxKeys: 10000
+    }
+  },
+  nitro: {
+    // Les entités TypeORM utilisent des décorateurs « experimental » ; esbuild ne lit pas
+    // typescript.tsConfig. esbuild ne gère pas emitDecoratorMetadata : chaque @Column doit
+    // donc déclarer son `type` explicitement.
+    esbuild: {
+      options: {
+        tsconfigRaw: {
+          compilerOptions: {
+            experimentalDecorators: true,
+            useDefineForClassFields: false
+          }
+        }
+      }
     }
   },
   typescript: {

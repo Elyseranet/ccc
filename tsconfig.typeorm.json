@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": "./server/database",
+    "rootDir": ".",
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -12,5 +12,13 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["server/database/**/*.ts"]
+  "include": [
+    "server/database/**/*.ts",
+    "server/utils/logger.util.ts",
+    "server/consts/log-event.const.ts",
+    "server/enums/**/*.ts",
+    "server/interfaces/log-entry.interface.ts",
+    "server/types/log-sink.type.ts",
+    "shared/**/*.ts"
+  ]
 }

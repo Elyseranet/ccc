@@ -10,12 +10,15 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "test:run": "vitest run --config vitest.config.ts",
+    "test:api": "vitest run --config vitest.api.config.ts",
     "postinstall": "nuxt prepare",
     "db:typeorm:build": "tsc -p tsconfig.typeorm.json --outDir .typeorm-dist",
-    "db:migration:generate": "npm run db:typeorm:build && typeorm migration:generate -d .typeorm-dist/data-source.js",
-    "db:migration:run": "npm run db:typeorm:build && typeorm migration:run -d .typeorm-dist/data-source.js",
-    "db:migration:revert": "npm run db:typeorm:build && typeorm migration:revert -d .typeorm-dist/data-source.js",
-    "db:seed:legacy": "npm run db:typeorm:build && node .typeorm-dist/seeds/seed-legacy-workbook.js"
+    "db:migration:generate": "npm run db:typeorm:build && typeorm migration:generate -d .typeorm-dist/server/database/data-source.js",
+    "db:migration:run": "npm run db:typeorm:build && typeorm migration:run -d .typeorm-dist/server/database/data-source.js",
+    "db:migration:revert": "npm run db:typeorm:build && typeorm migration:revert -d .typeorm-dist/server/database/data-source.js",
+    "test:db": "vitest run -c vitest.db.config.ts",
+    "db:seed:legacy": "npm run db:typeorm:build && node .typeorm-dist/server/database/seeds/seed-legacy-workbook.js"
   },
   "dependencies": {
     "dotenv": "^16.6.1",
@@ -24,11 +27,14 @@
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.27",
     "vue": "^3.5.43",
-    "vue-router": "^5.3.1"
+    "vue-router": "^5.3.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^4.3.4",
     "nuxt": "^4.6.0",
     "sass-embedded": "^1.105.1",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "vitest": "^5.0.5"
   }
 }
