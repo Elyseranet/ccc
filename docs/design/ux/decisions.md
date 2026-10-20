@@ -73,3 +73,14 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | FA-12 | **Pas de ratio** sur la fiche joueur (spec : joués / V / D). Ratio uniquement dans le face-à-face (RG37). |
 | A17 | « Activité récente » admin : **flux dérivé** des validations de match et de tirage, sans table d'audit. |
 | A5 | Orphelins : lignes 1–12 **fusionnées** avec leur candidat, ligne 13 « Marion Cobra » **créée** (cf. `docs/tickets/legacy-identity-map.md`). |
+
+## Arbitrages livraison et règles (2026-10-20)
+
+| # | Décision |
+|---|---|
+| AUDIT-1 | `npm audit` : 12 high + 2 critical, tous dans la chaîne Nuxt 4.6.1 (devtools, simple-git, nitropack/listhen/node-forge, braces/micromatch), préexistants sur `develop` ; `--omit=dev` = 0. **Waiver documenté** dans chaque PR/merge + ticket de remédiation (suivre les correctifs Nuxt, vérifier le bundle `.output`, pas de devtools en prod). Pas de downgrade. |
+| A16-label | Tuile accueil : **« 729 matchs joués depuis 2012, dont 554 avec score »**. |
+| R-1 | Départage à 4 joueurs ou plus : **un seul match à N côtés, premier à 3 points** (généralise A11). |
+| R-2 | Départage à 3 : les deux perdants sont **ex aequo**, non classés entre eux. |
+| R-3 | « Tour suivant engagé » (B-12) : poule → qualification arrêtée ; phase finale → tirage (même brouillon) existant pour le tour suivant. Correction refusée (409) dans ces cas. |
+| R-4 | Commentaires d'édition (en-têtes du classeur) : **admin uniquement**, comme A13. |

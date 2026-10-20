@@ -14,10 +14,10 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 
 | Ticket | Titre | Vague | Dépend de | Bloqué par arbitrage | État |
 |---|---|---|---|---|---|
-| [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | À faire |
-| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO) | — | À faire |
+| [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | En revue (`feature/B-01`, 26a64bd) |
+| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | En revue (`feature/B-02`, 5b4d0ce) |
 | [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | À faire |
-| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | A5 : table `legacy-identity-map.md` à remplir par l'utilisateur (import réel seulement) | À faire |
+| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | À faire |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | À faire |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | À faire |
 | [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | À faire |
@@ -28,7 +28,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | — | À faire |
 | [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (égalité à 4 et plus : Je ne sais pas) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
-| [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | **A17** | Bloqué (A17) |
+| [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -75,7 +75,7 @@ Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques 
 | A16 | Gabarits vides non importés : 729 matchs, dont 554 avec score ; « 1 414 » est faux | B-04, B-06 |
 
 Questions qui restent ouvertes après ces décisions :
-- **A17** (flux d'activité admin) : voir plus bas, il bloque B-15.
+- ~~**A17** (flux d'activité admin)~~ : tranché le 2026-10-20, flux dérivé (option a). B-15 est débloqué.
 - Départage à **quatre joueurs ou plus** : RG19 et RG20 disent « trois ou plus », A11 décrit un match à trois côtés. Je ne sais pas comment départager à quatre ; B-03 et B-13 refusent le cas tant que la règle n'est pas écrite.
 - Départage à trois : le vainqueur prend la place ; l'ordre des deux autres (s'il compte pour une place suivante) n'est pas écrit. Je ne sais pas.
 - Définition de « tour suivant engagé » pour la correction (A15) : proposée dans B-12, à confirmer en revue.
@@ -145,34 +145,30 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 
 | Id | Titre | Maquette HH | Dépend de | Statut | Worktree |
 |---|---|---|---|---|---|
-| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, coque admin | B-01 (Vitest), B-02 (DTO) | À faire, **bloquant** | `../CCC-F-00` |
+| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **En cours** (dev F-00), **bloquant** | `../CCC-F-00` |
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | À faire | `../CCC-F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00 | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00 | À faire | `../CCC-F-04` |
-| [F-05](F-05.md) | Face-à-face | **aucune** (wireframe) | F-00, maquette | **Bloqué : design** (FA-01b) | `../CCC-F-05` |
-| [F-06](F-06.md) | Règles et Variantes | **aucune** (esquisse) | F-00, maquette | **Bloqué : design** (FA-01b) | `../CCC-F-06` |
+| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-05` |
+| [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00 | À faire | `../CCC-F-07` |
-| [F-08](F-08.md) | Admin : poules et matchs, saisie de score | `admin-scores.html` | F-00 (route : FA-05) | À faire | `../CCC-F-08` |
-| [F-09](F-09.md) | Admin : participants | **aucune** (wireframe) | F-00, maquette | **Bloqué : design** (FA-01b) | `../CCC-F-09` |
-| [F-10](F-10.md) | Compte : connexion, invitation, Mon profil | **aucune** (wireframe) | F-00, maquette (route : FA-06) | **Bloqué : design** (FA-01b) | `../CCC-F-10` |
+| [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
+| [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-09` |
+| [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-10` |
+| [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00 | À faire (créé, FA-09) | `../CCC-F-11` |
+| [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | À faire (créé, FA-08) | `../CCC-F-12` |
 
-**Compteur** : 11 tickets front ouverts, 0 fermé ; 4 bloqués par l'absence de maquette ; 11 arbitrages en attente (FA-01b, FA-02, FA-04 à FA-12), FA-01 levé, FA-03 réglé entre leads ; A16, A9 et A13 tranchés et intégrés (F-00, F-01, F-03, F-04) ; A17 touche encore F-07.
+**Compteur** (2026-10-20) : 13 tickets front ouverts (1 en cours, 12 à faire), 0 fermé, 0 bloqué par le design. Tous les arbitrages front sont tranchés (`docs/design/ux/decisions.md`, « Arbitrages front »). Une seule validation reste attendue : le **seuil FA-04**, à proposer par F-00 après mesure. Le libellé A16 (« 729 matchs joués depuis 2012, dont 554 avec score ») attend aussi la validation du chef de projet.
 
 ### Ordre et parallélisme
 
 ```
-B-01, B-02 ──► F-00 (1 dev) ──┬─► F-01 ┐
-                              ├─► F-02 │
-                              ├─► F-03 │  6 devs en parallèle dès le merge de F-00
-                              ├─► F-04 │  (7 si F-03 est scindé)
-                              ├─► F-07 │
-                              ├─► F-08 ┘
-                              └─► F-05, F-06, F-09, F-10 : +4 devs dès que les maquettes HH existent
+B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets en parallèle (13 si F-03 est scindé)
 ```
 
-- Aucun ticket F-01 à F-10 ne touche un fichier d'un autre. F-00 crée toutes les routes, layouts, services, fixtures et composants transverses.
-- Seul fichier partagé ensuite : les locales `en.json` / `fr.json`. Chaque ticket ajoute ses clés dans **son** namespace (`home.*`, `palmares.*`…), insérées à leur place alphabétique, pour réduire les conflits.
+- Aucun ticket F-01 à F-12 ne touche un fichier d'un autre. F-00 crée toutes les routes (`/admin/matchs`, `/admin/tirages`, `/admin/plus` et `/profil` compris), les layouts, services, fixtures, composants transverses et la table des libellés de tours.
+- Seul fichier partagé ensuite : les locales `en.json` / `fr.json`. Chaque ticket ajoute ses clés dans **son** namespace, insérées à leur place alphabétique.
 - **Bascule fixture → live**, route par route : une ligne de `app/consts/api-sources.const.ts`, une fois la route back mergée.
 
 | Ticket front | Routes back nécessaires à la bascule |
@@ -180,10 +176,11 @@ B-01, B-02 ──► F-00 (1 dev) ──┬─► F-01 ┐
 | F-01, F-03 | B-06 (+ B-04 pour les données) |
 | F-02 | B-07 |
 | F-04, F-05 | B-05 |
-| F-07 | B-06 |
+| F-07 | B-06, B-11, B-15 |
 | F-08 | B-12 |
 | F-09 | B-09, B-10 |
-| F-10 | B-08, B-09 |
+| F-10, F-12 | B-08, B-09 |
+| F-11 | B-11 |
 
 ### Definition of Done commune (en plus des critères de chaque ticket)
 
@@ -223,25 +220,25 @@ Les 8 écarts sont pris en charge par `backend-lead` (section Back, « Écarts d
 | C7 | Activité récente, tirages en brouillon | Brouillons : `GET /admin/editions/{id}/tirages` (B-11). Flux d'activité : B-15, **bloqué par l'arbitrage back A17** (flux dérivé, table d'audit, ou retrait du bloc). | F-07 |
 | C8 | Création d'un participant | `POST /editions/{id}/participants` avec `{ newCompetitor }`, qui crée en une transaction le compétiteur, le compte, l'invitation et l'inscription (B-10) | F-09 |
 
-### Arbitrages à poser à l'utilisateur (non tranchés)
+### Arbitrages front : tous tranchés (2026-10-20)
 
-| # | Sujet | Faits | Options | Recommandation du lead front |
-|---|---|---|---|---|
-| FA-01 | ~~Police de texte~~ **Levé** | Le chef de projet confirme le 2026-10-20 que la référence est la version committée de `happy-hour/`, validée par l'utilisateur : **Gabarito** en texte courant et Bagel Fat One en display. | — | Corriger la ligne « DM Sans » de `decisions.md` (périmètre UX/UI) pour que la doc ne contredise plus la maquette. |
-| FA-01b | Écrans sans maquette HH | Face-à-face, Règles, Admin participants et Compte n'existent qu'en wireframe. Les captures « vs maquette » sont impossibles. | (a) `ui-designer` produit les 4 maquettes HH, et F-05, F-06, F-09, F-10 attendent ; (b) intégration depuis le wireframe avec les composants HH existants, validation visuelle après coup | (a) : la consigne est iso-visuel, et sans référence il n'y a rien à mesurer. |
-| FA-02 | Emplacement des interfaces du contrat | Le cadrage dit `app/interfaces/`. B-01 et B-02 ont retenu `shared/interfaces/api/` et `shared/enums/`. Nuxt 4.6.1 gère `shared/` (alias `#shared`, vérifié dans `@nuxt/schema`). | `shared/` (serveur et client importent le même fichier) ; `app/interfaces/` (le serveur importe depuis `app/`) | `shared/` : c'est le seul dossier fait pour être importé des deux côtés, et B-02 l'utilise déjà. |
-| FA-04 | Tolérance « pixel perfect » | Les maquettes sont du HTML/CSS à la main ; l'app rend des composants Origam (DOM, sous-pixels, anticrénelage différents). Un écart de 0 pixel n'est pas atteignable en pratique. **Aucun seuil n'a été mesuré.** | (a) mesurer l'écart sur l'en-tête de F-00, puis fixer un seuil (`maxDiffPixelRatio`) appliqué à tous ; (b) 0 écart strict ; (c) revue visuelle humaine seule | (a) |
-| FA-05 | Route admin « Poules et matchs » | `parcours.md` : `/admin/poules`. `mapping.md` : `/admin/matchs?f=saisis`. La barre basse dit « Matchs ». | `/admin/poules` ; `/admin/matchs` | Je ne tranche pas. |
-| FA-06 | Route « Mon profil » | Aucune source ne la nomme (`compte.html` ne cite que `/invitation/`). | `/profil` ; `/mon-profil` ; `/compte` | Je ne tranche pas. |
-| FA-07 | Dépendances de test et de typage | Aucune n'est installée. B-01 apporte Vitest et `test:run`. | Ajout de `@nuxt/test-utils`, `@vue/test-utils`, `@playwright/test`, `@axe-core/playwright`, `vue-tsc`, `typescript`, `@pinia/nuxt` (Pinia est déjà dans la stack imposée) ; ou un autre outillage choisi avec `qa-tester` | Ce jeu-là, sous réserve que `npm ls axios` et `npm audit` restent propres. |
-| FA-08 | Entrée « Plus » de la barre basse admin | La maquette montre 4 entrées (Tableau, Matchs, Tirages, Plus) mais pas le contenu de « Plus ». | Un tiroir avec Participants, Bracket, Compétiteurs, Éditions et le site public ; ou une page `/admin/plus` | À faire dessiner par `ui-designer`. |
-| FA-09 | Écrans admin sans ticket | Tirages (wireframe `admin-tirage.html`), Bracket, Compétiteurs et Éditions figurent dans la navigation de `admin.html`, sans maquette HH ni ticket. | (a) les masquer de la navigation jusqu'à leur ticket ; (b) les ouvrir maintenant et demander les maquettes | (b) pour Tirages, le cœur de P2 ; sinon (a). |
-| FA-10 | Ordre des onglets d'édition | Maquette : Synthèse, Participants, **Tirages**, Poules, Bracket, Matchs. `parcours.md` : Tirages en dernier. | Ordre de la maquette ; ordre du parcours | La maquette (iso-visuel). |
-| FA-11 | Bracket sans connecteurs (RG13) | `OrigamBracket` n'a aucune prop pour masquer les connecteurs. Seul le slot `connector` existe (`OrigamBracket.vue`, l. 84 et 180) ; un slot vide laisse probablement un `<svg class="origam-bracket__connectors">` vide (non mesuré). | (a) slot vide dans CCC, et ticket Origam seulement si le rendu diverge ; (b) ouvrir tout de suite le ticket Origam proposé ci-dessous | (a), puis décider selon la mesure de F-03. |
-| FA-12 | Ratio de victoires sur la fiche | `joueur.html` affiche « 71 % de victoires · à confirmer pour la fiche (RG37) ». La spec V3 limite la fiche à joués / V / D ; RG37 inclut le ratio. | Afficher ; ne pas afficher | Je ne tranche pas. |
+Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « Arbitrages front ». Elles sont reportées dans les tickets :
+- **FA-01** : Gabarito → F-00.
+- **FA-01b** : maquettes livrées (37f4c07) → F-05, F-06, F-09, F-10.
+- **FA-02** : `shared/` → F-00.
+- **FA-04** : seuil mesuré sur l'en-tête dans F-00, puis soumis à l'utilisateur → F-00, et tous les tickets.
+- **FA-05** : `/admin/matchs` → F-00, F-08.
+- **FA-06** : `/profil` → F-00, F-10.
+- **FA-07** : outillage accepté → F-00.
+- **FA-08** : « Plus » maquetté → F-12.
+- **FA-09** : Tirages ticketé ; Bracket, Compétiteurs et Éditions masqués → F-00, F-11.
+- **FA-10** : ordre de la maquette → F-03.
+- **FA-11** : slot `connector` vide → F-03.
+- **FA-12** : pas de ratio sur la fiche → F-04, F-05.
+- **A17** : flux dérivé → F-07.
 
 ### Tickets Origam proposés (non créés)
 
-1. **`OrigamBracket` : ne pas rendre les connecteurs.** Ce serait une prop booléenne, par exemple, le nom étant au choix du DS. Cas d'usage : un tournoi dont les affiches sont retirées au sort à chaque tour (CCC RG13), où les traits de liaison sont faux. Le slot `connector` permet de vider les tracés, mais pas de supprimer le `<svg>` porteur. À ouvrir seulement si FA-11 donne (b), ou si la mesure de F-03 montre un artefact.
+1. **`OrigamBracket` : ne pas rendre les connecteurs** (seulement si la mesure de F-03 montre un artefact, FA-11). Ce serait une prop booléenne, par exemple, le nom étant au choix du DS. Cas d'usage : un tournoi dont les affiches sont retirées au sort à chaque tour (CCC RG13), où les traits de liaison sont faux. Le slot `connector` permet de vider les tracés, mais pas de supprimer le `<svg>` porteur. À ouvrir seulement si FA-11 donne (b), ou si la mesure de F-03 montre un artefact.
 2. **`OrigamTab` en lien de navigation** (facultatif). `ITabProps` n'étend pas `ILinkProps` : un onglet ne peut pas porter `to`. CCC synchronise l'onglet avec `?onglet=` à la main (F-02, F-03), ce qui contourne le manque sans bloquer.
 3. Déjà ouvert : **Elyseranet/origam#1212** (slot de police `display`). À sa release, la classe `.font-display` migre vers `fontFamily: 'display'`.
