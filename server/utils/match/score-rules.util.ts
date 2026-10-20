@@ -4,11 +4,11 @@ import {
   SCORE_TARGET_TIEBREAK_MULTI_SIDES,
   SIDES_DUEL,
   SIDES_MULTI_MIN,
-} from '../../consts/domain-rules.const'
-import { SCORE_ERROR_CODE } from '../../enums/domain.enum'
-import type { IScoreValidation } from '../../interfaces/match.interface'
-import { MATCH_PURPOSE } from '../../../shared/enums/match.enum'
-import { ROUND_KIND } from '../../../shared/enums/round.enum'
+} from '../../consts/domain-rules.const.js'
+import { SCORE_ERROR_CODE } from '../../enums/domain.enum.js'
+import type { IScoreValidation } from '../../interfaces/match.interface.js'
+import { MATCH_PURPOSE } from '../../../shared/enums/match.enum.js'
+import { ROUND_KIND } from '../../../shared/enums/round.enum.js'
 
 function inconsistent(reason: string): IScoreValidation {
   return { valid: false, code: SCORE_ERROR_CODE.SCORE_INCONSISTENT, reason }

@@ -4,7 +4,7 @@ Application de gestion du championnat CCC, avec un site public et un back-office
 
 Le socle technique utilise Nuxt 4 et Nitro, PostgreSQL et TypeORM. Les premières vues suivent l'export de design fourni : accueil, compétition, compétiteurs, face-à-face, règlement, variantes, Hall of Fame et espace d'administration.
 
-Les vues actuelles sont un prototype de présentation. Elles n'ont pas encore d'authentification ni de persistance métier. Le contenu du classeur historique est chargé dans des tables d'archive ; son rapprochement vers les futures entités métier reste à effectuer avant publication.
+Les vues actuelles sont un prototype de présentation. Elles n'ont pas encore d'authentification ni de persistance métier. Le contenu du classeur historique est chargé dans des tables d'archive ; sa reprise vers les entités métier se lance avec `npm run db:import:legacy` (voir plus bas).
 
 ## Prérequis
 
@@ -87,7 +87,29 @@ Pour produire un snapshot après un nouvel export XLSX :
 python3 scripts/xlsx_to_legacy_json.py "/chemin/vers/export.xlsx" server/database/seeds/data/ccc-workbook.json
 ```
 
-Les valeurs source sont archivées sans transformer les tableaux de synthèse en données métier normalisées. Le rapprochement des identités et des rencontres reste à faire avant leur exploitation par les écrans du tournoi.
+Les valeurs source sont archivées telles quelles. Leur reprise vers les entités métier est décrite ci-dessous.
+
+### Reprendre l'archive vers les entités métier (B-04)
+
+```sh
+npm run db:migration:run   # M1 doit être appliquée
+npm run db:seed:legacy     # archive legacy_workbook_*
+npm run db:import:legacy   # reprise vers les entités métier
+```
+
+La commande lit l'archive la plus récente, construit tout le plan en mémoire puis écrit en **une seule transaction**. Elle est rejouable : chaque écriture est un upsert sur une clé naturelle (`editions.code`, `competitor_aliases.alias`, `matches.legacy_code`, `pools`/`rounds`/`participations`/`match_sides` sur leur clé unique) et un second passage ne change ni les comptes ni les `id`. Elle n'écrit que des éditions `origin = LEGACY_IMPORT` et s'arrête si une édition `APP` porte le même code. Les compétiteurs ne sont créés qu'une fois : un nom corrigé dans l'application survit à un rejeu.
+
+**Fichier de correspondance** : `server/database/seeds/data/legacy-identity-map.json` (décision A5, `docs/tickets/legacy-identity-map.md`). Chaque graphie de l'onglet `scores` absente de `Data` y figure, soit `{ "alias": "...", "competitor": "<nom Data exact>" }`, soit `{ "alias": "...", "create": true }`. Le rapprochement se fait sur la **graphie exacte, casse et espaces compris** : le script refuse, sans rien écrire, toute graphie sans correspondance exacte. Le fichier n'est jamais deviné par le script.
+
+**Rapport** : `.data/reports/legacy-import-report.json` (dossier gitignoré), plus un résumé JSON journalisé. Il contient les comptes par table, les anomalies (2012a et 2012b : N = 16 pour 11 listés, 2017 : 5,76 hors barème, joueurs sans cellule `Data`) et le diff de vérification : les classements ACP et All Time, les rangs, les participations et les titres recalculés par les fonctions de domaine sont comparés au classeur pour les 145 joueurs. Un écart inattendu **annule la transaction** (code de sortie 1) ; le rapport est écrit quand même. Les écarts attendus restent listés avec leur explication : le V/D des compétiteurs fusionnés (la colonne F du classeur est un `COUNTIF` sur le nom) et une égalité exacte à 8,76 que le `RANK` flottant du classeur départage.
+
+**Impact d'un `npm run db:migration:revert` de M1** : il supprime toutes les tables métier, donc tout ce que la reprise a écrit, ainsi que les données saisies depuis dans l'application. L'archive brute reste intacte ; relancer `npm run db:import:legacy` reconstruit uniquement la partie issue du classeur.
+
+```sh
+# Tests d'intégration de la reprise (base jetable dont le nom finit par _test, variables en ligne de commande)
+NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
+NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
+```
 
 ## Tests
 

@@ -1,5 +1,5 @@
-import { ACP_WINDOW, CENTS_PER_POINT } from '../../consts/domain-rules.const'
-import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum'
+import { ACP_WINDOW, CENTS_PER_POINT } from '../../consts/domain-rules.const.js'
+import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum.js'
 import type {
   IPlayerAverage,
   IPlayerScore,
@@ -7,10 +7,10 @@ import type {
   IRankingEdition,
   IScoredParticipation,
   IStagedParticipation,
-} from '../../interfaces/ranking.interface'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { DomainRuleError } from '../domain/domain-rule-error.util'
+} from '../../interfaces/ranking.interface.js'
+import { EDITION_STATUS } from '../../../shared/enums/edition.enum.js'
+import { FINAL_STAGE } from '../../../shared/enums/participation.enum.js'
+import { DomainRuleError } from '../domain/domain-rule-error.util.js'
 
 export function toCents(points: number): number {
   return Math.round(points * CENTS_PER_POINT)

@@ -1,5 +1,5 @@
-import { SIDES_DUEL } from '../../consts/domain-rules.const'
-import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum'
+import { SIDES_DUEL } from '../../consts/domain-rules.const.js'
+import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum.js'
 import type {
   IHeadToHead,
   IMatchOutcome,
@@ -7,9 +7,9 @@ import type {
   IScoredSide,
   IPlayerBalance,
   IWinLoss,
-} from '../../interfaces/stats.interface'
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
-import { DomainRuleError } from '../domain/domain-rule-error.util'
+} from '../../interfaces/stats.interface.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum.js'
+import { DomainRuleError } from '../domain/domain-rule-error.util.js'
 
 /** Un match entre dans les statistiques s'il est VALIDATED et REGULAR (le départage est exclu). */
 export function isCountedMatch(match: IMatchRecord): boolean {

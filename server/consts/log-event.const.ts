@@ -6,5 +6,7 @@ export const LOG_EVENT = {
   COMPETITORS_SEARCH: 'competitors_search',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   LEGACY_WORKBOOK_IMPORT_COMPLETED: 'legacy_workbook_import_completed',
-  LEGACY_WORKBOOK_IMPORT_FAILED: 'legacy_workbook_import_failed'
+  LEGACY_WORKBOOK_IMPORT_FAILED: 'legacy_workbook_import_failed',
+  LEGACY_DOMAIN_IMPORT_COMPLETED: 'legacy_domain_import_completed',
+  LEGACY_DOMAIN_IMPORT_FAILED: 'legacy_domain_import_failed'
 } as const

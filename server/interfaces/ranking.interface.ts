@@ -1,6 +1,6 @@
-import type { ICompetitorPublic } from '../../shared/interfaces/api/competitor.interface'
-import type { EDITION_STATUS } from '../../shared/enums/edition.enum'
-import type { FINAL_STAGE } from '../../shared/enums/participation.enum'
+import type { ICompetitorPublic } from '../../shared/interfaces/api/competitor.interface.js'
+import type { EDITION_STATUS } from '../../shared/enums/edition.enum.js'
+import type { FINAL_STAGE } from '../../shared/enums/participation.enum.js'
 
 export interface IRankingEdition {
   id: string
