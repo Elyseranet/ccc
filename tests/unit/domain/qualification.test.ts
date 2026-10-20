@@ -57,9 +57,9 @@ describe('RG18, RG20, A10 : sélection des qualifiés', () => {
     expect(two.tiebreakSlots).toBe(1)
 
     const three = selectQualifiers([p('a'), p('b'), p('c')], 1, 1)
-    expect(three.requiresTiebreak[0]!.format).toBe(TIEBREAK_FORMAT.THREE_SIDES)
+    expect(three.requiresTiebreak[0]!.format).toBe(TIEBREAK_FORMAT.MULTI_SIDES)
     const four = selectQualifiers([p('a'), p('b'), p('c'), p('d')], 1, 2)
-    expect(four.requiresTiebreak[0]!.format).toBe(TIEBREAK_FORMAT.UNDEFINED)
+    expect(four.requiresTiebreak[0]!.format).toBe(TIEBREAK_FORMAT.MULTI_SIDES)
     expect(four.tiebreakSlots).toBe(2)
   })
 

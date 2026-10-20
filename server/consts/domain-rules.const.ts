@@ -26,8 +26,8 @@ export const SCORE_TARGET_POOL = 5
 /** RG22 : score du vainqueur d'une rencontre de phase finale (deux bières). */
 export const SCORE_TARGET_KNOCKOUT = 10
 
-/** A11 : cible d'un départage à trois côtés. */
-export const SCORE_TARGET_TIEBREAK_THREE_SIDES = 3
+/** A11, R-1 : cible d un départage à N côtés (N >= 3), premier à 3. */
+export const SCORE_TARGET_TIEBREAK_MULTI_SIDES = 3
 
 export const SIDES_DUEL = 2
-export const SIDES_TRIPLE = 3
+export const SIDES_MULTI_MIN = 3

@@ -4,7 +4,7 @@ import type {
   IHeadToHead,
   IMatchOutcome,
   IMatchRecord,
-  IMatchSide,
+  IScoredSide,
   IPlayerBalance,
   IWinLoss,
 } from '../../interfaces/stats.interface'
@@ -28,7 +28,7 @@ export function resolveMatchOutcome(match: IMatchRecord): IMatchOutcome {
       `Un match comptabilisé a ${SIDES_DUEL} côtés, reçu ${match.sides.length}`,
     )
   }
-  const [a, b] = match.sides as [IMatchSide, IMatchSide]
+  const [a, b] = match.sides as [IScoredSide, IScoredSide]
   if (a.playerId === b.playerId) {
     throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Un joueur ne joue pas contre lui-même')
   }
@@ -42,17 +42,36 @@ export function countedOutcomes(matches: readonly IMatchRecord[]): IMatchOutcome
   return matches.filter(isCountedMatch).map(resolveMatchOutcome)
 }
 
-/** RG7 : victoires et défaites par joueur. */
+/** R-5 : matchs REGULAR au résultat inconnu, par joueur (un match compte pour ses deux côtés). */
+export function countUnknownResults(matches: readonly IMatchRecord[]): Map<string, number> {
+  const unknown = new Map<string, number>()
+  for (const match of matches) {
+    if (match.status === MATCH_STATUS.RESULT_UNKNOWN && match.purpose === MATCH_PURPOSE.REGULAR) {
+      for (const side of match.sides) {
+        unknown.set(side.playerId, (unknown.get(side.playerId) ?? 0) + 1)
+      }
+    }
+  }
+  return unknown
+}
+
+/**
+ * RG7, R-5 : victoires et défaites par joueur, sur les matchs avec score uniquement. Un match
+ * RESULT_UNKNOWN n'est ni une victoire ni une défaite : il est compté dans `unknownResults`.
+ */
 export function computeWinLoss(matches: readonly IMatchRecord[]): IWinLoss[] {
   const table = new Map<string, IWinLoss>()
   const entry = (playerId: string): IWinLoss => {
-    const existing = table.get(playerId) ?? { playerId, wins: 0, losses: 0 }
+    const existing = table.get(playerId) ?? { playerId, wins: 0, losses: 0, unknownResults: 0 }
     table.set(playerId, existing)
     return existing
   }
   for (const { winner, loser } of countedOutcomes(matches)) {
     entry(winner.playerId).wins += 1
     entry(loser.playerId).losses += 1
+  }
+  for (const [playerId, count] of countUnknownResults(matches)) {
+    entry(playerId).unknownResults = count
   }
   return [...table.values()]
 }
@@ -66,6 +85,7 @@ export function computePlayerBalance(matches: readonly IMatchRecord[]): IPlayerB
       played: 0,
       wins: 0,
       losses: 0,
+      unknownResults: 0,
       winRatio: 0,
       pointsFor: 0,
       pointsAgainst: 0,
@@ -84,12 +104,15 @@ export function computePlayerBalance(matches: readonly IMatchRecord[]): IPlayerB
     l.pointsFor += loser.score
     l.pointsAgainst += winner.score
   }
+  for (const [playerId, count] of countUnknownResults(matches)) {
+    entry(playerId).unknownResults = count
+  }
   return [...table.values()].map((balance) => {
     const played = balance.wins + balance.losses
     return {
       ...balance,
       played,
-      winRatio: balance.wins / played,
+      winRatio: played === 0 ? null : balance.wins / played,
       differential: balance.pointsFor - balance.pointsAgainst,
     }
   })

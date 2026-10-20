@@ -26,7 +26,7 @@ function compareAcrossPools(a: IPoolStandingEntry, b: IPoolStandingEntry): numbe
  * - Égalité DANS une poule qui touche la (n+1)ème place : le (n+1)ème n'est pas connu, la
  *   fonction renvoie ces égalités sans qualifier personne.
  * - Égalité à la frontière des m places : les joueurs sont renvoyés dans `requiresTiebreak`
- *   (2 -> départage à 5, 3 -> match à 3 côtés, 4 ou plus -> Je ne sais pas), avec
+ *   (2 -> départage à 5, 3 ou plus -> un match à N côtés, premier à 3, R-1), avec
  *   `tiebreakSlots` places à pourvoir. Les matchs TIEBREAK validés de `tiebreakMatches`
  *   (paramètre ajouté au ticket pour que l'égalité se referme une fois le départage joué)
  *   la tranchent.

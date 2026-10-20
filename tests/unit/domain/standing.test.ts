@@ -62,14 +62,49 @@ describe('RG19, A10 : classement de poule', () => {
     const standing = computePoolStanding(['a', 'b', 'c'], cycle)
     expect(standing.entries.every((e) => e.rank === 1)).toBe(true)
     expect(standing.requiresTiebreak).toEqual([
-      { playerIds: ['a', 'b', 'c'], startRank: 1, format: TIEBREAK_FORMAT.THREE_SIDES },
+      { playerIds: ['a', 'b', 'c'], startRank: 1, format: TIEBREAK_FORMAT.MULTI_SIDES },
     ])
   })
 
-  it('un départage à trois côtés validé tranche l égalité concernée', () => {
+  it('R-2 : un départage à trois côtés tranche le gagnant, les deux perdants restent ex aequo', () => {
     const cycle = [duel('a', 5, 'b', 3), duel('b', 5, 'c', 3), duel('c', 5, 'a', 3)]
+    // 3-2-1 : b gagne, a et c ne sont pas classés entre eux malgré 2 contre 1
     const standing = computePoolStanding(['a', 'b', 'c'], [...cycle, tiebreak(['a', 2], ['b', 3], ['c', 1])])
-    expect(ranks(standing)).toEqual(['1:b', '2:a', '3:c'])
+    expect(ranks(standing)).toEqual(['1:b', '2:a', '2:c'])
+    expect(standing.requiresTiebreak).toEqual([
+      { playerIds: ['a', 'c'], startRank: 2, format: TIEBREAK_FORMAT.ONE_VS_ONE },
+    ])
+  })
+
+  it('R-1 : à quatre joueurs, un seul match à 4 côtés (premier à 3)', () => {
+    const matches = [
+      tiebreak(['a', 1], ['b', 3], ['c', 0], ['d', 2]),
+    ]
+    expect(ranks(computePoolStanding(['a', 'b', 'c', 'd'], []))).toEqual(['1:a', '1:b', '1:c', '1:d'])
+    const standing = computePoolStanding(['a', 'b', 'c', 'd'], matches)
+    expect(ranks(standing)).toEqual(['1:b', '2:a', '2:c', '2:d'])
+    expect(standing.requiresTiebreak).toEqual([
+      { playerIds: ['a', 'c', 'd'], startRank: 2, format: TIEBREAK_FORMAT.MULTI_SIDES },
+    ])
+  })
+
+  it('R-6 : mini-poule 2-2-1-1, la confrontation directe est réappliquée aux sous-groupes', () => {
+    // a, b, c, d : 3 victoires et cap s average +1 chacun (tous les scores sont 5-4)
+    // mini-poule : a>b, a>c, d>a, b>c, b>d, c>d  ->  a 2, b 2, c 1, d 1
+    const matches = [
+      duel('a', 5, 'b', 4), duel('a', 5, 'c', 4), duel('d', 5, 'a', 4),
+      duel('b', 5, 'c', 4), duel('b', 5, 'd', 4), duel('c', 5, 'd', 4),
+      duel('a', 5, 'e', 4), duel('f', 5, 'a', 4),
+      duel('b', 5, 'e', 4), duel('f', 5, 'b', 4),
+      duel('c', 5, 'e', 4), duel('c', 5, 'f', 4),
+      duel('d', 5, 'e', 4), duel('d', 5, 'f', 4),
+      duel('e', 5, 'f', 4),
+    ]
+    const standing = computePoolStanding(['d', 'c', 'b', 'a', 'e', 'f'], matches)
+    expect(standing.entries.slice(0, 4).map((e) => [e.wins, e.capsAverage])).toEqual([
+      [3, 1], [3, 1], [3, 1], [3, 1],
+    ])
+    expect(ranks(standing)).toEqual(['1:a', '2:b', '3:c', '4:d', '5:f', '6:e'])
     expect(standing.requiresTiebreak).toEqual([])
   })
 
@@ -87,12 +122,12 @@ describe('RG19, A10 : classement de poule', () => {
     expect(ranks(resolved)).toEqual(['1:b', '2:c', '3:a'])
   })
 
-  it('deux joueurs qui ne se sont pas rencontrés restent à égalité (1v1), à quatre : Je ne sais pas', () => {
+  it('deux joueurs qui ne se sont pas rencontrés restent à égalité (1v1) ; à quatre : match à N côtés', () => {
     expect(computePoolStanding(['a', 'b'], []).requiresTiebreak).toEqual([
       { playerIds: ['a', 'b'], startRank: 1, format: TIEBREAK_FORMAT.ONE_VS_ONE },
     ])
     expect(computePoolStanding(['a', 'b', 'c', 'd'], []).requiresTiebreak[0]!.format).toBe(
-      TIEBREAK_FORMAT.UNDEFINED,
+      TIEBREAK_FORMAT.MULTI_SIDES,
     )
   })
 
@@ -115,8 +150,9 @@ describe('RG19, A10 : classement de poule', () => {
 describe('tiebreak.util', () => {
   it('format selon le nombre de joueurs', () => {
     expect(tiebreakFormatFor(2)).toBe(TIEBREAK_FORMAT.ONE_VS_ONE)
-    expect(tiebreakFormatFor(3)).toBe(TIEBREAK_FORMAT.THREE_SIDES)
-    expect(tiebreakFormatFor(4)).toBe(TIEBREAK_FORMAT.UNDEFINED)
+    expect(tiebreakFormatFor(3)).toBe(TIEBREAK_FORMAT.MULTI_SIDES)
+    expect(tiebreakFormatFor(4)).toBe(TIEBREAK_FORMAT.MULTI_SIDES)
+    expect(tiebreakFormatFor(8)).toBe(TIEBREAK_FORMAT.MULTI_SIDES)
   })
 
   it('un départage aux scores tous égaux ne tranche rien (pas de boucle)', () => {

@@ -15,9 +15,9 @@ import { resolveTiedGroup, tiebreakFormatFor } from './tiebreak.util'
  * égalité n'est jamais tranché : il est renvoyé dans `requiresTiebreak`, sauf si un match
  * TIEBREAK validé le départage (A11). Les joueurs encore à égalité partagent le même rang.
  *
- * Interprétation de RG19 : la confrontation directe est étendue à trois joueurs ou plus
- * en comptant les victoires dans la mini-poule des joueurs concernés ; pour deux joueurs elle
- * se réduit au résultat de leur match. RG19 ne le dit pas explicitement pour trois joueurs.
+ * R-6 : confrontation directe = mini-poule des joueurs concernés (pour deux joueurs, leur match) ;
+ * si elle laisse un sous-groupe à égalité, elle est réappliquée à ce sous-groupe, puis le match
+ * de départage à N côtés (R-1) tranche ce qui reste.
  * Les matchs dont un joueur n'est pas dans `playerIds` sont ignorés.
  */
 export function computePoolStanding(
@@ -61,6 +61,15 @@ export function computePoolStanding(
     return wins
   }
 
+  // R-6 : mini-poule d'abord ; si elle laisse un sous-groupe à égalité, on réapplique la
+  // confrontation directe à ce sous-groupe seul (matchs entre ses membres) tant qu'elle départage.
+  const resolveByDirect = (block: IPoolStandingEntry[]): IPoolStandingEntry[][] => {
+    const direct = directWins(block)
+    const sorted = [...block].sort((a, b) => direct.get(b.playerId)! - direct.get(a.playerId)!)
+    const parts = splitByKey(sorted, (entry) => direct.get(entry.playerId)!)
+    return parts.length === 1 ? [block] : parts.flatMap(resolveByDirect)
+  }
+
   const entries: IPoolStandingEntry[] = []
   const requiresTiebreak: ITiebreakRequirement[] = []
   const place = (tied: IPoolStandingEntry[]): void => {
@@ -82,9 +91,7 @@ export function computePoolStanding(
   for (const winsBlock of splitByKey(byWins, (entry) => entry.wins)) {
     const byCaps = [...winsBlock].sort((a, b) => b.capsAverage - a.capsAverage)
     for (const capsBlock of splitByKey(byCaps, (entry) => entry.capsAverage)) {
-      const direct = directWins(capsBlock)
-      const byDirect = [...capsBlock].sort((a, b) => direct.get(b.playerId)! - direct.get(a.playerId)!)
-      for (const directBlock of splitByKey(byDirect, (entry) => direct.get(entry.playerId)!)) {
+      for (const directBlock of resolveByDirect(capsBlock)) {
         const resolved = resolveTiedGroup(
           directBlock.map((entry) => entry.playerId),
           matches,

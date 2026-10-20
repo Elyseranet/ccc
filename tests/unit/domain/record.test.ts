@@ -18,9 +18,31 @@ describe('RG7, RG36, RG37 (jeu synthétique)', () => {
 
   it('RG7 : bilan victoires / défaites', () => {
     expect(computeWinLoss(matches)).toEqual([
-      { playerId: 'ann', wins: 2, losses: 0 },
-      { playerId: 'bob', wins: 1, losses: 2 },
-      { playerId: 'cat', wins: 0, losses: 1 },
+      { playerId: 'ann', wins: 2, losses: 0, unknownResults: 0 },
+      { playerId: 'bob', wins: 1, losses: 2, unknownResults: 0 },
+      { playerId: 'cat', wins: 0, losses: 1, unknownResults: 0 },
+    ])
+  })
+
+  it('R-5 : un match RESULT_UNKNOWN n est ni victoire ni défaite, il est compté à part', () => {
+    const unknown = [
+      duel('ann', 0, 'bob', 0, { status: MATCH_STATUS.RESULT_UNKNOWN }),
+      duel('ann', 0, 'cat', 0, { status: MATCH_STATUS.RESULT_UNKNOWN }),
+      // un départage inconnu n est pas un match REGULAR : non compté
+      duel('bob', 0, 'cat', 0, {
+        status: MATCH_STATUS.RESULT_UNKNOWN,
+        purpose: MATCH_PURPOSE.TIEBREAK,
+      }),
+    ]
+    expect(computeWinLoss([...matches, ...unknown])).toEqual([
+      { playerId: 'ann', wins: 2, losses: 0, unknownResults: 2 },
+      { playerId: 'bob', wins: 1, losses: 2, unknownResults: 1 },
+      { playerId: 'cat', wins: 0, losses: 1, unknownResults: 1 },
+    ])
+    // un joueur qui n a que des résultats inconnus apparaît, sans ratio
+    expect(computePlayerBalance([unknown[0]!])).toEqual([
+      expect.objectContaining({ playerId: 'ann', played: 0, winRatio: null, unknownResults: 1 }),
+      expect.objectContaining({ playerId: 'bob', played: 0, winRatio: null, unknownResults: 1 }),
     ])
   })
 
@@ -32,8 +54,12 @@ describe('RG7, RG36, RG37 (jeu synthétique)', () => {
       duel('ann', 5, 'bob', 0, { status: MATCH_STATUS.SCHEDULED }),
       duel('ann', 5, 'bob', 0, { purpose: MATCH_PURPOSE.TIEBREAK }),
     ]
-    expect(computeWinLoss([...matches, ...noise])).toEqual(computeWinLoss(matches))
-    expect(computePlayerBalance([...matches, ...noise])).toEqual(computePlayerBalance(matches))
+    const withoutUnknown = (rows: { unknownResults: number }[]) =>
+      rows.map((row) => ({ ...row, unknownResults: 0 }))
+    expect(withoutUnknown(computeWinLoss([...matches, ...noise]))).toEqual(computeWinLoss(matches))
+    expect(withoutUnknown(computePlayerBalance([...matches, ...noise]))).toEqual(
+      computePlayerBalance(matches),
+    )
     expect(computeHeadToHead([...matches, ...noise], 'ann', 'bob')).toEqual(
       computeHeadToHead(matches, 'ann', 'bob'),
     )
@@ -46,6 +72,7 @@ describe('RG7, RG36, RG37 (jeu synthétique)', () => {
       played: 3,
       wins: 1,
       losses: 2,
+      unknownResults: 0,
       winRatio: 1 / 3,
       pointsFor: 15,
       pointsAgainst: 19,
@@ -99,6 +126,25 @@ describe('RG7, RG36, RG37 sur le classeur (onglets scores et F2F)', () => {
   it('554 matchs scorés, tous REGULAR et VALIDATED ; 729 lignes nommées au total (A16)', () => {
     expect(matches).toHaveLength(554)
     expect(matches.length + unknown.length).toBe(729)
+  })
+
+  it('R-5 : sur les matchs avec score Deseine est à 39/13, et 19 matchs sont au résultat inconnu', () => {
+    const asUnknown = unknown.map(([a, b]) =>
+      duel(a, 0, b, 0, { status: MATCH_STATUS.RESULT_UNKNOWN }),
+    )
+    const all = [...matches, ...asUnknown]
+    const deseine = computeWinLoss(all).find((w) => w.playerId === 'Nicolas Deseine')
+    expect(deseine).toEqual({ playerId: 'Nicolas Deseine', wins: 39, losses: 13, unknownResults: 19 })
+    // J du classeur (F2F) = matchs avec score + matchs au résultat inconnu, pour chaque joueur
+    const balances = new Map(computePlayerBalance(all).map((b) => [b.playerId, b]))
+    let compared = 0
+    for (const { values } of f2f.slice(1)) {
+      const balance = balances.get(String(values[0]))
+      if (typeof values[1] !== 'number' || !balance) continue
+      expect(balance.played + balance.unknownResults, String(values[0])).toBe(values[1])
+      compared += 1
+    }
+    expect(compared).toBeGreaterThan(100)
   })
 
   it('Nicolas Deseine : points 339 / 218 / C/A 121 exacts ; V/D 39/13 scorés + 14/5 sans score = 53/18', () => {

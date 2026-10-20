@@ -50,6 +50,16 @@ describe('RG21, RG22 : validation d un score', () => {
     expect(triple(4, 1, 0).valid).toBe(false)
   })
 
+  it('R-1 : départage à N côtés (N >= 3), premier à 3', () => {
+    expect(triple(3, 2, 1, 0)).toEqual({ valid: true })
+    expect(triple(0, 0, 0, 0, 3)).toEqual({ valid: true })
+    expect(triple(3, 3, 0, 0).valid).toBe(false)
+    expect(triple(2, 2, 1, 0).valid).toBe(false)
+    expect(targetScore(ROUND_KIND.POOLS, MATCH_PURPOSE.TIEBREAK, 5)).toBe(3)
+    // hors départage, jamais plus de deux côtés
+    expect(pool(5, 1, 0, 0).valid).toBe(false)
+  })
+
   it('cible par contexte', () => {
     expect(targetScore(ROUND_KIND.POOLS, MATCH_PURPOSE.REGULAR, 2)).toBe(5)
     expect(targetScore(ROUND_KIND.QUARTER, MATCH_PURPOSE.REGULAR, 2)).toBe(10)

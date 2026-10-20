@@ -1,9 +1,9 @@
 import {
   SCORE_TARGET_KNOCKOUT,
   SCORE_TARGET_POOL,
-  SCORE_TARGET_TIEBREAK_THREE_SIDES,
+  SCORE_TARGET_TIEBREAK_MULTI_SIDES,
   SIDES_DUEL,
-  SIDES_TRIPLE,
+  SIDES_MULTI_MIN,
 } from '../../consts/domain-rules.const'
 import { SCORE_ERROR_CODE } from '../../enums/domain.enum'
 import type { IScoreValidation } from '../../interfaces/match.interface'
@@ -16,20 +16,20 @@ function inconsistent(reason: string): IScoreValidation {
 
 /**
  * Score cible : 5 en poule et en départage 1v1, 10 en phase finale (RG21, RG22),
- * 3 pour un départage à trois côtés (A11).
+ * 3 pour un départage à N côtés, N >= 3 (A11, R-1).
  * Barrages (PLAYOFF) : phase finale, donc 10 ; constat sur l'onglet `scores`, les 8 matchs
  * `1/16` de 2024 ont tous un vainqueur à 10.
  */
 export function targetScore(roundKind: ROUND_KIND, purpose: MATCH_PURPOSE, sides: number): number {
   if (purpose === MATCH_PURPOSE.TIEBREAK) {
-    return sides === SIDES_TRIPLE ? SCORE_TARGET_TIEBREAK_THREE_SIDES : SCORE_TARGET_POOL
+    return sides >= SIDES_MULTI_MIN ? SCORE_TARGET_TIEBREAK_MULTI_SIDES : SCORE_TARGET_POOL
   }
   return roundKind === ROUND_KIND.POOLS ? SCORE_TARGET_POOL : SCORE_TARGET_KNOCKOUT
 }
 
 /**
  * RG21, RG22, A11 : exactement un côté atteint la cible ; les autres sont des entiers dans
- * [0, cible-1]. Deux côtés, ou trois pour un départage uniquement. Sinon SCORE_INCONSISTENT (422).
+ * [0, cible-1]. Deux côtés, ou N >= 3 pour un départage uniquement. Sinon SCORE_INCONSISTENT (422).
  */
 export function validateScore(
   roundKind: ROUND_KIND,
@@ -38,7 +38,7 @@ export function validateScore(
 ): IScoreValidation {
   const sides = scores.length
   const sidesAllowed =
-    sides === SIDES_DUEL || (sides === SIDES_TRIPLE && purpose === MATCH_PURPOSE.TIEBREAK)
+    sides === SIDES_DUEL || (sides >= SIDES_MULTI_MIN && purpose === MATCH_PURPOSE.TIEBREAK)
   if (!sidesAllowed) {
     return inconsistent(`Nombre de côtés invalide : ${sides}`)
   }

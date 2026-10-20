@@ -1,6 +1,6 @@
 import type { MATCH_PURPOSE, MATCH_STATUS } from '../../shared/enums/match.enum'
 
-export interface IMatchSide {
+export interface IScoredSide {
   playerId: string
   score: number
 }
@@ -9,24 +9,26 @@ export interface IMatchSide {
 export interface IMatchRecord {
   status: MATCH_STATUS
   purpose: MATCH_PURPOSE
-  sides: IMatchSide[]
+  sides: IScoredSide[]
 }
 
 export interface IMatchOutcome {
-  winner: IMatchSide
-  loser: IMatchSide
+  winner: IScoredSide
+  loser: IScoredSide
 }
 
 export interface IWinLoss {
   playerId: string
   wins: number
   losses: number
+  /** R-5 : matchs REGULAR au résultat inconnu (ni victoire ni défaite). */
+  unknownResults: number
 }
 
 export interface IPlayerBalance extends IWinLoss {
   played: number
-  /** victoires / joués ; un joueur n'apparaît qu'avec au moins un match. */
-  winRatio: number
+  /** victoires / joués ; null si aucun match avec score. */
+  winRatio: number | null
   pointsFor: number
   pointsAgainst: number
   differential: number

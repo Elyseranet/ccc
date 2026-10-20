@@ -1,25 +1,22 @@
 import { TIEBREAK_FORMAT } from '../../enums/domain.enum'
 import type { IMatchRecord } from '../../interfaces/stats.interface'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
-import { splitByKey } from '../domain/group.util'
 
 /**
- * Format du départage selon le nombre de joueurs à égalité : 2 -> 1v1 à 5, 3 -> match à
- * 3 côtés, premier à 3 (A10, A11). 4 ou plus : Je ne sais pas, aucune règle écrite
- * (RG19 et RG20 disent « trois ou plus », A11 ne décrit qu'un match à trois côtés).
+ * Format du départage selon le nombre de joueurs à égalité : 2 -> 1v1 à 5 ; 3 ou plus -> un
+ * seul match à N côtés, premier à 3 (A10, A11, R-1).
  */
 export function tiebreakFormatFor(playerCount: number): TIEBREAK_FORMAT {
-  if (playerCount === 2) {
-    return TIEBREAK_FORMAT.ONE_VS_ONE
-  }
-  return playerCount === 3 ? TIEBREAK_FORMAT.THREE_SIDES : TIEBREAK_FORMAT.UNDEFINED
+  return playerCount === 2 ? TIEBREAK_FORMAT.ONE_VS_ONE : TIEBREAK_FORMAT.MULTI_SIDES
 }
 
 /**
- * Applique les matchs TIEBREAK validés à un groupe de joueurs à égalité. Renvoie les groupes
- * dans l'ordre d'arrivée ; un groupe de plus d'un joueur reste à égalité (aucun match de départage
- * validé qui concerne exactement ces joueurs, ou scores égaux). Un départage à trois côtés dont
- * les deux derniers ont le même score laisse ces deux-là à égalité : on ne les tranche pas.
+ * Applique les matchs TIEBREAK validés à un groupe de joueurs à égalité (A11, R-1, R-2).
+ * Un match à N côtés a un seul gagnant (le meilleur score) ; TOUS les perdants restent ex aequo,
+ * même si leurs scores diffèrent (3-2-1 : les deux derniers ne sont pas classés entre eux).
+ * Un éventuel second départage entre perdants est un autre match TIEBREAK qui concerne exactement
+ * ce sous-groupe. Renvoie les groupes dans l'ordre d'arrivée ; un groupe de plus d'un joueur reste
+ * à égalité (aucun match validé qui le concerne exactement, ou scores tous égaux).
  */
 export function resolveTiedGroup(
   playerIds: readonly string[],
@@ -36,12 +33,13 @@ export function resolveTiedGroup(
   if (!match) {
     return [[...playerIds]]
   }
-  const sides = [...match.sides].sort((a, b) => b.score - a.score)
-  const groups = splitByKey(sides, (side) => side.score).map((block) =>
-    block.map((side) => side.playerId),
-  )
-  if (groups.length === 1) {
+  const best = Math.max(...match.sides.map((side) => side.score))
+  const winners = match.sides.filter((side) => side.score === best).map((side) => side.playerId)
+  const losers = match.sides.filter((side) => side.score !== best).map((side) => side.playerId)
+  if (losers.length === 0) {
     return [[...playerIds]]
   }
-  return groups.flatMap((group) => (group.length > 1 ? resolveTiedGroup(group, matches) : [group]))
+  return [winners, losers].flatMap((group) =>
+    group.length > 1 ? resolveTiedGroup(group, matches) : [group],
+  )
 }
