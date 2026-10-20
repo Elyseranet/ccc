@@ -23,11 +23,15 @@ export const remainingThrottleSeconds = (throttledUntil: Date | null, now: Date)
 
 /** Enregistre un échec de manière atomique et pose le délai correspondant. */
 export const recordLoginFailure = async (dataSource: DataSource, userId: string, now = new Date()): Promise<number> => {
-  const rows: Array<{ failed_login_count: number }> = (await dataSource.query(
-    `UPDATE "users" SET "failed_login_count" = "failed_login_count" + 1 WHERE "id" = $1 RETURNING "failed_login_count"`,
-    [userId]
-  ))[0]
-  const failedCount = Number(rows[0]?.failed_login_count ?? 0)
+  // Incrément atomique côté base (pas de lecture puis écriture) : deux échecs simultanés comptent tous deux.
+  const result = await dataSource
+    .createQueryBuilder()
+    .update(UserEntity)
+    .set({ failedLoginCount: () => '"failed_login_count" + 1' })
+    .where('id = :id', { id: userId })
+    .returning(['failedLoginCount'])
+    .execute()
+  const failedCount = Number((result.raw as Array<{ failed_login_count: number }>)[0]?.failed_login_count ?? 0)
   const delaySeconds = computeLoginDelaySeconds(failedCount)
   if (delaySeconds > 0) {
     await dataSource.getRepository(UserEntity).update({ id: userId }, { throttledUntil: new Date(now.getTime() + delaySeconds * 1000) })
