@@ -157,8 +157,8 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00 | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
-| [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-09` |
-| [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-10` |
+| [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-09` |
+| [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-10` |
 | [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00 | À faire (créé, FA-09) | `../CCC-F-11` |
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | À faire (créé, FA-08) | `../CCC-F-12` |
 
@@ -181,8 +181,9 @@ B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets
 | F-04, F-05 | B-05 |
 | F-07 | B-06, B-11, B-15 |
 | F-08 | B-12 |
-| F-09 | B-09, B-10 |
-| F-10, F-12 | B-08, B-09 |
+| F-09 | B-09, B-10, B-16 |
+| F-10 | B-08, B-09, B-16 |
+| F-12 | B-08 |
 | F-11 | B-11 |
 
 ### Lancement en parallèle (dès que F-00 est dans develop)
@@ -212,7 +213,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 - F-03 : l'URL porte le code d'édition (R-9) ; carte « Matchs » selon R-10.
 - F-04 et F-05 : R-5 (V/D sur les matchs avec score uniquement) et `winRatio` à null.
 - F-07 : flux d'activité dérivé (A17), sur fixture jusqu'au merge de B-15.
-- F-09 et F-10 : champ avatar en attente de l'arbitrage (upload ou initiales). F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
+- F-09 et F-10 : avatar téléversé et stocké en base (AV-1), via `origam-file-field` limité à 2 Mo ; ils dépendent de **B-16** pour la bascule. F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
 - Tous : tests a11y des formulaires sur le rendu hydraté, à cause de l'id d'input qui change entre serveur et client (Origam #1226).
 
 ### Definition of Done commune (en plus des critères de chaque ticket)
