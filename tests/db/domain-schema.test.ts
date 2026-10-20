@@ -174,7 +174,7 @@ describe('domain constraints', () => {
     )
   })
 
-  it('accepts three sides and rejects a fourth position (A11)', async () => {
+  it('accepts four sides and rejects position 0 (A11, R-1)', async () => {
     const edition = await createEdition(2024)
     const round = await createRound(edition.id, ROUND_KIND.POOLS, 1)
     const match = await dataSource.getRepository(MatchEntity).save({
@@ -186,14 +186,14 @@ describe('domain constraints', () => {
     })
     const sides = dataSource.getRepository(MatchSideEntity)
 
-    for (const position of [1, 2, 3]) {
+    for (const position of [1, 2, 3, 4]) {
       const participation = await createParticipation(edition.id, (await createCompetitor(`T${position}`)).id)
       await sides.save({ matchId: match.id, position, participationId: participation.id })
     }
 
-    const extra = await createParticipation(edition.id, (await createCompetitor('T4')).id)
+    const extra = await createParticipation(edition.id, (await createCompetitor('T0')).id)
 
-    await expect(sides.save({ matchId: match.id, position: 4, participationId: extra.id })).rejects.toThrow(
+    await expect(sides.save({ matchId: match.id, position: 0, participationId: extra.id })).rejects.toThrow(
       /ck_match_sides_position/
     )
   })

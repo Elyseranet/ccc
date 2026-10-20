@@ -1,14 +1,14 @@
 import { Check, Column, Entity, Index, JoinColumn, ManyToOne, type Relation, Unique } from 'typeorm'
-import { MATCH_SIDE_MAX_POSITION, MATCH_SIDE_MIN_POSITION } from '../consts/match.const.js'
+import { MATCH_SIDE_MIN_POSITION } from '../consts/match.const.js'
 import { MatchEntity } from './match.entity.js'
 import { ParticipationEntity } from './participation.entity.js'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
-/** Un côté par ligne, pour couvrir le match à trois côtés (A11). Le public ne lit que `validated_score`. */
+/** Un côté par ligne, pour couvrir le match à N côtés (A11, R-1). Le public ne lit que `validated_score`. */
 @Entity({ name: 'match_sides' })
 @Unique('uq_match_sides_match_position', ['matchId', 'position'])
 @Unique('uq_match_sides_match_participation', ['matchId', 'participationId'])
-@Check('ck_match_sides_position', `"position" BETWEEN ${MATCH_SIDE_MIN_POSITION} AND ${MATCH_SIDE_MAX_POSITION}`)
+@Check('ck_match_sides_position', `"position" >= ${MATCH_SIDE_MIN_POSITION}`)
 @Check('ck_match_sides_recorded_score', '"recorded_score" >= 0')
 @Check('ck_match_sides_validated_score', '"validated_score" >= 0')
 export class MatchSideEntity extends UuidPrimaryEntity {
