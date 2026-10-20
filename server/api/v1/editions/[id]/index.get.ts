@@ -13,7 +13,7 @@ import {
   loadPoolEntities,
   loadRoundEntities,
   loadValidatedDraws
-} from '../../../../utils/edition/edition-read.util'
+} from '../../../../services/edition.service'
 import { readEditionResource } from '../../../../utils/edition/edition-route.util'
 
 /** Vue complète d'une édition. `comment` d'édition (R-4) et `comment` de match (A13) n'en font jamais partie. */

@@ -21,14 +21,6 @@ export interface IEditionContentStamp {
   participationCount: number
 }
 
-/** Ligne brute de l'empreinte de contenu (colonnes SQL en snake_case, comptes en texte). */
-export interface IEditionContentStampRow {
-  last_match_validated_at: Date | null
-  public_match_count: string
-  last_draw_validated_at: Date | null
-  participation_count: string
-}
-
 export interface IEditionMatchCounts {
   total: number
   scored: number

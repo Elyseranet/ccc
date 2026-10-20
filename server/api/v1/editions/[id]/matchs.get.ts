@@ -2,7 +2,7 @@ import { getQuery } from 'h3'
 import type { IMatch } from '../../../../../shared/interfaces/api/match.interface'
 import type { IPaginated } from '../../../../../shared/interfaces/api/pagination.interface'
 import { parseMatchListQuery } from '../../../../utils/edition/edition-query.util'
-import { loadPublicMatchPage } from '../../../../utils/edition/edition-read.util'
+import { loadPublicMatchPage } from '../../../../services/edition.service'
 import { readEditionResource } from '../../../../utils/edition/edition-route.util'
 
 export default defineEventHandler((event) => {

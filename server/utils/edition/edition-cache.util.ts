@@ -2,42 +2,15 @@ import { createHash } from 'node:crypto'
 import { getRequestHeader, sendNoContent, setResponseHeader } from 'h3'
 import type { H3Event } from 'h3'
 import type { DataSource } from 'typeorm'
-import { DRAW_STATUS } from '../../../shared/enums/draw.enum'
 import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { MATCH_STATUS } from '../../../shared/enums/match.enum'
 import {
   CACHE_CONTROL_OPEN_EDITION,
   DEFAULT_CLOSED_EDITION_MAX_AGE_SECONDS,
   EDITION_ETAG_PREFIX
 } from '../../consts/edition.const'
 import type { EditionEntity } from '../../database/entities/edition.entity'
-import type { IEditionContentStamp, IEditionContentStampRow } from '../../interfaces/edition-query.interface'
-
-/**
- * Empreinte du contenu PUBLIC d'une édition : dernier match validé, nombre de matchs publics,
- * dernier tirage validé, effectif. Un score saisi mais non validé ne la fait pas bouger : l'ETag
- * ne trahit donc pas une saisie (E-f).
- */
-export const loadEditionContentStamp = async (
-  dataSource: DataSource,
-  edition: EditionEntity
-): Promise<IEditionContentStamp> => {
-  const [row] = await dataSource.query<IEditionContentStampRow[]>(
-    `SELECT
-       (SELECT MAX(validated_at) FROM matches WHERE edition_id = $1 AND status = ANY($2::match_status[])) AS last_match_validated_at,
-       (SELECT COUNT(*) FROM matches WHERE edition_id = $1 AND status = ANY($2::match_status[])) AS public_match_count,
-       (SELECT MAX(validated_at) FROM draws WHERE edition_id = $1 AND status = $3::draw_status) AS last_draw_validated_at,
-       (SELECT COUNT(*) FROM participations WHERE edition_id = $1) AS participation_count`,
-    [edition.id, [MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN], DRAW_STATUS.VALIDATED]
-  )
-  return {
-    status: edition.status,
-    lastMatchValidatedAt: row!.last_match_validated_at?.toISOString() ?? null,
-    publicMatchCount: Number(row!.public_match_count),
-    lastDrawValidatedAt: row!.last_draw_validated_at?.toISOString() ?? null,
-    participationCount: Number(row!.participation_count)
-  }
-}
+import { loadEditionContentStamp } from '../../services/edition.service'
+import type { IEditionContentStamp } from '../../interfaces/edition-query.interface'
 
 /** Un ETag par ressource : l'URL (chemin et requête) entre dans l'empreinte. */
 export const buildEditionEtag = (edition: EditionEntity, stamp: IEditionContentStamp, path: string): string => {

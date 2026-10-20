@@ -4,7 +4,7 @@ import type { EditionEntity } from '../../database/entities/edition.entity'
 import { getParamsWithSchema } from '../http/validation.util'
 import { applyEditionCache } from './edition-cache.util'
 import { editionParamsSchema } from './edition-query.util'
-import { findEditionOrThrow } from './edition-read.util'
+import { findEditionOrThrow } from '../../services/edition.service'
 
 /**
  * Squelette commun des lectures publiques `/editions/{id}/…` : validation de `id` (400), édition

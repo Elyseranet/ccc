@@ -1,31 +1,31 @@
 import { In } from 'typeorm'
 import type { DataSource } from 'typeorm'
-import { DRAW_STATUS } from '../../../shared/enums/draw.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { MATCH_STATUS } from '../../../shared/enums/match.enum'
-import type { IDraw } from '../../../shared/interfaces/api/draw.interface'
-import type { IEditionChampion, IEditionSummary } from '../../../shared/interfaces/api/edition.interface'
-import type { IMatch } from '../../../shared/interfaces/api/match.interface'
-import type { IPaginated } from '../../../shared/interfaces/api/pagination.interface'
-import type { IArchiveStats } from '../../../shared/interfaces/api/stats.interface'
-import { API_ERROR_MESSAGE } from '../../consts/api-error.const'
-import { MATCH_PUBLIC_RELATIONS } from '../../consts/edition.const'
-import { DrawAssignmentEntity } from '../../database/entities/draw-assignment.entity'
-import { DrawEntity } from '../../database/entities/draw.entity'
-import { CompetitorEntity } from '../../database/entities/competitor.entity'
-import { EditionEntity } from '../../database/entities/edition.entity'
-import { MatchEntity } from '../../database/entities/match.entity'
-import { ParticipationEntity } from '../../database/entities/participation.entity'
-import { PoolEntity } from '../../database/entities/pool.entity'
-import { RoundEntity } from '../../database/entities/round.entity'
-import { MATCH_SORT } from '../../enums/match-sort.enum'
-import type { IEditionMatchCounts, IMatchListQuery } from '../../interfaces/edition-query.interface'
-import { toCompetitorPublic } from '../competitor/competitor-public.mapper.util'
-import { toPublicDraw } from '../draw/draw-public.mapper.util'
-import { notFound } from '../http/api-error.util'
-import { buildPaginated } from '../http/pagination.util'
-import { toPublicMatch, toStoredMatchStatuses } from '../match/match-public.mapper.util'
-import { isEditionUuid } from './edition-query.util'
+import { DRAW_STATUS } from '../../shared/enums/draw.enum'
+import { FINAL_STAGE } from '../../shared/enums/participation.enum'
+import { MATCH_STATUS } from '../../shared/enums/match.enum'
+import type { IDraw } from '../../shared/interfaces/api/draw.interface'
+import type { IEditionChampion, IEditionSummary } from '../../shared/interfaces/api/edition.interface'
+import type { IMatch } from '../../shared/interfaces/api/match.interface'
+import type { IPaginated } from '../../shared/interfaces/api/pagination.interface'
+import type { IArchiveStats } from '../../shared/interfaces/api/stats.interface'
+import { API_ERROR_MESSAGE } from '../consts/api-error.const'
+import { MATCH_PUBLIC_RELATIONS } from '../consts/edition.const'
+import { DrawAssignmentEntity } from '../database/entities/draw-assignment.entity'
+import { DrawEntity } from '../database/entities/draw.entity'
+import { CompetitorEntity } from '../database/entities/competitor.entity'
+import { EditionEntity } from '../database/entities/edition.entity'
+import { MatchEntity } from '../database/entities/match.entity'
+import { ParticipationEntity } from '../database/entities/participation.entity'
+import { PoolEntity } from '../database/entities/pool.entity'
+import { RoundEntity } from '../database/entities/round.entity'
+import { MATCH_SORT } from '../enums/match-sort.enum'
+import type { IEditionContentStamp, IEditionMatchCounts, IMatchListQuery } from '../interfaces/edition-query.interface'
+import { toCompetitorPublic } from '../utils/competitor/competitor-public.mapper.util'
+import { toPublicDraw } from '../utils/draw/draw-public.mapper.util'
+import { notFound } from '../utils/http/api-error.util'
+import { buildPaginated } from '../utils/http/pagination.util'
+import { toPublicMatch, toStoredMatchStatuses } from '../utils/match/match-public.mapper.util'
+import { isEditionUuid } from '../utils/edition/edition-query.util'
 
 /** Accepte l'UUID ou le code (`2012a`). 404 si inconnue. */
 export const findEditionOrThrow = async (dataSource: DataSource, idOrCode: string): Promise<EditionEntity> => {
@@ -191,4 +191,39 @@ export const loadArchiveStats = async (dataSource: DataSource): Promise<IArchive
     dataSource.getRepository(MatchEntity).countBy({ status: MATCH_STATUS.RESULT_UNKNOWN })
   ])
   return { editions, competitors, matches: scoredMatches + unknownResultMatches, scoredMatches, unknownResultMatches }
+}
+
+const maxOf = async (query: { getRawOne: <T>() => Promise<T | undefined> }): Promise<string | null> => {
+  const row = await query.getRawOne<{ latest: Date | null }>()
+  return row?.latest?.toISOString() ?? null
+}
+
+/**
+ * Empreinte du contenu PUBLIC d'une édition : dernier match validé, nombre de matchs publics,
+ * dernier tirage validé, effectif. Un score saisi mais non validé ne la fait pas bouger : l'ETag
+ * ne trahit donc pas une saisie (E-f). Le MAX passe par le QueryBuilder : `Repository.maximum`
+ * convertit en nombre et perdrait la date.
+ */
+export const loadEditionContentStamp = async (
+  dataSource: DataSource,
+  edition: EditionEntity
+): Promise<IEditionContentStamp> => {
+  const publicStatuses = In([MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN])
+  const matchRepo = dataSource.getRepository(MatchEntity)
+  const drawRepo = dataSource.getRepository(DrawEntity)
+  const [lastMatchValidatedAt, publicMatchCount, lastDrawValidatedAt, participationCount] = await Promise.all([
+    maxOf(matchRepo.createQueryBuilder('m').select('MAX(m.validatedAt)', 'latest')
+      .where({ editionId: edition.id, status: publicStatuses })),
+    matchRepo.countBy({ editionId: edition.id, status: publicStatuses }),
+    maxOf(drawRepo.createQueryBuilder('d').select('MAX(d.validatedAt)', 'latest')
+      .where({ editionId: edition.id, status: DRAW_STATUS.VALIDATED })),
+    dataSource.getRepository(ParticipationEntity).countBy({ editionId: edition.id })
+  ])
+  return {
+    status: edition.status,
+    lastMatchValidatedAt,
+    publicMatchCount: publicMatchCount,
+    lastDrawValidatedAt,
+    participationCount
+  }
 }

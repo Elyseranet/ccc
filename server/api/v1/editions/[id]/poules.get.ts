@@ -1,6 +1,6 @@
 import type { IPool } from '../../../../../shared/interfaces/api/pool.interface'
 import { buildPools } from '../../../../utils/edition/edition-assemble.util'
-import { loadEditionMatches, loadParticipations, loadPoolEntities } from '../../../../utils/edition/edition-read.util'
+import { loadEditionMatches, loadParticipations, loadPoolEntities } from '../../../../services/edition.service'
 import { readEditionResource } from '../../../../utils/edition/edition-route.util'
 
 /** Poules et classements (RG19, A10), sur les seuls matchs validés. */
