@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon compte · CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="">
+<div class="ambient" aria-hidden="true"></div>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-toolbar tag="header" flat · nav = origam-btn (to) · pas d'avatar ni de « Connexion » en en-tête (décision A3/E-d) -->
+<header class="hh-header"><div class="wrap hh-header__bar">
+  <a class="hh-brand font-display" href="index.html" aria-label="CCC, accueil"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <nav class="hh-nav" aria-label="Navigation principale"><ul><li><a href="edition.html">Éditions</a></li><li><a href="joueurs.html">Joueurs</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="regles.html">Règles</a></li></ul></nav>
+  <span class="hh-header__end" aria-hidden="true"></span>
+</div></header>
+<main id="contenu">
+
+<section class="page-hero" aria-labelledby="h-acc"><div class="wrap"><p class="eyebrow">Compte participant</p><h1 id="h-acc" class="page-hero__title font-display neon">Mon compte</h1><p class="page-hero__lead">Trois écrans du rôle participant : la première connexion depuis l’invitation, la connexion et le profil.</p></div></section>
+<section class="wrap" aria-label="Écrans du compte"><div class="tabs" role="tablist" aria-label="Sections"><button role="tab" id="ac-t-first" aria-controls="ac-p-first" aria-selected="true" tabindex="0">Première connexion</button><button role="tab" id="ac-t-login" aria-controls="ac-p-login" aria-selected="false" tabindex="-1">Connexion</button><button role="tab" id="ac-t-prof" aria-controls="ac-p-prof" aria-selected="false" tabindex="-1">Mon profil</button></div><section role="tabpanel" id="ac-p-first" aria-labelledby="ac-t-first"><div class="acc-grid">
+  <section class="card acc-card" aria-labelledby="h-first">
+    <span class="chip chip--neon">Invitation · valable 7 jours</span>
+    <h2 id="h-first" class="h-section font-display neon--sm">Bienvenue au CCC</h2>
+    <p class="muted">L’organisation vous a inscrit·e. Choisissez votre mot de passe, ajoutez une photo et votre téléphone si vous le souhaitez.</p>
+    <!-- origam-form · origam-password-field ×2 · origam-file-field (avatar) · origam-text-field type=tel -->
+    <form class="acc-form" action="#">
+      <p class="field"><label for="pw1">Mot de passe</label><input id="pw1" class="input" type="password" autocomplete="new-password" aria-describedby="pw-hint"></p>
+      <p class="field"><label for="pw2">Confirmer le mot de passe</label><input id="pw2" class="input" type="password" autocomplete="new-password"></p>
+      <p id="pw-hint" class="hint muted">Le lien ne sert qu’une fois.</p>
+      <div class="acc-avatar"><span class="avatar avatar--xl font-display" aria-hidden="true">SD</span><p class="field"><label for="av">Avatar</label><input id="av" class="input input--file" type="file" accept="image/*"></p></div>
+      <p class="field"><label for="tel">Téléphone · facultatif, jamais public</label><input id="tel" class="input" type="tel" autocomplete="tel"></p>
+      <button class="btn btn--primary" type="submit">Activer mon compte</button>
+    </form>
+  </section>
+  <aside class="card acc-state" aria-labelledby="h-exp">
+    <span class="acc-state__ic font-display" aria-hidden="true">!</span>
+    <h3 id="h-exp" class="h-card">Lien expiré ou déjà utilisé</h3>
+    <p class="muted">Une invitation est valable 7 jours. Demandez à l’organisation de vous en renvoyer une : l’ancien lien ne fonctionnera plus.</p>
+    <a class="btn btn--outlined btn--sm" href="index.html">Retour au site</a>
+  </aside>
+</div></section><section role="tabpanel" id="ac-p-login" aria-labelledby="ac-t-login" hidden><div class="acc-grid acc-grid--login">
+  <section class="card acc-card" aria-labelledby="h-login">
+    <h2 id="h-login" class="h-section font-display neon--sm">Connexion</h2>
+    <p class="muted">Pour les participants et l’organisation.</p>
+    <form class="acc-form" action="#">
+      <p class="field"><label for="em">Email</label><input id="em" class="input" type="email" autocomplete="email"></p>
+      <p class="field"><label for="pw">Mot de passe</label><input id="pw" class="input" type="password" autocomplete="current-password"></p>
+      <p class="acc-error" role="alert" id="login-err"><span class="chip chip--danger">Erreur</span>Email ou mot de passe incorrect.</p>
+      <button class="btn btn--primary" type="submit">Se connecter</button>
+    </form>
+  </section>
+  <aside class="acc-aside"><p class="acc-aside__big font-display neon">Santé !</p><p class="muted">Après connexion : un participant arrive sur son profil, l’organisation sur son espace.</p></aside>
+</div></section><section role="tabpanel" id="ac-p-prof" aria-labelledby="ac-t-prof" hidden><div class="acc-grid">
+  <section class="card acc-card" aria-labelledby="h-prof">
+    <div class="acc-prof-h"><span class="avatar avatar--xl font-display" aria-hidden="true">SD</span><div><p class="eyebrow">Mon profil · /profil</p><h2 id="h-prof" class="h-section font-display neon--sm">Sam Dupont</h2><p class="muted">« Rebond »</p></div></div>
+    <!-- origam-data-list (lecture seule) + origam-form (champs modifiables : avatar, téléphone, mot de passe — A4) -->
+    <dl class="acc-ro">
+      <div><dt>Nom, prénom</dt><dd>Sam Dupont</dd><small class="muted">Modifié par l’organisation</small></div>
+      <div><dt>Pseudo</dt><dd>« Rebond »</dd><small class="muted">Réservé à l’organisation (A4)</small></div>
+      <div><dt>Email</dt><dd>s•••••@•••••.fr</dd><small class="muted">Privé, jamais public</small></div>
+    </dl>
+    <form class="acc-form" action="#">
+      <div class="acc-avatar"><span class="avatar avatar--xl font-display" aria-hidden="true">SD</span><p class="field"><label for="av2">Changer d’avatar</label><input id="av2" class="input input--file" type="file" accept="image/*"></p></div>
+      <p class="field"><label for="tel2">Téléphone · privé</label><input id="tel2" class="input" type="tel" value="06 •• •• •• ••" autocomplete="tel"></p>
+      <p class="field"><label for="pw3">Nouveau mot de passe</label><input id="pw3" class="input" type="password" autocomplete="new-password"></p>
+      <div class="acc-cta"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn btn--outlined" href="joueur.html">Voir ma fiche publique</a></div>
+    </form>
+  </section>
+  <aside class="card acc-state acc-state--ok" aria-live="polite"><span class="acc-state__ic font-display" aria-hidden="true">✓</span><h3 class="h-card">Profil enregistré</h3><p class="muted">Votre fiche publique n’affiche jamais votre email ni votre téléphone.</p></aside>
+</div></section></section>
+</main>
+<footer class="hh-footer"><div class="wrap">
+  <div class="hh-footer__grid">
+    <p class="hh-footer__brand font-display neon--sm">CCC</p>
+    <nav aria-label="Pied de page"><ul><li><a href="regles.html">Règles</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="compte.html">Connexion</a></li></ul></nav>
+  </div>
+  <p class="hh-footer__note">Maquette haute fidélité. Chiffres réels repris de la Spec fonctionnelle : 16 éditions, 145 compétiteurs, 729 matchs joués dont 554 avec score (décision A16), effectifs de 16 (2012) à 49 (2023). Noms, scores, effectifs des autres années et configurations de poule sont des données d'illustration générées selon les règles RG1–RG24.</p>
+</div></footer>
+<script>
+  // Maquette : comportement d'origam-tabs (flèches, Début/Fin). Aucune animation pilotée en JS.
+  document.querySelectorAll('[role="tablist"]').forEach((list) => {
+    const tabs = [...list.querySelectorAll('[role="tab"]')]
+    const show = (t) => { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on }) }
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(t))
+      t.addEventListener('keydown', (ev) => {
+        const k = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[ev.key]
+        if (k === undefined) return
+        ev.preventDefault(); const n = tabs[(k + tabs.length) % tabs.length]; n.focus(); show(n)
+      })
+    })
+  })
+</script>
+</body>
+</html>

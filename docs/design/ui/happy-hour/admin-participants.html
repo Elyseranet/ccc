@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Participants · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-layout : origam-drawer permanent (≥ 1000 px) · origam-bottom-nav (< 1000 px, 4 entrées, décision A7) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="admin-participants.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li></ul></nav>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <!-- origam-toolbar : sélecteur d'édition global (origam-select) -->
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Édition 2026 · avant le tirage</p><h1 class="adm-h1 font-display neon--sm">Participants</h1></div><p class="muted num">44 inscrits · ajout et retrait possibles jusqu’à la validation du tirage</p></div>
+<div class="pa-grid">
+  <section class="card pa-add" aria-labelledby="h-add">
+    <h2 id="h-add" class="h-card">Ajouter un participant</h2>
+    <p class="muted">Un seul flux : chercher dans les 145 profils, rattacher, ou créer et inviter.</p>
+    <!-- origam-select autocomplete (search, items) · origam-list des suggestions · origam-btn « Créer » -->
+    <div class="combo">
+      <p class="field"><label for="pa-q">Nom, prénom ou pseudo</label><input id="pa-q" class="input" type="search" value="Cam" role="combobox" aria-expanded="true" aria-controls="pa-list" aria-autocomplete="list" autocomplete="off"></p>
+      <ul id="pa-list" class="combo__list" role="listbox" aria-label="Profils correspondants">
+        <li role="option" aria-selected="true" class="sug is-active"><span class="avatar">CD</span><span><b>Camille Durand</b><small class="muted">1 édition · dernière 2013</small></span><span class="chip">Profil existant</span></li>
+        <li role="option" aria-selected="false" class="sug sug--new"><span class="avatar avatar--new" aria-hidden="true">+</span><span><b>Créer un nouveau participant « Cam »</b><small class="muted">Aucun de ces profils ? Créez-le et envoyez l’invitation</small></span></li>
+      </ul>
+    </div>
+    <!-- origam-form : avatar (origam-file-field), nom, prénom, pseudo, email, téléphone (SF P1) -->
+    <form class="pa-form" action="#" aria-labelledby="h-new">
+      <h3 id="h-new" class="h-card">Nouveau participant</h3>
+      <div class="pa-form__grid">
+        <p class="field"><label for="n-ln">Nom</label><input id="n-ln" class="input" value="Roussel"></p>
+        <p class="field"><label for="n-fn">Prénom</label><input id="n-fn" class="input" value="Camille"></p>
+        <p class="field"><label for="n-ps">Pseudo</label><input id="n-ps" class="input" value="Décapsuleur"></p>
+        <p class="field"><label for="n-av">Avatar</label><input id="n-av" class="input input--file" type="file" accept="image/*"></p>
+        <p class="field"><label for="n-em">Email · privé</label><input id="n-em" class="input is-error" type="email" value="camille@exemple.fr" aria-invalid="true" aria-describedby="n-em-err"></p>
+        <p class="field"><label for="n-tel">Téléphone · privé</label><input id="n-tel" class="input" type="tel"></p>
+      </div>
+      <p id="n-em-err" class="acc-error" role="alert"><span class="chip chip--danger">Refusé</span>Cet email est déjà rattaché à un autre compte. Rattachez le profil existant ou corrigez l’email.</p>
+      <p class="rule"><span class="chip chip--info">Invitation</span>Un compte est créé et un email d’invitation part aussitôt. Le lien est valable 7 jours ; un renvoi annule l’ancien (A14).</p>
+      <div class="pa-form__cta"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="submit">Créer, rattacher et inviter</button></div>
+    </form>
+  </section>
+  <section class="pa-list" aria-labelledby="h-ins">
+    <header class="adm-card-h"><h2 id="h-ins" class="h-card">Inscrits</h2><span class="chip chip--neon num">44</span></header>
+    <div class="table-wrap"><table class="table"><caption class="sr-only">Participants inscrits à l’édition 2026</caption><thead><tr><th scope="col">Joueur</th><th scope="col">Pseudo</th><th scope="col" class="r">Éditions</th><th scope="col">Compte</th><th scope="col" class="r">Action</th></tr></thead>
+      <tbody><tr><td><span class="pl-cell"><span class="avatar">LA</span><b>Lisa André</b></span></td><td class="muted">—</td><td class="r num">10</td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Lisa André</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">CA</span><b>Chloé André</b></span></td><td class="muted">—</td><td class="r num">0</td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Chloé André</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">MB</span><b>Maya Bonnet</b></span></td><td class="muted">« Triple »</td><td class="r num">0</td><td><span class="chip chip--warn">Invité</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Maya Bonnet</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">JB</span><b>Julia Bonnet</b></span></td><td class="muted">—</td><td class="r num">3</td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Julia Bonnet</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">AC</span><b>Anna Chevalier</b></span></td><td class="muted">—</td><td class="r num">2</td><td><span class="chip chip--danger">Invitation expirée</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Renvoyer<span class="sr-only"> l’invitation à Anna Chevalier</span></button><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Anna Chevalier</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">CD</span><b>Clara David</b></span></td><td class="muted">—</td><td class="r num">4</td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Clara David</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">AD</span><b>Arthur Dufour</b></span></td><td class="muted">—</td><td class="r num">3</td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Arthur Dufour</span></button></td></tr><tr><td><span class="pl-cell"><span class="avatar">CD</span><b>Chloé Dumont</b></span></td><td class="muted">« Shifumi »</td><td class="r num">4</td><td><span class="chip chip--warn">Invité</span></td><td class="r"><button class="btn btn--text btn--sm" type="button">Retirer<span class="sr-only"> Chloé Dumont</span></button></td></tr></tbody></table></div>
+    <nav class="pager" aria-label="Pagination des inscrits"><span class="num">1–8 sur 44</span><ol><li><a href="#" aria-current="page">1</a></li><li><a href="#">2</a></li><li><a href="#">3</a></li><li><a href="#">4</a></li><li><a href="#">5</a></li><li><a href="#">6</a></li></ol></nav>
+  </section>
+</div>
+<div class="snack" role="status"><span class="chip chip--ok">Invitation envoyée</span>Profil rattaché à l’édition 2026</div></main>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+</body>
+</html>

@@ -14,7 +14,9 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | `bulles.js` | Décor des vitrines (canvas, requestAnimationFrame), remplaçant provisoire de la vidéo. |
 | `index.html`, `palmares.html` | Vitrines (animation JS / vidéo autorisées, CLAUDE.md du projet). |
 | `edition.html`, `joueur.html`, `joueurs.html` | Pages denses publiques (CSS seul). |
-| `admin.html`, `admin-scores.html` | Organisation (CSS seul) ; `admin-scores` montre la saisie ouverte. |
+| `face-a-face.html`, `regles.html`, `compte.html` | Face-à-face (seul ratio public), règles + variantes, compte participant (1re connexion, connexion, /profil). |
+| `admin.html`, `admin-matchs.html` | Tableau de bord ; poules et matchs (`/admin/matchs`, FA-05) avec la saisie ouverte. |
+| `admin-participants.html`, `admin-tirages.html`, `admin-plus.html` | Participants (autocomplétion, création, invitation) ; tirage physique ; entrée « Plus » de la barre basse (390 px). |
 
 ## Décisions portées par le thème
 
@@ -62,7 +64,7 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Fiche joueur | En-tête de fiche | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"`<br>Jamais d’email ni de téléphone (données privées). |
 | Fiche joueur | Pastille titres | `origam-chip` | `color: "primary"`, `size: "small"`<br>RG6. |
 | Fiche joueur | Comparer avec… | `origam-btn` | `variant: "flat"`, `color: "primary"`, `elevation: "lg"`, `to: "/face-a-face?a=…"` |
-| Fiche joueur | Chiffres (matchs, V, D) | `origam-card` | `rounded: "xl"`, `border: true`<br>Ratio marqué « à confirmer » (RG37 hors liste P5). |
+| Fiche joueur | Chiffres (matchs, V, D) | `origam-card` | `rounded: "xl"`, `border: true`<br>Matchs joués, victoires, défaites seulement : pas de ratio (FA-12, ratio réservé au face-à-face). |
 | Fiche joueur | Parcours (graphique) | — (CSS d’app) | Barres CSS d’app (une série ordinale) ; données = tableau ci-dessous. origam-chart `type="column"` possible si l’on accepte des catégories ordinales. |
 | Fiche joueur | Parcours (tableau) | `origam-data-table` | `headers`, `items`, `density: "compact"` |
 | Fiche joueur | Adversaires fréquents | `origam-list` | `items`, `density: "comfortable"`<br>Lien « Face-à-face » = origam-btn `variant="text"`, nom accessible complet. |
@@ -70,21 +72,51 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Joueurs | Champ nom ou pseudo | `origam-text-field` | `type: "search"`, `label: "Nom ou pseudo"`, `variant: "solo"`, `rounded: "full"`, `clearable: true` |
 | Joueurs | Filtre édition | `origam-select` | `items`, `label: "Édition jouée"`, `variant: "solo"` |
 | Joueurs | Annuaire | `origam-data-table` | `headers`, `items`, `itemsPerPage: 20`, `sortBy`, `density: "compact"`<br>145 compétiteurs → 8 pages. Région aria-live pour le nombre de résultats. |
-| Admin | Navigation bureau | `origam-drawer` | `permanent: true`, `width: 272`, `border: true`, `elevation: "none"`<br>Items = origam-list `nav`. |
+| Admin | Navigation bureau | `origam-drawer` | `permanent: true`, `width: 272`, `border: true`, `elevation: "none"`<br>Items = origam-list `nav` : Tableau de bord, Participants, Tirages, Poules et matchs. Bracket, Compétiteurs, Éditions masqués jusqu’à leur ticket (FA-09). |
 | Admin | Items de navigation | `origam-list` | `nav: true`, `density: "comfortable"`, `rounded: "lg"` |
 | Admin | Navigation mobile | `origam-bottom-nav` | `items`, `grow: true`, `elevation: "lg"`, `mandatory: true`<br>4 entrées : Tableau, Matchs, Tirages, Plus (A7). |
 | Admin | Édition active | `origam-select` | `items`, `label: "Édition active"`, `variant: "solo"`, `rounded: "full"`<br>Contexte global de toutes les pages admin. |
 | Admin | Centre de contrôle | `origam-stepper` | `items`, `orientation: "vertical"`, `clickable: false`, `showConnectors: true`<br>9 étapes de la Spec fonctionnelle. Statuts done / active / pending. |
-| Admin | À traiter | `origam-card` | `to: "/admin/matchs?f=saisis"`, `rounded: "xl"`, `border: true`, `hover: true`<br>Compteur : origam-badge `content="7"` sur le CTA. |
+| Admin | À traiter | `origam-card` | `to: "/admin/matchs?f=saisis"`, `rounded: "xl"`, `border: true`, `hover: true`<br>Compteur : origam-badge `content="7"` sur le CTA. Route `/admin/matchs` (FA-05). |
 | Admin | Compteur du CTA | `origam-badge` | `content: 7`, `inline: true`, `color: "secondary"` |
-| Admin | Activité récente | `origam-list` | `items`, `density: "compact"`<br>Journal des tirages (auteur, horodatage). |
-| Admin · scores | Filtres de file | `origam-chip-group` | `mandatory: true`, `filter: true`<br>À traiter / Saisis / Sans score / Validés (A1). |
-| Admin · scores | Cartes de match | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "sm"`<br>Bureau : origam-data-table. Mobile : liste de cartes. |
-| Admin · scores | Saisie (bureau) | `origam-dialog` | `modelValue: true`, `maxWidth: 560`, `persistent: false`, `scrim: true`, `title: "Saisir le score"`<br>Mobile : même contenu en tiroir bas (origam-sheet `side`/`snapPoints`, à confirmer). |
-| Admin · scores | Tiroir mobile | `origam-sheet` | `open: true`, `swipeable: true`, `rounded: "xl"` |
-| Admin · scores | Champs de score | `origam-number-field` | `min: 0`, `max: 5`, `label: "Clara Lambert"`, `variant: "solo"`, `rounded: "lg"`<br>Max 5 en poule, 10 en phase finale (RG22). Erreurs via `errorMessages`. |
-| Admin · scores | Formulaire | `origam-form` | `validateOn: "submit"`<br>Enregistrer ≠ Valider (états : à jouer → saisi → validé). |
-| Admin · scores | Rappel de règle | `origam-alert` | À vérifier : props exactes d’origam-alert non utilisées ici (Je ne sais pas lesquelles conviennent). |
+| Admin | Activité récente | `origam-list` | `items`, `density: "compact"`<br>Flux dérivé des seules validations de match et de tirage, sans table d’audit (A17). |
+| Admin · matchs | Filtres de file | `origam-chip-group` | `mandatory: true`, `filter: true`<br>À traiter / Saisis / Sans score / Validés (A1). |
+| Admin · matchs | Cartes de match | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "sm"`<br>Bureau : origam-data-table. Mobile : liste de cartes. |
+| Admin · matchs | Saisie (bureau) | `origam-dialog` | `modelValue: true`, `maxWidth: 560`, `persistent: false`, `scrim: true`, `title: "Saisir le score"`<br>Mobile : même contenu en tiroir bas (origam-sheet `side`/`snapPoints`, à confirmer). |
+| Admin · matchs | Tiroir mobile | `origam-sheet` | `open: true`, `swipeable: true`, `rounded: "xl"` |
+| Admin · matchs | Champs de score | `origam-number-field` | `min: 0`, `max: 5`, `label: "Clara Lambert"`, `variant: "solo"`, `rounded: "lg"`<br>Max 5 en poule, 10 en phase finale (RG22). Erreurs via `errorMessages`. |
+| Admin · matchs | Formulaire | `origam-form` | `validateOn: "submit"`<br>Enregistrer ≠ Valider (états : à jouer → saisi → validé). |
+| Admin · matchs | Rappel de règle | `origam-alert` | `status: "info"`, `title: "Cible 5"`, `text: "En poule, le vainqueur marque exactement 5 (RG22)."`, `rounded: "lg"`, `density: "compact"`<br>Props vérifiées le 2026-10-20 (IAlertProps : status success | info | warning | error). |
+| Face-à-face | Choix des joueurs | `origam-select` | `autocomplete: true`, `search: "…"`, `items`, `label: "Joueur 1"`, `variant: "solo"`, `rounded: "full"`, `clearable: true`<br>×2 ; URL `?a=&b=` partageable. Bouton « Inverser » : origam-btn `icon` + `aria-label`. |
+| Face-à-face | Inverser | `origam-btn` | `icon: true`, `variant: "outlined"`, `rounded: "full"`, `prependAriaLabel: "Inverser les deux joueurs"`<br>Nom accessible aussi en `aria-label` natif. |
+| Face-à-face | Score des rencontres | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"`<br>Proportion = barre + texte « 2 – 2 » (jamais la couleur seule). Départages exclus. |
+| Face-à-face | Bilans globaux (RG37) | `origam-data-list` | `items`, `density: "compact"`, `rounded: "lg"`<br>Matchs, ratio, V, D, points marqués / encaissés, différentiel : le SEUL endroit public où le ratio apparaît (FA-12). |
+| Face-à-face | Historique (RG36) | `origam-data-table` | `headers`, `items`, `density: "compact"`<br>Rencontres sans score connu comptées à part, jamais comme nuls. |
+| Règles | Onglets Le jeu / Le tournoi / Variantes | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Variantes = section de Règles (A2), redirection `/variants`. |
+| Règles | Déroulé d’un point | `origam-stepper` | `items`, `orientation: "horizontal"`, `clickable: false`<br>Contenu repris de app/pages/rules.vue. |
+| Règles | Règles d’or (RG25–RG32) | `origam-list` | `items`<br>Grille statique, aucun défilement automatique. |
+| Règles | Schéma d’une variante | `origam-card` | `rounded: "xl"`, `border: true`<br>Schéma SVG `role="img"` + `aria-label` décrivant la disposition ; textes repris de app/pages/variants.vue. |
+| Compte | Mot de passe (1re connexion) | `origam-password-field` | `label: "Mot de passe"`, `variant: "solo"`, `rounded: "full"`, `strengthBar: true`, `persistentRequirements: true`<br>Lien d’invitation valable 7 jours, usage unique (A14). |
+| Compte | Avatar | `origam-file-field` | `label: "Avatar"`, `variant: "solo"`, `rounded: "full"`, `maxFileSize: 2000000`, `showSize: true`<br>A4 : le participant modifie avatar, téléphone, mot de passe. |
+| Compte | Téléphone | `origam-text-field` | `type: "tel"`, `label: "Téléphone"`, `variant: "solo"`, `rounded: "full"`, `hint: "Privé, jamais public"` |
+| Compte | Champs en lecture seule (/profil) | `origam-data-list` | `items`, `density: "compact"`, `rounded: "lg"`<br>Nom, prénom, pseudo (réservé à l’admin, A4), email masqué. |
+| Compte | Erreur de connexion | `origam-alert` | `status: "error"`, `text: "Email ou mot de passe incorrect."`, `rounded: "lg"`, `density: "compact"` |
+| Admin · participants | Recherche / autocomplétion | `origam-select` | `autocomplete: true`, `search: "Cam"`, `items`, `label: "Nom, prénom ou pseudo"`, `variant: "solo"`, `rounded: "full"`, `noDataText: "Aucun profil ne correspond."`<br>Dernier item du menu : « Créer un nouveau participant » (slot de liste). Un seul flux : chercher → rattacher ou créer → inviter. |
+| Admin · participants | Formulaire de création | `origam-form` | `validateOn: "submit"`<br>Champs SF P1 : nom, prénom, pseudo, avatar (origam-file-field), email, téléphone (privés). |
+| Admin · participants | Email déjà pris | `origam-text-field` | `type: "email"`, `label: "Email"`, `error: true`, `errorMessages`, `variant: "solo"`, `rounded: "full"`<br>Refus 409 ; proposer le rattachement du profil existant. |
+| Admin · participants | Information invitation | `origam-alert` | `status: "info"`, `title: "Invitation"`, `text: "Lien valable 7 jours ; un renvoi annule l’ancien."`, `rounded: "lg"`<br>A14. |
+| Admin · participants | Inscrits | `origam-data-table` | `headers`, `items`, `itemsPerPage: 8`, `density: "compact"`<br>États du compte : Invité, Actif, Invitation expirée (→ Renvoyer). Retrait possible avant le tirage seulement. |
+| Admin · participants | Confirmation | `origam-snackbar` | `modelValue: true`, `text: "Invitation envoyée"`, `status: "success"`, `location: "bottom"`, `timeout: 4000` |
+| Admin · tirages | Étapes du tirage | `origam-stepper` | `items`, `orientation: "horizontal"`, `clickable: false`, `showConnectors: true`<br>5 étapes ; vertical sur mobile. |
+| Admin · tirages | Avancement | `origam-progress` | `modelValue: 82`, `color: "primary"`, `rounded: true`<br>37 / 45 joueurs placés. |
+| Admin · tirages | Affectation d’une place | `origam-select` | `autocomplete: true`, `items`, `label: "Poule 1, place 2"`, `variant: "solo"`, `rounded: "full"`, `density: "compact"`<br>Un joueur placé disparaît des autres listes. Têtes de série en place 1 (RG9, RG11). |
+| Admin · tirages | Brouillon enregistré | `origam-snackbar` | `modelValue: true`, `text: "Brouillon enregistré"`, `status: "success"`, `location: "bottom"`, `timeout: 2500`<br>A1 : brouillon serveur à chaque affectation. |
+| Admin · tirages | Têtes de série | `origam-list` | `items`, `density: "compact"`<br>ACP sur les 5 dernières éditions clôturées (A8). |
+| Admin · tirages | Confirmation de validation | `origam-dialog` | `modelValue: true`, `persistent: true`, `maxWidth: 560`, `title: "Valider le tirage des poules ?"`, `scrim: true`<br>Non annulable : le texte le dit, focus initial sur « Annuler », bouton `color="error"`. |
+| Admin · tirages | Valider définitivement | `origam-btn` | `variant: "flat"`, `color: "error"`, `size: "large"` |
+| Admin · Plus (mobile) | Entrée « Plus » | `origam-list` | `nav: true`, `items`, `density: "comfortable"`, `rounded: "lg"`<br>Participants, Voir le site public, Mon compte (FA-08). Rien de masqué par FA-09. |
+| Admin · Plus (mobile) | Édition active | `origam-select` | `items`, `label: "Édition active"`, `variant: "solo"`, `rounded: "full"` |
+| Admin · Plus (mobile) | Déconnexion | `origam-btn` | `variant: "outlined"`, `block: true` |
 
 ## Vidéo de fond des vitrines : asset à fournir
 
@@ -96,6 +128,8 @@ Je n’ai pas créé de vidéo. Ce qu’il faut fournir pour remplacer le canvas
 
 ## Données des maquettes
 
-- **Réelles (Spec fonctionnelle)** : 16 éditions (2012 compte deux éditions), 145 compétiteurs, 1 414 matchs dont 554 avec score, effectifs 16 (2012), 36 (2017), 49 (2023, maximum), huitièmes depuis 2015 sauf 2016, barrages en 2024.
+- **Réelles** : 16 éditions (2012 compte deux éditions), 145 compétiteurs, **729 matchs joués dont 554 avec score** (A16 ; l’ancien « 1 414 » comptait 685 gabarits vides), effectifs 16 (2012), 36 (2017), 49 (2023, maximum), huitièmes depuis 2015 sauf 2016, barrages en 2024.
 - **Règles appliquées** : barème RG1 × N/50 (RG2), ACP sur 5 éditions et All Time (RG4), moyenne (RG5), titres en astérisques (RG6), évolution annuelle (RG8), têtes de série (RG9), tirage poule après poule (RG11), tirage à chaque tour (RG13), barrages 2024 (RG14), round-robin intégral (RG15), départage cap’s average (RG19), 5 en poule et 10 en phase finale (RG22), identifiant `{édition}-{rang}` (RG24).
 - **Illustratifs** : tous les noms (fictifs), les scores, les effectifs des autres années, la répartition des poules et la règle de qualification (RG18 : « selon la configuration retenue »). Ils sont générés par un script à graine fixe, donc cohérents entre les pages (mêmes joueurs, mêmes résultats, mêmes points).
+- ⚠️ **Écart connu** : avec des tournois complets en poule, le volume de matchs par édition des maquettes (ex. 120 en 2025) dépasse la moyenne réelle (729 / 16 ≈ 46). Les vraies données d’import remplaceront ces volumes.
+- **Libellé public proposé (A16)** : « 729 matchs joués depuis 2012, dont 554 avec score ».

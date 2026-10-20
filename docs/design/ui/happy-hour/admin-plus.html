@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plus · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-layout : origam-drawer permanent (≥ 1000 px) · origam-bottom-nav (< 1000 px, 4 entrées, décision A7) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li></ul></nav>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <!-- origam-toolbar : sélecteur d'édition global (origam-select) -->
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Organisation</p><h1 class="adm-h1 font-display neon--sm">Plus</h1></div></div>
+<!-- origam-list nav : ce qui n'a pas de place dans origam-bottom-nav (4 entrées, A7). Bracket, Compétiteurs, Éditions masqués (FA-09). -->
+<nav aria-label="Plus d’options"><ul class="plus">
+  <li><a class="plus__i" href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span><b>Participants</b><small class="muted">Inscrire, inviter, renvoyer une invitation</small></span><span aria-hidden="true">›</span></a></li>
+  <li><a class="plus__i" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg><span><b>Voir le site public</b><small class="muted">Ce que voient les visiteurs</small></span><span aria-hidden="true">›</span></a></li>
+  <li><a class="plus__i" href="compte.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span><b>Mon compte</b><small class="muted">Mot de passe</small></span><span aria-hidden="true">›</span></a></li>
+</ul></nav>
+<section class="card plus-ed" aria-labelledby="h-ped"><h2 id="h-ped" class="h-card">Édition active</h2><p class="field"><label for="ped">Toutes les pages travaillent sur cette édition</label><select id="ped" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p></section>
+<form action="#" class="plus-out"><button class="btn btn--outlined" type="submit">Se déconnecter</button></form></main>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+</body>
+</html>

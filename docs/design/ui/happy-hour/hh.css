@@ -65,7 +65,7 @@ small { font-size: var(--origam-font__size---sm); }
 .btn--text { min-height: var(--origam-space---11); padding-inline: var(--origam-space---3); color: var(--origam-color__action--primary---fgSubtle); }
 .btn--text:hover { background: var(--origam-color__action--primary---bgSubtle); }
 .btn--sm { min-height: var(--origam-space---11); padding-inline: var(--origam-space---4); font-size: var(--origam-font__size---sm); }
-.btn:disabled { background: var(--origam-color__action--primary---bgDisabled); color: var(--origam-color__action--primary---fgDisabled); box-shadow: none; cursor: not-allowed; }
+.btn:disabled { background: var(--origam-color__action--primary---bgDisabled); color: var(--origam-color__text---tertiary); box-shadow: none; cursor: not-allowed; }
 
 /* ── origam-chip ──────────────────────────────────────────────────────── */
 .chip { display: inline-flex; align-items: center; gap: var(--origam-space---1); padding: var(--origam-space---1) var(--origam-space---3); border-radius: var(--origam-radius---full); font-size: var(--origam-font__size---xs); font-weight: var(--origam-font__weight---bold); line-height: 1.3; white-space: nowrap; background: var(--origam-color__surface---overlay); color: var(--origam-color__text---secondary); }
@@ -181,3 +181,4 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 .chip .stars { color: inherit; }
+.table-wrap, .btn { position: relative; }
