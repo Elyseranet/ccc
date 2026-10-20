@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
-import { INTERNAL_ERROR_MESSAGE } from '../../server/consts/api-error.const'
+import { API_ERROR_MESSAGE, INTERNAL_ERROR_MESSAGE } from '../../server/consts/api-error.const'
 import {
   badRequest,
   conflict,
@@ -45,6 +45,22 @@ describe('api-error factories', () => {
 
   it('omits details when none were given', () => {
     expect(toApiError(notFound())).not.toHaveProperty('details')
+  })
+})
+
+describe('default messages', () => {
+  it.each([
+    ['badRequest', badRequest(), API_ERROR_MESSAGE.BAD_REQUEST],
+    ['unauthorized', unauthorized(), API_ERROR_MESSAGE.UNAUTHORIZED],
+    ['forbidden', forbidden(), API_ERROR_MESSAGE.FORBIDDEN],
+    ['notFound', notFound(), API_ERROR_MESSAGE.NOT_FOUND],
+    ['conflict', conflict(), API_ERROR_MESSAGE.CONFLICT],
+    ['gone', gone(), API_ERROR_MESSAGE.GONE],
+    ['unprocessable', unprocessable(), API_ERROR_MESSAGE.UNPROCESSABLE],
+    ['tooManyRequests', tooManyRequests(), API_ERROR_MESSAGE.RATE_LIMITED],
+    ['validationFailed', validationFailed([]), API_ERROR_MESSAGE.VALIDATION_FAILED]
+  ])('%s uses its default message constant', (_name, error, message) => {
+    expect(toApiError(error).message).toBe(message)
   })
 })
 

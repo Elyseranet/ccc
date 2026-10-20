@@ -1,11 +1,9 @@
 import { createError } from 'h3'
 import type { H3Error } from 'h3'
 import { API_ERROR_CODE } from '../../../shared/enums/api-error-code.enum'
-import { DEFAULT_CODE_BY_STATUS, INTERNAL_ERROR_MESSAGE, SERVICE_UNAVAILABLE_MESSAGE } from '../../consts/api-error.const'
+import { API_ERROR_MESSAGE, DEFAULT_CODE_BY_STATUS, INTERNAL_ERROR_MESSAGE, SERVICE_UNAVAILABLE_MESSAGE } from '../../consts/api-error.const'
 import type { TApiErrorDetails } from '../../types/api-error-details.type'
 import type { IApiError } from '../../../shared/interfaces/api/error.interface'
-
-
 
 const buildError = (
   statusCode: number,
@@ -18,31 +16,31 @@ const buildError = (
   data: { code, ...(details === undefined ? {} : { details }) }
 })
 
-export const badRequest = (message = 'Bad request', details?: TApiErrorDetails): H3Error =>
+export const badRequest = (message = API_ERROR_MESSAGE.BAD_REQUEST, details?: TApiErrorDetails): H3Error =>
   buildError(400, API_ERROR_CODE.BAD_REQUEST, message, details)
 
-export const validationFailed = (details: TApiErrorDetails, message = 'Validation failed'): H3Error =>
+export const validationFailed = (details: TApiErrorDetails, message = API_ERROR_MESSAGE.VALIDATION_FAILED): H3Error =>
   buildError(400, API_ERROR_CODE.VALIDATION_FAILED, message, details)
 
-export const unauthorized = (message = 'Authentication required'): H3Error =>
+export const unauthorized = (message = API_ERROR_MESSAGE.UNAUTHORIZED): H3Error =>
   buildError(401, API_ERROR_CODE.UNAUTHORIZED, message)
 
-export const forbidden = (message = 'Forbidden'): H3Error =>
+export const forbidden = (message = API_ERROR_MESSAGE.FORBIDDEN): H3Error =>
   buildError(403, API_ERROR_CODE.FORBIDDEN, message)
 
-export const notFound = (message = 'Resource not found'): H3Error =>
+export const notFound = (message = API_ERROR_MESSAGE.NOT_FOUND): H3Error =>
   buildError(404, API_ERROR_CODE.NOT_FOUND, message)
 
-export const conflict = (message = 'Conflict', details?: TApiErrorDetails): H3Error =>
+export const conflict = (message = API_ERROR_MESSAGE.CONFLICT, details?: TApiErrorDetails): H3Error =>
   buildError(409, API_ERROR_CODE.CONFLICT, message, details)
 
-export const gone = (message = 'Resource is no longer available'): H3Error =>
+export const gone = (message = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
-export const unprocessable = (message = 'Unprocessable entity', details?: TApiErrorDetails): H3Error =>
+export const unprocessable = (message = API_ERROR_MESSAGE.UNPROCESSABLE, details?: TApiErrorDetails): H3Error =>
   buildError(422, API_ERROR_CODE.UNPROCESSABLE, message, details)
 
-export const tooManyRequests = (message = 'Too many requests'): H3Error =>
+export const tooManyRequests = (message = API_ERROR_MESSAGE.RATE_LIMITED): H3Error =>
   buildError(429, API_ERROR_CODE.RATE_LIMITED, message)
 
 /** 5xx : le message est générique, le détail (cause) ne part que dans les logs. */
@@ -69,7 +67,7 @@ export const toApiError = (error: unknown): IApiError => {
 
   const data = (candidate?.data ?? {}) as { code?: API_ERROR_CODE, details?: IApiError['details'] }
   const code = data.code ?? DEFAULT_CODE_BY_STATUS[statusCode] ?? API_ERROR_CODE.BAD_REQUEST
-  const apiError: IApiError = { statusCode, code, message: candidate?.message ?? 'Error' }
+  const apiError: IApiError = { statusCode, code, message: candidate?.message ?? API_ERROR_MESSAGE.UNKNOWN }
   if (data.details !== undefined) {
     apiError.details = data.details
   }
