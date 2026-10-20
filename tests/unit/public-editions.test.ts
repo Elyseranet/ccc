@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../../shared/enums/match.enum'
 import { ROUND_KIND } from '../../shared/enums/round.enum'
+import type { DrawEntity } from '../../server/database/entities/draw.entity'
+import { toPublicDraw } from '../../server/utils/draw/draw-public.mapper.util'
 import type { MatchEntity } from '../../server/database/entities/match.entity'
 import { MATCH_SORT } from '../../server/enums/match-sort.enum'
 import { matchesIfNoneMatch } from '../../server/utils/edition/edition-cache.util'
@@ -101,5 +103,22 @@ describe('matchesIfNoneMatch', () => {
   it('does not match a different or missing tag', () => {
     expect(matchesIfNoneMatch('"other"', etag)).toBe(false)
     expect(matchesIfNoneMatch(undefined, etag)).toBe(false)
+  })
+})
+
+describe('toPublicDraw', () => {
+  it('whitelists the draw parameters: an extra jsonb key is never exposed', () => {
+    const draw = {
+      id: 'd1',
+      kind: 'POOLS',
+      status: 'VALIDATED',
+      round: null,
+      parameters: { poolCount: 2, seedCount: 1, note: 'private note' },
+      createdAt: new Date('2026-01-01T00:00:00Z'),
+      validatedAt: new Date('2026-01-02T00:00:00Z')
+    } as unknown as DrawEntity
+    const dto = toPublicDraw(draw, [])
+    expect(dto.parameters).toEqual({ poolCount: 2, seedCount: 1 })
+    expect(JSON.stringify(dto)).not.toContain('private note')
   })
 })

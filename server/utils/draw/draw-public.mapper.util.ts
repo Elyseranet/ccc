@@ -22,7 +22,8 @@ export const toPublicDraw = (draw: DrawEntity, assignments: DrawAssignmentEntity
   kind: draw.kind,
   roundKind: draw.round?.kind ?? null,
   status: draw.status,
-  parameters: draw.parameters,
+  // Liste blanche : une clé parasite du jsonb ne devient jamais publique.
+  parameters: { poolCount: draw.parameters.poolCount, seedCount: draw.parameters.seedCount },
   createdAt: draw.createdAt.toISOString(),
   validatedAt: draw.validatedAt?.toISOString() ?? null,
   assignments: [...assignments].sort((a, b) => a.drawnOrder - b.drawnOrder).map(toPublicAssignment)
