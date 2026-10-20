@@ -43,10 +43,11 @@ Ne pas utiliser `down -v` sauf si la suppression des données PostgreSQL est int
 
 L'image (`Dockerfile`) est agnostique de l'environnement : aucune valeur n'est cuite dans l'image, et aucun `.env` n'y entre (`.dockerignore`). Toute la configuration vit dans les variables d'environnement de Coolify (`NUXT_*`, lues à l'exécution via `runtimeConfig`).
 
-Deux modes sont utilisables :
+Mode recommandé (décision OPS-1 et OPS-2) : Coolify construit l'image depuis le dépôt (`https://github.com/Elyseranet/ccc`, privé) avec le `Dockerfile` seul, et PostgreSQL est une **ressource Coolify séparée** (sauvegardes gérées par Coolify). Renseigner `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD` et `_DATABASE` avec les valeurs de cette ressource. Il n'y a pas de registre d'images ni de workflow de publication.
 
-- **Application Dockerfile** : Coolify construit le `Dockerfile` à la racine, et PostgreSQL est une ressource Coolify séparée. Renseigner `NUXT_DATABASE_HOST` avec le nom interne de cette ressource.
-- **Docker Compose** : Coolify utilise `docker-compose.yml` (app + PostgreSQL 16 + volume). Aucun port n'est publié : Coolify route le domaine vers le port 3000 du service `app`.
+Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comme ressource « Docker Compose ». Aucun port n'y est publié : Coolify route le domaine vers le port 3000 du service `app`.
+
+Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
 
 ### Prérequis de release
 
@@ -57,6 +58,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | Variable | Obligatoire | Rôle |
 |---|---|---|
 | `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
+| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Disponible après intégration de B-08. |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_*`, `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS`, `NUXT_AUTH_*` | non | Arrivent avec la vague 2 back (B-05, B-08) ; voir `.env.example` après leur intégration. |
@@ -65,7 +67,7 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 
 ### Domaine et sonde de santé
 
-- Le domaine est attribué dans Coolify (service `app`, port 3000).
+- Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
 - La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
 - La route est soumise au limiteur de débit par IP : derrière Traefik, tous les clients partagent l'IP du proxy tant que T-SEC-02 n'est pas fait (`X-Forwarded-For` de confiance, SSL PostgreSQL, variables `NUXT_TRUSTED_PROXIES` et `NUXT_DATABASE_SSL` pressenties, pas encore implémentées). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
 
