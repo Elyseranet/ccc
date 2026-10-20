@@ -72,3 +72,4 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | FA-11 | Bracket : slot `connector` vide ; ticket Origam seulement si la mesure de F-03 montre un artefact. |
 | FA-12 | **Pas de ratio** sur la fiche joueur (spec : joués / V / D). Ratio uniquement dans le face-à-face (RG37). |
 | A17 | « Activité récente » admin : **flux dérivé** des validations de match et de tirage, sans table d'audit. |
+| A5 | Orphelins : lignes 1–12 **fusionnées** avec leur candidat, ligne 13 « Marion Cobra » **créée** (cf. `docs/tickets/legacy-identity-map.md`). |

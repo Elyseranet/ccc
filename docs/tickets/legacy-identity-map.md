@@ -1,6 +1,6 @@
 # Correspondance des identités legacy — brouillon de décision (A5)
 
-- **Statut** : **à décider par l'utilisateur, ligne par ligne.** Rien n'est tranché ici.
+- **Statut** : **décidé par l'utilisateur le 2026-10-20** — lignes 1 à 12 fusionnées avec leur candidat, ligne 13 (`Marion Cobra`) créée.
 - **Ticket** : [B-04](B-04.md). L'import réel refuse de tourner tant qu'une ligne n'a pas de décision. Une fois le tableau rempli, B-04 le transcrit dans `server/database/seeds/data/legacy-identity-map.json`.
 - **Source** : snapshot `server/database/seeds/data/ccc-workbook.json`, lu le 2026-10-20 (onglets `scores` et `Data`).
 
@@ -20,19 +20,19 @@ Décisions possibles pour chaque ligne :
 
 | # | Graphie orpheline (`scores`) | Éditions et tours | Matchs (avec score, victoires) | Adversaires | Candidat dans `Data` (éditions avec points) | Le candidat joue-t-il la même édition ? | Pré-rempli ST | **Décision** |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `Andrea Busetto` | 2025 : Poule1 | 6 (6, 2 V) | Clara Boudehen, Clément Fossati, Emma Barré, Kevin Mercurio, Margaux Duburc, Pauline Bailly | `Andréa Busetto` (2018 à 2025) | non | **Fusionner**, à confirmer | |
-| 2 | `Rémi Bastien` | 2025 : Poule2 ; 2026 : Poule4 | 10 (10, 3 V) | Arnaud Prioul, Guillaume Boutin, Jérémy Febvre, Laurie Charlier, Léo Fossati, Margot Delory, Nicolas Deseine, Paul Lejemmetel | `Remi Bastien ` (avec espace final ; 2013, 2014, 2016 à 2020, 2022 à 2026) | non | **Fusionner**, à confirmer | |
-| 3 | `Vincent K/Vern` | 2024 : Huitième | 1 (1, 0 V) | Paul Lejemmetel | `Vincent K/vern` (2022, 2024) | oui, 4 matchs en Poule8 | **Fusionner**, à confirmer | |
-| 4 | `Gauthier RIchard` | 2026 : Poule3 | 6 (6, 2 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Domitille Boutin, Jérémie Febvre, Lucie Jecepa | `Gauthier Richard` (2026) | non | **Fusionner**, à confirmer | |
-| 5 | `Domitille Boutin` | 2026 : Poule3, Huitième | 7 (7, 5 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Gauthier RIchard, Guillaume Boutin, Jérémie Febvre, Lucie Jecepa | `Domi Boutin` (2014 à 2019, 2022 à 2024, 2026) | non | — (la SF dit explicitement qu'aucune source ne tranche) | |
-| 6 | `Audrey JeCpa` | 2026 : Poule1 | 6 (6, 1 V) | Claire Deseine, Claire Furic, Estelle Bastien, Ludovic Febvre, Nicolas Furic, Simon Vaur | `Audrey Jecepa` (2026) | non | — | |
-| 7 | `Caroline Jecpa` | 2026 : Poule3 | 6 (6, 0 V) | Arthur Vaur, Charly Duburc, Domitille Boutin, Gauthier RIchard, Jérémie Febvre, Lucie Jecepa | `Caroline Jecepa` (2026) | non | — | |
-| 8 | `Lucie JeCpa` | 2026 : Huitième | 1 (1, 0 V) | Arnaud Prioul | `Lucie Jecepa` (2026) | oui, 6 matchs en Poule3 | — | |
-| 9 | `Aurélie Jochet` | 2026 : Poule2, Huitième | 6 (6, 2 V) | Benoit Bastien, François Jaget, Jeanne Robidel, Léo Fossati, Margaux Duburc, Thomas Duburc | `Aurélie Jochel` (2023, 2026) | non | — | |
-| 10 | `Jérémie Febvre` | 2026 : Poule3 | 6 (6, 5 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Domitille Boutin, Gauthier RIchard, Lucie Jecepa | `Jérémy Febvre` (2022 à 2026) | oui, 2 matchs (Huitième, Quart) | — | |
-| 11 | `Edouart Laroche` | 2025 : Huitième | 1 (1, 0 V) | Paul Lejemmetel | `Edouard Laroche` (2021, 2022, 2023, 2025) | oui, 6 matchs en Poule4 | — | |
-| 12 | `Salomé Grand-Guillot` | 2015 : Poule1 | 5 (0 avec score) | Antoine Gallais, Aurèle Pelerin, Domi Boutin, Marion Pallier, Thomas Graffin | `Salomé Grand Guillot` (2015) | oui, 1 match (Huitième) | — | |
-| 13 | `Marion Cobra` | 2017 : Poule2 | 4 (4, 1 V) | Clément Fossati, Juan Dewey, Paul Lejemmetel, Romain Bellegrade | aucun candidat évident. Le plus proche par le texte est `Marion Leroy` (2017, 2018), avec une ressemblance faible | non | — | |
+| 1 | `Andrea Busetto` | 2025 : Poule1 | 6 (6, 2 V) | Clara Boudehen, Clément Fossati, Emma Barré, Kevin Mercurio, Margaux Duburc, Pauline Bailly | `Andréa Busetto` (2018 à 2025) | non | **Fusionner**, à confirmer | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 2 | `Rémi Bastien` | 2025 : Poule2 ; 2026 : Poule4 | 10 (10, 3 V) | Arnaud Prioul, Guillaume Boutin, Jérémy Febvre, Laurie Charlier, Léo Fossati, Margot Delory, Nicolas Deseine, Paul Lejemmetel | `Remi Bastien ` (avec espace final ; 2013, 2014, 2016 à 2020, 2022 à 2026) | non | **Fusionner**, à confirmer | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 3 | `Vincent K/Vern` | 2024 : Huitième | 1 (1, 0 V) | Paul Lejemmetel | `Vincent K/vern` (2022, 2024) | oui, 4 matchs en Poule8 | **Fusionner**, à confirmer | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 4 | `Gauthier RIchard` | 2026 : Poule3 | 6 (6, 2 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Domitille Boutin, Jérémie Febvre, Lucie Jecepa | `Gauthier Richard` (2026) | non | **Fusionner**, à confirmer | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 5 | `Domitille Boutin` | 2026 : Poule3, Huitième | 7 (7, 5 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Gauthier RIchard, Guillaume Boutin, Jérémie Febvre, Lucie Jecepa | `Domi Boutin` (2014 à 2019, 2022 à 2024, 2026) | non | — (la SF dit explicitement qu'aucune source ne tranche) | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 6 | `Audrey JeCpa` | 2026 : Poule1 | 6 (6, 1 V) | Claire Deseine, Claire Furic, Estelle Bastien, Ludovic Febvre, Nicolas Furic, Simon Vaur | `Audrey Jecepa` (2026) | non | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 7 | `Caroline Jecpa` | 2026 : Poule3 | 6 (6, 0 V) | Arthur Vaur, Charly Duburc, Domitille Boutin, Gauthier RIchard, Jérémie Febvre, Lucie Jecepa | `Caroline Jecepa` (2026) | non | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 8 | `Lucie JeCpa` | 2026 : Huitième | 1 (1, 0 V) | Arnaud Prioul | `Lucie Jecepa` (2026) | oui, 6 matchs en Poule3 | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 9 | `Aurélie Jochet` | 2026 : Poule2, Huitième | 6 (6, 2 V) | Benoit Bastien, François Jaget, Jeanne Robidel, Léo Fossati, Margaux Duburc, Thomas Duburc | `Aurélie Jochel` (2023, 2026) | non | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 10 | `Jérémie Febvre` | 2026 : Poule3 | 6 (6, 5 V) | Arthur Vaur, Caroline Jecpa, Charly Duburc, Domitille Boutin, Gauthier RIchard, Lucie Jecepa | `Jérémy Febvre` (2022 à 2026) | oui, 2 matchs (Huitième, Quart) | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 11 | `Edouart Laroche` | 2025 : Huitième | 1 (1, 0 V) | Paul Lejemmetel | `Edouard Laroche` (2021, 2022, 2023, 2025) | oui, 6 matchs en Poule4 | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 12 | `Salomé Grand-Guillot` | 2015 : Poule1 | 5 (0 avec score) | Antoine Gallais, Aurèle Pelerin, Domi Boutin, Marion Pallier, Thomas Graffin | `Salomé Grand Guillot` (2015) | oui, 1 match (Huitième) | — | **Fusionner** avec le candidat (utilisateur, 2026-10-20) |
+| 13 | `Marion Cobra` | 2017 : Poule2 | 4 (4, 1 V) | Clément Fossati, Juan Dewey, Paul Lejemmetel, Romain Bellegrade | aucun candidat évident. Le plus proche par le texte est `Marion Leroy` (2017, 2018), avec une ressemblance faible | non | — | **Créer** un nouveau compétiteur (utilisateur, 2026-10-20) |
 
 Notes :
 - Ligne 13 : le prénom correspond, pas le nom. **Je ne sais pas** s'il s'agit d'un surnom.
