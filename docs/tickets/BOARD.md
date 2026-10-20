@@ -78,6 +78,10 @@ Questions de règle tranchées le 2026-10-20 (`decisions.md`, R-1 à R-6) : dép
 
 Waiver npm audit (AUDIT-1, 2026-10-20) : chaque merge le mentionne ; remédiation suivie par [T-SEC-01](T-SEC-01.md).
 
+R-7 (2026-10-20) : un départage qui doit pourvoir plusieurs places se rejoue entre les perdants jusqu'à pourvoir toutes les places (B-13).
+
+Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), bloqué par le choix d'hébergement.
+
 #### Historique des options présentées (A1 à A16)
 
 Une décision par ligne. L'option recommandée venait en premier.
