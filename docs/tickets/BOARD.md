@@ -20,7 +20,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | En cours (vague 2) |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | En cours (vague 2) |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | En cours (vague 2) |
-| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | En cours (vague 2) |
+| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | En revue : validé (e229f35), en attente de l'intégration de la vague 2 |
 | [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | En cours (vague 2) |
 | [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | — (fournisseur SMTP de prod : configuration) | À faire |
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | À faire |
