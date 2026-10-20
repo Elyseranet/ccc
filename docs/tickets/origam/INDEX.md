@@ -11,3 +11,4 @@
 | #1226 | `text-field`/`select` : id d'input différent SSR/client | aucun |
 | #1227 | thème : clé `components.global` → avertissements | retirer `global: { density }` du thème CCC |
 | #1228 | évolution : option `icons` dans le module Nuxt | plugin manuel si besoin |
+| #1230 | `list-item` : opacité de l'overlay actif codée en dur (0,12), sans token | aucun (tiroir en `origam-btn` dans un `aside`) |
