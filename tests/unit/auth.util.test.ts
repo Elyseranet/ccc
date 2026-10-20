@@ -5,10 +5,14 @@ import { isCrossSiteWrite, parseAllowedOrigins } from '../../server/utils/auth/c
 import { burnPasswordCheck, hashPassword, verifyPassword } from '../../server/utils/auth/password.util'
 import {
   buildSessionCookieOptions,
+  getSessionCookieName,
   generateSessionToken,
   hashSessionToken,
   isWellFormedSessionToken
 } from '../../server/utils/auth/session-token.util'
+import type { H3Event } from 'h3'
+import { USER_ROLE } from '../../shared/enums/user.enum'
+import { requireRole, requireUser } from '../../server/utils/auth/require-role.util'
 import { normalizeEmail } from '../../shared/utils/email.util'
 
 const OWN = 'https://ccc.example'
@@ -124,5 +128,40 @@ describe('schemas', () => {
     expect(updateMeSchema.safeParse({ currentPassword: 'old' }).success).toBe(false)
     expect(updateMeSchema.safeParse({ currentPassword: 'old', newPassword: 'a'.repeat(PASSWORD_MIN_LENGTH - 1) }).success).toBe(false)
     expect(updateMeSchema.safeParse({ currentPassword: 'old', newPassword: 'a'.repeat(PASSWORD_MIN_LENGTH) }).success).toBe(true)
+  })
+})
+
+describe('session cookie name', () => {
+  it('uses the __Host- prefix in production only', () => {
+    expect(getSessionCookieName(true)).toBe('__Host-ccc_session')
+    expect(getSessionCookieName(false)).toBe('ccc_session')
+  })
+
+  it('production cookie satisfies the __Host- requirements: Secure, Path=/, no Domain', () => {
+    const options = buildSessionCookieOptions(true)
+    expect(options).toMatchObject({ secure: true, path: '/' })
+    expect(options).not.toHaveProperty('domain')
+  })
+})
+
+describe('requireRole', () => {
+  const eventFor = (role?: USER_ROLE) => ({
+    context: role ? { user: { id: 'u', email: 'u@ccc.test', role, competitorId: null, sessionId: 's' } } : {}
+  }) as unknown as H3Event
+
+  it('is 401 without identity', () => {
+    expect(() => requireRole(eventFor(), USER_ROLE.ADMIN)).toThrowError(expect.objectContaining({ statusCode: 401 }))
+  })
+
+  it('is 403 for a participant on an admin guard', () => {
+    expect(() => requireRole(eventFor(USER_ROLE.PARTICIPANT), USER_ROLE.ADMIN)).toThrowError(expect.objectContaining({ statusCode: 403 }))
+  })
+
+  it('lets an admin through and returns the identity', () => {
+    expect(requireRole(eventFor(USER_ROLE.ADMIN), USER_ROLE.ADMIN).role).toBe(USER_ROLE.ADMIN)
+  })
+
+  it('requireUser accepts any authenticated role', () => {
+    expect(requireUser(eventFor(USER_ROLE.PARTICIPANT)).role).toBe(USER_ROLE.PARTICIPANT)
   })
 })

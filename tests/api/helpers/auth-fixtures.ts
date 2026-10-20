@@ -6,7 +6,7 @@ import { CompetitorEntity } from '../../../server/database/entities/competitor.e
 import { UserEntity } from '../../../server/database/entities/user.entity'
 import { hashPassword } from '../../../server/utils/auth/password.util'
 
-export const SESSION_COOKIE = 'ccc_session'
+export const SESSION_COOKIE = '__Host-ccc_session'
 
 export interface ISeededUser {
   id: string
@@ -59,7 +59,7 @@ export const jsonPatch = (path: string, body: unknown, cookie?: string): Promise
 
 /** `Set-Cookie` brut de la réponse. */
 export const setCookieOf = (response: Response): string | undefined =>
-  response.headers.getSetCookie().find((entry) => entry.startsWith(`${SESSION_COOKIE}=`))
+  response.headers.getSetCookie().find((entry) => entry.startsWith(`${SESSION_COOKIE}=`) || entry.startsWith('ccc_session='))
 
 /** Valeur à renvoyer dans `Cookie:` à partir d'un `Set-Cookie`. */
 export const cookieHeaderOf = (response: Response): string => {

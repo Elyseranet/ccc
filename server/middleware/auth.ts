@@ -1,9 +1,8 @@
 import { getCookie, getRequestHeader, getRequestURL } from 'h3'
 import { LOG_EVENT } from '../consts/log-event.const'
 import { API_PREFIX } from '../consts/request.const'
-import { SESSION_COOKIE_NAME } from '../consts/auth.const'
 import { isCrossSiteWrite, parseAllowedOrigins } from '../utils/auth/csrf.util'
-import { isWellFormedSessionToken } from '../utils/auth/session-token.util'
+import { getSessionCookieName, isWellFormedSessionToken } from '../utils/auth/session-token.util'
 import { resolveSession } from '../utils/auth/session-store.util'
 import { forbiddenOrigin } from '../utils/http/api-error.util'
 import { sanitizeRouteForLog } from '../utils/log-sanitize.util'
@@ -36,7 +35,7 @@ export default defineEventHandler(async (event) => {
     throw forbiddenOrigin()
   }
 
-  const token = getCookie(event, SESSION_COOKIE_NAME)
+  const token = getCookie(event, getSessionCookieName(process.env.NODE_ENV === 'production'))
   if (isWellFormedSessionToken(token)) {
     const user = await resolveSession(await useDataSource(), token)
     if (user) {

@@ -173,7 +173,7 @@ Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les frontières applicatives, inv
 
 ## Authentification (B-08)
 
-Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké) et cookie `ccc_session` : `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` en production, durée 14 jours.
+Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké) et cookie : `HttpOnly`, `SameSite=Lax`, `Path=/`, durée 14 jours. En production il s'appelle `__Host-ccc_session` (préfixe qui impose `Secure`, `Path=/` et aucun `Domain`) ; hors production, en HTTP, `ccc_session` sans `Secure`.
 
 | Route | Accès | Réponse |
 |---|---|---|
@@ -181,8 +181,7 @@ Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké)
 | `POST /api/v1/auth/logout` | public, idempotent | 204, session révoquée, cookie effacé |
 | `GET /api/v1/moi` | authentifié | 200 `IMe` (seule route qui expose `phone`, à son titulaire) |
 | `PATCH /api/v1/moi` | authentifié | liste blanche `avatarUrl`, `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
-| `GET /api/v1/admin/ping` | ADMIN | sonde de `requireRole` : 401 / 403 / 200 |
 
-Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. Mots de passe : scrypt (`node:crypto`), 12 caractères minimum. Le limiteur de débit est en mémoire (une instance).
+Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. **Une écriture sans en-tête `Origin` (ni `Sec-Fetch-Site`) est acceptée** : une telle requête ne vient pas d'un navigateur, et la défense CSRF repose sur `SameSite=Lax` plus la vérification d'`Origin` quand il est présent. Mots de passe : scrypt (`node:crypto`), 15 caractères minimum (OWASP Authentication Cheat Sheet, sans MFA), 128 maximum. Le limiteur de débit est en mémoire (une instance).
 
 Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard) crée un compte `INVITED` sans mot de passe ; le lien d'invitation qui lui permet d'en définir un arrive avec B-09.

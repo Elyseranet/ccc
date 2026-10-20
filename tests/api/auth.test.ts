@@ -69,6 +69,8 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect(cookie).toMatch(/SameSite=Lax/i)
       expect(cookie).toMatch(/Path=\//)
       expect(cookie).toMatch(/Secure/i)
+      expect(cookie.startsWith('__Host-ccc_session=')).toBe(true)
+      expect(cookie).not.toMatch(/Domain=/i)
       expect(cookie).toMatch(/Max-Age=\d+/)
     })
 
@@ -140,8 +142,8 @@ describe('auth (login, logout, /moi, roles)', async () => {
     })
 
     it('is 401 with a forged or malformed cookie', async () => {
-      expect((await getWith('/api/v1/moi', `ccc_session=${'a'.repeat(43)}`)).status).toBe(401)
-      expect((await getWith('/api/v1/moi', 'ccc_session=nope')).status).toBe(401)
+      expect((await getWith('/api/v1/moi', `__Host-ccc_session=${'a'.repeat(43)}`)).status).toBe(401)
+      expect((await getWith('/api/v1/moi', '__Host-ccc_session=nope')).status).toBe(401)
     })
 
     it('returns IMe including the phone, to its owner only', async () => {
@@ -183,14 +185,11 @@ describe('auth (login, logout, /moi, roles)', async () => {
   })
 
   describe('roles', () => {
-    it('admin ping: 401 anonymous, 403 participant, 200 admin', async () => {
-      expect((await getWith('/api/v1/admin/ping')).status).toBe(401)
+    it('resolves the role from the session: admin and participant get their own IMe', async () => {
       const participantCookie = cookieHeaderOf(await login(participant.email, PASSWORD))
-      const forbiddenResponse = await getWith('/api/v1/admin/ping', participantCookie)
-      expect(forbiddenResponse.status).toBe(403)
-      expect((await forbiddenResponse.json()).code).toBe(API_ERROR_CODE.FORBIDDEN)
+      expect((await (await getWith('/api/v1/moi', participantCookie)).json()).role).toBe(USER_ROLE.PARTICIPANT)
       const adminCookie = cookieHeaderOf(await login(admin.email, PASSWORD))
-      expect((await getWith('/api/v1/admin/ping', adminCookie)).status).toBe(200)
+      expect((await (await getWith('/api/v1/moi', adminCookie)).json()).role).toBe(USER_ROLE.ADMIN)
     })
 
     it('leaves public routes public', async () => {

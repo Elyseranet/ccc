@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto'
-import { SESSION_COOKIE_NAME, SESSION_TOKEN_BYTES, SESSION_TTL_SECONDS } from '../../consts/auth.const'
+import { SESSION_COOKIE_NAME, SESSION_COOKIE_NAME_PRODUCTION, SESSION_TOKEN_BYTES, SESSION_TTL_SECONDS } from '../../consts/auth.const'
 import type { ISessionCookieOptions } from '../../interfaces/auth.interface'
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
@@ -23,4 +23,6 @@ export const buildSessionCookieOptions = (isProduction: boolean, maxAge = SESSIO
   maxAge
 })
 
-export { SESSION_COOKIE_NAME }
+
+export const getSessionCookieName = (isProduction: boolean): string =>
+  isProduction ? SESSION_COOKIE_NAME_PRODUCTION : SESSION_COOKIE_NAME

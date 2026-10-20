@@ -1,4 +1,6 @@
 export const SESSION_COOKIE_NAME = 'ccc_session'
+/** En production : préfixe `__Host-` (OWASP Session Management) qui impose Secure, Path=/ et aucun Domain. */
+export const SESSION_COOKIE_NAME_PRODUCTION = `__Host-${SESSION_COOKIE_NAME}`
 
 /** Durée de vie d'une session : 14 jours, sans prolongation (pas de session éternelle). */
 export const SESSION_TTL_SECONDS = 14 * 24 * 60 * 60
@@ -13,7 +15,8 @@ export const SESSION_PURGE_GRACE_MS = 24 * 60 * 60 * 1000
 export const SESSION_TOKEN_BYTES = 32
 
 /**
- * scrypt. Profil N=2^16, r=8, p=2 (64 MiB, un des profils de la fiche OWASP « Password Storage »).
+ * scrypt. Profil N=2^16, r=8, p=2 (64 MiB), un des profils listés par l'OWASP Password Storage Cheat Sheet
+ * (https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html, consultée le 2026-10-20).
  * Les paramètres sont écrits dans le hash : on peut les relever plus tard sans invalider les anciens.
  */
 export const PASSWORD_HASH = {
@@ -26,8 +29,12 @@ export const PASSWORD_HASH = {
   MAX_MEMORY_BYTES: 128 * 1024 * 1024
 } as const
 
-/** Politique de longueur : non spécifiée par la Spec, valeur proposée (NIST SP 800-63B : minimum 8, 12 ici) à valider en revue. */
-export const PASSWORD_MIN_LENGTH = 12
+/**
+ * Minimum 15 : l'OWASP Authentication Cheat Sheet juge faible un mot de passe de moins de 15 caractères sans MFA
+ * (https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), et la Spec ne prévoit pas de MFA.
+ * Maximum 128 (OWASP demande au moins 64).
+ */
+export const PASSWORD_MIN_LENGTH = 15
 export const PASSWORD_MAX_LENGTH = 128
 
 export const EMAIL_MAX_LENGTH = 254
