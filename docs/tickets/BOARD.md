@@ -16,7 +16,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 |---|---|---|---|---|---|
 | [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | En revue (`feature/B-01`, 26a64bd) |
 | [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | En revue (`feature/B-02`, 5b4d0ce) |
-| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | À faire |
+| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | En cours : correctifs de revue R-1, R-2, R-5, R-6 (`feature/B-03`, 418c7c9) |
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | À faire |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | À faire |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | À faire |
@@ -74,12 +74,9 @@ Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques 
 | A15 | `POST /matchs/{id}/correction` journalisée, 409 si tour suivant engagé | B-12 |
 | A16 | Gabarits vides non importés : 729 matchs, dont 554 avec score ; « 1 414 » est faux | B-04, B-06 |
 
-Questions qui restent ouvertes après ces décisions :
-- ~~**A17** (flux d'activité admin)~~ : tranché le 2026-10-20, flux dérivé (option a). B-15 est débloqué.
-- Départage à **quatre joueurs ou plus** : RG19 et RG20 disent « trois ou plus », A11 décrit un match à trois côtés. Je ne sais pas comment départager à quatre ; B-03 et B-13 refusent le cas tant que la règle n'est pas écrite.
-- Départage à trois : le vainqueur prend la place ; l'ordre des deux autres (s'il compte pour une place suivante) n'est pas écrit. Je ne sais pas.
-- Définition de « tour suivant engagé » pour la correction (A15) : proposée dans B-12, à confirmer en revue.
-- Commentaires d'**édition** (en-têtes `{code}-0` du classeur, par exemple « 1ère édition #lhistoireestenmarche ») : A13 ne vise que les commentaires de match. Je ne sais pas s'ils sont publics ; en attendant, `editions.comment` est importé mais absent des DTO publics.
+Questions de règle tranchées le 2026-10-20 (`decisions.md`, R-1 à R-6) : départage à N côtés premier à 3 (R-1), perdants ex aequo (R-2), « tour suivant engagé » validé (R-3), commentaires d'édition réservés à l'admin (R-4), bilan V/D sur les seuls matchs avec score avec le nombre de résultats inconnus (R-5), mini-poule avant le départage (R-6). A17 tranché : flux dérivé. **Aucune question back ouverte.**
+
+Waiver npm audit (AUDIT-1, 2026-10-20) : chaque merge le mentionne ; remédiation suivie par [T-SEC-01](T-SEC-01.md).
 
 #### Historique des options présentées (A1 à A16)
 
