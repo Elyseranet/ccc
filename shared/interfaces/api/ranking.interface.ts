@@ -1,4 +1,4 @@
-import type { ICompetitorPublic } from './competitor.interface'
+import type { ICompetitorPublic } from './competitor.interface.js'
 
 export interface IRankingRow {
   rank: number

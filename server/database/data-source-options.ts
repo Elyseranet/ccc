@@ -17,5 +17,8 @@ export const buildDataSourceOptions = (
   entities: ENTITIES,
   migrations,
   synchronize: false,
+  // gen_random_uuid() est natif en PostgreSQL 13+ : aucune extension à installer (B-02).
+  uuidExtension: 'pgcrypto',
+  installExtensions: false,
   namingStrategy: new SnakeNamingStrategy()
 })

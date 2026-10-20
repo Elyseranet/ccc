@@ -1,5 +1,5 @@
-import type { PARTICIPATION_STATUS } from '../../enums/participation.enum'
-import type { ICompetitorPublic } from './competitor.interface'
+import type { PARTICIPATION_STATUS } from '../../enums/participation.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
 
 export interface IPoolStandingRow {
   rank: number

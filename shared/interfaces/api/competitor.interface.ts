@@ -1,5 +1,5 @@
-import type { EDITION_STATUS } from '../../enums/edition.enum'
-import type { FINAL_STAGE } from '../../enums/participation.enum'
+import type { EDITION_STATUS } from '../../enums/edition.enum.js'
+import type { FINAL_STAGE } from '../../enums/participation.enum.js'
 
 /**
  * Identité publique d'un compétiteur. Ne contient jamais d'email ni de téléphone (invariant 8).

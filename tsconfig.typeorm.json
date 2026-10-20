@@ -19,6 +19,6 @@
     "server/enums/**/*.ts",
     "server/interfaces/log-entry.interface.ts",
     "server/types/log-sink.type.ts",
-    "shared/enums/**/*.ts"
+    "shared/**/*.ts"
   ]
 }

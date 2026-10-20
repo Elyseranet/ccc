@@ -1,5 +1,5 @@
-import type { MATCH_PURPOSE, MATCH_STATUS } from '../../enums/match.enum'
-import type { ROUND_KIND } from '../../enums/round.enum'
+import type { MATCH_PURPOSE, MATCH_STATUS } from '../../enums/match.enum.js'
+import type { ROUND_KIND } from '../../enums/round.enum.js'
 
 /**
  * `score` vaut `validated_score` côté public, et `null` tant que le match n'est pas validé :

@@ -58,6 +58,21 @@ npm run db:migration:revert
 Les commandes nécessitent une connexion PostgreSQL valide définie dans l'environnement ou `.env`.
 `npm run db:migration:revert` annule la migration la plus récente ; pour la migration d'archive, cela supprime ses deux tables et toutes les lignes qu'elles contiennent.
 
+La CLI génère la migration en JavaScript (elle lit le `data-source` compilé) : la relire, la convertir en `.ts` avec `up` et `down`, puis supprimer le `.js`.
+
+### Schéma métier (M1) et rollback
+
+La migration `CreateDomainSchema` crée `competitors`, `competitor_aliases`, `editions`, `pools`, `rounds`, `participations`, `matches`, `match_sides`, `draws` et `draw_assignments`. Elle n'installe aucune extension PostgreSQL (`gen_random_uuid()` est natif depuis PostgreSQL 13).
+
+`npm run db:migration:revert` supprime ces dix tables et leurs types enum, donc **toutes les données métier, y compris celles importées par la reprise B-04**. L'archive brute (`legacy_workbook_*`) reste intacte : la reprise se rejoue pour reconstruire les données métier.
+
+Les tests d'intégration du schéma (`npm run test:db`) tournent sur une base dédiée dont le nom finit par `_test`. Ils **suppriment et recréent** son contenu. Passer les variables en ligne de commande, sans jamais copier un `.env` :
+
+```sh
+NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
+NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
+```
+
 ### Charger les archives du classeur
 
 Le snapshot `server/database/seeds/data/ccc-workbook.json` conserve les lignes, les valeurs disponibles, les formules et les indices de format des cellules des onglets fournis. L'import crée les tables d'archive si nécessaire et peut être rejoué sans dupliquer une ligne.

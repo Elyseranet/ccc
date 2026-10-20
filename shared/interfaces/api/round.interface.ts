@@ -1,5 +1,5 @@
-import type { ROUND_KIND, ROUND_STATUS } from '../../enums/round.enum'
-import type { IMatch } from './match.interface'
+import type { ROUND_KIND, ROUND_STATUS } from '../../enums/round.enum.js'
+import type { IMatch } from './match.interface.js'
 
 export interface IRound {
   id: string

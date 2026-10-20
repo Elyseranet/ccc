@@ -17,6 +17,7 @@
     "db:migration:generate": "npm run db:typeorm:build && typeorm migration:generate -d .typeorm-dist/server/database/data-source.js",
     "db:migration:run": "npm run db:typeorm:build && typeorm migration:run -d .typeorm-dist/server/database/data-source.js",
     "db:migration:revert": "npm run db:typeorm:build && typeorm migration:revert -d .typeorm-dist/server/database/data-source.js",
+    "test:db": "vitest run -c vitest.db.config.ts",
     "db:seed:legacy": "npm run db:typeorm:build && node .typeorm-dist/server/database/seeds/seed-legacy-workbook.js"
   },
   "dependencies": {
