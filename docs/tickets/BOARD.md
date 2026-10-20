@@ -85,6 +85,10 @@ Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-0
 
 Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), vague 2, à livrer au plus tard avec B-05.
 
+Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
+
+Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), traité pendant l'intégration de la vague 2.
+
 #### Historique des options présentées (A1 à A16)
 
 Une décision par ligne. L'option recommandée venait en premier.
