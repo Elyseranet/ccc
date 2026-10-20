@@ -11,6 +11,7 @@ import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../shared/enums/edition.enum'
 import type { IRankingEvolutionPoint, IRankingEvolutionSeries, IRankingRow } from '../../shared/interfaces/api/ranking.interface'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const env = requireTestDatabaseEnv()
 const CODES = ['2012a', '2012b', '2013', '2014', '2015', '2016', '2017', '2018']
@@ -22,6 +23,7 @@ let aliceId: string
 describe('GET /api/v1/classements/*', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env
   })

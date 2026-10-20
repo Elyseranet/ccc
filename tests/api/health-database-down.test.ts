@@ -3,6 +3,7 @@ import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { HEALTH_STATUS } from '../../shared/enums/health-status.enum'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 // Port 1 : rien n'y écoute, la connexion est refusée immédiatement.
 const UNREACHABLE_PORT = '1'
@@ -12,6 +13,7 @@ describe('GET /api/v1/health (database cut)', async () => {
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: { ...env, NUXT_DATABASE_PORT: UNREACHABLE_PORT }
   })

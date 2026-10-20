@@ -4,10 +4,12 @@ import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { HEALTH_STATUS } from '../../shared/enums/health-status.enum'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 describe('GET /api/v1/health (database reachable)', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: requireTestDatabaseEnv()
   })

@@ -8,6 +8,7 @@ import type { IPaginated } from '../../shared/interfaces/api/pagination.interfac
 import { PRIVATE_PHONE, resetAndSeedCompetitors } from './helpers/competitor-fixtures'
 import type { ICompetitorFixtures } from './helpers/competitor-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000'
 const FORBIDDEN_KEYS = /"(email|phone|passwordHash|comment)"/
@@ -26,6 +27,7 @@ const names = (page: IPaginated<ICompetitorListItem>): string[] => page.items.ma
 describe('public competitor routes', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: requireTestDatabaseEnv()
   })

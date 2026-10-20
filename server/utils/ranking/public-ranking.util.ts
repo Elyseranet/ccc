@@ -1,14 +1,14 @@
-import type { IRankingRow, IRankingEvolutionSeries } from '../../../shared/interfaces/api/ranking.interface'
-import type { ICompetitorPublic } from '../../../shared/interfaces/api/competitor.interface'
-import { RANKING_TYPE } from '../../../shared/enums/ranking.enum'
+import type { IRankingRow, IRankingEvolutionSeries } from '../../../shared/interfaces/api/ranking.interface.js'
+import type { ICompetitorPublic } from '../../../shared/interfaces/api/competitor.interface.js'
+import { RANKING_TYPE } from '../../../shared/enums/ranking.enum.js'
 import type {
   IPlayerScore,
   IRankingEditionInfo,
   IRankingSourceParticipation,
   IScoredParticipation,
-} from '../../interfaces/ranking.interface'
-import { computeEvolution } from './evolution.util'
-import { closedEditionsInOrder, computeAcp, computeAllTime, computeAverage, countTitles } from './ranking.util'
+} from '../../interfaces/ranking.interface.js'
+import { computeEvolution } from './evolution.util.js'
+import { closedEditionsInOrder, computeAcp, computeAllTime, computeAverage, countTitles } from './ranking.util.js'
 
 /**
  * Ne garde que ce qui compte pour un classement (A8) : les participations des éditions

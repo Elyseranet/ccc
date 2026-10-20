@@ -22,6 +22,7 @@ import {
   seedPublicEditions
 } from './helpers/seed-public-editions'
 import type { IPublicFixture } from './helpers/seed-public-editions'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const env = requireTestDatabaseEnv()
 
@@ -36,6 +37,7 @@ describe('public edition reads (B-06)', async () => {
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env
   })

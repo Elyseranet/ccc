@@ -16,16 +16,16 @@ const buildError = (
   data: { code, ...(details === undefined ? {} : { details }) }
 })
 
-export const badRequest = (message = API_ERROR_MESSAGE.BAD_REQUEST, details?: TApiErrorDetails): H3Error =>
+export const badRequest = (message: string = API_ERROR_MESSAGE.BAD_REQUEST, details?: TApiErrorDetails): H3Error =>
   buildError(400, API_ERROR_CODE.BAD_REQUEST, message, details)
 
-export const validationFailed = (details: TApiErrorDetails, message = API_ERROR_MESSAGE.VALIDATION_FAILED): H3Error =>
+export const validationFailed = (details: TApiErrorDetails, message: string = API_ERROR_MESSAGE.VALIDATION_FAILED): H3Error =>
   buildError(400, API_ERROR_CODE.VALIDATION_FAILED, message, details)
 
-export const unauthorized = (message = API_ERROR_MESSAGE.UNAUTHORIZED): H3Error =>
+export const unauthorized = (message: string = API_ERROR_MESSAGE.UNAUTHORIZED): H3Error =>
   buildError(401, API_ERROR_CODE.UNAUTHORIZED, message)
 
-export const forbidden = (message = API_ERROR_MESSAGE.FORBIDDEN): H3Error =>
+export const forbidden = (message: string = API_ERROR_MESSAGE.FORBIDDEN): H3Error =>
   buildError(403, API_ERROR_CODE.FORBIDDEN, message)
 
 export const notFound = (message: string = API_ERROR_MESSAGE.NOT_FOUND): H3Error =>
@@ -34,16 +34,16 @@ export const notFound = (message: string = API_ERROR_MESSAGE.NOT_FOUND): H3Error
 export const competitorNotFound = (): H3Error =>
   buildError(404, API_ERROR_CODE.COMPETITOR_NOT_FOUND, API_ERROR_MESSAGE.COMPETITOR_NOT_FOUND)
 
-export const conflict = (message = API_ERROR_MESSAGE.CONFLICT, details?: TApiErrorDetails): H3Error =>
+export const conflict = (message: string = API_ERROR_MESSAGE.CONFLICT, details?: TApiErrorDetails): H3Error =>
   buildError(409, API_ERROR_CODE.CONFLICT, message, details)
 
-export const gone = (message = API_ERROR_MESSAGE.GONE): H3Error =>
+export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
-export const unprocessable = (message = API_ERROR_MESSAGE.UNPROCESSABLE, details?: TApiErrorDetails): H3Error =>
+export const unprocessable = (message: string = API_ERROR_MESSAGE.UNPROCESSABLE, details?: TApiErrorDetails): H3Error =>
   buildError(422, API_ERROR_CODE.UNPROCESSABLE, message, details)
 
-export const tooManyRequests = (message = API_ERROR_MESSAGE.RATE_LIMITED): H3Error =>
+export const tooManyRequests = (message: string = API_ERROR_MESSAGE.RATE_LIMITED): H3Error =>
   buildError(429, API_ERROR_CODE.RATE_LIMITED, message)
 
 /** 5xx : le message est générique, le détail (cause) ne part que dans les logs. */
