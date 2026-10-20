@@ -84,3 +84,5 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | R-2 | Départage à 3 : les deux perdants sont **ex aequo**, non classés entre eux. |
 | R-3 | « Tour suivant engagé » (B-12) : poule → qualification arrêtée ; phase finale → tirage (même brouillon) existant pour le tour suivant. Correction refusée (409) dans ces cas. |
 | R-4 | Commentaires d'édition (en-têtes du classeur) : **admin uniquement**, comme A13. |
+| R-5 | Bilan V/D public : **matchs avec score uniquement** (ex. Deseine 39/13, et non 53/18 du classeur) ; afficher à côté « N matchs au résultat inconnu ». |
+| R-6 | RG19 : à 3 joueurs ou plus à égalité, **mini-poule (confrontation directe entre eux) d'abord**, puis match de départage à N côtés si l'égalité persiste. |
