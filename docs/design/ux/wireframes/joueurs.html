@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Joueurs (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><a href="accueil.html"><strong>CCC</strong></a>
+  <nav aria-label="Navigation principale"><ul>
+    <li><a href="edition.html">Éditions</a></li>
+    <li><a href="joueurs.html" aria-current=page>Joueurs</a></li>
+    <li><a href="palmares.html" >Palmarès</a></li>
+    <li><a href="regles.html" >Règles</a></li></ul></nav>
+  <span class="spacer"></span><a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="admin-dashboard.html">Espace organisateur</a></header>
+<main id="contenu">
+  <h1>Joueurs</h1>
+  <p>145 compétiteurs depuis 2012.</p>
+  <form role="search" class="row" aria-label="Rechercher un joueur">
+    <div><label for="q">Nom ou pseudo</label><input id="q" type="search" autocomplete="off"></div>
+    <div><label for="ys">Édition jouée</label><select id="ys"><option>Toutes</option><option>2026</option></select></div>
+    <a class="btn" href="face-a-face.html">Comparer deux joueurs</a>
+  </form>
+  <div class="note">Spec API : la liste publique GET /competiteurs est paginée et SANS recherche ; la recherche à autocomplétion (?q=) est réservée à l'administrateur (écart E6). Ce wireframe suppose un filtrage côté client de la liste publique : à confirmer avec le backend. Libellé « pseudo » (SF P5) au lieu de « surnom ». Résultats annoncés dans une région aria-live. Liste = « tous les participants historiques » (SF P5).</div>
+  <div class="note note--ds">origam-text-field (type search) ou origam-command-palette pour la recherche rapide globale (Cmd+K, optionnel) ; origam-select ; origam-data-table.</div>
+  <table><caption class="sr">Liste des compétiteurs</caption>
+    <thead><tr><th scope="col" aria-sort="ascending">Joueur</th><th scope="col">Éditions</th><th scope="col">Matchs</th><th scope="col">Victoires</th><th scope="col">Titres</th></tr></thead>
+    <tbody><tr><td><a href="joueur.html">Joueur A</a></td><td>7</td><td>…</td><td>…</td><td>1</td></tr><tr><td><a href="joueur.html">Joueur B</a></td><td>3</td><td>…</td><td>…</td><td>0</td></tr></tbody></table>
+  <p>Page 1 / 8 · <button>Précédent</button> <button>Suivant</button></p>
+  <div class="note">Tri par colonne (nom par défaut, jamais « les plus forts » sans critère). Mobile : chaque ligne devient une carte (origam-data-table gère une variante mobile, à vérifier). Un seul lien par ligne (le nom), cible ≥ 44px.</div>
+  <h2>États</h2>
+  <p class="state-title">AUCUN RÉSULTAT</p><div class="box box--dashed" role="status"><p>Aucun joueur pour « xyz ».</p><button>Effacer la recherche</button></div>
+  <p class="state-title">ANNUAIRE VIDE (import non fait)</p><div class="box box--dashed"><p>L'annuaire n'est pas encore publié.</p></div>
+  <p class="state-title">CHARGEMENT</p><div class="box" aria-busy="true"><div class="sk"></div><div class="sk"></div></div>
+  <p class="state-title">ERREUR</p><div class="box" role="alert"><p>Impossible de charger les joueurs.</p><button>Réessayer</button></div>
+</main></body></html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Admin participants (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><strong>CCC · Organisation</strong><span class="spacer"></span>
+  <label for="ctx" class="sr">Édition active</label><select id="ctx"><option>Édition 2026 · poules</option><option>2025 (archive, lecture seule)</option></select>
+  <a class="btn" href="accueil.html">Voir le site public</a><button>Compte</button></header>
+<div class="note">Le sélecteur d'édition est global : toutes les pages admin travaillent sur une édition choisie ici (aujourd'hui aucune page admin n'a de contexte d'édition). Archive = lecture seule.</div>
+<div class="shell"><aside><nav aria-label="Administration"><ul>
+ <li><a href="admin-dashboard.html" >Tableau de bord</a></li></ul>
+ <h2>Édition en cours</h2><ul>
+ <li><a href="admin-participants.html" aria-current=page>Participants</a></li>
+ <li><a href="admin-tirage.html" >Tirages</a></li>
+ <li><a href="admin-score.html">Poules et matchs</a></li>
+ <li><a href="#">Bracket</a></li></ul>
+ <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div id="contenu">
+<main>
+ <h1>Participants · Édition 2026</h1>
+ <section class="box" aria-labelledby="h-add"><h2 id="h-add">Ajouter un participant</h2>
+  <label for="ac">Rechercher un compétiteur (145 profils historiques)</label>
+  <input id="ac" type="search" role="combobox" aria-expanded="true" aria-controls="sug" autocomplete="off" value="rem">
+  <ul id="sug" role="listbox" class="box" style="list-style:none;margin:.2rem 0;padding:.3rem">
+   <li role="option">Rémi Bastien <small>(pseudo, 4 éditions)</small></li><li role="option">Remi Bastien <small>(graphie proche, rapprochement à vérifier)</small></li>
+   <li role="option"><b>+ Créer un nouveau participant « rem »</b></li></ul>
+  <div class="note">Spec P1 : à chaque saisie, le système cherche dans les participants existants et propose les profils correspondants. Cas 1 : existant, rattaché sans recréer de compte. Cas 2 : nouveau. Les graphies concurrentes de l'historique (`Remi Bastien ` / `Rémi Bastien`, `Andrea` / `Andréa Busetto`) sont exactement ce que l'autocomplétion doit éviter de reproduire (SF « Participants »). Homonymes : Je ne sais pas ce que fait le système (SF P1 Échecs).</div>
+  <div class="note note--ds">origam-select avec recherche (à vérifier) ou origam-text-field + origam-menu ; origam-list.</div></section>
+
+ <form class="box" aria-labelledby="h-new" style="margin-top:1rem;max-width:620px"><h2 id="h-new">Nouveau participant</h2>
+  <div class="grid grid--2">
+   <div><label for="n1">Nom</label><input id="n1" required></div><div><label for="n2">Prénom</label><input id="n2" required></div>
+   <div><label for="n3">Pseudo</label><input id="n3"></div><div><label for="n4">Avatar</label><input id="n4" type="file" accept="image/*"></div>
+   <div><label for="n5">Email</label><input id="n5" type="email" required></div><div><label for="n6">Téléphone</label><input id="n6" type="tel"></div></div>
+  <p>Un compte est créé automatiquement et un email d'invitation part avec un lien de première connexion.</p>
+  <p role="alert" class="badge badge--wait">Cet email est déjà rattaché à un autre compte.</p>
+  <div class="row"><button type="button">Annuler</button><button class="primary">Créer et rattacher</button></div>
+  <div class="note">Champs exactement ceux de la spec : avatar, nom, prénom, pseudo, email, téléphone (SF P1). Email et téléphone sont privés (jamais en public). Email déjà pris : refus certain, texte du message à écrire (SF « Ce que voit l'utilisateur quand ça échoue »). Retours d'envoi de l'invitation (échec d'email) : Je ne sais pas, à concevoir (API « Événements sortants »).</div>
+  <div class="note note--ds">origam-form, origam-text-field, origam-file-field, origam-snackbar.</div></form>
+
+ <section aria-labelledby="h-list" style="margin-top:1rem"><h2 id="h-list">Inscrits (N)</h2>
+  <table><caption class="sr">Inscrits</caption><thead><tr><th scope="col">Joueur</th><th scope="col">Pseudo</th><th scope="col">Compte</th><th scope="col"><span class="sr">Action</span></th></tr></thead>
+   <tbody><tr><td>Nom Prénom</td><td>pseudo</td><td><span class="badge badge--ok">Actif</span></td><td><button>Retirer Nom Prénom</button></td></tr>
+          <tr><td>Nom Prénom</td><td>pseudo</td><td><span class="badge badge--wait">Invité</span></td><td><button>Retirer Nom Prénom</button></td></tr></tbody></table>
+  <div class="note">États du compte : invité, première connexion faite, actif (SF « États »). Retrait possible seulement avant le tirage (API DELETE « avant tirage »).</div></section>
+
+ <h2>États</h2>
+ <p class="state-title">TIRAGE VALIDÉ (inscriptions closes)</p><div class="box box--dashed"><p>Les inscriptions sont closes : le tirage est validé. Ajout et retrait indisponibles (API : 409).</p></div>
+ <p class="state-title">AUCUN INSCRIT</p><div class="box box--dashed"><p>Aucun participant pour cette édition.</p></div>
+ <p class="state-title">AUCUNE CORRESPONDANCE</p><div class="box box--dashed"><p>Aucun profil ne correspond. Créer un nouveau participant ?</p></div>
+ <p class="state-title">ERREUR</p><div class="box" role="alert"><p>Impossible d'enregistrer. Rien n'a été modifié.</p><button>Réessayer</button></div>
+</main></div></div></body></html>

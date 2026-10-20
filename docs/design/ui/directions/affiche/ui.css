@@ -1,0 +1,166 @@
+/* Direction Affiche — habillage de maquette. Uniquement var(--origam-*) (tokens.css) et color-mix() dessus.
+   Animations CSS seules ; toutes coupées sous prefers-reduced-motion (voir _shared/layout.css). */
+
+:root { color-scheme: light; }
+[data-mode="dark"] { color-scheme: dark; }
+
+body { background: var(--origam-color__surface---default); }
+.skip { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); border-radius: var(--origam-radius---full); }
+.display { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); line-height: var(--origam-font__lineHeight---none); }
+
+/* ── header ───────────────────────────────────────── */
+.site-header { background: var(--origam-color__surface---default); border-bottom: 2px solid var(--origam-color__border---strong); }
+.brand__name { font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---2xl); text-transform: uppercase; }
+.cap { fill: var(--origam-color__action--primary---bg); }
+.cap-in { fill: var(--origam-color__text---primary); }
+.site-nav ul { justify-content: flex-end; gap: var(--origam-space---2); }
+.site-nav a { border-radius: var(--origam-radius---full); font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---primary); }
+.site-nav a:hover { background: var(--origam-color__action--ghost---bgHover); }
+.site-nav a[aria-current] { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.mode-toggle { border-radius: var(--origam-radius---full); color: var(--origam-color__text---primary); box-shadow: inset 0 0 0 2px var(--origam-color__border---strong); }
+
+/* ── boutons ──────────────────────────────────────── */
+.btn { border-radius: var(--origam-radius---full); font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); font-size: var(--origam-font__size---sm); padding-inline: var(--origam-space---6); min-height: var(--origam-space---12); }
+.btn--flat { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.btn--flat:hover { transform: rotate(-2deg) scale(1.04); box-shadow: var(--origam-shadow---md); }
+.btn--outlined { box-shadow: inset 0 0 0 2px currentColor; }
+.btn--outlined:hover { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.btn--text { padding-inline: 0; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+/* ── chips (pill, bold, uppercase) ─────────────────── */
+.chip { border-radius: var(--origam-radius---full); font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); background: var(--origam-color__surface---raised); color: var(--origam-color__text---primary); box-shadow: inset 0 0 0 2px var(--origam-color__border---strong); }
+.chip--current { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); box-shadow: none; }
+.chip--gold { background: var(--origam-color__sticker---yellow); color: var(--origam-color__feedback--warning---fg); box-shadow: none; }
+
+/* ── hero : aplat orange + collage ────────────────── */
+.hero { background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); padding-block: var(--origam-space---12) var(--origam-space---16); border-bottom: 2px solid var(--origam-color__border---strong); }
+[data-mode="dark"] .hero { border-bottom-color: var(--origam-color__action--primary---bg); }
+.hero__fx span { width: clamp(9rem, 17vw, 15rem); aspect-ratio: 4 / 5; border-radius: var(--origam-radius---md); box-shadow: var(--origam-shadow---lg); animation: float 7s var(--origam-motion__easing---decelerate) infinite alternate; }
+.hero__fx span:nth-child(1) { right: 22%; top: 12%; rotate: -8deg; background:
+  linear-gradient(transparent 48%, var(--origam-color__surface---raised) 48% 50%, transparent 50%),
+  linear-gradient(90deg, transparent 30%, var(--origam-color__surface---raised) 30% 31.5%, transparent 31.5%),
+  var(--origam-color__action--secondary---bg); }
+.hero__fx span:nth-child(2) { right: 6%; top: 28%; rotate: 7deg; animation-delay: -2s; background:
+  radial-gradient(circle at 50% 42%, var(--origam-color__action--primary---bg) 0 22%, transparent 22.5%),
+  repeating-linear-gradient(0deg, color-mix(in srgb, var(--origam-color__surface---default) 12%, transparent) 0 2px, transparent 2px 10px),
+  var(--origam-color__text---primary); }
+.hero__fx span:nth-child(3) { right: 15%; bottom: -6%; rotate: -3deg; animation-delay: -4s; aspect-ratio: 5 / 3; background:
+  radial-gradient(circle at 30% 50%, var(--origam-color__sticker---yellow) 0 18%, transparent 18.5%),
+  radial-gradient(circle at 70% 50%, var(--origam-color__sticker---yellow) 0 18%, transparent 18.5%),
+  var(--origam-color__surface---raised); }
+@keyframes float { to { translate: 0 -14px; } }
+.hero__inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'kicker' 'title' 'lead' 'actions'; }
+.hero__kicker { margin-bottom: var(--origam-space---6); }
+.hero__since { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wider); font-size: var(--origam-font__size---sm); }
+.hero__title { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); letter-spacing: var(--origam-font__letterSpacing---tight); max-width: 11ch; }
+.hero__title .w { animation: slam var(--origam-motion__duration---slow) var(--origam-motion__easing---standard) both; }
+.hero__title .w2 { display: inline-grid; place-items: center; width: 2.1em; aspect-ratio: 1; margin-inline: 0.15em; padding-right: 0.12em; border-radius: 50%; font-size: 0.3em; line-height: 1; vertical-align: 0.9em; background: var(--origam-color__action--primary---fg); color: var(--origam-color__action--primary---bg); rotate: -12deg; animation-delay: 120ms; }
+.hero__title .w3 { animation-delay: 220ms; }
+@keyframes slam { from { opacity: 0; transform: translateY(40%) skewY(6deg); } }
+.hero__lead { margin-top: var(--origam-space---6); font-size: var(--origam-font__size---xl); font-weight: var(--origam-font__weight---semibold); }
+.hero__actions { margin-top: var(--origam-space---8); }
+.hero .btn--flat { background: var(--origam-color__action--primary---fg); color: var(--origam-color__action--primary---bg); }
+.hero__cap { position: absolute; right: 0; bottom: var(--origam-space---2); width: clamp(7rem, 11vw, 9.5rem); animation: spin 18s linear infinite; }
+.hero__cap .cap { fill: var(--origam-color__sticker---yellow); }
+.hero__cap .cap-in { fill: var(--origam-color__action--primary---fg); }
+.cap-txt { fill: var(--origam-color__sticker---yellow); font: italic 400 19px var(--origam-font__family---serif); }
+@keyframes spin { to { rotate: 360deg; } }
+
+/* ── ticker : bande d'encre ───────────────────────── */
+.ticker { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); rotate: -1.2deg; margin-block: calc(-1 * var(--origam-space---4)) var(--origam-space---4); position: relative; z-index: 2; }
+.ticker__track { animation: marquee var(--origam-motion__duration---marquee) linear infinite; }
+.ticker__list li { padding: var(--origam-space---4) var(--origam-space---5); font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-size: var(--origam-font__size---2xl); }
+.ticker__list li::after { content: '★'; margin-left: var(--origam-space---10); color: var(--origam-color__action--primary---bg); font-style: normal; font-size: var(--origam-font__size---lg); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ── bento magazine ───────────────────────────────── */
+.section__title { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---tight); padding-top: 0.08em; }
+.section__aside { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wider); font-size: var(--origam-font__size---xs); }
+
+.tile { border-radius: var(--origam-radius---lg); box-shadow: var(--origam-shadow---md); background: var(--origam-color__surface---raised);
+  transition: rotate var(--origam-motion__duration---medium) var(--origam-motion__easing---standard), transform var(--origam-motion__duration---medium) var(--origam-motion__easing---standard), box-shadow var(--origam-motion__duration---medium) var(--origam-motion__easing---standard); }
+a.tile:hover { rotate: 0deg; transform: translateY(-6px) scale(1.01); box-shadow: var(--origam-shadow---xl); }
+.tile__eyebrow, .tile__meta { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wider); font-size: var(--origam-font__size---xs); }
+.tile__title { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); font-size: var(--origam-font__size---3xl); line-height: var(--origam-font__lineHeight---none); }
+.tile__num { font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---none); }
+.tile__label { font-weight: var(--origam-font__weight---bold); }
+.tile__link { font-weight: var(--origam-font__weight---bold); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-transform: uppercase; font-size: var(--origam-font__size---sm); }
+
+.t-current { rotate: -0.6deg; }
+.t-editions { rotate: 1.2deg; background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); }
+.t-players { rotate: -1.4deg; background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.t-champ { rotate: 0.8deg; background: var(--origam-color__sticker---yellow); color: var(--origam-color__feedback--warning---fg); }
+.t-champ__name { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---none); }
+.t-matches { rotate: -1deg; background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); }
+.t-h2h { rotate: 1.6deg; background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.t-h2h__vs { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---none); }
+.t-h2h__vs i { font-size: 0.4em; padding: 0.3em 0.5em; border-radius: var(--origam-radius---full); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); rotate: -10deg; }
+.t-rule { rotate: -0.5deg; }
+.t-rule__quote { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-size: var(--origam-font__size---3xl); line-height: var(--origam-font__lineHeight---tight); }
+
+.result { border-radius: var(--origam-radius---full); background: var(--origam-color__surface---default); }
+.result__p { font-weight: var(--origam-font__weight---semibold); color: var(--origam-color__text---secondary); }
+.result__p.is-win { color: var(--origam-color__text---primary); font-weight: var(--origam-font__weight---extrabold); }
+.result__s { font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---2xl); line-height: 1; }
+
+/* ── footer ───────────────────────────────────────── */
+.site-footer { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); }
+.site-footer .brand__name { font-size: var(--origam-font__size---xl); }
+.site-footer a { font-weight: var(--origam-font__weight---bold); }
+.mock-note { color: color-mix(in srgb, var(--origam-color__surface---default) 78%, transparent); }
+[data-mode="dark"] .site-footer { background: var(--origam-color__surface---sunken); color: var(--origam-color__text---primary); border-top: 2px solid var(--origam-color__action--primary---bg); }
+[data-mode="dark"] .mock-note { color: var(--origam-color__text---tertiary); }
+
+/* ── fiche joueur ─────────────────────────────────── */
+.crumbs { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); font-size: var(--origam-font__size---xs); }
+.profile { border-radius: var(--origam-radius---xl); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); box-shadow: var(--origam-shadow---xl); padding: var(--origam-space---10); }
+.profile__fx span { width: clamp(7rem, 12vw, 11rem); aspect-ratio: 4 / 5; border-radius: var(--origam-radius---md); right: 18%; top: -18%; rotate: 10deg; animation: float 7s var(--origam-motion__easing---decelerate) infinite alternate;
+  background: linear-gradient(transparent 48%, var(--origam-color__surface---raised) 48% 50%, transparent 50%), var(--origam-color__action--secondary---bg); }
+.profile__fx span:nth-child(2) { right: 4%; top: auto; bottom: -25%; rotate: -7deg; animation-delay: -3s; background: radial-gradient(circle, var(--origam-color__sticker---yellow) 0 30%, transparent 31%), var(--origam-color__text---primary); }
+.profile__avatar { border-radius: 50%; background: var(--origam-color__action--primary---fg); color: var(--origam-color__action--primary---bg); font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---3xl); rotate: -8deg; box-shadow: 0 0 0 6px var(--origam-color__sticker---yellow); }
+.profile__alias { display: inline-block; padding: var(--origam-space---1) var(--origam-space---3); border-radius: var(--origam-radius---full); background: var(--origam-color__action--primary---fg); color: var(--origam-color__action--primary---bg); font-weight: var(--origam-font__weight---extrabold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); rotate: -3deg; }
+.profile__name { margin-top: var(--origam-space---3); font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---none); }
+.profile__meta { font-weight: var(--origam-font__weight---semibold); }
+.profile .btn--flat { background: var(--origam-color__action--primary---fg); color: var(--origam-color__action--primary---bg); }
+
+.stat { border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---sm); }
+.stat dt { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wider); font-size: var(--origam-font__size---xs); }
+.stat dd { font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---3xl); line-height: var(--origam-font__lineHeight---none); text-transform: uppercase; }
+.stat dd small { margin-top: var(--origam-space---2); font-family: var(--origam-font__family---sans); font-style: normal; text-transform: none; font-size: var(--origam-font__size---sm); font-weight: var(--origam-font__weight---bold); }
+.stat--hero { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); rotate: -1deg; }
+.stat--hero dd { font-size: var(--origam-font__size---5xl); }
+.stat--accent { background: var(--origam-color__sticker---yellow); color: var(--origam-color__feedback--warning---fg); rotate: 0.6deg; }
+.ratio { border-radius: var(--origam-radius---full); background: color-mix(in srgb, var(--origam-color__surface---default) 20%, transparent); height: var(--origam-space---4); }
+.ratio span { border-radius: inherit; background: var(--origam-color__action--primary---bg); transform-origin: left; animation: grow var(--origam-motion__duration---xslow) var(--origam-motion__easing---decelerate) both; }
+@keyframes grow { from { transform: scaleX(0); } }
+
+.path { border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---md); }
+.path__bar { background: var(--origam-color__text---primary); border-radius: var(--origam-radius---full) var(--origam-radius---full) 4px 4px; transform-origin: bottom; animation: lift var(--origam-motion__duration---xslow) var(--origam-motion__easing---standard) both; }
+.path__chart li:nth-child(n) .path__bar { animation-delay: calc(var(--lvl) * 70ms); }
+.path__chart .is-top .path__bar { background: var(--origam-color__action--primary---bg); box-shadow: inset 0 0 0 2px var(--origam-color__border---strong); }
+.path__chart .is-current .path__bar { background: repeating-linear-gradient(-45deg, var(--origam-color__text---primary) 0 3px, transparent 3px 7px); }
+@keyframes lift { from { transform: scaleY(0); } }
+.path__chart b { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-weight: var(--origam-font__weight---regular); font-size: var(--origam-font__size---md); }
+.path__chart i { font-weight: var(--origam-font__weight---bold); color: var(--origam-color__text---secondary); }
+.path__chart li::after { background: var(--origam-color__text---primary); color: var(--origam-color__surface---default); border-radius: var(--origam-radius---full); font-weight: var(--origam-font__weight---bold); padding-inline: var(--origam-space---3); }
+.path__table th { font-weight: var(--origam-font__weight---bold); text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wider); font-size: var(--origam-font__size---xs); border-bottom: 2px solid var(--origam-color__border---strong); }
+.path__table td { border-bottom: 1px solid var(--origam-color__border---default); font-weight: var(--origam-font__weight---medium); }
+.path__table td:first-child { font-family: var(--origam-font__family---serif); font-style: italic; font-size: var(--origam-font__size---xl); }
+.path__table tbody tr:hover { background: var(--origam-color__action--primary---bgSubtle); }
+.path__table tr.is-top { background: color-mix(in srgb, var(--origam-color__sticker---yellow) 35%, transparent); }
+
+.opp { border-radius: var(--origam-radius---full); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---sm); transition: rotate var(--origam-motion__duration---medium) var(--origam-motion__easing---standard); }
+.opp:hover { rotate: -0.8deg; }
+.opp__avatar { border-radius: 50%; background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); font-weight: var(--origam-font__weight---extrabold); }
+.opp__name { font-family: var(--origam-font__family---serif); font-style: italic; text-transform: uppercase; font-size: var(--origam-font__size---xl); }
+.opp__n { font-weight: var(--origam-font__weight---bold); color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); }
+.opp__rec b { font-weight: var(--origam-font__weight---extrabold); }
+.opp__bar { background: var(--origam-color__action--primary---bg); height: 4px; }
+
+@media (max-width: 720px) {
+  .hero__fx span:nth-child(1), .hero__fx span:nth-child(3) { display: none; }
+  .hero__fx span:nth-child(2) { right: -12%; top: 4%; opacity: 0.5; }
+  .ticker { rotate: 0deg; }
+  .tile, .stat--hero, .stat--accent { rotate: 0deg; }
+}
+.player-search input { border-radius: var(--origam-radius---full); border: 2px solid var(--origam-color__border---strong); font-weight: var(--origam-font__weight---semibold); }

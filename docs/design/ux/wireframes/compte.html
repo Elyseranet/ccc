@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Compte (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><a href="accueil.html"><strong>CCC</strong></a><span class="spacer"></span><a class="btn" href="accueil.html">Retour au site</a></header>
+<main id="contenu">
+ <p class="note">Écrans du rôle « Participant » (SF « Acteurs », « Comptes et première connexion »). Absents du prototype actuel.</p>
+
+ <section class="box" aria-labelledby="h-inv" style="max-width:560px"><h1 id="h-inv">Première connexion</h1>
+  <p>Vous avez été invité·e au Championnat de Caps. Définissez votre mot de passe et complétez votre profil.</p>
+  <form>
+   <div><label for="pw">Mot de passe</label><input id="pw" type="password" autocomplete="new-password"></div>
+   <div><label for="pw2">Confirmer le mot de passe</label><input id="pw2" type="password" autocomplete="new-password"></div>
+   <fieldset><legend>Votre profil</legend>
+    <div><label for="pa">Pseudo</label><input id="pa"></div><div><label for="av">Avatar</label><input id="av" type="file" accept="image/*"></div></fieldset>
+   <button class="primary">Activer mon compte</button></form>
+  <div class="note">Le lien porte un jeton à usage unique (API : GET/POST /auth/invitation/{jeton}). Champs modifiables par le participant : « certaines informations personnelles », lesquelles ne sont pas dites (Q13) ; les champs ci-dessus sont des placeholders. Durée de validité du lien : non spécifiée.</div>
+  <p class="state-title">LIEN EXPIRÉ OU DÉJÀ UTILISÉ (410)</p><div class="box box--dashed" role="alert"><p>Ce lien n'est plus valable. Contactez l'organisateur pour recevoir une nouvelle invitation.</p></div>
+  <div class="note">Politique de renvoi d'invitation : Je ne sais pas (API « Événements sortants »).</div></section>
+
+ <section class="box" aria-labelledby="h-log" style="max-width:560px;margin-top:1rem"><h1 id="h-log">Connexion</h1>
+  <form><div><label for="em">Email</label><input id="em" type="email" autocomplete="username"></div><div><label for="mp">Mot de passe</label><input id="mp" type="password" autocomplete="current-password"></div><button class="primary">Se connecter</button></form>
+  <div class="note">Réinitialisation de mot de passe : non mentionnée dans les specs, Je ne sais pas si elle est prévue. Après connexion : participant → Mon profil ; administrateur → Espace organisateur.</div></section>
+
+ <section class="box" aria-labelledby="h-pro" style="max-width:560px;margin-top:1rem"><h1 id="h-pro">Mon profil</h1>
+  <dl><dt>Nom, prénom</dt><dd>Lecture seule (Je ne sais pas, Q13)</dd><dt>Pseudo</dt><dd>Modifiable ? (Q13)</dd><dt>Email, téléphone</dt><dd>Privés, jamais publics</dd></dl>
+  <p><a href="joueur.html">Voir ma fiche publique</a></p>
+  <div class="note">Le participant consulte son profil et modifie « partiellement » ses informations (SF « Droits »). Le pseudo sert d'identité publique : sa modifiabilité est une question ouverte de la spec.</div></section>
+</main></body></html>

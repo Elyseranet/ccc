@@ -1,0 +1,194 @@
+/* Structure commune aux directions (grilles, flux, responsive, garde-fous motion).
+   Aucune couleur ni ombre ici : uniquement des var(--origam-*) issues de tokens.css.
+   Chaque direction habille et recompose ces blocs dans son ui.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: clip;
+  background: var(--origam-color__surface---default);
+  color: var(--origam-color__text---primary);
+  font-family: var(--origam-font__family---sans);
+  font-size: var(--origam-font__size---md);
+  line-height: var(--origam-font__lineHeight---normal);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3, p, dl, dd, ol, ul, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+table { border-collapse: collapse; width: 100%; }
+i { font-style: normal; }
+.num { font-variant-numeric: tabular-nums; }
+main { overflow-x: clip; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.wrap { width: min(78rem, 100% - 2 * var(--origam-space---4)); margin-inline: auto; }
+
+.skip { position: absolute; left: var(--origam-space---4); top: calc(-1 * var(--origam-space---12)); z-index: 30; padding: var(--origam-space---2) var(--origam-space---4); }
+.skip:focus { top: var(--origam-space---2); }
+:where(a, button, select, summary, [tabindex]):focus-visible { outline: 2px solid var(--origam-color__border---focus); outline-offset: 3px; }
+
+/* ── header ─────────────────────────────────────────── */
+.site-header { position: sticky; top: 0; z-index: 20; }
+.site-header__inner { display: flex; align-items: center; gap: var(--origam-space---6); min-height: var(--origam-space---16); }
+.brand { display: inline-flex; align-items: center; gap: var(--origam-space---2); min-height: var(--origam-space---11); text-decoration: none; flex: none; }
+.brand__mark { width: var(--origam-space---8); height: var(--origam-space---8); }
+.site-nav { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.site-nav ul { display: flex; gap: var(--origam-space---1); }
+.site-nav a { display: inline-flex; align-items: center; min-height: var(--origam-space---11); padding-inline: var(--origam-space---3); text-decoration: none; white-space: nowrap; }
+
+/* ── boutons (origam-btn) ───────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--origam-space---2);
+  min-height: var(--origam-space---11); padding-inline: var(--origam-space---5);
+  border: 0; background: none; color: inherit; font: inherit; text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: background-color var(--origam-motion__duration---normal) var(--origam-motion__easing---standard),
+              color var(--origam-motion__duration---normal) var(--origam-motion__easing---standard),
+              box-shadow var(--origam-motion__duration---medium) var(--origam-motion__easing---standard),
+              transform var(--origam-motion__duration---medium) var(--origam-motion__easing---standard);
+}
+.btn.btn--icon { flex: none; width: var(--origam-space---11); min-width: var(--origam-space---11); padding-inline: 0; }
+
+/* ── chips (origam-chip) ────────────────────────────── */
+.chip { display: inline-flex; align-items: center; gap: var(--origam-space---2); padding: var(--origam-space---1) var(--origam-space---3); font-size: var(--origam-font__size---xs); line-height: 1.2; white-space: nowrap; }
+
+/* ── hero ───────────────────────────────────────────── */
+.hero { position: relative; isolation: isolate; overflow: hidden; }
+.hero__fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.hero__fx span { position: absolute; }
+.hero__inner { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'kicker kicker' 'title cap' 'lead cap' 'actions cap'; align-items: end; column-gap: var(--origam-space---10); }
+.hero__kicker { grid-area: kicker; display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---3); }
+.hero__title { grid-area: title; }
+.hero__title .w { display: inline-block; }
+.hero__lead { grid-area: lead; max-width: 34rem; }
+.hero__actions { grid-area: actions; display: flex; flex-wrap: wrap; gap: var(--origam-space---3); }
+.hero__cap { grid-area: cap; width: clamp(9rem, 22vw, 18rem); align-self: center; }
+
+/* ── ticker (règles d'or) ───────────────────────────── */
+.ticker { overflow: hidden; }
+.ticker__track { display: flex; width: max-content; }
+.ticker__list { display: flex; flex: none; }
+.ticker__list li { display: inline-flex; align-items: center; white-space: nowrap; }
+
+/* ── sections ───────────────────────────────────────── */
+.section { padding-block: var(--origam-space---16); }
+.section--tight { padding-block: var(--origam-space---10) 0; }
+.section__head { display: flex; align-items: end; justify-content: space-between; gap: var(--origam-space---4); margin-bottom: var(--origam-space---6); flex-wrap: wrap; }
+
+/* ── bento (origam-card ×7) ─────────────────────────── */
+.bento {
+  display: grid; gap: var(--origam-space---4);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(10rem, auto);
+  grid-template-areas:
+    'current current editions players'
+    'current current champ champ'
+    'matches h2h rule rule';
+}
+.tile { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: var(--origam-space---3); padding: var(--origam-space---6); text-decoration: none; overflow: hidden; }
+.t-current { grid-area: current; justify-content: flex-start; }
+.t-editions { grid-area: editions; }
+.t-players { grid-area: players; }
+.t-champ { grid-area: champ; }
+.t-matches { grid-area: matches; }
+.t-h2h { grid-area: h2h; }
+.t-rule { grid-area: rule; }
+.tile__head { display: flex; align-items: center; justify-content: space-between; gap: var(--origam-space---3); }
+.tile__link { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; min-height: var(--origam-space---11); }
+.tile__num { line-height: 0.9; }
+.results { display: grid; gap: var(--origam-space---2); margin-block: var(--origam-space---4); }
+.result { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--origam-space---3); padding: var(--origam-space---3) var(--origam-space---4); }
+.result__p:last-child { text-align: right; }
+.result__s i { padding-inline: var(--origam-space---1); }
+.t-h2h__vs { display: flex; align-items: center; gap: var(--origam-space---3); }
+
+/* ── fiche joueur ───────────────────────────────────── */
+.player { padding-bottom: var(--origam-space---16); }
+.crumbs { padding-top: var(--origam-space---6); }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: var(--origam-space---2); }
+.crumbs li + li::before { content: '/'; margin-right: var(--origam-space---2); }
+.profile { position: relative; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: var(--origam-space---6); margin-top: var(--origam-space---6); padding: var(--origam-space---8); overflow: hidden; }
+.profile__fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.profile__fx span { position: absolute; }
+.profile__avatar { display: grid; place-items: center; width: clamp(5rem, 12vw, 8.5rem); aspect-ratio: 1; }
+.profile__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---3); margin-top: var(--origam-space---3); }
+
+.stats-bento { display: grid; gap: var(--origam-space---4); grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr)); grid-template-areas: 'hero a b c' 'hero d d d'; }
+.stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--origam-space---2); padding: var(--origam-space---5); }
+.stat--hero { grid-area: hero; justify-content: space-between; }
+.stats-bento > .stat:nth-child(2) { grid-area: a; }
+.stats-bento > .stat:nth-child(3) { grid-area: b; }
+.stats-bento > .stat:nth-child(4) { grid-area: c; }
+.stats-bento > .stat:nth-child(5) { grid-area: d; }
+.stat dd small { display: block; }
+.stat--hero { flex-direction: column; }
+.stat--hero dt { order: -1; }
+.count { position: relative; display: inline-block; }
+.ratio { height: var(--origam-space---3); overflow: hidden; }
+.ratio span { display: block; height: 100%; width: calc(var(--p) * 1%); }
+
+.path { padding: var(--origam-space---6); }
+.path__chart { position: relative; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); align-items: end; gap: var(--origam-space---2); height: 15rem; margin-bottom: var(--origam-space---6); }
+.path__chart li { position: relative; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; height: 100%; gap: var(--origam-space---1); }
+.path__bar { align-self: end; width: min(100%, 3.5rem); height: calc(12% + var(--lvl) * 17.6%); border-radius: 4px 4px 0 0; }
+.path__chart b { font-size: var(--origam-font__size---xs); white-space: nowrap; }
+.path__chart i { font-size: var(--origam-font__size---xs); }
+.path__chart li::after { content: attr(data-tip); position: absolute; bottom: calc(100% - var(--origam-space---6)); left: 50%; translate: -50% 0; padding: var(--origam-space---1) var(--origam-space---2); white-space: nowrap; font-size: var(--origam-font__size---xs); opacity: 0; pointer-events: none; transition: opacity var(--origam-motion__duration---fast) var(--origam-motion__easing---standard); }
+.path__chart li:hover::after { opacity: 1; }
+.table-scroll { overflow-x: auto; }
+.path__table { min-width: 34rem; font-size: var(--origam-font__size---sm); }
+.path__table th, .path__table td { padding: var(--origam-space---3); text-align: left; }
+.path__table td:last-child, .path__table th:last-child { text-align: right; }
+
+.opponents { display: grid; gap: var(--origam-space---2); }
+.opp { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: var(--origam-space---4); padding: var(--origam-space---3) var(--origam-space---4); overflow: hidden; }
+.opp__avatar { display: grid; place-items: center; width: var(--origam-space---10); aspect-ratio: 1; font-size: var(--origam-font__size---xs); }
+.opp__bar { position: absolute; left: 0; bottom: 0; height: 2px; width: calc(var(--w) * 1%); }
+
+/* ── footer ─────────────────────────────────────────── */
+.site-footer { padding-block: var(--origam-space---8); }
+.site-footer__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---4); }
+.site-footer ul { display: flex; gap: var(--origam-space---4); }
+.site-footer a { display: inline-flex; align-items: center; min-height: var(--origam-space---11); }
+.mock-note { padding-top: var(--origam-space---4); font-size: var(--origam-font__size---xs); }
+
+/* ── responsive ─────────────────────────────────────── */
+@media (max-width: 1000px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: 'current current' 'editions players' 'champ champ' 'matches h2h' 'rule rule'; }
+  .stats-bento { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: 'hero hero hero' 'a b c' 'd d d'; }
+}
+@media (max-width: 720px) {
+  .site-header__inner { flex-wrap: wrap; gap: 0 var(--origam-space---3); justify-content: space-between; }
+  .site-nav { order: 3; flex-basis: 100%; }
+  .hero__inner { grid-template-columns: 1fr; grid-template-areas: 'kicker' 'title' 'lead' 'actions'; }
+  .hero__cap { display: none; }
+  .bento { grid-template-columns: 1fr; grid-template-areas: 'current' 'editions' 'players' 'champ' 'matches' 'h2h' 'rule'; }
+  .profile { grid-template-columns: auto minmax(0, 1fr); padding: var(--origam-space---5); }
+  .profile__cta { grid-column: 1 / -1; justify-self: start; }
+  .stats-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: 'hero hero' 'a b' 'c d'; }
+  .opp { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .opp__n { display: none; }
+  .opp .btn { grid-column: 2 / -1; justify-self: start; padding-inline: 0; }
+  .section { padding-block: var(--origam-space---10); }
+}
+
+/* ── garde-fou motion (owner decision 2026-10-02) ───── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .ticker__track { width: auto; }
+  .ticker__list { flex-wrap: wrap; }
+  .ticker__list[aria-hidden] { display: none; }
+}
+
+/* Info-bulles du parcours : les colonnes de bord s'ancrent à l'intérieur (pas de débordement horizontal). */
+.path__chart li:nth-child(-n+2)::after { left: 0; translate: 0 0; }
+.path__chart li:nth-last-child(-n+2)::after { left: auto; right: 0; translate: 0 0; }
+
+/* Recherche publique de joueurs (origam-text-field type=search) */
+.player-search { display: flex; gap: var(--origam-space---2); margin-top: var(--origam-space---6); }
+.player-search input { flex: 1; min-width: 0; min-height: var(--origam-space---11); padding-inline: var(--origam-space---4); font: inherit; color: var(--origam-color__text---primary); background: var(--origam-color__surface---raised); border: 1px solid var(--origam-color__border---default); }
+.player-search input::placeholder { color: var(--origam-color__text---tertiary); }

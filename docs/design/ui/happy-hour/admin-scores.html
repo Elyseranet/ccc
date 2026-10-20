@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poules et matchs · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-layout : origam-drawer permanent (≥ 1000 px) · origam-bottom-nav (< 1000 px, 4 entrées, décision A7) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-scores.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h5v4H4zM4 15h5v4H4zM15 10h5v4h-5zM9 7h3v10H9M12 12h3"/></svg>Bracket</a></li></ul></nav>
+  <p class="eyebrow adm-side__t">Référentiel</p>
+  <ul class="adm-nav"><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Compétiteurs</a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16"/></svg>Éditions</a></li></ul>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <!-- origam-toolbar : sélecteur d'édition global (origam-select) -->
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Édition 2026</p><h1 class="adm-h1 font-display neon--sm">Poules et matchs</h1></div></div>
+<!-- origam-chip-group (filtres, mandatory) -->
+<div class="m-filters" role="group" aria-label="Filtrer"><button class="fchip" aria-pressed="true">À traiter <span class="num">37</span></button><button class="fchip" aria-pressed="false">Saisis <span class="num">7</span></button><button class="fchip" aria-pressed="false">Sans score <span class="num">30</span></button><button class="fchip" aria-pressed="false">Validés <span class="num">68</span></button></div>
+<p class="field adm-pool"><label for="pf">Poule</label><select id="pf" class="input"><option>Toutes les poules</option><option>Poule 1</option><option>Poule 2</option><option>Poule 3</option><option>Poule 4</option><option>Poule 5</option><option>Poule 6</option><option>Poule 7</option><option>Poule 8</option></select></p>
+<!-- origam-list (mobile) / origam-data-table (bureau) : file de traitement, pas ordre chronologique -->
+<ol class="mcs"><li class="mc"><span class="mc__t eyebrow">Poule 2 · 2026-69</span><span class="chip chip--warn">Saisi · à valider</span><span class="mc__a">Clara Lambert</span><span class="mc__s font-display"><b class="num">5</b><i>–</i><b class="num">1</b></span><span class="mc__b">Paul Girard</span><button class="btn btn--primary btn--sm" type="button">Valider<span class="sr-only"> Clara Lambert contre Paul Girard</span></button></li><li class="mc"><span class="mc__t eyebrow">Poule 3 · 2026-70</span><span class="chip chip--warn">Saisi · à valider</span><span class="mc__a">Sam Dupont</span><span class="mc__s font-display"><b class="num">1</b><i>–</i><b class="num">5</b></span><span class="mc__b">Lisa Meyer</span><button class="btn btn--primary btn--sm" type="button">Valider<span class="sr-only"> Sam Dupont contre Lisa Meyer</span></button></li><li class="mc"><span class="mc__t eyebrow">Poule 2 · 2026-71</span><span class="chip chip--warn">Saisi · à valider</span><span class="mc__a">Paul Girard</span><span class="mc__s font-display"><b class="num">5</b><i>–</i><b class="num">1</b></span><span class="mc__b">Mila Lambert</span><button class="btn btn--primary btn--sm" type="button">Valider<span class="sr-only"> Paul Girard contre Mila Lambert</span></button></li><li class="mc"><span class="mc__t eyebrow">Poule 1 · 2026-72</span><span class="chip chip--warn">Saisi · à valider</span><span class="mc__a">Côme Duval</span><span class="mc__s font-display"><b class="num">3</b><i>–</i><b class="num">5</b></span><span class="mc__b">Maya Bonnet</span><button class="btn btn--primary btn--sm" type="button">Valider<span class="sr-only"> Côme Duval contre Maya Bonnet</span></button></li><li class="mc"><span class="mc__t eyebrow">Poule 4 · 2026-76</span><span class="chip">Sans score</span><span class="mc__a">Théo Gauthier</span><span class="mc__s font-display"><span class="muted">—</span></span><span class="mc__b">Eva Michel</span><button class="btn btn--outlined btn--sm" type="button">Saisir<span class="sr-only"> Théo Gauthier contre Eva Michel</span></button></li><li class="mc"><span class="mc__t eyebrow">Poule 8 · 2026-77</span><span class="chip">Sans score</span><span class="mc__a">Lina Mercier</span><span class="mc__s font-display"><span class="muted">—</span></span><span class="mc__b">Eliott Laurent</span><button class="btn btn--outlined btn--sm" type="button">Saisir<span class="sr-only"> Lina Mercier contre Eliott Laurent</span></button></li></ol>
+
+<!-- origam-dialog (bureau) / tiroir bas (mobile) · origam-form + origam-number-field ×2 · origam-messages (aria-describedby) -->
+<div class="sheet-scrim" aria-hidden="true"></div>
+<section class="sheet" role="dialog" aria-modal="true" aria-labelledby="h-sheet" aria-describedby="sheet-rule">
+  <span class="sheet__grip" aria-hidden="true"></span>
+  <header class="sheet__h"><div><p class="eyebrow">Poule 2 · match 2026-69</p><h2 id="h-sheet" class="h-card">Saisir le score</h2></div><button class="btn btn--outlined btn--sm sheet__x" type="button" aria-label="Fermer">✕</button></header>
+  <form class="sheet__form" action="#">
+    <div class="duel">
+      <p class="duel__p"><label for="sa">Clara Lambert</label><input id="sa" class="score-in font-display" type="number" inputmode="numeric" min="0" max="5" value="5" aria-describedby="sheet-rule"></p>
+      <span class="duel__vs font-display" aria-hidden="true">–</span>
+      <p class="duel__p"><label for="sb">Paul Girard</label><input id="sb" class="score-in font-display" type="number" inputmode="numeric" min="0" max="5" value="1" aria-describedby="sheet-rule"></p>
+    </div>
+    <p id="sheet-rule" class="rule"><span class="chip chip--info">Cible 5</span>En poule, le vainqueur marque exactement 5 (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.</p>
+    <p class="sheet__meta muted">Saisi par l’administrateur · en attente de validation</p>
+    <div class="sheet__cta"><button class="btn btn--outlined" type="button">Enregistrer</button><button class="btn btn--primary" type="submit">Valider 5–1</button></div>
+  </form>
+</section></main>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-scores.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+</body>
+</html>

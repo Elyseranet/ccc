@@ -1,0 +1,145 @@
+import type { IOrigamTheme } from 'origam/interfaces'
+
+/*********************************************************
+ * CCC — thème « Happy Hour » (direction retenue le 2026-10-20)
+ *
+ * @description
+ * La soirée au bar : nuit violette, néon rose, ambre de la bière, crème de la mousse.
+ * Mode SOMBRE uniquement. Un mode clair n'a pas été retenu : sur fond crème, le néon
+ * rose et l'ambre perdent leur rôle de lumière et l'univers « soirée » disparaît.
+ * Voir notes dans mapping.md.
+ *
+ * @description
+ * Découpage conforme à `activeDefaultsFor` (origam.ts) :
+ *   - CCC_HH_BASE : name sans mode → props `components` + tokens non colorés.
+ *   - CCC_HH_DARK : couleurs + ombres (seul mode livré).
+ *
+ * @description
+ * EXCEPTION PROPS-FIRST (décision utilisateur 2026-10-20, docs/design/ux/decisions.md) :
+ * la police display Bagel Fat One est appliquée par une CLASSE CSS LOCALE (`.font-display`)
+ * car `fontFamily` (TFontFamily) n'accepte que sans | serif | mono. Rien d'autre ne sort
+ * des props et des tokens. Suivi DS : Elyseranet/origam#1212 (slot de police display).
+ ********************************************************/
+
+export const CCC_HH_BASE: IOrigamTheme = {
+  name: 'ccc',
+  label: 'CCC · Happy Hour',
+  description: 'Nuit violette, néon rose, ambre bière et mousse.',
+  swatch: 'linear-gradient(135deg, #160b2e 45%, #ff3d9a 45% 70%, #ffb21a 70%)',
+
+  // ── 1) PROPS D'ABORD ────────────────────────────────────────────
+  components: {
+    global: { density: 'default' },
+
+    // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (ambre + ombre néon via elevation).
+    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold' },
+    'origam-btn-group': { rounded: 'full' },
+
+    // Surfaces
+    'origam-card': { rounded: 'xl', border: true, elevation: 'md', density: 'comfortable' },
+    'origam-sheet': { rounded: 'xl', border: true, elevation: 'md' },
+    'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560 },
+    'origam-drawer': { elevation: 'none', border: true },
+    'origam-toolbar': { flat: true, density: 'default', elevation: 'none' },
+    'origam-bottom-nav': { elevation: 'lg', grow: true },
+
+    // Données
+    'origam-chip': { size: 'small', pill: true, border: false, fontWeight: 'bold' },
+    'origam-chip-group': { column: false },
+    'origam-badge': { rounded: 'full', inline: true },
+    'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'primary' },
+    'origam-tab': { fontWeight: 'bold' },
+    'origam-table': { border: true, rounded: 'lg', density: 'compact', hover: true, elevation: 'none' },
+    'origam-data-table': { density: 'compact', hover: true, rounded: 'lg', border: true },
+    'origam-list': { density: 'comfortable', rounded: 'lg', slim: false },
+    'origam-list-item': { rounded: 'lg' },
+    'origam-data-list': { density: 'compact', rounded: 'lg', border: true },
+    'origam-bracket': { variant: 'single-elimination', color: 'primary', density: 'compact', showScores: true, showSeed: false, showRoundTitles: true, elevation: 'md' },
+    'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
+    'origam-pagination': { density: 'compact', showFirstLastPage: false },
+    'origam-breadcrumb': { density: 'compact' },
+    'origam-avatar': { rounded: 'full', size: 'default' },
+    'origam-empty-state': { size: 'lg', align: 'center' },
+    'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
+
+    // Saisie
+    'origam-text-field': { variant: 'solo', rounded: 'full', density: 'default' },
+    'origam-select': { variant: 'solo', rounded: 'full', density: 'default' },
+    'origam-number-field': { variant: 'solo', rounded: 'lg', density: 'default', hideSpinButtons: false }
+  },
+
+  // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────
+  vars: {
+    rounded: { none: '0px', xs: '6px', sm: '10px', md: '14px', lg: '20px', xl: '28px', '2xl': '40px', full: '9999px' },
+    typo: {
+      // `display` n'est PAS lu par les props (TFontFamily) : il alimente la classe locale .font-display (exception).
+      family: {
+        // Gabarito : grotesque géométrique au dessin rond et un peu farceur (pas une police « système »).
+        sans: "'Gabarito', system-ui, sans-serif",
+        mono: "'JetBrains Mono', monospace",
+        display: "'Bagel Fat One', 'Gabarito', sans-serif"
+      },
+      // Échelle modulaire 1.25 (tierce majeure) à partir de 16 px. xs = sm : plancher de lisibilité (12,8 px),
+      // pour qu'aucun palier ne soit à moins de 1.25 du suivant.
+      size: {
+        xs: '0.8rem', sm: '0.8rem', md: '1rem', lg: '1.25rem', xl: '1.5625rem',
+        '2xl': '1.953rem', '3xl': 'clamp(1.953rem, 3.2vw, 2.441rem)', '4xl': 'clamp(2.441rem, 5.4vw, 3.815rem)', '5xl': 'clamp(3.815rem, 9vw, 7.451rem)'
+      },
+      weight: { regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800 },
+      lineHeight: { none: 0.88, tight: 1.08, snug: 1.3, normal: 1.55, relaxed: 1.7, loose: 2 },
+      letterSpacing: { tight: '-0.02em', normal: '0em', wide: '0.02em', wider: '0.08em', widest: '0.16em' }
+    },
+    spacing: { '11': '44px' },
+    motion: {
+      // Courbes exponentielles uniquement, aucun rebond ni élastique (aucune valeur > 1).
+      duration: { instant: '0ms', fast: '120ms', normal: '200ms', medium: '320ms', slow: '600ms', xslow: '900ms' },
+      easing: { standard: 'cubic-bezier(0.25, 1, 0.5, 1)' /* ease-out-quart */, decelerate: 'cubic-bezier(0.16, 1, 0.3, 1)' /* ease-out-expo */, accelerate: 'cubic-bezier(0.5, 0, 0.75, 0)' /* ease-in-quart */, sharp: 'cubic-bezier(0.83, 0, 0.17, 1)' /* ease-in-out-quint */, linear: 'linear' }
+    }
+  }
+}
+
+export const CCC_HH_DARK: IOrigamTheme = {
+  name: 'ccc',
+  mode: 'dark',
+  vars: {
+    color: {
+      surface: { default: '#160b2e', raised: '#22113f', overlay: '#2c1752', sunken: '#0e0620', disabled: '#2c1752' },
+      text: {
+        primary: '#fff4dc',   // mousse — 15.76:1 sur raised
+        secondary: '#c9b8e8', // lilas — 8.51:1 sur overlay
+        tertiary: '#a99ad0',  // 6.74:1 sur raised
+        disabled: '#6d5f92',
+        inverse: '#160b2e',
+        onColor: '#160b2e',
+        ink: '#fff4dc'
+      },
+      action: {
+        // Ambre = action. Encre de nuit dessus : 10.38:1.
+        primary: { bg: '#ffb21a', bgHover: '#ffc24a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ffb21a' },
+        // Néon = accent éditorial (chips, onglet actif, extrusion des titres). 5.69:1 avec la nuit.
+        secondary: { bg: '#ff3d9a', bgHover: '#ff5aa8', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 61, 154, 0.16)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ff5aa8' },
+        ghost: { bg: 'rgba(255, 244, 220, 0)', bgHover: 'rgba(255, 244, 220, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#fff4dc', fgDisabled: '#6d5f92' }
+      },
+      border: { default: 'rgba(201, 184, 232, 0.18)', subtle: 'rgba(201, 184, 232, 0.09)', strong: 'rgba(201, 184, 232, 0.38)', focus: '#3ee8ff' },
+      feedback: {
+        success: { bg: '#4ff0a8', bgSubtle: 'rgba(79, 240, 168, 0.14)', fg: '#160b2e', fgSubtle: '#4ff0a8', border: '#4ff0a8' },
+        warning: { bg: '#ffb21a', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgSubtle: '#ffb21a', border: '#ffb21a' },
+        danger: { bg: '#ff6b81', bgSubtle: 'rgba(255, 107, 129, 0.14)', fg: '#160b2e', fgSubtle: '#ff6b81', border: '#ff6b81' },
+        info: { bg: '#7fd4ff', bgSubtle: 'rgba(127, 212, 255, 0.14)', fg: '#160b2e', fgSubtle: '#7fd4ff', border: '#7fd4ff' }
+      },
+      // Couleurs d'univers (décor : capsules, pinte, glaçon). Pas de rôle sémantique dans le DS.
+      bar: { foam: '#fff4dc', amber: '#ffb21a', neon: '#ff3d9a', ice: '#3ee8ff', night: '#160b2e', glow: '#3a1f66' }
+    },
+    shadow: {
+      none: 'none',
+      xs: '0 1px 0 rgba(255, 244, 220, 0.06) inset',
+      sm: '0 1px 0 rgba(255, 244, 220, 0.06) inset, 0 8px 20px -10px rgba(5, 2, 12, 0.8)',
+      md: '0 1px 0 rgba(255, 244, 220, 0.08) inset, 0 24px 48px -24px rgba(5, 2, 12, 0.9)',
+      // Ombre « néon » décalée : l'élévation des actions.
+      lg: '0 6px 0 #ff3d9a',
+      xl: '0 10px 0 #ff3d9a, 0 24px 48px -12px rgba(255, 61, 154, 0.45)'
+    }
+  }
+}
+
+export const CCC_HH_THEMES: IOrigamTheme[] = [CCC_HH_BASE, CCC_HH_DARK]

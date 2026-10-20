@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Admin scores (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><strong>CCC · Organisation</strong><span class="spacer"></span>
+  <label for="ctx" class="sr">Édition active</label><select id="ctx"><option>Édition 2026 · poules</option><option>2025 (archive, lecture seule)</option></select>
+  <a class="btn" href="accueil.html">Voir le site public</a><button>Compte</button></header>
+<div class="note">Le sélecteur d'édition est global : toutes les pages admin travaillent sur une édition choisie ici (aujourd'hui aucune page admin n'a de contexte d'édition). Archive = lecture seule.</div>
+<div class="shell"><aside><nav aria-label="Administration"><ul>
+ <li><a href="admin-dashboard.html" >Tableau de bord</a></li></ul>
+ <h2>Édition en cours</h2><ul>
+ <li><a href="admin-participants.html">Participants</a></li>
+ <li><a href="admin-tirage.html" >Tirages</a></li>
+ <li><a href="admin-score.html" aria-current=page>Poules et matchs</a></li>
+ <li><a href="#">Bracket</a></li></ul>
+ <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div id="contenu">
+<main>
+ <h1>Poules et matchs · Édition 2026</h1>
+ <div class="row" role="group" aria-label="Filtres"><span class="chip chip--on">À traiter (19)</span><span class="chip">Saisis (7)</span><span class="chip">Sans score (12)</span><span class="chip">Validés</span>
+  <label for="fpo" class="sr">Poule</label><select id="fpo"><option>Toutes les poules</option></select><span class="spacer"></span><label for="fq" class="sr">Rechercher</label><input id="fq" type="search" placeholder="Joueur"></div>
+ <table><caption class="sr">Matchs de l'édition</caption>
+  <thead><tr><th scope="col">Poule</th><th scope="col">Joueur 1</th><th scope="col">Score</th><th scope="col">Joueur 2</th><th scope="col">Statut</th><th scope="col"><span class="sr">Action</span></th></tr></thead>
+  <tbody>
+   <tr><td>1</td><td>Joueur A</td><td>5 – 3</td><td>Joueur B</td><td><span class="badge badge--wait">Saisi, à valider</span></td><td><button>Valider</button></td></tr>
+   <tr><td>1</td><td>Joueur A</td><td>—</td><td>Joueur C</td><td><span class="badge">Sans score</span></td><td><button>Saisir</button></td></tr>
+   <tr><td>2</td><td>Joueur D</td><td>5 – 1</td><td>Joueur E</td><td><span class="badge badge--ok">Validé</span></td><td><button>Corriger</button></td></tr></tbody></table>
+ <div class="note">Les boutons d'action portent un nom accessible complet (« Valider A–B », via aria-label ou texte masqué). La page remplace « Scores » + « Poules et matchs » (arbitrage A1) ; aujourd'hui /admin/scores renvoie vers /admin/groups, soit deux entrées pour une tâche. Le tableau est ordonné par file de traitement, pas par date.</div>
+ <div class="note note--ds">origam-data-table + origam-chip-group (filtres) + origam-badge/chip (statut) ; action ouvre origam-dialog (bureau) ou origam-drawer bas (mobile).</div>
+
+ <h2>Saisie d'un score</h2>
+ <form class="box" aria-labelledby="h-form" style="max-width:560px">
+  <h3 id="h-form">Poule 1 · Joueur A contre Joueur B <span class="badge">Cible : 5 points</span></h3>
+  <div class="row"><div><label for="sa">Joueur A</label><input id="sa" type="number" min="0" inputmode="numeric" value="5"></div><span class="vs">–</span><div><label for="sb">Joueur B</label><input id="sb" type="number" min="0" inputmode="numeric" value="3"></div></div>
+  <p role="alert" class="badge badge--wait">À la validation : le vainqueur doit avoir exactement 5 (poule) ou 10 (phase finale).</p>
+  <div class="row"><button type="button">Annuler</button><button class="primary">Enregistrer le score</button></div>
+  <div class="note">Cible 5 points en poule, 10 en phase finale (affichée d'après le type de match). Saisir ≠ valider : l'enregistrement place le match en « Saisi, à valider » (invariant 4). Les champs conservent le côté (Joueur A à gauche), l'ordre ne désigne pas le gagnant (invariant 3). Désactiver le bouton pendant l'envoi : une validation répétée ne doit rien dupliquer (invariant 6).</div>
+  <div class="note note--ds">origam-number-field ×2 dans origam-form ; erreurs liées par aria-describedby (origam-messages).</div></form>
+
+ <h2>Validation</h2>
+ <section class="box" style="max-width:560px"><h3>Valider A 5 – 3 B</h3>
+  <p>Saisi par admin à 14:02. La validation met à jour le classement de la poule 1 et les qualifications.</p>
+  <div class="row"><button>Corriger le score</button><button class="primary">Valider le score</button></div>
+  <div class="note">QUI VALIDE (spec) : l'administrateur seul saisit et valide (SF « Droits » ; « Non couvert » : pas de saisie participant). Aucun état « en attente du second joueur ». Le code propose pourtant « Faire valider… par le second joueur » (admin-guidance.const.ts:9) : écart E1. Deux gestes distincts : « Enregistrer » (score conservé, non opposable) puis « Valider » (met à jour classement et qualifications). Bornes du score du perdant : Je ne sais pas.</div>
+  <div class="note note--ds">Dialog de confirmation avec récapitulatif : origam-dialog ; résultat : origam-snackbar « Score validé, classement recalculé ».</div></section>
+
+ <h2>États</h2>
+ <p class="state-title">CORRECTION AUTORISÉE (aucun tour suivant engagé)</p>
+ <div class="box"><p>Match validé. <button>Corriger</button> — le classement et les qualifications seront recalculés. Confirmation obligatoire.</p></div>
+ <p class="state-title">CORRECTION BLOQUÉE (tour suivant engagé)</p>
+ <div class="box box--dashed"><p>Ce score ne peut plus être corrigé : le tour suivant est engagé. <button disabled>Corriger</button></p><div class="note">Règle du 2026-10-10. Dire POURQUOI le bouton est inactif (texte visible, pas seulement grisé).</div></div>
+ <p class="state-title">CONFLIT (score déjà validé par une autre session)</p>
+ <div class="box" role="alert"><p>Ce match a été validé entre-temps. Rechargez pour voir la version actuelle.</p><button>Recharger</button></div>
+ <p class="state-title">ERREUR RÉSEAU À LA VALIDATION</p>
+ <div class="box" role="alert"><p>La validation n'a pas pu être confirmée. Vérifiez l'état du match avant de réessayer.</p><button>Vérifier l'état</button></div>
+ <p class="state-title">AUCUN MATCH (poules non tirées)</p><div class="box box--dashed"><p>Les matchs seront générés après la validation du tirage. <a href="admin-tirage.html">Aller au tirage</a></p></div>
+ <p class="state-title">ÉDITION ARCHIVÉE</p><div class="box box--dashed"><p>Édition en lecture seule.</p></div>
+</main></div></div></body></html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Championnat de Caps · CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="is-vitrine">
+<div class="ambient" aria-hidden="true"></div>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-toolbar tag="header" flat · nav = origam-btn (to) · pas d'avatar ni de « Connexion » en en-tête (décision A3/E-d) -->
+<header class="hh-header"><div class="wrap hh-header__bar">
+  <a class="hh-brand font-display" href="index.html" aria-label="CCC, accueil"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <nav class="hh-nav" aria-label="Navigation principale"><ul><li><a href="edition.html">Éditions</a></li><li><a href="joueurs.html">Joueurs</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="#">Règles</a></li></ul></nav>
+  <span class="hh-header__end" aria-hidden="true"></span>
+</div></header>
+<main id="contenu">
+
+<section class="home-hero" aria-labelledby="h-hero">
+  <canvas class="bubbles" aria-hidden="true"></canvas>
+  <!-- Vitrine : vidéo de fond prévue (asset à fournir) — <origam-video autoplay muted loop playsInline poster> ; repli = ce canvas. -->
+  <div class="wrap home-hero__grid">
+    <div class="home-hero__text">
+      <p class="home-hero__kicker"><span class="chip chip--amber">16 éditions</span><span class="eyebrow">Depuis 2012 · ACP CCC</span></p>
+      <h1 id="h-hero" class="home-hero__title font-display neon"><span>Championnat</span> <span>de Caps</span></h1>
+      <p class="home-hero__lead">Deux joueurs assis, deux bières à deux mètres, une capsule à faire tomber. <strong>Le tournoi annuel du CCC</strong> : poules à 5 points, phase finale à 10, et le gagnant finit sa bière.</p>
+      <p class="home-hero__cta"><a class="btn btn--primary" href="edition.html">Voir l’édition 2026 <span aria-hidden="true">→</span></a><a class="btn btn--outlined" href="palmares.html">Le palmarès</a></p>
+    </div>
+    <div class="pint" aria-hidden="true">
+      <svg class="pint__svg" viewBox="0 0 220 300">
+        <path class="pint__beer" d="M40 70 L180 70 L165 285 Q164 292 156 292 L64 292 Q56 292 55 285 Z"/>
+        <path class="pint__shade" d="M140 70 L180 70 L165 285 Q164 292 156 292 L130 292 Z"/>
+        <path class="pint__hi" d="M58 96 L66 96 L76 270 L70 270 Z"/>
+        <g class="pint__bubbles"><circle cx="80" cy="270" r="4"/><circle cx="110" cy="280" r="3"/><circle cx="140" cy="265" r="5"/><circle cx="95" cy="250" r="3"/><circle cx="125" cy="275" r="4"/><circle cx="150" cy="282" r="3"/></g>
+        <path class="pint__edge" d="M40 70 L55 285 Q56 292 64 292 L156 292 Q164 292 165 285 L180 70"/>
+        <path class="pint__foam" d="M30 72 Q28 40 58 42 Q64 14 98 22 Q118 2 142 22 Q176 14 182 44 Q204 50 190 76 Q110 92 30 72 Z"/>
+        <path class="pint__drip" d="M58 74 Q56 104 64 110 Q72 104 70 76 Z"/>
+        <path class="pint__drip pint__drip--2" d="M160 76 Q158 122 168 126 Q176 118 172 76 Z"/>
+      </svg>
+      <svg class="flycap flycap--1" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/><text class="cap-txt" x="50" y="58" text-anchor="middle">CCC</text></svg>
+      <svg class="flycap flycap--2" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg>
+      <svg class="flycap flycap--3" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--ice" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg>
+    </div>
+  </div>
+</section>
+<section class="ticker" aria-labelledby="h-gold"><h2 id="h-gold" class="sr-only">Les huit règles d’or</h2><ol class="ticker__list"><li class="font-display">Les bières sont servies pleines et fraîches</li><li class="font-display">La partie débute par un shifumi</li><li class="font-display">Poules en une bière, phase finale en deux</li><li class="font-display">Le contre cap’s annule le point</li><li class="font-display">Le cap’s back ne compte pas</li><li class="font-display">Le bûcheron ne compte pas</li><li class="font-display">Le rebond est homologué</li><li class="font-display">Fair-play : le gagnant finit sa bière</li></ol></section>
+
+<section class="section" aria-labelledby="h-now">
+  <div class="wrap">
+    <div class="section__head"><h2 id="h-now" class="h-section font-display neon--sm">Édition 2026</h2><p class="muted">Résultats <strong>validés</strong> par l’organisation, mis à jour au rechargement.</p></div>
+    <div class="bento">
+      <article class="card t-now" aria-labelledby="h-last">
+        <div class="t-now__head"><h3 id="h-last" class="h-card">Derniers scores validés</h3><span class="chip chip--neon">Phase de poules</span></div>
+        <div class="progress" role="img" aria-label="68 matchs de poule validés sur 105"><span style="--p:64.8"></span></div>
+        <p class="t-now__meta num">68 / 105 matchs de poule validés · 8 poules · 45 joueurs</p>
+        <ol class="results"><li class="result"><span class="result__p is-win"><a href="#">Manon Faure</a></span><span class="result__s num font-display">5<i>–</i>4</span><span class="result__p"><a href="#">Théo Gauthier</a></span><span class="chip">Poule 4</span></li><li class="result"><span class="result__p is-win"><a href="#">Côme Michel</a></span><span class="result__s num font-display">5<i>–</i>3</span><span class="result__p"><a href="#">Mila Lambert</a></span><span class="chip">Poule 2</span></li><li class="result"><span class="result__p is-win"><a href="#">Maya Bonnet</a></span><span class="result__s num font-display">5<i>–</i>3</span><span class="result__p"><a href="#">Maël Faure</a></span><span class="chip">Poule 1</span></li><li class="result"><span class="result__p is-win"><a href="#">Anna Chevalier</a></span><span class="result__s num font-display">5<i>–</i>2</span><span class="result__p"><a href="#">Lisa André</a></span><span class="chip">Poule 5</span></li></ol>
+        <a class="btn btn--text" href="edition.html">Tous les matchs <span aria-hidden="true">→</span></a>
+      </article>
+      <a class="card card--link t-stat t-stat--ed" href="edition.html"><span class="t-stat__n font-display num">16</span><span class="t-stat__l">éditions depuis 2012</span></a>
+      <a class="card card--link t-stat t-stat--pl" href="joueurs.html"><span class="t-stat__n font-display num">145</span><span class="t-stat__l">compétiteurs</span></a>
+      <a class="card card--link t-champ" href="palmares.html">
+        <span class="eyebrow">Champion·ne 2025</span>
+        <span class="t-champ__name font-display neon--sm">Lou Bernard</span>
+        <span class="t-champ__meta">« La Mousse » · <span class="stars">****</span> 4 titres</span>
+        <svg class="t-champ__cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg>
+      </a>
+      <a class="card card--link t-stat t-stat--m" href="edition.html"><span class="t-stat__n font-display num">1 414</span><span class="t-stat__l">matchs archivés, dont 554 avec score</span></a>
+      <article class="card t-rank" aria-labelledby="h-rank">
+        <h3 id="h-rank" class="h-card">Classement ACP</h3><p class="eyebrow">5 dernières éditions</p>
+        <ol class="mini-rank"><li><span class="mini-rank__n font-display">1</span><span><a href="#">Lou Bernard</a> <span class="stars" aria-label="4 titres">****</span></span><span class="num">49.76</span></li><li><span class="mini-rank__n font-display">2</span><span><a href="#">Nina Perrin</a> <span class="stars" aria-label="3 titres">***</span></span><span class="num">27.60</span></li><li><span class="mini-rank__n font-display">3</span><span><a href="#">Inès Perrin</a> <span class="stars" aria-label="1 titre">*</span></span><span class="num">25.26</span></li></ol>
+        <a class="btn btn--text" href="palmares.html">Tout le classement <span aria-hidden="true">→</span></a>
+      </article>
+      <a class="card card--link t-rule" href="joueurs.html"><span class="eyebrow">Face-à-face</span><span class="t-rule__q font-display">Qui gagne entre vous deux ?</span><span class="t-stat__l">Comparer deux joueurs <span aria-hidden="true">→</span></span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="hh-footer"><div class="wrap">
+  <div class="hh-footer__grid">
+    <p class="hh-footer__brand font-display neon--sm">CCC</p>
+    <nav aria-label="Pied de page"><ul><li><a href="#">Règles</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="admin.html">Connexion</a></li></ul></nav>
+  </div>
+  <p class="hh-footer__note">Maquette haute fidélité. Chiffres réels repris de la Spec fonctionnelle : 16 éditions, 145 compétiteurs, 1 414 matchs dont 554 avec score, effectifs de 16 (2012) à 49 (2023). Noms, scores, effectifs des autres années et configurations de poule sont des données d'illustration générées selon les règles RG1–RG24.</p>
+</div></footer>
+<script src="bulles.js" defer></script>
+</body>
+</html>

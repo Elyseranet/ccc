@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Admin tableau de bord (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><strong>CCC · Organisation</strong><span class="spacer"></span>
+  <label for="ctx" class="sr">Édition active</label><select id="ctx"><option>Édition 2026 · poules</option><option>2025 (archive, lecture seule)</option></select>
+  <a class="btn" href="accueil.html">Voir le site public</a><button>Compte</button></header>
+<div class="note">Le sélecteur d'édition est global : toutes les pages admin travaillent sur une édition choisie ici (aujourd'hui aucune page admin n'a de contexte d'édition). Archive = lecture seule.</div>
+<div class="shell"><aside><nav aria-label="Administration"><ul>
+ <li><a href="admin-dashboard.html" aria-current=page>Tableau de bord</a></li></ul>
+ <h2>Édition en cours</h2><ul>
+ <li><a href="admin-participants.html">Participants</a></li>
+ <li><a href="admin-tirage.html" >Tirages</a></li>
+ <li><a href="admin-score.html" >Poules et matchs</a></li>
+ <li><a href="#">Bracket</a></li></ul>
+ <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div id="contenu">
+<main>
+ <h1>Tableau de bord</h1>
+ <section class="box" aria-labelledby="h-ed"><h2 id="h-ed">Édition 2026</h2>
+  <ol aria-label="Avancement de l'édition (9 étapes)">
+   <li>1 Création <span class="badge badge--ok">fait</span></li><li>2 Participants <span class="badge badge--ok">fait</span></li><li>3 Tirage des poules <span class="badge badge--ok">fait</span></li>
+   <li aria-current="step"><b>4 Matchs de poules</b> <span class="badge badge--wait">en cours</span></li><li>5 Validation des qualifiés</li><li>6 Tirage du bracket (par tour)</li><li>7 Matchs du bracket</li><li>8 Finale</li><li>9 Clôture</li></ol>
+  <div class="note note--ds">origam-stepper vertical (9 étapes) ; non cliquable. Les 9 étapes sont celles du « centre de contrôle » (SF) ; le prototype n'en affichait que 5 (pages/admin/index.vue:9) et « Éditions » n'est pas une étape mais une création. « Tout ce qui n'est pas atteignable depuis cet écran est hors produit » (SF) : chaque étape mène à son écran.</div>
+  <a class="btn btn--primary" href="admin-score.html">Continuer : valider les scores en attente (7)</a></section>
+ <section aria-labelledby="h-todo" style="margin-top:1rem"><h2 id="h-todo">À traiter maintenant</h2>
+  <ul class="grid grid--3" style="list-style:none;padding:0">
+   <li class="box"><span class="stat">7</span> scores saisis à valider <a href="admin-score.html">Traiter</a></li>
+   <li class="box"><span class="stat">12</span> matchs de poule sans score <a href="admin-score.html">Saisir</a></li>
+   <li class="box"><span class="stat">0</span> tirage en attente</li></ul>
+  <div class="note">Le tableau de bord répond à « qu'est-ce que je dois faire ? », pas à « combien d'archives existe-t-il ? ». Les 3 chiffres d'archive (16 / 145 / 1 414) vont dans Référentiel. Chaque tuile est un lien direct vers la liste filtrée (une étape de moins qu'aujourd'hui).</div>
+  <div class="note note--ds">origam-card + origam-badge (compteur) ; liens = origam-btn avec href.</div></section>
+ <section aria-labelledby="h-act" style="margin-top:1rem"><h2 id="h-act">Activité récente</h2>
+  <ul><li>Score A 5 – 3 B saisi — admin, 14:02</li><li>Tirage poule 1 validé — admin, 13:40</li></ul>
+  <div class="note">Journal exposé car la spec journalise les tirages (qui, quand, résultat ; ST « Tirages »). Pour les scores, auteur/horodatage : ARCHITECTURE.md ; non requis par la spec. Nombre d'administrateurs : Je ne sais pas (non dit).</div></section>
+ <h2>États</h2>
+ <p class="state-title">AUCUNE ÉDITION</p><div class="box box--dashed"><h3>Aucune édition en cours</h3><p>Créez une édition pour démarrer.</p><button class="primary">Créer une édition</button></div>
+ <p class="state-title">ÉDITION TERMINÉE</p><div class="box box--dashed"><p>Édition 2026 clôturée. Rien à traiter.</p></div>
+ <p class="state-title">NON CONNECTÉ / SESSION EXPIRÉE</p><div class="box" role="alert"><p>Votre session a expiré. <a href="#">Se reconnecter</a></p></div>
+</main></div></div></body></html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Accueil (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header">
+  <a href="accueil.html"><strong>CCC</strong></a>
+  <nav aria-label="Navigation principale"><ul>
+    <li><a href="edition.html" >Éditions</a></li>
+    <li><a href="joueurs.html" >Joueurs</a></li>
+    <li><a href="palmares.html" >Palmarès</a></li>
+    <li><a href="regles.html">Règles</a></li>
+  </ul></nav>
+  <span class="spacer"></span>
+  <a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="admin-dashboard.html">Espace organisateur</a>
+</header>
+<div class="note note--ds">origam-toolbar (header) + origam-btn (liens). Variantes = section de Règles (A2). En-tête : « Mon profil » (participant connecté) et « Espace organisateur » (administrateur connecté) apparaissent seulement si connecté ; sinon rien, et « Connexion » en pied de page (A3, E7).</div>
+<main id="contenu">
+  <section aria-labelledby="h-hero" class="hero-xl">
+    <p>Depuis 2012</p>
+    <h1 id="h-hero">Championnat de Caps</h1>
+    <p>Poules, bracket et palmarès du tournoi annuel du CCC.</p>
+    <p class="row"><a class="btn btn--primary" href="edition.html">Voir l'édition 2026</a><a class="btn" href="palmares.html">Le palmarès</a></p>
+    <div class="note">VARIANTE ÉDITORIALE : hero plein écran, un titre, une seule action principale ; le CTA suit l'état de l'édition (SF États). Le visuel de fond est décoratif (alt vide). Entrée animée en CSS uniquement, annulée sous prefers-reduced-motion. L'info utile (état de l'édition) doit rester visible sans scroller : la bande « Édition en cours » ci-dessous remonte dans le premier écran sur mobile.</div>
+  </section>
+
+  <section aria-labelledby="h-bento" style="margin-top:1rem">
+    <h2 id="h-bento">Le championnat en un coup d'œil</h2>
+    <div class="bento">
+      <article class="w2 h2"><h3>Édition en cours</h3><p><span class="badge badge--wait">Phase de poules</span></p><ul><li>A 5 – 3 B <span class="badge badge--ok">validé</span></li><li>C 5 – 4 D <span class="badge badge--ok">validé</span></li></ul><a href="edition.html">Tous les matchs</a></article>
+      <article><h3>Éditions</h3><span class="stat">16</span></article>
+      <article><h3>Compétiteurs</h3><span class="stat">145</span></article>
+      <article class="w2"><h3>Dernier champion</h3><p>Nom · édition précédente</p><a href="palmares.html">Palmarès</a></article>
+      <article><h3>Matchs archivés</h3><span class="stat">1 414</span><p>dont 554 avec score</p></article>
+      <article><h3>Face-à-face</h3><a href="face-a-face.html">Comparer deux joueurs</a></article>
+    </div>
+    <div class="note">Bento = chaque tuile est un lien ou une réponse, jamais décorative. Ordre du DOM = ordre de lecture (pas de réordonnancement CSS qui casse la tabulation). Mobile : une colonne, tuile « édition en cours » en premier. Valeurs illustratives. 1 414 / 554 : ARCHITECTURE.md.</div>
+    <div class="note note--ds">origam-card (tuiles), origam-grid / origam-masonry à vérifier pour le bento.</div>
+  </section>
+
+  <section aria-labelledby="h-etat" style="margin-top:1.5rem">
+    <h2 id="h-etat">États dégradés</h2>
+    <p class="state-title">VIDE — aucune édition publiée</p>
+    <div class="box box--dashed"><h3>Aucune édition en cours</h3><p>La prochaine édition n'est pas encore annoncée.</p><a class="btn" href="palmares.html">Parcourir les archives</a></div>
+    <p class="state-title">CHARGEMENT</p>
+    <div class="box" aria-busy="true"><div class="sk"></div><div class="sk"></div></div>
+    <p class="state-title">ERREUR</p>
+    <div class="box" role="alert"><p>Impossible de charger l'édition en cours.</p><button>Réessayer</button></div>
+    <div class="note note--ds">origam-empty-state (presets no-data / error), origam-skeleton. Le bandeau « archives à importer » actuel disparaît du public : c'est un état de projet, pas un état utilisateur.</div>
+  </section>
+</main>
+<footer class="box" style="margin-top:2rem"><nav aria-label="Pied de page"><a href="regles.html">Règles</a> · <a href="admin-dashboard.html">Espace organisateur</a></nav></footer>
+</body></html>

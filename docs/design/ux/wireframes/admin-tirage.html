@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Admin tirage (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><strong>CCC · Organisation</strong><span class="spacer"></span>
+  <label for="ctx" class="sr">Édition active</label><select id="ctx"><option>Édition 2026 · poules</option><option>2025 (archive, lecture seule)</option></select>
+  <a class="btn" href="accueil.html">Voir le site public</a><button>Compte</button></header>
+<div class="note">Le sélecteur d'édition est global : toutes les pages admin travaillent sur une édition choisie ici (aujourd'hui aucune page admin n'a de contexte d'édition). Archive = lecture seule.</div>
+<div class="shell"><aside><nav aria-label="Administration"><ul>
+ <li><a href="admin-dashboard.html" >Tableau de bord</a></li></ul>
+ <h2>Édition en cours</h2><ul>
+ <li><a href="admin-participants.html">Participants</a></li>
+ <li><a href="admin-tirage.html" aria-current=page>Tirages</a></li>
+ <li><a href="admin-score.html" >Poules et matchs</a></li>
+ <li><a href="#">Bracket</a></li></ul>
+ <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div id="contenu">
+<main>
+ <h1>Tirage des poules · Édition 2026</h1>
+ <p>Le tirage est réalisé physiquement ; l'application enregistre le résultat et sa validation.</p>
+ <ol class="row" aria-label="Étapes du tirage" style="list-style:none;padding:0"><li class="badge badge--ok">1 Paramètres ✓</li><li class="badge badge--ok">2 Têtes de série ✓</li><li class="badge" aria-current="step"><b>3 Saisie du tirage</b></li><li class="badge badge--wait">4 Récapitulatif</li><li class="badge badge--wait">5 Validation</li></ol>
+ <div class="note note--ds">origam-stepper horizontal (vertical sur mobile). Chaque étape ne se débloque que si la précédente est complète.</div>
+
+ <section aria-labelledby="h-seed" class="box"><h2 id="h-par">1. Paramètres</h2>
+  <div class="row"><div><label for="np">Nombre de poules</label><input id="np" type="number" min="1"></div><div><label for="nt">Nombre de têtes de série</label><input id="nt" type="number" min="1"></div></div>
+  <p role="alert" class="badge badge--wait">Le nombre de têtes de série doit être égal au nombre de poules.</p>
+  <div class="note">SF P2 étape 1 et RG9 : les deux nombres sont paramétrés par l'administrateur et doivent coïncider (sinon refus, API 409). Tailles de poules inégales possibles (RG16) : rappel de la règle de jeu « les joueurs des poules les moins nombreuses boivent une bière » (RG17), purement informatif.</div>
+  <h2 id="h-seed">2. Têtes de série</h2>
+  <p>Calculées d'après le classement ACP (RG4, RG9).</p>
+  <table><thead><tr><th scope="col">Rang</th><th scope="col">Joueur</th></tr></thead><tbody><tr><td>1</td><td>Joueur A</td></tr><tr><td>2</td><td>Joueur B</td></tr></tbody></table>
+  <div class="note">Têtes de série = meilleurs du classement ACP ; fenêtre « 5 dernières années » (RG9) lue comme « 5 éditions » (décision 2026-10-10, ARCHITECTURE.md). Égalité : titres, puis finales, puis demies… jusqu'aux participations, classées du plus petit au plus grand ; au-delà, non tranché (RG10). Le mode de calcul est explicité à l'écran.</div></section>
+
+ <section aria-labelledby="h-sai" class="box" style="margin-top:1rem"><h2 id="h-sai">3. Saisir le résultat du tirage</h2>
+  <p>Joueurs restants à placer : <b>9 / 16</b></p>
+  <div class="grid grid--2">
+   <fieldset><legend>Poule 1</legend>
+     <div class="row"><label for="p1a">Place 1</label><select id="p1a"><option>Joueur A (tête de série)</option></select></div>
+     <div class="row"><label for="p1b">Place 2</label><select id="p1b"><option>— choisir —</option></select></div></fieldset>
+   <fieldset><legend>Poule 2</legend><div class="row"><label for="p2a">Place 1</label><select id="p2a"><option>— choisir —</option></select></div></fieldset></div>
+  <div class="note">Un joueur déjà placé n'apparaît plus dans les autres listes (sinon invariant « une participation appartient à zéro ou une poule » violé). La saisie suit l'ordre du tirage physique : l'organisateur est devant la main innocente, il doit pouvoir saisir une affectation en 2 gestes. Sauvegarde brouillon automatique. Aide contextuelle : joueurs restants, joueurs placés.</div>
+  <div class="note note--ds">origam-select (autocomplete), origam-list des joueurs restants, origam-snackbar « Brouillon enregistré ».</div></section>
+
+ <section aria-labelledby="h-rec" class="box" style="margin-top:1rem"><h2 id="h-rec">4. Récapitulatif</h2>
+  <table><thead><tr><th scope="col">Poule</th><th scope="col">Joueurs</th></tr></thead><tbody><tr><td>1</td><td>A, …</td></tr></tbody></table></section>
+
+ <section aria-labelledby="h-val" class="box" style="margin-top:1rem"><h2 id="h-val">5. Validation</h2>
+  <p>La validation fige les affectations. <b>Cette action n'est pas annulable</b> (règle fonctionnelle).</p>
+  <button class="primary" aria-haspopup="dialog">Valider le tirage…</button>
+  <div class="box" role="dialog" aria-labelledby="dlg" style="margin-top:.6rem;max-width:480px"><h3 id="dlg">Valider le tirage des poules ?</h3>
+   <p>16 joueurs, 4 poules (exemple). Les affectations seront figées.</p>
+   <div class="row"><button>Annuler</button><button class="primary">Valider définitivement</button></div></div>
+  <div class="note">Spec : « La validation est définitive ; les sources ne prévoient pas d'annulation de tirage » (SF P2 Échecs). La boîte de dialogue le dit. Reste ouvert (SF Questions ouvertes) : le cas d'un désistement après tirage. La main innocente tire physiquement (RG12) ; qui produit le résultat (serveur ou saisie) : question ouverte de la spec API, ARCHITECTURE.md retient l'enregistrement.</div>
+  <div class="note note--ds">origam-dialog (focus piégé, Échap = annuler, focus initial sur « Annuler »). origam-confirm-wrapper existe mais son rôle (saisie de confirmation) est à vérifier avant usage.</div></section>
+
+ <h2>États</h2>
+ <p class="state-title">PARTICIPANTS INSUFFISANTS</p><div class="box box--dashed"><p>Aucun participant inscrit : le tirage n'est pas disponible. <a href="#">Aller aux participants</a></p></div>
+ <p class="state-title">TIRAGE VALIDÉ (lecture seule)</p><div class="box box--dashed"><p>Tirage validé par admin le 00/00 à 00:00. Les affectations ne sont plus modifiables.</p></div>
+ <p class="state-title">ERREUR D'ENREGISTREMENT</p><div class="box" role="alert"><p>Le tirage n'a pas pu être enregistré. Aucune donnée n'a été perdue : votre saisie est conservée.</p><button>Réessayer</button></div>
+ <p class="state-title">ENVOI EN COURS</p><div class="box" aria-busy="true"><button disabled>Validation en cours…</button></div>
+</main></div></div></body></html>

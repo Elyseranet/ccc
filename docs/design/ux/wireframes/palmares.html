@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Palmarès (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><a href="accueil.html"><strong>CCC</strong></a>
+  <nav aria-label="Navigation principale"><ul>
+    <li><a href="edition.html">Éditions</a></li>
+    <li><a href="joueurs.html" >Joueurs</a></li>
+    <li><a href="palmares.html" aria-current=page>Palmarès</a></li>
+    <li><a href="regles.html" >Règles</a></li></ul></nav>
+  <span class="spacer"></span><a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="admin-dashboard.html">Espace organisateur</a></header>
+<main id="contenu">
+  <h1>Palmarès</h1>
+  <p>Distinctions calculées à partir des résultats validés.</p>
+  <nav aria-label="Catégories"><ul class="tabs"><li><a href="#champions" aria-current="page">Champions</a></li><li><a href="#classements">Classements</a></li><li><a href="#records">Records</a></li><li><a href="#cuillere">Cuillère de bois</a></li></ul></nav>
+  <div class="note">Aujourd'hui : 7 cartes toutes « En attente des archives ». Cible : d'abord la chronologie des champions (le contenu que cherche un visiteur) puis les classements par catégorie. Nom de page : « Hall of Fame » est conservé ou francisé ? arbitrage A4.</div>
+  <div class="note">VARIANTE ÉDITORIALE « STORYTELLING AU SCROLL » : le palmarès se lit comme une chronologie verticale (une section par période ou par édition), titre collant en CSS (position: sticky). Les effets de révélation au scroll ne sont acceptables que s'ils sont CSS purs (animation-timeline / transitions) et supprimés sous prefers-reduced-motion ; le contenu doit être entièrement lisible sans eux. Je n'ai pas vérifié le support navigateur de animation-timeline : prévoir un repli statique. Le tableau triable reste disponible pour l'usage efficace (« Voir en tableau »).</div>
+  <p><a class="btn" href="#tableau">Voir en tableau triable</a></p>
+  <div class="story" id="champions">
+    <section aria-labelledby="h-e26"><h2 id="h-e26">2026</h2><p>Édition en cours · vainqueur à venir.</p><a href="edition.html">Voir l'édition</a></section>
+    <section aria-labelledby="h-e25"><h2 id="h-e25">2025</h2><p>Vainqueur : <a href="joueur.html">Joueur A</a> · finaliste : Joueur B.</p><div class="ph">visuel décoratif / podium</div><a href="edition.html">Voir l'édition</a></section>
+    <section aria-labelledby="h-e12"><h2 id="h-e12">2012 (deux éditions)</h2><p>…</p></section>
+  </div>
+  <section id="tableau" aria-labelledby="h-t" style="margin-top:1.5rem"><h2 id="h-t">Champions en tableau</h2>
+    <table><thead><tr><th scope="col">Édition</th><th scope="col">Vainqueur</th><th scope="col">Finaliste</th></tr></thead><tbody><tr><td>2025</td><td>Joueur A</td><td>Joueur B</td></tr></tbody></table></section>
+  <section id="classements" aria-labelledby="h-cl" style="margin-top:1.5rem"><h2 id="h-cl">Classements</h2>
+    <div class="row" role="group" aria-label="Classement"><span class="chip chip--on">ACP (5 dernières éditions)</span><span class="chip">All Time</span><span class="chip">Évolution</span></div>
+    <table><caption class="sr">Classement ACP</caption>
+      <thead><tr><th scope="col">Rang</th><th scope="col">Joueur</th><th scope="col">Points ACP</th><th scope="col">Points All Time</th><th scope="col">Participations</th><th scope="col">Moyenne</th></tr></thead>
+      <tbody><tr><td>1</td><td><a href="joueur.html">Joueur A</a> ***</td><td>00,00</td><td>00,00</td><td>9</td><td>00,00</td></tr></tbody></table>
+    <div class="note">Spec : deux classements publics, ACP (somme des 5 dernières éditions) et All Time (RG4), moyenne par participation (RG5), titres en astérisques (RG6), évolution année par année (RG8) ; API : GET /classements/acp, /all-time, /evolution. Points = barème × N/50 (RG1-RG2). Ex-aequo pour la tête de série : départage RG10. PLACEMENT sous « Palmarès » = proposition UX (écart E3). Le graphique d'évolution a besoin d'une alternative tableau.</div>
+    <div class="note note--ds">origam-data-table ; évolution : origam-chart (à vérifier) + tableau.</div></section>
+
+  <section id="records" aria-labelledby="h-r" style="margin-top:1.5rem"><h2 id="h-r">Records</h2>
+    <div class="note">ATTENTION : seules « titres » (RG6) et « cuillère de bois » (RG38) existent dans la spec. Finales, participations, victoires, ratio, plus longue série viennent du prototype (écart E2) : à confirmer avant d'être construits. Titres, finales, participations et victoires se dérivent toutefois des données de la spec (RG1, RG5, RG7).</div>
+    <div class="bento">
+      <article class="w2 h2"><h3>Plus de titres</h3><ol><li><a href="joueur.html">Joueur A</a> — 3</li><li>Joueur B — 2</li><li>Joueur C — 2</li></ol><a href="#">Top 10</a></article>
+      <article><h3>Plus de finales</h3><ol><li>…</li></ol></article><article><h3>Plus de participations</h3><ol><li>…</li></ol></article>
+      <article><h3>Plus de victoires</h3><ol><li>…</li></ol></article><article><h3>Plus longue série</h3><ol><li>…</li></ol></article>
+      <article class="w2"><h3>Meilleur ratio</h3><ol><li>…</li></ol><p>Seuil minimal de matchs : Je ne sais pas (Q6). Catégorie absente de la spec (écart E2).</p></article></div></section>
+  <section id="cuillere" aria-labelledby="h-w" style="margin-top:1.5rem"><h2 id="h-w">Cuillère de bois</h2><p>Dernière place en poule.</p>
+    <div class="note">Cuillère de bois : deux définitions coexistent dans le classeur (A : participations avant la première qualification ; B : éliminations en poule), « sans que l'une soit désignée comme la bonne », plusieurs lauréats possibles à égalité (RG38). Inclusion et définition : Je ne sais pas (Q7).</div></section>
+  <h2>États</h2>
+  <p class="state-title">CATÉGORIE SANS DONNÉES</p><div class="box box--dashed"><p>Pas encore de résultat pour cette catégorie.</p></div>
+  <p class="state-title">ÉGALITÉ</p><div class="box box--dashed"><p>Les ex-aequo partagent le rang (« 2e ex-aequo »), jamais départagés arbitrairement à l'affichage.</p></div>
+</main></body></html>

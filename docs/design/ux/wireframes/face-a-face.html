@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Face-à-face (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><a href="accueil.html"><strong>CCC</strong></a>
+  <nav aria-label="Navigation principale"><ul>
+    <li><a href="edition.html">Éditions</a></li>
+    <li><a href="joueurs.html" aria-current=page>Joueurs</a></li>
+    <li><a href="palmares.html" >Palmarès</a></li>
+    <li><a href="regles.html" >Règles</a></li></ul></nav>
+  <span class="spacer"></span><a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="admin-dashboard.html">Espace organisateur</a></header>
+<main id="contenu">
+  <nav class="crumbs" aria-label="Fil d'Ariane"><a href="joueurs.html">Joueurs</a> › Face-à-face</nav>
+  <h1>Face-à-face</h1>
+  <form aria-label="Choix des deux joueurs" class="row">
+    <div><label for="pa">Joueur 1</label><input id="pa" list="pl" value="Joueur A"></div>
+    <button type="button" aria-label="Inverser les deux joueurs">⇄</button>
+    <div><label for="pb">Joueur 2</label><input id="pb" list="pl" value="Joueur B"></div>
+    <button class="primary">Comparer</button><datalist id="pl"><option value="Joueur A"><option value="Joueur B"></datalist>
+  </form>
+  <div class="note">Les deux sélecteurs sont des champs avec autocomplétion (145 joueurs : un select déroulant est inutilisable). La comparaison se met à jour sans rechargement et l'URL (?a=&amp;b=) reste partageable. Pas de bouton « Comparer » obligatoire si les deux champs sont remplis ; bouton « Inverser » utile. Aujourd'hui les deux select sont désactivés et vides.</div>
+  <div class="note note--ds">origam-select avec recherche / autocomplete (vérifier la prop dans les sources) ×2, origam-btn icône avec aria-label.</div>
+
+  <section aria-labelledby="h-b" style="margin-top:1rem"><h2 id="h-b">Bilan</h2>
+    <div class="grid grid--3">
+      <article class="box"><h3>Joueur A</h3><span class="stat">4</span><p>victoires</p></article>
+      <article class="box"><h3>Rencontres</h3><span class="stat">6</span><p>Dernière : 2025, tour 2</p></article>
+      <article class="box"><h3>Joueur B</h3><span class="stat">2</span><p>victoires</p></article></div>
+    <div class="note">La proportion ne repose pas que sur la couleur : texte « 4 – 2 » toujours présent. Les matchs de départage sont exclus (décision 2026-10-10). Les matchs sans score connu sont comptés à part (« 1 rencontre sans score »), jamais comme nuls.</div></section>
+  <section aria-labelledby="h-h" style="margin-top:1rem"><h2 id="h-h">Historique des rencontres</h2>
+    <table><thead><tr><th scope="col">Édition</th><th scope="col">Phase</th><th scope="col">Score</th><th scope="col">Vainqueur</th></tr></thead>
+      <tbody><tr><td>2025</td><td>Bracket · tour 2</td><td>10 – 6</td><td>Joueur A</td></tr><tr><td>2023</td><td>Poule 3</td><td>5 – 2</td><td>Joueur B</td></tr></tbody></table></section>
+  <h2>États</h2>
+  <p class="state-title">AUCUN JOUEUR CHOISI</p><div class="box box--dashed"><p>Choisissez deux joueurs pour comparer leur bilan.</p></div>
+  <p class="state-title">LE MÊME JOUEUR DEUX FOIS</p><div class="box box--dashed" role="alert"><p>Choisissez deux joueurs différents.</p></div>
+  <p class="state-title">JAMAIS AFFRONTÉS</p><div class="box box--dashed" role="status"><p>Joueur A et Joueur B ne se sont jamais affrontés.</p><a href="joueur.html">Voir la fiche de Joueur A</a></div>
+  <p class="state-title">CHARGEMENT</p><div class="box" aria-busy="true"><div class="sk"></div></div>
+</main></body></html>

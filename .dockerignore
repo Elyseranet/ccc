@@ -1,0 +1,14 @@
+.git
+.nuxt
+.output
+.typeorm-dist
+.data
+.cache
+node_modules
+coverage
+dist
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store

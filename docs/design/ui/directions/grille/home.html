@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCC · Accueil — direction Grille</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="../_shared/layout.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body class="page-home">
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<!-- origam-toolbar tag="header" flat -->
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="home.html" aria-label="CCC, accueil">
+      <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap" points="50.0,2.0 56.3,8.5 64.1,4.1 68.2,12.2 77.0,10.3 78.6,19.2 87.5,20.1 86.4,29.0 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74.0 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50.0,92.0 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74.0 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29.0 12.5,20.1 21.4,19.2 23.0,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-in" cx="50" cy="50" r="30"/></svg>
+      <span class="brand__name">CCC</span>
+    </a>
+    <nav class="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="#">Éditions</a></li>
+        <li><a href="dense-page.html">Joueurs</a></li>
+        <li><a href="#">Palmarès</a></li>
+        <li><a href="#">Règles</a></li>
+      </ul>
+    </nav>
+    <button class="btn btn--icon mode-toggle" type="button" aria-pressed="false" aria-label="Mode sombre">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+  <!-- Hero : origam-title tag=h1 + origam-btn (flat primary / outlined) -->
+  <section class="hero" aria-labelledby="h-hero">
+    <div class="hero__fx" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="wrap hero__inner">
+      <p class="hero__kicker"><span class="chip chip--current">Édition 2026 · poules en cours</span><span class="hero__since">Depuis 2012</span></p>
+      <h1 id="h-hero" class="hero__title"><span class="w w1">Championnat</span> <span class="w w2">de</span> <span class="w w3">Caps</span></h1>
+      <p class="hero__lead">Poules, bracket et palmarès du tournoi annuel du CCC. Deux joueurs, deux bières, une capsule.</p>
+      <p class="hero__actions">
+        <a class="btn btn--flat" href="#">Voir l'édition 2026 <span aria-hidden="true">→</span></a>
+        <a class="btn btn--outlined" href="#">Le palmarès</a>
+      </p>
+      <svg class="hero__cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap" points="50.0,2.0 56.3,8.5 64.1,4.1 68.2,12.2 77.0,10.3 78.6,19.2 87.5,20.1 86.4,29.0 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74.0 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50.0,92.0 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74.0 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29.0 12.5,20.1 21.4,19.2 23.0,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-in" cx="50" cy="50" r="30"/><text class="cap-txt" x="50" y="56" text-anchor="middle">CCC</text></svg>
+    </div>
+  </section>
+
+  <!-- Bandeau des règles d'or (Spec fonctionnelle RG25–RG32). La 2e copie ne sert qu'à la boucle CSS. -->
+  <section class="ticker" aria-labelledby="h-gold">
+    <h2 id="h-gold" class="sr-only">Les règles d'or</h2>
+    <div class="ticker__track">
+      <ol class="ticker__list">
+        <li>Les bières sont servies pleines et fraîches</li>
+        <li>La partie débute par un shifumi</li>
+        <li>Poules en une bière, phase finale en deux</li>
+        <li>Le contre cap's annule le point</li>
+        <li>Le cap's back ne compte pas</li>
+        <li>Le bûcheron ne compte pas</li>
+        <li>Le rebond est homologué</li>
+        <li>Fair-play : le gagnant finit sa bière</li>
+      </ol>
+      <ol class="ticker__list" aria-hidden="true">
+        <li>Les bières sont servies pleines et fraîches</li>
+        <li>La partie débute par un shifumi</li>
+        <li>Poules en une bière, phase finale en deux</li>
+        <li>Le contre cap's annule le point</li>
+        <li>Le cap's back ne compte pas</li>
+        <li>Le bûcheron ne compte pas</li>
+        <li>Le rebond est homologué</li>
+        <li>Fair-play : le gagnant finit sa bière</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Résultats VALIDÉS uniquement, mis à jour au rechargement : aucun effet « live » (décision E-f). -->
+  <!-- Bento : chaque tuile = origam-card (link quand elle mène quelque part). Ordre DOM = ordre de lecture. -->
+  <section class="section" aria-labelledby="h-bento">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 id="h-bento" class="section__title">Le championnat en un coup d'œil</h2>
+      </div>
+      <div class="bento">
+        <article class="tile t-current" aria-labelledby="h-current">
+          <div class="tile__head"><h3 id="h-current" class="tile__title">Édition 2026</h3><span class="chip chip--current">Poules</span></div>
+          <p class="tile__meta">Derniers scores validés · un match de poule se gagne à 5</p>
+          <ol class="results">
+            <li class="result"><span class="result__p is-win">Joueur A</span><span class="result__s num">5<i>–</i>3</span><span class="result__p">Joueur B</span></li>
+            <li class="result"><span class="result__p">Joueur C</span><span class="result__s num">4<i>–</i>5</span><span class="result__p is-win">Joueur D</span></li>
+            <li class="result"><span class="result__p is-win">Joueur E</span><span class="result__s num">5<i>–</i>1</span><span class="result__p">Joueur F</span></li>
+          </ol>
+          <a class="tile__link" href="#">Tous les matchs <span aria-hidden="true">→</span></a>
+        </article>
+
+        <a class="tile t-editions" href="#"><span class="tile__num num">16</span><span class="tile__label">éditions depuis 2012</span></a>
+        <a class="tile t-players" href="dense-page.html"><span class="tile__num num">145</span><span class="tile__label">compétiteurs</span></a>
+
+        <a class="tile t-champ" href="dense-page.html">
+          <span class="tile__eyebrow">Dernier champion · 2025</span>
+          <span class="t-champ__name">Lou Bernard</span>
+          <span class="tile__label">Voir sa fiche <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="tile t-matches" href="#"><span class="tile__num num">1 414</span><span class="tile__label">matchs archivés, dont 554 avec score</span></a>
+
+        <a class="tile t-h2h" href="#">
+          <span class="tile__eyebrow">Face-à-face</span>
+          <span class="t-h2h__vs" aria-hidden="true"><b>A</b><i>vs</i><b>B</b></span>
+          <span class="tile__label">Comparer deux joueurs <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="tile t-rule" href="#">
+          <span class="tile__eyebrow">Règle d'or n° 7</span>
+          <span class="t-rule__quote">Le rebond est homologué.</span>
+          <span class="tile__label">Toutes les règles <span aria-hidden="true">→</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <span class="brand__name">CCC · Championnat de Caps</span>
+    <nav aria-label="Pied de page"><ul><li><a href="#">Règles</a></li><li><a href="#">Connexion</a></li></ul></nav>
+  </div>
+  <p class="wrap mock-note">Maquette : noms et scores fictifs. Chiffres 16 / 145 / 1 414 / 554 et règles d'or : Spec fonctionnelle et ARCHITECTURE.md.</p>
+</footer>
+
+<script>
+  // Maquette uniquement : bascule data-mode comme useTheme().toggleMode(). Aucun visuel piloté en JS.
+  const btn = document.querySelector('.mode-toggle')
+  btn.addEventListener('click', () => {
+    const root = document.documentElement
+    root.dataset.mode = root.dataset.mode === 'dark' ? 'light' : 'dark'
+    btn.setAttribute('aria-pressed', String(root.dataset.mode === 'dark'))
+  })
+</script>
+</body>
+</html>

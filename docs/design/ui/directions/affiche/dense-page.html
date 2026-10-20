@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCC · Fiche joueur — direction Affiche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Archivo:ital,wght@0,400..800;1,700..800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="../_shared/layout.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body class="page-player">
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="home.html" aria-label="CCC, accueil">
+      <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap" points="50.0,2.0 56.3,8.5 64.1,4.1 68.2,12.2 77.0,10.3 78.6,19.2 87.5,20.1 86.4,29.0 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74.0 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50.0,92.0 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74.0 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29.0 12.5,20.1 21.4,19.2 23.0,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-in" cx="50" cy="50" r="30"/></svg>
+      <span class="brand__name">CCC</span>
+    </a>
+    <nav class="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="#">Éditions</a></li>
+        <li><a href="dense-page.html" aria-current="page">Joueurs</a></li>
+        <li><a href="#">Palmarès</a></li>
+        <li><a href="#">Règles</a></li>
+      </ul>
+    </nav>
+    <button class="btn btn--icon mode-toggle" type="button" aria-pressed="false" aria-label="Mode sombre">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="contenu" class="player">
+  <div class="wrap">
+    <!-- origam-breadcrumb -->
+    <nav class="crumbs" aria-label="Fil d'Ariane"><ol><li><a href="home.html">Accueil</a></li><li><a href="#">Joueurs</a></li><li aria-current="page">Sam Dupont</li></ol></nav>
+
+    <!-- Recherche publique de joueurs (décision E-e) : origam-form role=search + origam-text-field type=search -->
+    <form class="player-search" role="search" action="#">
+      <label class="sr-only" for="q">Rechercher un joueur</label>
+      <input id="q" name="q" type="search" placeholder="Rechercher un joueur, un pseudo…" autocomplete="off">
+      <button class="btn btn--outlined" type="submit">Rechercher</button>
+    </form>
+
+    <!-- En-tête de fiche : origam-avatar + origam-title + origam-chip + origam-btn. Jamais d'email ni de téléphone (données privées). -->
+    <header class="profile">
+      <div class="profile__fx" aria-hidden="true"><span></span><span></span></div>
+      <span class="profile__avatar" aria-hidden="true">SD</span>
+      <div class="profile__id">
+        <p class="profile__alias">« Rebond »</p>
+        <h1 class="profile__name"><span>Sam</span> <span>Dupont</span></h1>
+        <p class="profile__meta"><span class="chip chip--gold">1 titre <span aria-hidden="true">★</span></span><span>Première édition 2019 · 8 participations</span></p>
+      </div>
+      <a class="btn btn--flat profile__cta" href="#">Comparer avec… <span aria-hidden="true">→</span></a>
+    </header>
+
+    <!-- Chiffres clés : origam-card ×n. Matchs de départage exclus (décision 2026-10-10). -->
+    <section class="section section--tight" aria-labelledby="h-stats">
+      <h2 id="h-stats" class="sr-only">Chiffres clés</h2>
+      <dl class="stats-bento">
+        <div class="stat stat--hero"><dt>Victoires</dt><dd class="num"><span class="count" style="--to: 41">41</span><small>sur 54 matchs</small></dd>
+          <div class="ratio" role="img" aria-label="76 % de victoires"><span style="--p: 76"></span></div></div>
+        <div class="stat"><dt>Matchs joués</dt><dd class="num">54</dd></div>
+        <div class="stat"><dt>Défaites</dt><dd class="num">13</dd></div>
+        <div class="stat"><dt>Ratio</dt><dd class="num">76 %</dd></div>
+        <div class="stat stat--accent"><dt>Meilleur parcours</dt><dd>Champion <small>2024</small></dd></div>
+      </dl>
+    </section>
+
+    <!-- Parcours : graphique (une seule série, ordinale) + table équivalente (origam-data-table) -->
+    <section class="section section--tight" aria-labelledby="h-path">
+      <div class="section__head"><h2 id="h-path" class="section__title">Parcours par édition</h2><p class="section__aside">Tour atteint, de la poule au titre</p></div>
+      <figure class="path card">
+        <ol class="path__chart" aria-hidden="true">
+          <li style="--lvl: 0" data-tip="2019 · éliminé en poule"><span class="path__bar"></span><b>Poule</b><i>2019</i></li>
+          <li style="--lvl: 1" data-tip="2020 · huitième de finale"><span class="path__bar"></span><b>8e</b><i>2020</i></li>
+          <li style="--lvl: 2" data-tip="2021 · quart de finale"><span class="path__bar"></span><b>Quart</b><i>2021</i></li>
+          <li style="--lvl: 3" data-tip="2022 · demi-finale"><span class="path__bar"></span><b>Demie</b><i>2022</i></li>
+          <li style="--lvl: 4" data-tip="2023 · finaliste"><span class="path__bar"></span><b>Finale</b><i>2023</i></li>
+          <li style="--lvl: 5" class="is-top" data-tip="2024 · champion"><span class="path__bar"></span><b>Titre</b><i>2024</i></li>
+          <li style="--lvl: 2" data-tip="2025 · quart de finale"><span class="path__bar"></span><b>Quart</b><i>2025</i></li>
+          <li style="--lvl: 0" class="is-current" data-tip="2026 · en cours, 1er de la poule 1"><span class="path__bar"></span><b>En cours</b><i>2026</i></li>
+        </ol>
+        <figcaption class="sr-only">Le tableau ci-dessous donne les mêmes données.</figcaption>
+        <div class="table-scroll">
+          <table class="path__table">
+            <caption class="sr-only">Parcours de Sam Dupont par édition</caption>
+            <thead><tr><th scope="col">Édition</th><th scope="col">Poule</th><th scope="col">Résultat</th><th scope="col">Bilan</th></tr></thead>
+            <tbody>
+              <tr class="is-current"><td>2026</td><td>Poule 1 · 1er</td><td><span class="chip chip--current">En cours</span></td><td class="num">3 V – 0 D</td></tr>
+              <tr><td>2025</td><td>Poule 3 · 3e</td><td>Quart de finale</td><td class="num">4 V – 3 D</td></tr>
+              <tr class="is-top"><td>2024</td><td>Poule 5 · 1er</td><td><span class="chip chip--gold">Champion</span></td><td class="num">9 V – 0 D</td></tr>
+              <tr><td>2023</td><td>Poule 2 · 1er</td><td>Finaliste</td><td class="num">7 V – 2 D</td></tr>
+              <tr><td>2022</td><td>Poule 4 · 1er</td><td>Demi-finale</td><td class="num">7 V – 1 D</td></tr>
+              <tr><td>2021</td><td>Poule 1 · 1er</td><td>Quart de finale</td><td class="num">5 V – 2 D</td></tr>
+              <tr><td>2020</td><td>Poule 2 · 2e</td><td>Huitième de finale</td><td class="num">4 V – 2 D</td></tr>
+              <tr><td>2019</td><td>Poule 3 · 5e</td><td>Éliminé en poule</td><td class="num">2 V – 3 D</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </figure>
+    </section>
+
+    <!-- Adversaires fréquents : origam-data-table + origam-btn vers le face-à-face -->
+    <section class="section section--tight" aria-labelledby="h-opp">
+      <div class="section__head"><h2 id="h-opp" class="section__title">Adversaires les plus fréquents</h2></div>
+      <ol class="opponents">
+        <li class="opp"><span class="opp__avatar" aria-hidden="true">LB</span><span class="opp__name">Lou Bernard</span><span class="opp__n num">6 matchs</span><span class="opp__rec num"><b>4 V</b> – 2 D</span><span class="opp__bar" style="--w: 67" aria-hidden="true"></span><a class="btn btn--text" href="#">Face-à-face <span class="sr-only">avec Lou Bernard</span></a></li>
+        <li class="opp"><span class="opp__avatar" aria-hidden="true">JA</span><span class="opp__name">Joueur A</span><span class="opp__n num">5 matchs</span><span class="opp__rec num"><b>3 V</b> – 2 D</span><span class="opp__bar" style="--w: 60" aria-hidden="true"></span><a class="btn btn--text" href="#">Face-à-face <span class="sr-only">avec Joueur A</span></a></li>
+        <li class="opp"><span class="opp__avatar" aria-hidden="true">JD</span><span class="opp__name">Joueur D</span><span class="opp__n num">4 matchs</span><span class="opp__rec num"><b>1 V</b> – 3 D</span><span class="opp__bar" style="--w: 25" aria-hidden="true"></span><a class="btn btn--text" href="#">Face-à-face <span class="sr-only">avec Joueur D</span></a></li>
+      </ol>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <span class="brand__name">CCC · Championnat de Caps</span>
+    <nav aria-label="Pied de page"><ul><li><a href="#">Règles</a></li><li><a href="#">Connexion</a></li></ul></nav>
+  </div>
+  <p class="wrap mock-note">Maquette : joueur, parcours et bilans fictifs. Champs affichés : Spec fonctionnelle P5 (identité, historique par année, matchs / victoires / défaites). Le ratio et le titre (RG6, RG37) restent à confirmer pour la fiche.</p>
+</footer>
+
+<script>
+  const btn = document.querySelector('.mode-toggle')
+  btn.addEventListener('click', () => {
+    const root = document.documentElement
+    root.dataset.mode = root.dataset.mode === 'dark' ? 'light' : 'dark'
+    btn.setAttribute('aria-pressed', String(root.dataset.mode === 'dark'))
+  })
+</script>
+</body>
+</html>

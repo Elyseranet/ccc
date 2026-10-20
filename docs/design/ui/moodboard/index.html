@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCC · Moodboard festif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Bagel+Fat+One&amp;family=DM+Sans:opsz,wght@9..40,400..800&amp;family=Shrikhand&amp;family=Archivo:wght@400..900&amp;family=JetBrains+Mono:wght@500&amp;display=swap">
+<style>
+/* ── Tokens du moodboard (source unique des couleurs de cette page) ───────── */
+:root {
+  --paper: #f6f2ea; --paper-2: #ece6da; --ink: #17130f; --ink-2: #4a4239; --ink-3: #6b6156; --line: rgba(23, 19, 15, 0.12);
+  --mono: 'JetBrains Mono', monospace; --sans: 'Instrument Sans', system-ui, sans-serif; --serif: 'Instrument Serif', Georgia, serif;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 128px;
+  --r1: 6px; --r2: 14px; --r3: 24px; --rf: 999px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Piste A — Happy Hour */
+  --a-night: #160b2e; --a-night-2: #22113f; --a-foam: #fff4dc; --a-pink: #ff3d9a; --a-amber: #ffb21a; --a-cyan: #3ee8ff; --a-lilac: #c9b8e8;
+  /* Piste B — Kermesse */
+  --b-paper: #fff3df; --b-ink: #1b0f0a; --b-tomato: #ff4b2b; --b-tomato-text: #c8331b; --b-sun: #ffc928; --b-grass: #1f7a46; --b-sky: #2b5fe0; --b-brown: #5a4636; --b-white: #ffffff;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img, svg { display: block; max-width: 100%; }
+h1, h2, h3, p, figure, dl, dd, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+.wrap { width: min(80rem, 100% - 2 * var(--s4)); margin-inline: auto; }
+:where(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ── En-tête ─────────────────────────────────────────────────────────────── */
+.mb-head { padding-block: var(--s9) var(--s8); border-bottom: 1px solid var(--line); }
+.mb-head__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s7); align-items: end; }
+.mb-title { margin-top: var(--s5); font: 400 clamp(3rem, 8vw, 7.5rem)/0.92 var(--serif); letter-spacing: -0.02em; }
+.mb-title em { font-style: italic; }
+.mb-lead { font-size: 18px; color: var(--ink-2); max-width: 34rem; }
+.mb-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4) var(--s5); margin-top: var(--s6); }
+.mb-meta dt { font: 500 11px/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.mb-meta dd { margin-top: var(--s1); font-weight: 600; }
+
+.mb-traits { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+.mb-traits li { padding: var(--s6) var(--s5) var(--s6) 0; }
+.mb-traits li + li { padding-left: var(--s5); border-left: 1px solid var(--line); }
+.mb-traits b { display: block; font: 400 28px/1.05 var(--serif); }
+.mb-traits p { margin-top: var(--s2); font-size: 14px; color: var(--ink-2); }
+
+/* ── Références ──────────────────────────────────────────────────────────── */
+.mb-section { padding-block: var(--s9) var(--s8); }
+.mb-section__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s7); }
+.mb-h2 { font: 400 clamp(2.25rem, 5vw, 4rem)/1 var(--serif); letter-spacing: -0.01em; }
+.refs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s7) var(--s5); counter-reset: ref; }
+.ref { counter-increment: ref; display: flex; flex-direction: column; }
+.ref--wide { grid-column: span 2; }
+.ref__shot { position: relative; overflow: hidden; border-radius: var(--r2); background: var(--paper-2); box-shadow: 0 1px 0 var(--line), 0 24px 48px -32px rgba(23, 19, 15, 0.45); aspect-ratio: 16 / 10; }
+.ref__shot img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 900ms var(--ease); }
+.ref:hover .ref__shot img { transform: scale(1.03); }
+.ref__shot::before { content: counter(ref, decimal-leading-zero); position: absolute; top: var(--s3); left: var(--s3); z-index: 1; padding: 2px var(--s2); border-radius: var(--rf); background: var(--paper); font: 500 11px/1.4 var(--mono); }
+.ref__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s1) var(--s3); margin-top: var(--s4); }
+.ref__name { font: 400 30px/1.05 var(--serif); }
+.ref__url { font: 500 12px/1.4 var(--mono); color: var(--ink-2); text-underline-offset: 3px; overflow-wrap: anywhere; }
+.ref__badges { display: flex; flex-wrap: wrap; gap: var(--s1); margin-top: var(--s3); }
+.badge { padding: 3px var(--s2); border: 1px solid var(--line); border-radius: var(--rf); font: 500 11px/1.4 var(--mono); color: var(--ink-2); }
+.badge--award { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.ref__notes { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s2) var(--s4); margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line); font-size: 14px; }
+.ref__notes dt { font: 500 11px/1.9 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.ref__notes dd { color: var(--ink-2); }
+
+/* ── Pistes ──────────────────────────────────────────────────────────────── */
+.piste { padding-block: var(--s9); border-top: 1px solid var(--line); }
+.piste__intro { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s7); align-items: start; }
+.piste__name { font: 400 clamp(2.75rem, 6vw, 5.5rem)/0.95 var(--serif); }
+.piste__name span { display: block; font: 500 12px/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s3); }
+.piste__pitch { font-size: 18px; color: var(--ink-2); }
+.piste__from { margin-top: var(--s4); font-size: 14px; color: var(--ink-3); }
+.piste__kit { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s5); margin-top: var(--s7); }
+.swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); }
+@media (max-width: 640px) { .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sw { display: flex; flex-direction: column; justify-content: space-between; min-height: 9.5rem; padding: var(--s3); border-radius: var(--r2); font: 500 11px/1.4 var(--mono); box-shadow: inset 0 0 0 1px var(--line); }
+.sw b { font: 600 14px/1.2 var(--sans); }
+.specimen { padding: var(--s5); border-radius: var(--r2); background: var(--paper-2); }
+.specimen__big { line-height: 0.95; }
+.specimen p { margin-top: var(--s3); }
+.specimen small { display: block; margin-top: var(--s4); font: 500 11px/1.5 var(--mono); color: var(--ink-3); }
+.hero-frame { margin-top: var(--s5); border-radius: var(--r3); overflow: hidden; box-shadow: 0 40px 80px -40px rgba(23, 19, 15, 0.55); }
+.hero-frame figcaption { padding: var(--s3) var(--s4); background: var(--ink); color: var(--paper); font: 500 11px/1.5 var(--mono); }
+
+/* ── HERO A — Happy Hour ─────────────────────────────────────────────────── */
+.ha { position: relative; isolation: isolate; overflow: hidden; min-height: 44rem; padding: var(--s6) var(--s7) 0; background: radial-gradient(70% 90% at 80% 20%, var(--a-night-2), var(--a-night) 70%); color: var(--a-foam); font-family: 'DM Sans', sans-serif; display: grid; grid-template-rows: auto 1fr auto; }
+.ha__nav { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); }
+.ha__logo { display: inline-flex; align-items: center; gap: var(--s2); font: 400 26px/1 'Bagel Fat One', sans-serif; color: var(--a-foam); text-decoration: none; }
+.ha__logo svg { width: 34px; height: 34px; }
+.ha__links { display: flex; gap: var(--s5); font-weight: 600; font-size: 15px; }
+.ha__links a { text-decoration: none; color: var(--a-lilac); }
+.ha__links a:hover { color: var(--a-foam); }
+.ha__body { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: var(--s6); padding-block: var(--s7); }
+.ha__kicker { display: inline-flex; align-items: center; gap: var(--s2); padding: var(--s1) var(--s3); border-radius: var(--rf); background: var(--a-amber); color: var(--a-night); font-weight: 800; font-size: 14px; rotate: -3deg; }
+.ha__title { margin-top: var(--s5); font: 400 clamp(3.5rem, 8.2vw, 8.25rem)/0.86 'Bagel Fat One', sans-serif; letter-spacing: -0.01em; color: var(--a-foam);
+  text-shadow: 0 2px 0 var(--a-pink), 0 4px 0 var(--a-pink), 0 6px 0 var(--a-pink), 0 8px 0 var(--a-pink), 0 10px 0 var(--a-pink), 0 24px 40px rgba(255, 61, 154, 0.45); }
+.ha__title .shine { display: inline-block; transform-origin: 50% 100%; animation: wobble 4s var(--ease) infinite; }
+@keyframes wobble { 0%, 80%, 100% { transform: none; } 86% { transform: scale(1.03, 0.96); } 92% { transform: scale(0.98, 1.03); } }
+.ha__lead { margin-top: var(--s6); max-width: 30rem; font-size: 19px; line-height: 1.45; color: var(--a-lilac); }
+.ha__lead b { color: var(--a-foam); }
+.ha__cta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s6); }
+.ha__btn { display: inline-flex; align-items: center; gap: var(--s2); min-height: 52px; padding-inline: var(--s5); border-radius: var(--rf); font-weight: 800; font-size: 16px; text-decoration: none; transition: transform 300ms var(--ease), box-shadow 300ms var(--ease); }
+.ha__btn--main { background: var(--a-amber); color: var(--a-night); box-shadow: 0 6px 0 var(--a-pink); }
+.ha__btn--main:hover { transform: translateY(-3px); box-shadow: 0 9px 0 var(--a-pink); }
+.ha__btn--ghost { color: var(--a-foam); box-shadow: inset 0 0 0 2px var(--a-lilac); }
+.ha__btn--ghost:hover { box-shadow: inset 0 0 0 2px var(--a-foam); }
+/* la pinte */
+.ha__pint { position: relative; justify-self: center; width: min(100%, 22rem); }
+.ha__pint .glass { fill: var(--a-amber); }
+.ha__pint .glass-shade { fill: var(--a-night); opacity: 0.18; }
+.ha__pint .glass-hi { fill: var(--a-foam); opacity: 0.45; }
+.ha__pint .glass-edge { fill: none; stroke: var(--a-foam); stroke-width: 3; opacity: 0.85; }
+.ha__pint .foam { fill: var(--a-foam); }
+.ha__pint .drip { fill: var(--a-foam); transform-box: fill-box; transform-origin: top; animation: drip 3.2s var(--ease) infinite; }
+.ha__pint .drip:nth-of-type(2) { animation-delay: -1.4s; }
+@keyframes drip { 0%, 30% { transform: scaleY(0.2); } 70%, 100% { transform: scaleY(1); } }
+.ha__pint .bubble { fill: var(--a-foam); opacity: 0.75; animation: rise 3.6s linear infinite; }
+.ha__pint .bubble:nth-of-type(2n) { animation-duration: 2.8s; animation-delay: -1s; }
+.ha__pint .bubble:nth-of-type(3n) { animation-duration: 4.4s; animation-delay: -2.2s; }
+@keyframes rise { from { transform: translateY(0); opacity: 0; } 15% { opacity: 0.8; } to { transform: translateY(-190px); opacity: 0; } }
+/* capsules volantes */
+.ha__cap { position: absolute; width: 4.5rem; animation: float 6s ease-in-out infinite alternate; }
+.ha__cap .c { fill: var(--a-pink); } .ha__cap .ci { fill: var(--a-night); } .ha__cap .ct { fill: var(--a-foam); font: 400 22px 'Bagel Fat One', sans-serif; }
+.ha__cap--1 { top: 6%; right: 4%; rotate: 18deg; }
+.ha__cap--2 { bottom: 14%; left: 54%; width: 3.25rem; rotate: -24deg; animation-delay: -2s; }
+.ha__cap--2 .c { fill: var(--a-cyan); }
+.ha__cap--3 { top: 46%; right: -3%; width: 2.75rem; animation-delay: -4s; }
+.ha__cap--3 .c { fill: var(--a-amber); }
+@keyframes float { to { translate: 0 -18px; rotate: 0deg; } }
+/* bandeau */
+.ha__ticker { margin-inline: calc(-1 * var(--s7)); overflow: hidden; border-top: 2px solid var(--a-pink); background: var(--a-pink); color: var(--a-night); }
+.ha__track { display: flex; width: max-content; animation: marquee 28s linear infinite; }
+.ha__track span { padding: var(--s3) var(--s5); font: 400 22px/1 'Bagel Fat One', sans-serif; white-space: nowrap; }
+.ha__track span::after { content: '✺'; margin-left: var(--s5); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ── HERO B — Kermesse ───────────────────────────────────────────────────── */
+.hb { position: relative; isolation: isolate; overflow: hidden; min-height: 44rem; padding: var(--s7); background: var(--b-paper); color: var(--b-ink); font-family: 'Archivo', sans-serif; }
+.hb__frame { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
+.hb__frame .bg { fill: var(--b-ink); }
+.hb__frame .i1 { fill: var(--b-tomato); } .hb__frame .i2 { fill: var(--b-sun); } .hb__frame .i3 { fill: var(--b-sky); } .hb__frame .i4 { fill: var(--b-grass); } .hb__frame .i5 { fill: var(--b-paper); }
+.hb__inner { position: relative; display: grid; grid-template-rows: auto 1fr; min-height: calc(44rem - 2 * var(--s7)); padding: var(--s6); border-radius: var(--r2); background: var(--b-paper); }
+.hb__flags { position: absolute; inset: 0 var(--s4) auto; display: flex; justify-content: space-between; pointer-events: none; }
+.hb__flags i { width: 2.4rem; height: 2.8rem; clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top center; animation: sway 2.8s ease-in-out infinite alternate; }
+.hb__flags i:nth-child(4n+1) { background: var(--b-tomato); } .hb__flags i:nth-child(4n+2) { background: var(--b-sun); animation-delay: -0.7s; }
+.hb__flags i:nth-child(4n+3) { background: var(--b-sky); animation-delay: -1.4s; } .hb__flags i:nth-child(4n) { background: var(--b-grass); animation-delay: -2.1s; }
+@keyframes sway { from { rotate: -6deg; } to { rotate: 6deg; } }
+.hb__nav { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding-top: var(--s6); }
+.hb__logo { font: 400 30px/1 'Shrikhand', serif; color: var(--b-tomato-text); text-decoration: none; }
+.hb__links { display: flex; gap: var(--s5); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; }
+.hb__links a { text-decoration: none; }
+.hb__links a:hover { text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: var(--b-tomato); }
+.hb__body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s6); }
+.hb__date { display: inline-block; padding: var(--s1) var(--s3); background: var(--b-ink); color: var(--b-sun); font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; rotate: 2deg; }
+.hb__title { margin-top: var(--s5); font: 400 clamp(2.5rem, 8vw, 8rem)/0.9 'Shrikhand', serif; color: var(--b-tomato); text-shadow: 5px 5px 0 var(--b-ink); }
+.hb__title .l2 { display: block; color: var(--b-sky); padding-left: 0.6em; }
+.hb__title .w { display: inline-block; animation: hop 2.4s var(--ease) infinite; }
+.hb__title .w:nth-child(2) { animation-delay: 0.12s; } .hb__title .w:nth-child(3) { animation-delay: 0.24s; }
+@keyframes hop { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(-0.08em) rotate(-2deg); } }
+.hb__lead { margin-top: var(--s5); max-width: 32rem; font-size: 19px; font-weight: 500; line-height: 1.45; color: var(--b-brown); }
+.hb__cta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s6); }
+.hb__btn { display: inline-flex; align-items: center; gap: var(--s2); min-height: 52px; padding-inline: var(--s5); border-radius: var(--rf); border: 3px solid var(--b-ink); font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; text-decoration: none; transition: transform 250ms var(--ease), box-shadow 250ms var(--ease); }
+.hb__btn--main { background: var(--b-sun); box-shadow: 5px 5px 0 var(--b-ink); }
+.hb__btn--main:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--b-ink); }
+.hb__btn--ghost { background: var(--b-white); }
+.hb__btn--ghost:hover { background: var(--b-ink); color: var(--b-paper); }
+.hb__badge { position: relative; width: clamp(10rem, 18vw, 15rem); aspect-ratio: 1; }
+.hb__badge svg { position: absolute; inset: 0; }
+.hb__badge .ring { animation: spin 18s linear infinite; }
+.hb__badge .ring text { font: 800 11px 'Archivo', sans-serif; letter-spacing: 3px; text-transform: uppercase; fill: var(--b-ink); }
+.hb__badge .disc { fill: var(--b-tomato); }
+.hb__badge .cap { fill: var(--b-sun); stroke: var(--b-ink); stroke-width: 2; }
+.hb__badge .num { font: 400 30px 'Shrikhand', serif; fill: var(--b-ink); }
+@keyframes spin { to { rotate: 360deg; } }
+
+/* ── Suite ───────────────────────────────────────────────────────────────── */
+.mb-next { padding-block: var(--s8) var(--s9); border-top: 1px solid var(--line); }
+.mb-next ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s5); margin-top: var(--s6); counter-reset: n; }
+.mb-next li { counter-increment: n; padding-top: var(--s4); border-top: 2px solid var(--ink); color: var(--ink-2); }
+.mb-next li::before { content: counter(n, decimal-leading-zero); display: block; font: 500 12px/1 var(--mono); color: var(--ink-3); margin-bottom: var(--s3); }
+.mb-next b { color: var(--ink); }
+.mb-foot { padding-block: var(--s6); border-top: 1px solid var(--line); font: 500 12px/1.6 var(--mono); color: var(--ink-3); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .refs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ref--wide { grid-column: span 2; }
+  .mb-traits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mb-traits li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .mb-traits li:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 860px) {
+  .mb-head__grid, .piste__intro, .piste__kit { grid-template-columns: 1fr; }
+  .ha__body, .hb__body { grid-template-columns: minmax(0, 1fr); }
+  .ha__pint { width: min(70%, 15rem); }
+  .hb__badge { justify-self: start; width: 9rem; }
+  .ha__links, .hb__links { display: none; }
+  .mb-next ol { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .refs { grid-template-columns: 1fr; }
+  .ref--wide { grid-column: auto; }
+  .mb-traits { grid-template-columns: 1fr; }
+  .mb-traits li, .mb-traits li + li { padding-left: 0; border-left: 0; }
+  .mb-traits li + li { border-top: 1px solid var(--line); }
+  .ha { padding: var(--s5) var(--s4) 0; min-height: 0; }
+  .ha__ticker { margin-inline: calc(-1 * var(--s4)); }
+  .hb { padding: var(--s4); min-height: 0; }
+  .hb__inner { padding: var(--s4); min-height: 0; }
+  .hb__title .l2 { padding-left: 0.3em; }
+  .hb__title { font-size: 9.4vw; text-shadow: 3px 3px 0 var(--b-ink); }
+  .ha__cap--2 { display: none; }
+  .hb__inner { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="mb-head">
+  <div class="wrap mb-head__grid">
+    <div>
+      <p class="eyebrow">CCC · Championnat de Caps — Étape 1 de validation</p>
+      <h1 class="mb-title">Moodboard <em>festif</em>,<br>culture bière.</h1>
+    </div>
+    <div>
+      <p class="mb-lead">Onze références réelles, chargées et capturées une à une, puis deux pistes d'ambiance esquissées en vrai HTML/CSS. Le but : choisir un univers avant de dessiner les écrans.</p>
+      <dl class="mb-meta">
+        <div><dt>Captures</dt><dd>Chromium · 1440 × 900</dd></div>
+        <div><dt>Date</dt><dd>19 octobre 2026</dd></div>
+        <div><dt>Références</dt><dd>11 sites, URL vérifiées</dd></div>
+        <div><dt>Statut</dt><dd>En attente de choix</dd></div>
+      </dl>
+    </div>
+  </div>
+</header>
+
+<section aria-labelledby="h-traits">
+  <h2 id="h-traits" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">Ce qui revient d'une référence à l'autre</h2>
+  <ul class="wrap mb-traits">
+    <li><b>Un mot, énorme.</b><p>« bubbly », « Drink cultured. », « Thanks legends! » : le hero tient en un mot ou une phrase courte, en lettrage display.</p></li>
+    <li><b>De la matière.</b><p>Bulles, mousse, gonflable, illustration en volume : le festif passe par la texture, pas par les aplats seuls.</p></li>
+    <li><b>Trois couleurs vives, pas dix.</b><p>Chaque site tient une palette courte et saturée, avec une encre forte pour le texte.</p></li>
+    <li><b>Un ton qui rit.</b><p>Heaps Normal, Oatly, Mikkeller : l'humour est dans la photo, le dessin et la copie, pas seulement dans la couleur.</p></li>
+  </ul>
+</section>
+
+<main>
+  <section class="mb-section" aria-labelledby="h-refs">
+    <div class="wrap">
+      <div class="mb-section__head">
+        <h2 id="h-refs" class="mb-h2">Références</h2>
+        <p class="eyebrow">Captures prises par moi · aucune image fournie par un tiers</p>
+      </div>
+
+      <ol class="refs">
+        <li class="ref ref--wide">
+          <figure class="ref__shot"><img src="refs/www-drinkpoppi-com.jpg" alt="Accueil de poppi : le mot bubbly en lettrage 3D rose brillant sur fond de bulles ambrées" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">poppi</h3><a class="ref__url" href="https://www.drinkpoppi.com/">drinkpoppi.com</a></div>
+          <p class="ref__badges"><span class="badge">soda</span><span class="badge">vidéo de fond</span><span class="badge">bandeau défilant</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Un seul mot, « bubbly », en lettrage 3D gonflé et brillant, intégré à la vidéo.</dd>
+            <dt>Couleur</dt><dd>Fuchsia, jaune et ambre pétillant : trois couleurs, aucune neutre.</dd>
+            <dt>Motion</dt><dd>Une vidéo de fond (1 élément &lt;video&gt; mesuré) et un bandeau de slogans qui défile sous l'en-tête.</dd>
+            <dt>À garder</dt><dd>La macro de bulles comme décor, et le mot unique en volume.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/www-rockenseine-com.jpg" alt="Accueil de Rock en Seine : logo en cartouche rétro entouré d'objets gonflables violets" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Rock en Seine</h3><a class="ref__url" href="https://www.rockenseine.com/">rockenseine.com</a></div>
+          <p class="ref__badges"><span class="badge">festival</span><span class="badge">Lenis</span><span class="badge">39 animations CSS</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Logo en cartouche à damier, capitales grasses (Jost).</dd>
+            <dt>Couleur</dt><dd>Lavande, violet, crème.</dd>
+            <dt>Motion</dt><dd>Défilement lissé (Lenis) et 39 animations CSS actives au chargement.</dd>
+            <dt>À garder</dt><dd>Les objets gonflables façon jouet : festif sans être vulgaire.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/www-beerbbqfest-com-au.jpg" alt="Accueil du Beer and BBQ Festival : THANKS LEGENDS en capitales roses dans un cadre de pictogrammes colorés" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Beer &amp; BBQ Festival</h3><a class="ref__url" href="https://www.beerbbqfest.com.au/">beerbbqfest.com.au</a></div>
+          <p class="ref__badges"><span class="badge">festival bière</span><span class="badge">listé sur Awwwards</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Condensé capitales géant rose corail, logo en script.</dd>
+            <dt>Composition</dt><dd>Message encadré par une bordure de pictos (chope, flamme, guitare).</dd>
+            <dt>Finition</dt><dd>Badge à texte circulaire « Booze &amp; food festival ».</dd>
+            <dt>À garder</dt><dd>Le cadre de motifs : il dit « fête » avant qu'on lise un mot.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/visitmeatopia-com.jpg" alt="Accueil de Meatopia : logo en volume au-dessus d'un village miniature en 3D au coucher du soleil" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Meatopia</h3><a class="ref__url" href="https://visitmeatopia.com/">visitmeatopia.com</a></div>
+          <p class="ref__badges"><span class="badge badge--award">Awwwards HM · 18/08/2026</span><span class="badge">canvas 3D</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Logo en volume, façon enseigne de foire.</dd>
+            <dt>Motion</dt><dd>Une scène 3D rendue dans un &lt;canvas&gt; : un monde miniature à explorer.</dd>
+            <dt>À garder</dt><dd>Le « monde » du festival comme navigation : piste pour le Palmarès.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/vibebevvy-com.jpg" alt="Accueil de Vibe : Drink cultured en serif très grasse sur une photo d'homme souriant dans une piscine" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Vibe</h3><a class="ref__url" href="https://vibebevvy.com/">vibebevvy.com</a></div>
+          <p class="ref__badges"><span class="badge badge--award">Awwwards HM · 25/09/2026</span><span class="badge">Lenis</span><span class="badge">canvas</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Serif display très grasse (VC Henrietta) et Space Mono pour le détail.</dd>
+            <dt>Composition</dt><dd>Titre géant posé sur une photo plein cadre, CTA pilule jaune.</dd>
+            <dt>À garder</dt><dd>L'énergie de la photo de convives, pas du produit seul.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/www-mikkeller-com.png" alt="Accueil de Mikkeller : cases dessinées en noir et blanc, BARS, SHOP ART, MAIN SITE" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Mikkeller</h3><a class="ref__url" href="https://www.mikkeller.com/">mikkeller.com</a></div>
+          <p class="ref__badges"><span class="badge">brasserie</span><span class="badge">Webflow</span><span class="badge">3 vidéos</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Lettrage BD et polices maison (Mikkeller Special Brew, Mikkelwind).</dd>
+            <dt>Couleur</dt><dd>Noir et blanc pur.</dd>
+            <dt>À garder</dt><dd>La navigation dessinée en cases, et la preuve qu'une brasserie peut rester drôle en monochrome.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/mbcc-mikkeller-com.jpg" alt="Accueil du Mikkeller Beer Celebration Copenhagen : READY FOR 2027 sur un saxophoniste et un soleil rouge" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Mikkeller Beer Celebration</h3><a class="ref__url" href="https://mbcc.mikkeller.com/">mbcc.mikkeller.com</a></div>
+          <p class="ref__badges"><span class="badge">festival bière</span><span class="badge">Webflow</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Capitales maison (Mbcc 2022 Final) et Poppins.</dd>
+            <dt>Couleur</dt><dd>Orange, rouge, vert franc.</dd>
+            <dt>À garder</dt><dd>Festival bière = musique, gens, soleil : un hero humain.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/parisbeerfestival-fr.jpg" alt="Accueil du Paris Beer Festival : lettrage dessiné Paris Beer Festival, Tour Eiffel, dates en étiquettes" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Paris Beer Festival</h3><a class="ref__url" href="https://parisbeerfestival.fr/">parisbeerfestival.fr</a></div>
+          <p class="ref__badges"><span class="badge">festival bière · Paris</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Lettrage manuscrit dessiné, Work Sans en texte.</dd>
+            <dt>Couleur</dt><dd>Bleu ciel, corail, jaune bière.</dd>
+            <dt>À garder</dt><dd>La référence la plus proche du public CCC : francophone, bière, convivial.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/heapsnormal-com.jpg" alt="Accueil de Heaps Normal : une femme en survêtement tigré et lunettes noires dans une salle de sport" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Heaps Normal</h3><a class="ref__url" href="https://heapsnormal.com/">heapsnormal.com</a></div>
+          <p class="ref__badges"><span class="badge">bière sans alcool</span><span class="badge">12 animations CSS</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Bagoss Condensed pour les titres, Founders Grotesk pour le texte.</dd>
+            <dt>Ton</dt><dd>Décalé assumé : la photo fait la blague.</dd>
+            <dt>À garder</dt><dd>C'est exactement le registre « fun et décalé » demandé.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/drinkolipop-com.jpg" alt="Accueil d'Olipop : Come sip with us sur fond rose à étincelles, canette pomegranate sparkle" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Olipop</h3><a class="ref__url" href="https://drinkolipop.com/">drinkolipop.com</a></div>
+          <p class="ref__badges"><span class="badge">soda</span><span class="badge">GSAP</span><span class="badge">Swiper</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Serif ronde très grasse (WindsorEF) et Ano.</dd>
+            <dt>Couleur</dt><dd>Rose bonbon, bordeaux, crème.</dd>
+            <dt>À garder</dt><dd>Le split texte / produit et les étincelles : festif mais propre.</dd>
+          </dl>
+        </li>
+        <li class="ref">
+          <figure class="ref__shot"><img src="refs/www-oatly-com.jpg" alt="Accueil d'Oatly : cartes de contenu sur papier quadrillé, F.A.Q-ING AMAZING" loading="lazy"></figure>
+          <div class="ref__head"><h3 class="ref__name">Oatly</h3><a class="ref__url" href="https://www.oatly.com/">oatly.com</a></div>
+          <p class="ref__badges"><span class="badge">boisson</span><span class="badge">ton absurde</span></p>
+          <dl class="ref__notes">
+            <dt>Typo</dt><dd>Margo Pro et capitales façon écriture à la main.</dd>
+            <dt>Composition</dt><dd>Papier quadrillé et cartes de contenu en bento.</dd>
+            <dt>À garder</dt><dd>Le ton : des titres qui font sourire (« F.A.Q-ing amazing »).</dd>
+          </dl>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PISTE A ═══════════════ -->
+  <section class="piste" aria-labelledby="h-pa">
+    <div class="wrap">
+      <div class="piste__intro">
+        <h2 id="h-pa" class="piste__name"><span>Piste A</span>Happy Hour</h2>
+        <div>
+          <p class="piste__pitch">La soirée au bar : nuit violette, néon rose, ambre de la bière et crème de la mousse. Un lettrage rond et gonflé, une pinte qui déborde, des capsules qui volent. C'est la piste « soirée » : chaude, brillante, un peu kitsch, assumée.</p>
+          <p class="piste__from">À partir de : poppi (mot unique en volume, bulles), Vibe (titre géant, CTA pilule), Rock en Seine (gonflable).</p>
+        </div>
+      </div>
+      <div class="piste__kit">
+        <ul class="swatches" aria-label="Palette de la piste A">
+          <li class="sw" style="background:var(--a-night);color:var(--a-foam)"><b>Nuit</b><span>#160B2E · fond</span></li>
+          <li class="sw" style="background:var(--a-pink);color:var(--a-night)"><b>Néon</b><span>#FF3D9A · 5,69:1 avec la nuit</span></li>
+          <li class="sw" style="background:var(--a-amber);color:var(--a-night)"><b>Ambre</b><span>#FFB21A · 10,38:1</span></li>
+          <li class="sw" style="background:var(--a-foam);color:var(--a-night)"><b>Mousse</b><span>#FFF4DC · 17,14:1</span></li>
+          <li class="sw" style="background:var(--a-cyan);color:var(--a-night)"><b>Glaçon</b><span>#3EE8FF · accent rare</span></li>
+        </ul>
+        <div class="specimen">
+          <p class="specimen__big" style="font:400 64px/0.95 'Bagel Fat One',sans-serif">Caps!</p>
+          <p style="font:500 18px/1.45 'DM Sans',sans-serif">Deux joueurs, deux bières, une capsule. Le gagnant finit sa bière.</p>
+          <small>Bagel Fat One (display, Google Fonts) · DM Sans 400–800 (texte)</small>
+        </div>
+      </div>
+
+      <figure class="hero-frame">
+        <section class="ha" aria-label="Esquisse de hero, piste A">
+          <nav class="ha__nav" aria-label="Navigation (esquisse)">
+            <a class="ha__logo" href="#"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/></svg>CCC</a>
+            <span class="ha__links"><a href="#">Éditions</a><a href="#">Joueurs</a><a href="#">Palmarès</a><a href="#">Règles</a></span>
+          </nav>
+          <div class="ha__body">
+            <div>
+              <p class="ha__kicker">16 éditions · depuis 2012</p>
+              <h1 class="ha__title"><span class="shine">Championnat</span><br>de Caps</h1>
+              <p class="ha__lead">Une capsule, deux bières, deux mètres d'écart. <b>Le tournoi annuel du CCC</b> : poules à 5 points, phase finale à 10.</p>
+              <p class="ha__cta"><a class="ha__btn ha__btn--main" href="#">Voir l'édition 2026 →</a><a class="ha__btn ha__btn--ghost" href="#">Le palmarès</a></p>
+            </div>
+            <svg class="ha__pint" viewBox="0 0 220 300" aria-hidden="true">
+              <path class="glass" d="M40 70 L180 70 L165 285 Q164 292 156 292 L64 292 Q56 292 55 285 Z"/>
+              <path class="glass-shade" d="M140 70 L180 70 L165 285 Q164 292 156 292 L130 292 Z"/>
+              <path class="glass-hi" d="M58 96 L66 96 L76 270 L70 270 Z"/>
+              <circle class="bubble" cx="80" cy="270" r="4"/><circle class="bubble" cx="110" cy="280" r="3"/><circle class="bubble" cx="140" cy="265" r="5"/><circle class="bubble" cx="95" cy="250" r="3"/><circle class="bubble" cx="125" cy="275" r="4"/><circle class="bubble" cx="150" cy="282" r="3"/>
+              <path class="glass-edge" d="M40 70 L55 285 Q56 292 64 292 L156 292 Q164 292 165 285 L180 70"/>
+              <path class="foam" d="M30 72 Q28 40 58 42 Q64 14 98 22 Q118 2 142 22 Q176 14 182 44 Q204 50 190 76 Q110 92 30 72 Z"/>
+              <path class="drip" d="M58 74 Q56 104 64 110 Q72 104 70 76 Z"/>
+              <path class="drip" d="M160 76 Q158 122 168 126 Q176 118 172 76 Z"/>
+            </svg>
+            <svg class="ha__cap ha__cap--1" viewBox="0 0 100 100" aria-hidden="true"><polygon class="c" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="ci" cx="50" cy="50" r="31"/><text class="ct" x="50" y="58" text-anchor="middle">CCC</text></svg>
+            <svg class="ha__cap ha__cap--2" viewBox="0 0 100 100" aria-hidden="true"><polygon class="c" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="ci" cx="50" cy="50" r="31"/></svg>
+            <svg class="ha__cap ha__cap--3" viewBox="0 0 100 100" aria-hidden="true"><polygon class="c" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="ci" cx="50" cy="50" r="31"/></svg>
+          </div>
+          <div class="ha__ticker" aria-hidden="true"><div class="ha__track">
+            <span>Le rebond est homologué</span><span>Le bûcheron ne compte pas</span><span>Fair-play : le gagnant finit sa bière</span><span>La partie débute par un shifumi</span>
+            <span>Le rebond est homologué</span><span>Le bûcheron ne compte pas</span><span>Fair-play : le gagnant finit sa bière</span><span>La partie débute par un shifumi</span>
+          </div></div>
+        </section>
+        <figcaption>Esquisse en HTML/CSS pur : bulles qui montent, mousse qui coule, titre qui rebondit, bandeau défilant. En production, la vitrine pourra remplacer la pinte par une vidéo de bulles (règle CCC). Tout s'arrête sous prefers-reduced-motion.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PISTE B ═══════════════ -->
+  <section class="piste" aria-labelledby="h-pb">
+    <div class="wrap">
+      <div class="piste__intro">
+        <h2 id="h-pb" class="piste__name"><span>Piste B</span>Kermesse</h2>
+        <div>
+          <p class="piste__pitch">L'affiche de fête de village : papier crème, tomate, soleil, ciel et gazon, encre franche. Un script rétro gras, des fanions, un cadre de pictos et un badge qui tourne. C'est la piste « tournoi entre potes » : solaire, artisanale, très lisible.</p>
+          <p class="piste__from">À partir de : Beer &amp; BBQ Festival (cadre de motifs, badge circulaire), Paris Beer Festival (lettrage), Mikkeller Beer Celebration (couleurs franches), Oatly (ton).</p>
+        </div>
+      </div>
+      <div class="piste__kit">
+        <ul class="swatches" aria-label="Palette de la piste B">
+          <li class="sw" style="background:var(--b-paper);color:var(--b-ink)"><b>Papier</b><span>#FFF3DF · fond</span></li>
+          <li class="sw" style="background:var(--b-tomato);color:var(--b-ink)"><b>Tomate</b><span>#FF4B2B · 5,62:1 avec l'encre</span></li>
+          <li class="sw" style="background:var(--b-sun);color:var(--b-ink)"><b>Soleil</b><span>#FFC928 · 12,18:1</span></li>
+          <li class="sw" style="background:var(--b-sky);color:var(--b-white)"><b>Ciel</b><span>#2B5FE0 · 5,50:1 en blanc</span></li>
+          <li class="sw" style="background:var(--b-grass);color:var(--b-white)"><b>Gazon</b><span>#1F7A46 · 5,34:1 en blanc</span></li>
+        </ul>
+        <div class="specimen">
+          <p class="specimen__big" style="font:400 60px/0.95 'Shrikhand',serif;color:var(--b-tomato-text)">Santé !</p>
+          <p style="font:500 18px/1.45 'Archivo',sans-serif">Deux joueurs, deux bières, une capsule. Le gagnant finit sa bière.</p>
+          <small>Shrikhand (display, Google Fonts) · Archivo 400–900 (texte, déjà la police du CCC)</small>
+        </div>
+      </div>
+
+      <figure class="hero-frame">
+        <section class="hb" aria-label="Esquisse de hero, piste B">
+          <svg class="hb__frame" aria-hidden="true">
+            <defs>
+              <pattern id="kermesse" width="96" height="96" patternUnits="userSpaceOnUse">
+                <rect class="bg" width="96" height="96"/>
+                <polygon class="i1" transform="translate(6 6) scale(.36)" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/>
+                <circle class="i5" cx="24" cy="24" r="6"/>
+                <path class="i2" d="M58 8 h22 l-3 30 h-16 z"/><rect class="i5" x="57" y="4" width="24" height="6" rx="3"/>
+                <circle class="i4" cx="22" cy="70" r="7"/><circle class="i4" cx="14" cy="80" r="7"/><circle class="i4" cx="30" cy="80" r="7"/><circle class="i4" cx="22" cy="90" r="5"/>
+                <path class="i3" d="M60 60 l12 8 l12 -8 l-4 14 l4 14 l-12 -8 l-12 8 l4 -14 z"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#kermesse)"/>
+          </svg>
+          <div class="hb__inner">
+            <div class="hb__flags" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <nav class="hb__nav" aria-label="Navigation (esquisse)">
+              <a class="hb__logo" href="#">CCC</a>
+              <span class="hb__links"><a href="#">Éditions</a><a href="#">Joueurs</a><a href="#">Palmarès</a><a href="#">Règles</a></span>
+            </nav>
+            <div class="hb__body">
+              <div>
+                <p class="hb__date">Édition 2026 · poules en cours</p>
+                <h1 class="hb__title"><span class="w">Championnat</span> <span class="l2"><span class="w">de</span> <span class="w">Caps</span></span></h1>
+                <p class="hb__lead">Le tournoi annuel du CCC depuis 2012. Shifumi pour commencer, une bière en poule, deux en finale, et le gagnant finit sa bière.</p>
+                <p class="hb__cta"><a class="hb__btn hb__btn--main" href="#">Voir l'édition 2026</a><a class="hb__btn hb__btn--ghost" href="#">Le palmarès</a></p>
+              </div>
+              <div class="hb__badge" aria-hidden="true">
+                <svg viewBox="0 0 200 200" class="ring"><defs><path id="circ" d="M100 100 m-78 0 a78 78 0 1 1 156 0 a78 78 0 1 1 -156 0"/></defs><text><textPath href="#circ">16 éditions · 145 joueurs · depuis 2012 ·</textPath></text></svg>
+                <svg viewBox="0 0 200 200"><circle class="disc" cx="100" cy="100" r="62"/><polygon class="cap" transform="translate(58 58) scale(.84)" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><text class="num" x="100" y="111" text-anchor="middle">16</text></svg>
+              </div>
+            </div>
+          </div>
+        </section>
+        <figcaption>Esquisse en HTML/CSS pur : fanions qui se balancent, mots qui sautillent, badge qui tourne, boutons « tampon ». Le cadre de motifs est un &lt;pattern&gt; SVG, recolorable par tokens. Tout s'arrête sous prefers-reduced-motion.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mb-next" aria-labelledby="h-next">
+    <div class="wrap">
+      <h2 id="h-next" class="mb-h2">Et ensuite</h2>
+      <ol>
+        <li><b>Choisir une piste</b> (ou un mélange), et me transmettre vos propres références si vous en avez.</li>
+        <li><b>Je décline la piste retenue</b> en thème Origam (props d'abord), puis en accueil et Palmarès, où vidéo, 3D légère et animation JS sont autorisées.</li>
+        <li><b>Les écrans denses</b> (édition, fiche joueur) reprennent l'univers en CSS seul, avec un contraste AA vérifié.</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="mb-foot">
+  <div class="wrap">Captures prises le 19/10/2026 dans Chromium (Playwright) à 1440 × 900, après fermeture automatique des bandeaux cookies et des contrôles d'âge quand c'était possible. Les mentions Awwwards viennent de la liste « Food &amp; Drink » consultée le même jour. Les détails techniques (vidéo, canvas, Lenis, GSAP, nombre d'animations CSS) ont été mesurés sur les pages chargées. Le texte et les données des esquisses sont ceux du CCC.</div>
+</footer>
+</body>
+</html>

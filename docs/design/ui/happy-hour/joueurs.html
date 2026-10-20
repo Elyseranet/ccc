@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joueurs · CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="">
+<div class="ambient" aria-hidden="true"></div>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-toolbar tag="header" flat · nav = origam-btn (to) · pas d'avatar ni de « Connexion » en en-tête (décision A3/E-d) -->
+<header class="hh-header"><div class="wrap hh-header__bar">
+  <a class="hh-brand font-display" href="index.html" aria-label="CCC, accueil"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <nav class="hh-nav" aria-label="Navigation principale"><ul><li><a href="edition.html">Éditions</a></li><li><a href="joueurs.html" aria-current="page">Joueurs</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="#">Règles</a></li></ul></nav>
+  <span class="hh-header__end" aria-hidden="true"></span>
+</div></header>
+<main id="contenu">
+
+<section class="page-hero" aria-labelledby="h-pl">
+  <div class="wrap">
+    <p class="eyebrow">Annuaire</p>
+    <h1 id="h-pl" class="page-hero__title font-display neon">Joueurs</h1>
+    <p class="page-hero__lead"><span class="num">145</span> compétiteurs ont joué au moins une édition depuis 2012.</p>
+  </div>
+</section>
+<div class="wrap">
+  <!-- origam-form role=search · origam-text-field type=search (variant solo) · origam-select · recherche publique (E-e) -->
+  <form class="card pl-search" role="search" action="#">
+    <p class="field pl-search__q"><label for="q">Nom ou pseudo</label><input id="q" class="input" type="search" placeholder="Ex. Rebond, Dupont…" autocomplete="off"></p>
+    <p class="field"><label for="f-ed">Édition jouée</label><select id="f-ed" class="input"><option>Toutes</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option><option>2014</option><option>2013</option><option>2012 · 2e</option><option>2012 · 1re</option></select></p>
+    <button class="btn btn--primary" type="submit">Rechercher</button>
+    <a class="btn btn--outlined" href="#">Comparer deux joueurs</a>
+  </form>
+  <p class="pl-count muted" aria-live="polite"><span class="num">145</span> joueurs · tri par nom</p>
+  <div class="table-wrap pl-table"><table class="table"><caption class="sr-only">Liste des compétiteurs, page 1 sur 8</caption>
+    <thead><tr><th scope="col"><a href="#" class="sort" aria-sort="ascending">Joueur ↑</a></th><th scope="col" class="r">Éditions</th><th scope="col" class="r">Matchs</th><th scope="col" class="r">Victoires</th><th scope="col" class="r">Titres</th><th scope="col">Première</th></tr></thead>
+    <tbody><tr><td><span class="pl-cell"><span class="avatar">AA</span><span><a href="#">Arthur André</a><small class="muted"> « Tournée »</small></span></span></td><td class="r num">2</td><td class="r num">13</td><td class="r num">8</td><td class="r num">—</td><td class="num">2020</td></tr><tr><td><span class="pl-cell"><span class="avatar">CA</span><span><a href="#">Chloé André</a></span></span></td><td class="r num">1</td><td class="r num">4</td><td class="r num">2</td><td class="r num">—</td><td class="num">2026</td></tr><tr><td><span class="pl-cell"><span class="avatar">GA</span><span><a href="#">Gabriel André</a><small class="muted"> « Happy Hour »</small></span></span></td><td class="r num">4</td><td class="r num">19</td><td class="r num">5</td><td class="r num">—</td><td class="num">2012 · 1re</td></tr><tr><td><span class="pl-cell"><span class="avatar">LA</span><span><a href="#">Lisa André</a></span></span></td><td class="r num">11</td><td class="r num">56</td><td class="r num">26</td><td class="r num">—</td><td class="num">2012 · 2e</td></tr><tr><td><span class="pl-cell"><span class="avatar">SA</span><span><a href="#">Simon André</a></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">2</td><td class="r num">—</td><td class="num">2022</td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><span><a href="#">Anna Bernard</a></span></span></td><td class="r num">1</td><td class="r num">6</td><td class="r num">3</td><td class="r num">—</td><td class="num">2017</td></tr><tr><td><span class="pl-cell"><span class="avatar">LB</span><span><a href="#">Lou Bernard</a> <span class="stars" aria-label="4 titres">****</span><small class="muted"> « La Mousse »</small></span></span></td><td class="r num">10</td><td class="r num">79</td><td class="r num">68</td><td class="r num">4</td><td class="num">2012 · 2e</td></tr><tr><td><span class="pl-cell"><span class="avatar">NB</span><span><a href="#">Nathan Bernard</a><small class="muted"> « Demi »</small></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">2</td><td class="r num">—</td><td class="num">2024</td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><span><a href="#">Agathe Bertrand</a><small class="muted"> « Mousseux »</small></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">1</td><td class="r num">—</td><td class="num">2020</td></tr><tr><td><span class="pl-cell"><span class="avatar">CB</span><span><a href="#">Clara Bertrand</a></span></span></td><td class="r num">3</td><td class="r num">15</td><td class="r num">5</td><td class="r num">—</td><td class="num">2012 · 1re</td></tr><tr><td><span class="pl-cell"><span class="avatar">RB</span><span><a href="#">Robin Blanc</a></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">2</td><td class="r num">—</td><td class="num">2021</td></tr><tr><td><span class="pl-cell"><span class="avatar">IB</span><span><a href="#">Inès Bonnet</a></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">1</td><td class="r num">—</td><td class="num">2012 · 1re</td></tr><tr><td><span class="pl-cell"><span class="avatar">JB</span><span><a href="#">Julia Bonnet</a></span></span></td><td class="r num">4</td><td class="r num">23</td><td class="r num">12</td><td class="r num">—</td><td class="num">2017</td></tr><tr><td><span class="pl-cell"><span class="avatar">MB</span><span><a href="#">Maya Bonnet</a><small class="muted"> « Triple »</small></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">4</td><td class="r num">—</td><td class="num">2026</td></tr><tr><td><span class="pl-cell"><span class="avatar">MB</span><span><a href="#">Maël Bonnet</a></span></span></td><td class="r num">1</td><td class="r num">8</td><td class="r num">5</td><td class="r num">—</td><td class="num">2013</td></tr><tr><td><span class="pl-cell"><span class="avatar">RB</span><span><a href="#">Rose Bonnet</a><small class="muted"> « Fair-Play »</small></span></span></td><td class="r num">4</td><td class="r num">22</td><td class="r num">9</td><td class="r num">—</td><td class="num">2013</td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><span><a href="#">Ambre Boyer</a></span></span></td><td class="r num">1</td><td class="r num">4</td><td class="r num">2</td><td class="r num">—</td><td class="num">2019</td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><span><a href="#">Antoine Boyer</a></span></span></td><td class="r num">1</td><td class="r num">5</td><td class="r num">3</td><td class="r num">—</td><td class="num">2014</td></tr><tr><td><span class="pl-cell"><span class="avatar">LB</span><span><a href="#">Louise Boyer</a></span></span></td><td class="r num">2</td><td class="r num">11</td><td class="r num">6</td><td class="r num">—</td><td class="num">2018</td></tr><tr><td><span class="pl-cell"><span class="avatar">MB</span><span><a href="#">Margaux Boyer</a><small class="muted"> « Comptoir »</small></span></span></td><td class="r num">1</td><td class="r num">8</td><td class="r num">5</td><td class="r num">—</td><td class="num">2013</td></tr></tbody></table></div>
+  <nav class="pager" aria-label="Pagination"><span class="num">1–20 sur 145</span><ol><li><a href="#" aria-current="page">1</a></li><li><a href="#">2</a></li><li><a href="#">3</a></li><li><a href="#">4</a></li><li><a href="#">5</a></li><li><a href="#">6</a></li><li><a href="#">7</a></li><li><a href="#">8</a></li></ol></nav>
+</div>
+
+</main>
+<footer class="hh-footer"><div class="wrap">
+  <div class="hh-footer__grid">
+    <p class="hh-footer__brand font-display neon--sm">CCC</p>
+    <nav aria-label="Pied de page"><ul><li><a href="#">Règles</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="admin.html">Connexion</a></li></ul></nav>
+  </div>
+  <p class="hh-footer__note">Maquette haute fidélité. Chiffres réels repris de la Spec fonctionnelle : 16 éditions, 145 compétiteurs, 1 414 matchs dont 554 avec score, effectifs de 16 (2012) à 49 (2023). Noms, scores, effectifs des autres années et configurations de poule sont des données d'illustration générées selon les règles RG1–RG24.</p>
+</div></footer>
+
+</body>
+</html>

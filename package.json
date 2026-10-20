@@ -1,0 +1,34 @@
+{
+  "name": "ccc",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "db:typeorm:build": "tsc -p tsconfig.typeorm.json --outDir .typeorm-dist",
+    "db:migration:generate": "npm run db:typeorm:build && typeorm migration:generate -d .typeorm-dist/data-source.js",
+    "db:migration:run": "npm run db:typeorm:build && typeorm migration:run -d .typeorm-dist/data-source.js",
+    "db:migration:revert": "npm run db:typeorm:build && typeorm migration:revert -d .typeorm-dist/data-source.js",
+    "db:seed:legacy": "npm run db:typeorm:build && node .typeorm-dist/seeds/seed-legacy-workbook.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "origam": "^2.22.0",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.27",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "nuxt": "^4.6.0",
+    "sass-embedded": "^1.105.1",
+    "ts-node": "^10.9.2"
+  }
+}

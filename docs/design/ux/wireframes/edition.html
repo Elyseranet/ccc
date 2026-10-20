@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Édition (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header">
+  <a href="accueil.html"><strong>CCC</strong></a>
+  <nav aria-label="Navigation principale"><ul>
+    <li><a href="edition.html" aria-current=page>Éditions</a></li>
+    <li><a href="joueurs.html" >Joueurs</a></li>
+    <li><a href="palmares.html" >Palmarès</a></li>
+    <li><a href="regles.html">Règles</a></li>
+  </ul></nav>
+  <span class="spacer"></span>
+  <a class="btn" href="compte.html">Mon profil</a> <a class="btn" href="admin-dashboard.html">Espace organisateur</a>
+</header>
+<div class="note note--ds">origam-toolbar (header) + origam-btn (liens). Variantes = section de Règles (A2). En-tête : « Mon profil » (participant connecté) et « Espace organisateur » (administrateur connecté) apparaissent seulement si connecté ; sinon rien, et « Connexion » en pied de page (A3, E7).</div>
+<main id="contenu">
+  <nav class="crumbs" aria-label="Fil d'Ariane"><a href="accueil.html">Accueil</a> › Éditions › 2026</nav>
+  <header class="row">
+    <h1>Édition 2026</h1>
+    <div><label for="ed">Édition</label>
+      <select id="ed"><option>2026</option><option>2025</option><option>…</option><option>2012 (1re)</option><option>2012 (2e)</option></select></div>
+    <span class="badge badge--wait">Poules en cours</span>
+  </header>
+  <div class="note">Sélecteur indispensable : 16 éditions, et 2012 en compte deux (donc libellé distinct de l'année, ARCHITECTURE.md). L'édition est portée par l'URL (ex. /editions/&lt;id&gt;) pour être partageable. Aujourd'hui /competition n'a aucun sélecteur. États d'une édition (SF « États et transitions ») : créée, participants ouverts, poules tirées, poules en cours, qualifiés validés, un état par tour de phase finale, clôturée. Visibilité publique d'une édition en cours : Je ne sais pas (API, questions ouvertes).</div>
+  <div class="note note--ds">origam-select (ou origam-menu sur mobile) + origam-chip pour le statut ; fil d'Ariane = origam-breadcrumb.</div>
+
+  <nav aria-label="Sections de l'édition"><ul class="tabs">
+    <li><a href="#synthese" aria-current="page">Synthèse</a></li>
+    <li><a href="#participants">Participants</a></li>
+    <li><a href="#poules">Poules</a></li>
+    <li><a href="#bracket">Bracket</a></li>
+    <li><a href="#matchs">Matchs</a></li>
+    <li><a href="#tirages">Tirages</a></li>
+  </ul></nav>
+  <div class="note note--ds">origam-tabs avec panneaux (ou liens vers sous-routes si on veut des URL par onglet : à trancher avec le front). Ne pas coder les onglets en ancres + classe « active » codée en dur, comme aujourd'hui.</div>
+
+  <section id="synthese" aria-labelledby="h-syn" style="margin-top:1rem">
+    <h2 id="h-syn">Synthèse</h2>
+    <div class="grid grid--3">
+      <article class="box"><h3>Vainqueur</h3><p>— (édition en cours)</p></article>
+      <article class="box"><h3>Participants</h3><span class="stat">N</span></article>
+      <article class="box"><h3>Avancement</h3><ol><li>Tirage des poules <span class="badge badge--ok">fait</span></li><li>Poules <span class="badge badge--wait">en cours</span></li><li>Qualifiés <span class="badge">à venir</span></li><li>Phase finale : tirage de chaque tour <span class="badge">à venir</span></li><li>Clôture</li></ol></article>
+    </div>
+    <div class="note note--ds">origam-stepper (lecture seule) pour l'avancement. Les étapes suivent les états de la spec ; le tirage d'un tour n'est possible que si tous les matchs du tour précédent sont validés (SF États, RG13). Vainqueur d'une édition archivée : dérivé du résultat « champion » (RG1).</div>
+  </section>
+
+  <section id="participants" aria-labelledby="h-part" style="margin-top:1.5rem">
+    <h2 id="h-part">Participants</h2>
+    <table><caption class="sr">Participants de l'édition</caption>
+      <thead><tr><th scope="col">Joueur</th><th scope="col">Pseudo</th><th scope="col">Poule</th><th scope="col">Statut</th></tr></thead>
+      <tbody><tr><td><a href="joueur.html">Nom Prénom</a></td><td>pseudo</td><td>1</td><td>Qualifié</td></tr><tr><td>Nom Prénom</td><td>pseudo</td><td>2</td><td>Éliminé en poule</td></tr></tbody></table>
+    <div class="note">Statuts : inscrit, en poule, qualifié ou éliminé, par tour, vainqueur (SF « États et transitions »). Effectif observé : 16 (2012) à 49 (2023). Pas de téléphone ni d'email (public).</div>
+  </section>
+
+  <section id="poules" aria-labelledby="h-poules" style="margin-top:1.5rem">
+    <h2 id="h-poules">Poules</h2>
+    <p><label for="fp">Aller à la poule</label><select id="fp"><option>Toutes</option><option>Poule 1</option><option>…</option></select></p>
+    <div class="grid grid--2">
+      <article><table><caption>Poule 1 — classement</caption>
+        <thead><tr><th scope="col">#</th><th scope="col">Joueur</th><th scope="col">J</th><th scope="col">V</th><th scope="col">D</th><th scope="col">Pts +/−</th></tr></thead>
+        <tbody><tr><td>1</td><td><a href="joueur.html">Joueur A</a></td><td>2</td><td>2</td><td>0</td><td>10 / 6</td></tr><tr><td>2</td><td>Joueur B</td><td>2</td><td>1</td><td>1</td><td>…</td></tr></tbody></table>
+        <p class="badge badge--ok">Qualifié : voir règle</p></article>
+      <article class="box box--dashed"><h3>Matchs de la poule 1</h3><ul><li>A 5 – 3 B <span class="badge badge--ok">validé</span></li><li>A – C <span class="badge badge--wait">à jouer</span></li></ul></article>
+    </div>
+    <div class="note">Départage au sein d'une poule : cap's average, puis résultat du match direct, puis 1v1v1 à trois ou plus (RG19). Qualifiés : « les n premiers de chaque poule + les m meilleurs (n+1)èmes », configuration variable selon l'effectif (RG18). Entre poules, à trois ou plus : 1v1v1 ; à deux : match de départage à 5 (ARCHITECTURE.md ; la spec laisse ouvert, RG20). <b>Je ne sais pas</b> : la formule du cap's average (Q14) et la liste finale des colonnes du classement ; elles sont des placeholders. Aucun barème de poule n'est défini : l'élimination en poule rapporte 0 point (RG1).</div>
+    <div class="note note--ds">origam-data-table (tri, mobile : cartes), qualification = origam-chip. Seuls les scores validés alimentent le classement (invariant 4).</div>
+  </section>
+
+  <section id="bracket" aria-labelledby="h-br" style="margin-top:1.5rem">
+    <h2 id="h-br">Phase finale</h2>
+    <p>Le tirage est refait à chaque tour (RG13) : seules les affiches du tour déjà tiré sont affichées.</p>
+    <div class="bracket" role="region" aria-label="Tours de la phase finale, défilement horizontal" tabindex="0">
+      <ol aria-label="Huitièmes (tirés)"><li><b>Joueur A</b> 10<br><b>Joueur B</b> 7</li><li><b>Joueur C</b> –<br><b>Joueur D</b> –</li></ol>
+      <ol aria-label="Quarts"><li class="box--dashed">Tirage des quarts à venir, une fois les huitièmes validés</li></ol>
+      <ol aria-label="Demi, Finale"><li class="box--dashed">Demi · Finale : tirages à venir</li></ol>
+    </div>
+    <details><summary>Voir en liste (alternative accessible)</summary><ul><li>Huitième : A 10 – 7 B</li><li>Huitième : C – D</li></ul></details>
+    <div class="note">CORRIGÉ d'après la spec (SF P4, RG13) : « Le bracket n'est pas un arbre pré-rempli ». Un arbre qui préaffiche des demi-finales n'est pas valable. Libellés de tour (RG24) : Poule1..8, 1/16 (appelé Barrages dans l'onglet Data), Huitième, Quart, Demi, Finale. Barrages : seulement en 2024 ; les premiers de poule entrent directement en huitièmes et se mélangent aux qualifiés des barrages (RG14). Nombre de tours selon l'effectif ; 11 éditions comportent des huitièmes.</div>
+    <div class="note note--ds">origam-bracket suppose un arbre prédéfini : à vérifier s'il accepte des tours ajoutés au fil du temps (non vérifié) ; à défaut, une colonne par tour (origam-list / origam-card) suffit.</div>
+  </section>
+
+  <section id="matchs" aria-labelledby="h-m" style="margin-top:1.5rem">
+    <h2 id="h-m">Matchs</h2>
+    <div class="row" role="group" aria-label="Filtres"><span class="chip chip--on">Tous</span><span class="chip">Poules</span><span class="chip">Phase finale</span><span class="chip">À jouer</span><span class="chip">Validés</span></div>
+    <table><caption class="sr">Matchs de l'édition</caption>
+      <thead><tr><th scope="col">Phase</th><th scope="col">Joueur 1</th><th scope="col">Score</th><th scope="col">Joueur 2</th><th scope="col">Statut</th></tr></thead>
+      <tbody><tr><td>Poule1</td><td>A</td><td>5 – 3</td><td>B</td><td>validé</td></tr><tr><td>Huitième</td><td>A</td><td>—</td><td>C</td><td>à jouer</td></tr></tbody></table>
+    <div class="note">Archives : 1 414 matchs dont 554 avec score (SF/ST : 860 sans score ; seulement 6 éditions complètes, 5 sans aucun score). Un match sans score historique affiche « Score non renseigné » (jamais 0–0 ; « Les scores manquants restent inconnus »).</div>
+    <div class="note note--ds">origam-chip-group (filtres), origam-data-table + origam-pagination.</div>
+  </section>
+
+  <section id="tirages" aria-labelledby="h-tir" style="margin-top:1.5rem">
+    <h2 id="h-tir">Tirages</h2>
+    <table><caption class="sr">Historique des tirages</caption>
+      <thead><tr><th scope="col">Tirage</th><th scope="col">Date et heure</th><th scope="col">Validé par</th></tr></thead>
+      <tbody><tr><td>Poules</td><td>00/00 00:00</td><td>Administrateur</td></tr><tr><td>Huitièmes</td><td>—</td><td>—</td></tr></tbody></table>
+    <div class="note">Tirages journalisés (qui, quand, résultat) : ST « Tirages » ; API : GET /editions/{id}/tirages public « avec horodatage ». Les horaires saisis en texte libre dans le classeur (deux éditions seulement) : reprise à décider, SF Questions ouvertes.</div>
+  </section>
+
+  <section style="margin-top:1.5rem" aria-labelledby="h-st"><h2 id="h-st">États dégradés</h2>
+    <p class="state-title">ÉDITION SANS DONNÉES (archive non importée)</p><div class="box box--dashed"><h3>Résultats non disponibles pour 2014</h3><p>Cette édition est archivée sans détail des matchs.</p></div>
+    <p class="state-title">BRACKET NON TIRÉ</p><div class="box box--dashed"><p>La phase finale démarre après la validation de tous les matchs de poule.</p></div>
+    <p class="state-title">CHARGEMENT</p><div class="box" aria-busy="true"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+    <p class="state-title">ERREUR / HORS LIGNE</p><div class="box" role="alert"><p>Connexion perdue. Dernières données connues affichées.</p><button>Réessayer</button></div>
+  </section>
+</main>
+</body></html>
