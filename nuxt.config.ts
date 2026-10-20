@@ -50,7 +50,18 @@ export default defineNuxtConfig({
     }
   },
   typescript: {
-    tsConfig: {
+    // Décorateurs TypeORM : requis par le projet serveur et par le projet app (les types de
+    // routes Nitro générés pour `$fetch` importent les handlers, donc les entités). Posés sur
+    // `tsConfig` (global), ils n'atteignaient que partiellement les projets shared et node
+    // (TS5052 sous nuxi typecheck).
+    appTsConfig: {
+      compilerOptions: {
+        experimentalDecorators: true,
+        emitDecoratorMetadata: true,
+        useDefineForClassFields: false
+      }
+    },
+    serverTsConfig: {
       compilerOptions: {
         experimentalDecorators: true,
         emitDecoratorMetadata: true,
