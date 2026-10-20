@@ -111,8 +111,10 @@ describe('schemas', () => {
     expect(updateMeSchema.safeParse({ avatarUrl: null, phone: null }).success).toBe(true)
   })
 
-  it('PATCH /moi refuses a non-http avatar, a bad phone and an empty body', () => {
+  it('PATCH /moi refuses a non-https avatar or one with credentials, a bad phone and an empty body', () => {
     expect(updateMeSchema.safeParse({ avatarUrl: 'javascript:alert(1)' }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ avatarUrl: 'http://img.test/a.png' }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ avatarUrl: 'https://u:p@img.test/a.png' }).success).toBe(false)
     expect(updateMeSchema.safeParse({ phone: 'call me' }).success).toBe(false)
     expect(updateMeSchema.safeParse({}).success).toBe(false)
   })

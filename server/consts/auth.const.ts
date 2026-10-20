@@ -45,4 +45,4 @@ export const CSRF_SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'] as const
 export const FETCH_SITE_SAME_ORIGIN = ['same-origin', 'none'] as const
 
 export const PASSWORD_CHANGE_MAX_ATTEMPTS = 5
-export const AVATAR_ALLOWED_PROTOCOLS = ['https:', 'http:']
+export const AVATAR_ALLOWED_PROTOCOLS = ['https:']

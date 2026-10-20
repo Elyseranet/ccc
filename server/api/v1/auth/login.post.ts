@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   })
 
   let accepted = false
-  if (user && user.status === USER_STATUS.ACTIVE) {
+  if (user && user.status === USER_STATUS.ACTIVE && user.passwordHash) {
     accepted = await verifyPassword(body.password, user.passwordHash)
   } else {
     await burnPasswordCheck(body.password)

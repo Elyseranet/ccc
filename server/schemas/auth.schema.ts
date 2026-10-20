@@ -16,11 +16,12 @@ export const loginSchema = z.object({
 
 const avatarUrlSchema = z.string().trim().max(AVATAR_URL_MAX_LENGTH).refine((value) => {
   try {
-    return AVATAR_ALLOWED_PROTOCOLS.includes(new URL(value).protocol)
+    const url = new URL(value)
+    return AVATAR_ALLOWED_PROTOCOLS.includes(url.protocol) && url.username === '' && url.password === ''
   } catch {
     return false
   }
-}, 'Must be an http(s) URL')
+}, 'Must be an https URL without credentials')
 
 /**
  * Liste blanche A4 : avatar, téléphone, mot de passe. `.strict()` refuse en 400 tout autre champ
