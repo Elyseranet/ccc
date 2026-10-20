@@ -185,6 +185,36 @@ B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets
 | F-10, F-12 | B-08, B-09 |
 | F-11 | B-11 |
 
+### Lancement en parallèle (dès que F-00 est dans develop)
+
+Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensemble**, un dev par ticket, chacun dans son worktree.
+
+**Réutiliser ce que F-00 livre, ne jamais le recréer** :
+- composants `app/components/common/` (PageHero, GoldenRules, BubblesBackdrop, PlayerLink, AsyncState, BrandMark, SkipLink) et `app/components/icons/` ;
+- composables de données (`useEditions`, `useEdition`, `useCompetitors`, `useCompetitor`, `useHeadToHead`, `useRankings`, `useMe`, `useAdminEdition`, `useNavigationState`) ;
+- `BaseService` et ses services ;
+- `consts/routes.const.ts` et `consts/round-labels.const.ts` (A9 « Barrages ») ;
+- stores `auth` et `admin-edition` ;
+- DTO et enums de `shared/` (#shared).
+
+**Qui touche quoi**, pour éviter les conflits :
+
+| Fichier partagé | Règle |
+|---|---|
+| `app/enums/api-endpoint.enum.ts`, `app/consts/api-sources.const.ts` | Clés pré-déclarées par F-00. Un ticket ne change que la valeur FIXTURE → LIVE de ses propres endpoints, au moment de la bascule. |
+| Services | F-09 crée `participant.service.ts`, F-10 crée `auth.service.ts`. F-08 ajoute les écritures dans `match.service.ts`, F-11 dans `draw.service.ts`. Aucun autre ticket ne modifie un service. |
+| Fixtures | Un ticket qui a besoin de nouvelles données crée `app/fixtures/<ticket-feature>.fixture.ts`. Il ne modifie une fixture existante que si c'est **sa** ressource (F-08 : `match`, F-11 : `draw`). |
+| `app/locales/en.json` et `fr.json` | Clés ajoutées **uniquement** dans le namespace du ticket (`home.*`, `palmares.*`, `edition.*`, `players.*`, `player.*`, `head_to_head.*`, `rules.*`, `admin.dashboard.*`, `admin.matches.*`, `admin.participants.*`, `account.*`, `admin.draws.*`, `admin.more.*`), insérées à leur place alphabétique, dans les deux fichiers. |
+| e2e | Chaque ticket ajoute `tests/e2e/visual/<ticket>.spec.ts` et, au besoin, `tests/e2e/a11y/<ticket>.spec.ts`, en s'appuyant sur `tests/e2e/visual.util.ts` (F-00). Il ne modifie ni `visual.spec.ts` ni `a11y.spec.ts`. Seul F-03 modifie `tests/e2e/pages.const.ts`, pour passer l'URL d'édition au code (R-9). |
+| Layouts, thème, `main.css` | **Aucun ticket ne les modifie.** Un besoin dans la coque se remonte au lead front, qui décide d'un ticket dédié. |
+
+**Points d'attention par ticket** :
+- F-03 : l'URL porte le code d'édition (R-9) ; carte « Matchs » selon R-10.
+- F-04 et F-05 : R-5 (V/D sur les matchs avec score uniquement) et `winRatio` à null.
+- F-07 : flux d'activité dérivé (A17), sur fixture jusqu'au merge de B-15.
+- F-09 et F-10 : champ avatar en attente de l'arbitrage (upload ou initiales). F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
+- Tous : tests a11y des formulaires sur le rendu hydraté, à cause de l'id d'input qui change entre serveur et client (Origam #1226).
+
 ### Definition of Done commune (en plus des critères de chaque ticket)
 
 - Travail dans son worktree `../CCC-F-xx`, branche `feature/F-xx-…`. **Jamais de copie de `.env`** : `find ../CCC-F-xx -maxdepth 2 -name ".env"` doit être vide.
