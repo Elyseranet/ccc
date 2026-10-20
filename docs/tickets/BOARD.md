@@ -14,9 +14,9 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 
 | Ticket | Titre | Vague | Dépend de | Bloqué par arbitrage | État |
 |---|---|---|---|---|---|
-| [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | En revue (`feature/B-01`, 26a64bd) |
-| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | En revue (`feature/B-02`, 5b4d0ce) |
-| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | En cours : correctifs de revue R-1, R-2, R-5, R-6 (`feature/B-03`, 418c7c9) |
+| [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
+| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
+| [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | À faire |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | À faire |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | À faire |
@@ -81,6 +81,8 @@ Waiver npm audit (AUDIT-1, 2026-10-20) : chaque merge le mentionne ; remédiatio
 R-7 (2026-10-20) : un départage qui doit pourvoir plusieurs places se rejoue entre les perdants jusqu'à pourvoir toutes les places (B-13).
 
 Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), bloqué par le choix d'hébergement.
+
+Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), vague 2, à livrer au plus tard avec B-05.
 
 #### Historique des options présentées (A1 à A16)
 
