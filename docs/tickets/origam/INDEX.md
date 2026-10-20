@@ -1,0 +1,13 @@
+# Tickets Origam ouverts depuis CCC
+
+| Ticket | Sujet | Contournement CCC |
+|---|---|---|
+| #1212 | slot de police `display` | classe locale `.font-display` |
+| #1133 (commentaire) | composants sans `.d.ts`, vue-tsc | script `typecheck` filtré (temporaire) |
+| #1222 | `btn` variante `text` transparente à l'état actif | entrée active en `flat` |
+| #1223 | `drawer` sans `attach` : hydratation SSR en 500 | `aside` CSS, ou `:attach="true"` |
+| #1224 | `field` : attributs `isactive`/`isfocused` sur `<input>` | aucun |
+| #1225 | `select` : `aria-controls` absent menu fermé | aucun |
+| #1226 | `text-field`/`select` : id d'input différent SSR/client | aucun |
+| #1227 | thème : clé `components.global` → avertissements | retirer `global: { density }` du thème CCC |
+| #1228 | évolution : option `icons` dans le module Nuxt | plugin manuel si besoin |

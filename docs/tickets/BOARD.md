@@ -142,7 +142,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 
 | Id | Titre | Maquette HH | Dépend de | Statut | Worktree |
 |---|---|---|---|---|---|
-| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **En cours** (dev F-00), **bloquant** | `../CCC-F-00` |
+| [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **En revue : corrections demandées** (revue du 2026-10-20 sur 404fd5c : rebase sur 37f4c07, /admin/plus manquant, e2e instable 1/65, écarts visuels ; voir le message à dev-f00), **bloquant** | `../CCC-F-00` |
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | À faire | `../CCC-F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00 | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |

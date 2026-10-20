@@ -115,9 +115,9 @@ export const CCC_HH_DARK: IOrigamTheme = {
       },
       action: {
         // Ambre = action. Encre de nuit dessus : 10.38:1.
-        primary: { bg: '#ffb21a', bgHover: '#ffc24a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ffb21a' },
+        primary: { bg: '#ffb21a', bgHover: '#ffc24a', bgActive: '#ffb21a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ffb21a' },
         // Néon = accent éditorial (chips, onglet actif, extrusion des titres). 5.69:1 avec la nuit.
-        secondary: { bg: '#ff3d9a', bgHover: '#ff5aa8', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 61, 154, 0.16)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ff5aa8' },
+        secondary: { bg: '#ff3d9a', bgHover: '#ff5aa8', bgActive: '#ff3d9a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 61, 154, 0.16)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ff5aa8' },
         ghost: { bg: 'rgba(255, 244, 220, 0)', bgHover: 'rgba(255, 244, 220, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#fff4dc', fgDisabled: '#6d5f92' }
       },
       border: { default: 'rgba(201, 184, 232, 0.18)', subtle: 'rgba(201, 184, 232, 0.09)', strong: 'rgba(201, 184, 232, 0.38)', focus: '#3ee8ff' },

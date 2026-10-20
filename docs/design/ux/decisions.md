@@ -87,3 +87,4 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | R-5 | Bilan V/D public : **matchs avec score uniquement** (ex. Deseine 39/13, et non 53/18 du classeur) ; afficher à côté « N matchs au résultat inconnu ». |
 | R-6 | RG19 : à 3 joueurs ou plus à égalité, **mini-poule (confrontation directe entre eux) d'abord**, puis match de départage à N côtés si l'égalité persiste. |
 | MERGE-1 | Merge dans `develop` **autorisé sous conditions** (utilisateur, 2026-10-20) : chaque lot est mergé par le chef de projet dès que les 3 contrôles sont verts (TU, e2e/API, `/security-review`), avec le waiver AUDIT-1 dans le message de commit ; SHA et sorties réelles rapportés. Un contrôle rouge = pas de merge, retour à l'utilisateur. |
+| R-7 | Départage devant pourvoir plusieurs places : le gagnant prend la place, **les perdants rejouent** (N−1 côtés, ou 1v1 à deux) jusqu'à ce que toutes les places soient pourvues. |
