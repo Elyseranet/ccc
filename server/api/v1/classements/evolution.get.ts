@@ -7,7 +7,7 @@ import { getQueryWithSchema } from '../../../utils/http/validation.util'
 
 /** Avec `competiteur` : les points d'un joueur ; sans : les séries de tous les joueurs en un appel (C5). */
 export default defineEventHandler(async (event): Promise<IRankingEvolutionPoint[] | IRankingEvolutionSeries[]> => {
-  enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.RANKING_EVOLUTION)
+  enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.PUBLIC_READ)
   const { type, competiteur } = await getQueryWithSchema(event, rankingEvolutionQuerySchema)
   return competiteur === undefined
     ? getEvolutionForAll(type)

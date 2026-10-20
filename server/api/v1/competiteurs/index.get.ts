@@ -14,9 +14,8 @@ import type { IPaginated } from '../../../../shared/interfaces/api/pagination.in
 export default defineEventHandler(async (event): Promise<IPaginated<ICompetitorListItem>> => {
   const rawQuery = getQuery(event)
   // Avant la validation : une rafale de `q` invalides consomme aussi le quota.
-  if (rawQuery.q !== undefined) {
-    enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.COMPETITORS_SEARCH)
-  }
+  // La recherche garde sa limite plus stricte ; la liste simple relève du budget public partagé.
+  enforceRateLimit(event, rawQuery.q !== undefined ? RATE_LIMIT_ROUTE_KEY.COMPETITORS_SEARCH : RATE_LIMIT_ROUTE_KEY.PUBLIC_READ)
 
   const query = await getQueryWithSchema(event, competitorListQuerySchema)
   const pagination = parsePagination(rawQuery)

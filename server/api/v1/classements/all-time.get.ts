@@ -5,6 +5,6 @@ import { getRanking } from '../../../services/ranking.service'
 import { enforceRateLimit } from '../../../utils/http/rate-limit.util'
 
 export default defineEventHandler(async (event): Promise<IRankingRow[]> => {
-  enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.RANKING_ALL_TIME)
+  enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.PUBLIC_READ)
   return getRanking(RANKING_TYPE.ALL_TIME)
 })

@@ -18,9 +18,10 @@ import { logger } from '../../../utils/logger.util'
 
 export default defineEventHandler(async (event): Promise<IMe> => {
   setResponseHeader(event, 'Cache-Control', 'no-store')
+  // Le limiteur par IP passe avant la lecture du corps : une rafale de corps volumineux ou invalides consomme le quota.
+  enforceLoginRateLimit(event)
   const body = await readBodyWithSchema(event, loginSchema)
   const email = normalizeEmail(body.email)
-  enforceLoginRateLimit(event)
 
   const dataSource = await useDataSource()
   const user = await dataSource.getRepository(UserEntity).findOne({

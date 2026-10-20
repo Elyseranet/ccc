@@ -10,6 +10,7 @@ import {
   notFound,
   serviceUnavailable,
   toApiError,
+  payloadTooLarge,
   tooManyRequests,
   unauthorized,
   unprocessable,
@@ -26,6 +27,7 @@ describe('api-error factories', () => {
     ['conflict', conflict(), 409, API_ERROR_CODE.CONFLICT],
     ['gone', gone(), 410, API_ERROR_CODE.GONE],
     ['unprocessable', unprocessable(), 422, API_ERROR_CODE.UNPROCESSABLE],
+    ['payloadTooLarge', payloadTooLarge(), 413, API_ERROR_CODE.PAYLOAD_TOO_LARGE],
     ['tooManyRequests', tooManyRequests(), 429, API_ERROR_CODE.RATE_LIMITED],
     ['internalError', internalError(), 500, API_ERROR_CODE.INTERNAL_ERROR],
     ['serviceUnavailable', serviceUnavailable(), 503, API_ERROR_CODE.SERVICE_UNAVAILABLE]
@@ -57,6 +59,7 @@ describe('default messages', () => {
     ['conflict', conflict(), API_ERROR_MESSAGE.CONFLICT],
     ['gone', gone(), API_ERROR_MESSAGE.GONE],
     ['unprocessable', unprocessable(), API_ERROR_MESSAGE.UNPROCESSABLE],
+    ['payloadTooLarge', payloadTooLarge(), API_ERROR_MESSAGE.PAYLOAD_TOO_LARGE],
     ['tooManyRequests', tooManyRequests(), API_ERROR_MESSAGE.RATE_LIMITED],
     ['validationFailed', validationFailed([]), API_ERROR_MESSAGE.VALIDATION_FAILED]
   ])('%s uses its default message constant', (_name, error, message) => {

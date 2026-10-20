@@ -1,6 +1,8 @@
+import { RATE_LIMIT_ROUTE_KEY } from '../../../../consts/rate-limit.const'
 import { badRequest } from '../../../../utils/http/api-error.util'
 import { competitorIdParamsSchema, headToHeadQuerySchema } from '../../../../utils/competitor/competitor-query.util'
 import { getHeadToHead, listHeadToHeadSummaries } from '../../../../services/competitor.service'
+import { enforceRateLimit } from '../../../../utils/http/rate-limit.util'
 import { getParamsWithSchema, getQueryWithSchema } from '../../../../utils/http/validation.util'
 import type { IHeadToHead, IHeadToHeadSummary } from '../../../../../shared/interfaces/api/head-to-head.interface'
 
@@ -9,6 +11,7 @@ import type { IHeadToHead, IHeadToHeadSummary } from '../../../../../shared/inte
  * Sans `adversaire` : la liste de toutes les paires du joueur.
  */
 export default defineEventHandler(async (event): Promise<IHeadToHead | IHeadToHeadSummary[]> => {
+  enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.PUBLIC_READ)
   const { id } = await getParamsWithSchema(event, competitorIdParamsSchema)
   const { adversaire } = await getQueryWithSchema(event, headToHeadQuerySchema)
 

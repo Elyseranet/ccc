@@ -31,6 +31,12 @@ export default defineNuxtConfig({
       competitorsSearch: {
         windowMs: 60000,
         maxRequests: 30
+      },
+      // Budget unique partagé par toutes les routes publiques en lecture (M3) : généreux, car le soir
+      // du tournoi le public est souvent derrière une seule IP (wifi du lieu).
+      publicRead: {
+        windowMs: 60000,
+        maxRequests: 300
       }
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).

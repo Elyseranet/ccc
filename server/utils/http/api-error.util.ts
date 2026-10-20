@@ -40,6 +40,9 @@ export const conflict = (message: string = API_ERROR_MESSAGE.CONFLICT, details?:
 export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
+export const payloadTooLarge = (): H3Error =>
+  buildError(413, API_ERROR_CODE.PAYLOAD_TOO_LARGE, API_ERROR_MESSAGE.PAYLOAD_TOO_LARGE)
+
 export const unprocessable = (message: string = API_ERROR_MESSAGE.UNPROCESSABLE, details?: TApiErrorDetails): H3Error =>
   buildError(422, API_ERROR_CODE.UNPROCESSABLE, message, details)
 
