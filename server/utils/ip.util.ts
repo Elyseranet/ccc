@@ -24,3 +24,11 @@ export const normalizeIpForRateLimit = (ip: string): string => {
     .map((group) => (Number.parseInt(group, 16) || 0).toString(16))
   return `${prefix.join(':')}::/64`
 }
+
+const IPV4_PATTERN = /^(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}$/
+
+/** IP tronquée pour les logs : IPv4 ramenée à son /24, IPv6 déjà agrégée au /64 par la normalisation. */
+export const truncateIpForLog = (normalizedIp: string): string => {
+  const match = IPV4_PATTERN.exec(normalizedIp)
+  return match ? `${match[1]}.0/24` : normalizedIp
+}

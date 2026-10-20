@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { SlidingWindowRateLimiter } from '../../server/utils/http/rate-limit.util'
+import { SlidingWindowRateLimiter, assertRateLimitConfig, resolveRateLimitOptions } from '../../server/utils/http/rate-limit.util'
 
 const createClock = (start = 1_000_000) => {
   let current = start
@@ -91,5 +91,28 @@ describe('SlidingWindowRateLimiter key cap', () => {
     }
 
     expect(limiter.size).toBe(3)
+  })
+})
+
+describe('rate limit settings validation (T-SEC-03)', () => {
+  it.each([
+    ['NaN', { windowMs: Number.NaN, maxRequests: 1, maxKeys: 1 }, 'windowMs'],
+    ['zero', { windowMs: 1000, maxRequests: 0, maxKeys: 1 }, 'maxRequests'],
+    ['negative', { windowMs: 1000, maxRequests: 1, maxKeys: -5 }, 'maxKeys'],
+    ['fractional', { windowMs: 1000.5, maxRequests: 1, maxKeys: 1 }, 'windowMs']
+  ])('rejects %s and names the setting', (_label, options, name) => {
+    expect(() => new SlidingWindowRateLimiter(options)).toThrow(name)
+  })
+
+  it('rejects at startup a config with an empty or missing value', () => {
+    expect(() => assertRateLimitConfig({ windowMs: 60000, maxRequests: '', maxKeys: 10 })).toThrow('maxRequests')
+    expect(() => assertRateLimitConfig({ windowMs: 60000, maxKeys: 10 })).toThrow('maxRequests')
+  })
+
+  it('lets the search route override the defaults', () => {
+    const config = { windowMs: 60000, maxRequests: 60, maxKeys: 10, competitorsSearch: { maxRequests: 5 } }
+    expect(resolveRateLimitOptions(config, 'competitors-search')).toEqual({ windowMs: 60000, maxRequests: 5, maxKeys: 10 })
+    expect(resolveRateLimitOptions(config, 'health').maxRequests).toBe(60)
+    expect(() => assertRateLimitConfig({ ...config, competitorsSearch: { maxRequests: 0 } })).toThrow('maxRequests')
   })
 })

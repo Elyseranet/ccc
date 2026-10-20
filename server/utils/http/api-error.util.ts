@@ -1,7 +1,7 @@
 import { createError } from 'h3'
 import type { H3Error } from 'h3'
 import { API_ERROR_CODE } from '../../../shared/enums/api-error-code.enum'
-import { API_ERROR_MESSAGE, DEFAULT_CODE_BY_STATUS, INTERNAL_ERROR_MESSAGE, SERVICE_UNAVAILABLE_MESSAGE } from '../../consts/api-error.const'
+import { API_ERROR_MESSAGE, DEFAULT_CODE_BY_STATUS, DEFAULT_MESSAGE_BY_STATUS, INTERNAL_ERROR_MESSAGE, SERVICE_UNAVAILABLE_MESSAGE } from '../../consts/api-error.const'
 import type { TApiErrorDetails } from '../../types/api-error-details.type'
 import type { IApiError } from '../../../shared/interfaces/api/error.interface'
 
@@ -50,6 +50,9 @@ export const internalError = (): H3Error =>
 export const serviceUnavailable = (): H3Error =>
   buildError(503, API_ERROR_CODE.SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE_MESSAGE)
 
+const defaultMessageForStatus = (statusCode: number): string =>
+  DEFAULT_MESSAGE_BY_STATUS[statusCode] ?? API_ERROR_MESSAGE.UNKNOWN
+
 /**
  * Normalise n'importe quelle erreur vers le contrat IApiError.
  * Toute erreur 5xx ou non-h3 devient un message générique.
@@ -67,7 +70,10 @@ export const toApiError = (error: unknown): IApiError => {
 
   const data = (candidate?.data ?? {}) as { code?: API_ERROR_CODE, details?: IApiError['details'] }
   const code = data.code ?? DEFAULT_CODE_BY_STATUS[statusCode] ?? API_ERROR_CODE.BAD_REQUEST
-  const apiError: IApiError = { statusCode, code, message: candidate?.message ?? API_ERROR_MESSAGE.UNKNOWN }
+  // Seule une erreur construite par nos fabriques (data.code présent) maîtrise son message ;
+  // le message d'une erreur h3 ou tierce n'est jamais repris.
+  const message = data.code !== undefined && candidate?.message ? candidate.message : defaultMessageForStatus(statusCode)
+  const apiError: IApiError = { statusCode, code, message }
   if (data.details !== undefined) {
     apiError.details = data.details
   }

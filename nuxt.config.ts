@@ -23,7 +23,12 @@ export default defineNuxtConfig({
     rateLimit: {
       windowMs: 60000,
       maxRequests: 60,
-      maxKeys: 10000
+      maxKeys: 10000,
+      // Recherche publique ?q= (décision E-e) : plus stricte que le défaut.
+      competitorsSearch: {
+        windowMs: 60000,
+        maxRequests: 30
+      }
     }
   },
   nitro: {

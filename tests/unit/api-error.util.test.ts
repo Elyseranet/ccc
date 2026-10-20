@@ -81,11 +81,26 @@ describe('toApiError', () => {
 
   it('maps a plain h3 4xx without code to the default code of its status', () => {
     const error = Object.assign(new Error('Not here'), { statusCode: 404 })
-    expect(toApiError(error)).toEqual({ statusCode: 404, code: API_ERROR_CODE.NOT_FOUND, message: 'Not here' })
+    expect(toApiError(error)).toEqual({ statusCode: 404, code: API_ERROR_CODE.NOT_FOUND, message: API_ERROR_MESSAGE.NOT_FOUND })
   })
 
   it('handles non-error values', () => {
     expect(toApiError(undefined).statusCode).toBe(500)
     expect(toApiError('boom').statusCode).toBe(500)
+  })
+})
+
+describe('toApiError third-party 4xx (T-SEC-03)', () => {
+  it('ignores the message of an error without data.code', () => {
+    const thirdParty = { statusCode: 400, message: 'secret internal parser detail' }
+    expect(toApiError(thirdParty)).toEqual({
+      statusCode: 400,
+      code: API_ERROR_CODE.BAD_REQUEST,
+      message: API_ERROR_MESSAGE.BAD_REQUEST
+    })
+  })
+
+  it('falls back to a generic message for an unmapped 4xx status', () => {
+    expect(toApiError({ statusCode: 418, message: 'teapot detail' }).message).toBe(API_ERROR_MESSAGE.UNKNOWN)
   })
 })

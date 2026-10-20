@@ -1,12 +1,10 @@
 import type { MatchEntity } from '../../database/entities/match.entity'
+import { NO_SCORE } from '../../consts/match-record.const'
 import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum'
 import { MATCH_RECORD_KEY } from '../../enums/match-record-key.enum'
 import type { IMatchRecord } from '../../interfaces/stats.interface'
 import { MATCH_STATUS } from '../../../shared/enums/match.enum'
 import { DomainRuleError } from '../domain/domain-rule-error.util'
-
-/** Score d'un côté sans résultat : sans effet, le statut écarte le match des bilans V/D. */
-const NO_SCORE = 0
 
 /**
  * Convertit un match chargé avec `sides` et `sides.participation` vers l'IMatchRecord de B-03.
