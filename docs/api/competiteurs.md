@@ -4,11 +4,14 @@ Routes publiques, en lecture seule, sous `/api/v1`. Aucune ne renvoie d'email, d
 
 ## Règles de calcul
 
+- `titles` ne compte que les éditions `CLOSED` (A8), par la même fonction `countTitles` que le classement.
 - Les statistiques ne comptent que les matchs `REGULAR` (le départage est exclu).
 - R-5 : victoires, défaites et `matchesPlayed` ne comptent que les matchs **avec score** (`VALIDATED`). Un match `RESULT_UNKNOWN` n'est ni une victoire ni une défaite : il est compté à part dans `unknownResults`.
 - FA-12 : aucun ratio sur la fiche ni dans la liste. Le ratio n'existe que dans le face-à-face (`winRatio`, `null` si aucun match de la paire n'a de score).
 
 ## `GET /competiteurs`
+
+Limite connue : le tri et la pagination se font en mémoire, après chargement de tous les compétiteurs filtrés et des matchs comptés. C'est adapté au volume actuel (145 compétiteurs) et à revoir au-delà de quelques milliers.
 
 Réponse : `IPaginated<ICompetitorListItem>`.
 

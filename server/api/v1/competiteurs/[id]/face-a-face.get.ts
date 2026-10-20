@@ -1,6 +1,6 @@
 import { badRequest } from '../../../../utils/http/api-error.util'
 import { competitorIdParamsSchema, headToHeadQuerySchema } from '../../../../utils/competitor/competitor-query.util'
-import { getHeadToHead, listHeadToHeadSummaries } from '../../../../utils/competitor/competitor.service.util'
+import { getHeadToHead, listHeadToHeadSummaries } from '../../../../services/competitor.service'
 import { getParamsWithSchema, getQueryWithSchema } from '../../../../utils/http/validation.util'
 import type { IHeadToHead, IHeadToHeadSummary } from '../../../../../shared/interfaces/api/head-to-head.interface'
 

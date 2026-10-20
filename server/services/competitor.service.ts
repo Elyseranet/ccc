@@ -1,30 +1,32 @@
 import type { DataSource } from 'typeorm'
-import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../../consts/competitor.const'
-import { CompetitorEntity } from '../../database/entities/competitor.entity'
-import { MatchSideEntity } from '../../database/entities/match-side.entity'
-import { MatchEntity } from '../../database/entities/match.entity'
-import { ParticipationEntity } from '../../database/entities/participation.entity'
-import { MATCH_RECORD_KEY } from '../../enums/match-record-key.enum'
-import type { ICompetitorCareer, ICompetitorListQuery, IMatchContext } from '../../interfaces/competitor.interface'
-import type { IMatchRecord } from '../../interfaces/stats.interface'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { MATCH_PURPOSE } from '../../../shared/enums/match.enum'
+import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const'
+import { CompetitorEntity } from '../database/entities/competitor.entity'
+import { MatchSideEntity } from '../database/entities/match-side.entity'
+import { MatchEntity } from '../database/entities/match.entity'
+import { ParticipationEntity } from '../database/entities/participation.entity'
+import { MATCH_RECORD_KEY } from '../enums/match-record-key.enum'
+import type { ICompetitorCareer, ICompetitorListQuery, IMatchContext } from '../interfaces/competitor.interface'
+import type { IMatchRecord } from '../interfaces/stats.interface'
+import { EDITION_STATUS } from '../../shared/enums/edition.enum'
+import type { FINAL_STAGE } from '../../shared/enums/participation.enum'
+import { MATCH_PURPOSE } from '../../shared/enums/match.enum'
 import type {
   ICompetitorDetail,
   ICompetitorListItem,
   ICompetitorParticipation,
   ICompetitorPublic,
   ICompetitorStats
-} from '../../../shared/interfaces/api/competitor.interface'
-import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../../../shared/interfaces/api/head-to-head.interface'
-import type { IPaginated } from '../../../shared/interfaces/api/pagination.interface'
-import { toMatchRecord } from '../match/match-record.mapper.util'
-import { competitorNotFound } from '../http/api-error.util'
-import { buildPaginated } from '../http/pagination.util'
-import { computeHeadToHead, computePlayerBalance, countedOutcomes, resolveMatchOutcome } from '../stats/record.util'
-import { toCompetitorPublic } from './competitor-public.mapper.util'
-import { buildContainsPattern } from './competitor-query.util'
-import { sortCompetitors } from './competitor-sort.util'
+} from '../../shared/interfaces/api/competitor.interface'
+import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../../shared/interfaces/api/head-to-head.interface'
+import type { IPaginated } from '../../shared/interfaces/api/pagination.interface'
+import { toMatchRecord } from '../utils/match/match-record.mapper.util'
+import { competitorNotFound } from '../utils/http/api-error.util'
+import { buildPaginated } from '../utils/http/pagination.util'
+import { countTitles } from '../utils/ranking/ranking.util'
+import { computeHeadToHead, computePlayerBalance, countedOutcomes, resolveMatchOutcome } from '../utils/stats/record.util'
+import { toCompetitorPublic } from '../utils/competitor/competitor-public.mapper.util'
+import { buildContainsPattern } from '../utils/competitor/competitor-query.util'
+import { sortCompetitors } from '../utils/competitor/competitor-sort.util'
 
 const folded = (column: string): string => `translate(lower(${column}), :accented, :folded)`
 
@@ -68,25 +70,39 @@ const loadRegularMatches = async (db: DataSource, competitorId?: string): Promis
   return matches.map((match) => ({ match, record: toMatchRecord(match, MATCH_RECORD_KEY.COMPETITOR) }))
 }
 
+/** A8 : seul un titre d'édition CLOSED compte, comme dans le classement (B-07). Une seule règle : `countTitles` (RG6). */
+const titlesByCompetitor = (rows: Array<{ competitorId: string, finalStage: FINAL_STAGE | null, editionStatus: EDITION_STATUS }>): Map<string, number> =>
+  new Map(countTitles(rows
+    .filter((row) => row.editionStatus === EDITION_STATUS.CLOSED && row.finalStage !== null)
+    .map((row) => ({ playerId: row.competitorId, editionId: '', finalStage: row.finalStage! })))
+    .map(({ playerId, titles }) => [playerId, titles]))
+
 const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCareer>> => {
   const rows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
     .innerJoin('pt.edition', 'e')
     .select('pt.competitorId', 'competitorId')
-    .addSelect('COUNT(*)', 'editionsPlayed')
-    .addSelect('COUNT(*) FILTER (WHERE pt.finalStage = :champion)', 'titles')
-    .addSelect('MIN(e.chronologicalRank)', 'firstEditionRank')
-    .addSelect('(ARRAY_AGG(e.code ORDER BY e.chronologicalRank))[1]', 'firstEditionCode')
-    .setParameter('champion', FINAL_STAGE.CHAMPION)
-    .groupBy('pt.competitorId')
-    .getRawMany<{ competitorId: string, editionsPlayed: string, titles: string, firstEditionRank: number | null, firstEditionCode: string | null }>()
+    .addSelect('pt.finalStage', 'finalStage')
+    .addSelect('e.status', 'editionStatus')
+    .addSelect('e.code', 'code')
+    .addSelect('e.chronologicalRank', 'rank')
+    .orderBy('e.chronologicalRank', 'ASC')
+    .getRawMany<{ competitorId: string, finalStage: FINAL_STAGE | null, editionStatus: EDITION_STATUS, code: string, rank: number }>()
 
-  return new Map(rows.map((row) => [row.competitorId, {
-    competitorId: row.competitorId,
-    editionsPlayed: Number(row.editionsPlayed),
-    titles: Number(row.titles),
-    firstEditionCode: row.firstEditionCode,
-    firstEditionRank: row.firstEditionRank === null ? null : Number(row.firstEditionRank)
-  }]))
+  const titles = titlesByCompetitor(rows)
+  const careers = new Map<string, ICompetitorCareer>()
+  for (const row of rows) {
+    const career = careers.get(row.competitorId) ?? {
+      competitorId: row.competitorId,
+      editionsPlayed: 0,
+      titles: titles.get(row.competitorId) ?? 0,
+      // Lignes triées par rang chronologique : la première rencontrée est la première édition.
+      firstEditionCode: row.code,
+      firstEditionRank: Number(row.rank)
+    }
+    career.editionsPlayed += 1
+    careers.set(row.competitorId, career)
+  }
+  return careers
 }
 
 const findCompetitors = async (db: DataSource, query: Pick<ICompetitorListQuery, 'q' | 'edition'>): Promise<CompetitorEntity[]> => {
@@ -190,7 +206,7 @@ export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail
       pointsFor: balance.pointsFor,
       pointsAgainst: balance.pointsAgainst
     }),
-    titles: participationRows.filter((row) => row.finalStage === FINAL_STAGE.CHAMPION).length
+    titles: titlesByCompetitor(participationRows.map((row) => ({ competitorId: id, finalStage: row.finalStage, editionStatus: row.edition.status }))).get(id) ?? 0
   }
 
   return { ...competitor, participations, stats }

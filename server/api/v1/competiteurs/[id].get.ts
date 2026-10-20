@@ -1,5 +1,5 @@
 import { competitorIdParamsSchema } from '../../../utils/competitor/competitor-query.util'
-import { getCompetitorDetail } from '../../../utils/competitor/competitor.service.util'
+import { getCompetitorDetail } from '../../../services/competitor.service'
 import { getParamsWithSchema } from '../../../utils/http/validation.util'
 import type { ICompetitorDetail } from '../../../../shared/interfaces/api/competitor.interface'
 
