@@ -14,6 +14,8 @@ export interface IPoolStandingRow {
   pointsAgainst: number
   /** Cap's average : points marqués moins points encaissés (RG19). */
   capsAverage: number
+  /** R-5 : matchs REGULAR au résultat inconnu, exclus de played, wins et losses. */
+  unknownResults: number
 }
 
 export interface IPool {

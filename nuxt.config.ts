@@ -20,6 +20,9 @@ export default defineNuxtConfig({
       password: '',
       database: ''
     },
+    cache: {
+      closedEditionMaxAgeSeconds: 3600
+    },
     rateLimit: {
       windowMs: 60000,
       maxRequests: 60,

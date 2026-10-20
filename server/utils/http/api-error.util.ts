@@ -28,7 +28,7 @@ export const unauthorized = (message = API_ERROR_MESSAGE.UNAUTHORIZED): H3Error 
 export const forbidden = (message = API_ERROR_MESSAGE.FORBIDDEN): H3Error =>
   buildError(403, API_ERROR_CODE.FORBIDDEN, message)
 
-export const notFound = (message = API_ERROR_MESSAGE.NOT_FOUND): H3Error =>
+export const notFound = (message: string = API_ERROR_MESSAGE.NOT_FOUND): H3Error =>
   buildError(404, API_ERROR_CODE.NOT_FOUND, message)
 
 export const competitorNotFound = (): H3Error =>

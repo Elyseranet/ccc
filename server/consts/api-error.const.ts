@@ -11,6 +11,7 @@ export const API_ERROR_MESSAGE = {
   NOT_FOUND: 'Resource not found',
   COMPETITOR_NOT_FOUND: 'Competitor not found',
   ROUTE_NOT_FOUND: 'Route not found',
+  EDITION_NOT_FOUND: 'Edition not found',
   CONFLICT: 'Conflict',
   GONE: 'Resource is no longer available',
   UNPROCESSABLE: 'Unprocessable entity',
