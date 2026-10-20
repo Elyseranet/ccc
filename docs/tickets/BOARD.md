@@ -89,6 +89,8 @@ Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SE
 
 Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), traité pendant l'intégration de la vague 2.
 
+Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3.
+
 #### Historique des options présentées (A1 à A16)
 
 Une décision par ligne. L'option recommandée venait en premier.
