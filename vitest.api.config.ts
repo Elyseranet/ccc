@@ -1,4 +1,4 @@
-import { API_TEST_SETUP_TIMEOUT_MS } from './tests/api/helpers/nuxt-setup'
+import { API_TEST_SETUP_TIMEOUT_MS } from './tests/api/helpers/nuxt-setup.ts'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
