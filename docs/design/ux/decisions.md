@@ -34,3 +34,24 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 - **Piste A — Happy Hour** (moodboard `docs/design/ui/moodboard/index.html`) : nuit violette, néon rose, ambre bière, mousse ; Bagel Fat One (display) + Gabarito (texte courant, remplace DM Sans — validé par l'utilisateur le 2026-10-20 avec le bandeau statique et l'échelle typo 1,25).
 - **Police display** : appliquée via une **classe CSS locale** dans CCC, hors props Origam (choix utilisateur ; Origam ne propose que `sans`/`serif`/`mono`). Exception documentée à la règle PROPS-FIRST, limitée à la famille de police des titres display. Évolution demandée sur Origam : Elyseranet/origam#1212 (slot `display`) — à la release, migrer la classe locale vers `fontFamily: 'display'`.
+
+## Arbitrages back (2026-10-20) — cf. `docs/tickets/BOARD.md`
+
+| # | Décision |
+|---|---|
+| A1 | Le serveur **enregistre le tirage physique** (brouillon à chaque affectation) ; +2 routes Spec API (têtes de série, affectations). |
+| A2 | **Session serveur en base + cookie httpOnly**. |
+| A3 | **SMTP générique (nodemailer)**, Mailpit en dev ; fournisseur de prod à choisir plus tard. |
+| A4 | Participant modifie **avatar, téléphone, mot de passe** ; pseudo réservé à l'admin. |
+| A5 | Orphelins : **tableau nom par nom décidé par l'utilisateur** (`legacy-identity-map`, 4 paires ST pré-remplies). |
+| A6 | 2012a/2012b : **N = 16** conservé ; « 5 participants non identifiés ». |
+| A7 | 2017 : **5,76 conservé** (valeur source), écart signalé dans le rapport de reprise. |
+| A8 | ACP = 5 dernières éditions **clôturées**. |
+| A9 | Tour avant les huitièmes = **« Barrages »**. |
+| A10 | Poule : **victoires → cap's average → confrontation directe** ; entre poules inégales : ratio de victoires puis cap's average par match. |
+| A11 | « 1v1v1 en 3 » = **match à 3 côtés, premier à 3 points**. |
+| A12 | Cotes : **hors produit** pour l'instant. |
+| A13 | Commentaires de match : importés, **visibles admin uniquement**. |
+| A14 | Invitation valable **7 jours**, renvoi par l'admin (invalide l'ancien lien). |
+| A15 | Correction : **`POST /matchs/{id}/correction`** journalisée, 409 si tour suivant engagé. |
+| A16 | Les 685 gabarits vides **ne sont pas importés** : 729 matchs réels, dont 554 avec score. Le chiffre public « 1 414 matchs » est **faux** et doit être remplacé. |
