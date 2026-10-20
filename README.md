@@ -49,9 +49,15 @@ Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comm
 
 Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
 
-### Prérequis de release
+### Prérequis de release : garde par page livrée
 
-Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01) : il échoue tant qu'un endpoint de `app/consts/api-sources.const.ts` est en `API_SOURCE.FIXTURE`. Ce script arrive avec F-00 ; tant qu'il n'est pas mergé, le build de l'image échoue avec « Missing script: test:release ». C'est volontaire : il n'y a pas de variable pour désactiver la garde.
+Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint encore en `API_SOURCE.FIXTURE`. Il n'y a pas de variable pour désactiver la garde.
+
+- `app/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme (session comprise : `ME` figure partout). Toutes les routes sont pré-déclarées à `delivered: false`.
+- Un ticket F-xx passe sa ligne à `delivered: true` dans le même commit qui bascule ses endpoints en `LIVE` dans `app/consts/api-sources.const.ts`. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme encore en fixture.
+- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
+- Garde-fous toujours actifs (`npm run test:run`) : une page de `app/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
+- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
 
 ### Variables d'environnement
 

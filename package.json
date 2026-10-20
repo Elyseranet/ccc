@@ -25,6 +25,7 @@
     "typecheck": "node scripts/typecheck.mjs",
     "test:front": "vitest run --config vitest.config.ts --project front",
     "test:release": "RELEASE_BUILD=true vitest run --config vitest.config.ts --project front tests/nuxt/front/api-sources.release.test.ts",
+    "test:release:e2e": "playwright test --config playwright.release.config.ts",
     "test:a11y": "playwright test --config playwright.config.ts --project=a11y",
     "test:visual": "playwright test --config playwright.config.ts --project=visual"
   },
