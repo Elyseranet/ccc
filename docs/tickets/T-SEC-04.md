@@ -1,7 +1,7 @@
 # T-SEC-04 — Constats LOW de la revue de sécurité de la vague 2
 
 - **Origine** : revue de sécurité de `feature/integration-wave2` @ 918308d, le 2026-10-20. Elle compte 0 critical, 0 high, 3 medium (corrigés avant merge) et 7 low. Ce ticket regroupe les low **non bloquants** qui ne sont pas traités dans la vague 2.
-- **Statut** : À faire (L2, L3, N1, N3) ; L7 est fermé avec B-16.
+- **Statut** : L2, L3 et N3 livrés (feature/T-SEC-04 @ 180a26d, en revue). **N1 : risque accepté et documenté** (décision utilisateur 2026-10-21, decisions.md, commit 143e5ac), sans code, comme SEC-A3. L7 sera fermé avec B-16.
 - **Vague** : 3
 - **Dépendances** : B-08 (mergé avec la vague 2).
 
