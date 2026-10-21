@@ -1,5 +1,6 @@
 # T-OPS-01 — Image Docker de production livrable sur Coolify
 
+- **Statut (2026-10-21)** : livré sur `feature/T-OPS-01` @ `ed7feca` (image, entrypoint migrations, `ccc-ops`, garde de release par page livrée + endpoints de layout, B2 retiré, README Coolify) ; revue front OK sous réserve, revue back en cours ; merge après F-00.
 - **Origine** : demande utilisateur du 2026-10-20 : « générer un fichier docker comme sur tous les projets, pour livrer automatiquement sur Coolify ».
 - **Référence interne** : convention des autres projets (i18n-dashboard : `Dockerfile` multi-stage `node:22-alpine`, image **agnostique de l'environnement**, configuration 100 % par variables `NUXT_*` injectées par Coolify ; `curl` installé pour la sonde de santé Coolify ; `HEALTHCHECK` dans l'image ; ADR i18n-dashboard 0001 « environment lives in Coolify env vars »).
 - **Inclut T-REL-01** : le build de l'image doit échouer si un endpoint est encore en fixture (`npm run test:release` avant `nuxt build`).
