@@ -1,6 +1,6 @@
 # Tableau des tickets — CCC
 
-Il n'y a pas de remote : ce fichier fait office de tableau. Il est partagé par `backend-lead` (section Back) et `frontend-lead` (section Front). Chaque lead ne modifie que sa section. Un ticket est fermé ici **dans le même tour** que son merge, avec le SHA et la preuve de vérification.
+Les tickets vivent dans le dépôt (remote `origin` = Elyseranet/ccc, privé) : ce fichier fait office de tableau. Il est partagé par `backend-lead` (section Back) et `frontend-lead` (section Front). Chaque lead ne modifie que sa section. Un ticket est fermé ici **dans le même tour** que son merge, avec le SHA et la preuve de vérification.
 
 États possibles : `À faire` · `En cours` · `Bloqué (Ax)` · `En revue` · `Fermé (SHA)`.
 
@@ -17,11 +17,11 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
-| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | En revue : validé (05da1d8), en attente de l'intégration de la vague 2 |
-| [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | En revue : validé (03092f4, avec T-SEC-03), en attente de l'intégration de la vague 2 |
-| [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | En revue : validé (8f025ce), en attente de l'intégration de la vague 2 |
-| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | En revue : validé (e229f35), en attente de l'intégration de la vague 2 |
-| [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | En cours (vague 2) |
+| [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
+| [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
+| [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
+| [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
+| [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | — (fournisseur SMTP de prod : configuration) | À faire |
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | À faire |
 | [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | À faire |
@@ -83,11 +83,11 @@ R-7 (2026-10-20) : un départage qui doit pourvoir plusieurs places se rejoue en
 
 Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), bloqué par le choix d'hébergement.
 
-Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), vague 2, à livrer au plus tard avec B-05.
+Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
 Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
 
-Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), traité pendant l'intégration de la vague 2.
+Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
 Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3.
 
