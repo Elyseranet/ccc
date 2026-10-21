@@ -29,7 +29,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
-| [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | À faire |
+| [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | En revue : validé (`feature/B-16` @ `4e39f80`, smoke sharp sur l'image réelle OK), en attente de l'intégration 3a |
 | [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | En cours (dev-b12, `feature/B-17`) |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
@@ -110,7 +110,7 @@ Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-0
 
 Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
-Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
+Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. **En revue : validé** (`feature/T-SEC-04` @ `bbfaa8b` : L2, L3, N3 ; N1 documenté), en attente de l'intégration 3a. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
 
 Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
