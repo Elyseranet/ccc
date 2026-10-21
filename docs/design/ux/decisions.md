@@ -125,3 +125,13 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-13 — Écrans admin d'édition et d'identité de compétiteur (décision utilisateur 2026-10-21)
 - Un ticket front est ouvert dès maintenant pour la création et la modification d'une édition, ainsi que pour la correction de l'identité d'un compétiteur, sur les routes de B-10. Sans ces écrans, l'organisateur ne peut pas créer une édition depuis l'application.
+
+## OPS-5 — Accès de Coolify au dépôt privé (décision utilisateur 2026-10-21)
+- Coolify accède au dépôt par une **GitHub App** installée sur l'organisation Elyseranet et limitée au dépôt `ccc`. La ressource est de type « Private Repository (with GitHub App) », sur la branche `develop`, avec le build pack Dockerfile. Chaque push déclenche un déploiement automatique.
+- Cause de l'échec du 2026-10-21 : la ressource lisait `https://github.com/Elyseranet/ccc` sans identifiants.
+
+## F-09-H — Homonymes à l'ajout d'un joueur (décision utilisateur 2026-10-21)
+- Pas d'avertissement d'homonyme en v1. La recherche avec autocomplétion montre déjà les profils proches avant toute création.
+
+## RG26-A — Bandeau des règles sur l'accueil (décision utilisateur 2026-10-21)
+- Le bandeau de l'accueil garde l'abréviation de la maquette validée (« La partie débute par un shifumi »). `/regles` affiche le texte complet de la Spec fonctionnelle.
