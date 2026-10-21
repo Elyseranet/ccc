@@ -143,3 +143,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## PAR-1 — Parallélisme limité à environ 8 agents (décision utilisateur 2026-10-21)
 - Le 2026-10-21, la limite d'usage claude.ai a coupé deux fois toute l'équipe, alors que 21 agents tournaient en même temps.
 - À partir de maintenant, environ 8 agents tournent en parallèle : 2 leads, 3 devs back et 3 devs front. Les autres tickets ne reprennent qu'au fur et à mesure que des devs livrent.
+
+## DT-1 — Contournement du typage de `origam-data-table` (Origam #1246) (décision utilisateur 2026-10-21)
+- Un seul composant partagé, `AppDataTable.vue`, affiche `origam-data-table`. Il porte l'unique contournement de type, accompagné de la référence #1246. Les pages l'utilisent et restent typées normalement.
+- Ce composant est livré en prérequis commun F-00j. Il sera retiré à la sortie d'une version d'Origam qui corrige #1246.
