@@ -41,8 +41,10 @@ describe('PlayerLink : prop size', () => {
 })
 
 describe('.font-display', () => {
-  it('pose aussi la police display de origam-title', () => {
+  it('pose aussi famille, graisse et interlettrage display de origam-title', () => {
     const css = readFileSync('app/assets/css/main.css', 'utf8')
     expect(css).toMatch(/\.font-display\s*\{[^}]*--origam-title---font-family:\s*var\(--origam-font__family---display\)/)
+    expect(css).toMatch(/\.font-display\s*\{[^}]*--origam-title---font-weight:\s*var\(--origam-font__weight---regular\)/)
+    expect(css).toMatch(/\.font-display\s*\{[^}]*--origam-title---letter-spacing:\s*-0\.01em/)
   })
 })

@@ -27,6 +27,7 @@
 import { computed } from 'vue'
 import { OrigamBtn } from 'origam/components'
 import { useT } from '~/composables/useT'
+import { PLAYER_LINK_DEFAULT_SIZE } from '~/consts/player-link.const'
 import type { IPlayerLinkProps } from '~/interfaces/common-components.interface'
 
 /*********************************************************
@@ -39,7 +40,7 @@ import type { IPlayerLinkProps } from '~/interfaces/common-components.interface'
 const { t } = useT()
 const props = withDefaults(defineProps<IPlayerLinkProps>(), {
   titles: 0,
-  size: 'small'
+  size: PLAYER_LINK_DEFAULT_SIZE
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
