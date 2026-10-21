@@ -47,7 +47,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-chip': { size: 'small', pill: true, border: false, fontWeight: 'bold' },
     'origam-chip-group': { column: false },
     'origam-badge': { rounded: 'full', inline: true },
-    'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'primary' },
+    'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'secondary' },
     'origam-tab': { fontWeight: 'bold' },
     'origam-table': { border: true, borderColor: 'var(--origam-color__border---default)', rounded: 'lg', density: 'default', hover: true, elevation: 'none' },
     'origam-data-table': { density: 'default', hover: true, rounded: 'lg', border: true, borderColor: 'var(--origam-color__border---default)' },
@@ -87,7 +87,26 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-data-table-header-cell---background': 'transparent',
     // Lignes : transparentes sur la surface de la table ; survol = fantôme du thème.
     '--origam-data-table-row---background-color': 'transparent',
-    '--origam-data-table-row--hover---background-color': 'var(--origam-color__action--ghost---bgHover)'
+    '--origam-data-table-row--hover---background-color': 'var(--origam-color__action--ghost---bgHover)',
+    // Onglets en pilule (F-00l) : ni une prop ni un token sémantique n'expriment ces valeurs ; l'onglet actif du DS est
+    // `action.primary` en dur, la maquette le veut en `action.secondary`. Chaque entrée pointe vers un token existant.
+    '--origam-tabs---border-width': 'var(--origam-border__width---thin)',
+    '--origam-tabs---border-color': 'var(--origam-color__border---default)',
+    '--origam-tabs---border-radius': 'var(--origam-radius---full)',
+    '--origam-tabs--pills---background-color': 'var(--origam-color__surface---sunken)',
+    '--origam-tabs--pills---gap': 'var(--origam-space---1)',
+    '--origam-tabs--pills---padding': 'var(--origam-space---1)',
+    '--origam-tabs__item---height': 'var(--origam-space---11)',
+    '--origam-tabs__item---padding-inline': 'var(--origam-space---5)',
+    '--origam-tabs__item---border-radius': 'var(--origam-radius---full)',
+    '--origam-tabs__item---font-size': 'var(--origam-font__size---md)',
+    '--origam-tabs__item---letter-spacing': 'normal',
+    '--origam-tabs__item---color': 'var(--origam-color__text---secondary)',
+    '--origam-tabs__item--hover---color': 'var(--origam-color__text---primary)',
+    '--origam-tabs__item--hover---background-color': 'transparent',
+    '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
+    '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
+    '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)'
   },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────

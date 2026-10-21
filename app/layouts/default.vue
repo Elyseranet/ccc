@@ -194,11 +194,19 @@ defineExpose({})
 .public-shell {
   position: relative;
   min-height: 100vh;
-  background:
-    radial-gradient(var(--public-shell---halo-neon-size, 60rem 40rem) at 85% -10%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%),
-    radial-gradient(var(--public-shell---halo-glow-size, 50rem 36rem) at -10% 30%, color-mix(in srgb, var(--origam-color__bar---glow) 90%, transparent), transparent 70%),
-    var(--origam-color__surface---default);
-  background-attachment: fixed;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(var(--public-shell---halo-neon-size, 60rem 40rem) at 85% -10%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%),
+      radial-gradient(var(--public-shell---halo-glow-size, 50rem 36rem) at -10% 30%, color-mix(in srgb, var(--origam-color__bar---glow) 90%, transparent), transparent 70%),
+      var(--origam-color__surface---default);
+  }
 
   &__header {
     position: sticky;
@@ -264,6 +272,7 @@ defineExpose({})
 }
 
 .public-main {
+  background: transparent;
   min-height: calc(100vh - var(--public-main---reserved-height, 20rem));
 }
 

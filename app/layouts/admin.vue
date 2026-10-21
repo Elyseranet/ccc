@@ -212,7 +212,6 @@ defineExpose({})
   background:
     radial-gradient(var(--admin-shell---halo-size, 50rem 30rem) at 100% 0%, color-mix(in srgb, var(--origam-color__bar---neon) 14%, transparent), transparent 70%),
     var(--origam-color__surface---default);
-  background-attachment: fixed;
 }
 
 .admin-drawer {
