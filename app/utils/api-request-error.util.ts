@@ -1,5 +1,6 @@
 import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
 import type { IApiError } from '#shared/interfaces/api/error.interface'
+import { HTTP_DATE, MS_PER_SECOND, RETRY_AFTER_SECONDS } from '~/consts/retry-after.const'
 import type { IFetchErrorLike } from '~/interfaces/api-client.interface'
 
 /*********************************************************
@@ -8,7 +9,7 @@ import type { IFetchErrorLike } from '~/interfaces/api-client.interface'
  * @description
  * Rejet typé d'un statut non-2xx : porte le corps `IApiError` du serveur.
  * `isOffline` distingue une absence de réponse (réseau coupé, timeout) d'une réponse en erreur.
- * `retryAfterSeconds` porte l'en-tête `Retry-After` d'un 429 (RFC 9110 : secondes ou date HTTP), null s'il est absent ou invalide.
+ * `retryAfterSeconds` porte l'en-tête `Retry-After` d'une réponse en erreur, quel que soit le statut (429, 503 ; RFC 9110 : secondes ou date HTTP), null s'il est absent ou invalide.
  ********************************************************/
 export class ApiRequestError extends Error {
   readonly error: IApiError
@@ -25,10 +26,6 @@ export class ApiRequestError extends Error {
     this.retryAfterSeconds = retryAfterSeconds
   }
 }
-
-const RETRY_AFTER_SECONDS = /^\d+$/
-const HTTP_DATE = /^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
-const MS_PER_SECOND = 1000
 
 /*********************************************************
  * Retry-After
