@@ -1,3 +1,4 @@
+import type { IApiError } from '#shared/interfaces/api/error.interface'
 import type { MATCH_STATUS } from '#shared/enums/match.enum'
 import type { ROUND_KIND } from '#shared/enums/round.enum'
 import type { USER_ROLE } from '#shared/enums/user.enum'
@@ -40,4 +41,12 @@ export interface IAdminMatchesQuery {
   statut?: MATCH_STATUS[]
   tour?: ROUND_KIND
   poule?: number
+}
+
+export interface IFetchErrorLike {
+  statusCode?: number
+  status?: number
+  message?: string
+  data?: Partial<IApiError>
+  response?: { headers?: Pick<Headers, 'get'> }
 }
