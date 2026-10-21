@@ -15,8 +15,12 @@ export interface ICompetitorPublic {
 
 export interface ICompetitorListItem extends ICompetitorPublic {
   editionsPlayed: number
+  /** R-5 : matchs avec score uniquement (victoires + défaites). */
   matchesPlayed: number
   wins: number
+  losses: number
+  /** R-5 : matchs REGULAR au résultat inconnu, ni victoire ni défaite. */
+  unknownResults: number
   titles: number
   firstEditionCode: string | null
 }
@@ -33,9 +37,11 @@ export interface ICompetitorParticipation {
 }
 
 export interface ICompetitorStats {
+  /** Matchs avec score uniquement (R-5). */
   played: number
   wins: number
   losses: number
+  unknownResults: number
   pointsFor: number
   pointsAgainst: number
   titles: number

@@ -1,10 +1,10 @@
-import { ACP_WINDOW } from '../../consts/domain-rules.const'
+import { ACP_WINDOW } from '../../consts/domain-rules.const.js'
 import type {
   IEditionEvolution,
   IRankingEdition,
   IScoredParticipation,
-} from '../../interfaces/ranking.interface'
-import { closedEditionsInOrder, rankTotals } from './ranking.util'
+} from '../../interfaces/ranking.interface.js'
+import { closedEditionsInOrder, rankTotals } from './ranking.util.js'
 
 /**
  * RG8 : ACP et All Time de chaque joueur après chaque édition clôturée, dans l'ordre

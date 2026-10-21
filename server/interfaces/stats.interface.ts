@@ -1,4 +1,4 @@
-import type { MATCH_PURPOSE, MATCH_STATUS } from '../../shared/enums/match.enum'
+import type { MATCH_PURPOSE, MATCH_STATUS } from '../../shared/enums/match.enum.js'
 
 export interface IScoredSide {
   playerId: string

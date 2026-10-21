@@ -9,3 +9,8 @@ export interface IRateLimitResult {
   remaining: number
   retryAfterMs: number
 }
+
+export interface ILoginLimiters<TLimiter> {
+  byIp: TLimiter
+  byPasswordChange: TLimiter
+}

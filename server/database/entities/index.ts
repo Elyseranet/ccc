@@ -5,11 +5,14 @@ import { DrawEntity } from './draw.entity.js'
 import { EditionEntity } from './edition.entity.js'
 import { LegacyWorkbookImportEntity } from './legacy-workbook-import.entity.js'
 import { LegacyWorkbookRowEntity } from './legacy-workbook-row.entity.js'
+import { LoginDeviceEntity } from './login-device.entity.js'
 import { MatchSideEntity } from './match-side.entity.js'
 import { MatchEntity } from './match.entity.js'
 import { ParticipationEntity } from './participation.entity.js'
 import { PoolEntity } from './pool.entity.js'
 import { RoundEntity } from './round.entity.js'
+import { SessionEntity } from './session.entity.js'
+import { UserEntity } from './user.entity.js'
 
 /**
  * Registre explicite des entités, partagé par la CLI TypeORM et le runtime Nitro
@@ -27,5 +30,8 @@ export const ENTITIES = [
   MatchEntity,
   MatchSideEntity,
   DrawEntity,
-  DrawAssignmentEntity
+  DrawAssignmentEntity,
+  UserEntity,
+  SessionEntity,
+  LoginDeviceEntity
 ]

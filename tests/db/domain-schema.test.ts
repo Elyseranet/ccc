@@ -12,6 +12,7 @@ import { MatchSideEntity } from '../../server/database/entities/match-side.entit
 import { MatchEntity } from '../../server/database/entities/match.entity'
 import { ParticipationEntity } from '../../server/database/entities/participation.entity'
 import { RoundEntity } from '../../server/database/entities/round.entity'
+import { cleanup, resetSchema } from './helpers/test-database'
 
 const DOMAIN_TABLES = [
   'competitors',
@@ -60,22 +61,11 @@ const createMatch = async (editionId: string, roundId: string, sequence: number,
   dataSource.getRepository(MatchEntity).save({ editionId, roundId, sequence, targetScore })
 
 beforeAll(async () => {
-  const databaseName = process.env.NUXT_DATABASE_DATABASE ?? ''
-
-  if (!databaseName.endsWith('_test')) {
-    throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
-  }
-
-  dataSource = (await import('../../server/database/data-source')).default
-  await dataSource.initialize()
-  await dataSource.dropDatabase()
-  await dataSource.runMigrations()
+  dataSource = await resetSchema()
 })
 
 afterAll(async () => {
-  if (dataSource?.isInitialized) {
-    await dataSource.destroy()
-  }
+  await cleanup()
 })
 
 describe('migration M1', () => {
@@ -84,7 +74,10 @@ describe('migration M1', () => {
   })
 
   it('reverts to an empty domain schema then re-applies', async () => {
-    await dataSource.undoLastMigration()
+    await dataSource.undoLastMigration() // M4 (appareils de confiance)
+    await dataSource.undoLastMigration() // M3 (compteur d'échecs de connexion)
+    await dataSource.undoLastMigration() // M2 (identité) : les FK vers users tombent avant M1
+    await dataSource.undoLastMigration() // M1
     expect(await tablesPresent()).toEqual([])
 
     const legacy: Array<{ table_name: string }> = await dataSource.query(

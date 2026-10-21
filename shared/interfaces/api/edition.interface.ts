@@ -20,9 +20,16 @@ export interface IEditionSummary {
   location: string | null
   status: EDITION_STATUS
   origin: EDITION_ORIGIN
+  /** N figé à la clôture (RG2, A6) ; null tant que l'édition n'est pas close. */
   participantCount: number | null
+  /** A6 : participantCount moins les participants listés (2012a, 2012b : 5) ; null si N est inconnu. */
+  unidentifiedParticipantCount: number | null
+  /** Matchs programmés de l'édition, tous statuts confondus (un score saisi non validé compte comme « à jouer »). */
   matchCount: number
+  /** Matchs VALIDATED : les seuls dont le score est public. */
   scoredMatchCount: number
+  /** R-5 : matchs RESULT_UNKNOWN, ni victoire ni défaite dans les bilans. */
+  unknownResultMatchCount: number
   champion: IEditionChampion | null
 }
 

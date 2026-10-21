@@ -2,10 +2,10 @@ import {
   CENTS_PER_POINT,
   POINTS_BASE_SCALE,
   POINTS_REFERENCE_PARTICIPANTS,
-} from '../../consts/domain-rules.const'
-import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { DomainRuleError } from '../domain/domain-rule-error.util'
+} from '../../consts/domain-rules.const.js'
+import { DOMAIN_ERROR_CODE } from '../../enums/domain.enum.js'
+import { FINAL_STAGE } from '../../../shared/enums/participation.enum.js'
+import { DomainRuleError } from '../domain/domain-rule-error.util.js'
 
 /**
  * RG1, RG2 : points d'une participation, en centièmes (entier).
