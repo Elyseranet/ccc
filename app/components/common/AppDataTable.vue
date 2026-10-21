@@ -1,9 +1,9 @@
 <template>
   <origam-data-table
-    v-bind="forwardedProps()"
+    v-bind="forwardedProps"
   >
     <template
-      v-for="slotName in slotNames()"
+      v-for="slotName in slotNames"
       :key="slotName"
       #[slotName]="slotProps"
     >
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, useSlots } from 'vue'
+import { computed, getCurrentInstance, useSlots } from 'vue'
 import { OrigamDataTable } from 'origam/components'
 import type { IDataTableProps } from 'origam/interfaces'
 import type { IAppDataTableEmits, IAppDataTableProps, IAppDataTableSlots } from '~/interfaces/app-data-table.interface'
@@ -36,7 +36,7 @@ const emits = defineEmits<IAppDataTableEmits>()
 defineSlots<IAppDataTableSlots>()
 const instance = getCurrentInstance()
 const slots = useSlots()
-const slotNames = () => Object.keys(slots) as Array<keyof IAppDataTableSlots>
+const slotNames = computed(() => Object.keys(slots) as Array<keyof IAppDataTableSlots>)
 
 /*********************************************************
  * Origam #1246 : prop `item` requise
@@ -46,15 +46,16 @@ const slotNames = () => Object.keys(slots) as Array<keyof IAppDataTableSlots>
  * table sans `item` échoue au typecheck (et Vue avertit « Missing required prop: item » en dev). Cette table ne
  * porte aucune ligne : on retire `item` du contrat de ce wrapper (`Omit`), et c'est ICI, et nulle part ailleurs dans
  * le projet, que l'on reconvertit les props retransmises vers `IDataTableProps`.
- * Même contrat redéfini pour `items` : Origam le type `IDataTableItem[]` (la ligne interne : `key`, `index`, `columns`),
- * alors que la table reçoit des objets libres ; le wrapper l'accepte en `any[]`.
- * Condition de suppression : Origam publie la correction de #1246 (`item` absent de `IDataTableProps`, `items` libre).
- * Ce fichier devient alors inutile : les écrans reprennent `origam-data-table`.
+ * Origam #1250 : `items` mal typé. Origam le type `IDataTableItem[]` (la ligne interne : `key`, `index`, `columns`),
+ * alors que la table reçoit des objets libres ; le wrapper l'accepte en `any[]` (items.interface.ts:15 et
+ * data-table-header.interface.ts:22 côté Origam).
+ * Condition de suppression : Origam publie les corrections de #1246 (`item` absent de `IDataTableProps`) ET de #1250
+ * (`items` libre). Ce fichier devient alors inutile : les écrans reprennent `origam-data-table`.
  ********************************************************/
-const forwardedProps = (): IDataTableProps => ({
+const forwardedProps = computed(() => ({
   ...pickPassedProps(instance?.vnode.props, props as Record<string, unknown>),
   ...pickPassedListeners(instance?.vnode.props)
-}) as unknown as IDataTableProps
+}) as unknown as IDataTableProps)
 
 /*********************************************************
  * Expose

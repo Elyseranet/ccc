@@ -1,6 +1,5 @@
 import { camelize } from 'vue'
-
-const HANDLER_PREFIX = /^on[A-Z]/
+import { PASSED_LISTENER_PREFIX } from '~/consts/passed-props.const'
 
 /*********************************************************
  * Props réellement passées à un composant
@@ -16,4 +15,4 @@ export const pickPassedProps = (rawProps: Record<string, unknown> | null | undef
 }
 
 export const pickPassedListeners = (rawProps: Record<string, unknown> | null | undefined): Record<string, unknown> =>
-  Object.fromEntries(Object.entries(rawProps ?? {}).filter(([name]) => HANDLER_PREFIX.test(name)))
+  Object.fromEntries(Object.entries(rawProps ?? {}).filter(([name]) => PASSED_LISTENER_PREFIX.test(name)))
