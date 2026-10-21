@@ -67,18 +67,10 @@
         <template #default>
           <div class="admin-top__edition">
             <span
-              :id="editionLabelId"
               class="admin-top__eyebrow"
             >{{ editionLabel }}</span>
-            <origam-select
-              v-model="adminEdition.editionId"
-              :items="editionOptions"
-              :aria-labelledby="editionLabelId"
-              single-line
-              hide-details
-              variant="solo"
-              rounded="full"
-              :menu-icon="CaretDown"
+            <admin-edition-select
+              :label="editionLabel"
               data-cy="admin-edition-select"
             />
           </div>
@@ -117,12 +109,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamBottomNav, OrigamBtn, OrigamMain, OrigamSelect, OrigamToolbar } from 'origam/components'
+import { OrigamBottomNav, OrigamBtn, OrigamMain, OrigamToolbar } from 'origam/components'
 import { INTENT, VARIANT } from 'origam/enums'
 import BrandMark from '~/components/common/BrandMark.vue'
-import CaretDown from '~/components/icons/CaretDown.vue'
+import AdminEditionSelect from '~/components/admin/AdminEditionSelect.vue'
 import SkipLink from '~/components/common/SkipLink.vue'
-import { useAdminEdition } from '~/composables/useAdminEdition'
 import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
 import { ADMIN_BOTTOM_NAVIGATION, ADMIN_NAVIGATION } from '~/consts/admin-navigation.const'
@@ -144,11 +135,9 @@ import { useAuthStore } from '~/stores/auth.store'
 const { t } = useT()
 const { isActive, ariaCurrent } = useNavigationState()
 const auth = useAuthStore()
-const { store: adminEdition, options: editionOptions } = await useAdminEdition()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{ default(): unknown }>()
-const editionLabelId = 'admin-edition-label'
 
 /*********************************************************
  * Libellés
@@ -291,7 +280,7 @@ defineExpose({})
   &__public {
     --origam-btn---color: var(--origam-color__text---primary);
     --origam-btn---border-color: var(--origam-color__border---strong);
-    --origam-btn---border-width: var(--origam-border__width---2);
+    --origam-btn---border-width-outlined: var(--origam-border__width---2);
     --origam-btn---padding-lg: var(--origam-space---4);
 
     margin-top: auto;
@@ -319,27 +308,6 @@ defineExpose({})
     display: grid;
     gap: var(--origam-space---1);
     width: var(--admin-top---edition-width, 18rem);
-
-    :deep(.origam-field) {
-      --origam-input__control---height: var(--origam-space---11);
-      --origam-field---padding-start: calc(var(--origam-space---5) + 1px);
-      --origam-field---padding-end: var(--origam-space---5);
-      --origam-field---corner-clearance: var(--origam-space---5);
-      --origam-field---letter-spacing: normal;
-      --origam-field---border-opacity-outlined: 0.18;
-      --origam-field__input---opacity: 1;
-
-      background: var(--origam-color__surface---sunken);
-      --origam-field---append-inner-icon-opacity: 1;
-      --origam-field---padding-end: 0px;
-      color: var(--origam-color__text---primary);
-      --origam-field__input---padding-top: calc((var(--origam-space---11) - 1.5rem) / 2 - 1px);
-      --origam-field__input---padding-bottom: calc((var(--origam-space---11) - 1.5rem) / 2 + 1px);
-    }
-  }
-
-  &__edition :deep(.origam-field__append-inner) {
-    padding-inline: 0 var(--origam-space---3);
   }
 
   &__eyebrow {
