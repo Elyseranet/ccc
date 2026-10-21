@@ -26,7 +26,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | À faire |
 | [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | À faire |
 | [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | — | À faire |
-| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (égalité à 4 et plus : Je ne sais pas) | À faire |
+| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | À faire |
@@ -39,16 +39,40 @@ Un `backend-developer` par ticket, chacun dans son worktree `../CCC-B-xx`.
 
 | Vague | Tickets en parallèle | Nombre de devs |
 |---|---|---|
-| 1 | B-01, B-02, B-03 | **3** |
-| 2 | B-04, B-05, B-06, B-07, B-08 | **5** |
-| 3 | B-09, B-10, B-12 | **3** |
-| 4 | B-11, puis B-13 | 1 ou 2 |
-| 5 | B-14 | 1 |
+| 1 | B-01, B-02, B-03 | **3** — fermée (merge `a188c52`) |
+| 2 | B-04, B-05, B-06, B-07, B-08 (+ T-SEC-03, T-DB-01) | **5** — fermée (merge `124c85a`) |
+| 3a | B-09, B-10, B-12, B-16, T-SEC-04, T-SEC-05 | **6** |
+| 3b | B-11 (après B-10) | 1 |
+| 3c | B-13 et B-15 (après B-11 et B-12) | 2 |
+| 3d | B-14 (après B-12 et B-13) | 1 |
+
+#### Plan de la vague 3 (2026-10-21, plan seulement : aucun dev lancé avant le go du `project-manager`)
+
+Toutes les branches partent de `develop` @ `e1a2709` (vague 2 mergée).
+
+| Étape | Ticket | Démarre quand | Pourquoi ce placement |
+|---|---|---|---|
+| 3a | **B-09** invitations, première connexion, `POST /competiteurs`, lien de `user:create-admin` | tout de suite | B-08 est mergé. **Premier commit séparé** : le service `createCompetitorWithAccount` (transaction compétiteur, compte et invitation), dont B-10 a besoin. Même méthode que les mappers de B-05 en vague 2 |
+| 3a | **B-10** admin éditions, identité, participants ; `code` immuable (R-9) | tout de suite | Rattachement d'un compétiteur existant, éditions et `PATCH /competiteurs/{id}` ne dépendent que de B-08. La branche `{ newCompetitor }` reprend le premier commit de B-09 par cherry-pick |
+| 3a | **B-12** scores : enregistrer, valider, corriger, vue admin des matchs | tout de suite | Dépend de B-02, B-03 et B-08, tous mergés ; il se teste sur des fixtures de matchs. Critère ETag (B-06) et R-3 inclus |
+| 3a | **B-16** avatar : téléversement, `sharp` 0.35.5 épinglé, EXIF supprimé | tout de suite | Les routes `/moi/avatar` et `/competiteurs/{id}/avatar` ne dépendent que de B-08. B-16 **porte seul** le retrait de `avatarUrl` (schéma de `PATCH /moi`, colonne `competitors.avatar_url`). B-09 n'ajoute donc **pas** d'avatar à `newCompetitor`. Le parcours de création en deux appels (F-09) ne demande B-10 que pour le test de bout en bout |
+| 3a | **T-SEC-04** L2 (concurrence de scrypt), L3 (option `secureCookie` explicite), N1, N3 | tout de suite | Corrige le socle d'auth et `readBoundedJsonBody` (N3). Zone partagée avec B-09 (hachage, cookie de session) : voir les conflits ci-dessous |
+| 3a | **T-SEC-05** convertisseur Python, seed sans `runMigrations()` | tout de suite | Indépendant : script Python et seed legacy uniquement |
+| 3b | **B-11** tirage des poules | après le merge (ou l'intégration) de B-10 | Il a besoin des participants et de l'état d'édition livrés par B-10 |
+| 3c | **B-13** qualification, barrages, départages, tirage de tour | après B-11 et B-12 | Il consomme les tirages (B-11) et la validation des scores (B-12) |
+| 3c | **B-15** flux d'activité admin | après B-11 et B-12 | Il dérive l'activité des validations de match (B-12) et de tirage (B-11) |
+| 3d | **B-14** clôture et gel des points | après B-12 et B-13 | La finale doit être validable (B-13) |
+
+Parallélisme maximal : **6 devs** en 3a. Ensuite 1, puis 2, puis 1. Intégration et contrôles par étape, comme en vague 2 : branche d'intégration, test:api ×5 sur base neuve, migrations aller/retour/aller, revue de sécurité, puis merge par le `project-manager` (MERGE-1).
 
 Zones de conflit à surveiller :
 - `server/database/entities/index.ts` (registre des entités) : B-02 le crée, B-08 l'étend.
 - Horodatage des migrations : M1 vient de B-02, M2 de B-08. Chacun génère sa migration sur sa branche, puis rebase avant merge.
 - `shared/enums/api-error-code.enum.ts` : chaque ticket **ajoute** ses codes, sans en renommer aucun.
+- **Vague 3, migrations** : B-09 (table `invitations`) et B-16 (`competitor_avatars`, retrait de `competitors.avatar_url`) en créent une chacun ; B-14 n'en crée aucune a priori. Chacun la génère sur sa branche. À l'intégration, l'horodatage le plus récent passe en dernier, puis `migration:generate` doit répondre « No changes ».
+- **Vague 3, auth** : B-09 (consommation d'invitation : hachage et ouverture de session) et T-SEC-04 (sémaphore scrypt, option `secureCookie`) touchent `password.util.ts`, `session-token.util.ts` et `login.post.ts`. T-SEC-04 livre en premier ses fonctions (`hashPassword` sous sémaphore, `buildSessionCookieOptions(config)`), et B-09 les appelle, sans les réécrire.
+- **Vague 3, profil** : B-16 modifie `server/schemas/auth.schema.ts` (retrait de `avatarUrl`) et `moi.patch.ts` ; B-09 et B-10 n'y touchent pas.
+- **Vague 3, corps de requête** : B-16 (multipart) doit contourner explicitement la limite JSON de 16 Ko (M2), et T-SEC-04 (N3) ajoute un délai de lecture dans `readBoundedJsonBody`. Le délai de N3 s'applique aussi au flux multipart de B-16.
 
 Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques des fixtures vers les routes réelles. Ils se testent sur des fixtures, sans attendre B-04. En revanche, les données réelles n'existent qu'après B-04.
 
