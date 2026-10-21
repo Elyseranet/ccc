@@ -23,3 +23,9 @@
 - **Observé, non démontré** : swap à 6 Go sur 7 Go et load average 8 à 18 pendant les fenêtres d'échec.
 - **Garde-fou** : `scripts/test-run.mjs` (`test:run`, `test:front`, `test:release`) compare les fichiers découverts par `vitest list --filesOnly` aux fichiers du rapport JSON ; échec si fichier absent, en échec, sans test, total incohérent ou code de sortie non nul. Aucun nombre en dur. Logique testée dans `tests/unit/test-run.util.test.ts`.
 - **Piste restante** : intercepter un run bloqué (`sample` du processus principal) pendant une fenêtre d'échec ; non réussi, aucun blocage capturé sur ~170 runs ultérieurs.
+
+## Point du 2026-10-21 (chef de projet) — ticket **ouvert**
+
+- Le garde-fou `scripts/test-run.mjs` est mergé dans `develop` au commit `2913c81` (branche rebasée `95823da`). Sur `develop` : « 38/38 fichiers exécutés, 389 tests réussis, 1 ignorés, 0 en échec ».
+- **Observation** : pendant la vague F-01..F-12, 13 serveurs `nuxt dev` laissés par des agents arrêtés tournaient encore. La suite Playwright échouait alors par délais de navigation dépassés : 6 tests en échec, 40 réussis. Une fois ces serveurs arrêtés, elle est passée à 46/46 en 39 s. Cela conforte la piste de la charge machine (mémoire et processeur), sans **démontrer** la cause des échecs Vitest.
+- Enquête en pause (QA-1). Le ticket reste ouvert.

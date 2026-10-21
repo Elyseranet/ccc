@@ -116,7 +116,7 @@ Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **f
 
 Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3. **En revue : validé** (`feature/T-SEC-05` @ `279ba8f`, non-régression sur le vrai classeur vérifiée), en attente de l'intégration 3a.
 
-Échecs intermittents de la suite Vitest (fichiers non collectés, hooks à 60 s) : [T-QA-01](T-QA-01.md), **ouvert**. Un garde-fou est livré sur `feature/T-QA-01` @ `95263a4`, mais pas encore mergé. Avec lui, `test:run` échoue si un fichier découvert manque au rapport. La cause racine n'est pas trouvée : 14 anomalies spontanées sur 469 runs, 4 signatures. Le garde-fou rend l'incident visible, il ne l'empêche pas. Décision QA-1 : le garde-fou sera mergé après T-OPS-01. L'enquête est en pause et le ticket reste ouvert.
+Échecs intermittents de la suite Vitest (fichiers non collectés, hooks à 60 s) : [T-QA-01](T-QA-01.md), **ouvert**. Le garde-fou est mergé dans `develop` @ `2913c81` (branche rebasée `95823da`). Avec lui, `test:run` échoue si un fichier découvert manque au rapport. La cause racine n'est pas trouvée : 14 anomalies spontanées sur 469 runs, 4 signatures. Le garde-fou rend l'incident visible, il ne l'empêche pas. Décision QA-1 : L'enquête est en pause et le ticket reste ouvert.
 
 #### Historique des options présentées (A1 à A16)
 
@@ -319,3 +319,10 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 1. **`OrigamBracket` : ne pas rendre les connecteurs** (seulement si la mesure de F-03 montre un artefact, FA-11). Ce serait une prop booléenne, par exemple, le nom étant au choix du DS. Cas d'usage : un tournoi dont les affiches sont retirées au sort à chaque tour (CCC RG13), où les traits de liaison sont faux. Le slot `connector` permet de vider les tracés, mais pas de supprimer le `<svg>` porteur. À ouvrir seulement si FA-11 donne (b), ou si la mesure de F-03 montre un artefact.
 2. **`OrigamTab` en lien de navigation** (facultatif). `ITabProps` n'étend pas `ILinkProps` : un onglet ne peut pas porter `to`. CCC synchronise l'onglet avec `?onglet=` à la main (F-02, F-03), ce qui contourne le manque sans bloquer.
 3. Déjà ouvert : **Elyseranet/origam#1212** (slot de police `display`). À sa release, la classe `.font-display` migre vers `fontFamily: 'display'`.
+
+### Ops — T-OPS-01 / T-REL-01 / T-OPS-02 (chef de projet, 2026-10-21)
+
+- [T-OPS-01](T-OPS-01.md) : **Fermé** — mergé dans `develop` @ `a72f3ac` (branche `de8704e`).
+- [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
+- [T-OPS-02](T-OPS-02.md) : À faire (2 constats LOW de la revue de T-OPS-01).
+- **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
