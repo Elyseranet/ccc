@@ -223,6 +223,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 - F-07 : flux d'activité dérivé (A17), sur fixture jusqu'au merge de B-15.
 - F-09 et F-10 : avatar téléversé et stocké en base (AV-1), via `origam-file-field` limité à 2 Mo ; ils dépendent de **B-16** pour la bascule. F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
 - F-01, F-03, F-04, F-05 : un avatar de joueur public = `ICompetitorPublic.avatarUrl` (route publique B-16, cache immuable par `?v=`), sinon les initiales (`origam-avatar` `text`). Affichage carré, recadré par CSS, avec un `alt` traduit ou `aria-hidden` si le nom est déjà à côté.
+- Tous : à la livraison, **confirmer ou corriger sa ligne `PAGE_DELIVERY`** (endpoints réellement consommés par la page ; ceux du layout sont déclarés à part) avant de passer `delivered: true` (T-OPS-01).
 - Tous les écrans de lecture : l'erreur **429** (limite de 300 requêtes par minute et par IP sur les lectures publiques) passe par `AsyncState`, qui affiche un message dédié avec « Réessayer » (fourni par F-00). On la teste avec la variante de fixture `rate_limited`.
 - F-08 à F-11 (écritures) : corps JSON avec `Content-Type: application/json` (posé par `$fetch`), sous 16 Ko ; 400 et 413 traduits. L'avatar part en multipart (2 Mo).
 - Tous : tests a11y des formulaires sur le rendu hydraté, à cause de l'id d'input qui change entre serveur et client (Origam #1226).
