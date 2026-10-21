@@ -1,3 +1,4 @@
+import type { GOLDEN_RULES_VARIANT } from '~/enums/golden-rules-variant.enum'
 import type { ICompetitorPublic } from '#shared/interfaces/api/competitor.interface'
 import type { TSize } from 'origam/types'
 import type { ApiRequestError } from '~/utils/api-request-error.util'
@@ -46,6 +47,11 @@ export interface IGoldenRule {
   number: number
   key: string
   label: string
+  detail?: ITranslatableText
+}
+
+export interface IGoldenRulesProps {
+  variant?: GOLDEN_RULES_VARIANT
 }
 
 export interface IBubblesOptions {
