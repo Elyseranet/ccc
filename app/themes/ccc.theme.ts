@@ -63,9 +63,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
 
     // Saisie
-    'origam-text-field': { variant: 'solo', rounded: 'full', density: 'default' },
-    'origam-select': { variant: 'solo', rounded: 'full', density: 'default' },
-    'origam-number-field': { variant: 'solo', rounded: 'lg', density: 'default', hideSpinButtons: false }
+    'origam-text-field': { variant: 'outlined', rounded: 'full', density: 'default' },
+    'origam-select': { variant: 'outlined', rounded: 'full', density: 'default' },
+    'origam-number-field': { variant: 'outlined', rounded: 'lg', density: 'default', hideSpinButtons: false },
+    'origam-password-field': { variant: 'outlined', rounded: 'full', density: 'default' }
   },
 
   // Échappement `cssVars` : Origam décale le libellé d'un bouton de `--origam-btn---text-indent` (0,16 em, pour centrer un
@@ -106,7 +107,22 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--hover---background-color': 'transparent',
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
-    '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)'
+    '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)',
+    // Champs (F-00m) : hauteur 48 px (le défaut « default » d'Origam vaut 36 px), retrait du texte 20 px.
+    '--origam-input__control---height-md': 'var(--origam-space---12)',
+    '--origam-field---padding-start': 'var(--origam-space---5)',
+    '--origam-field---padding-end': 'var(--origam-space---5)',
+    // Champs outlined : fond surface.sunken, filet 1 px border.default, sans atténuation d'opacité.
+    '--origam-field---background-color': 'var(--origam-color__surface---sunken)',
+    '--origam-field---border-color': 'var(--origam-color__border---default)',
+    '--origam-field---border-opacity-outlined': '1',
+    // Valeur choisie d'un select : text.primary (le défaut d'Origam est text.secondary).
+    '--origam-select__selection---color': 'var(--origam-color__text---primary)',
+    '--origam-field---border-width-outlined': 'var(--origam-border__width---thin)',
+    // Boutons « x-large » (F-00m, appels à l'action des formulaires) : 48 px de haut (défaut Origam : 52 px) ; outlined : filet strong de 2 px.
+    '--origam-btn---height-xl': 'var(--origam-space---12)',
+    '--origam-btn---border-color': 'var(--origam-color__border---strong)',
+    '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)'
   },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────
