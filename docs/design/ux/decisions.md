@@ -135,3 +135,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## RG26-A — Bandeau des règles sur l'accueil (décision utilisateur 2026-10-21)
 - Le bandeau de l'accueil garde l'abréviation de la maquette validée (« La partie débute par un shifumi »). `/regles` affiche le texte complet de la Spec fonctionnelle.
+
+## F-13-M — Maquette admin Éditions et Compétiteurs validée (décision utilisateur 2026-10-21)
+- `docs/design/ui/happy-hour/admin-editions.html` et `admin-editions.css`, plus les lignes F-13 de `mapping.md`, sont validés et deviennent la référence pixel perfect de F-13.
+- Les champs de date utilisent le sélecteur Origam ; le champ natif visible sur les captures n'est pas la référence. Les bornes de l'année suivent le schéma serveur de B-10 (2000 à 2100), pas la valeur provisoire de la maquette (2012 à 2099).
