@@ -6,6 +6,7 @@ import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
 import { USER_ROLE } from '../../shared/enums/user.enum'
 import { deviceCookieHeaderOf, login, resetTestDatabase, seedUser, TEST_DEVICE_SECRET } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
+import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 const IP_LIMIT = 3
 const PASSWORD = 'a-long-enough-password'
@@ -17,6 +18,7 @@ describe('IP limit with a trusted device cookie (SEC-A4)', async () => {
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
+    setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
     env: {
       ...env,
