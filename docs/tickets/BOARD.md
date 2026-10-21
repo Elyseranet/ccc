@@ -30,6 +30,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | À faire |
+| [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | À faire : affectation en attente du go du PM |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -241,6 +242,9 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 | Fixtures | Un ticket qui a besoin de nouvelles données crée `app/fixtures/<ticket-feature>.fixture.ts`. Il ne modifie une fixture existante que si c'est **sa** ressource (F-08 : `match`, F-11 : `draw`). |
 | `app/locales/en.json` et `fr.json` | Clés ajoutées **uniquement** dans le namespace du ticket (`home.*`, `palmares.*`, `edition.*`, `players.*`, `player.*`, `head_to_head.*`, `rules.*`, `admin.dashboard.*`, `admin.matches.*`, `admin.participants.*`, `account.*`, `admin.draws.*`, `admin.more.*`), insérées à leur place alphabétique, dans les deux fichiers. |
 | e2e | Chaque ticket ajoute `tests/e2e/visual/<ticket>.spec.ts` et, au besoin, `tests/e2e/a11y/<ticket>.spec.ts`, en s'appuyant sur `tests/e2e/visual.util.ts` (F-00). Il ne modifie ni `visual.spec.ts` ni `a11y.spec.ts`. Seul F-03 modifie `tests/e2e/pages.const.ts`, pour passer l'URL d'édition au code (R-9). |
+| Prérequis partagés (cherry-pickés dans develop) | **F-00b** (dev-f01) : fixture 2026 « poules en cours » et scénario `?fixture=registration`. **F-00c** (dev-f08) : 105 matchs admin de 2026. **F-00d** (dev-f12) : `AuthService.logout()` et `useLogout`. |
+| Propriétaires de fichiers partagés pour la vague F | `competitor.service.ts` → F-04 ; `base.service.ts` et `api-client.interface.ts` → F-08 (`headers`) ; `GoldenRules.vue` → F-06 (variante `cards`) ; `auth.service.ts` → F-00d, puis F-10. Les nouvelles clés d'endpoint sont insérées dans l'ordre alphabétique. |
+| Contrats back non mergés | Aucun type créé dans `shared/` : on utilise des interfaces de vue dans `app/interfaces/*-view.interface.ts`, mappées au merge. Seule exception : la copie identique de `score.interface.ts` dans F-08, écartée au rebase. |
 | Layouts, thème, `main.css` | **Aucun ticket ne les modifie.** Un besoin dans la coque se remonte au lead front, qui décide d'un ticket dédié. |
 
 **Points d'attention par ticket** :
