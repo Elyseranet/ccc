@@ -1,4 +1,5 @@
 import type { ICompetitorPublic } from '#shared/interfaces/api/competitor.interface'
+import type { TSize } from 'origam/types'
 import type { ApiRequestError } from '~/utils/api-request-error.util'
 
 export interface ITranslatableText {
@@ -12,6 +13,11 @@ export interface IBreadcrumbEntry {
   to?: string
 }
 
+export interface IPageHeroSlots {
+  eyebrow?: () => unknown
+  'after-lead'?: () => unknown
+}
+
 export interface IPageHeroProps {
   title: ITranslatableText
   subtitle?: ITranslatableText
@@ -21,6 +27,7 @@ export interface IPageHeroProps {
 export interface IPlayerLinkProps {
   competitor: Pick<ICompetitorPublic, 'id' | 'displayName'>
   titles?: number
+  size?: TSize
 }
 
 export interface IAsyncStateProps {

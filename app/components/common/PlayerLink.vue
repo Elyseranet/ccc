@@ -2,7 +2,7 @@
   <origam-btn
     :to="profilePath"
     variant="text"
-    size="small"
+    :size="size"
     rounded="full"
     font-weight="semibold"
     class="player-link"
@@ -38,7 +38,8 @@ import type { IPlayerLinkProps } from '~/interfaces/common-components.interface'
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IPlayerLinkProps>(), {
-  titles: 0
+  titles: 0,
+  size: 'small'
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()

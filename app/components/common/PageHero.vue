@@ -7,6 +7,7 @@
       :aria-label="breadcrumbLabel"
       data-cy="page-hero-breadcrumb"
     />
+    <slot name="eyebrow" />
     <origam-title
       tag="h1"
       font-size="5xl"
@@ -22,6 +23,7 @@
     >
       {{ subtitleText }}
     </p>
+    <slot name="after-lead" />
   </header>
 </template>
 
@@ -29,7 +31,7 @@
 import { computed } from 'vue'
 import { OrigamBreadcrumb, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'
-import type { IPageHeroProps } from '~/interfaces/common-components.interface'
+import type { IPageHeroProps, IPageHeroSlots } from '~/interfaces/common-components.interface'
 
 /*********************************************************
  * Global
@@ -44,7 +46,7 @@ const props = withDefaults(defineProps<IPageHeroProps>(), {
   breadcrumb: () => []
 })
 const emits = defineEmits<{}>()
-defineSlots<{}>()
+defineSlots<IPageHeroSlots>()
 
 /*********************************************************
  * Textes
