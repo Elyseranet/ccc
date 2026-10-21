@@ -49,8 +49,8 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-badge': { rounded: 'full', inline: true },
     'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'primary' },
     'origam-tab': { fontWeight: 'bold' },
-    'origam-table': { border: true, rounded: 'lg', density: 'compact', hover: true, elevation: 'none' },
-    'origam-data-table': { density: 'compact', hover: true, rounded: 'lg', border: true },
+    'origam-table': { border: true, borderColor: 'var(--origam-color__border---default)', rounded: 'lg', density: 'default', hover: true, elevation: 'none' },
+    'origam-data-table': { density: 'default', hover: true, rounded: 'lg', border: true, borderColor: 'var(--origam-color__border---default)' },
     'origam-list': { density: 'comfortable', rounded: 'lg', slim: false },
     'origam-list-item': { rounded: 'lg' },
     'origam-data-list': { density: 'compact', rounded: 'lg', border: true },
@@ -70,7 +70,25 @@ export const CCC_HH_BASE: IOrigamTheme = {
 
   // Échappement `cssVars` : Origam décale le libellé d'un bouton de `--origam-btn---text-indent` (0,16 em, pour centrer un
   // texte à interlettrage large). Les boutons du Happy Hour ont un interlettrage normal : l'indentation est donc nulle.
-  cssVars: { '--origam-btn---text-indent': '0' },
+  // Tableaux (F-00g) : ni une prop ni un token sémantique n'expriment ces valeurs ; chaque entrée pointe vers un token existant.
+  cssVars: {
+    '--origam-btn---text-indent': '0',
+    // Fond de la table : surface.raised (le défaut du DS est surface.default).
+    '--origam-table---background-color': 'var(--origam-color__surface---raised)',
+    '--origam-data-table---background-color': 'var(--origam-color__surface---raised)',
+    // Texte des tableaux : taille « sm » (12,8 px) comme la maquette.
+    '--origam-table---font-size': 'var(--origam-font__size---sm)',
+    // En-têtes : 700, tertiaire, filet de 1 px, sans fond propre. Densité « default » (props) = cellules de 12 px / 16 px.
+    '--origam-table__header-cell---font-weight': 'var(--origam-font__weight---bold)',
+    '--origam-table__header-cell---color': 'var(--origam-color__text---tertiary)',
+    '--origam-table__header-cell---background-color': 'transparent',
+    '--origam-table__header-cell---border-bottom-width': 'var(--origam-border__width---thin)',
+    '--origam-data-table-header-cell---color': 'var(--origam-color__text---tertiary)',
+    '--origam-data-table-header-cell---background': 'transparent',
+    // Lignes : transparentes sur la surface de la table ; survol = fantôme du thème.
+    '--origam-data-table-row---background-color': 'transparent',
+    '--origam-data-table-row--hover---background-color': 'var(--origam-color__action--ghost---bgHover)'
+  },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────
   vars: {
