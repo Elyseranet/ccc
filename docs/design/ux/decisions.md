@@ -102,3 +102,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | OPS-2 | Base de production : **ressource PostgreSQL Coolify séparée** (sauvegardes gérées par Coolify) ; l'app s'y connecte par `NUXT_DATABASE_*`. Le compose app+db reste pour le local. |
 | OPS-3 | Garde de release : **par endpoint utilisé** — le build échoue seulement si une page accessible en production consomme un endpoint en fixture ; les pages non livrées sont masquées. Déploiement au fil de l'eau sans jamais servir de données fictives. |
 | OPS-4 | Nom de domaine : **à fournir plus tard** par l'utilisateur. |
+
+## QA-1 — T-QA-01 : garde-fou mergé, enquête en pause (décision utilisateur 2026-10-21)
+- Le garde-fou `scripts/test-run.mjs` (`feature/T-QA-01` @ `95263a4`) est mergé dans `develop` juste après T-OPS-01, sur lequel il est basé. Il passe par la même pre-delivery : tests unitaires, e2e et sécurité.
+- L'enquête sur la cause racine est en pause. T-QA-01 reste **ouvert**. La piste mémoire (swap) sera réévaluée pendant la vague F-01..F-12.
