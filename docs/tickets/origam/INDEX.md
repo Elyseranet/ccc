@@ -17,3 +17,4 @@
 | #1249 | `list-item` lien : `role="listitem"` sur l'`<a>`, rôle de lien perdu (WCAG 4.1.2) | aucun (axe passe ; test F-12 cible `listitem`) |
 | #1250 | `data-table` : `items` typé `IDataTableItem[]` (ligne interne), TS2322 sur un usage normal | cast unique dans `AppDataTable` (F-00j, DT-1) |
 | #1251 | `select` : `aria-label`/`title` « Ouvrir » de repli écrasent un `<label for>` externe (WCAG 4.1.2) | aucun pour l'instant (F-12) |
+| #1252 | évolution : token `line-height` des onglets (`line-height: 1` en dur) | règle `:where(.origam-tab__label)` dans `main.css` (F-00l) |
