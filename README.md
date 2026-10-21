@@ -23,21 +23,82 @@ Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
 
 ## Docker
 
-La commande suivante construit l'application Nuxt et démarre l'application avec PostgreSQL :
+En local, la commande suivante construit l'image et démarre l'application avec PostgreSQL (le compose de production ne publie aucun port ; `docker-compose.local.yml` publie `APP_PORT`, 3000 par défaut) :
 
 ```sh
-docker compose up --build
+docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
 ```
 
-L'application est disponible sur `http://localhost:3000` et PostgreSQL sur le port configuré par `NUXT_DATABASE_PORT` (5432 par défaut). Les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
+`NUXT_DATABASE_PASSWORD` est obligatoire (dans `.env` ou l'environnement) ; sans lui, Compose refuse de démarrer. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur. Les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
 
 Pour arrêter les conteneurs sans supprimer les données :
 
 ```sh
-docker compose down
+docker compose -f docker-compose.yml -f docker-compose.local.yml down
 ```
 
-Compose ne lance pas de migration au démarrage. Ne pas utiliser `docker compose down -v` sauf si la suppression des données PostgreSQL est intentionnelle.
+Ne pas utiliser `down -v` sauf si la suppression des données PostgreSQL est intentionnelle.
+
+## Déploiement Coolify
+
+L'image (`Dockerfile`) est agnostique de l'environnement : aucune valeur n'est cuite dans l'image, et aucun `.env` n'y entre (`.dockerignore`). Toute la configuration vit dans les variables d'environnement de Coolify (`NUXT_*`, lues à l'exécution via `runtimeConfig`).
+
+Mode recommandé (décision OPS-1 et OPS-2) : Coolify construit l'image depuis le dépôt (`https://github.com/Elyseranet/ccc`, privé) avec le `Dockerfile` seul, et PostgreSQL est une **ressource Coolify séparée** (sauvegardes gérées par Coolify). Renseigner `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD` et `_DATABASE` avec les valeurs de cette ressource. Il n'y a pas de registre d'images ni de workflow de publication.
+
+Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comme ressource « Docker Compose ». Aucun port n'y est publié : Coolify route le domaine vers le port 3000 du service `app`.
+
+Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
+
+### Prérequis de release : garde par page livrée
+
+Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint encore en `API_SOURCE.FIXTURE`. Il n'y a pas de variable pour désactiver la garde.
+
+- `app/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`app/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
+- Un ticket F-xx passe sa ligne à `delivered: true` dans le même commit qui bascule ses endpoints en `LIVE` dans `app/consts/api-sources.const.ts`. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme encore en fixture.
+- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
+- Garde-fous toujours actifs (`npm run test:run`) : une page de `app/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
+- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
+
+### Variables d'environnement
+
+| Variable | Obligatoire | Rôle |
+|---|---|---|
+| `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
+| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Obligatoire dans le compose ; l'application refuse de démarrer en production sans lui (SEC-A4). Disponible après intégration de B-08. |
+| `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
+| `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
+| `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
+| `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
+| `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
+| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). |
+| `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS` | non (3600) | `Cache-Control` public des lectures d'une édition CLOSED (vague 2). |
+
+Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
+
+### Domaine et sonde de santé
+
+- Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
+- La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
+- La route est soumise au limiteur de débit par IP : derrière Traefik, tous les clients partagent l'IP du proxy tant que T-SEC-02 n'est pas fait (`X-Forwarded-For` de confiance, SSL PostgreSQL, variables `NUXT_TRUSTED_PROXIES` et `NUXT_DATABASE_SSL` pressenties, pas encore implémentées). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
+
+### Première mise en route
+
+1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique `migration:run` avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
+2. Ouvrir le terminal du conteneur dans Coolify, ou `docker exec -it <conteneur> ...`, et lancer les commandes d'exploitation avec `ccc-ops` :
+
+| Commande | Rôle | Disponibilité |
+|---|---|---|
+| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration. | image actuelle |
+| `ccc-ops db:seed:legacy` | Charge les archives brutes du classeur. | image actuelle |
+| `ccc-ops db:import:legacy` | Reprise du classeur vers les entités métier. | B-04 |
+| `ccc-ops user:create-admin` | Crée le premier administrateur. | B-08 |
+| `ccc-ops user:unlock` | Déverrouille un compte. | B-08 |
+
+Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
+
+Les rapports de `db:import:legacy` sont écrits dans `/app/.data/reports/` et sont éphémères (perdus au redémarrage du conteneur) ; les récupérer avec `docker cp <conteneur>:/app/.data/reports ./reports`.
+
+Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n'est nécessaire ni présent.
 
 ## Développement
 

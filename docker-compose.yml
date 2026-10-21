@@ -1,27 +1,27 @@
+# Compose de production (utilisable tel quel comme ressource « Docker Compose » de Coolify).
+# Aucune valeur secrète par défaut : une variable obligatoire absente fait échouer `compose config`.
+# Aucun port publié : Coolify (Traefik) route le domaine vers le port 3000 du service `app`.
+# En local, ajouter docker-compose.local.yml pour publier le port.
 services:
   db:
     image: postgres:16-alpine
-    container_name: ccc-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${NUXT_DATABASE_DATABASE:-ccc}
       POSTGRES_USER: ${NUXT_DATABASE_USERNAME:-ccc}
-      POSTGRES_PASSWORD: ${NUXT_DATABASE_PASSWORD:?Set NUXT_DATABASE_PASSWORD in .env}
-    ports:
-      - "${NUXT_DATABASE_PORT:-5432}:5432"
+      POSTGRES_PASSWORD: ${NUXT_DATABASE_PASSWORD:?Définir NUXT_DATABASE_PASSWORD}
     volumes:
       - ccc_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ccc-app
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -30,14 +30,18 @@ services:
       NUXT_DATABASE_HOST: db
       NUXT_DATABASE_PORT: 5432
       NUXT_DATABASE_USERNAME: ${NUXT_DATABASE_USERNAME:-ccc}
-      NUXT_DATABASE_PASSWORD: ${NUXT_DATABASE_PASSWORD:?Set NUXT_DATABASE_PASSWORD in .env}
+      NUXT_DATABASE_PASSWORD: ${NUXT_DATABASE_PASSWORD:?Définir NUXT_DATABASE_PASSWORD}
       NUXT_DATABASE_DATABASE: ${NUXT_DATABASE_DATABASE:-ccc}
-      NUXT_AUTH_DEVICE_COOKIE_SECRET: ${NUXT_AUTH_DEVICE_COOKIE_SECRET:?Set NUXT_AUTH_DEVICE_COOKIE_SECRET in .env}
-    ports:
-      - "${APP_PORT:-3000}:3000"
+      NUXT_AUTH_DEVICE_COOKIE_SECRET: ${NUXT_AUTH_DEVICE_COOKIE_SECRET:?Définir NUXT_AUTH_DEVICE_COOKIE_SECRET}
+      NUXT_RATE_LIMIT_WINDOW_MS: ${NUXT_RATE_LIMIT_WINDOW_MS:-60000}
+      NUXT_RATE_LIMIT_MAX_REQUESTS: ${NUXT_RATE_LIMIT_MAX_REQUESTS:-60}
+      NUXT_RATE_LIMIT_MAX_KEYS: ${NUXT_RATE_LIMIT_MAX_KEYS:-10000}
+    expose:
+      - "3000"
     depends_on:
       db:
         condition: service_healthy
+    # La sonde est celle du HEALTHCHECK de l'image (GET /api/v1/health).
 
 volumes:
   ccc_db_data:

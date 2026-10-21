@@ -10,5 +10,9 @@ export const ROUTES = {
   ADMIN_PARTICIPANTS: '/admin/participants',
   ADMIN_DRAWS: '/admin/tirages',
   ADMIN_MATCHES: '/admin/matchs',
-  ADMIN_MORE: '/admin/plus'
+  ADMIN_MORE: '/admin/plus',
+  EDITION: '/editions/:id',
+  PLAYER: '/joueurs/:id',
+  HEAD_TO_HEAD: '/joueurs/face-a-face',
+  INVITATION: '/invitation/:jeton'
 } as const

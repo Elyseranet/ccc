@@ -8,7 +8,7 @@ export const findFixtureEndpoints = (table: Record<string, API_SOURCE> = API_SOU
   Object.entries(table).filter(([, source]) => source === API_SOURCE.FIXTURE).map(([endpoint]) => endpoint)
 
 export const isFixtureSelectionAllowed = (): boolean =>
-  import.meta.dev || process.env.NODE_ENV === 'test'
+  import.meta.dev || import.meta.test
 
 export const parseFixtureVariant = (raw: unknown, allowed: boolean): FIXTURE_VARIANT => {
   if (!allowed) {
