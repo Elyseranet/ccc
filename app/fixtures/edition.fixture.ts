@@ -8,6 +8,7 @@ import type { IMatch } from '#shared/interfaces/api/match.interface'
 import type { IPaginated } from '#shared/interfaces/api/pagination.interface'
 import type { IArchiveStats } from '#shared/interfaces/api/stats.interface'
 import { editionId } from '~/fixtures/edition-id.fixture'
+import { EDITION_2026_LATEST_MATCHES, edition2026PoolsPlaying, edition2026Registration, edition2026RegistrationSummary, isEdition2026 } from '~/fixtures/edition-2026.fixture'
 import type { IFixtureSet } from '~/interfaces/fixture.interface'
 
 /*********************************************************
@@ -442,6 +443,8 @@ export const EDITIONS_FIXTURE: IFixtureSet<IEditionSummary[]> = {
 ],
   empty: []
 }
+
+EDITIONS_FIXTURE.registration = EDITIONS_FIXTURE.default.map(item => isEdition2026(item.id) ? edition2026RegistrationSummary(item) : item)
 
 const EDITION_2025: IEditionDetail = {
   "id": editionId('2025'),
@@ -3912,14 +3915,17 @@ const EDITION_2025: IEditionDetail = {
 
 export const editionDetailFixture = (id: string): IFixtureSet<IEditionDetail> => {
   const summary = EDITIONS_FIXTURE.default.find(item => item.id === id)
-  const base = id === EDITION_2025.id || !summary ? EDITION_2025 : { ...EDITION_2025, ...summary, participants: [], pools: [], rounds: [], matches: [], draws: [], bracket: [] }
-  return { default: base, empty: { ...base, participants: [], pools: [], rounds: [], matches: [], draws: [], bracket: [] } }
+  const isCurrent = isEdition2026(id)
+  const body = isCurrent ? edition2026PoolsPlaying(EDITION_2025.participants) : { participants: [], pools: [], rounds: [], matches: [], draws: [], bracket: [] }
+  const base = id === EDITION_2025.id || !summary ? EDITION_2025 : { ...EDITION_2025, ...summary, ...body }
+  const registration = isCurrent && summary ? { ...EDITION_2025, ...edition2026RegistrationSummary(summary), ...edition2026Registration(EDITION_2025.participants) } : base
+  return { default: base, empty: { ...base, participants: [], pools: [], rounds: [], matches: [], draws: [], bracket: [] }, registration }
 }
 
 export const editionMatchesFixture = (id: string): IFixtureSet<IPaginated<IMatch>> => {
-  const items = id === EDITION_2025.id ? EDITION_2025.matches : []
+  const items = id === EDITION_2025.id ? EDITION_2025.matches : (isEdition2026(id) ? EDITION_2026_LATEST_MATCHES : [])
   return {
-    default: { items, total: id === EDITION_2025.id ? 120 : 0, page: 1, pageSize: 16 },
+    default: { items, total: id === EDITION_2025.id ? 120 : items.length, page: 1, pageSize: 16 },
     empty: { items: [], total: 0, page: 1, pageSize: 16 }
   }
 }

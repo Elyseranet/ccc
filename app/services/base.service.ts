@@ -60,6 +60,9 @@ export abstract class BaseService {
       throw new ApiRequestError({ statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'Fixture error variant' })
     }
     const set = await fixture()
-    return this.variant === FIXTURE_VARIANT.EMPTY ? set.empty : set.default
+    if (this.variant === FIXTURE_VARIANT.EMPTY) {
+      return set.empty
+    }
+    return this.variant === FIXTURE_VARIANT.REGISTRATION ? (set.registration ?? set.default) : set.default
   }
 }
