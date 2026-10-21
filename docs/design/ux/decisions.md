@@ -147,3 +147,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## DT-1 — Contournement du typage de `origam-data-table` (Origam #1246) (décision utilisateur 2026-10-21)
 - Un seul composant partagé, `AppDataTable.vue`, affiche `origam-data-table`. Il porte l'unique contournement de type, accompagné de la référence #1246. Les pages l'utilisent et restent typées normalement.
 - Ce composant est livré en prérequis commun F-00j. Il sera retiré à la sortie d'une version d'Origam qui corrige #1246.
+
+## PROD-1 — Garde-fou de configuration en production (B-09), déploiement retenu (décision utilisateur 2026-10-21)
+- Le garde-fou `NUXT_STRICT_RUNTIME_CONFIG` entre avec la vague 3a. Il est activé dans l'image Docker de production et refuse le démarrage dans quatre cas :
+  - `siteUrl` n'est pas en https, ou pointe vers localhost ;
+  - le transport mail n'est pas `smtp` ;
+  - `mail.host` vaut localhost ;
+  - `mail.from` est vide.
+- Le premier déploiement Coolify réussi attend que l'utilisateur fournisse le domaine (OPS-4) et un compte SMTP, renseignés dans les variables Coolify. Le garde-fou n'a pas de mode « recette » qui le désactiverait.
