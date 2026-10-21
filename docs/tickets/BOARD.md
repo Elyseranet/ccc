@@ -91,6 +91,8 @@ Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), tra
 
 Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3.
 
+Échecs intermittents de la suite Vitest (fichiers non collectés, hooks à 60 s) : [T-QA-01](T-QA-01.md), **ouvert**. Un garde-fou est livré sur `feature/T-QA-01` @ `95263a4`, mais pas encore mergé. Avec lui, `test:run` échoue si un fichier découvert manque au rapport. La cause racine n'est pas trouvée : 14 anomalies spontanées sur 469 runs, 4 signatures. Le garde-fou rend l'incident visible, il ne l'empêche pas.
+
 #### Historique des options présentées (A1 à A16)
 
 Une décision par ligne. L'option recommandée venait en premier.
