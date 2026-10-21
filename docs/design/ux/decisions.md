@@ -111,3 +111,17 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - La première édition d'une année prend le code `AAAA`, par exemple `2027`. Les suivantes de la même année prennent `AAAAb`, `AAAAc`, et ainsi de suite.
 - Le code est généré par le serveur (`buildEditionCode`, B-10). L'organisateur ne le saisit pas, et il reste immuable (R-9).
 - Les codes de l'archive restent inchangés (`2012a`, `2012b`, puis `2013` à `2026`). L'asymétrie avec 2012 est acceptée.
+
+## N1 — Cookie d'appareil volé : risque accepté et documenté (décision utilisateur 2026-10-21)
+- Aucun plafond global par compte n'est ajouté. Pour exploiter ce cookie, il faut avoir volé un cookie httpOnly, donc compromis l'appareil. Le flux d'essais reste ralenti (SEC-A2 : 5 essais libres, puis un délai jusqu'à 300 s) et borné par la limite par IP. Un changement de mot de passe révoque tous les appareils (N2).
+- T-SEC-04 se ferme sur L2, L3 et N3. N1 y est documenté comme risque accepté, au même titre que SEC-A3.
+
+## Q1 — Retrait d'un inscrit pendant le tirage des poules (décision utilisateur 2026-10-21)
+- Le retrait reste autorisé tant que le tirage des poules est en **brouillon**. Il supprime aussi l'affectation du joueur dans ce brouillon, et l'organisateur ressaisit.
+- Une fois le tirage **validé**, le retrait est refusé : 409 `REGISTRATION_CLOSED`. Le changement porte sur B-10 et B-11 (coordination et test).
+
+## Q2 — Ajout d'un inscrit pendant le tirage des poules (décision utilisateur 2026-10-21)
+- L'ajout reste autorisé jusqu'à la **validation** du tirage, conformément à la Spec API. Le nouvel inscrit n'est pas encore affecté dans le brouillon. La validation du tirage (B-11) est refusée tant qu'un inscrit reste sans affectation.
+
+## F-13 — Écrans admin d'édition et d'identité de compétiteur (décision utilisateur 2026-10-21)
+- Un ticket front est ouvert dès maintenant pour la création et la modification d'une édition, ainsi que pour la correction de l'identité d'un compétiteur, sur les routes de B-10. Sans ces écrans, l'organisateur ne peut pas créer une édition depuis l'application.
