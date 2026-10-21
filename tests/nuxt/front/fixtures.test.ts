@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
 import { USER_ROLE } from '#shared/enums/user.enum'
 import { MATCH_STATUS } from '#shared/enums/match.enum'
+import { editionId } from '~/fixtures/edition-id.fixture'
 import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
 import { RANKING_KIND } from '~/enums/ranking-kind.enum'
 import { CompetitorService } from '~/services/competitor.service'
@@ -114,12 +115,26 @@ describe('fixtures issues des maquettes', () => {
     expect(evolution.every(series => series.points.length === 10)).toBe(true)
   })
 
+  it('la file admin 2026 porte les 105 matchs de la maquette : 7 saisis, 30 sans score, 68 validés', async () => {
+    const matches = await new MatchService().adminList(editionId('2026'))
+    const count = (status: MATCH_STATUS) => matches.filter(match => match.status === status).length
+    expect(matches).toHaveLength(105)
+    expect(count(MATCH_STATUS.RECORDED)).toBe(7)
+    expect(count(MATCH_STATUS.SCHEDULED)).toBe(30)
+    expect(count(MATCH_STATUS.VALIDATED)).toBe(68)
+  })
+
   it('la file admin ne montre jamais un score non validé comme public', async () => {
-    const matches = await new MatchService().adminList('n-importe-quelle-edition')
-    expect(matches.length).toBeGreaterThan(0)
+    const matches = await new MatchService().adminList(editionId('2026'))
     for (const match of matches) {
-      expect(match.sides.every(side => side.score === null)).toBe(true)
-      expect([MATCH_STATUS.SCHEDULED, MATCH_STATUS.RECORDED]).toContain(match.status)
+      const validated = match.status === MATCH_STATUS.VALIDATED
+      expect(match.sides.every(side => validated ? side.score === side.recordedScore : side.score === null)).toBe(true)
     }
+  })
+
+  it('une édition d’archive ne contient que des matchs validés', async () => {
+    const matches = await new MatchService().adminList(editionId('2025'))
+    expect(matches.length).toBeGreaterThan(0)
+    expect(matches.every(match => match.status === MATCH_STATUS.VALIDATED)).toBe(true)
   })
 })
