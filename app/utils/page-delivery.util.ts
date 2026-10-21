@@ -1,4 +1,5 @@
 import { API_SOURCES } from '~/consts/api-sources.const'
+import { LAYOUT_ENDPOINTS } from '~/consts/layout-endpoints.const'
 import { PAGE_DELIVERY } from '~/consts/page-delivery.const'
 import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
 import { API_SOURCE } from '~/enums/api-source.enum'
@@ -22,6 +23,10 @@ export const isPageAccessible = (
   table: Record<string, IPageDelivery> = PAGE_DELIVERY
 ): boolean => allowUndelivered || isPageDelivered(path, table)
 
+/** Endpoints d'une page : les siens, plus ceux de son layout. */
+export const getPageEndpoints = (page: IPageDelivery): API_ENDPOINT[] =>
+  [...new Set([...LAYOUT_ENDPOINTS[page.layout], ...page.endpoints])]
+
 /** Couples page livrée / endpoint encore en fixture : doit être vide pour une release. */
 export const findDeliveredFixtureUsages = (
   table: Record<string, IPageDelivery> = PAGE_DELIVERY,
@@ -29,7 +34,7 @@ export const findDeliveredFixtureUsages = (
 ): IPageFixtureUsage[] =>
   Object.entries(table)
     .filter(([, page]) => page.delivered)
-    .flatMap(([page, { endpoints }]) => endpoints
+    .flatMap(([page, entry]) => getPageEndpoints(entry)
       .filter(endpoint => sources[endpoint] === API_SOURCE.FIXTURE)
       .map(endpoint => ({ page, endpoint })))
 
@@ -45,7 +50,7 @@ export const findStalePages = (routes: string[], table: Record<string, IPageDeli
 
 /** Endpoints qu'aucune page ne déclare. */
 export const findOrphanEndpoints = (table: Record<string, IPageDelivery> = PAGE_DELIVERY): API_ENDPOINT[] => {
-  const used = new Set(Object.values(table).flatMap(page => page.endpoints))
+  const used = new Set(Object.values(table).flatMap(getPageEndpoints))
   return Object.values(API_ENDPOINT).filter(endpoint => !used.has(endpoint))
 }
 

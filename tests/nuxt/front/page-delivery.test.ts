@@ -1,10 +1,12 @@
 import { readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { LAYOUT_ENDPOINTS } from '~/consts/layout-endpoints.const'
 import { PAGE_DELIVERY } from '~/consts/page-delivery.const'
 import { ROUTES } from '~/consts/routes.const'
 import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
 import { API_SOURCE } from '~/enums/api-source.enum'
+import { LAYOUT } from '~/enums/layout.enum'
 import type { IPageDelivery } from '~/interfaces/page-delivery.interface'
 import type { INavigationGroup, INavigationItem } from '~/interfaces/navigation.interface'
 import {
@@ -34,8 +36,8 @@ const toRoute = (file: string): string =>
 const pageRoutes = listPageFiles(PAGES_DIRECTORY).map(toRoute)
 
 const table = (delivered: boolean): Record<string, IPageDelivery> => ({
-  '/a': { delivered, endpoints: [API_ENDPOINT.ME, API_ENDPOINT.EDITIONS] },
-  '/b': { delivered: false, endpoints: [API_ENDPOINT.STATS] }
+  '/a': { delivered, layout: LAYOUT.DEFAULT, endpoints: [API_ENDPOINT.EDITIONS] },
+  '/b': { delivered: false, layout: LAYOUT.DEFAULT, endpoints: [API_ENDPOINT.STATS] }
 })
 
 const sources = (live: API_ENDPOINT[]): Record<API_ENDPOINT, API_SOURCE> =>
@@ -93,6 +95,27 @@ describe('garde de release par page livrée', () => {
     ])
   })
 
+  it('les endpoints du layout comptent : ME en fixture bloque une page livrée sans endpoint propre', () => {
+    const pages: Record<string, IPageDelivery> = { '/a': { delivered: true, layout: LAYOUT.DEFAULT, endpoints: [] } }
+    expect(findDeliveredFixtureUsages(pages, sources([]))).toEqual([{ page: '/a', endpoint: API_ENDPOINT.ME }])
+  })
+
+  it('une page admin livrée avec EDITIONS en fixture est signalée (sélecteur d’édition du layout)', () => {
+    const pages: Record<string, IPageDelivery> = { '/admin/x': { delivered: true, layout: LAYOUT.ADMIN, endpoints: [] } }
+    expect(LAYOUT_ENDPOINTS[LAYOUT.ADMIN]).toContain(API_ENDPOINT.EDITIONS)
+    expect(findDeliveredFixtureUsages(pages, sources([API_ENDPOINT.ME]))).toEqual([
+      { page: '/admin/x', endpoint: API_ENDPOINT.EDITIONS }
+    ])
+  })
+
+  it('toute page admin de la table hérite des endpoints du layout admin', () => {
+    const adminPages = Object.entries(PAGE_DELIVERY).filter(([path]) => path.startsWith('/admin'))
+    expect(adminPages.length).toBeGreaterThan(0)
+    for (const [, page] of adminPages) {
+      expect(page.layout).toBe(LAYOUT.ADMIN)
+    }
+  })
+
   it('passe quand les endpoints d’une page livrée sont tous en LIVE', () => {
     expect(findDeliveredFixtureUsages(table(true), sources([API_ENDPOINT.ME, API_ENDPOINT.EDITIONS]))).toEqual([])
   })
@@ -107,7 +130,10 @@ describe('masquage en production', () => {
     { key: 'k.a', label: 'A', to: '/a' },
     { key: 'k.b', label: 'B', to: '/b' }
   ]
-  const delivered = { '/a': { delivered: true, endpoints: [] }, '/b': { delivered: false, endpoints: [] } }
+  const delivered: Record<string, IPageDelivery> = {
+    '/a': { delivered: true, layout: LAYOUT.DEFAULT, endpoints: [] },
+    '/b': { delivered: false, layout: LAYOUT.DEFAULT, endpoints: [] }
+  }
 
   it('en production, seule une page livrée est accessible', () => {
     expect(isPageAccessible('/a', false, delivered)).toBe(true)

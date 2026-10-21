@@ -53,7 +53,7 @@ Une seule instance de l'application est déployée pour l'instant. Les migration
 
 Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint encore en `API_SOURCE.FIXTURE`. Il n'y a pas de variable pour désactiver la garde.
 
-- `app/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme (session comprise : `ME` figure partout). Toutes les routes sont pré-déclarées à `delivered: false`.
+- `app/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`app/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
 - Un ticket F-xx passe sa ligne à `delivered: true` dans le même commit qui bascule ses endpoints en `LIVE` dans `app/consts/api-sources.const.ts`. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme encore en fixture.
 - En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
 - Garde-fous toujours actifs (`npm run test:run`) : une page de `app/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
@@ -64,10 +64,14 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | Variable | Obligatoire | Rôle |
 |---|---|---|
 | `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
-| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Disponible après intégration de B-08. |
+| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Obligatoire dans le compose ; l'application refuse de démarrer en production sans lui (SEC-A4). Disponible après intégration de B-08. |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
-| `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_*`, `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS`, `NUXT_AUTH_*` | non | Arrivent avec la vague 2 back (B-05, B-08) ; voir `.env.example` après leur intégration. |
+| `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
+| `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
+| `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
+| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). |
+| `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS` | non (3600) | `Cache-Control` public des lectures d'une édition CLOSED (vague 2). |
 
 Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
 
@@ -91,6 +95,8 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 | `ccc-ops user:unlock` | Déverrouille un compte. | B-08 |
 
 Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
+
+Les rapports de `db:import:legacy` sont écrits dans `/app/.data/reports/` et sont éphémères (perdus au redémarrage du conteneur) ; les récupérer avec `docker cp <conteneur>:/app/.data/reports ./reports`.
 
 Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n'est nécessaire ni présent.
 
