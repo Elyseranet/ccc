@@ -195,7 +195,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-10` |
 | [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00, B-17 (DTO), B-11 (routes) | À faire (créé, FA-09) | `../CCC-F-11` |
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | À faire (créé, FA-08) | `../CCC-F-12` |
-| [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | **aucune** : maquette à produire par `ui-designer`, puis à faire valider | F-00, B-10, B-16 (photo) | **Bloqué : design** | à créer |
+| [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
 
 **Compteur** (2026-10-20) : 13 tickets front ouverts (1 en cours, 12 à faire), 0 fermé, 0 bloqué par le design. Tous les arbitrages front sont tranchés (`docs/design/ux/decisions.md`, « Arbitrages front »). Une seule validation reste attendue : le **seuil FA-04**, à proposer par F-00 après mesure. Le libellé A16 (« 729 matchs joués depuis 2012, dont 554 avec score ») attend aussi la validation du chef de projet.
 
@@ -246,6 +246,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 | Prérequis partagés (cherry-pickés dans develop) | **F-00b** (fixture 2026 et scénario `registration`) → 0636c05. **F-00c** (105 matchs admin de 2026) → 26107be. **F-00d** (`AuthService.logout`, `useLogout`) → 4c92de2 et 39e12d3. **F-00e** (police display d'origam-title, slots de PageHero, `size` de PlayerLink) → 2bab527 et 5074a4f. **F-00f** (`Retry-After` dans ApiRequestError) → 5626ea8 et 2489908. **F-00g** (style global des tableaux dans le thème, dev-f04) : en cours. |
 | Propriétaires de fichiers partagés pour la vague F | `competitor.service.ts` → F-04 ; `base.service.ts` et `api-client.interface.ts` → F-08 (`headers`) ; `GoldenRules.vue` → F-06 (variante `cards`) ; `auth.service.ts` → F-00d, puis F-10. Les nouvelles clés d'endpoint sont insérées dans l'ordre alphabétique. |
 | Contrats back non mergés | Aucun type créé dans `shared/` : on utilise des interfaces de vue dans `app/interfaces/*-view.interface.ts`, mappées au merge. Seule exception : la copie identique de `score.interface.ts` dans F-08, écartée au rebase. |
+| Parallélisme (PAR-1, fabdef3) | **Au plus 3 devs front actifs en même temps**, un nuxt dev chacun. Le lead tient la file. Ordre : F-00g/F-04, F-12 et F-06 actifs, puis F-05 (F-00h), F-10, F-01, F-02, F-07, F-08, F-09, F-11, F-03, F-13. |
 | Serveurs `nuxt dev` | **À arrêter à la fin de chaque vérification**, jamais laissés en tâche de fond. 13 serveurs oubliés faisaient tomber Playwright en délai dépassé (6 échecs) ; après leur arrêt, 46/46. |
 | Layouts, thème, `main.css` | **Aucun ticket ne les modifie.** Un besoin dans la coque se remonte au lead front, qui décide d'un ticket dédié. |
 
