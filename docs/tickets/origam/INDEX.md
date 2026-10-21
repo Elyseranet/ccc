@@ -18,3 +18,4 @@
 | #1250 | `data-table` : `items` typé `IDataTableItem[]` (ligne interne), TS2322 sur un usage normal | cast unique dans `AppDataTable` (F-00j, DT-1) |
 | #1251 | `select` : `aria-label`/`title` « Ouvrir » de repli écrasent un `<label for>` externe (WCAG 4.1.2) | aucun pour l'instant (F-12) |
 | #1252 | évolution : token `line-height` des onglets (`line-height: 1` en dur) | règle `:where(.origam-tab__label)` dans `main.css` (F-00l) |
+| #1253 | `tabs` pills : la prop `color` n'agit pas sur l'onglet actif (repli `action.primary` en dur) | cssVars `--origam-tabs__item--pills--active---*` dans le thème (F-00l) |
