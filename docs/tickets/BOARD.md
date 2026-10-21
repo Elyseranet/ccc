@@ -188,7 +188,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, B-17 (parcours, titres de l'adversaire, enums de tri) | À faire | `../CCC-F-04` |
 | [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-05` |
-| [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Validé par le lead front, 65e186d** (en attente du squash, MERGE-1) | `../CCC-F-06` |
+| [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** — squash dans `develop` @ `f85ef6e` (branche `65e186d`) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
 | [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-09` |
