@@ -26,3 +26,8 @@ logs
 
 # Agent worktrees
 .claude/worktrees/
+
+# Tests
+test-results
+playwright-report
+visual-results

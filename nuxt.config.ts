@@ -1,16 +1,40 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-import { CCC_DARK_THEME } from './app/themes/ccc.theme'
+import { CCC_HH_THEMES } from './app/themes/ccc.theme'
+
+const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-  modules: ['origam/nuxt'],
+  devtools: { enabled: process.env.E2E !== 'true' },
+  modules: ['origam/nuxt', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: FONTS_URL }
+      ]
+    }
+  },
   origam: {
-    themes: [CCC_DARK_THEME],
+    themes: CCC_HH_THEMES,
     defaultTheme: 'ccc',
+    modes: ['dark'],
     defaultMode: 'dark',
+    locale: { locale: 'fr', fallbackLocale: 'en' },
     autoImport: false
+  },
+  routeRules: {
+    '/hall-of-fame': { redirect: { to: '/palmares', statusCode: 301 } },
+    '/competition': { redirect: { to: '/editions', statusCode: 301 } },
+    '/players': { redirect: { to: '/joueurs', statusCode: 301 } },
+    '/head-to-head': { redirect: { to: '/joueurs/face-a-face', statusCode: 301 } },
+    '/rules': { redirect: { to: '/regles', statusCode: 301 } },
+    '/variants': { redirect: { to: '/regles#variantes', statusCode: 301 } },
+    '/admin/scores': { redirect: { to: '/admin/matchs', statusCode: 301 } },
+    '/admin/groups': { redirect: { to: '/admin/matchs', statusCode: 301 } },
+    '/admin/draws': { redirect: { to: '/admin/tirages', statusCode: 301 } }
   },
   runtimeConfig: {
     database: {
@@ -52,6 +76,7 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    compressPublicAssets: true,
     // Les entités TypeORM utilisent des décorateurs « experimental » ; esbuild ne lit pas
     // typescript.tsConfig. esbuild ne gère pas emitDecoratorMetadata : chaque @Column doit
     // donc déclarer son `type` explicitement.
@@ -83,6 +108,16 @@ export default defineNuxtConfig({
         experimentalDecorators: true,
         emitDecoratorMetadata: true,
         useDefineForClassFields: false
+      }
+    },
+    sharedTsConfig: {
+      compilerOptions: {
+        experimentalDecorators: true
+      }
+    },
+    nodeTsConfig: {
+      compilerOptions: {
+        experimentalDecorators: true
       }
     }
   }

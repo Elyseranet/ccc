@@ -1,84 +1,343 @@
 <template>
   <div class="public-shell">
-    <origam-toolbar tag="header" height="auto" class="topbar">
-      <div class="topbar__inner page-wrap">
-        <origam-btn class="brand" to="/" variant="plain" :aria-label="t('nav_home', 'Accueil CCC')">
-          <span class="brand__mark"><span /></span>
-          <span class="brand__name">{{ t('brand_name', 'CCC') }}</span>
-        </origam-btn>
-        <origam-toolbar tag="nav" height="auto" class="public-nav" :aria-label="t('main_navigation', 'Navigation principale')">
-          <origam-btn v-for="item in links" :key="item.key" :to="item.to" variant="plain" class="public-nav__link" active-class="public-nav__link--active">{{ t(item.key, item.label) }}</origam-btn>
+    <skip-link />
+    <div class="public-shell__header">
+      <div class="page-wrap">
+        <origam-toolbar
+          tag="header"
+          height="auto"
+          flat
+          rounded="full"
+          border
+          border-color="var(--origam-color__border---default)"
+          class="public-header"
+        >
+          <template #default>
+            <nuxt-link
+              :to="ROUTES.HOME"
+              class="public-header__brand font-display"
+              data-cy="brand-link"
+              :aria-label="brandLabel"
+            >
+              <brand-mark />
+              <span>{{ brandName }}</span>
+            </nuxt-link>
+            <nav
+              class="public-header__nav"
+              :aria-label="navLabel"
+            >
+              <ul class="public-header__list">
+                <li
+                  v-for="item in navigation"
+                  :key="item.to"
+                >
+                  <origam-btn
+                    :to="item.to"
+                    :variant="item.variant"
+                    :bg-color="item.color"
+                    :color="item.color"
+                    rounded="full"
+                    font-weight="semibold"
+                    class="public-header__link"
+                    :class="item.linkClass"
+                    :aria-current="item.current"
+                    :data-cy="`nav-${item.to}`"
+                    :text="item.text"
+                  />
+                </li>
+              </ul>
+            </nav>
+            <origam-btn
+              v-if="accountLink"
+              :to="accountLink.to"
+              variant="outlined"
+              size="small"
+              rounded="full"
+              class="public-header__account"
+              data-cy="account-link"
+              :text="accountLink.text"
+            />
+            <span
+              v-else
+              class="public-header__end"
+              aria-hidden="true"
+            />
+          </template>
         </origam-toolbar>
-        <origam-btn class="topbar__login" to="/admin" variant="plain" color="secondary" :aria-label="t('user_login', 'Connexion')">
-          <span>{{ t('user_login', 'Connexion') }}</span>
-          <origam-avatar class="topbar__avatar" :text="USER_AVATAR_INITIALS" aria-hidden="true" />
-        </origam-btn>
       </div>
-    </origam-toolbar>
-    <origam-main id="contenu" class="public-main">
-      <slot name="default" />
+    </div>
+    <origam-main
+      id="contenu"
+      tabindex="-1"
+      class="public-main"
+    >
+      <template #default>
+        <slot name="default" />
+      </template>
     </origam-main>
-    <footer class="site-footer">
-      <div class="page-wrap site-footer__inner">
-        <span class="brand__name">{{ t('brand_name', 'CCC') }}</span>
-        <span class="site-footer__note">{{ t('footer_note', 'Championnat de Caps · CCC') }}</span>
-        <origam-btn to="/rules" variant="plain">{{ t('rules', 'Règlement') }} <span aria-hidden="true">↗</span></origam-btn>
+    <footer class="public-footer">
+      <div class="public-footer__inner page-wrap">
+        <p class="public-footer__brand font-display neon--sm">
+          {{ brandName }}
+        </p>
+        <nav :aria-label="footerLabel">
+          <ul class="public-footer__list">
+            <li
+              v-for="item in footerNavigation"
+              :key="item.to"
+            >
+              <origam-btn
+                :to="item.to"
+                variant="text"
+                rounded="full"
+                font-weight="semibold"
+                class="public-footer__link"
+                :data-cy="`footer-${item.to}`"
+                :text="item.text"
+              />
+            </li>
+          </ul>
+        </nav>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { OrigamBtn, OrigamMain, OrigamToolbar } from 'origam/components'
+import BrandMark from '~/components/common/BrandMark.vue'
+import SkipLink from '~/components/common/SkipLink.vue'
+import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
-import { OrigamAvatar, OrigamBtn, OrigamMain, OrigamToolbar } from 'origam/components'
-import { PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
-import { USER_AVATAR_INITIALS } from '~/consts/user-account.const'
+import { INTENT, VARIANT } from 'origam/enums'
+import { ROUTES } from '~/consts/routes.const'
+import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
+import { useAuthStore } from '~/stores/auth.store'
 
 /*********************************************************
- * Public navigation
+ * Global
  *
  * @description
- * Keeps the public destinations in one place for consistent navigation.
+ * Layout public : en-tête flottant, contenu principal (#contenu) et pied de page.
+ * La navigation est une liste de liens de document (`nav > ul`), pas une listbox applicative.
+ *
+ * @description
+ * Contournement Origam #1222 : la variante `text` impose un fond transparent ; l'entrée active passe en `flat` + `secondary`.
+ * Le surlignage actif d'Origam (overlay noir de 20 %) est neutralisé par `--origam-btn---overlay-opacity-active`.
  ********************************************************/
 const { t } = useT()
+const auth = useAuthStore()
+const { isActive, ariaCurrent } = useNavigationState()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{ default(): unknown }>()
-const links = PUBLIC_NAVIGATION
+
+/*********************************************************
+ * Libellés
+ *
+ * @description
+ * Tout texte passe par `t()` ; les listes de navigation portent des clés.
+ ********************************************************/
+const brandName = computed(() => t('layout.brand_name', 'CCC'))
+const brandLabel = computed(() => t('layout.header.brand_label', 'CCC, accueil'))
+const navLabel = computed(() => t('layout.header.nav_label', 'Navigation principale'))
+const footerLabel = computed(() => t('layout.footer.nav_label', 'Pied de page'))
+const footerNavigation = computed(() => FOOTER_NAVIGATION.map(item => ({ to: item.to, text: t(item.key, item.label) })))
+
+/*********************************************************
+ * Navigation
+ *
+ * @description
+ * L'entrée active passe de `text` à `flat` + `secondary` : la variante `text` d'Origam impose un fond transparent.
+ ********************************************************/
+const navigation = computed(() => PUBLIC_NAVIGATION.map((item) => {
+  const active = isActive(item.to, item.exact)
+  return {
+    to: item.to,
+    text: t(item.key, item.label),
+    active,
+    variant: active ? VARIANT.FLAT : VARIANT.TEXT,
+    color: active ? INTENT.SECONDARY : undefined,
+    linkClass: active ? undefined : 'public-header__link--rest',
+    current: ariaCurrent(item.to, item.exact)
+  }
+}))
+
+/*********************************************************
+ * Compte
+ *
+ * @description
+ * Pas d'avatar ni de « Connexion » en en-tête (A3, E-d) : seul un utilisateur connecté voit un lien,
+ * « Espace organisateur » pour un administrateur, « Mon profil » pour un participant.
+ ********************************************************/
+const accountLink = computed(() => {
+  if (auth.isAdmin) {
+    return { to: ROUTES.ADMIN, text: t('layout.header.organizer_space', 'Espace organisateur') }
+  }
+  if (auth.isAuthenticated) {
+    return { to: ROUTES.PROFILE, text: t('layout.header.my_profile', 'Mon profil') }
+  }
+  return null
+})
 
 /*********************************************************
  * Expose
  *
  * @description
- * The public shell has no parent-facing controls.
+ * Le layout n'expose rien à un parent.
  ********************************************************/
 defineExpose({})
 </script>
 
 <style scoped lang="scss">
-.public-shell { min-height: 100vh; background: var(--bg); }
-.topbar { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(18px); }
-.topbar__inner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; min-height: 68px; gap: 32px; }
-.brand { display: inline-flex; align-items: center; justify-self: start; flex: none; gap: 10px; }
-.brand__mark { display: grid; width: 30px; height: 30px; place-items: center; border: 2px solid var(--accent); border-radius: 50%; }
-.brand__mark span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.brand__name { font-size: 15px; font-weight: 800; letter-spacing: .04em; }
-.brand__name span { color: var(--accent); }
-.public-nav { display: flex; grid-column: 2; min-width: 0; align-self: stretch; align-items: stretch; gap: 4px; overflow-x: auto; }
-.public-nav__link { display: inline-flex; align-items: center; flex: none; padding: 0 13px; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13px; font-weight: 600; transition: color .2s ease; }
-.public-nav__link:hover, .public-nav__link--active { color: var(--text); border-bottom-color: var(--accent); }
-.topbar__login { display: flex; grid-column: 3; align-items: center; justify-self: end; gap: 8px; }
-.topbar__avatar { width: 34px; height: 34px; }
-.site-footer a span { color: var(--accent); }
-.public-main { min-height: calc(100vh - 140px); }
-.site-footer { border-top: 1px solid var(--border); background: #0a0b0d; }
-.site-footer__inner { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 18px; }
-.site-footer__note { color: var(--faint); font-size: 12px; }
-.site-footer a { color: var(--muted); font-size: 12px; }
-@media (max-width: 850px) { .topbar__inner { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'brand login' 'nav nav'; gap: 0 18px; padding-top: 13px; } .brand { grid-area: brand; } .public-nav { grid-area: nav; width: 100%; min-height: 42px; } .public-nav__link { padding-inline: 10px; } .topbar__login { grid-area: login; grid-column: auto; position: static; justify-self: end; } }
-@media (max-width: 550px) { .site-footer__inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 18px; } .site-footer__note { order: 3; } }
+.public-shell {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(var(--public-shell---halo-neon-size, 60rem 40rem) at 85% -10%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%),
+    radial-gradient(var(--public-shell---halo-glow-size, 50rem 36rem) at -10% 30%, color-mix(in srgb, var(--origam-color__bar---glow) 90%, transparent), transparent 70%),
+    var(--origam-color__surface---default);
+  background-attachment: fixed;
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    padding-top: var(--origam-space---3);
+  }
+}
+
+.public-header {
+  display: flex;
+  align-items: center;
+  gap: var(--origam-space---5);
+  min-height: var(--origam-space---16);
+  padding-inline: var(--origam-space---5) var(--origam-space---3);
+  background: color-mix(in srgb, var(--origam-color__surface---overlay) 82%, transparent);
+  backdrop-filter: blur(var(--public-header---blur, 16px)) saturate(140%);
+  box-shadow: var(--origam-shadow---md);
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--origam-space---11);
+    gap: var(--origam-space---2);
+    font-size: var(--origam-font__size---2xl);
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  &__nav {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  &__list {
+    display: flex;
+    justify-content: center;
+    gap: var(--origam-space---1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__link {
+    --origam-btn---padding-lg: var(--origam-space---4);
+    --origam-btn---min-width: 0;
+  }
+
+  &__link--rest {
+    color: var(--origam-color__text---secondary);
+  }
+
+  &__end {
+    width: var(--origam-space---11);
+    flex: none;
+  }
+
+  &__account {
+    flex: none;
+  }
+}
+
+.public-main {
+  min-height: calc(100vh - var(--public-main---reserved-height, 20rem));
+}
+
+.public-footer {
+  margin-top: var(--origam-space---20);
+  padding-block: var(--origam-space---10) var(--origam-space---8);
+  border-top: var(--origam-border__width---thin) solid var(--origam-color__border---default);
+  background: var(--origam-color__surface---sunken);
+
+  &__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---5);
+  }
+
+  &__brand {
+    margin: 0;
+    font-size: var(--origam-font__size---3xl);
+    line-height: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--origam-space---2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__link {
+    --origam-btn---padding-lg: var(--origam-space---3);
+    --origam-btn---min-width: 0;
+
+    color: var(--origam-color__text---secondary);
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 760px) {
+  .public-header {
+    flex-wrap: wrap;
+    gap: 0;
+    padding: var(--origam-space---1) var(--origam-space---2) var(--origam-space---1) var(--origam-space---4);
+    border-radius: var(--origam-radius---xl);
+
+    &__nav {
+      order: 3;
+      flex-basis: 100%;
+    }
+
+    &__list {
+      justify-content: flex-start;
+      gap: 0;
+    }
+
+    &__link {
+      --origam-btn---font-size: var(--origam-font__size---sm);
+      --origam-btn---padding-lg: var(--origam-space---3);
+    }
+
+    &__end,
+    &__account {
+      margin-left: auto;
+    }
+  }
+}
 </style>
 
 <style>
-:root { --public-shell---background: #0e0f12; }
+:root {
+  --public-header---blur: 16px;
+  --public-main---reserved-height: 20rem;
+}
 </style>

@@ -1,12 +1,27 @@
-import type { INavigationItem } from '~/interfaces/navigation.interface'
+import IconDashboard from '~/components/icons/IconDashboard.vue'
+import IconDraws from '~/components/icons/IconDraws.vue'
+import IconMatches from '~/components/icons/IconMatches.vue'
+import IconMore from '~/components/icons/IconMore.vue'
+import IconParticipants from '~/components/icons/IconParticipants.vue'
+import { ROUTES } from '~/consts/routes.const'
+import type { INavigationGroup, INavigationItem } from '~/interfaces/navigation.interface'
 
-export const ADMIN_NAVIGATION: INavigationItem[] = [
-  { key: 'admin_dashboard', label: 'Tableau de bord', to: '/admin' },
-  { key: 'admin_competitors', label: 'Compétiteurs', to: '/admin/competitors' },
-  { key: 'admin_participants', label: 'Participants', to: '/admin/participants' },
-  { key: 'admin_draws', label: 'Tirage des poules', to: '/admin/draws' },
-  { key: 'admin_groups', label: 'Poules & matchs', to: '/admin/groups' },
-  { key: 'admin_bracket', label: 'Bracket', to: '/admin/bracket' },
-  { key: 'admin_scores', label: 'Scores', to: '/admin/scores' },
-  { key: 'admin_editions', label: 'Éditions', to: '/admin/editions' }
+export const ADMIN_NAVIGATION: INavigationGroup[] = [
+  {
+    key: 'layout.admin.group_organisation',
+    label: 'Organisation',
+    items: [
+      { key: 'layout.admin.nav_dashboard', label: 'Tableau de bord', to: ROUTES.ADMIN, icon: IconDashboard, exact: true },
+      { key: 'layout.admin.nav_participants', label: 'Participants', to: ROUTES.ADMIN_PARTICIPANTS, icon: IconParticipants },
+      { key: 'layout.admin.nav_draws', label: 'Tirages', to: ROUTES.ADMIN_DRAWS, icon: IconDraws },
+      { key: 'layout.admin.nav_matches', label: 'Poules et matchs', to: ROUTES.ADMIN_MATCHES, icon: IconMatches }
+    ]
+  }
+]
+
+export const ADMIN_BOTTOM_NAVIGATION: INavigationItem[] = [
+  { key: 'layout.admin.bottom_dashboard', label: 'Tableau', to: ROUTES.ADMIN, icon: IconDashboard, exact: true },
+  { key: 'layout.admin.bottom_matches', label: 'Matchs', to: ROUTES.ADMIN_MATCHES, icon: IconMatches },
+  { key: 'layout.admin.bottom_draws', label: 'Tirages', to: ROUTES.ADMIN_DRAWS, icon: IconDraws },
+  { key: 'layout.admin.bottom_more', label: 'Plus', to: ROUTES.ADMIN_MORE, icon: IconMore }
 ]
