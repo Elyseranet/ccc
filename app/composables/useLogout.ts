@@ -1,15 +1,18 @@
 import { useFixtureVariant } from '~/composables/useFixtureVariant'
+import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/async-state.const'
 import { ROUTES } from '~/consts/routes.const'
 import { AuthService } from '~/services/auth.service'
 import { useAuthStore } from '~/stores/auth.store'
+import { ApiRequestError } from '~/utils/api-request-error.util'
 
 /*********************************************************
  * useLogout
  *
  * @description
  * Déconnexion : `POST /auth/logout`, puis la session locale est vidée et l'utilisateur est renvoyé vers l'espace public.
- * Si l'appel échoue, la session serveur est peut-être encore valide : on ne vide pas la session locale et `failed` passe à vrai,
- * pour que l'écran le dise au lieu de laisser croire à une déconnexion.
+ * Un 401 veut dire que la session serveur n'existe plus : l'utilisateur est déjà déconnecté, on traite comme un succès.
+ * Sur toute autre erreur (réseau, 5xx, autre 4xx), la session serveur est peut-être encore valide : on garde la session locale
+ * et `failed` passe à vrai, pour que l'écran le dise au lieu de laisser croire à une déconnexion.
  ********************************************************/
 export const useLogout = () => {
   const auth = useAuthStore()
@@ -17,15 +20,20 @@ export const useLogout = () => {
   const pending = ref(false)
   const failed = ref(false)
 
+  const isAlreadyLoggedOut = (cause: unknown): boolean =>
+    cause instanceof ApiRequestError && cause.error.statusCode === HTTP_STATUS_UNAUTHORIZED
+
   const logout = async () => {
     pending.value = true
     failed.value = false
     try {
       await service.logout()
-    } catch {
-      failed.value = true
-      pending.value = false
-      return
+    } catch (cause) {
+      if (!isAlreadyLoggedOut(cause)) {
+        failed.value = true
+        pending.value = false
+        return
+      }
     }
     auth.clear()
     pending.value = false
