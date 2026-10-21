@@ -1,7 +1,7 @@
 # T-SEC-04 — Constats LOW de la revue de sécurité de la vague 2
 
 - **Origine** : revue de sécurité de `feature/integration-wave2` @ 918308d, le 2026-10-20. Elle compte 0 critical, 0 high, 3 medium (corrigés avant merge) et 7 low. Ce ticket regroupe les low **non bloquants** qui ne sont pas traités dans la vague 2.
-- **Statut** : À faire (L2, L3) ; L7 est fermé avec B-16.
+- **Statut** : À faire (L2, L3, N1, N3) ; L7 est fermé avec B-16.
 - **Vague** : 3
 - **Dépendances** : B-08 (mergé avec la vague 2).
 
@@ -15,6 +15,13 @@
    - Test : avec l'option vraie, le cookie est `__Host-`, Secure, Path=/ et sans Domain ; avec l'option fausse, il n'est ni l'un ni l'autre.
 3. **L7 — `server/schemas/auth.schema.ts:17-24`** : n'importe quelle URL https est acceptée comme avatar. Une image hébergée chez un tiers permet de suivre les visiteurs (IP, heure).
    - **Fermé par B-16** : l'URL d'avatar disparaît au profit d'un téléversement servi par l'API. Ce point sera fermé dans le même tour que le merge de B-16, avec le test « `avatarUrl` refusé par PATCH /moi » de B-16.
+
+4. **N1 — cookie d'appareil volé** (revue ciblée de integration-wave2 @ d5fcc33, 2026-10-21) : un attaquant qui possède un cookie d'appareil valide (SEC-A4) dispose d'un second flux d'essais, avec son propre compteur. Ce flux reste ralenti de la même façon (5 essais libres, puis 2^(n−5) s plafonnés à 300 s) et borné par la limite par IP. Il échappe en revanche au délai posé par les clients non reconnus.
+   - Correctif à étudier : lier le cookie à une empreinte légère du client, ou plafonner le nombre d'essais cumulés sur tous les appareils d'un compte dans une fenêtre. Le changement de mot de passe révoque désormais les appareils (correctif N2, livré avant le merge de la vague 2).
+   - Test : deux flux en parallèle (avec et sans cookie) ne dépassent pas le plafond global retenu.
+5. **N3 — aucun délai applicatif sur la lecture du corps** : un client lent (slowloris) peut garder une requête ouverte tant que le corps n'est pas complet. Le plafond de 16 Kio (M2) borne la taille, pas la durée.
+   - Correctif : un délai de lecture du corps en constante (par exemple 10 s), avec une réponse 408 au-delà, dans `readBoundedJsonBody`. Ou le documenter comme relevant du reverse proxy (Coolify/Traefik), ce qui renvoie à T-SEC-02.
+   - Test : un corps envoyé plus lentement que le délai est interrompu en 408.
 
 ## Hors ticket
 
