@@ -106,3 +106,8 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## QA-1 — T-QA-01 : garde-fou mergé, enquête en pause (décision utilisateur 2026-10-21)
 - Le garde-fou `scripts/test-run.mjs` (`feature/T-QA-01` @ `95263a4`) est mergé dans `develop` juste après T-OPS-01, sur lequel il est basé. Il passe par la même pre-delivery : tests unitaires, e2e et sécurité.
 - L'enquête sur la cause racine est en pause. T-QA-01 reste **ouvert**. La piste mémoire (swap) sera réévaluée pendant la vague F-01..F-12.
+
+## CE-1 — Code d'une édition créée dans l'application (décision utilisateur 2026-10-21)
+- La première édition d'une année prend le code `AAAA`, par exemple `2027`. Les suivantes de la même année prennent `AAAAb`, `AAAAc`, et ainsi de suite.
+- Le code est généré par le serveur (`buildEditionCode`, B-10). L'organisateur ne le saisit pas, et il reste immuable (R-9).
+- Les codes de l'archive restent inchangés (`2012a`, `2012b`, puis `2013` à `2026`). L'asymétrie avec 2012 est acceptée.
