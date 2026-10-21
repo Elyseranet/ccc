@@ -31,7 +31,8 @@ export const CCC_HH_BASE: IOrigamTheme = {
   components: {
     global: { density: 'default' },
 
-    // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (ambre + ombre néon via elevation).
+    // Actions : défaut texte neutre. CTA = `variant="flat" bg-color="primary" elevation="lg" :hover="{ elevation: 'xl' }"`, sans `color`
+    // (fond ambre action.primary.bg, texte action.primary.fg, ombre néon shadow.lg) ; `size="x-large"` pour les CTA de formulaire (48 px, F-00m).
     'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold' },
     'origam-btn-group': { rounded: 'full' },
 
