@@ -16,3 +16,4 @@
   3. Sur `feature/B-10` @ `7f1169b`, avec les vraies valeurs.
 - Encore inconnus : la commande exacte de dev-b10 (suite complète ou ciblée), la liste des 10 tests en échec et la charge de la machine à ce moment-là. Si la machine était saturée, les échecs relèvent probablement de T-QA-01 (délais de démarrage de l'environnement Nuxt), mais ce n'est **pas démontré**.
 - Le ticket reste ouvert et passe en priorité basse. Il sera fermé, preuve à l'appui, si une suite complète `test:run` lancée avec ces variables sur une machine au repos est verte.
+- **Chef de projet, 2026-10-21 22:06** : j'ai lancé la suite complète `npm run test:run` sur `develop` @ `752cf34`, avec les 5 variables `NUXT_DATABASE_*` factices (load average 24). Résultat : « 41/41 fichiers exécutés, 410 tests réussis, 1 ignorés, 0 en échec ». **Non reproduit sur la suite complète.** La branche B-10, qui compte 43 fichiers, n'a pas été testée ici avec la suite complète.
