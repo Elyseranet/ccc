@@ -30,7 +30,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | À faire |
-| [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | À faire : affectation en attente du go du PM |
+| [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | En cours (dev-b12, `feature/B-17`) |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
