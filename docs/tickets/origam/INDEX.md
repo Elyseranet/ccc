@@ -15,3 +15,4 @@
 | #1245 | évolution : tokens de typographie des en-têtes de tableau (casse, interlettrage) | règle `:where(.origam-table) th` dans `main.css` (F-00g) |
 | #1246 | `data-table` hérite d'une prop `item` requise (« Missing required prop: item ») | aucun (avertissement en dev seulement) |
 | #1249 | `list-item` lien : `role="listitem"` sur l'`<a>`, rôle de lien perdu (WCAG 4.1.2) | aucun (axe passe ; test F-12 cible `listitem`) |
+| #1250 | `data-table` : `items` typé `IDataTableItem[]` (ligne interne), TS2322 sur un usage normal | cast unique dans `AppDataTable` (F-00j, DT-1) |

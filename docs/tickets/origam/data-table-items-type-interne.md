@@ -14,7 +14,11 @@ Constaté dans CCC (F-00j, wrapper `AppDataTable`) en 2.37.3.
 
 ## Cause
 
-`IDataTableProps` (`packages/ds/src/interfaces/DataTable/data-table.interface.ts:49`) agrège des interfaces qui typent `items` avec le type de ligne interne (`IDataTableItem`), au lieu d'un type d'entrée générique. Je ne sais pas laquelle des interfaces agrégées déclare précisément `items` : à localiser dans `IDataTableItemsProps`, sans doute.
+`IDataTableProps` (`packages/ds/src/interfaces/DataTable/data-table.interface.ts:49`) agrège des interfaces qui typent `items` avec le type de ligne interne (`IDataTableItem`), au lieu d'un type d'entrée générique. Localisé dans les sources de la branche `ds` (2.37.4, `v2.37.4-1-g5e55bd3e1`) :
+- `packages/ds/src/interfaces/DataTable/items.interface.ts:15` déclare `items?: Array<IDataTableItem>` ;
+- `packages/ds/src/interfaces/DataTable/data-table-header.interface.ts:22` déclare `items?: Array<IDataTableItem>`.
+
+(`data-table-rows.interface.ts:59` type aussi `items` avec `IDataTableItem | IDataTableGroup` ; c'est légitime au niveau des lignes.)
 
 ## Impact
 
