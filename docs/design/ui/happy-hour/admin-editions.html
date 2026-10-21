@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Éditions et compétiteurs · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="admin-editions.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- F-13 : entrées Éditions et Compétiteurs réactivées dans le tiroir (FA-09 levé pour ces deux écrans) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li></ul>
+  <p class="eyebrow adm-side__t">Référentiel <span class="chip chip--neon">F-13</span></p>
+  <ul class="adm-nav"><li><a href="#ed-p-list" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16M8 3v4M16 3v4"/></svg>Éditions</a></li><li><a href="#ed-p-comp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6M19 8v6M16 11h6"/></svg>Compétiteurs</a></li></ul></nav>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Référentiel</p><h1 class="adm-h1 font-display neon--sm">Éditions et compétiteurs</h1></div><p class="muted">Maquette F-13 · à valider avant intégration</p></div>
+<div class="tabs" role="tablist" aria-label="Écrans du référentiel"><button role="tab" id="ed-t-list" aria-controls="ed-p-list" aria-selected="true" tabindex="0">Éditions</button><button role="tab" id="ed-t-edit" aria-controls="ed-p-edit" aria-selected="false" tabindex="-1">Modifier une édition</button><button role="tab" id="ed-t-comp" aria-controls="ed-p-comp" aria-selected="false" tabindex="-1">Compétiteurs</button><button role="tab" id="ed-t-plus" aria-controls="ed-p-plus" aria-selected="false" tabindex="-1">Menu « Plus » (mobile)</button></div><section role="tabpanel" id="ed-p-list" aria-labelledby="ed-t-list">
+<div class="ed-bar">
+  <p class="field ed-search"><label for="ed-q">Rechercher une édition</label><input id="ed-q" class="input" type="search" placeholder="Code ou année" autocomplete="off"></p>
+  <a class="btn btn--primary" href="#ed-create">Créer une édition</a>
+</div>
+<div class="table-wrap"><table class="table"><caption class="sr-only">Éditions du championnat</caption>
+  <thead><tr><th scope="col">Code</th><th scope="col">Année</th><th scope="col">Nom</th><th scope="col">Date</th><th scope="col">Statut</th><th scope="col">Origine</th><th scope="col" class="r">Participants</th><th scope="col" class="r">Action</th></tr></thead>
+  <tbody><tr><td class="num"><b>2026</b></td><td class="num">2026</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--neon">Poules en cours</span></td><td><span class="chip chip--amber">Application</span></td><td class="r num">45</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Modifier<span class="sr-only"> l’édition 2026</span></a></td></tr><tr><td class="num"><b>2025</b></td><td class="num">2025</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">45</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2025</span></a></td></tr><tr><td class="num"><b>2024</b></td><td class="num">2024</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">47</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2024</span></a></td></tr><tr><td class="num"><b>2023</b></td><td class="num">2023</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">49</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2023</span></a></td></tr><tr><td class="num"><b>2022</b></td><td class="num">2022</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">46</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2022</span></a></td></tr><tr><td class="num"><b>2021</b></td><td class="num">2021</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">44</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2021</span></a></td></tr><tr><td class="num"><b>2020</b></td><td class="num">2020</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">40</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2020</span></a></td></tr><tr><td class="num"><b>2019</b></td><td class="num">2019</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">41</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2019</span></a></td></tr><tr><td class="num"><b>2018</b></td><td class="num">2018</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">38</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2018</span></a></td></tr><tr><td class="num"><b>2017</b></td><td class="num">2017</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">36</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2017</span></a></td></tr><tr><td class="num"><b>2016</b></td><td class="num">2016</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">30</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2016</span></a></td></tr><tr><td class="num"><b>2015</b></td><td class="num">2015</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">28</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2015</span></a></td></tr><tr><td class="num"><b>2014</b></td><td class="num">2014</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">24</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2014</span></a></td></tr><tr><td class="num"><b>2013</b></td><td class="num">2013</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">20</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2013</span></a></td></tr><tr><td class="num"><b>2012b</b></td><td class="num">2012</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">16</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2012b</span></a></td></tr><tr><td class="num"><b>2012a</b></td><td class="num">2012</td><td><span class="muted">Non renseigné</span></td><td><span class="muted">Non renseigné</span></td><td><span class="chip chip--ok">Clôturée</span></td><td><span class="chip">Archive</span></td><td class="r num">16</td><td class="r"><a class="btn btn--text btn--sm" href="#ed-p-edit">Consulter<span class="sr-only"> l’édition 2012a</span></a></td></tr></tbody></table></div>
+<p class="muted ed-note">Les éditions de l’archive (2012a à 2025) ont été importées : nom, date et lieu n’y sont pas renseignés. Le code d’une édition ne change jamais, c’est son adresse publique (/editions/2012a).</p>
+
+<section class="card ed-form" id="ed-create" aria-labelledby="h-create">
+  <header class="ed-form__h"><div><p class="eyebrow">Nouvelle édition</p><h2 id="h-create" class="h-card">Créer une édition</h2></div><span class="chip">Code attribué à la création</span></header>
+  <!-- origam-form · origam-number-field (année) · origam-text-field (nom, lieu) · origam-date-picker-field (date) · origam-textarea-field (description) -->
+  <form class="ed-grid" action="#" novalidate>
+    <p class="field"><label for="c-year">Année <span aria-hidden="true">*</span></label><input id="c-year" class="input is-error" type="number" inputmode="numeric" value="27" required aria-invalid="true" aria-describedby="c-year-err"><span id="c-year-err" class="err">Indiquez une année sur 4 chiffres, par exemple 2027.</span></p>
+    <p class="field"><label for="c-name">Nom</label><input id="c-name" class="input" value="Championnat de Caps 2027"></p>
+    <p class="field"><label for="c-date">Date</label><input id="c-date" class="input" type="date" value="2027-06-12"></p>
+    <p class="field"><label for="c-loc">Lieu</label><input id="c-loc" class="input" placeholder="Ville, bar ou salle"></p>
+    <p class="field ed-grid__full"><label for="c-desc">Description</label><textarea id="c-desc" class="input input--area" rows="3" placeholder="Ce que les joueurs doivent savoir sur cette édition"></textarea></p>
+    <p class="rule ed-grid__full"><span class="chip chip--info">Code</span>Vous ne saisissez pas le code : le serveur le génère à la création. 2027 pour la première édition de l’année, puis 2027b, 2027c…</p>
+    <div class="ed-alert ed-grid__full" role="alert"><span class="chip chip--danger">400</span><p><b>Le formulaire contient une erreur.</b> L’année est obligatoire et doit compter 4 chiffres.</p></div>
+    <div class="ed-alert ed-grid__full" role="alert"><span class="chip chip--danger">409</span><p><b>Plus aucun code disponible pour cette année.</b> Toutes les lettres ont déjà servi : choisissez une autre année ou modifiez une édition existante.</p></div>
+    <div class="ed-cta ed-grid__full"><button class="btn btn--outlined" type="reset">Annuler</button><button class="btn btn--primary" type="submit">Créer l’édition</button></div>
+  </form>
+</section>
+
+<section class="card ed-done" aria-labelledby="h-done" aria-live="polite">
+  <span class="ed-done__code font-display neon--sm" aria-hidden="true">2027</span>
+  <div><p class="eyebrow">Édition créée</p><h2 id="h-done" class="h-card">Code attribué : <span class="num">2027</span></h2><p class="muted">Adresse publique : <b>/editions/2027</b>. Ce code ne pourra plus être modifié.</p></div>
+  <div class="ed-done__cta"><a class="btn btn--primary" href="admin-participants.html">Ajouter les participants</a><a class="btn btn--outlined" href="#ed-p-edit">Modifier les informations</a></div>
+</section></section><section role="tabpanel" id="ed-p-edit" aria-labelledby="ed-t-edit" hidden>
+<section class="card ed-form" aria-labelledby="h-edit">
+  <header class="ed-form__h"><div><p class="eyebrow">Édition 2026</p><h2 id="h-edit" class="h-card">Modifier les informations</h2></div><span class="chip chip--neon">Poules en cours</span></header>
+  <!-- origam-data-list (lecture seule) : code, année, statut — R-9 -->
+  <dl class="ed-ro"><div><dt>Code</dt><dd class="num">2026</dd><small class="muted">Immuable : adresse publique (R-9)</small></div><div><dt>Année</dt><dd class="num">2026</dd><small class="muted">Non modifiable</small></div><div><dt>Statut</dt><dd><span class="chip chip--neon">Poules en cours</span></dd><small class="muted">Suit le déroulé du tournoi</small></div></dl>
+  <form class="ed-grid" action="#">
+    <p class="field"><label for="e-name">Nom</label><input id="e-name" class="input" placeholder="Ex. Championnat de Caps 2026"></p>
+    <p class="field"><label for="e-date">Date</label><input id="e-date" class="input" type="date"></p>
+    <p class="field"><label for="e-loc">Lieu</label><input id="e-loc" class="input" placeholder="Ville, bar ou salle"></p>
+    <p class="field ed-grid__full"><label for="e-desc">Description</label><textarea id="e-desc" class="input input--area" rows="3"></textarea></p>
+    <div class="ed-cta ed-grid__full"><button class="btn btn--outlined" type="reset">Annuler</button><button class="btn btn--primary" type="submit">Enregistrer</button></div>
+  </form>
+</section>
+
+<section class="card ed-form ed-form--locked" aria-labelledby="h-closed">
+  <header class="ed-form__h"><div><p class="eyebrow">Édition 2025</p><h2 id="h-closed" class="h-card">Édition clôturée · lecture seule</h2></div><span class="chip chip--ok">Clôturée</span></header>
+  <div class="ed-alert" role="status"><span class="chip chip--ok">Clôturée</span><p>Une édition clôturée ne se modifie plus : ses résultats et ses points sont figés.</p></div>
+  <dl class="ed-ro ed-ro--4"><div><dt>Code</dt><dd class="num">2025</dd><small class="muted">Immuable</small></div><div><dt>Année</dt><dd class="num">2025</dd><small class="muted"></small></div><div><dt>Nom</dt><dd><span class="muted">Non renseigné</span></dd><small class="muted"></small></div><div><dt>Date</dt><dd><span class="muted">Non renseigné</span></dd><small class="muted"></small></div><div><dt>Lieu</dt><dd><span class="muted">Non renseigné</span></dd><small class="muted"></small></div><div><dt>Participants</dt><dd class="num">45</dd><small class="muted">N figé à la clôture</small></div></dl>
+  <div class="ed-alert" role="alert"><span class="chip chip--danger">409</span><p><b>Modification refusée.</b> L’édition 2025 est clôturée (EDITION_CLOSED). Rechargez la page pour afficher son état actuel.</p></div>
+</section></section><section role="tabpanel" id="ed-p-comp" aria-labelledby="ed-t-comp" hidden>
+<div class="ed-bar"><p class="field ed-search"><label for="cp-q">Rechercher un compétiteur</label><input id="cp-q" class="input" type="search" placeholder="Nom, prénom ou pseudo" autocomplete="off"></p><p class="muted num">145 compétiteurs</p></div>
+<div class="cp-grid">
+  <div class="cp-list">
+    <div class="table-wrap"><table class="table"><caption class="sr-only">Annuaire des compétiteurs, page 1 sur 15</caption>
+      <thead><tr><th scope="col">Nom affiché</th><th scope="col">Prénom</th><th scope="col">Nom</th><th scope="col">Pseudo</th><th scope="col" class="r">Éditions</th><th scope="col" class="r">Action</th></tr></thead>
+      <tbody><tr><td><span class="pl-cell"><span class="avatar">AA</span><b>Arthur André</b></span></td><td>Arthur</td><td>André</td><td class="muted">« Tournée »</td><td class="r num">2</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Arthur André</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">CA</span><b>Chloé André</b></span></td><td>Chloé</td><td>André</td><td class="muted">—</td><td class="r num">1</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Chloé André</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">GA</span><b>Gabriel André</b></span></td><td>Gabriel</td><td>André</td><td class="muted">« Happy Hour »</td><td class="r num">4</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Gabriel André</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">LA</span><b>Lisa André</b></span></td><td>Lisa</td><td>André</td><td class="muted">—</td><td class="r num">11</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Lisa André</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">SA</span><b>Simon André</b></span></td><td>Simon</td><td>André</td><td class="muted">—</td><td class="r num">1</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Simon André</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><b>Anna Bernard</b></span></td><td>Anna</td><td>Bernard</td><td class="muted">—</td><td class="r num">1</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Anna Bernard</span></a></td></tr><tr class=is-sel><td><span class="pl-cell"><span class="avatar">LB</span><b>Lou Bernard</b></span></td><td>Lou</td><td>Bernard</td><td class="muted">« La Mousse »</td><td class="r num">10</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Lou Bernard</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">NB</span><b>Nathan Bernard</b></span></td><td>Nathan</td><td>Bernard</td><td class="muted">« Demi »</td><td class="r num">1</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Nathan Bernard</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">AB</span><b>Agathe Bertrand</b></span></td><td>Agathe</td><td>Bertrand</td><td class="muted">« Mousseux »</td><td class="r num">1</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Agathe Bertrand</span></a></td></tr><tr><td><span class="pl-cell"><span class="avatar">CB</span><b>Clara Bertrand</b></span></td><td>Clara</td><td>Bertrand</td><td class="muted">—</td><td class="r num">3</td><td class="r"><a class="btn btn--text btn--sm" href="#cp-form">Corriger<span class="sr-only"> l’identité de Clara Bertrand</span></a></td></tr></tbody></table></div>
+    <nav class="pager" aria-label="Pagination des compétiteurs"><span class="num">1–10 sur 145</span><ol><li><a href="#" aria-current="page">1</a></li><li><a href="#">2</a></li><li><a href="#">3</a></li><li><a href="#">4</a></li><li><a href="#">5</a></li></ol></nav>
+  </div>
+  <section class="card cp-form" id="cp-form" aria-labelledby="h-cp">
+    <header class="ed-form__h"><div><p class="eyebrow">Correction d’identité</p><h2 id="h-cp" class="h-card">Lou Bernard</h2></div></header>
+    <!-- Photo : origam-avatar + origam-file-field (PUT /competiteurs/{id}/avatar, multipart) + origam-btn supprimer (DELETE → initiales) -->
+    <fieldset class="cp-photo"><legend class="cp-photo__lg">Photo</legend>
+      <div class="cp-photo__row">
+        <span class="cp-av font-display" role="img" aria-label="Aucune photo : initiales LB">LB</span>
+        <div class="cp-photo__act">
+          <p class="field"><label for="cp-file">Envoyer une photo</label><input id="cp-file" class="input input--file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="cp-file-h cp-file-e1 cp-file-e2"></p>
+          <p id="cp-file-h" class="muted cp-hint">JPEG, PNG ou WebP, 2 Mo maximum. Les métadonnées (EXIF, position GPS) sont supprimées à l’envoi.</p>
+          <button class="btn btn--outlined btn--sm" type="button" disabled>Supprimer la photo</button>
+        </div>
+      </div>
+      <p id="cp-file-e1" class="err" role="alert"><span class="chip chip--danger">413</span><span>Fichier trop lourd : 2 Mo maximum.</span></p>
+      <p id="cp-file-e2" class="err" role="alert"><span class="chip chip--danger">415</span><span>Format refusé : envoyez une image JPEG, PNG ou WebP.</span></p>
+      <p class="muted cp-hint">Sans photo, l’avatar affiche les initiales. « Supprimer la photo » ramène aux initiales.</p>
+    </fieldset>
+    <form class="ed-grid" action="#">
+      <p class="field ed-grid__full"><label for="cp-disp">Nom affiché <span aria-hidden="true">*</span></label><input id="cp-disp" class="input" value="Lou Bernard" required aria-describedby="cp-disp-h"><span id="cp-disp-h" class="muted cp-hint">Utilisé partout sur le site public.</span></p>
+      <p class="field"><label for="cp-fn">Prénom</label><input id="cp-fn" class="input" value="Lou"></p>
+      <p class="field"><label for="cp-ln">Nom</label><input id="cp-ln" class="input" value="Bernard"></p>
+      <p class="field ed-grid__full"><label for="cp-ps">Pseudo</label><input id="cp-ps" class="input" value="La Mousse"></p>
+      <div class="ed-cta ed-grid__full"><button class="btn btn--outlined" type="reset">Annuler</button><button class="btn btn--primary" type="submit">Enregistrer</button></div>
+    </form>
+  </section>
+</div></section><section role="tabpanel" id="ed-p-plus" aria-labelledby="ed-t-plus" hidden><p class="muted ed-note">Sur mobile, les deux entrées réactivées rejoignent l’entrée « Plus » de la barre basse, au-dessus des entrées existantes.</p>
+<ul class="plus ed-plus">
+  <li><a class="plus__i" href="#ed-p-list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16M8 3v4M16 3v4"/></svg><span><b>Éditions</b><small class="muted">Créer une édition, modifier ses informations</small></span><span aria-hidden="true">›</span></a></li>
+  <li><a class="plus__i" href="#ed-p-comp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6M19 8v6M16 11h6"/></svg><span><b>Compétiteurs</b><small class="muted">Corriger une identité, gérer la photo</small></span><span aria-hidden="true">›</span></a></li>
+  <li><a class="plus__i" href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span><b>Participants</b><small class="muted">Inscrire, inviter, renvoyer une invitation</small></span><span aria-hidden="true">›</span></a></li>
+  <li><a class="plus__i" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg><span><b>Voir le site public</b><small class="muted">Ce que voient les visiteurs</small></span><span aria-hidden="true">›</span></a></li>
+</ul></section>
+</main>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+<script>
+  // Maquette : comportement d'origam-tabs (flèches, Début/Fin). Aucune animation pilotée en JS.
+  document.querySelectorAll('[role="tablist"]').forEach((list) => {
+    const tabs = [...list.querySelectorAll('[role="tab"]')]
+    const show = (t) => { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on }) }
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(t))
+      t.addEventListener('keydown', (ev) => {
+        const k = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[ev.key]
+        if (k === undefined) return
+        ev.preventDefault(); const n = tabs[(k + tabs.length) % tabs.length]; n.focus(); show(n)
+      })
+    })
+  })
+</script>
+</body>
+</html>

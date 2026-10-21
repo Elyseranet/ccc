@@ -16,6 +16,7 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | `edition.html`, `joueur.html`, `joueurs.html` | Pages denses publiques (CSS seul). |
 | `face-a-face.html`, `regles.html`, `compte.html` | Face-à-face (seul ratio public), règles + variantes, compte participant (1re connexion, connexion, /profil). |
 | `admin.html`, `admin-matchs.html` | Tableau de bord ; poules et matchs (`/admin/matchs`, FA-05) avec la saisie ouverte. |
+| `admin-editions.html` + `admin-editions.css` | F-13 : éditions (liste, création, modification, clôturée) et compétiteurs (annuaire, identité, photo) ; à valider. |
 | `admin-participants.html`, `admin-tirages.html`, `admin-plus.html` | Participants (autocomplétion, création, invitation) ; tirage physique ; entrée « Plus » de la barre basse (390 px). |
 
 ## Décisions portées par le thème
@@ -117,6 +118,29 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Admin · Plus (mobile) | Entrée « Plus » | `origam-list` | `nav: true`, `items`, `density: "comfortable"`, `rounded: "lg"`<br>Participants, Voir le site public, Mon compte (FA-08). Rien de masqué par FA-09. |
 | Admin · Plus (mobile) | Édition active | `origam-select` | `items`, `label: "Édition active"`, `variant: "solo"`, `rounded: "full"` |
 | Admin · Plus (mobile) | Déconnexion | `origam-btn` | `variant: "outlined"`, `block: true` |
+| F-13 · Éditions | Navigation (tiroir) | `origam-drawer` | `permanent: true`, `width: 272`, `border: true`<br>Section « Référentiel » réactivée : Éditions, Compétiteurs (levée de FA-09 pour F-13). L’entrée courante reçoit la classe active selon la route. |
+| F-13 · Éditions | Onglets de la maquette | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Dans l’app : deux routes distinctes (éditions, compétiteurs) ; les onglets ne servent qu’à présenter les écrans dans la maquette. |
+| F-13 · Éditions | Recherche | `origam-text-field` | `type: "search"`, `label: "Rechercher une édition"`, `variant: "solo"`, `rounded: "full"`, `clearable: true` |
+| F-13 · Éditions | Créer une édition | `origam-btn` | `variant: "flat"`, `color: "primary"`, `elevation: "lg"`, `to: "/admin/editions/nouvelle"`<br>Route exacte : Je ne sais pas, à fixer par le front. |
+| F-13 · Éditions | Liste des éditions | `origam-data-table` | `headers`, `items`, `density: "compact"`, `hover: true`, `sortBy`<br>Colonnes : code, année, nom, date, statut (EDITION_STATUS), origine (EDITION_ORIGIN), participants, action. Archive : nom, date, lieu « Non renseigné ». |
+| F-13 · Éditions | Statut | `origam-chip` | `size: "small"`, `pill: true`, `color: "success"`<br>CLOSED = success ; POOLS_PLAYING / QUALIFIED / PLAYOFFS = secondary (néon) ; REGISTRATION / POOLS_DRAWN = info. |
+| F-13 · Éditions | Année (création) | `origam-number-field` | `label: "Année"`, `min: 2012`, `max: 2099`, `precision: 0`, `required: true`, `variant: "solo"`, `rounded: "full"`, `errorMessages`<br>Bornes min / max : Je ne sais pas, à confirmer avec le schéma de B-10. |
+| F-13 · Éditions | Nom, lieu | `origam-text-field` | `label: "Nom"`, `variant: "solo"`, `rounded: "full"`, `placeholder: "…"` |
+| F-13 · Éditions | Date | `origam-date-picker-field` | `label: "Date"`, `variant: "solo"`, `rounded: "full"`, `clearable: true` |
+| F-13 · Éditions | Description | `origam-textarea-field` | `label: "Description"`, `rows: 3`, `autoGrow: true`, `variant: "solo"`, `rounded: "lg"` |
+| F-13 · Éditions | Rappel « code généré » | `origam-alert` | `status: "info"`, `title: "Code"`, `text: "…"`, `rounded: "lg"`, `density: "compact"`<br>CE-1 : 2027, puis 2027b, 2027c… Le code n’est jamais saisi. |
+| F-13 · Éditions | Erreur de validation (400) | `origam-alert` | `status: "error"`, `title: "Le formulaire contient une erreur."`, `text: "…"`, `rounded: "lg"`<br>Plus le message de champ via `errorMessages`. |
+| F-13 · Éditions | Code épuisé (409) | `origam-alert` | `status: "error"`, `title: "Plus aucun code disponible pour cette année."`, `text: "…"`, `rounded: "lg"`<br>EDITION_CODE_EXHAUSTED. |
+| F-13 · Éditions | Confirmation de création | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"`<br>Affiche le code attribué et l’adresse publique /editions/<code>. Actions : ajouter les participants, modifier les informations. |
+| F-13 · Éditions | Champs en lecture seule | `origam-data-list` | `items`, `density: "compact"`, `rounded: "lg"`<br>Code, année, statut (R-9). Édition clôturée : tous les champs. |
+| F-13 · Éditions | Édition clôturée (409) | `origam-alert` | `status: "error"`, `title: "Modification refusée."`, `text: "…"`, `rounded: "lg"`<br>EDITION_CLOSED. État par défaut d’une édition CLOSED : formulaire remplacé par la lecture seule. |
+| F-13 · Compétiteurs | Annuaire admin | `origam-data-table` | `headers`, `items`, `itemsPerPage: 10`, `density: "compact"`, `hover: true`<br>Colonnes : nom affiché, prénom, nom, pseudo, éditions, action « Corriger ». Ligne en cours d’édition marquée. |
+| F-13 · Compétiteurs | Avatar | `origam-avatar` | `image: "…"`, `text: "LB"`, `size: "x-large"`, `rounded: "full"`<br>Sans photo : initiales (`text`). |
+| F-13 · Compétiteurs | Envoi de photo | `origam-file-field` | `label: "Envoyer une photo"`, `maxFileSize: 2097152`, `maxFileSizeErrorString: "…"`, `variant: "solo"`, `rounded: "full"`, `hint: "JPEG, PNG ou WebP, 2 Mo maximum"`<br>PUT /competiteurs/{id}/avatar (B-16). Le filtre de type (accept) : Je ne sais pas si OrigamFileField le transmet à l’input (aucune prop `accept` dans IFileFieldProps) ; le serveur refuse de toute façon en 415. |
+| F-13 · Compétiteurs | Supprimer la photo | `origam-btn` | `variant: "outlined"`, `size: "small"`, `disabled: true`<br>DELETE /competiteurs/{id}/avatar → initiales. Désactivé quand il n’y a pas de photo. |
+| F-13 · Compétiteurs | Erreurs de photo | `origam-alert` | `status: "error"`, `text: "Fichier trop lourd : 2 Mo maximum."`, `density: "compact"`, `rounded: "lg"`<br>413 trop lourd ; 415 format refusé ; 422 fichier illisible (message à rédiger). |
+| F-13 · Compétiteurs | Identité | `origam-text-field` | `label: "Nom affiché"`, `required: true`, `variant: "solo"`, `rounded: "full"`, `hint: "Utilisé partout sur le site public."`<br>Plus prénom, nom, pseudo. PATCH /competiteurs/{id} (B-10). |
+| F-13 · Plus (mobile) | Entrées réactivées | `origam-list` | `nav: true`, `items`, `density: "comfortable"`, `rounded: "lg"`<br>Éditions et Compétiteurs ajoutées en tête du menu « Plus ». |
 
 ## Vidéo de fond des vitrines : asset à fournir
 

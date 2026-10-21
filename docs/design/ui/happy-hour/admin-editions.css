@@ -1,0 +1,73 @@
+/* CCC · Happy Hour — F-13 : éditions et compétiteurs (admin, CSS seul).
+   Fichier propre à cette maquette : les feuilles validées (hh.css, admin.css) ne sont pas modifiées.
+   Uniquement des var(--origam-*) issues de tokens.css. */
+
+.adm-side__t .chip { margin-left: var(--origam-space---1); vertical-align: middle; }
+.adm .tabs { margin-bottom: var(--origam-space---2); }
+
+/* Barre d'outils de liste */
+.ed-bar { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--origam-space---4); margin-bottom: var(--origam-space---5); }
+.ed-search { min-width: min(100%, 22rem); }
+.ed-search .input { width: 100%; }
+.ed-note { margin-block: var(--origam-space---4) var(--origam-space---6); font-size: var(--origam-font__size---sm); max-width: 60rem; }
+
+/* Formulaires */
+.ed-form { display: grid; gap: var(--origam-space---5); margin-top: var(--origam-space---6); }
+.ed-form__h { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: var(--origam-space---3); }
+.ed-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---4); }
+.ed-grid__full { grid-column: 1 / -1; }
+.ed-grid .input { width: 100%; }
+.input--area { min-height: 7rem; padding-block: var(--origam-space---3); border-radius: var(--origam-radius---lg); resize: vertical; font: inherit; line-height: var(--origam-font__lineHeight---normal); }
+.input--file { padding-block: var(--origam-space---3); }
+.input.is-error { border-color: var(--origam-color__feedback--danger---border); }
+.err { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); font-size: var(--origam-font__size---sm); font-weight: var(--origam-font__weight---semibold); color: var(--origam-color__feedback--danger---fgSubtle); }
+.rule { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); padding: var(--origam-space---3) var(--origam-space---4); border-radius: var(--origam-radius---lg); background: var(--origam-color__feedback--info---bgSubtle); font-size: var(--origam-font__size---sm); }
+.ed-alert { display: flex; align-items: start; gap: var(--origam-space---3); padding: var(--origam-space---3) var(--origam-space---4); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); font-size: var(--origam-font__size---sm); }
+.ed-alert[role="alert"] { border-color: var(--origam-color__feedback--danger---border); background: var(--origam-color__feedback--danger---bgSubtle); }
+.ed-alert p { flex: 1; }
+.ed-cta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--origam-space---3); }
+
+/* Lecture seule (origam-data-list) */
+.ed-ro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--origam-space---2); }
+.ed-ro--4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ed-ro div { display: grid; gap: 2px; align-content: start; padding: var(--origam-space---3) var(--origam-space---4); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); }
+.ed-ro dt { font-size: var(--origam-font__size---xs); font-weight: var(--origam-font__weight---bold); letter-spacing: var(--origam-font__letterSpacing---wide); text-transform: uppercase; color: var(--origam-color__text---tertiary); }
+.ed-ro dd { font-weight: var(--origam-font__weight---bold); }
+.ed-ro small { font-size: var(--origam-font__size---sm); }
+.ed-form--locked { border-style: dashed; }
+
+/* Confirmation de création */
+.ed-done { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---6); margin-top: var(--origam-space---5); border-color: var(--origam-color__feedback--success---border); }
+.ed-done__code { font-size: var(--origam-font__size---4xl); line-height: 1; color: var(--origam-color__bar---amber); }
+.ed-done__cta { display: flex; flex-wrap: wrap; gap: var(--origam-space---3); }
+
+/* Compétiteurs */
+.cp-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--origam-space---5); align-items: start; }
+.cp-grid > * { min-width: 0; }
+.table .is-sel td { background: var(--origam-color__action--primary---bgSubtle); }
+.table .is-sel td:first-child { box-shadow: inset 3px 0 0 var(--origam-color__action--primary---bg); }
+.cp-form { margin-top: 0; }
+.cp-photo { display: grid; gap: var(--origam-space---3); padding: var(--origam-space---4); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---lg); }
+.cp-photo__lg { padding-inline: var(--origam-space---2); font-size: var(--origam-font__size---xs); font-weight: var(--origam-font__weight---bold); letter-spacing: var(--origam-font__letterSpacing---wide); text-transform: uppercase; color: var(--origam-color__text---tertiary); }
+.cp-photo__row { display: flex; align-items: start; gap: var(--origam-space---4); }
+.cp-photo__act { display: grid; gap: var(--origam-space---2); flex: 1; min-width: 0; justify-items: start; }
+.cp-photo__act .field, .cp-photo__act .input { width: 100%; }
+.cp-av { display: grid; place-items: center; flex: none; width: 5.5rem; aspect-ratio: 1; border-radius: var(--origam-radius---full); background: var(--origam-color__bar---amber); color: var(--origam-color__surface---default); font-size: var(--origam-font__size---2xl); box-shadow: var(--origam-shadow---lg); }
+.cp-hint { font-size: var(--origam-font__size---sm); }
+
+/* Menu « Plus » mis à jour */
+.ed-plus { max-width: 34rem; }
+
+@media (max-width: 1200px) {
+  .cp-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .ed-grid, .ed-ro, .ed-ro--4 { grid-template-columns: minmax(0, 1fr); }
+  .ed-bar .btn { width: 100%; }
+  .ed-cta { display: grid; grid-template-columns: 1fr 1.4fr; }
+  .ed-done { grid-template-columns: minmax(0, 1fr); gap: var(--origam-space---3); }
+  .ed-done__cta { display: grid; }
+  .cp-photo__row { flex-direction: column; }
+}
+.err { flex-wrap: nowrap; align-items: start; } .err > span:last-child { flex: 1; }
+.ed-alert[role="alert"] .chip--danger { background: var(--origam-color__feedback--danger---bg); color: var(--origam-color__feedback--danger---fg); }
