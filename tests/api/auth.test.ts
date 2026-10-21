@@ -340,6 +340,23 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect((await login(owner.email, PASSWORD, cookie)).status).toBe(429)
     })
 
+    it('a password change revokes the trusted devices: 0 rows, and the old cookie is unrecognised', async () => {
+      const owner = await newOwner()
+      const first = await login(owner.email, PASSWORD)
+      const session = cookieHeaderOf(first)
+      const oldDeviceCookie = deviceCookieHeaderOf(first)
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(1)
+
+      const NEW_PASSWORD = 'brand-new-password-2'
+      const changed = await jsonPatch('/api/v1/moi', { currentPassword: PASSWORD, newPassword: NEW_PASSWORD }, session)
+      expect(changed.status).toBe(200)
+      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(0)
+
+      // Le cookie volé n'a plus de passe-droit : sur un compte en délai, il reçoit 429 comme un client inconnu.
+      await throttleAccount(owner.id)
+      expect((await login(owner.email, NEW_PASSWORD, oldDeviceCookie)).status).toBe(429)
+    })
+
     it('keeps at most 20 devices per account', async () => {
       const owner = await newOwner()
       for (let index = 0; index < 22; index += 1) {

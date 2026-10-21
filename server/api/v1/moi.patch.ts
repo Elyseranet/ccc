@@ -1,14 +1,13 @@
 import { setResponseHeader } from 'h3'
 import type { IMe } from '../../../shared/interfaces/api/me.interface'
 import { LOG_EVENT } from '../../consts/log-event.const'
-import { CompetitorEntity } from '../../database/entities/competitor.entity'
 import { UserEntity } from '../../database/entities/user.entity'
 import { updateMeSchema } from '../../schemas/auth.schema'
 import { enforcePasswordChangeRateLimit } from '../../utils/auth/login-rate-limit.util'
 import { loadMe } from '../../utils/auth/me.util'
 import { hashPassword, verifyPassword } from '../../utils/auth/password.util'
 import { requireUser } from '../../utils/auth/require-role.util'
-import { revokeOtherSessions } from '../../utils/auth/session-store.util'
+import { applyProfileChanges } from '../../utils/auth/profile-update.util'
 import { invalidCurrentPassword, unprocessable } from '../../utils/http/api-error.util'
 import { readBodyWithSchema } from '../../utils/http/validation.util'
 import { logger } from '../../utils/logger.util'
@@ -38,20 +37,16 @@ export default defineEventHandler(async (event): Promise<IMe> => {
     newHash = await hashPassword(body.newPassword)
   }
 
-  await dataSource.transaction(async (manager) => {
-    if (wantsContactUpdate && user.competitorId) {
-      await manager.getRepository(CompetitorEntity).update({ id: user.competitorId }, {
-        ...(body.avatarUrl !== undefined ? { avatarUrl: body.avatarUrl } : {}),
-        ...(body.phone !== undefined ? { phone: body.phone } : {})
-      })
-    }
-    if (newHash) {
-      await manager.getRepository(UserEntity).update({ id: user.id }, { passwordHash: newHash })
-    }
+  await applyProfileChanges(dataSource, {
+    userId: user.id,
+    currentSessionId: user.sessionId,
+    competitorId: user.competitorId,
+    avatarUrl: body.avatarUrl,
+    phone: body.phone,
+    newPasswordHash: newHash
   })
 
   if (newHash) {
-    await revokeOtherSessions(dataSource, user.id, user.sessionId)
     logger.info(LOG_EVENT.AUTH_PASSWORD_CHANGED, { requestId: event.context.requestId, userId: user.id })
   }
   return loadMe(dataSource, user.id)

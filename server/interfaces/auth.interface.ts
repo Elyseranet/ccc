@@ -25,6 +25,16 @@ export interface ICrossSiteInput {
   allowedOrigins: string[]
 }
 
+/** Changements de `PATCH /moi` appliqués ensemble par `applyProfileChanges`. */
+export interface IProfileChanges {
+  userId: string
+  currentSessionId: string
+  competitorId: string | null
+  avatarUrl?: string | null
+  phone?: string | null
+  newPasswordHash?: string
+}
+
 /** Compteur d'échecs commun au compte et à l'appareil de confiance. */
 export interface IThrottleCounters {
   failedLoginCount: number

@@ -1,5 +1,5 @@
 import { IsNull, LessThan, Not } from 'typeorm'
-import type { DataSource } from 'typeorm'
+import type { DataSource, EntityManager } from 'typeorm'
 import { USER_STATUS } from '../../../shared/enums/user.enum'
 import { SessionEntity } from '../../database/entities/session.entity'
 import { SESSION_ABSOLUTE_TIMEOUT_SECONDS, SESSION_IDLE_TIMEOUT_SECONDS, SESSION_PURGE_GRACE_MS, SESSION_TOUCH_INTERVAL_MS } from '../../consts/auth.const'
@@ -57,7 +57,7 @@ export const revokeSessionByToken = async (dataSource: DataSource, token: string
 }
 
 export const revokeOtherSessions = async (
-  dataSource: DataSource,
+  dataSource: DataSource | EntityManager,
   userId: string,
   keepSessionId: string,
   now = new Date()
