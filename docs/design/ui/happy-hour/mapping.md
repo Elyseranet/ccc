@@ -45,14 +45,14 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Accueil | Avancement des poules | `origam-progress` | `modelValue: 65`, `color: "primary"`, `rounded: true`<br>Résultats validés uniquement (E-f), pas d’effet live. |
 | Accueil | Derniers scores validés | `origam-list` | `items`, `density: "comfortable"`, `rounded: "lg"`<br>Un item = vainqueur · score · perdant · chip de poule. |
 | Accueil / Palmarès | Bandeau des règles d’or | — (CSS d’app) | Composant d’app STATIQUE (aucun défilement automatique) : grille 4 × 2 en bureau, défilement manuel à l’aimant sur mobile. Contenu = RG25–RG32. |
-| Palmarès | Onglets ACP / All Time / Évolution | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Panneaux : origam-tab-panels / origam-tab-panel. |
+| Palmarès | Onglets ACP / All Time / Évolution | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "secondary"`<br>Panneaux : origam-tab-panels / origam-tab-panel. Onglet actif en `action.secondary` (néon rose), onglets en pilule : style porté par les props du thème (`components['origam-tabs']`, prérequis F-00l), pas par un style de page. |
 | Palmarès | Tableaux de classement | `origam-data-table` | `headers`, `items`, `density: "compact"`, `hover: true`, `sortBy`, `caption: "Classement ACP"`<br>Titres = astérisques (RG6) dans le slot de cellule. |
 | Palmarès | Graphique d’évolution | `origam-chart` | `type: "line"`, `series`, `categories`, `showLegend: true`, `showGrid: true`, `showTooltip: true`, `animated: false`<br>Une seule échelle (points ACP). Tableau équivalent sous « Voir en tableau ». |
 | Palmarès | Chronologie des titres | `origam-card` | `rounded: "lg"`, `border: true`, `elevation: "none"`<br>Un item par édition (2012 compte deux éditions). |
 | Édition | Fil d’Ariane | `origam-breadcrumb` | `items`, `density: "compact"` |
 | Édition | Sélecteur d’édition | `origam-select` | `items`, `variant: "solo"`, `rounded: "full"`, `label: "Changer d’édition"`<br>L’édition est portée par l’URL (identifiant ≠ année : 2012a / 2012b). |
-| Édition | Onglets Synthèse → Matchs | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Sticky sous l’en-tête en bureau. |
-| Édition | Déroulé (9 étapes) | `origam-stepper` | `items`, `orientation: "vertical"`, `clickable: false`, `showConnectors: true`<br>Items : `{ title, status: done | active | pending }` (STEPPER_ITEM_STATUS). |
+| Édition | Onglets Synthèse → Matchs | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "secondary"`<br>Sticky sous l’en-tête en bureau. Onglet actif en `action.secondary` (néon rose), onglets en pilule : style porté par les props du thème (`components['origam-tabs']`, prérequis F-00l), pas par un style de page. |
+| Édition | Déroulé (9 étapes) | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"`<br>PAS d’origam-stepper : une origam-card contenant un `<ol>` natif ; chaque étape est une ligne (fond `surface.sunken`, rayon `lg`) avec numéro et origam-chip « Fait ». |
 | Édition | Chiffres de l’édition | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"` |
 | Édition | Participants | `origam-list` | `items`, `density: "comfortable"`<br>Chaque item : origam-avatar + nom + origam-chip de résultat. |
 | Édition | Avatar | `origam-avatar` | `text: "LB"`, `size: "default"`, `rounded: "full"` |
@@ -82,7 +82,7 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Admin | Compteur du CTA | `origam-badge` | `content: 7`, `inline: true`, `color: "secondary"` |
 | Admin | Activité récente | `origam-list` | `items`, `density: "compact"`<br>Flux dérivé des seules validations de match et de tirage, sans table d’audit (A17). |
 | Admin · matchs | Filtres de file | `origam-chip-group` | `mandatory: true`, `filter: true`<br>À traiter / Saisis / Sans score / Validés (A1). |
-| Admin · matchs | Cartes de match | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "sm"`<br>Bureau : origam-data-table. Mobile : liste de cartes. |
+| Admin · matchs | Cartes de match | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "sm"`<br>Cartes en bureau (grille de 2 colonnes) comme en mobile (1 colonne). Pas d’origam-data-table. |
 | Admin · matchs | Saisie (bureau) | `origam-dialog` | `modelValue: true`, `maxWidth: 560`, `persistent: false`, `scrim: true`, `title: "Saisir le score"`<br>Mobile : même contenu en tiroir bas (origam-sheet `side`/`snapPoints`, à confirmer). |
 | Admin · matchs | Tiroir mobile | `origam-sheet` | `open: true`, `swipeable: true`, `rounded: "xl"` |
 | Admin · matchs | Champs de score | `origam-number-field` | `min: 0`, `max: 5`, `label: "Clara Lambert"`, `variant: "solo"`, `rounded: "lg"`<br>Max 5 en poule, 10 en phase finale (RG22). Erreurs via `errorMessages`. |
@@ -93,8 +93,8 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Face-à-face | Score des rencontres | `origam-card` | `rounded: "xl"`, `border: true`, `elevation: "md"`<br>Proportion = barre + texte « 2 – 2 » (jamais la couleur seule). Départages exclus. |
 | Face-à-face | Bilans globaux (RG37) | `origam-data-list` | `items`, `density: "compact"`, `rounded: "lg"`<br>Matchs, ratio, V, D, points marqués / encaissés, différentiel : le SEUL endroit public où le ratio apparaît (FA-12). |
 | Face-à-face | Historique (RG36) | `origam-data-table` | `headers`, `items`, `density: "compact"`<br>Rencontres sans score connu comptées à part, jamais comme nuls. |
-| Règles | Onglets Le jeu / Le tournoi / Variantes | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Variantes = section de Règles (A2), redirection `/variants`. |
-| Règles | Déroulé d’un point | `origam-stepper` | `items`, `orientation: "horizontal"`, `clickable: false`<br>Contenu repris de app/pages/rules.vue. |
+| Règles | Onglets Le jeu / Le tournoi / Variantes | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "secondary"`<br>Variantes = section de Règles (A2), redirection `/variants`. Onglet actif en `action.secondary` (néon rose), onglets en pilule : style porté par les props du thème (`components['origam-tabs']`, prérequis F-00l), pas par un style de page. |
+| Règles | Déroulé d’un point | `origam-card` | `rounded: "xl"`, `border: true`<br>PAS d’origam-stepper : un `<ol>` natif de 4 origam-card (numéro en pastille néon, titre, texte). Contenu repris de app/pages/rules.vue. |
 | Règles | Règles d’or (RG25–RG32) | `origam-list` | `items`<br>Grille statique, aucun défilement automatique. |
 | Règles | Schéma d’une variante | `origam-card` | `rounded: "xl"`, `border: true`<br>Schéma SVG `role="img"` + `aria-label` décrivant la disposition ; textes repris de app/pages/variants.vue. |
 | Compte | Mot de passe (1re connexion) | `origam-password-field` | `label: "Mot de passe"`, `variant: "solo"`, `rounded: "full"`, `strengthBar: true`, `persistentRequirements: true`<br>Lien d’invitation valable 7 jours, usage unique (A14). |
@@ -115,8 +115,8 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Admin · tirages | Têtes de série | `origam-list` | `items`, `density: "compact"`<br>ACP sur les 5 dernières éditions clôturées (A8). |
 | Admin · tirages | Confirmation de validation | `origam-dialog` | `modelValue: true`, `persistent: true`, `maxWidth: 560`, `title: "Valider le tirage des poules ?"`, `scrim: true`<br>Non annulable : le texte le dit, focus initial sur « Annuler », bouton `color="error"`. |
 | Admin · tirages | Valider définitivement | `origam-btn` | `variant: "flat"`, `color: "error"`, `size: "large"` |
-| Admin · Plus (mobile) | Entrée « Plus » | `origam-list` | `nav: true`, `items`, `density: "comfortable"`, `rounded: "lg"`<br>Participants, Voir le site public, Mon compte (FA-08). Rien de masqué par FA-09. |
-| Admin · Plus (mobile) | Édition active | `origam-select` | `items`, `label: "Édition active"`, `variant: "solo"`, `rounded: "full"` |
+| Admin · Plus (mobile) | Entrée « Plus » | `origam-list` | `nav: true`, `items`, `density: "comfortable"`, `rounded: "xl"`<br>Participants, Voir le site public, Mon compte (FA-08). Rien de masqué par FA-09. Rayon des liens `xl` (28 px dans le thème ccc). |
+| Admin · Plus (mobile) | Édition active | `origam-select` | `items`, `label: "Toutes les pages travaillent sur cette édition"`, `variant: "solo"`, `rounded: "full"`<br>« Édition active » est le titre (h2) de la carte qui contient le champ, pas le libellé du champ. Dans la maquette, le libellé visible est relié par `<label for>`. |
 | Admin · Plus (mobile) | Déconnexion | `origam-btn` | `variant: "outlined"`, `block: true` |
 | F-13 · Éditions | Navigation (tiroir) | `origam-drawer` | `permanent: true`, `width: 272`, `border: true`<br>Section « Référentiel » réactivée : Éditions, Compétiteurs (levée de FA-09 pour F-13). L’entrée courante reçoit la classe active selon la route. |
 | F-13 · Éditions | Onglets de la maquette | `origam-tabs` | `variant: "pills"`, `rounded: "full"`, `color: "primary"`<br>Dans l’app : deux routes distinctes (éditions, compétiteurs) ; les onglets ne servent qu’à présenter les écrans dans la maquette. |
