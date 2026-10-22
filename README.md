@@ -45,6 +45,20 @@ L'image (`Dockerfile`) est agnostique de l'environnement : aucune valeur n'est c
 
 Mode recommandé (décision OPS-1 et OPS-2) : Coolify construit l'image depuis le dépôt (`https://github.com/Elyseranet/ccc`, privé) avec le `Dockerfile` seul, et PostgreSQL est une **ressource Coolify séparée** (sauvegardes gérées par Coolify). Renseigner `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD` et `_DATABASE` avec les valeurs de cette ressource. Il n'y a pas de registre d'images ni de workflow de publication.
 
+### Variables obligatoires en production (garde-fou PROD-1)
+
+L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) : **ne pas la retirer ni la mettre à `false` dans Coolify**, il n'existe pas de mode recette. Avec cet indicateur, le serveur **et** `ccc-ops user:create-admin` refusent de démarrer, avec un message qui nomme la variable fautive (jamais sa valeur), si l'une de ces variables manque ou est locale :
+
+| Variable | Exigence |
+|---|---|
+| `NUXT_PUBLIC_SITE_URL` | URL en `https:`, qui ne désigne ni `localhost` ni `127.0.0.1` ; base des liens d'invitation |
+| `NUXT_MAIL_TRANSPORT` | `smtp` (`capture` est réservé aux tests d'API) |
+| `NUXT_MAIL_HOST` | serveur SMTP réel, ni `localhost` ni `127.0.0.1` |
+| `NUXT_MAIL_PORT`, `NUXT_MAIL_SECURE`, `NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD` | à renseigner selon le fournisseur SMTP (le garde-fou ne contrôle que `host`, `transport`, `from` et `siteUrl`) |
+| `NUXT_MAIL_FROM` | expéditeur non vide, par ex. `CCC <no-reply@votre-domaine>` |
+
+L'indicateur est faux par défaut et ne dépend pas de `NODE_ENV` : le développement local et le build des tests d'API ne le posent pas.
+
 Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comme ressource « Docker Compose ». Aucun port n'y est publié : Coolify route le domaine vers le port 3000 du service `app`.
 
 Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
@@ -199,6 +213,9 @@ Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (A
 | `NUXT_RATE_LIMIT_MAX_REQUESTS` | `60` | Nombre de requêtes autorisées par IP et par clé de route dans la fenêtre. |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `30` | Réglages propres à la recherche publique `GET /api/v1/competiteurs?q=` (clé `competitors-search`) ; surchargent les valeurs par défaut ci-dessus. |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `300` | Budget unique, partagé par toutes les routes publiques en lecture (clé `public-read`) : liste des compétiteurs (hors `?q=`), fiche, face-à-face, éditions et sous-ressources, stats, classements. `/health` et la recherche `?q=` gardent leur clé. |
+| `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000` | URL publique du site : base des liens d'invitation (jamais l'en-tête `Host`). À renseigner en production. |
+| `NUXT_MAIL_HOST`, `_PORT`, `_SECURE`, `_USER`, `_PASSWORD`, `_FROM` | `localhost`, `1025`, `false`, vide, vide, `CCC <no-reply@ccc.local>` | Envoi des invitations par SMTP (nodemailer) : Mailpit en local, fournisseur SMTP en production. |
+| `NUXT_RATE_LIMIT_INVITATION_TOKEN_WINDOW_MS`, `_MAX_REQUESTS` | `900000`, `30` | Budget par IP des routes publiques `GET`/`POST /auth/invitation/{jeton}` (clé `invitation-token`). |
 | `NUXT_RATE_LIMIT_MAX_KEYS` | `10000` | Plafond de clés `ip:route` gardées en mémoire ; au-delà, la clé la plus anciennement utilisée est évincée. Les IPv6 sont agrégées par préfixe /64. |
 
 Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy : voir T-SEC-02.
@@ -267,4 +284,4 @@ Cookie d'appareil de confiance (SEC-A4, migration M4, table `login_devices` ; m�
 
 **Risque accepté (N1, décision utilisateur 2026-10-21, `docs/design/ux/decisions.md`).** Un attaquant qui possède l'email ET un cookie d'appareil valide (le cookie est `HttpOnly` : il ne peut être volé que sur l'appareil lui-même) obtient un second flux d'essais, avec son propre compteur. Ce flux est ralenti comme les autres (5 essais libres, puis un délai de 2^(n−5) s plafonné à 300 s) et borné par la limite par IP. Un changement de mot de passe révoque tous les appareils de confiance du compte (N2). **Aucun plafond global d'essais par compte n'est appliqué.**
 
-Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard) crée un compte `INVITED` sans mot de passe ; le lien d'invitation qui lui permet d'en définir un arrive avec B-09.
+Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard, `NUXT_PUBLIC_SITE_URL` requis) crée un compte `INVITED` sans mot de passe et affiche une fois, sur la sortie standard, son lien de première connexion (7 jours, usage unique). Invitations, envoi d'email (SMTP, `NUXT_MAIL_*`) et routes : voir `docs/api/invitations.md`.

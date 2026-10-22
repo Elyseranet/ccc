@@ -64,7 +64,10 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/ccc-ops.sh /usr/local/bin/ccc-ops
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/ccc-ops
 
+# PROD-1 : garde-fou de configuration. Le serveur et `user:create-admin` refusent de démarrer si NUXT_PUBLIC_SITE_URL
+# n'est pas en https ou vise localhost, ou si le SMTP (NUXT_MAIL_*) est absent ou local. Aucun mode recette.
 ENV NODE_ENV=production \
+    NUXT_STRICT_RUNTIME_CONFIG=true \
     HOST=0.0.0.0 \
     PORT=3000
 

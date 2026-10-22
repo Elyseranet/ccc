@@ -6,7 +6,7 @@ import { CompetitorEntity } from '../../src/server/db/typeorm/entities/competito
 import { LoginDeviceEntity } from '../../src/server/db/typeorm/entities/login-device.entity'
 import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
 import { UserEntity } from '../../src/server/db/typeorm/entities/user.entity'
-import { cleanup, resetSchema } from './helpers/test-database'
+import { cleanup, resetSchema, revertMigrationsUntil } from './helpers/test-database'
 
 let dataSource: DataSource
 
@@ -47,9 +47,7 @@ describe('migration M2', () => {
   })
 
   it('reverts cleanly (tables, FK and enum types) then re-applies', async () => {
-    await dataSource.undoLastMigration() // M4, qui dépend de users
-    await dataSource.undoLastMigration() // M3
-    await dataSource.undoLastMigration() // M2
+    await revertMigrationsUntil(dataSource, 'CreateDomainSchema') // M2 et ses dépendantes (M3, M4, M5…)
     expect(await tables()).toEqual([])
     expect(await userForeignKeys()).toEqual([])
     const types: Array<{ typname: string }> = await dataSource.query(
@@ -80,8 +78,7 @@ describe('migration M3', () => {
   })
 
   it('reverts then re-applies without touching users', async () => {
-    await dataSource.undoLastMigration() // M4
-    await dataSource.undoLastMigration() // M3
+    await revertMigrationsUntil(dataSource, 'CreateIdentitySchema') // M3 et ses dépendantes
     expect(await throttleColumns()).toEqual([])
     expect(await tables()).toEqual(['sessions', 'users'])
     await dataSource.runMigrations()
@@ -109,7 +106,7 @@ describe('migration M4', () => {
   })
 
   it('reverts then re-applies', async () => {
-    await dataSource.undoLastMigration()
+    await revertMigrationsUntil(dataSource, 'AddLoginThrottle') // M4 et ses dépendantes
     expect(await deviceTables()).toEqual([])
     expect(await tables()).toEqual(['sessions', 'users'])
     await dataSource.runMigrations()

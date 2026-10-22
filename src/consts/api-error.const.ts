@@ -13,6 +13,7 @@ export const API_ERROR_MESSAGE = {
   ROUTE_NOT_FOUND: 'Route not found',
   EDITION_NOT_FOUND: 'Edition not found',
   CONFLICT: 'Conflict',
+  EMAIL_ALREADY_USED: 'Email already used',
   GONE: 'Resource is no longer available',
   UNPROCESSABLE: 'Unprocessable entity',
   PAYLOAD_TOO_LARGE: 'Request body too large',

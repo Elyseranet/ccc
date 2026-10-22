@@ -13,6 +13,11 @@ export const LOG_EVENT = {
   AUTH_PASSWORD_CHANGED: 'auth_password_changed',
   AUTH_CROSS_ORIGIN_REFUSED: 'auth_cross_origin_refused',
   ADMIN_CREATED: 'admin_created',
+  COMPETITOR_ACCOUNT_CREATED: 'competitor_account_created',
+  INVITATION_ISSUED: 'invitation_issued',
+  INVITATION_SENT: 'invitation_sent',
+  INVITATION_SEND_FAILED: 'invitation_send_failed',
+  INVITATION_ACCEPTED: 'invitation_accepted',
   ARCHIVES_SEED_APPLIED: 'archives_seed_applied',
   ARCHIVES_SEED_FAILED: 'archives_seed_failed'
 } as const

@@ -3,7 +3,8 @@ import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../inter
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
-import type { DataSource } from 'typeorm'
+import { QueryFailedError } from 'typeorm'
+import type { DataSource, EntityManager } from 'typeorm'
 import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { MatchSideEntity } from '../server/db/typeorm/entities/match-side.entity.js'
@@ -15,7 +16,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_PURPOSE } from '../enums/match.enum.js'
 import { toMatchRecord } from '../utils/match-record.mapper.util.js'
-import { competitorNotFound } from '../utils/api-error.util.js'
+import { competitorNotFound, emailAlreadyUsed } from '../utils/api-error.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { countTitles } from '../utils/ranking.util.js'
 import { computeHeadToHead, computePlayerBalance, countedOutcomes, resolveMatchOutcome } from '../utils/record.util.js'
@@ -23,6 +24,16 @@ import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { buildContainsPattern } from '../utils/competitor-query.util.js'
 import { sortCompetitors } from '../utils/competitor-sort.util.js'
 import { useDataSource } from '../utils/database.util.js'
+import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
+import { PG_UNIQUE_VIOLATION, USER_EMAIL_UNIQUE_CONSTRAINT } from '../consts/invitation.const.js'
+import { LOG_EVENT } from '../consts/log-event.const.js'
+import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
+import type { INewCompetitor } from '../interfaces/competitor-creation.interface.js'
+import type { ICompetitorWithAccount } from '../interfaces/invitation.interface.js'
+import { buildDisplayName } from '../utils/display-name.util.js'
+import { normalizeEmail } from '../utils/email.util.js'
+import { issueInvitation } from '../utils/invitation-store.util.js'
+import { logger } from '../utils/logger.util.js'
 
 /*********************************************************
  * competitor.service
@@ -310,4 +321,61 @@ export const listHeadToHeadSummaries = async (id: string): Promise<IHeadToHeadSu
     .map((opponent) => toSummary(competitor, toCompetitorPublic(opponent), byOpponent.get(opponent.id)!))
     .filter((summary) => summary.played > 0)
     .sort((a, b) => b.played - a.played || a.opponent.displayName.localeCompare(b.opponent.displayName))
+}
+
+const isEmailCollision = (error: unknown): boolean => {
+  if (!(error instanceof QueryFailedError)) {
+    return false
+  }
+  const driverError = error.driverError as { code?: string, constraint?: string } | undefined
+  return driverError?.code === PG_UNIQUE_VIOLATION && driverError.constraint === USER_EMAIL_UNIQUE_CONSTRAINT
+}
+
+const toNullable = (value: string | null | undefined): string | null => {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : null
+}
+
+/**
+ * P1, cas 2 : crée le compétiteur, le compte `INVITED` (rôle PARTICIPANT, sans mot de passe) et l'invitation.
+ * S'exécute dans la transaction de l'appelant (`manager`), qui reste maître du commit : l'envoi de l'email
+ * doit partir APRÈS ce commit. Un email déjà rattaché à un compte donne 409 `EMAIL_ALREADY_USED`, et la
+ * transaction de l'appelant n'a alors rien écrit de durable. Pas d'avatar (B-16).
+ */
+export const createCompetitorWithAccount = async (
+  manager: EntityManager,
+  input: INewCompetitor,
+  now = new Date()
+): Promise<ICompetitorWithAccount> => {
+  const email = normalizeEmail(input.email)
+  const users = manager.getRepository(UserEntity)
+  if (await users.exists({ where: { email } })) {
+    throw emailAlreadyUsed()
+  }
+
+  const firstName = input.firstName.trim()
+  const lastName = input.lastName.trim()
+  try {
+    const competitor = await manager.getRepository(CompetitorEntity).save({
+      displayName: buildDisplayName(firstName, lastName),
+      firstName,
+      lastName,
+      nickname: toNullable(input.nickname),
+      phone: toNullable(input.phone),
+      avatarUrl: null
+    })
+    const user = await users.save({
+      email,
+      role: USER_ROLE.PARTICIPANT,
+      status: USER_STATUS.INVITED,
+      passwordHash: null,
+      competitorId: competitor.id
+    })
+    const invitation = await issueInvitation(manager, user.id, now)
+    logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_CREATED, { competitorId: competitor.id, userId: user.id })
+    return { competitorId: competitor.id, userId: user.id, ...invitation }
+  } catch (error) {
+    // Collision concurrente sur l'email entre le contrôle et l'insertion.
+    throw isEmailCollision(error) ? emailAlreadyUsed() : error
+  }
 }

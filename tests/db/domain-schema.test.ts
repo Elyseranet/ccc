@@ -12,7 +12,7 @@ import { MatchSideEntity } from '../../src/server/db/typeorm/entities/match-side
 import { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
 import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
 import { RoundEntity } from '../../src/server/db/typeorm/entities/round.entity'
-import { cleanup, resetSchema } from './helpers/test-database'
+import { cleanup, resetSchema, revertMigrationsUntil } from './helpers/test-database'
 
 const DOMAIN_TABLES = [
   'competitors',
@@ -74,10 +74,8 @@ describe('migration M1', () => {
   })
 
   it('reverts to an empty domain schema then re-applies', async () => {
-    await dataSource.undoLastMigration() // M4 (appareils de confiance)
-    await dataSource.undoLastMigration() // M3 (compteur d'échecs de connexion)
-    await dataSource.undoLastMigration() // M2 (identité) : les FK vers users tombent avant M1
-    await dataSource.undoLastMigration() // M1
+    // M1 et tout ce qui en dépend (identité, FK vers users, invitations) ; M0 (legacy) reste en place.
+    await revertMigrationsUntil(dataSource, 'CreateLegacyWorkbookImportTables')
     expect(await tablesPresent()).toEqual([])
 
     const legacy: Array<{ table_name: string }> = await dataSource.query(

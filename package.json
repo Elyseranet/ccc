@@ -32,6 +32,7 @@
   "dependencies": {
     "@pinia/nuxt": "^1.0.3",
     "dotenv": "^16.6.1",
+    "nodemailer": "^10.2.0",
     "origam": "^2.37.3",
     "pg": "^8.16.3",
     "pinia": "^4.1.0",
@@ -45,6 +46,7 @@
     "@axe-core/playwright": "^4.14.0",
     "@nuxt/test-utils": "^4.3.4",
     "@playwright/test": "^1.64.1",
+    "@types/nodemailer": "^8.0.2",
     "@types/pngjs": "^6.0.5",
     "@vue/test-utils": "^2.5.1",
     "happy-dom": "^21.0.3",

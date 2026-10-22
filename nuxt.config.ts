@@ -1,5 +1,6 @@
 import { CCC_HH_THEMES } from './src/themes/ccc.theme'
 import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
+import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
@@ -59,6 +60,9 @@ export default defineNuxtConfig({
     '/admin/draws': { redirect: { to: '/admin/tirages', statusCode: 301 } }
   },
   runtimeConfig: {
+    // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
+    // (Dockerfile, étage runner). Indépendant de NODE_ENV : le build des tests d'API est aussi un build de production.
+    strictRuntimeConfig: false,
     database: {
       host: '',
       port: 5432,
@@ -83,7 +87,29 @@ export default defineNuxtConfig({
       publicRead: {
         windowMs: 60000,
         maxRequests: 300
+      },
+      // Routes publiques portant un jeton d'invitation (GET et POST partagent le budget) : freine le devinage.
+      invitationToken: {
+        windowMs: 900000,
+        maxRequests: 30
       }
+    },
+    // Envoi d'email (A3, B-09). Surcharge : NUXT_MAIL_HOST, NUXT_MAIL_PORT, NUXT_MAIL_SECURE, NUXT_MAIL_USER,
+    // NUXT_MAIL_PASSWORD, NUXT_MAIL_FROM. Valeurs par défaut = Mailpit local (SMTP 1025, sans authentification).
+    // `transport: 'capture'` (NUXT_MAIL_TRANSPORT) est réservé aux tests d'API : il écrit dans `captureFile`.
+    mail: {
+      transport: DEFAULT_MAIL_TRANSPORT,
+      host: DEFAULT_MAIL_HOST,
+      port: 1025,
+      secure: false,
+      user: '',
+      password: '',
+      from: DEFAULT_MAIL_FROM,
+      captureFile: ''
+    },
+    public: {
+      // URL publique du site (NUXT_PUBLIC_SITE_URL) : base des liens d'invitation, jamais déduite de l'en-tête Host.
+      siteUrl: DEFAULT_SITE_URL
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
     auth: {

@@ -7,7 +7,7 @@ import type { IAuthUser } from '../interfaces/auth.interface.js'
 import { generateSessionToken, hashSessionToken } from './session-token.util.js'
 
 /** Crée une session et renvoie le jeton en clair : c'est la seule fois qu'il existe côté serveur. */
-export const createSession = async (dataSource: DataSource, userId: string, now = new Date()): Promise<string> => {
+export const createSession = async (dataSource: DataSource | EntityManager, userId: string, now = new Date()): Promise<string> => {
   const { token, tokenHash } = generateSessionToken()
   await dataSource.getRepository(SessionEntity).insert({
     userId,
