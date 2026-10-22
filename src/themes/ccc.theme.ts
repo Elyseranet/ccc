@@ -149,7 +149,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Boutons « x-large » (F-00m, appels à l'action des formulaires) : 48 px de haut (défaut Origam : 52 px) ; outlined : filet strong de 2 px.
     '--origam-btn---height-xl': 'var(--origam-space---12)',
     '--origam-btn---border-color': 'var(--origam-color__border---strong)',
-    '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)'
+    '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)',
+    // Pastilles (F-00q) : la maquette donne 4 px / 12 px de padding et une interligne de 1,3 (snug) pour du texte xs, soit 24,64 px de haut ; Origam fixe line-height: 1 et mesure la hauteur en content-box (`size` small : 24 px, padding 0 10 px).
+    '--origam-chip---height-sm': 'calc(var(--origam-font__size---xs) * var(--origam-font__lineHeight---snug) + 2 * var(--origam-space---1))',
+    '--origam-chip---padding-sm': 'var(--origam-space---3)'
   },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────
