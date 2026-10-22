@@ -1,4 +1,4 @@
-import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/async-state.const'
+import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/http-status.const'
 import { ROUTES } from '~/consts/routes.const'
 import { AuthService } from '~/services/auth.service'
 import { useAuthStore } from '~/stores/auth.store'

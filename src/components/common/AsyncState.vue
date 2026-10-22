@@ -53,7 +53,8 @@ import { computed } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamEmptyState, OrigamSkeleton, OrigamSkeletonGroup } from 'origam/components'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
 import { useT } from '~/composables/useT'
-import { HTTP_STATUS_TOO_MANY_REQUESTS, SKELETON_LINES } from '~/consts/async-state.const'
+import { SKELETON_LINES } from '~/consts/async-state.const'
+import { HTTP_STATUS_TOO_MANY_REQUESTS } from '~/consts/http-status.const'
 import type { IAsyncStateEmits, IAsyncStateProps } from '~/interfaces/common-components.interface'
 
 /*********************************************************

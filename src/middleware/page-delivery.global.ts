@@ -1,3 +1,4 @@
+import { HTTP_STATUS_NOT_FOUND } from '~/consts/http-status.const'
 import { isPageAccessible } from '~/utils/page-delivery.util'
 
 /*********************************************************
@@ -14,5 +15,5 @@ export default defineNuxtRouteMiddleware((to) => {
   if (!record || isPageAccessible(record.path)) {
     return
   }
-  throw createError({ statusCode: 404, statusMessage: 'Not Found', fatal: true })
+  throw createError({ statusCode: HTTP_STATUS_NOT_FOUND, statusMessage: 'Not Found', fatal: true })
 })

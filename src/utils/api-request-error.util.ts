@@ -1,3 +1,4 @@
+import { DEFAULT_REQUEST_ERROR_MESSAGE, NETWORK_ERROR_STATUS } from '../consts/http-status.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import type { IApiError } from '../interfaces/error.interface.js'
 import { HTTP_DATE, MS_PER_SECOND, RETRY_AFTER_SECONDS } from '../consts/retry-after.const.js'
@@ -54,13 +55,13 @@ export const toApiRequestError = (cause: unknown): ApiRequestError => {
     return cause
   }
   const source = (cause ?? {}) as IFetchErrorLike
-  const statusCode = source.statusCode ?? source.status ?? 0
-  const isOffline = statusCode === 0 && !source.response
+  const statusCode = source.statusCode ?? source.status ?? NETWORK_ERROR_STATUS
+  const isOffline = statusCode === NETWORK_ERROR_STATUS && !source.response
   const retryAfterSeconds = parseRetryAfter(source.response?.headers?.get('retry-after'))
   return new ApiRequestError({
     statusCode,
     code: source.data?.code ?? API_ERROR_CODE.INTERNAL_ERROR,
-    message: source.data?.message ?? source.message ?? 'Request failed',
+    message: source.data?.message ?? source.message ?? DEFAULT_REQUEST_ERROR_MESSAGE,
     details: source.data?.details
   }, isOffline, retryAfterSeconds)
 }

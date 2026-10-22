@@ -7,8 +7,9 @@ import { CompetitorService } from '~/services/competitor.service'
  *
  * @description
  * Annuaire des compétiteurs (`GET /competiteurs`), recherche publique comprise (E-e).
+ * `scope` distingue deux usages simultanés sur une même page (clé de cache propre à chacun).
  ********************************************************/
-export const useCompetitors = (query: MaybeRefOrGetter<ICompetitorsQuery> = {}) => {
+export const useCompetitors = (query: MaybeRefOrGetter<ICompetitorsQuery> = {}, scope = '') => {
   const service = new CompetitorService({ fetcher: useRequestFetch() })
-  return useAsyncData(`competitors`, () => service.list(toValue(query)), { watch: [() => toValue(query)] })
+  return useAsyncData(`competitors:${scope}`, () => service.list(toValue(query)), { watch: [() => toValue(query)] })
 }

@@ -45,3 +45,8 @@ export interface IFetchErrorLike {
   data?: Partial<IApiError>
   response?: { headers?: Pick<Headers, 'get'> }
 }
+
+export interface IAsyncDataErrorData extends Partial<IApiError> {
+  isOffline?: boolean
+  retryAfterSeconds?: number | null
+}
