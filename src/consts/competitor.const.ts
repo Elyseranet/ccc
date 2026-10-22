@@ -28,7 +28,7 @@ export const LIKE_SPECIAL_CHARACTERS = /[\\%_]/g
 export const COMBINING_MARKS = /\p{M}/gu
 
 /** Colonnes publiques uniquement : le téléphone n'est même pas lu depuis la base. */
-export const COMPETITOR_PUBLIC_COLUMNS = ['c.id', 'c.displayName', 'c.firstName', 'c.lastName', 'c.nickname', 'c.avatarUrl']
+export const COMPETITOR_PUBLIC_COLUMNS = ['c.id', 'c.displayName', 'c.firstName', 'c.lastName', 'c.nickname', 'c.avatarVersion']
 
 /** Statuts de match qui entrent dans les bilans : avec score, ou résultat inconnu (R-5). */
 export const STATS_MATCH_STATUSES = [MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN]

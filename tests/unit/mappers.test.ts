@@ -14,7 +14,7 @@ describe('toCompetitorPublic', () => {
       firstName: 'Rémi',
       lastName: 'D',
       nickname: null,
-      avatarUrl: null,
+      avatarVersion: null,
       phone: '0600000000',
       email: 'remi@example.com',
       passwordHash: 'x',
@@ -23,6 +23,13 @@ describe('toCompetitorPublic', () => {
     const result = toCompetitorPublic(entity)
     expect(Object.keys(result).sort()).toEqual(['avatarUrl', 'displayName', 'firstName', 'id', 'lastName', 'nickname'])
     expect(JSON.stringify(result)).not.toMatch(/0600000000|example\.com|passwordHash/)
+  })
+
+  it('builds the avatar URL from the stored fingerprint, or null without avatar', () => {
+    const base = { id: 'c1', displayName: 'Rémi', firstName: null, lastName: null, nickname: null }
+    expect(toCompetitorPublic({ ...base, avatarVersion: null } as unknown as CompetitorEntity).avatarUrl).toBeNull()
+    expect(toCompetitorPublic({ ...base, avatarVersion: '0123456789abcdef' } as unknown as CompetitorEntity).avatarUrl)
+      .toBe('/api/v1/competiteurs/c1/avatar?v=0123456789abcdef')
   })
 })
 

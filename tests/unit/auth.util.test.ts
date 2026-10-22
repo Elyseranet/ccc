@@ -150,15 +150,15 @@ describe('schemas', () => {
     expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78', [field]: 'x' }).success).toBe(false)
   })
 
-  it('PATCH /moi accepts avatar and phone, and null to clear them', () => {
-    expect(updateMeSchema.safeParse({ avatarUrl: 'https://img.test/a.png', phone: '+33 6 12 34 56 78' }).success).toBe(true)
-    expect(updateMeSchema.safeParse({ avatarUrl: null, phone: null }).success).toBe(true)
+  it('PATCH /moi accepts a phone, and null to clear it', () => {
+    expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78' }).success).toBe(true)
+    expect(updateMeSchema.safeParse({ phone: null }).success).toBe(true)
   })
 
-  it('PATCH /moi refuses a non-https avatar or one with credentials, a bad phone and an empty body', () => {
-    expect(updateMeSchema.safeParse({ avatarUrl: 'javascript:alert(1)' }).success).toBe(false)
-    expect(updateMeSchema.safeParse({ avatarUrl: 'http://img.test/a.png' }).success).toBe(false)
-    expect(updateMeSchema.safeParse({ avatarUrl: 'https://u:p@img.test/a.png' }).success).toBe(false)
+  it('PATCH /moi refuses avatarUrl (B-16, closes L7: the avatar is only set by upload), a bad phone and an empty body', () => {
+    expect(updateMeSchema.safeParse({ avatarUrl: 'https://img.test/a.png' }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ avatarUrl: null }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78', avatarUrl: 'https://img.test/a.png' }).success).toBe(false)
     expect(updateMeSchema.safeParse({ phone: 'call me' }).success).toBe(false)
     expect(updateMeSchema.safeParse({}).success).toBe(false)
   })

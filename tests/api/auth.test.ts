@@ -439,12 +439,19 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect(stored.role).toBe(USER_ROLE.PARTICIPANT)
     })
 
-    it('updates avatar and phone, and nothing else', async () => {
+    it('updates the phone, and nothing else', async () => {
       const cookie = cookieHeaderOf(await login(participant.email, PASSWORD))
-      const response = await jsonPatch('/api/v1/moi', { avatarUrl: 'https://img.test/me.png', phone: '+33 6 22 22 22 22' }, cookie)
+      const response = await jsonPatch('/api/v1/moi', { phone: '+33 6 22 22 22 22' }, cookie)
       expect(response.status).toBe(200)
       const body = JSON.parse(await readBody(response))
-      expect(body.competitor).toMatchObject({ avatarUrl: 'https://img.test/me.png', phone: '+33 6 22 22 22 22' })
+      expect(body.competitor).toMatchObject({ avatarUrl: null, phone: '+33 6 22 22 22 22' })
+    })
+
+    it('refuses avatarUrl (B-16, L7): 400 VALIDATION_FAILED, nothing written', async () => {
+      const cookie = cookieHeaderOf(await login(participant.email, PASSWORD))
+      const response = await jsonPatch('/api/v1/moi', { avatarUrl: 'https://tracker.example/pixel.png' }, cookie)
+      expect(response.status).toBe(400)
+      expect((await response.json()).code).toBe(API_ERROR_CODE.VALIDATION_FAILED)
     })
 
     it('requires an identity', async () => {

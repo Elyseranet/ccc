@@ -340,7 +340,7 @@ const toNullable = (value: string | null | undefined): string | null => {
  * P1, cas 2 : crée le compétiteur, le compte `INVITED` (rôle PARTICIPANT, sans mot de passe) et l'invitation.
  * S'exécute dans la transaction de l'appelant (`manager`), qui reste maître du commit : l'envoi de l'email
  * doit partir APRÈS ce commit. Un email déjà rattaché à un compte donne 409 `EMAIL_ALREADY_USED`, et la
- * transaction de l'appelant n'a alors rien écrit de durable. Pas d'avatar (B-16).
+ * transaction de l'appelant n'a alors rien écrit de durable. Pas d'avatar : il se téléverse ensuite (`PUT /competiteurs/{id}/avatar`, B-16).
  */
 export const createCompetitorWithAccount = async (
   manager: EntityManager,
@@ -361,8 +361,7 @@ export const createCompetitorWithAccount = async (
       firstName,
       lastName,
       nickname: toNullable(input.nickname),
-      phone: toNullable(input.phone),
-      avatarUrl: null
+      phone: toNullable(input.phone)
     })
     const user = await users.save({
       email,

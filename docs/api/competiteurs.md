@@ -1,6 +1,6 @@
 # API publique : compétiteurs (B-05)
 
-Routes publiques, en lecture seule, sous `/api/v1`. Aucune ne renvoie d'email, de téléphone ni de commentaire de match. Les erreurs ont la forme `IApiError` (`{ statusCode, code, message, details? }`).
+Routes publiques, en lecture seule, sous `/api/v1`. Aucune ne renvoie d'email, de téléphone ni de commentaire de match. `avatarUrl` vaut `null` ou `/api/v1/competiteurs/{id}/avatar?v={empreinte}` (voir [avatar.md](avatar.md)). Les erreurs ont la forme `IApiError` (`{ statusCode, code, message, details? }`).
 
 ## Règles de calcul
 

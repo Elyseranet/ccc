@@ -42,7 +42,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.ADMIN_MATCHES]: { file: 'admin/editions/[id]/matchs.get.ts', pendingTicket: 'B-12' },
   [API_ENDPOINT.MATCH_SCORE]: { file: 'matchs/[id]/score.put.ts', pendingTicket: 'B-12' },
   [API_ENDPOINT.MATCH_VALIDATION]: { file: 'matchs/[id]/validation.post.ts', pendingTicket: 'B-12' },
-  [API_ENDPOINT.ME_AVATAR_UPLOAD]: { file: 'moi/avatar.put.ts', pendingTicket: 'B-16' },
-  [API_ENDPOINT.ME_AVATAR_DELETE]: { file: 'moi/avatar.delete.ts', pendingTicket: 'B-16' },
-  [API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD]: { file: 'competiteurs/[id]/avatar.put.ts', pendingTicket: 'B-16' }
+  [API_ENDPOINT.ME_AVATAR_UPLOAD]: { file: 'moi/avatar.put.ts' },
+  [API_ENDPOINT.ME_AVATAR_DELETE]: { file: 'moi/avatar.delete.ts' },
+  [API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD]: { file: 'competiteurs/[id]/avatar.put.ts' }
 }

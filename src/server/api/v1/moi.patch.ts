@@ -13,15 +13,14 @@ import { readBodyWithSchema } from '../../../utils/validation.util'
 import { logger } from '../../../utils/logger.util'
 import { useDataSource } from '../../../utils/database.util'
 
-/** A4 : le participant ne modifie que son avatar, son téléphone et son mot de passe. */
+/** A4 : le participant ne modifie que son téléphone et son mot de passe ; l'avatar passe par `PUT /moi/avatar` (B-16). */
 export default defineEventHandler(async (event): Promise<IMe> => {
   const user = requireUser(event)
   setResponseHeader(event, 'Cache-Control', 'no-store')
   const body = await readBodyWithSchema(event, updateMeSchema)
   const dataSource = await useDataSource()
 
-  const wantsContactUpdate = body.avatarUrl !== undefined || body.phone !== undefined
-  if (wantsContactUpdate && !user.competitorId) {
+  if (body.phone !== undefined && !user.competitorId) {
     throw unprocessable('This account has no competitor profile')
   }
 
@@ -42,7 +41,6 @@ export default defineEventHandler(async (event): Promise<IMe> => {
     userId: user.id,
     currentSessionId: user.sessionId,
     competitorId: user.competitorId,
-    avatarUrl: body.avatarUrl,
     phone: body.phone,
     newPasswordHash: newHash
   })

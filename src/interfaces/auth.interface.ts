@@ -5,9 +5,8 @@ export interface ILoginRequest {
   password: string
 }
 
-/** Liste blanche de `PATCH /moi` (A4) : avatar, téléphone, mot de passe. */
+/** Liste blanche de `PATCH /moi` (A4) : téléphone, mot de passe (l'avatar : `PUT /moi/avatar`). */
 export interface IUpdateMeRequest {
-  avatarUrl?: string | null
   phone?: string | null
   currentPassword?: string
   newPassword?: string
@@ -48,7 +47,6 @@ export interface IProfileChanges {
   userId: string
   currentSessionId: string
   competitorId: string | null
-  avatarUrl?: string | null
   phone?: string | null
   newPasswordHash?: string
 }

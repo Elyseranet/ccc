@@ -92,6 +92,13 @@ export default defineNuxtConfig({
       invitationToken: {
         windowMs: 900000,
         maxRequests: 30
+      },
+      // Envois d'avatar (B-16) : sharp décode et ré-encode, ce qui coûte du CPU. 10 envois par 10 minutes et
+      // par IP laissent largement la place à un administrateur qui photographie une soirée d'inscriptions
+      // (une photo par participant), et bornent le coût d'un client qui boucle.
+      avatarUpload: {
+        windowMs: 600000,
+        maxRequests: 10
       }
     },
     // Envoi d'email (A3, B-09). Surcharge : NUXT_MAIL_HOST, NUXT_MAIL_PORT, NUXT_MAIL_SECURE, NUXT_MAIL_USER,

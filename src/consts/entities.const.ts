@@ -1,4 +1,5 @@
 import { CompetitorAliasEntity } from '../server/db/typeorm/entities/competitor-alias.entity.js'
+import { CompetitorAvatarEntity } from '../server/db/typeorm/entities/competitor-avatar.entity.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { DrawAssignmentEntity } from '../server/db/typeorm/entities/draw-assignment.entity.js'
 import { DrawEntity } from '../server/db/typeorm/entities/draw.entity.js'
@@ -24,6 +25,7 @@ export const ENTITIES = [
   LegacyWorkbookRowEntity,
   CompetitorEntity,
   CompetitorAliasEntity,
+  CompetitorAvatarEntity,
   EditionEntity,
   PoolEntity,
   RoundEntity,

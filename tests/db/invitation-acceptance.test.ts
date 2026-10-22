@@ -71,7 +71,7 @@ describe('acceptInvitation', () => {
     expect(user.passwordHash).not.toContain(PASSWORD)
 
     expect(await dataSource.getRepository(CompetitorEntity).findOneByOrFail({ id: competitorId })).toMatchObject({
-      firstName: 'Jeanne', lastName: 'Martin', displayName: 'Jeanne Martin', nickname: 'Jeannette', phone: '+33 6 00 00 00 00', avatarUrl: null
+      firstName: 'Jeanne', lastName: 'Martin', displayName: 'Jeanne Martin', nickname: 'Jeannette', phone: '+33 6 00 00 00 00', avatarVersion: null
     })
     const session = await dataSource.getRepository(SessionEntity).findOneByOrFail({ tokenHash: hashSessionToken(result.sessionToken) })
     expect(session.userId).toBe(userId)

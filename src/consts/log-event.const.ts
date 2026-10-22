@@ -12,6 +12,8 @@ export const LOG_EVENT = {
   AUTH_LOGOUT: 'auth_logout',
   AUTH_PASSWORD_CHANGED: 'auth_password_changed',
   AUTH_CROSS_ORIGIN_REFUSED: 'auth_cross_origin_refused',
+  AVATAR_UPLOADED: 'avatar_uploaded',
+  AVATAR_DELETED: 'avatar_deleted',
   ADMIN_CREATED: 'admin_created',
   EDITION_CREATED: 'edition_created',
   EDITION_UPDATED: 'edition_updated',

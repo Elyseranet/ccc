@@ -79,6 +79,15 @@ export const serviceBusy = (retryAfterSeconds: number): H3Error => createError({
   data: { code: API_ERROR_CODE.SERVICE_BUSY, retryAfterSeconds }
 })
 
+export const avatarTooLarge = (): H3Error =>
+  buildError(413, API_ERROR_CODE.AVATAR_TOO_LARGE, API_ERROR_MESSAGE.AVATAR_TOO_LARGE)
+
+export const avatarUnsupportedType = (): H3Error =>
+  buildError(415, API_ERROR_CODE.AVATAR_UNSUPPORTED_TYPE, API_ERROR_MESSAGE.AVATAR_UNSUPPORTED_TYPE)
+
+export const avatarUnreadable = (): H3Error =>
+  buildError(422, API_ERROR_CODE.AVATAR_UNREADABLE, API_ERROR_MESSAGE.AVATAR_UNREADABLE)
+
 export const requestTimeout = (): H3Error =>
   buildError(408, API_ERROR_CODE.REQUEST_TIMEOUT, API_ERROR_MESSAGE.REQUEST_TIMEOUT)
 

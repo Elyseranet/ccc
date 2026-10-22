@@ -62,7 +62,7 @@ describe('createCompetitorWithAccount', () => {
       lastName: 'Dupont',
       nickname: 'Jeannot',
       phone: '+33 6 12 34 56 78',
-      avatarUrl: null
+      avatarVersion: null
     })
     const invitation = await dataSource.getRepository(InvitationEntity).findOneByOrFail({ userId: result.userId })
     expect(invitation.expiresAt.getTime()).toBe(NOW.getTime() + INVITATION_TTL_MS)

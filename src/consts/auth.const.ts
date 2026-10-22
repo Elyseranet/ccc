@@ -43,7 +43,6 @@ export const PASSWORD_MAX_LENGTH = 128
 export const EMAIL_MAX_LENGTH = 254
 export const PHONE_MAX_LENGTH = 32
 export const PHONE_PATTERN = /^\+?[0-9 .()-]{6,32}$/
-export const AVATAR_URL_MAX_LENGTH = 2048
 
 export const RATE_LIMIT_AUTH_ROUTE_KEY = {
   LOGIN_IP: 'auth-login-ip',
@@ -55,7 +54,6 @@ export const CSRF_SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'] as const
 export const FETCH_SITE_SAME_ORIGIN = ['same-origin', 'none'] as const
 
 export const PASSWORD_CHANGE_MAX_ATTEMPTS = 5
-export const AVATAR_ALLOWED_PROTOCOLS = ['https:']
 
 /**
  * SEC-A2 : ralentissement progressif par compte, sans blocage dur. Aucun délai jusqu'à 5 échecs

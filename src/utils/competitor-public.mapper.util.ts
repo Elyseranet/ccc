@@ -1,3 +1,4 @@
+import { buildAvatarUrl } from './avatar-url.util.js'
 import type { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import type { ICompetitorPublic } from '../interfaces/competitor.interface.js'
 
@@ -8,5 +9,5 @@ export const toCompetitorPublic = (entity: CompetitorEntity): ICompetitorPublic 
   firstName: entity.firstName,
   lastName: entity.lastName,
   nickname: entity.nickname,
-  avatarUrl: entity.avatarUrl
+  avatarUrl: buildAvatarUrl(entity.id, entity.avatarVersion)
 })

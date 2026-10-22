@@ -216,11 +216,12 @@ Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (A
 | `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000` | URL publique du site : base des liens d'invitation (jamais l'en-tête `Host`). À renseigner en production. |
 | `NUXT_MAIL_HOST`, `_PORT`, `_SECURE`, `_USER`, `_PASSWORD`, `_FROM` | `localhost`, `1025`, `false`, vide, vide, `CCC <no-reply@ccc.local>` | Envoi des invitations par SMTP (nodemailer) : Mailpit en local, fournisseur SMTP en production. |
 | `NUXT_RATE_LIMIT_INVITATION_TOKEN_WINDOW_MS`, `_MAX_REQUESTS` | `900000`, `30` | Budget par IP des routes publiques `GET`/`POST /auth/invitation/{jeton}` (clé `invitation-token`). |
+| `NUXT_RATE_LIMIT_AVATAR_UPLOAD_WINDOW_MS`, `_MAX_REQUESTS` | `600000`, `10` | Envois d'avatar (`PUT /moi/avatar`, `PUT /competiteurs/{id}/avatar`, clé `avatar-upload`, par IP). Le limiteur passe avant la lecture du corps : un envoi refusé en 429 (avec `Retry-After`) n'est ni lu ni décodé par sharp. |
 | `NUXT_RATE_LIMIT_MAX_KEYS` | `10000` | Plafond de clés `ip:route` gardées en mémoire ; au-delà, la clé la plus anciennement utilisée est évincée. Les IPv6 sont agrégées par préfixe /64. |
 
 Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy : voir T-SEC-02.
 
-Corps des requêtes (M2) : les corps JSON sous `/api` sont plafonnés à 16 Kio (`API_JSON_BODY_MAX_BYTES`). Un `Content-Length` supérieur répond 413 `PAYLOAD_TOO_LARGE` sans lire le corps ; un envoi par morceaux est lu en flux et coupé au plafond. Le limiteur par IP du login passe avant la lecture du corps. Un corps qui n'est pas du JSON n'est pas lu (400). L'upload d'avatar multipart (B-16) aura son propre plafond.
+Corps des requêtes (M2) : les corps JSON sous `/api` sont plafonnés à 16 Kio (`API_JSON_BODY_MAX_BYTES`). Un `Content-Length` supérieur répond 413 `PAYLOAD_TOO_LARGE` sans lire le corps ; un envoi par morceaux est lu en flux et coupé au plafond. Le limiteur par IP du login passe avant la lecture du corps. Un corps qui n'est pas du JSON n'est pas lu (400). L'upload d'avatar multipart (B-16) a son propre plafond de 2 Mio, lu en flux (voir « Avatars »).
 
 En production (`NODE_ENV=production`), le démarrage échoue si `NUXT_DATABASE_HOST`, `_USERNAME`, `_PASSWORD` ou `_DATABASE` est vide ; le message nomme la variable, jamais sa valeur.
 
@@ -264,7 +265,7 @@ Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké)
 | `POST /api/v1/auth/login` `{ email, password }` | public, limité par IP et ralenti par compte | 200 `IMe` + cookie ; 401 `INVALID_CREDENTIALS` identique pour email inconnu et mot de passe faux ; 429 avec `Retry-After` (limite par IP, ou délai du compte) |
 | `POST /api/v1/auth/logout` | public, idempotent | 204, session révoquée, cookie effacé |
 | `GET /api/v1/moi` | authentifié | 200 `IMe` (seule route qui expose `phone`, à son titulaire) |
-| `PATCH /api/v1/moi` | authentifié | liste blanche `avatarUrl`, `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
+| `PATCH /api/v1/moi` | authentifié | liste blanche `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
 
 Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. **Une écriture sans en-tête `Origin` (ni `Sec-Fetch-Site`) est acceptée** : une telle requête ne vient pas d'un navigateur, et la défense CSRF repose sur `SameSite=Lax` plus la vérification d'`Origin` quand il est présent. Mots de passe : scrypt (`node:crypto`), 15 caractères minimum (OWASP Authentication Cheat Sheet, sans MFA), 128 maximum. Le limiteur de débit par IP est en mémoire (une instance).
 
@@ -285,3 +286,13 @@ Cookie d'appareil de confiance (SEC-A4, migration M4, table `login_devices` ; m�
 **Risque accepté (N1, décision utilisateur 2026-10-21, `docs/design/ux/decisions.md`).** Un attaquant qui possède l'email ET un cookie d'appareil valide (le cookie est `HttpOnly` : il ne peut être volé que sur l'appareil lui-même) obtient un second flux d'essais, avec son propre compteur. Ce flux est ralenti comme les autres (5 essais libres, puis un délai de 2^(n−5) s plafonné à 300 s) et borné par la limite par IP. Un changement de mot de passe révoque tous les appareils de confiance du compte (N2). **Aucun plafond global d'essais par compte n'est appliqué.**
 
 Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard, `NUXT_PUBLIC_SITE_URL` requis) crée un compte `INVITED` sans mot de passe et affiche une fois, sur la sortie standard, son lien de première connexion (7 jours, usage unique). Invitations, envoi d'email (SMTP, `NUXT_MAIL_*`) et routes : voir `docs/api/invitations.md`.
+
+## Avatars (B-16)
+
+Contrat complet : [docs/api/avatar.md](docs/api/avatar.md). Routes : `PUT` et `DELETE /api/v1/moi/avatar`, `PUT`, `DELETE` et `GET /api/v1/competiteurs/{id}/avatar` (le `GET` est public).
+
+- La photo est stockée en base (`competitor_avatars`, AV-1), au plus 2 Mio envoyés (`AVATAR_MAX_BYTES`), lus en flux. Type vérifié par signature (JPEG, PNG, WebP), puis ré-encodée par `sharp` : orientation appliquée, 512 px au plus, **EXIF, GPS, XMP et IPTC supprimés**.
+- `sharp` est épinglé à `0.35.5` (sans `^` : le binaire natif libvips suit la version). Les binaires sont précompilés par plateforme (`@img/sharp-<os>-<arch>`) : l'image Docker (`node:22-alpine`, musl) installe la variante `linuxmusl`, et Nitro l'embarque dans `.output`.
+- **Rollback de la migration `CreateCompetitorAvatars`** : `down` supprime `competitor_avatars` et recrée `competitors.avatar_url` (vide). **Les images téléversées sont perdues.** `up` refuse de s'exécuter si une `avatar_url` est encore renseignée.
+- Le dump `src/assets/seeds/archives.sql` ne référence plus `avatar_url` (les 146 valeurs étaient NULL).
+- Mentions de licences : `sharp` est sous Apache-2.0 ; `@img/sharp-libvips-*` (libvips) sous LGPL-3.0-or-later, chargée dynamiquement et sans modification (AV-2).
