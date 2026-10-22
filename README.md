@@ -4,7 +4,7 @@ Application de gestion du championnat CCC, avec un site public et un back-office
 
 Le socle technique utilise Nuxt 4 et Nitro, PostgreSQL et TypeORM. Les premières vues suivent l'export de design fourni : accueil, compétition, compétiteurs, face-à-face, règlement, variantes, Hall of Fame et espace d'administration.
 
-Les vues actuelles sont un prototype de présentation. Elles n'ont pas encore d'authentification ni de persistance métier. Le contenu du classeur historique est chargé dans des tables d'archive ; sa reprise vers les entités métier se lance avec `npm run db:import:legacy` (voir plus bas).
+Les archives 2012-2026 (le classeur brut et sa reprise vers les entités métier) sont livrées sous la forme d'un dump SQL figé, appliqué par `npm run db:seed:archives` (voir plus bas). L'application ne contient aucune donnée fictive : les écrans lisent toujours l'API réelle (ARCH-8).
 
 ## Prérequis
 
@@ -51,12 +51,13 @@ Une seule instance de l'application est déployée pour l'instant. Les migration
 
 ### Prérequis de release : garde par page livrée
 
-Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint encore en `API_SOURCE.FIXTURE`. Il n'y a pas de variable pour désactiver la garde.
+Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint dont la route serveur n'existe pas encore. Il n'y a pas de variable pour désactiver la garde.
 
-- `app/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`app/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
-- Un ticket F-xx passe sa ligne à `delivered: true` dans le même commit qui bascule ses endpoints en `LIVE` dans `app/consts/api-sources.const.ts`. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme encore en fixture.
+- `src/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`src/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
+- `src/consts/api-routes.const.ts` (`API_ROUTES`) associe chaque endpoint à son fichier de route Nitro. Une route pas encore écrite porte le ticket back qui la livre (`pendingTicket`) : l'écran répond en erreur (état AsyncState) jusqu'au merge de ce ticket, sans route provisoire ni fausse donnée (ARCH-11). Un test vérifie que le fichier existe si et seulement si `pendingTicket` est absent : à la livraison d'une route, retirer son `pendingTicket` dans le même commit.
+- Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
 - En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
-- Garde-fous toujours actifs (`npm run test:run`) : une page de `app/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
+- Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
 - `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
 
 ### Variables d'environnement
@@ -89,14 +90,11 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 | Commande | Rôle | Disponibilité |
 |---|---|---|
 | `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration. | image actuelle |
-| `ccc-ops db:seed:legacy` | Charge les archives brutes du classeur. | image actuelle |
-| `ccc-ops db:import:legacy` | Reprise du classeur vers les entités métier. | B-04 |
-| `ccc-ops user:create-admin` | Crée le premier administrateur. | B-08 |
-| `ccc-ops user:unlock` | Déverrouille un compte. | B-08 |
+| `ccc-ops db:seed:archives` | Applique le dump SQL figé des archives 2012-2026 (`src/assets/seeds/archives.sql`), en une transaction, sur une base migrée et vide. | image actuelle |
+| `ccc-ops user:create-admin` | Crée le premier administrateur. | image actuelle |
+| `ccc-ops user:unlock` | Déverrouille un compte. | image actuelle |
 
-Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `src/server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
-
-Les rapports de `db:import:legacy` sont écrits dans `/app/.data/reports/` et sont éphémères (perdus au redémarrage du conteneur) ; les récupérer avec `docker cp <conteneur>:/app/.data/reports ./reports`.
+Ordre conseillé : déployer (les migrations s'appliquent au démarrage), `db:seed:archives`, puis `user:create-admin`. Les scripts sont compilés par `npm run db:typeorm:build` dans `.typeorm-dist/src/…`.
 
 Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n'est nécessaire ni présent.
 
@@ -108,10 +106,10 @@ npm run dev
 
 ## Migrations TypeORM
 
-Les migrations sont stockées dans `src/server/database/migrations/` et le schéma n'est pas synchronisé automatiquement.
+Les migrations sont stockées dans `src/server/db/migrations/`, la configuration TypeORM (DataSource, options, stratégie de nommage, transformer) dans `src/server/db/typeorm/` et les entités dans `src/server/db/typeorm/entities/` (ARCH-6). Le schéma n'est pas synchronisé automatiquement.
 
 ```sh
-npm run db:migration:generate -- server/database/migrations/NomMigration
+npm run db:migration:generate -- src/server/db/migrations/NomMigration
 npm run db:migration:run
 npm run db:migration:revert
 ```
@@ -125,7 +123,7 @@ La CLI génère la migration en JavaScript (elle lit le `data-source` compilé) 
 
 La migration `CreateDomainSchema` crée `competitors`, `competitor_aliases`, `editions`, `pools`, `rounds`, `participations`, `matches`, `match_sides`, `draws` et `draw_assignments`. Elle n'installe aucune extension PostgreSQL (`gen_random_uuid()` est natif depuis PostgreSQL 13).
 
-`npm run db:migration:revert` supprime ces dix tables et leurs types enum, donc **toutes les données métier, y compris celles importées par la reprise B-04**. L'archive brute (`legacy_workbook_*`) reste intacte : la reprise se rejoue pour reconstruire les données métier.
+`npm run db:migration:revert` supprime ces dix tables et leurs types enum, donc **toutes les données métier, y compris les archives appliquées par `db:seed:archives`**. Pour les retrouver : revenir à un schéma migré et vide, puis rejouer `db:seed:archives`.
 
 Les tests d'intégration du schéma (`npm run test:db`) tournent sur une base dédiée dont le nom finit par `_test`. Ils **suppriment et recréent** son contenu. Passer les variables en ligne de commande, sans jamais copier un `.env` :
 
@@ -134,40 +132,19 @@ NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... 
 NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 ```
 
-### Charger les archives du classeur
+### Archives 2012-2026 : dump SQL figé (ARCH-5, ARCH-10)
 
-Le snapshot `src/server/database/seeds/data/ccc-workbook.json` conserve les lignes, les valeurs disponibles, les formules et les indices de format des cellules des onglets fournis. L'import crée les tables d'archive si nécessaire et peut être rejoué sans dupliquer une ligne.
+`src/assets/seeds/archives.sql` contient les archives sous forme d'`INSERT` : 16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score, et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes). Le dump a été généré une seule fois, le 2026-10-22, depuis une base neuve, par la chaîne de reprise de l'époque (seed du classeur puis reprise B-04). Les contrôles ont été faits avant la génération : Nicolas Deseine à 39/13, 0 écart bloquant entre les classements recalculés et le classeur. Cette chaîne (convertisseur, JSON, scripts de seed et d'import) a ensuite été supprimée. Le fichier ne s'édite pas à la main.
 
 ```sh
-NUXT_DATABASE_HOST=localhost npm run db:seed:legacy
+npm run db:migration:run    # schéma à jour
+npm run db:seed:archives    # une transaction ; refuse une base qui contient déjà des données
 ```
 
-Pour produire un snapshot après un nouvel export XLSX :
+Le test de non-régression `tests/db/archives-seed.test.ts` applique le dump sur une base neuve. Il revérifie les comptes, Deseine 39/13 et le « 0 écart avec le classeur » (`legacy-verification.util`, à partir des lignes brutes en base). Les cas « vraies données » du domaine (`tests/db/archives-*.test.ts`) lisent eux aussi le classeur depuis la base.
 
 ```sh
-python3 scripts/xlsx_to_legacy_json.py "/chemin/vers/export.xlsx" server/database/seeds/data/ccc-workbook.json
-```
-
-Les valeurs source sont archivées telles quelles. Leur reprise vers les entités métier est décrite ci-dessous.
-
-### Reprendre l'archive vers les entités métier (B-04)
-
-```sh
-npm run db:migration:run   # M1 doit être appliquée
-npm run db:seed:legacy     # archive legacy_workbook_*
-npm run db:import:legacy   # reprise vers les entités métier
-```
-
-La commande lit l'archive la plus récente, construit tout le plan en mémoire puis écrit en **une seule transaction**. Elle est rejouable : chaque écriture est un upsert sur une clé naturelle (`editions.code`, `competitor_aliases.alias`, `matches.legacy_code`, `pools`/`rounds`/`participations`/`match_sides` sur leur clé unique) et un second passage ne change ni les comptes ni les `id`. Elle n'écrit que des éditions `origin = LEGACY_IMPORT` et s'arrête si une édition `APP` porte le même code. Les compétiteurs ne sont créés qu'une fois : un nom corrigé dans l'application survit à un rejeu.
-
-**Fichier de correspondance** : `src/server/database/seeds/data/legacy-identity-map.json` (décision A5, `docs/tickets/legacy-identity-map.md`). Chaque graphie de l'onglet `scores` absente de `Data` y figure, soit `{ "alias": "...", "competitor": "<nom Data exact>" }`, soit `{ "alias": "...", "create": true }`. Le rapprochement se fait sur la **graphie exacte, casse et espaces compris** : le script refuse, sans rien écrire, toute graphie sans correspondance exacte. Le fichier n'est jamais deviné par le script.
-
-**Rapport** : `.data/reports/legacy-import-report.json` (dossier gitignoré), plus un résumé JSON journalisé. Il contient les comptes par table, les anomalies (2012a et 2012b : N = 16 pour 11 listés, 2017 : 5,76 hors barème, joueurs sans cellule `Data`) et le diff de vérification : les classements ACP et All Time, les rangs, les participations et les titres recalculés par les fonctions de domaine sont comparés au classeur pour les 145 joueurs. Un écart inattendu **annule la transaction** (code de sortie 1) ; le rapport est écrit quand même. Les écarts attendus restent listés avec leur explication : le V/D des compétiteurs fusionnés (la colonne F du classeur est un `COUNTIF` sur le nom) et une égalité exacte à 8,76 que le `RANK` flottant du classeur départage.
-
-**Impact d'un `npm run db:migration:revert` de M1** : il supprime toutes les tables métier, donc tout ce que la reprise a écrit, ainsi que les données saisies depuis dans l'application. L'archive brute reste intacte ; relancer `npm run db:import:legacy` reconstruit uniquement la partie issue du classeur.
-
-```sh
-# Tests d'intégration de la reprise (base jetable dont le nom finit par _test, variables en ligne de commande)
+# base jetable dont le nom finit par _test, variables en ligne de commande
 NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
 NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 ```
@@ -175,8 +152,11 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 ## Tests
 
 ```sh
-npm run test:run   # tests unitaires (Vitest), sans base de données
-npm run test:api   # tests d'intégration d'API (@nuxt/test-utils/e2e), base PostgreSQL dédiée
+npm run test:run      # tests unitaires et front (Vitest), sans base de données
+npm run test:api      # tests d'intégration d'API (@nuxt/test-utils/e2e), base PostgreSQL dédiée
+npm run test:bundle   # nuxt build, puis vérifie qu'aucun chunk navigateur ne contient de code serveur
+npm run test:a11y     # e2e Playwright (axe), sur nuxt dev et une base de test réelle
+npm run test:visual   # e2e Playwright, comparaison aux maquettes
 ```
 
 `test:api` construit l'application puis la lance contre une base de test. Les variables de connexion sont passées par l'environnement, jamais depuis `.env` copié ailleurs :
@@ -187,6 +167,23 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:api
 ```
 
 Le nom de la base doit se terminer par `_test` : sinon la suite refuse de démarrer, pour ne jamais toucher une base réelle.
+
+### e2e sur les vraies données (ARCH-9)
+
+Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUXT_DATABASE_DATABASE` (suffixe `_test` obligatoire). Il applique les migrations et le dump des archives, puis crée des comptes de test (administrateur, participant) avec une session réelle. Aucun mot de passe utilisable n'est créé. Les specs posent le cookie `ccc_session` avec `signIn(context, role)`. Lancer sur un port libre, avec les seules variables nécessaires :
+
+```sh
+E2E_PORT=3971 NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
+NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_e2e_test npx playwright test --config playwright.config.ts
+```
+
+Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
+
+### Garde anti-code-serveur dans le navigateur (ARCH-1, ARCH-2, ARCH-12)
+
+`src/utils/` et `src/services/` mêlent code navigateur et code serveur : un service fusionné exporte sa classe `$fetch` et ses fonctions TypeORM. Le build client déclare sans effet de bord les modules serveur (typeorm, pg, reflect-metadata, `src/server/**`, `node:*`), qui sont élagués avec les fonctions serveur inutilisées. Le plugin `clientBundleGuard` fait échouer `nuxt build` si l'un d'eux reste dans un chunk client. `npm run test:bundle` vérifie le résultat octet par octet. Il n'y a aucun scan d'auto-import (`imports.scan: false`) : chaque fichier importe explicitement ce qu'il utilise.
+
+**Limite acceptée (ARCH-12)** : en `nuxt dev`, Vite ne fait pas de tree-shaking. Un service fusionné charge donc TypeORM et les entités dans le navigateur, environ 5,5 Mo mesurés, sans erreur. Cela ne concerne que le développement : en production, la garde de build interdit tout code serveur dans les chunks client.
 
 ## Variables d'environnement du serveur
 
@@ -222,7 +219,7 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
   - Erreurs : `type` absent ou hors enum, ou `competiteur` qui n'est pas un UUID : 400 `VALIDATION_FAILED` ; `competiteur` inconnu : 404 `NOT_FOUND`.
 - Toute erreur sous `/api/` a la forme `{ statusCode, code, message, details? }` (`IApiError`, codes dans `src/enums/api-error-code.enum.ts`). Les erreurs 5xx portent un message générique ; le détail est dans les logs.
 - Chaque réponse porte un en-tête `X-Request-Id` ; les logs sont du JSON en ligne (`event`, `level`, `requestId`, `route`, `durationMs`).
-- Les entités TypeORM sont déclarées dans `src/server/database/entities/index.ts` (registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
+- Les entités TypeORM vivent dans `src/server/db/typeorm/entities/` et sont déclarées dans `src/consts/entities.const.ts` (`ENTITIES`, registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
 
 ## Architecture
 
