@@ -388,7 +388,7 @@ defineExpose({})
 
   &__stats :deep(.origam-data-list__kv-row) {
     grid-template-columns: 1fr;
-    gap: 2px;
+    row-gap: var(--head-to-head-summary__stat---row-gap, calc(var(--origam-space---1) / 2));
     border-bottom: 0;
     padding-inline: var(--origam-space---4);
     border-radius: var(--origam-radius---lg);
@@ -446,5 +446,6 @@ defineExpose({})
 <style>
 :root {
   --head-to-head-summary---section-gap: var(--origam-space---8);
+  --head-to-head-summary__stat---row-gap: calc(var(--origam-space---1) / 2);
 }
 </style>
