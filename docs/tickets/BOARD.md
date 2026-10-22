@@ -345,3 +345,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - **Gel levé.** Les branches en cours doivent être reprises sur la nouvelle arborescence (`src/` à plat, sans fixtures) : vague 3a back (B-09, B-10, B-12, B-16, B-17, T-SEC-04, T-OPS-02), F-04, F-05, F-00h et F-00n.
 - [T-ARCH-02](T-ARCH-02.md) : **Fermé** — cause environnementale (`node_modules` en lien symbolique dans un worktree) ; test de non-régression dans `develop`.
 - [T-ARCH-03](T-ARCH-03.md) : **Fermé** — mergé dans `develop` @ `5efed01` (branche `a0a8382`) ; schémas dans `src/server/schemas/`, stores en composables.
+- [F-04-PAG](F-04-PAG.md) : ouvert — remédiation de la dérogation visuelle sur origam-pagination (décision F-04-PAG).

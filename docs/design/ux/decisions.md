@@ -184,3 +184,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 - **Précision (décision utilisateur 2026-10-22)** : le lien « voir tous » ne s'affiche que si le joueur a **plus de 4 adversaires**.
 - **Rendu du lien (validé par l'utilisateur le 2026-10-22)** : libellé « Voir les N adversaires → » sous les 4 adversaires, selon la maquette UI `joueur.html` (commit `2851ce1`).
+
+## SEED-1 — Dump d'archives et changement de schéma (décision utilisateur 2026-10-22)
+- Le dump `src/assets/seeds/archives.sql` **n'est jamais édité à la main**. Si le schéma change (ex. B-16 retire `avatar_url`), il est **régénéré** par l'export à partir du classeur brut. ARCH-5 reste en vigueur.
+- L'édition manuelle de dev-b16 (146 INSERT) est écartée au profit de la régénération, qui se fait avant le merge de la vague 3a.
+
+## F-04-PAG — Pagination de la liste des joueurs (décision utilisateur 2026-10-22)
+- La pagination utilise **`origam-pagination`**, pas le pager maison.
+- L'écart visuel avec la maquette (7,36 % et 66,8 % sur les deux zones de la pagination) fait l'objet d'une **dérogation documentée** au contrôle visuel. Cette dérogation est suivie par le ticket `docs/tickets/F-04-PAG.md`, avec une fiche Origam à déposer.
