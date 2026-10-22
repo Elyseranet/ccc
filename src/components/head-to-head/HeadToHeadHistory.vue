@@ -28,7 +28,6 @@
         :headers="headers"
         :items="rows"
         :caption="caption"
-        density="compact"
         :mobile-breakpoint="tableBreakpoint"
         hide-default-footer
         class="head-to-head-history__table"
@@ -163,13 +162,6 @@ defineExpose({})
   &__hint {
     margin: 0;
     color: var(--origam-color__text---secondary);
-  }
-
-  &__table {
-    --origam-table__cell---padding-block: var(--origam-space---3);
-    --origam-table__cell---padding-inline: var(--origam-space---4);
-    --origam-table__header-cell---padding-block: var(--origam-space---3);
-    --origam-table__header-cell---padding-inline: var(--origam-space---4);
   }
 
   &__scroll {

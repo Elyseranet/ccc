@@ -19,56 +19,58 @@
         padding="8"
       >
         <template #default>
-          <p class="head-to-head-summary__side">
-            <span
-              class="head-to-head-summary__wins font-display"
-              data-cy="head-to-head-wins-a"
-            >{{ winsA }}</span>
-            <span>{{ winsLabelA }}</span>
-          </p>
-          <div class="head-to-head-summary__mid">
-            <template v-if="hasRatio">
+          <div class="head-to-head-summary__duel-grid">
+            <p class="head-to-head-summary__side">
+              <span
+                class="head-to-head-summary__wins font-display"
+                data-cy="head-to-head-wins-a"
+              >{{ winsA }}</span>
+              <span>{{ winsLabelA }}</span>
+            </p>
+            <div class="head-to-head-summary__mid">
+              <template v-if="hasRatio">
+                <p
+                  class="head-to-head-summary__score font-display neon--sm"
+                  data-cy="head-to-head-score"
+                >
+                  <span>{{ winsA }}</span>
+                  <i>{{ separator }}</i>
+                  <span>{{ winsB }}</span>
+                </p>
+                <origam-progress
+                  type="linear"
+                  :model-value="ratioPercent"
+                  :label="barLabel"
+                  color="primary"
+                  :bg-color="trackColor"
+                  :thickness="barThickness"
+                  rounded="full"
+                  class="head-to-head-summary__bar"
+                  data-cy="head-to-head-bar"
+                />
+                <p
+                  class="head-to-head-summary__meetings"
+                  data-cy="head-to-head-meetings"
+                >
+                  {{ meetingsText }}
+                </p>
+              </template>
               <p
-                class="head-to-head-summary__score font-display neon--sm"
-                data-cy="head-to-head-score"
-              >
-                <span>{{ winsA }}</span>
-                <i>{{ separator }}</i>
-                <span>{{ winsB }}</span>
-              </p>
-              <origam-progress
-                type="linear"
-                :model-value="ratioPercent"
-                :label="barLabel"
-                color="primary"
-                :bg-color="trackColor"
-                :thickness="barThickness"
-                rounded="full"
-                class="head-to-head-summary__bar"
-                data-cy="head-to-head-bar"
-              />
-              <p
+                v-else
                 class="head-to-head-summary__meetings"
-                data-cy="head-to-head-meetings"
+                data-cy="head-to-head-never-met"
               >
-                {{ meetingsText }}
+                {{ neverMetText }}
               </p>
-            </template>
-            <p
-              v-else
-              class="head-to-head-summary__meetings"
-              data-cy="head-to-head-never-met"
-            >
-              {{ neverMetText }}
+            </div>
+            <p class="head-to-head-summary__side head-to-head-summary__side--b">
+              <span
+                class="head-to-head-summary__wins head-to-head-summary__wins--b font-display"
+                data-cy="head-to-head-wins-b"
+              >{{ winsB }}</span>
+              <span>{{ winsLabelB }}</span>
             </p>
           </div>
-          <p class="head-to-head-summary__side head-to-head-summary__side--b">
-            <span
-              class="head-to-head-summary__wins head-to-head-summary__wins--b font-display"
-              data-cy="head-to-head-wins-b"
-            >{{ winsB }}</span>
-            <span>{{ winsLabelB }}</span>
-          </p>
         </template>
       </origam-card>
     </section>
@@ -105,37 +107,39 @@
           :data-cy="`head-to-head-player-card-${player.side}`"
         >
           <template #default>
-            <origam-avatar
-              class="head-to-head-summary__avatar font-display"
-              rounded="full"
-              :image="player.avatar"
-              :text="player.initials"
-              aria-hidden="true"
-            />
-            <origam-title
-              :id="`head-to-head-player-${player.side}-name`"
-              tag="h3"
-              font-size="xl"
-              font-weight="bold"
-              line-height="tight"
-              class="head-to-head-summary__name"
-            >
-              <template #default>
-                <player-link
-                  :competitor="player.competitor"
-                  :titles="player.titles"
-                />
-              </template>
-            </origam-title>
-            <origam-data-list
-              mode="kv"
-              :items="player.items"
-              :border="false"
-              density="compact"
-              rounded="lg"
-              class="head-to-head-summary__stats"
-              :data-cy="`head-to-head-stats-${player.side}`"
-            />
+            <div class="head-to-head-summary__player-grid">
+              <origam-avatar
+                class="head-to-head-summary__avatar font-display"
+                rounded="full"
+                :image="player.avatar"
+                :text="player.initials"
+                aria-hidden="true"
+              />
+              <origam-title
+                :id="`head-to-head-player-${player.side}-name`"
+                tag="h3"
+                font-size="xl"
+                font-weight="bold"
+                line-height="tight"
+                class="head-to-head-summary__name"
+              >
+                <template #default>
+                  <player-link
+                    :competitor="player.competitor"
+                    :titles="player.titles"
+                  />
+                </template>
+              </origam-title>
+              <origam-data-list
+                mode="kv"
+                :items="player.items"
+                :border="false"
+                density="compact"
+                rounded="lg"
+                class="head-to-head-summary__stats"
+                :data-cy="`head-to-head-stats-${player.side}`"
+              />
+            </div>
           </template>
         </origam-card>
       </div>
@@ -270,7 +274,7 @@ defineExpose({})
       var(--origam-color__surface---raised);
   }
 
-  &__duel :deep(.origam-card__content) {
+  &__duel-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
     align-items: center;
@@ -348,7 +352,7 @@ defineExpose({})
     gap: var(--origam-space---4);
   }
 
-  &__player :deep(.origam-card__content) {
+  &__player-grid {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
@@ -410,7 +414,7 @@ defineExpose({})
       padding: var(--origam-space---5);
     }
 
-    &__duel :deep(.origam-card__content) {
+    &__duel-grid {
       grid-template-columns: 1fr 1fr;
     }
 
