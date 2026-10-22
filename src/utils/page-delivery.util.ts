@@ -1,11 +1,14 @@
-import { API_SOURCES } from '../consts/api-sources.const.js'
+import { API_ROUTES } from '../consts/api-routes.const.js'
 import { LAYOUT_ENDPOINTS } from '../consts/layout-endpoints.const.js'
 import { PAGE_DELIVERY } from '../consts/page-delivery.const.js'
 import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
-import { API_SOURCE } from '../enums/api-source.enum.js'
 import type { INavigationGroup, INavigationItem } from '../interfaces/navigation.interface.js'
-import type { IPageDelivery, IPageFixtureUsage } from '../interfaces/page-delivery.interface.js'
-import { isFixtureSelectionAllowed } from './fixture.util.js'
+import type { IApiRoute, IPagePendingUsage } from '../interfaces/api-route.interface.js'
+import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
+
+/** Dev et test : toutes les pages sont visibles, livrées ou non. Production : seules les pages livrées. */
+export const isUndeliveredPageAllowed = (): boolean =>
+  import.meta.dev || import.meta.test
 
 /** `/editions/:id()` (vue-router) et `/editions/:id` (table) désignent la même route. */
 export const normalizeRoutePath = (path: string): string => {
@@ -19,7 +22,7 @@ export const isPageDelivered = (path: string, table: Record<string, IPageDeliver
 /** Dev et test : tout est visible. Production : seules les pages livrées. */
 export const isPageAccessible = (
   path: string,
-  allowUndelivered: boolean = isFixtureSelectionAllowed(),
+  allowUndelivered: boolean = isUndeliveredPageAllowed(),
   table: Record<string, IPageDelivery> = PAGE_DELIVERY
 ): boolean => allowUndelivered || isPageDelivered(path, table)
 
@@ -27,18 +30,32 @@ export const isPageAccessible = (
 export const getPageEndpoints = (page: IPageDelivery): API_ENDPOINT[] =>
   [...new Set([...LAYOUT_ENDPOINTS[page.layout], ...page.endpoints])]
 
-/** Couples page livrée / endpoint encore en fixture : doit être vide pour une release. */
-export const findDeliveredFixtureUsages = (
+/** Endpoints dont la route Nitro n'existe pas encore, avec le ticket back qui la livre (ARCH-11). */
+export const findPendingEndpoints = (routes: Record<API_ENDPOINT, IApiRoute> = API_ROUTES): Array<{ endpoint: API_ENDPOINT, ticket: string }> =>
+  (Object.entries(routes) as Array<[API_ENDPOINT, IApiRoute]>)
+    .flatMap(([endpoint, route]) => route.pendingTicket ? [{ endpoint, ticket: route.pendingTicket }] : [])
+
+/** Tickets back qu'attend une page (endpoints de la page et de son layout) : vide quand toutes ses routes existent. */
+export const findPagePendingTickets = (
+  path: string,
   table: Record<string, IPageDelivery> = PAGE_DELIVERY,
-  sources: Record<API_ENDPOINT, API_SOURCE> = API_SOURCES
-): IPageFixtureUsage[] =>
+  routes: Record<API_ENDPOINT, IApiRoute> = API_ROUTES
+): string[] => {
+  const page = table[normalizeRoutePath(path)]
+  return page ? [...new Set(getPageEndpoints(page).flatMap((endpoint) => routes[endpoint].pendingTicket ?? []))].sort() : []
+}
+
+/** Couples page livrée / endpoint sans route : doit être vide pour une release (OPS-3). */
+export const findDeliveredPendingUsages = (
+  table: Record<string, IPageDelivery> = PAGE_DELIVERY,
+  routes: Record<API_ENDPOINT, IApiRoute> = API_ROUTES
+): IPagePendingUsage[] =>
   Object.entries(table)
     .filter(([, page]) => page.delivered)
     .flatMap(([page, entry]) => getPageEndpoints(entry)
-      .filter(endpoint => sources[endpoint] === API_SOURCE.FIXTURE)
-      .map(endpoint => ({ page, endpoint })))
+      .flatMap(endpoint => routes[endpoint].pendingTicket ? [{ page, endpoint, ticket: routes[endpoint].pendingTicket! }] : []))
 
-/** Routes des fichiers de `app/pages` absentes de la table. */
+/** Routes des fichiers de `src/pages` absentes de la table. */
 export const findUndeclaredPages = (routes: string[], table: Record<string, IPageDelivery> = PAGE_DELIVERY): string[] =>
   routes.filter(route => !(normalizeRoutePath(route) in table))
 
@@ -56,14 +73,14 @@ export const findOrphanEndpoints = (table: Record<string, IPageDelivery> = PAGE_
 
 export const filterDeliveredItems = (
   items: INavigationItem[],
-  allowUndelivered: boolean = isFixtureSelectionAllowed(),
+  allowUndelivered: boolean = isUndeliveredPageAllowed(),
   table: Record<string, IPageDelivery> = PAGE_DELIVERY
 ): INavigationItem[] => items.filter(item => isPageAccessible(item.to, allowUndelivered, table))
 
 /** Retire aussi les groupes devenus vides. */
 export const filterDeliveredGroups = (
   groups: INavigationGroup[],
-  allowUndelivered: boolean = isFixtureSelectionAllowed(),
+  allowUndelivered: boolean = isUndeliveredPageAllowed(),
   table: Record<string, IPageDelivery> = PAGE_DELIVERY
 ): INavigationGroup[] => groups
   .map(group => ({ ...group, items: filterDeliveredItems(group.items, allowUndelivered, table) }))

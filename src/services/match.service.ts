@@ -1,5 +1,4 @@
 import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import type { IAdminMatchesQuery, IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
 
@@ -16,10 +15,6 @@ export class MatchService extends BaseService {
   }
 
   adminList (editionId: string, query: IAdminMatchesQuery = {}): Promise<IAdminMatch[]> {
-    return this.resolve<IAdminMatch[]>(
-      API_ENDPOINT.ADMIN_MATCHES,
-      () => this.request<IAdminMatch[]>(`/admin/editions/${encodeURIComponent(editionId)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } }),
-      async () => (await import('../assets/fixtures/match.fixture.js')).adminMatchesFixture(editionId)
-    )
+    return this.request<IAdminMatch[]>(`/admin/editions/${encodeURIComponent(editionId)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } })
   }
 }

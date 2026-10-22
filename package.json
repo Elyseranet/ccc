@@ -24,7 +24,7 @@
     "db:seed:archives": "npm run db:typeorm:build && node .typeorm-dist/src/utils/seed-archives-cli.util.js",
     "typecheck": "node scripts/typecheck.mjs",
     "test:front": "node scripts/test-run.mjs --project front",
-    "test:release": "RELEASE_BUILD=true node scripts/test-run.mjs --project front tests/nuxt/front/api-sources.release.test.ts",
+    "test:release": "RELEASE_BUILD=true node scripts/test-run.mjs --project front tests/nuxt/front/api-routes.release.test.ts",
     "test:release:e2e": "playwright test --config playwright.release.config.ts",
     "test:a11y": "playwright test --config playwright.config.ts --project=a11y",
     "test:visual": "playwright test --config playwright.config.ts --project=visual"

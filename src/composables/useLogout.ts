@@ -1,4 +1,3 @@
-import { useFixtureVariant } from '~/composables/useFixtureVariant'
 import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/async-state.const'
 import { ROUTES } from '~/consts/routes.const'
 import { AuthService } from '~/services/auth.service'
@@ -16,7 +15,7 @@ import { ApiRequestError } from '~/utils/api-request-error.util'
  ********************************************************/
 export const useLogout = () => {
   const auth = useAuthStore()
-  const service = new AuthService({ variant: useFixtureVariant() })
+  const service = new AuthService({ fetcher: useRequestFetch() })
   const pending = ref(false)
   const failed = ref(false)
 

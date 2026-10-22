@@ -1,3 +1,5 @@
+import type { ISessionIdentity } from '../interfaces/session.interface.js'
+
 export const SESSION_COOKIE_NAME = 'ccc_session'
 /** En production : préfixe `__Host-` (OWASP Session Management) qui impose Secure, Path=/ et aucun Domain. */
 export const SESSION_COOKIE_NAME_PRODUCTION = `__Host-${SESSION_COOKIE_NAME}`
@@ -86,3 +88,6 @@ export const LOGIN_DELAY_MAX_EXPONENT = 30
 /** Format stocké d'un hash scrypt : `scrypt$N$r$p$sel$hash`, six parties. */
 export const PASSWORD_HASH_SEPARATOR = '$'
 export const PASSWORD_HASH_PART_COUNT = 6
+
+/** Session d'un visiteur sans compte (`GET /moi` répond 401). */
+export const ANONYMOUS_SESSION: ISessionIdentity = Object.freeze({ role: null, initials: null })

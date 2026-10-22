@@ -8,9 +8,9 @@ import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
  *
  * @description
  * Une page `delivered: false` répond 404 en production et disparaît de la navigation. Une page `delivered: true`
- * ne doit consommer aucun endpoint en `API_SOURCE.FIXTURE` : `npm run test:release` échoue sinon, donc le build
- * de l'image aussi. Toutes les routes sont pré-déclarées : un ticket F-xx ne change que SA ligne, et passe
- * `delivered` à `true` dans le même commit qui bascule ses endpoints en LIVE.
+ * ne doit consommer aucun endpoint dont la route n'existe pas encore (`API_ROUTES`, `pendingTicket`) :
+ * `npm run test:release` échoue sinon, donc le build de l'image aussi. Toutes les routes sont pré-déclarées : un
+ * ticket F-xx ne change que SA ligne, et passe `delivered` à `true` quand l'écran est branché sur l'API réelle.
  *
  * `endpoints` ne liste que les endpoints propres à la page (composables et services compris). Ceux du layout
  * (`LAYOUT_ENDPOINTS` : `ME`, et `EDITIONS` pour l'admin) s'y ajoutent. La liste est une première affectation,

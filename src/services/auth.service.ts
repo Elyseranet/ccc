@@ -1,4 +1,3 @@
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
 
@@ -14,10 +13,6 @@ export class AuthService extends BaseService {
   }
 
   logout (): Promise<void> {
-    return this.resolve<void>(
-      API_ENDPOINT.AUTH_LOGOUT,
-      () => this.request<void>('/auth/logout', { method: 'POST' }),
-      async () => ({ default: undefined, empty: undefined })
-    )
+    return this.request<void>('/auth/logout', { method: 'POST' })
   }
 }

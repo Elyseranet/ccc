@@ -9,8 +9,3 @@ export interface IPageDelivery {
   /** Endpoints propres à la page, composables et services compris (hors layout). */
   endpoints: API_ENDPOINT[]
 }
-
-export interface IPageFixtureUsage {
-  page: string
-  endpoint: API_ENDPOINT
-}

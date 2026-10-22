@@ -1,5 +1,4 @@
 import type { IDraw } from '../interfaces/draw.interface.js'
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
 
@@ -15,10 +14,6 @@ export class DrawService extends BaseService {
   }
 
   adminList (editionId: string): Promise<IDraw[]> {
-    return this.resolve<IDraw[]>(
-      API_ENDPOINT.ADMIN_DRAWS,
-      () => this.request<IDraw[]>(`/admin/editions/${encodeURIComponent(editionId)}/tirages`),
-      async () => (await import('../assets/fixtures/draw.fixture.js')).adminDrawsFixture(editionId)
-    )
+    return this.request<IDraw[]>(`/admin/editions/${encodeURIComponent(editionId)}/tirages`)
   }
 }

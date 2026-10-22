@@ -5,14 +5,15 @@ import { LAYOUT_ENDPOINTS } from '../../../src/consts/layout-endpoints.const'
 import { PAGE_DELIVERY } from '../../../src/consts/page-delivery.const'
 import { ROUTES } from '../../../src/consts/routes.const'
 import { API_ENDPOINT } from '../../../src/enums/api-endpoint.enum'
-import { API_SOURCE } from '../../../src/enums/api-source.enum'
+import type { IApiRoute } from '../../../src/interfaces/api-route.interface'
 import { LAYOUT } from '../../../src/enums/layout.enum'
 import type { IPageDelivery } from '../../../src/interfaces/page-delivery.interface'
 import type { INavigationGroup, INavigationItem } from '../../../src/interfaces/navigation.interface'
 import {
   filterDeliveredGroups,
   filterDeliveredItems,
-  findDeliveredFixtureUsages,
+  findDeliveredPendingUsages,
+  findPagePendingTickets,
   findOrphanEndpoints,
   findStalePages,
   findUndeclaredPages,
@@ -40,12 +41,13 @@ const table = (delivered: boolean): Record<string, IPageDelivery> => ({
   '/b': { delivered: false, layout: LAYOUT.DEFAULT, endpoints: [API_ENDPOINT.STATS] }
 })
 
-const sources = (live: API_ENDPOINT[]): Record<API_ENDPOINT, API_SOURCE> =>
+/** Table de routes de test : les endpoints listés n'ont pas encore de route (ticket `B-99`). */
+const routes = (pending: API_ENDPOINT[]): Record<API_ENDPOINT, IApiRoute> =>
   Object.fromEntries(Object.values(API_ENDPOINT).map(endpoint =>
-    [endpoint, live.includes(endpoint) ? API_SOURCE.LIVE : API_SOURCE.FIXTURE])) as Record<API_ENDPOINT, API_SOURCE>
+    [endpoint, pending.includes(endpoint) ? { file: 'x.get.ts', pendingTicket: 'B-99' } : { file: 'x.get.ts' }])) as Record<API_ENDPOINT, IApiRoute>
 
 describe('table PAGE_DELIVERY', () => {
-  it('déclare chaque page de app/pages, routes dynamiques comprises', () => {
+  it('déclare chaque page de src/pages, routes dynamiques comprises', () => {
     expect(pageRoutes).toEqual(expect.arrayContaining([ROUTES.EDITION, ROUTES.PLAYER, ROUTES.INVITATION, ROUTES.HOME]))
     expect(findUndeclaredPages(pageRoutes)).toEqual([])
   })
@@ -88,23 +90,23 @@ describe('détection des erreurs de table', () => {
   })
 })
 
-describe('garde de release par page livrée', () => {
-  it('une page livrée qui consomme une fixture est signalée, endpoint partagé compris', () => {
-    expect(findDeliveredFixtureUsages(table(true), sources([API_ENDPOINT.ME]))).toEqual([
-      { page: '/a', endpoint: API_ENDPOINT.EDITIONS }
+describe('garde de release par page livrée (OPS-3, ARCH-8)', () => {
+  it('une page livrée qui consomme un endpoint sans route est signalée, avec le ticket back', () => {
+    expect(findDeliveredPendingUsages(table(true), routes([API_ENDPOINT.EDITIONS]))).toEqual([
+      { page: '/a', endpoint: API_ENDPOINT.EDITIONS, ticket: 'B-99' }
     ])
   })
 
-  it('les endpoints du layout comptent : ME en fixture bloque une page livrée sans endpoint propre', () => {
+  it('les endpoints du layout comptent : ME sans route bloque une page livrée sans endpoint propre', () => {
     const pages: Record<string, IPageDelivery> = { '/a': { delivered: true, layout: LAYOUT.DEFAULT, endpoints: [] } }
-    expect(findDeliveredFixtureUsages(pages, sources([]))).toEqual([{ page: '/a', endpoint: API_ENDPOINT.ME }])
+    expect(findDeliveredPendingUsages(pages, routes([API_ENDPOINT.ME]))).toEqual([{ page: '/a', endpoint: API_ENDPOINT.ME, ticket: 'B-99' }])
   })
 
-  it('une page admin livrée avec EDITIONS en fixture est signalée (sélecteur d’édition du layout)', () => {
+  it('une page admin livrée hérite d’EDITIONS (sélecteur d’édition du layout)', () => {
     const pages: Record<string, IPageDelivery> = { '/admin/x': { delivered: true, layout: LAYOUT.ADMIN, endpoints: [] } }
     expect(LAYOUT_ENDPOINTS[LAYOUT.ADMIN]).toContain(API_ENDPOINT.EDITIONS)
-    expect(findDeliveredFixtureUsages(pages, sources([API_ENDPOINT.ME]))).toEqual([
-      { page: '/admin/x', endpoint: API_ENDPOINT.EDITIONS }
+    expect(findDeliveredPendingUsages(pages, routes([API_ENDPOINT.EDITIONS]))).toEqual([
+      { page: '/admin/x', endpoint: API_ENDPOINT.EDITIONS, ticket: 'B-99' }
     ])
   })
 
@@ -116,12 +118,18 @@ describe('garde de release par page livrée', () => {
     }
   })
 
-  it('passe quand les endpoints d’une page livrée sont tous en LIVE', () => {
-    expect(findDeliveredFixtureUsages(table(true), sources([API_ENDPOINT.ME, API_ENDPOINT.EDITIONS]))).toEqual([])
+  it('passe quand toutes les routes d’une page livrée existent', () => {
+    expect(findDeliveredPendingUsages(table(true), routes([]))).toEqual([])
   })
 
-  it('ignore les fixtures d’une page non livrée', () => {
-    expect(findDeliveredFixtureUsages(table(false), sources([]))).toEqual([])
+  it('ignore une page non livrée', () => {
+    expect(findDeliveredPendingUsages(table(false), routes([API_ENDPOINT.EDITIONS]))).toEqual([])
+  })
+
+  it('liste les tickets back qu’attend une page, layout compris', () => {
+    expect(findPagePendingTickets('/a', table(true), routes([API_ENDPOINT.EDITIONS, API_ENDPOINT.ME]))).toEqual(['B-99'])
+    expect(findPagePendingTickets('/a', table(true), routes([]))).toEqual([])
+    expect(findPagePendingTickets('/inconnue', table(true), routes([]))).toEqual([])
   })
 })
 

@@ -1,4 +1,3 @@
-import { useFixtureVariant } from '~/composables/useFixtureVariant'
 import { EditionService } from '~/services/edition.service'
 
 /*********************************************************
@@ -8,9 +7,8 @@ import { EditionService } from '~/services/edition.service'
  * Liste des éditions (`GET /editions`), clé de cache stable.
  ********************************************************/
 export const useEditions = () => {
-  const variant = useFixtureVariant()
-  const service = new EditionService({ variant })
-  return useAsyncData(`editions:${variant}`, () => service.list())
+  const service = new EditionService({ fetcher: useRequestFetch() })
+  return useAsyncData(`editions`, () => service.list())
 }
 
 /*********************************************************
@@ -20,7 +18,6 @@ export const useEditions = () => {
  * Compteurs d'archive (`GET /stats`, C1).
  ********************************************************/
 export const useArchiveStats = () => {
-  const variant = useFixtureVariant()
-  const service = new EditionService({ variant })
-  return useAsyncData(`stats:${variant}`, () => service.stats())
+  const service = new EditionService({ fetcher: useRequestFetch() })
+  return useAsyncData(`stats`, () => service.stats())
 }

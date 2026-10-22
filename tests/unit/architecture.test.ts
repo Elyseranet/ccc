@@ -47,8 +47,7 @@ describe('arborescence (ARCH-1 à ARCH-7)', () => {
   })
 
   it('les constantes (SCREAMING_SNAKE) ne sont déclarées que dans src/consts, ou src/themes pour le thème (ARCH-7)', () => {
-    // Étape 1 de T-ARCH-01 : les fixtures (src/assets/fixtures) sont supprimées à l'étape suivante (ARCH-8).
-    const offenders = sourceFiles.filter((file) => !/^src\/(consts|themes|assets\/fixtures)\//.test(file)
+    const offenders = sourceFiles.filter((file) => !/^src\/(consts|themes)\//.test(file)
       && /^(export\s+)?const\s+[A-Z][A-Z0-9_]*\s*[:=]/m.test(read(file)))
     expect(offenders).toEqual([])
   })

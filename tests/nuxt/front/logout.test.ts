@@ -1,11 +1,11 @@
-import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { defineEventHandler, setResponseStatus } from 'h3'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { USER_ROLE } from '../../../src/enums/user.enum'
 import { useLogout } from '../../../src/composables/useLogout'
 import { ROUTES } from '../../../src/consts/routes.const'
-import { FIXTURE_VARIANT } from '../../../src/enums/fixture-variant.enum'
 import { AuthService } from '../../../src/services/auth.service'
 import { useAuthStore } from '../../../src/stores/auth.store'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
@@ -25,12 +25,19 @@ const mountLogout = async () => {
 }
 
 describe('AuthService', () => {
-  it('se déconnecte sur la fixture sans erreur', async () => {
+  it('appelle POST /api/v1/auth/logout', async () => {
+    const handler = vi.fn(() => null)
+    registerEndpoint('/api/v1/auth/logout', { method: 'POST', handler: defineEventHandler(handler) })
     await expect(new AuthService().logout()).resolves.toBeUndefined()
+    expect(handler).toHaveBeenCalledTimes(1)
   })
 
-  it('rejette en 500 sur la variante error', async () => {
-    await expect(new AuthService({ variant: FIXTURE_VARIANT.ERROR }).logout()).rejects.toMatchObject({ error: { statusCode: 500 } })
+  it('rejette en ApiRequestError 500 quand l’API échoue', async () => {
+    registerEndpoint('/api/v1/auth/logout', { method: 'POST', handler: defineEventHandler((event) => {
+      setResponseStatus(event, 500)
+      return { statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'boom' }
+    }) })
+    await expect(new AuthService().logout()).rejects.toMatchObject({ error: { statusCode: 500 } })
   })
 })
 
@@ -38,6 +45,7 @@ describe('useLogout', () => {
   beforeEach(() => {
     useAuthStore(useNuxtApp().$pinia).clear()
     navigateToMock.mockReset()
+    registerEndpoint('/api/v1/auth/logout', { method: 'POST', handler: defineEventHandler(() => null) })
   })
 
   it('vide la session puis renvoie vers l’accueil', async () => {

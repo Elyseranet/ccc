@@ -1,7 +1,6 @@
 import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats } from '../interfaces/competitor.interface.js'
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
 import type { DataSource } from 'typeorm'
@@ -46,27 +45,15 @@ export class CompetitorService extends BaseService {
   }
 
   list (query: ICompetitorsQuery = {}): Promise<IPaginated<ICompetitorListItem>> {
-    return this.resolve<IPaginated<ICompetitorListItem>>(
-      API_ENDPOINT.COMPETITORS,
-      () => this.request<IPaginated<ICompetitorListItem>>('/competiteurs', { query: { ...query } }),
-      async () => (await import('../assets/fixtures/competitor.fixture.js')).competitorsFixture(query)
-    )
+    return this.request<IPaginated<ICompetitorListItem>>('/competiteurs', { query: { ...query } })
   }
 
   detail (id: string): Promise<ICompetitorDetail> {
-    return this.resolve<ICompetitorDetail>(
-      API_ENDPOINT.COMPETITOR,
-      () => this.request<ICompetitorDetail>(`/competiteurs/${encodeURIComponent(id)}`),
-      async () => (await import('../assets/fixtures/competitor.fixture.js')).competitorDetailFixture(id)
-    )
+    return this.request<ICompetitorDetail>(`/competiteurs/${encodeURIComponent(id)}`)
   }
 
   headToHead (id: string, opponentId: string): Promise<IHeadToHead> {
-    return this.resolve<IHeadToHead>(
-      API_ENDPOINT.HEAD_TO_HEAD,
-      () => this.request<IHeadToHead>(`/competiteurs/${encodeURIComponent(id)}/face-a-face`, { query: { adversaire: opponentId } }),
-      async () => (await import('../assets/fixtures/competitor.fixture.js')).headToHeadFixture(id, opponentId)
-    )
+    return this.request<IHeadToHead>(`/competiteurs/${encodeURIComponent(id)}/face-a-face`, { query: { adversaire: opponentId } })
   }
 }
 

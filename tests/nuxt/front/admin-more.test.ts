@@ -1,4 +1,5 @@
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { defineEventHandler, setResponseStatus } from 'h3'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RouterLink } from 'vue-router'
@@ -11,7 +12,7 @@ import { AuthService } from '../../../src/services/auth.service'
 import { useAuthStore } from '../../../src/stores/auth.store'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 
-const mountPage = (query = '') => mountSuspended(AdminMorePage, { route: `${ROUTES.ADMIN_MORE}${query}`, global: { components: { RouterLink } } })
+const mountPage = () => mountSuspended(AdminMorePage, { route: ROUTES.ADMIN_MORE, global: { components: { RouterLink } } })
 
 describe('page « Plus » de l’admin (F-12)', () => {
   it('propose exactement Participants, site public et Mon compte, sans rien de ce que masque FA-09', () => {
@@ -51,9 +52,17 @@ describe('états dégradés de la page « Plus » (F-12)', () => {
     spy.mockRestore()
   })
 
-  for (const variant of ['empty', 'error', 'rate_limited']) {
-    it(`variante ${variant} : la page se rend avec un sélecteur sans option, sans plantage`, async () => {
-      const wrapper = await mountPage(`?fixture=${variant}`)
+  for (const [label, status, body] of [
+    ['liste vide', 200, []],
+    ['erreur serveur', 500, { statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'boom' }],
+    ['limite de débit', 429, { statusCode: 429, code: API_ERROR_CODE.RATE_LIMITED, message: 'slow down' }]
+  ] as const) {
+    it(`GET /editions en ${label} : la page se rend avec un sélecteur sans option, sans plantage`, async () => {
+      registerEndpoint('/api/v1/editions', defineEventHandler((event) => {
+        setResponseStatus(event, status)
+        return body
+      }))
+      const wrapper = await mountPage()
       expect(wrapper.get('h1').text()).toBe('Plus')
       expect(wrapper.find('[data-cy="admin-more-edition-select"]').exists()).toBe(true)
       expect(wrapper.get('[data-cy="admin-more-logout"]').text()).toBe('Se déconnecter')

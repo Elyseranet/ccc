@@ -1,5 +1,4 @@
 import type { IRankingEvolutionSeries, IRankingRow, IRankingEvolutionPoint, IRankingSource } from '../interfaces/ranking.interface.js'
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import { RANKING_KIND } from '../enums/ranking-kind.enum.js'
 import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
@@ -33,20 +32,11 @@ export class RankingService extends BaseService {
   }
 
   ranking (kind: RANKING_KIND): Promise<IRankingRow[]> {
-    const isAcp = kind === RANKING_KIND.ACP
-    return this.resolve<IRankingRow[]>(
-      isAcp ? API_ENDPOINT.RANKING_ACP : API_ENDPOINT.RANKING_ALL_TIME,
-      () => this.request<IRankingRow[]>(isAcp ? '/classements/acp' : '/classements/all-time'),
-      async () => (await import('../assets/fixtures/ranking.fixture.js')).rankingFixture(kind)
-    )
+    return this.request<IRankingRow[]>(kind === RANKING_KIND.ACP ? '/classements/acp' : '/classements/all-time')
   }
 
   evolution (kind: RANKING_KIND): Promise<IRankingEvolutionSeries[]> {
-    return this.resolve<IRankingEvolutionSeries[]>(
-      API_ENDPOINT.RANKING_EVOLUTION,
-      () => this.request<IRankingEvolutionSeries[]>('/classements/evolution', { query: { type: kind } }),
-      async () => (await import('../assets/fixtures/ranking.fixture.js')).evolutionFixture(kind)
-    )
+    return this.request<IRankingEvolutionSeries[]>('/classements/evolution', { query: { type: kind } })
   }
 }
 

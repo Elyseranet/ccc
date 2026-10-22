@@ -2,7 +2,6 @@ import type { IEditionDetail, IEditionSummary, IEditionChampion } from '../inter
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IArchiveStats } from '../interfaces/stats.interface.js'
-import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
 import type { IEditionMatchesQuery, IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
 import { In } from 'typeorm'
@@ -51,35 +50,19 @@ export class EditionService extends BaseService {
   }
 
   stats (): Promise<IArchiveStats> {
-    return this.resolve<IArchiveStats>(
-      API_ENDPOINT.STATS,
-      () => this.request<IArchiveStats>('/stats'),
-      async () => (await import('../assets/fixtures/edition.fixture.js')).STATS_FIXTURE
-    )
+    return this.request<IArchiveStats>('/stats')
   }
 
   list (): Promise<IEditionSummary[]> {
-    return this.resolve<IEditionSummary[]>(
-      API_ENDPOINT.EDITIONS,
-      () => this.request<IEditionSummary[]>('/editions'),
-      async () => (await import('../assets/fixtures/edition.fixture.js')).EDITIONS_FIXTURE
-    )
+    return this.request<IEditionSummary[]>('/editions')
   }
 
   detail (id: string): Promise<IEditionDetail> {
-    return this.resolve<IEditionDetail>(
-      API_ENDPOINT.EDITION,
-      () => this.request<IEditionDetail>(`/editions/${encodeURIComponent(id)}`),
-      async () => (await import('../assets/fixtures/edition.fixture.js')).editionDetailFixture(id)
-    )
+    return this.request<IEditionDetail>(`/editions/${encodeURIComponent(id)}`)
   }
 
   matches (id: string, query: IEditionMatchesQuery = {}): Promise<IPaginated<IMatch>> {
-    return this.resolve<IPaginated<IMatch>>(
-      API_ENDPOINT.EDITION_MATCHES,
-      () => this.request<IPaginated<IMatch>>(`/editions/${encodeURIComponent(id)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } }),
-      async () => (await import('../assets/fixtures/edition.fixture.js')).editionMatchesFixture(id)
-    )
+    return this.request<IPaginated<IMatch>>(`/editions/${encodeURIComponent(id)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } })
   }
 }
 

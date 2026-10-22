@@ -1,8 +1,7 @@
 import type { IApiError } from './error.interface.js'
 import type { MATCH_STATUS } from '../enums/match.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
-import type { USER_ROLE } from '../enums/user.enum.js'
-import type { FIXTURE_VARIANT } from '../enums/fixture-variant.enum.js'
+import type { TApiFetcher } from '../types/api-fetcher.type.js'
 
 export interface IApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -13,11 +12,7 @@ export interface IApiRequestOptions {
 export interface IBaseServiceOptions {
   baseUrl?: string
   timeout?: number
-  variant?: FIXTURE_VARIANT
-}
-
-export interface IMeServiceOptions extends IBaseServiceOptions {
-  fixtureRole?: USER_ROLE | null
+  fetcher?: TApiFetcher
 }
 
 export interface ICompetitorsQuery {
