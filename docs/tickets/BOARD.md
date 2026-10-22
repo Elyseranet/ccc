@@ -118,6 +118,8 @@ Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **f
 
 Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3. **Fermé sans objet** par le `project-manager` le 2026-10-22 : le convertisseur Python et le seed legacy sont supprimés (ARCH-5), la branche n'est pas mergée.
 
+Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier unique front et back, ARCH-2), proposé par le `frontend-lead` : [T-HTTP-01](T-HTTP-01.md), **À faire**, après le merge de F-00h et de la vague 3a.
+
 Échecs intermittents de la suite Vitest (fichiers non collectés, hooks à 60 s) : [T-QA-01](T-QA-01.md), **ouvert**. Le garde-fou est mergé dans `develop` @ `2913c81` (branche rebasée `95823da`). Avec lui, `test:run` échoue si un fichier découvert manque au rapport. La cause racine n'est pas trouvée : 14 anomalies spontanées sur 469 runs, 4 signatures. Le garde-fou rend l'incident visible, il ne l'empêche pas. Décision QA-1 : L'enquête est en pause et le ticket reste ouvert.
 
 #### Historique des options présentées (A1 à A16)
