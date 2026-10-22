@@ -107,6 +107,7 @@ defineExpose({})
   }
 
   &__lead {
+    max-width: var(--rules-variants__lead---max-width, var(--ccc-lead---max-width));
     margin: 0;
     font-size: var(--origam-font__size---xl);
     color: var(--origam-color__text---secondary);

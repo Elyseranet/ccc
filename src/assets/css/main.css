@@ -44,3 +44,4 @@ button, input, select, textarea { font: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+:root { --ccc-lead---max-width: 40rem; }
