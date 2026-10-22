@@ -12,6 +12,6 @@
 - **Objectif** : un seul fichier de statuts pour le front et le back (services fusionnés, ARCH-2), sans aucun littéral de statut dans `src/`.
 - **Critères d'acceptation** :
   1. Toutes les fabriques et tables du back utilisent les constantes de `src/consts/http-status.const.ts`. Les statuts manquants y sont ajoutés, avec la même convention de nommage que F-00h : au minimum 304, 403, 408, 409, 410, 413, 415, 422 et 503, plus ceux que la vague 3a aura introduits.
-  2. Aucune constante de statut n'est dupliquée ailleurs, y compris dans `async-state.const.ts`, si F-00h ne l'a pas déjà vidé.
+  2. Aucune constante de statut n'est dupliquée ailleurs. Côté front, F-00h (`316f394`, selon le `frontend-lead`) retire déjà `HTTP_STATUS_*` de `async-state.const.ts` : il n'y a pas de doublon front à supprimer. `NETWORK_ERROR_STATUS = 0`, ajouté par F-00h, n'est pas un statut HTTP et reste tel quel.
   3. Le comportement ne change pas. `test:run`, `test:db` et `test:api` sont verts, et les réponses d'erreur gardent le même statut et le même code applicatif.
   4. Un `grep` des littéraux de statut dans `src/utils`, `src/services`, `src/server` et `src/consts` ne renvoie plus que `http-status.const.ts` et des commentaires.
