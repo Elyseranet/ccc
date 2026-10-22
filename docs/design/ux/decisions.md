@@ -178,3 +178,6 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## ARCH-14 — Les stores sont des composables (décision utilisateur 2026-10-22)
 - Il n'y a pas de dossier `stores/`. Les stores Pinia sont des composables : ils vont dans `src/composables/`, selon le nommage des composables (`useCamelCase.ts`).
+
+## F-04-ADV — Adversaires sur la fiche joueur (décision utilisateur 2026-10-22)
+- La fiche joueur affiche les **4 adversaires les plus affrontés**, comme la maquette, suivis d'un lien « voir tous » vers le face-à-face (F-05), où l'on peut choisir n'importe quel adversaire. L'ordre est celui que renvoie le serveur (G11).
