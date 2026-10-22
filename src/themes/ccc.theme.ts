@@ -44,7 +44,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-bottom-nav': { elevation: 'lg', grow: true },
 
     // Données
-    'origam-chip': { size: 'small', pill: true, border: false, fontWeight: 'bold' },
+    'origam-chip': { size: 'small', pill: true, border: false, fontWeight: 'bold', color: 'var(--origam-color__text---secondary)', bgColor: 'var(--origam-color__surface---overlay)' },
     'origam-chip-group': { column: false },
     'origam-badge': { rounded: 'full', inline: true },
     'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'secondary' },
@@ -66,6 +66,9 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-text-field': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-select': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-number-field': { variant: 'outlined', rounded: 'lg', density: 'default', hideSpinButtons: false },
+    'origam-date-picker-field': { variant: 'outlined', rounded: 'full', density: 'default' },
+    'origam-textarea-field': { variant: 'outlined', rounded: 'lg', density: 'default' },
+    'origam-file-field': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-password-field': { variant: 'outlined', rounded: 'full', density: 'default' }
   },
 
@@ -91,6 +94,8 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-data-table-row--hover---background-color': 'var(--origam-color__action--ghost---bgHover)',
     // Onglets en pilule (F-00l) : ni une prop ni un token sémantique n'expriment ces valeurs ; l'onglet actif du DS est
     // `action.primary` en dur, la maquette le veut en `action.secondary`. Chaque entrée pointe vers un token existant.
+    // Les deux cssVars `--origam-tabs__item--pills--active---*` contournent Elyseranet/origam#1253 (prop color ignorée sur
+    // l'onglet actif en pilule) : à retirer quand Origam honore `color`.
     '--origam-tabs---border-width': 'var(--origam-border__width---thin)',
     '--origam-tabs---border-color': 'var(--origam-color__border---default)',
     '--origam-tabs---border-radius': 'var(--origam-radius---full)',
@@ -115,6 +120,9 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Champs outlined : fond surface.sunken, filet 1 px border.default, sans atténuation d'opacité.
     '--origam-field---background-color': 'var(--origam-color__surface---sunken)',
     '--origam-field---border-color': 'var(--origam-color__border---default)',
+    '--origam-field---focus-ring-width': 'calc(var(--origam-border__width---2) + var(--origam-border__width---thin))',
+    '--origam-field---focus-ring-offset': 'var(--origam-border__width---2)',
+    '--origam-field---focus-ring-color': 'var(--origam-color__border---focus)',
     '--origam-field---border-opacity-outlined': '1',
     // Valeur choisie d'un select : text.primary (le défaut d'Origam est text.secondary).
     '--origam-select__selection---color': 'var(--origam-color__text---primary)',
