@@ -347,3 +347,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-ARCH-03](T-ARCH-03.md) : **Fermé** — mergé dans `develop` @ `5efed01` (branche `a0a8382`) ; schémas dans `src/server/schemas/`, stores en composables.
 - [F-04-PAG](F-04-PAG.md) : ouvert — remédiation de la dérogation visuelle sur origam-pagination (décision F-04-PAG).
 - [F-14](F-14.md) : ouvert — M1 et D1 mergés @ `f17e215` ; restent D2 (en cours), D3 et D4.
+- [F-14](F-14.md) : ouvert — D2 mergé @ `f7fd47c` ; restent D3 et D4 (D4 à revérifier après F-00r).
