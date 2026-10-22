@@ -56,12 +56,12 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.PLAYERS]: {
     delivered: false,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.COMPETITORS]
+    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.COMPETITORS, API_ENDPOINT.STATS]
   },
   [ROUTES.PLAYER]: {
     delivered: false,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.COMPETITOR, API_ENDPOINT.HEAD_TO_HEAD, API_ENDPOINT.RANKING_EVOLUTION]
+    endpoints: [API_ENDPOINT.COMPETITOR, API_ENDPOINT.HEAD_TO_HEAD]
   },
   [ROUTES.HEAD_TO_HEAD]: {
     delivered: false,

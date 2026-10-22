@@ -66,3 +66,15 @@ describe('toApiRequestError et Retry-After', () => {
     expect(typed.retryAfterSeconds).toBe(5)
   })
 })
+
+describe('ApiRequestError et createError de Nuxt (F-04)', () => {
+  it('expose statusCode et data : le statut d’une erreur de useAsyncData survit à la sérialisation du payload', () => {
+    const error = new ApiRequestError({ statusCode: 404, code: API_ERROR_CODE.NOT_FOUND, message: 'Competitor not found' })
+    expect(error.statusCode).toBe(404)
+    expect(error.data).toEqual(error.error)
+    const wrapped = createError(error)
+    expect(wrapped.statusCode).toBe(404)
+    const serialized = JSON.parse(JSON.stringify({ statusCode: wrapped.statusCode, message: wrapped.message, data: wrapped.data }))
+    expect(toApiRequestError(serialized).error).toMatchObject({ statusCode: 404, code: API_ERROR_CODE.NOT_FOUND })
+  })
+})
