@@ -29,6 +29,7 @@ export interface IPlayerLinkProps {
   competitor: Pick<ICompetitorPublic, 'id' | 'displayName'>
   titles?: number
   size?: TSize
+  inline?: boolean
 }
 
 export interface IAsyncStateProps {

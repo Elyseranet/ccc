@@ -19,6 +19,7 @@ button, input, select, textarea { font: inherit; }
 .font-display { --origam-title---font-family: var(--origam-font__family---display); --origam-title---font-weight: var(--origam-font__weight---regular); --origam-title---letter-spacing: -0.01em; font-family: var(--origam-font__family---display); font-weight: var(--origam-font__weight---regular); letter-spacing: -0.01em; }
 :where(.origam-tab__label) { line-height: var(--origam-font__lineHeight---normal); }
 .origam-field.origam-field.origam-field { --origam-field---corner-clearance: var(--origam-space---5); }
+.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large { padding-inline: calc(var(--origam-btn---padding-xl, var(--origam-space---6)) + var(--origam-btn---density-padding-x, 0px) - var(--origam-btn---border-width-outlined, var(--origam-border__width---thin))); }
 :where(.origam-table) th { text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); }
 .neon { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon), 0 6px 0 var(--origam-color__bar---neon), 0 8px 0 var(--origam-color__bar---neon), 0 22px 40px color-mix(in srgb, var(--origam-color__bar---neon) 45%, transparent); }
 .neon--sm { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon); }

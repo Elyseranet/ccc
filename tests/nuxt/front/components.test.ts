@@ -84,6 +84,13 @@ describe('PlayerLink', () => {
     const none = await mountSuspended(PlayerLink, { ...withRouterLink, props: { competitor: { id: 'abc', displayName: 'Sam Dupont' } } })
     expect(none.find('.player-link__stars').exists()).toBe(false)
   })
+
+  it('inline : pose la classe qui retire hauteur et retrait du bouton (texte courant)', async () => {
+    const inline = await mountSuspended(PlayerLink, { ...withRouterLink, props: { competitor: { id: 'abc', displayName: 'Sam Dupont' }, inline: true } })
+    expect(inline.get('[data-cy="player-link"]').classes()).toContain('player-link--inline')
+    const block = await mountSuspended(PlayerLink, { ...withRouterLink, props: { competitor: { id: 'abc', displayName: 'Sam Dupont' } } })
+    expect(block.get('[data-cy="player-link"]').classes()).not.toContain('player-link--inline')
+  })
 })
 
 describe('AsyncState', () => {

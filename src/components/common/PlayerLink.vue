@@ -6,6 +6,7 @@
     rounded="full"
     font-weight="semibold"
     class="player-link"
+    :class="linkClasses"
     data-cy="player-link"
   >
     <template #default>
@@ -40,7 +41,8 @@ import type { IPlayerLinkProps } from '~/interfaces/common-components.interface'
 const { t } = useT()
 const props = withDefaults(defineProps<IPlayerLinkProps>(), {
   titles: 0,
-  size: PLAYER_LINK_DEFAULT_SIZE
+  size: PLAYER_LINK_DEFAULT_SIZE,
+  inline: false
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
@@ -52,6 +54,7 @@ defineSlots<{}>()
  * Le singulier et le pluriel ont chacun leur clé : pas de syntaxe de pluriel i18n dans ce projet.
  ********************************************************/
 const profilePath = computed(() => `/joueurs/${encodeURIComponent(props.competitor.id)}`)
+const linkClasses = computed(() => ({ 'player-link--inline': props.inline }))
 const hasTitles = computed(() => props.titles > 0)
 const stars = computed(() => '*'.repeat(props.titles))
 const titlesLabel = computed(() => props.titles === 1
@@ -69,6 +72,15 @@ defineExpose({})
 
 <style scoped lang="scss">
 .player-link {
+  &--inline {
+    --origam-btn---height: auto;
+    --origam-btn---min-height: 0;
+    --origam-btn---min-width: 0;
+    --origam-btn---font-size: 1em;
+    --origam-btn---line-height: var(--origam-font__lineHeight---normal);
+    padding-inline: 0;
+  }
+
   &__stars {
     margin-inline-start: var(--origam-space---1);
     color: var(--player-link---stars-color, var(--origam-color__bar---amber));
