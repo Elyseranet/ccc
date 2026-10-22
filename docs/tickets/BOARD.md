@@ -189,7 +189,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | Id | Titre | Maquette HH | Dépend de | Statut | Worktree |
 |---|---|---|---|---|---|
 | [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **Fermé** — squash dans `develop` @ `a90f586` (branche `0e6c965`) | `../CCC-F-00` |
-| [F-01](F-01.md) | Accueil | `index.html` | F-00 | À faire | `../CCC-F-01` |
+| [F-01](F-01.md) | Accueil | `index.html` | F-00 | En cours (dev-f05), lancé le 2026-10-22 sur develop 67270bd ; routes publiques toutes livrées | worktree de dev-f05 (`agent-a70ac359346e804a8`), branche `feature/F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | En cours (dev-f04) : prérequis F-00q/r/s et T-ARCH-03 mergés (fd76ba2), rebase en cours ; pagination tranchée F-04-PAG (`origam-pagination`, dérogation visuelle de la seule zone, remédiation F-04-PAG.md) ; F-04-ADV : lien « Voir les N adversaires → » validé, au-delà de 4 | `../CCC-F-04` |
