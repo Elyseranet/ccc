@@ -101,8 +101,8 @@ const prepareDirectory = async (page: Page, mockup: Page) => {
 }
 
 const preparePlayer = async (page: Page, mockup: Page) => {
-  await hide(mockup, ['.pl-hero__alias', '.pl-hero .chip .stars', '.opp .stars'])
-  await hide(page, ['[data-cy="player-alias"]', '.player-header__stars', '[data-cy="player-unknown-results"]', '.player-link__stars'])
+  await hide(mockup, ['.pl-hero__alias', '.pl-hero .chip .stars', '.opp .stars', '.pl-path .chip'])
+  await hide(page, ['[data-cy="player-alias"]', '.player-header__stars', '[data-cy="player-unknown-results"]', '.player-link__stars', '[data-cy="player-journey-table"] .origam-chip'])
   await mirror(page, mockup, [
     ['.crumbs li[aria-current]', '[data-cy="player-breadcrumb"] [aria-current="page"]'],
     ['.pl-hero__name', '[data-cy="page-title"]'],
