@@ -1,7 +1,7 @@
 # T-HTTP-01 — Statuts HTTP du back dans la constante partagée `http-status.const.ts`
 
 - **Statut** : À faire. Ouvert le 2026-10-22 par `backend-lead`, sur proposition du `frontend-lead`.
-- **Dépend de** : merge de F-00h (qui crée `src/consts/http-status.const.ts`) **et** merge de la vague 3a back. La vague 3a ajoute ses propres fabriques d'erreur (408, 413, 415, 429, 503 `SERVICE_BUSY`…). Les migrer avant ferait conflit sur `src/utils/api-error.util.ts` dans toutes les branches.
+- **Dépend de** : merge de F-00h (**fait** : squash `d0613b6` dans `develop`, qui crée `src/consts/http-status.const.ts` avec `HTTP_STATUS_BAD_REQUEST`, `_UNAUTHORIZED`, `_NOT_FOUND`, `_TOO_MANY_REQUESTS`, `_INTERNAL_SERVER_ERROR`, `NETWORK_ERROR_STATUS` et `DEFAULT_REQUEST_ERROR_MESSAGE`) **et** merge de la vague 3a back (reste à faire). La vague 3a ajoute ses propres fabriques d'erreur (408, 413, 415, 429, 503 `SERVICE_BUSY`…). Les migrer avant ferait conflit sur `src/utils/api-error.util.ts` dans toutes les branches.
 - **Constat** (relevé sur `develop` @ `82d914e`, `grep` des littéraux). Le back écrit ses statuts HTTP en dur :
   - `src/utils/api-error.util.ts` : fabriques `buildError(400 | 401 | 403 | 404 | 409 | 410 | 413 | 422 | 500 | 503, …)` et normalisation (`>= 500`, `=== 503`) ;
   - `src/consts/api-error.const.ts` : table statut → code applicatif ;
