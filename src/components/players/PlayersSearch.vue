@@ -62,7 +62,6 @@
             data-cy="players-search-submit"
           />
           <origam-btn
-            class="players-search__compare"
             variant="outlined"
             size="x-large"
             font-size="md"
@@ -146,10 +145,6 @@ defineExpose({})
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
     align-items: end;
     gap: var(--players-search---gap, var(--origam-space---3));
-  }
-
-  &__compare {
-    --origam-btn---padding-xl: calc(var(--origam-space---6) - var(--origam-border__width---2));
   }
 
   &__field {

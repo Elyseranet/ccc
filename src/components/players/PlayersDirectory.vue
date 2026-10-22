@@ -22,6 +22,7 @@
           />
           <span class="players-directory__identity">
             <player-link
+              inline
               :competitor="item"
               :titles="item.titles"
             />
@@ -169,16 +170,6 @@ defineExpose({})
   &__identity {
     display: flex;
     align-items: baseline;
-
-    :deep(.player-link) {
-      --origam-btn---height: auto;
-      --origam-btn---min-height: 0;
-      --origam-btn---min-width: 0;
-      --origam-btn---padding-sm: 0;
-      --origam-btn---font-size: var(--origam-font__size---sm);
-      --origam-btn---line-height: var(--origam-font__lineHeight---normal);
-      padding-inline: 0;
-    }
   }
 
   &__nickname {

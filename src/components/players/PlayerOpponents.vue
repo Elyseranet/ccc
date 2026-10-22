@@ -36,6 +36,7 @@
                 :avatar-url="summary.opponent.avatarUrl"
               />
               <player-link
+                inline
                 class="player-opponents__name"
                 :competitor="summary.opponent"
               />
@@ -188,13 +189,6 @@ defineExpose({})
 
   &__name {
     justify-self: start;
-    --origam-btn---height: auto;
-    --origam-btn---min-height: 0;
-    --origam-btn---min-width: 0;
-    --origam-btn---padding-sm: 0;
-    --origam-btn---font-size: var(--origam-font__size---md);
-    --origam-btn---line-height: var(--origam-font__lineHeight---normal);
-    padding-inline: 0;
   }
 
   &__link {
