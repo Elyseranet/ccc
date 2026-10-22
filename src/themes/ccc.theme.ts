@@ -32,7 +32,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Contournement Origam #1227 : `components.global.density` (valeur par défaut du DS) retiré ; il déclenchait un avertissement `density` sur chaque composant.
 
     // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (ambre + ombre néon via elevation).
-    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold', letterSpacing: 'normal' },
+    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold', letterSpacing: 'normal', lineHeight: 'normal' },
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
