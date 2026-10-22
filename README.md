@@ -174,7 +174,13 @@ Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUX
 
 ```sh
 E2E_PORT=3971 NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
-NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_e2e_test npx playwright test --config playwright.config.ts
+NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_<agent>_test npx playwright test --config playwright.config.ts
+```
+
+**Une base e2e par agent ou par worktree** (`ccc_<agent>_test`, par exemple `ccc_f04_test`, `ccc_lead_test`) : chaque lancement de Playwright passe par `global-setup`, qui remet la base à neuf et **recrée les sessions**. Deux agents sur la même base invalident mutuellement leurs sessions : les pages admin redirigent alors vers `/connexion` et les tests échouent en délai dépassé, sans rapport avec le code testé. Créer sa base une fois, dans le conteneur de développement :
+
+```sh
+docker exec ccc-db psql -U ccc -d ccc -c "create database ccc_<agent>_test owner ccc"
 ```
 
 Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
