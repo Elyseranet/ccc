@@ -43,6 +43,7 @@ src/
 - Couche « TS pur » (`utils`, `services`, `consts`, `enums`, `interfaces`, `types`, `server/schemas`, `server/db`) : imports **relatifs avec extension `.js`** (lus par Vitest, Nitro et `tsc` NodeNext pour la CLI). Couche Vue : alias `~/`.
 - **Aucune donnée fictive** (ARCH-8) : plus de fixtures ni d'`API_SOURCE`. `API_ROUTES` (`src/consts/api-routes.const.ts`) nomme la route Nitro de chaque endpoint, et le ticket back (`pendingTicket`) tant qu'elle n'existe pas (ARCH-11).
 - e2e sur les vraies données (ARCH-9) : base `_test` chargée par le seed SQL, sessions réelles ; zones de données masquées, seuil 1 % par zone.
+- **Une base e2e par agent ou par worktree** (`ccc_<agent>_test`, décision utilisateur via le chef de projet, 2026-10-22) : `global-setup` remet la base à neuf et recrée les sessions à chaque lancement, donc une base partagée invalide les sessions des autres agents (faux échecs en délai dépassé sur les pages admin). Commande de création : README, « e2e sur les vraies données ».
 
 ## Worktrees d'agents (T-ARCH-02, 2026-10-22)
 
