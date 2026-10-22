@@ -31,6 +31,11 @@ export const API_ERROR_MESSAGE = {
   INVALID_CREDENTIALS: 'Invalid email or password',
   INVALID_CURRENT_PASSWORD: 'Current password is incorrect',
   FORBIDDEN_ORIGIN: 'Cross-origin request refused',
+  MATCH_ALREADY_VALIDATED: 'Match already validated with different scores',
+  MATCH_VERSION_CONFLICT: 'Match was modified by another session',
+  NEXT_ROUND_ENGAGED: 'The next round is engaged: the score can no longer be corrected',
+  SCORE_INCONSISTENT: 'Scores are inconsistent with the match format',
+  MATCH_NOT_FOUND: 'Match not found',
   UNKNOWN: 'Error'
 } as const
 

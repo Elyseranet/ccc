@@ -65,6 +65,21 @@ export const invalidCurrentPassword = (): H3Error =>
 export const forbiddenOrigin = (): H3Error =>
   buildError(403, API_ERROR_CODE.FORBIDDEN_ORIGIN, API_ERROR_MESSAGE.FORBIDDEN_ORIGIN)
 
+export const matchNotFound = (): H3Error =>
+  buildError(404, API_ERROR_CODE.NOT_FOUND, API_ERROR_MESSAGE.MATCH_NOT_FOUND)
+
+export const matchAlreadyValidated = (): H3Error =>
+  buildError(409, API_ERROR_CODE.MATCH_ALREADY_VALIDATED, API_ERROR_MESSAGE.MATCH_ALREADY_VALIDATED)
+
+export const matchVersionConflict = (): H3Error =>
+  buildError(409, API_ERROR_CODE.MATCH_VERSION_CONFLICT, API_ERROR_MESSAGE.MATCH_VERSION_CONFLICT)
+
+export const nextRoundEngaged = (): H3Error =>
+  buildError(409, API_ERROR_CODE.NEXT_ROUND_ENGAGED, API_ERROR_MESSAGE.NEXT_ROUND_ENGAGED)
+
+export const scoreInconsistent = (reason: string): H3Error =>
+  buildError(422, API_ERROR_CODE.SCORE_INCONSISTENT, API_ERROR_MESSAGE.SCORE_INCONSISTENT, [{ path: 'scores', message: reason }])
+
 /** 5xx : le message est générique, le détail (cause) ne part que dans les logs. */
 export const internalError = (): H3Error =>
   buildError(500, API_ERROR_CODE.INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE)

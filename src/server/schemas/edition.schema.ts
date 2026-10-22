@@ -26,18 +26,24 @@ export const publicMatchStatusSchema = z.enum(MATCH_STATUS).refine(
   'RECORDED is not a public status'
 )
 
-export const matchStatusListSchema = z
+/** Liste de statuts de l'URL, chaque élément validé par `itemSchema` (côté public : sans RECORDED ; côté admin : tous). */
+export const buildMatchStatusListSchema = (itemSchema: z.ZodType<MATCH_STATUS, string>) => z
   .union([z.string(), z.array(z.string())])
   .transform((value) => (Array.isArray(value) ? value : [value]).flatMap((item) => item.split(',')))
-  .pipe(z.array(publicMatchStatusSchema).min(1).max(Object.keys(MATCH_STATUS).length))
+  .pipe(z.array(itemSchema).min(1).max(Object.keys(MATCH_STATUS).length))
+
+export const matchStatusListSchema = buildMatchStatusListSchema(publicMatchStatusSchema)
+
+export const matchTourSchema = z.enum(ROUND_KIND)
+
+export const matchPouleSchema = z
+  .string()
+  .regex(/^[1-9]\d{0,3}$/, 'Expected a positive integer')
+  .transform(Number)
 
 export const matchListQuerySchema = z.object({
-  tour: z.enum(ROUND_KIND).optional(),
-  poule: z
-    .string()
-    .regex(/^[1-9]\d{0,3}$/, 'Expected a positive integer')
-    .transform(Number)
-    .optional(),
+  tour: matchTourSchema.optional(),
+  poule: matchPouleSchema.optional(),
   statut: matchStatusListSchema.optional(),
   tri: z.enum(MATCH_SORT).optional()
 })
