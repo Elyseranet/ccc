@@ -19,6 +19,16 @@ import type { IOrigamTheme } from 'origam/interfaces'
  * la police display Bagel Fat One est appliquée par une CLASSE CSS LOCALE (`.font-display`)
  * car `fontFamily` (TFontFamily) n'accepte que sans | serif | mono. Rien d'autre ne sort
  * des props et des tokens. Suivi DS : Elyseranet/origam#1212 (slot de police display).
+ *
+ * @description
+ * Contournements Origam portés par `src/assets/css/main.css` (le CSS ne prend pas de commentaire) ; chacun se
+ * retire quand le défaut suivi est corrigé dans Origam (docs/tickets/origam/INDEX.md) :
+ *   - `:where(.origam-tab__label)` (interligne des onglets) : Elyseranet/origam#1252 ;
+ *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
+ *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
+ *     Elyseranet/origam#1261 ;
+ *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
+ *     Elyseranet/origam#1262.
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
