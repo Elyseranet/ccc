@@ -4,6 +4,7 @@ import { expect } from '@playwright/test'
 import type { Browser, Page } from '@playwright/test'
 import pixelmatch from 'pixelmatch'
 import { PNG } from 'pngjs'
+import { VALUE_MASK_INSETS } from './helpers/e2e.const'
 
 /*********************************************************
  * Comparaison visuelle maquette / application (FA-04)
@@ -27,22 +28,30 @@ const MAX_DIFF_RATIO = process.env.VISUAL_MAX_DIFF_RATIO ? Number(process.env.VI
 
 export interface IClip { x: number, y: number, width: number, height: number }
 
-/** Sélecteurs des zones de données à masquer, côté maquette et côté application. */
-export interface IDataMasks { mockup: string[], app: string[] }
+/**
+ * Sélecteurs des zones de données à masquer, côté maquette et côté application.
+ * `mockup` / `app` : l'élément entier est masqué. `values` : seule la valeur affichée d'un champ est masquée (aplat
+ * posé dans la boîte du champ, entre le padding gauche et le chevron), si bien que filet, rayon, fond et chevron
+ * restent dans la comparaison (F-14, M1).
+ */
+export interface IDataMasks { mockup: string[], app: string[], values?: { mockup: string[], app: string[] } }
+
 
 /** Aplat des zones masquées : identique des deux côtés, il ne compte donc pas dans l'écart. */
 const DATA_MASK_COLOR = '#FF00FF'
 
 /** Barre haute admin : sélecteur d'édition (liste réelle des éditions) et initiales du compte connecté. */
 export const ADMIN_TOP_DATA_MASKS: IDataMasks = {
-  mockup: ['.adm-top select', '.adm-top .avatar'],
-  app: ['.admin-top .admin-edition-select', '[data-cy="admin-avatar"]']
+  mockup: ['.adm-top .avatar'],
+  app: ['[data-cy="admin-avatar"]'],
+  values: { mockup: ['.adm-top select'], app: ['.admin-top .admin-edition-select'] }
 }
 
 /** Carte « Édition active » de la page Plus : sélecteur d'édition. */
 export const PLUS_EDITION_DATA_MASKS: IDataMasks = {
-  mockup: ['.plus-ed select'],
-  app: ['.admin-more__edition .admin-edition-select']
+  mockup: [],
+  app: [],
+  values: { mockup: ['.plus-ed select'], app: ['.admin-more__edition .admin-edition-select'] }
 }
 
 const NO_MASKS: IDataMasks = { mockup: [], app: [] }
@@ -61,10 +70,30 @@ export const box = async (page: Page, selector: string): Promise<IClip> => {
   return found
 }
 
+const addValueMasks = async (target: Page, selectors: string[]) => {
+  for (const selector of selectors) {
+    await target.locator(selector).first().evaluate((element, config) => {
+      const rect = element.getBoundingClientRect()
+      const veil = document.createElement('div')
+      veil.setAttribute('data-visual-value-mask', '')
+      veil.style.cssText = `position:absolute;pointer-events:none;z-index:2147483647;background:${config.color};left:${rect.left + window.scrollX + config.insets.left}px;top:${rect.top + window.scrollY + config.insets.vertical}px;width:${rect.width - config.insets.left - config.insets.right}px;height:${rect.height - 2 * config.insets.vertical}px`
+      document.body.appendChild(veil)
+    }, { color: DATA_MASK_COLOR, insets: VALUE_MASK_INSETS })
+  }
+}
+
+const removeValueMasks = async (target: Page) => {
+  await target.evaluate(() => document.querySelectorAll('[data-visual-value-mask]').forEach(node => node.remove()))
+}
+
 export const compare = async (page: Page, mockup: Page, name: string, viewport: string, mockClip: IClip, appClip: IClip, masks: IDataMasks = NO_MASKS) => {
   mkdirSync(OUTPUT_DIR, { recursive: true })
+  await addValueMasks(mockup, masks.values?.mockup ?? [])
+  await addValueMasks(page, masks.values?.app ?? [])
   const mockBuffer = await mockup.screenshot({ clip: mockClip, fullPage: true, mask: masks.mockup.map(selector => mockup.locator(selector)), maskColor: DATA_MASK_COLOR })
   const appBuffer = await page.screenshot({ clip: appClip, fullPage: true, mask: masks.app.map(selector => page.locator(selector)), maskColor: DATA_MASK_COLOR })
+  await removeValueMasks(mockup)
+  await removeValueMasks(page)
   writeFileSync(join(OUTPUT_DIR, `${name}-${viewport}-maquette.png`), mockBuffer)
   writeFileSync(join(OUTPUT_DIR, `${name}-${viewport}-app.png`), appBuffer)
   const a = PNG.sync.read(mockBuffer)
