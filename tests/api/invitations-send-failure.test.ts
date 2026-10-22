@@ -49,12 +49,16 @@ describe('invitation email failure', async () => {
     expect(user.status).toBe(USER_STATUS.INVITED)
     expect(await dataSource.getRepository(InvitationEntity).countBy({ userId: user.id })).toBe(1)
 
+    // Une seule horloge (celle de JS) : `createdAt` vient du now() de Postgres, qui peut différer d'une milliseconde.
+    const beforeResend = Date.now()
     const resent = await jsonPost(`/api/v1/competiteurs/${body.competitorId}/invitation`, {}, { Cookie: cookie })
     expect(resent.status).toBe(200)
     expect(await resent.json()).toMatchObject({ invitationSent: false })
     const rows = await dataSource.getRepository(InvitationEntity).find({ where: { userId: user.id }, order: { createdAt: 'ASC' } })
     expect(rows).toHaveLength(2)
-    expect(rows[0]!.expiresAt.getTime()).toBeLessThanOrEqual(rows[1]!.createdAt.getTime())
+    // L'ancien lien est invalidé au renvoi : son échéance est ramenée à l'instant du renvoi (horloge JS du serveur).
+    expect(rows[0]!.expiresAt.getTime()).toBeGreaterThanOrEqual(beforeResend)
+    expect(rows[0]!.expiresAt.getTime()).toBeLessThanOrEqual(Date.now())
     expect(rows[1]!.expiresAt.getTime()).toBeGreaterThan(Date.now())
   })
 })
