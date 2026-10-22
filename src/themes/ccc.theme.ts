@@ -28,7 +28,11 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
  *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
- *     Elyseranet/origam#1262.
+ *     Elyseranet/origam#1262 ;
+ *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,
+ *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
+ *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
+ *     token) : Elyseranet/origam#1266.
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
