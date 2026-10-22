@@ -72,6 +72,7 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Fiche joueur | Parcours (graphique) | — (CSS d’app) | Barres CSS d’app (une série ordinale) ; données = tableau ci-dessous. origam-chart `type="column"` possible si l’on accepte des catégories ordinales. |
 | Fiche joueur | Parcours (tableau) | `origam-data-table` | `headers`, `items`, `density: "compact"` |
 | Fiche joueur | Adversaires fréquents | `origam-list` | `items`, `density: "comfortable"`<br>Lien « Face-à-face » = origam-btn `variant="text"`, nom accessible complet. |
+| Fiche joueur | Lien « Voir les N adversaires → » | `origam-btn` | `variant: "text"`, `color: "primary"`, `to: "/face-a-face?a=<id>"`<br>F-04-ADV : affiché seulement si le joueur a plus de 4 adversaires, sous la liste, aligné à gauche. Même recette que « Tous les matchs → » de l’accueil : texte ambre (`action.primary.fgSubtle`), sans fond, flèche → en `aria-hidden`. Mène au face-à-face (F-05) avec ce joueur présélectionné. Le nombre N vient du bilan des rencontres du joueur. |
 | Joueurs | Recherche publique | `origam-form` | `validateOn: "submit"`<br>role="search". Décision E-e : `GET /competiteurs?q=` public. |
 | Joueurs | Champ nom ou pseudo | `origam-text-field` | `type: "search"`, `label: "Nom ou pseudo"`, `rounded: "full"`, `clearable: true`<br>Ne pas poser `variant` : le défaut du thème fait foi (outlined, F-00m). |
 | Joueurs | Filtre édition | `origam-select` | `items`, `label: "Édition jouée"`<br>Ne pas poser `variant` : le défaut du thème fait foi (outlined, F-00m). |

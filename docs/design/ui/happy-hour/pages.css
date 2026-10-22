@@ -205,6 +205,8 @@
 .opp__r { color: var(--origam-color__text---secondary); }
 .opp__r b { color: var(--origam-color__text---primary); }
 .opp__bar { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--w) * 1%); background: var(--origam-color__action--primary---bg); }
+/* F-04-ADV : lien « Voir les N adversaires → », sous la liste, aligné sur son bord gauche (comme « Tous les matchs → »). */
+.opps-more { margin-top: var(--origam-space---3); }
 
 /* ═══ JOUEURS ═══════════════════════════════════════════════════════════ */
 .pl-search { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto; align-items: end; gap: var(--origam-space---3); padding: var(--origam-space---5); }
