@@ -6,7 +6,7 @@ import { RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../../consts/auth.const'
 import { PRODUCTION_NODE_ENV } from '../../../../consts/node-env.const'
 import { LOG_EVENT } from '../../../../consts/log-event.const'
 import { UserEntity } from '../../../db/typeorm/entities/user.entity'
-import { loginSchema } from '../../../../schemas/auth.schema'
+import { loginSchema } from '../../../schemas/auth.schema'
 import {
   buildDeviceCookieOptions,
   getDeviceCookieName,

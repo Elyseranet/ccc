@@ -1,6 +1,6 @@
 import { sendRedirect } from 'h3'
 import { ROUTES } from '~/consts/routes.const'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/composables/useAuthStore'
 
 /*********************************************************
  * Middleware admin

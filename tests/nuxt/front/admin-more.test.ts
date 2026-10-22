@@ -9,7 +9,7 @@ import { ADMIN_MORE_ITEMS } from '../../../src/consts/admin-more.const'
 import { ROUTES } from '../../../src/consts/routes.const'
 import AdminMorePage from '~/pages/admin/plus.vue'
 import { AuthService } from '../../../src/services/auth.service'
-import { useAuthStore } from '../../../src/stores/auth.store'
+import { useAuthStore } from '../../../src/composables/useAuthStore'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 
 const mountPage = () => mountSuspended(AdminMorePage, { route: ROUTES.ADMIN_MORE, global: { components: { RouterLink } } })

@@ -1,5 +1,5 @@
 import { RATE_LIMIT_ROUTE_KEY } from '../../../../consts/rate-limit.const'
-import { competitorIdParamsSchema } from '../../../../schemas/competitor.schema'
+import { competitorIdParamsSchema } from '../../../schemas/competitor.schema'
 import { getCompetitorDetail } from '../../../../services/competitor.service'
 import { enforceRateLimit } from '../../../../utils/rate-limit.util'
 import { getParamsWithSchema } from '../../../../utils/validation.util'

@@ -12,7 +12,7 @@ Complète `~/CLAUDE.md` et `~/.claude/CLAUDE.md`. En cas de conflit sur les poin
 
 Les specs font foi et vivent dans Obsidian : `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidians/Projects/CCC/` (Spec fonctionnelle, Spec API, Spec technique). Décisions design : `docs/design/ux/decisions.md`.
 
-## Arborescence — décisions ARCH-1 à ARCH-12 (utilisateur, 2026-10-22, T-ARCH-01)
+## Arborescence — décisions ARCH-1 à ARCH-14 (utilisateur, 2026-10-22, T-ARCH-01 et T-ARCH-03)
 
 Détail et justification : `docs/design/ux/decisions.md`. L'exception FA-02 (`shared/`, alias `#shared`) est **abandonnée** (ARCH-4).
 
@@ -22,25 +22,25 @@ Détail et justification : `docs/design/ux/decisions.md`. L'exception FA-02 (`sh
 src/
   assets/        css/, locales/, seeds/archives.sql (dump SQL figé des archives, ARCH-5)
   components/    PascalCase.vue (admin/, common/, icons/, rules/)
-  composables/   useCamelCase.ts
+  composables/   useCamelCase.ts, stores Pinia compris (useAuthStore.ts, useAdminEditionStore.ts : un store est un composable, ARCH-14)
   consts/        kebab-case.const.ts : toutes les constantes, à plat (ENTITIES compris)
   enums/         kebab-case.enum.ts, à plat
   interfaces/    kebab-case.interface.ts, à plat (contrat d'API compris)
-  layouts/ middleware/ pages/ plugins/ stores/
-  schemas/       kebab-case.schema.ts : schémas zod, à plat (ARCH-7)
+  layouts/ middleware/ pages/ plugins/
   services/      kebab-case.service.ts, à plat : classe navigateur ($fetch) ET fonctions serveur (TypeORM) d'un même domaine, fusionnées (ARCH-2)
   themes/        thème Origam, à plat (ARCH-7)
   types/         kebab-case.type.ts, à plat
   utils/         kebab-case.util.ts, à plat : utils navigateur ET serveur, scripts CLI compris (*-cli.util.ts) (ARCH-1)
-  server/        uniquement ce que Nitro impose (api/, middleware/, plugins/) et la base (ARCH-6) :
+  server/        uniquement ce que Nitro impose (api/, middleware/, plugins/), la base (ARCH-6) et les schémas (ARCH-13) :
+    schemas/             kebab-case.schema.ts : schémas zod, à plat, jamais importés côté client (ARCH-13)
     db/migrations/       migrations TypeORM
     db/typeorm/          data-source, options, stratégie de nommage, transformer
     db/typeorm/entities/ *.entity.ts
 ```
 
-- **Aucun sous-dossier** dans `utils`, `services`, `interfaces`, `types`, `enums`, `consts`, `composables`, `stores`, `schemas`, `themes` : garde automatique dans `tests/unit/architecture.test.ts`.
+- **Aucun sous-dossier** dans `utils`, `services`, `interfaces`, `types`, `enums`, `consts`, `composables`, `themes`, `server/schemas` ; ni `src/stores` ni `src/schemas` : garde automatique dans `tests/unit/architecture.test.ts`.
 - **Aucun code serveur dans le bundle navigateur** : pas de scan d'auto-import (`imports.scan: false`), imports explicites ; le build client élague les modules serveur et `clientBundleGuard` fait échouer `nuxt build` sinon ; `npm run test:bundle` le vérifie. En `nuxt dev`, un service fusionné charge TypeORM dans le navigateur : accepté (ARCH-12).
-- Couche « TS pur » (`utils`, `services`, `consts`, `enums`, `interfaces`, `types`, `schemas`, `server/db`) : imports **relatifs avec extension `.js`** (lus par Vitest, Nitro et `tsc` NodeNext pour la CLI). Couche Vue : alias `~/`.
+- Couche « TS pur » (`utils`, `services`, `consts`, `enums`, `interfaces`, `types`, `server/schemas`, `server/db`) : imports **relatifs avec extension `.js`** (lus par Vitest, Nitro et `tsc` NodeNext pour la CLI). Couche Vue : alias `~/`.
 - **Aucune donnée fictive** (ARCH-8) : plus de fixtures ni d'`API_SOURCE`. `API_ROUTES` (`src/consts/api-routes.const.ts`) nomme la route Nitro de chaque endpoint, et le ticket back (`pendingTicket`) tant qu'elle n'existe pas (ARCH-11).
 - e2e sur les vraies données (ARCH-9) : base `_test` chargée par le seed SQL, sessions réelles ; zones de données masquées, seuil 1 % par zone.
 

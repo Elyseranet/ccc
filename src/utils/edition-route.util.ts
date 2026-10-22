@@ -5,7 +5,7 @@ import { RATE_LIMIT_ROUTE_KEY } from '../consts/rate-limit.const.js'
 import { enforceRateLimit } from './rate-limit.util.js'
 import { getParamsWithSchema } from './validation.util.js'
 import { applyEditionCache } from './edition-cache.util.js'
-import { editionParamsSchema } from '../schemas/edition.schema.js'
+import { editionParamsSchema } from '../server/schemas/edition.schema.js'
 import { findEditionOrThrow } from '../services/edition.service.js'
 import { useDataSource } from './database.util.js'
 

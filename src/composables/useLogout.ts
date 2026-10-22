@@ -1,7 +1,7 @@
 import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/http-status.const'
 import { ROUTES } from '~/consts/routes.const'
 import { AuthService } from '~/services/auth.service'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/composables/useAuthStore'
 import { ApiRequestError } from '~/utils/api-request-error.util'
 
 /*********************************************************

@@ -1,6 +1,6 @@
 import type { IRankingEvolutionPoint, IRankingEvolutionSeries } from '../../../../interfaces/ranking.interface'
 import { RATE_LIMIT_ROUTE_KEY } from '../../../../consts/rate-limit.const'
-import { rankingEvolutionQuerySchema } from '../../../../schemas/ranking.schema'
+import { rankingEvolutionQuerySchema } from '../../../schemas/ranking.schema'
 import { getEvolutionForAll, getEvolutionForCompetitor } from '../../../../services/ranking.service'
 import { enforceRateLimit } from '../../../../utils/rate-limit.util'
 import { getQueryWithSchema } from '../../../../utils/validation.util'

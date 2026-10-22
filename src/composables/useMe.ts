@@ -2,7 +2,7 @@ import { ANONYMOUS_SESSION } from '~/consts/auth.const'
 import { HTTP_STATUS_UNAUTHORIZED } from '~/consts/http-status.const'
 import type { ISessionIdentity } from '~/interfaces/session.interface'
 import { MeService } from '~/services/me.service'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/composables/useAuthStore'
 import { ApiRequestError } from '~/utils/api-request-error.util'
 import { toSessionIdentity } from '~/utils/session.util'
 

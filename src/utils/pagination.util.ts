@@ -1,6 +1,6 @@
 import type { IPaginationParams } from '../interfaces/pagination-params.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
-import { paginationQuerySchema } from '../schemas/pagination.schema.js'
+import { paginationQuerySchema } from '../server/schemas/pagination.schema.js'
 import { parseWithSchema } from './validation.util.js'
 
 export const parsePagination = (query: Record<string, unknown>): IPaginationParams => {

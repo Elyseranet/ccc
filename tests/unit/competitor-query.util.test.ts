@@ -6,7 +6,7 @@ import {
   escapeLikePattern,
   foldSearchText
 } from '../../src/utils/competitor-query.util'
-import { competitorListQuerySchema } from '../../src/schemas/competitor.schema'
+import { competitorListQuerySchema } from '../../src/server/schemas/competitor.schema'
 import { sortCompetitors } from '../../src/utils/competitor-sort.util'
 import type { ICompetitorListItem } from '../../src/interfaces/competitor.interface'
 
