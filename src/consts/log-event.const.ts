@@ -29,5 +29,9 @@ export const LOG_EVENT = {
   INVITATION_SEND_FAILED: 'invitation_send_failed',
   INVITATION_ACCEPTED: 'invitation_accepted',
   ARCHIVES_SEED_APPLIED: 'archives_seed_applied',
-  ARCHIVES_SEED_FAILED: 'archives_seed_failed'
+  ARCHIVES_SEED_FAILED: 'archives_seed_failed',
+  MIGRATIONS_APPLIED: 'migrations_applied',
+  MIGRATIONS_UP_TO_DATE: 'migrations_up_to_date',
+  MIGRATIONS_REVERTED: 'migrations_reverted',
+  MIGRATIONS_FAILED: 'migrations_failed'
 } as const

@@ -70,7 +70,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 - `src/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`src/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
 - `src/consts/api-routes.const.ts` (`API_ROUTES`) associe chaque endpoint à son fichier de route Nitro. Une route pas encore écrite porte le ticket back qui la livre (`pendingTicket`) : l'écran répond en erreur (état AsyncState) jusqu'au merge de ce ticket, sans route provisoire ni fausse donnée (ARCH-11). Un test vérifie que le fichier existe si et seulement si `pendingTicket` est absent : à la livraison d'une route, retirer son `pendingTicket` dans le même commit.
 - Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
-- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
+- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404. Le 404 d'une page non livrée n'est pas un contrôle d'accès ; l'autorisation reste portée par le middleware `admin` et par le serveur.
 - Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
 - `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
 
@@ -100,12 +100,12 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 
 ### Première mise en route
 
-1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique `migration:run` avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
+1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique les migrations (`ccc-ops migrate`, qui journalise en JSON `migrations_applied` ou `migrations_up_to_date`, sans les requêtes SQL de la CLI TypeORM) avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
 2. Ouvrir le terminal du conteneur dans Coolify, ou `docker exec -it <conteneur> ...`, et lancer les commandes d'exploitation avec `ccc-ops` :
 
 | Commande | Rôle | Disponibilité |
 |---|---|---|
-| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration. | image actuelle |
+| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration (`src/utils/run-migrations-cli.util.ts`, sans journal des requêtes SQL). | image actuelle |
 | `ccc-ops db:seed:archives` | Applique le dump SQL figé des archives 2012-2026 (`src/assets/seeds/archives.sql`), en une transaction, sur une base migrée et vide. | image actuelle |
 | `ccc-ops user:create-admin` | Crée le premier administrateur. | image actuelle |
 | `ccc-ops user:unlock` | Déverrouille un compte. | image actuelle |
