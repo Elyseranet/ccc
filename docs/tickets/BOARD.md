@@ -193,7 +193,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | En cours (dev-f04) : prérequis F-00q/r/s et T-ARCH-03 mergés (fd76ba2), rebase en cours ; pagination tranchée F-04-PAG (`origam-pagination`, dérogation visuelle de la seule zone, remédiation F-04-PAG.md) ; F-04-ADV : lien « Voir les N adversaires → » validé, au-delà de 4 | `../CCC-F-04` |
-| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | En cours (dev-f05), 0ae6634 sur F-00h 2158d28 : écarts « choix » et « hero » à expliquer ; duel@390 par alignement du texte de la maquette sur les données réelles. **À la validation : supprimer le worktree `agent-a70ac359346e804a8` et le conteneur `ccc-f05-pg`** | `../CCC-F-05` |
+| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | **Fermé** (2026-10-22) : mergé @ `67270bd` (branche abf0653) ; Origam #1267 | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
@@ -203,7 +203,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | **Fermé** — squash dans `develop` @ `ef81699` (branche `3d1e91a`) | `../CCC-F-12` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Partiel** : ME, EDITIONS et AUTH_LOGOUT en route réelle par T-ARCH-01 ; reste `delivered: true` sur `/admin/plus` et la preuve dans le conteneur. Premier créneau PAR-1 libre | à créer |
-| [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Partiel** : M1 + D1 mergés (f17e215) ; D2 (rayons, cause b18445c) livré 1d3527c, à rebaser sur 5efed01 puis contrôler ; D3, D4 à faire (dev-f06) | `../CCC-F-14` |
+| [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
