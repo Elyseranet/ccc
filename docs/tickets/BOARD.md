@@ -197,6 +197,7 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | **Fermé** — squash dans `develop` @ `ef81699` (branche `3d1e91a`) | `../CCC-F-12` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | À faire (4a2dea5) ; premier créneau PAR-1 libre après le merge de F-12 | à créer |
+| [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | À faire, ouvert le 2026-10-22 (relecture humaine des écarts après ARCH-9) ; en file PAR-1 | `../CCC-F-14` |
 
 **Compteur** (2026-10-20) : 14 tickets front ouverts (1 en cours, 12 à faire), 0 fermé, 0 bloqué par le design. Tous les arbitrages front sont tranchés (`docs/design/ux/decisions.md`, « Arbitrages front »). Une seule validation reste attendue : le **seuil FA-04**, à proposer par F-00 après mesure. Le libellé A16 (« 729 matchs joués depuis 2012, dont 554 avec score ») attend aussi la validation du chef de projet.
 
