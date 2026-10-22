@@ -110,7 +110,7 @@ export const usePlayerProfile = (id: MaybeRefOrGetter<string>) => {
     firstEditionLabel,
     participationCount: computed(() => detail.data.value?.participations.length ?? 0),
     opponents,
-    hasMoreOpponents: computed(() => opponentsTotal.value > PLAYER_OPPONENTS_LIMIT),
+    opponentsTotal,
     pending: computed(() => detail.pending.value),
     error,
     opponentsPending: computed(() => opponentsData.pending.value),

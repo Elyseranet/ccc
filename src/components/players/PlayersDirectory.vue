@@ -59,25 +59,23 @@
       class="players-directory__note"
       data-cy="players-career-note"
     >{{ careerNote }}</p>
-    <origam-pagination
+    <div
       v-if="total > 0"
-      :model-value="page"
-      :length="pageCount"
-      :total-visible="PLAYERS_PAGINATION_VISIBLE"
-      :total="total"
-      :per-page="pageSize"
-      :aria-label="paginationLabel"
-      with-info
+      class="players-directory__pager"
       data-cy="players-pagination"
-      @update:model-value="handlePage"
     >
-      <template #info="{ start, end, total: count }">
-        <span
-          class="players-directory__range"
-          data-cy="players-pager-range"
-        >{{ rangeText(start, end, count) }}</span>
-      </template>
-    </origam-pagination>
+      <span
+        class="players-directory__range"
+        data-cy="players-pager-range"
+      >{{ rangeText }}</span>
+      <origam-pagination
+        :model-value="page"
+        :length="pageCount"
+        :total-visible="PLAYERS_PAGINATION_VISIBLE"
+        :aria-label="paginationLabel"
+        @update:model-value="handlePage"
+      />
+    </div>
   </div>
 </template>
 
@@ -158,7 +156,11 @@ const pageCount = computed(() => Math.max(1, Math.ceil(props.total / props.pageS
 const caption = computed(() => t('players.table.caption', 'Liste des compétiteurs, page {page} sur {pages}', { page: props.page, pages: pageCount.value }))
 const careerNote = computed(() => t('players.career_note', 'Les statistiques sont celles de toute la carrière, quelle que soit l’édition choisie.'))
 const paginationLabel = computed(() => t('players.pagination.label', 'Pagination'))
-const rangeText = (from: number, to: number, count: number): string => t('players.pagination.range', '{from}–{to} sur {total}', { from, to, total: count })
+const rangeText = computed(() => t('players.pagination.range', '{from}–{to} sur {total}', {
+  from: (props.page - 1) * props.pageSize + 1,
+  to: Math.min(props.page * props.pageSize, props.total),
+  total: props.total
+}))
 const handlePage = (value: number) => {
   emits('update:page', value)
 }
@@ -199,6 +201,17 @@ defineExpose({})
     display: block;
     font-size: var(--origam-font__size---xs);
     color: var(--origam-color__text---tertiary);
+  }
+
+  &__pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---3);
+    margin-top: var(--origam-space---5);
+    font-size: var(--origam-font__size---sm);
+    color: var(--origam-color__text---secondary);
   }
 
   &__range {

@@ -76,14 +76,22 @@
         </origam-list-item>
       </template>
     </origam-list>
-    <origam-btn
+    <p
       v-if="hasMore"
-      class="player-opponents__see-all"
-      variant="text"
-      :to="seeAllLink"
-      :text="seeAllLabel"
-      data-cy="player-opponents-see-all"
-    />
+      class="player-opponents__more"
+    >
+      <origam-btn
+        class="player-opponents__see-all"
+        variant="text"
+        color="primary"
+        :to="seeAllLink"
+        data-cy="player-opponents-see-all"
+      >
+        <template #default>
+          {{ seeAllLabel }}&nbsp;<span aria-hidden="true">→</span>
+        </template>
+      </origam-btn>
+    </p>
   </section>
 </template>
 
@@ -107,7 +115,7 @@ import { buildHeadToHeadLink } from '~/utils/player.util'
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IPlayerOpponentsProps>(), {
-  hasMore: false
+  total: 0
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
@@ -147,7 +155,8 @@ const compareWith = (summary: IPlayerOpponent): string => t('player.opponents.co
  ********************************************************/
 const rowPaddingBlock = 'var(--origam-space---3)'
 const rowPaddingInline = 'var(--origam-space---4)'
-const seeAllLabel = computed(() => t('player.opponents.see_all', 'Voir tous les face-à-face'))
+const hasMore = computed(() => props.total > props.opponents.length)
+const seeAllLabel = computed(() => t('player.opponents.see_all', 'Voir les {count} adversaires', { count: props.total }))
 const seeAllLink = computed(() => buildHeadToHeadLink(props.playerId))
 const hasRatio = (summary: IPlayerOpponent): boolean => summary.winRatio !== null
 const barStyle = (summary: IPlayerOpponent) => ({ '--player-opponents__bar---width': Math.round((summary.winRatio ?? 0) * PERCENT) })
@@ -209,8 +218,12 @@ defineExpose({})
     --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
+  &__more {
+    margin: var(--origam-space---3) 0 0;
+  }
+
   &__see-all {
-    margin-top: var(--origam-space---3);
+    --origam-btn---padding-lg: var(--origam-space---3);
   }
 
   &__row {

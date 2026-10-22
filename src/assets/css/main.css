@@ -29,6 +29,14 @@ button, input, select, textarea { font: inherit; }
 .neon { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon), 0 6px 0 var(--origam-color__bar---neon), 0 8px 0 var(--origam-color__bar---neon), 0 22px 40px color-mix(in srgb, var(--origam-color__bar---neon) 45%, transparent); }
 .neon--sm { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon); }
 
+.origam-pagination.origam-pagination.origam-pagination .origam-pagination__prev,
+.origam-pagination.origam-pagination.origam-pagination .origam-pagination__next { display: none; }
+.origam-pagination.origam-pagination.origam-pagination { max-width: 100%; }
+.origam-pagination.origam-pagination.origam-pagination .origam-pagination__list { flex-wrap: wrap; justify-content: flex-start; gap: var(--origam-space---1); }
+.origam-pagination.origam-pagination.origam-pagination .origam-pagination__item { margin: 0; }
+.origam-pagination.origam-pagination.origam-pagination .origam-btn { --origam-btn---font-size: var(--origam-font__size---sm); }
+.origam-pagination.origam-pagination.origam-pagination .origam-btn:not(.origam-btn--active):not(:hover) { background-color: var(--origam-pagination--primary---background-color) !important; color: var(--origam-pagination--primary---color) !important; }
+
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .skip { position: absolute; left: var(--origam-space---4); top: calc(-1 * var(--origam-space---16)); z-index: 50; padding: var(--origam-space---2) var(--origam-space---4); border-radius: var(--origam-radius---full); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); font-weight: var(--origam-font__weight---bold); }

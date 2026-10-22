@@ -126,5 +126,5 @@ export interface IPlayerOpponent extends IHeadToHeadSummary {
 export interface IPlayerOpponentsProps {
   playerId: string
   opponents: IPlayerOpponent[]
-  hasMore?: boolean
+  total?: number
 }

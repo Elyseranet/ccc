@@ -78,7 +78,8 @@ const PLAYER_ZONES: IZone[] = [
   { name: 'joueur-entete', mockup: '.pl-hero', app: '[data-cy="player-header"]' },
   { name: 'joueur-stats', mockup: '.pl-stats', app: '.player-stats__grid' },
   { name: 'joueur-parcours', mockup: 'section[aria-labelledby="h-par"]', app: '[data-cy="player-journey"]', endMockup: '.pl-path thead tr', endApp: '[data-cy="player-journey-table"] thead tr' },
-  { name: 'joueur-adversaires', mockup: 'section[aria-labelledby="h-opp"]', app: '[data-cy="player-opponents"]', endMockup: '.opps .opp:first-child', endApp: '[data-cy="player-opponent"]:first-child' }
+  { name: 'joueur-adversaires', mockup: 'section[aria-labelledby="h-opp"]', app: '[data-cy="player-opponents"]', endMockup: '.opps .opp:first-child', endApp: '[data-cy="player-opponent"]:first-child' },
+  { name: 'joueur-adversaires-lien', mockup: '.opps-more', app: '.player-opponents__more' }
 ]
 
 const neutralCount = async (page: Page, mockup: Page) => {
@@ -112,7 +113,8 @@ const preparePlayer = async (page: Page, mockup: Page) => {
     ['.pl-stat dd', '.player-stats__value'],
     ['.section__head .muted', '.player-journey__lead, .player-opponents__lead'],
     ['.opp .avatar', '.player-opponents__item .player-avatar'],
-    ['.opp__n a', '.player-opponents__name .player-link__name']
+    ['.opp__n a', '.player-opponents__name .player-link__name'],
+    ['.opps-more a', '[data-cy="player-opponents-see-all"]']
   ])
   await invisible(mockup, ['.pchart > li', '.pl-path tbody', '.opp__c', '.opp__r', '.opp__bar'])
   await invisible(page, ['.player-journey__chart > li', '[data-cy="player-journey-table"] tbody', '.player-opponents__count', '.player-opponents__record', '.player-opponents__bar'])

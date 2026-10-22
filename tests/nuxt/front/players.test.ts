@@ -243,11 +243,12 @@ describe('adversaires : ordre du serveur, winRatio null, résultats inconnus (G1
 })
 
 describe('adversaires : lien « Voir tous » (F-04-ADV)', () => {
-  it('absent sans hasMore, présent avec hasMore et pointant vers le face-à-face du joueur', async () => {
+  it('absent sans adversaire en plus, présent au-delà et pointant vers le face-à-face du joueur', async () => {
     const without = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS } })
     expect(without.find('[data-cy="player-opponents-see-all"]').exists()).toBe(false)
-    const withMore = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS, hasMore: true } })
+    const withMore = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS, total: OPPONENTS.length + 45 } })
     expect(withMore.get('[data-cy="player-opponents-see-all"]').attributes('href')).toBe(`/joueurs/face-a-face?a=${PLAYER_ID}`)
+    expect(withMore.get('[data-cy="player-opponents-see-all"]').text().replace(/\u00a0/g, ' ')).toBe(`Voir les ${OPPONENTS.length + 45} adversaires →`)
   })
 
   it('la page n’affiche que 4 adversaires, dans l’ordre reçu, et le lien seulement au-delà', async () => {
