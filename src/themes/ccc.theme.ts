@@ -67,7 +67,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-bracket': { variant: 'single-elimination', color: 'primary', density: 'compact', showScores: true, showSeed: false, showRoundTitles: true, elevation: 'md' },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
     'origam-pagination': { density: 'compact', showFirstLastPage: false },
-    'origam-breadcrumb': { density: 'compact' },
+    'origam-breadcrumb': { density: 'compact', divider: '›' },
     'origam-avatar': { rounded: 'full', size: 'default' },
     'origam-empty-state': { size: 'lg', align: 'center' },
     'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
@@ -123,6 +123,15 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
     '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)',
+    // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, page courante
+    // en text.tertiary sans soulignement (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
+    // Le séparateur d'Origam porte déjà 8 px de chaque côté : la maquette (8 px entre l'élément et le séparateur, 8 px après) n'en veut pas de plus.
+    '--origam-breadcrumb---gap': '0px',
+    '--origam-breadcrumb-item---color': 'var(--origam-color__text---secondary)',
+    '--origam-breadcrumb-item---text-decoration': 'underline',
+    '--origam-breadcrumb-item---opacity-disabled': '1',
+    '--origam-breadcrumb-divider---color': 'var(--origam-color__text---tertiary)',
+    '--origam-breadcrumb-divider---opacity': '1',
     // Champs (F-00m) : hauteur 48 px (le défaut « default » d'Origam vaut 36 px), retrait du texte 20 px.
     '--origam-input__control---height-md': 'var(--origam-space---12)',
     '--origam-field---padding-start': 'var(--origam-space---5)',
