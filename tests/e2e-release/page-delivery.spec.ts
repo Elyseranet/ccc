@@ -1,4 +1,6 @@
+import { existsSync, readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
+import { E2E_SESSIONS_FILE } from '../e2e/helpers/e2e.const'
 import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
 
 /*********************************************************
@@ -9,7 +11,7 @@ import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
  * sans lien dans la navigation, même avec un cookie de session présenté.
  * Quand un ticket F-xx livre sa page, il retire la route de `DELIVERED_PAGES` ci-dessous.
  ********************************************************/
-const DELIVERED_PAGES: string[] = []
+const DELIVERED_PAGES: string[] = ['/admin/plus']
 
 const hidden = (pages: string[]): string[] => pages.filter(page => !DELIVERED_PAGES.includes(page))
 
@@ -47,4 +49,20 @@ test.describe('pages non livrées', () => {
 test('la sonde de santé reste publique', async ({ request }) => {
   const response = await request.get('/api/v1/health')
   expect([200, 503]).toContain(response.status())
+})
+
+test.describe('page livrée /admin/plus (T-LIVE-01)', () => {
+  test('sans session, redirige vers /connexion (pas 404)', async ({ request }) => {
+    const response = await request.get('/admin/plus', { maxRedirects: 0 })
+    expect(response.status()).toBe(302)
+    expect(response.headers().location).toBe('/connexion')
+  })
+
+  test('avec la session administrateur de la base amorcée, répond 200', async ({ request }) => {
+    const token = process.env.E2E_ADMIN_SESSION ?? (existsSync(E2E_SESSIONS_FILE) ? (JSON.parse(readFileSync(E2E_SESSIONS_FILE, 'utf8')) as Record<string, string>).admin : undefined)
+    test.skip(!token, 'aucune session administrateur : passer E2E_ADMIN_SESSION (jeton de la base amorcée par global-setup)')
+    const response = await request.get('/admin/plus', { maxRedirects: 0, headers: { cookie: `__Host-ccc_session=${token}` } })
+    expect(response.status()).toBe(200)
+    expect(await response.text()).toContain('data-cy="admin-more-nav"')
+  })
 })
