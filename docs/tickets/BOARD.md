@@ -8,29 +8,29 @@ Les tickets vivent dans le dépôt (remote `origin` = Elyseranet/ccc, privé) : 
 
 ## Back
 
-Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. Il s'agit d'un **plan** : aucun code applicatif n'est écrit.
+Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, ARCH-1 à ARCH-12). Le contrat d'API vit dans `src/interfaces/`, `src/types/` et `src/enums/` (plus de `shared/`, ARCH-4). Aucune donnée fictive : les tests back lisent une base `_test` chargée par leurs propres jeux de test ou par `src/assets/seeds/archives.sql` (ARCH-5, ARCH-8).
 
 ### Tickets
 
 | Ticket | Titre | Vague | Dépend de | Bloqué par arbitrage | État |
 |---|---|---|---|---|---|
 | [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
-| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `../../src/shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
+| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums et DTO du contrat (aujourd'hui dans `src/enums/` et `src/interfaces/`, ARCH-4) | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-06](B-06.md) | Public : `GET /editions`, détail, participants, poules, tours, matchs, tirages | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-07](B-07.md) | Public : classements ACP, All Time, évolution | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
-| [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | — (fournisseur SMTP de prod : configuration) | À faire |
-| [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | En revue : livré (`feature/B-10` @ `7f1169b`), en attente de l'intégration 3a ; branchement de l'email après le port mail de B-09 |
+| [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | — (fournisseur SMTP de prod : configuration) | En cours : validé sur l'ancienne arborescence (`feature/B-09` @ `531ea89`, PROD-1 compris) ; réappliqué avec T-SEC-04 par dev-b09 sur `feature/wave3a-identity` (depuis `82d914e`) |
+| [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | — | En cours : validé sur l'ancienne arborescence (`feature/B-10` @ `d2563c3`, email branché) ; à réappliquer par dev-b10 sur `feature/wave3a-identity`, après B-09 |
 | [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | À faire |
-| [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | — | En revue : validé (`feature/B-12` @ `8ae5910`), en attente de l'intégration 3a |
+| [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | — | En cours : réappliqué par dev-b12 (`feature/B-12-r` @ `a97dd60`, légers verts) ; test:db, test:api et doc d'API `docs/api/matchs.md` en cours |
 | [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
-| [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | En revue : validé (`feature/B-16` @ `4e39f80`, smoke sharp sur l'image réelle OK), en attente de l'intégration 3a |
-| [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | En cours (dev-b12, `feature/B-17`) |
+| [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | En cours : validé sur l'ancienne arborescence (`feature/B-16` @ `4e39f80`) ; à réappliquer par dev-b16 sur `feature/wave3a-identity`, après B-10 |
+| [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | En cours : validé sur l'ancienne arborescence (`feature/B-17` @ `27ee5cd`, G11 compris) ; réappliqué par dev-b12 (`feature/B-17-r` @ `8517bc5`, légers verts), test:db et test:api sur `archives.sql` en cours |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -42,7 +42,7 @@ Un `backend-developer` par ticket, chacun dans son worktree `../CCC-B-xx`.
 |---|---|---|
 | 1 | B-01, B-02, B-03 | **3** — fermée (merge `a188c52`) |
 | 2 | B-04, B-05, B-06, B-07, B-08 (+ T-SEC-03, T-DB-01) | **5** — fermée (merge `124c85a`) |
-| 3a | B-09, B-10, B-12, B-16, T-SEC-04, T-SEC-05 | **6** |
+| 3a | B-09, B-10, B-12, B-16, B-17, T-SEC-04, T-OPS-02 (T-SEC-05 fermé sans objet, ARCH-5) | **3** au plus (PAR-1) |
 | 3b | B-11 (après B-10) | 1 |
 | 3c | B-13 et B-15 (après B-11 et B-12) | 2 |
 | 3d | B-14 (après B-12 et B-13) | 1 |
@@ -51,11 +51,13 @@ Un `backend-developer` par ticket, chacun dans son worktree `../CCC-B-xx`.
 
 Toutes les branches partent de `develop` @ `e1a2709` (vague 2 mergée).
 
+**Reprise du 2026-10-22, après T-ARCH-01** (`develop` @ `82d914e`). Les branches sont réappliquées à la main, pas rebasées. T-SEC-04, B-09, B-10 et B-16 partagent beaucoup de fichiers (de 22 à 47 fichiers communs par paire), et leurs branches contiennent des copies des commits des autres. Ils sont donc réappliqués en chaîne sur une branche unique, `feature/wave3a-identity` : T-SEC-04 et B-09, puis B-10, puis B-16. B-12, B-17 et T-OPS-02 se recoupent peu avec la chaîne et ne se recoupent pas entre eux : ils sont repris en parallèle (`feature/B-12-r`, `feature/B-17-r`, `feature/T-OPS-02-r`), puis intégrés avec la chaîne sur `feature/integration-wave3a`.
+
 | Étape | Ticket | Démarre quand | Pourquoi ce placement |
 |---|---|---|---|
 | 3a | **B-09** invitations, première connexion, `POST /competiteurs`, lien de `user:create-admin` | tout de suite | B-08 est mergé. **Premier commit séparé** : le service `createCompetitorWithAccount` (transaction compétiteur, compte et invitation), dont B-10 a besoin. Même méthode que les mappers de B-05 en vague 2 |
 | 3a | **B-10** admin éditions, identité, participants ; `code` immuable (R-9) | tout de suite | Rattachement d'un compétiteur existant, éditions et `PATCH /competiteurs/{id}` ne dépendent que de B-08. La branche `{ newCompetitor }` reprend le premier commit de B-09 par cherry-pick |
-| 3a | **B-12** scores : enregistrer, valider, corriger, vue admin des matchs | tout de suite | Dépend de B-02, B-03 et B-08, tous mergés ; il se teste sur des fixtures de matchs. Critère ETag (B-06) et R-3 inclus |
+| 3a | **B-12** scores : enregistrer, valider, corriger, vue admin des matchs | tout de suite | Dépend de B-02, B-03 et B-08, tous mergés ; il se teste sur ses propres jeux de matchs en base `_test` (plus de fixtures, ARCH-8). Critère ETag (B-06) et R-3 inclus |
 | 3a | **B-16** avatar : téléversement, `sharp` 0.35.5 épinglé, EXIF supprimé | tout de suite | Les routes `/moi/avatar` et `/competiteurs/{id}/avatar` ne dépendent que de B-08. B-16 **porte seul** le retrait de `avatarUrl` (schéma de `PATCH /moi`, colonne `competitors.avatar_url`). B-09 n'ajoute donc **pas** d'avatar à `newCompetitor`. Le parcours de création en deux appels (F-09) ne demande B-10 que pour le test de bout en bout |
 | 3a | **T-SEC-04** L2 (concurrence de scrypt), L3 (option `secureCookie` explicite), N1, N3 | tout de suite | Corrige le socle d'auth et `readBoundedJsonBody` (N3). Zone partagée avec B-09 (hachage, cookie de session) : voir les conflits ci-dessous |
 | 3a | **T-SEC-05** convertisseur Python, seed sans `runMigrations()` | tout de suite | Indépendant : script Python et seed legacy uniquement |
@@ -67,15 +69,15 @@ Toutes les branches partent de `develop` @ `e1a2709` (vague 2 mergée).
 Parallélisme maximal : **6 devs** en 3a. Ensuite 1, puis 2, puis 1. Intégration et contrôles par étape, comme en vague 2 : branche d'intégration, test:api ×5 sur base neuve, migrations aller/retour/aller, revue de sécurité, puis merge par le `project-manager` (MERGE-1).
 
 Zones de conflit à surveiller :
-- `../../src/server/database/entities/index.ts` (registre des entités) : B-02 le crée, B-08 l'étend.
-- Horodatage des migrations : M1 vient de B-02, M2 de B-08. Chacun génère sa migration sur sa branche, puis rebase avant merge.
-- `../../src/enums/api-error-code.enum.ts` : chaque ticket **ajoute** ses codes, sans en renommer aucun.
+- `src/consts/entities.const.ts` (registre `ENTITIES`, ex-`entities/index.ts`) : chaque ticket qui crée une entité l'y ajoute.
+- Horodatage des migrations : M1 vient de B-02, M2 de B-08. Les migrations vivent dans `src/server/db/migrations/`.
+- `src/enums/api-error-code.enum.ts` : chaque ticket **ajoute** ses codes, sans en renommer aucun.
 - **Vague 3, migrations** : B-09 (table `invitations`) et B-16 (`competitor_avatars`, retrait de `competitors.avatar_url`) en créent une chacun ; B-14 n'en crée aucune a priori. Chacun la génère sur sa branche. À l'intégration, l'horodatage le plus récent passe en dernier, puis `migration:generate` doit répondre « No changes ».
 - **Vague 3, auth** : B-09 (consommation d'invitation : hachage et ouverture de session) et T-SEC-04 (sémaphore scrypt, option `secureCookie`) touchent `password.util.ts`, `session-token.util.ts` et `login.post.ts`. T-SEC-04 livre en premier ses fonctions (`hashPassword` sous sémaphore, `buildSessionCookieOptions(config)`), et B-09 les appelle, sans les réécrire.
-- **Vague 3, profil** : B-16 modifie `../../src/server/schemas/auth.schema.ts` (retrait de `avatarUrl`) et `moi.patch.ts` ; B-09 et B-10 n'y touchent pas.
-- **Vague 3, corps de requête** : B-16 (multipart) doit contourner explicitement la limite JSON de 16 Ko (M2), et T-SEC-04 (N3) ajoute un délai de lecture dans `readBoundedJsonBody`. Le délai de N3 s'applique aussi au flux multipart de B-16.
+- **Vague 3, profil** : B-16 modifie `src/schemas/auth.schema.ts` (retrait de `avatarUrl`) et `moi.patch.ts` ; B-09 et B-10 n'y touchent pas.
+- **Vague 3, corps de requête** : B-16 (multipart) doit contourner explicitement la limite JSON de 16 Ko (M2), et T-SEC-04 (N3) ajoute un délai de lecture dans `readBoundedJsonBody` (`src/utils/validation.util.ts`). Le délai de N3 s'applique aussi au flux multipart de B-16.
 
-Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques des fixtures vers les routes réelles. Ils se testent sur des fixtures, sans attendre B-04. En revanche, les données réelles n'existent qu'après B-04.
+Priorité front : les écrans appellent toujours la route réelle (ARCH-8). Tant qu'une route n'existe pas, `pendingTicket` dans `src/consts/api-routes.const.ts` nomme le ticket back qui la livre, et ce ticket le retire dans le commit de la route (ARCH-11).
 
 ### Arbitrages
 
@@ -110,11 +112,11 @@ Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-0
 
 Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
-Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. **En revue : validé** (`feature/T-SEC-04` @ `bbfaa8b` : L2, L3, N3 ; N1 documenté), en attente de l'intégration 3a. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
+Constats LOW de la revue de sécurité de la vague 2 (918308d) : [T-SEC-04](T-SEC-04.md), vague 3. **En cours** : validé sur l'ancienne arborescence (`feature/T-SEC-04` @ `bbfaa8b` : L2, L3, N3 ; N1 documenté) ; réappliqué par dev-b09 en tête de `feature/wave3a-identity`. Il couvre la concurrence de scrypt (L2) et le cookie Secure piloté par une option explicite (L3). L7 est fermé par B-16.
 
 Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
-Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3. **En revue : validé** (`feature/T-SEC-05` @ `279ba8f`, non-régression sur le vrai classeur vérifiée), en attente de l'intégration 3a.
+Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3. **Fermé sans objet** par le `project-manager` le 2026-10-22 : le convertisseur Python et le seed legacy sont supprimés (ARCH-5), la branche n'est pas mergée.
 
 Échecs intermittents de la suite Vitest (fichiers non collectés, hooks à 60 s) : [T-QA-01](T-QA-01.md), **ouvert**. Le garde-fou est mergé dans `develop` @ `2913c81` (branche rebasée `95823da`). Avec lui, `test:run` échoue si un fichier découvert manque au rapport. La cause racine n'est pas trouvée : 14 anomalies spontanées sur 469 runs, 4 signatures. Le garde-fou rend l'incident visible, il ne l'empêche pas. Décision QA-1 : L'enquête est en pause et le ticket reste ouvert.
 
@@ -169,7 +171,7 @@ Arbitrage ajouté après l'échange avec le front (FA-03) :
 
 ### Constats hors périmètre back, signalés à l'équipe
 
-- `~/CLAUDE.md` décrit un monorepo `packages/webapp` avec Redis et nodemailer, alors que CCC est une application Nuxt unique à la racine, avec `app/` et `../../src/server/`. Les tickets suivent la structure réelle.
+- `~/CLAUDE.md` décrit un monorepo `packages/webapp` avec Redis et nodemailer, alors que CCC est une application Nuxt unique à la racine, avec `src/` à plat. Le `CLAUDE.md` du projet le précise depuis le 2026-10-22 ; les tickets suivent cette structure.
 - `docker-compose.yml` expose 3000 et 5432, et non les ports `Yxxx` de `~/CLAUDE.md`. Je ne sais pas si cette convention s'applique à CCC.
 
 ---
