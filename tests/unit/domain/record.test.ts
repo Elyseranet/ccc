@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { DOMAIN_ERROR_CODE } from '../../../server/enums/domain.enum'
+import { DOMAIN_ERROR_CODE } from '../../../src/enums/domain.enum'
 import {
   computeHeadToHead,
   computePlayerBalance,
   computeWinLoss,
-} from '../../../server/utils/stats/record.util'
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
+} from '../../../src/server/utils/stats/record.util'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
 import { duel, tiebreak } from './match.factory'
 import { sheetRows, workbookMatches, workbookUnknownResultPairs } from './workbook.fixture'
 

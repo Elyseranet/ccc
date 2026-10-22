@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { SCORE_ERROR_CODE } from '../../../server/enums/domain.enum'
-import { targetScore, validateScore } from '../../../server/utils/match/score-rules.util'
-import { MATCH_PURPOSE } from '../../../shared/enums/match.enum'
-import { ROUND_KIND } from '../../../shared/enums/round.enum'
+import { SCORE_ERROR_CODE } from '../../../src/enums/domain.enum'
+import { targetScore, validateScore } from '../../../src/server/utils/match/score-rules.util'
+import { MATCH_PURPOSE } from '../../../src/enums/match.enum'
+import { ROUND_KIND } from '../../../src/enums/round.enum'
 import { sheetRows } from './workbook.fixture'
 
 const pool = (...scores: number[]) => validateScore(ROUND_KIND.POOLS, MATCH_PURPOSE.REGULAR, scores)

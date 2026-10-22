@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeIpForRateLimit } from '../../server/utils/ip.util'
+import { normalizeIpForRateLimit } from '../../src/server/utils/ip.util'
 
 describe('normalizeIpForRateLimit', () => {
   it('keeps an IPv4 whole', () => {

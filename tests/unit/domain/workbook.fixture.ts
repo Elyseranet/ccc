@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
 import type {
   IRankingEdition,
   IScoredParticipation,
-} from '../../../server/interfaces/ranking.interface'
-import type { IMatchRecord } from '../../../server/interfaces/stats.interface'
+} from '../../../src/server/interfaces/ranking.interface'
+import type { IMatchRecord } from '../../../src/server/interfaces/stats.interface'
 
 type TCell = string | number | null
 

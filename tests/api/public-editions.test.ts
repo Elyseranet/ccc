@@ -2,18 +2,18 @@ import 'reflect-metadata'
 import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { afterAll, describe, expect, it } from 'vitest'
-import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
-import { MATCH_STATUS } from '../../shared/enums/match.enum'
-import { ROUND_KIND } from '../../shared/enums/round.enum'
-import type { IApiError } from '../../shared/interfaces/api/error.interface'
-import type { IEditionDetail, IEditionParticipant, IEditionSummary } from '../../shared/interfaces/api/edition.interface'
-import type { IDraw } from '../../shared/interfaces/api/draw.interface'
-import type { IMatch } from '../../shared/interfaces/api/match.interface'
-import type { IPaginated } from '../../shared/interfaces/api/pagination.interface'
-import type { IPool } from '../../shared/interfaces/api/pool.interface'
-import type { IRound } from '../../shared/interfaces/api/round.interface'
-import type { IArchiveStats } from '../../shared/interfaces/api/stats.interface'
-import { MatchEntity } from '../../server/database/entities/match.entity'
+import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
+import { MATCH_STATUS } from '../../src/enums/match.enum'
+import { ROUND_KIND } from '../../src/enums/round.enum'
+import type { IApiError } from '../../src/interfaces/error.interface'
+import type { IEditionDetail, IEditionParticipant, IEditionSummary } from '../../src/interfaces/edition.interface'
+import type { IDraw } from '../../src/interfaces/draw.interface'
+import type { IMatch } from '../../src/interfaces/match.interface'
+import type { IPaginated } from '../../src/interfaces/pagination.interface'
+import type { IPool } from '../../src/interfaces/pool.interface'
+import type { IRound } from '../../src/interfaces/round.interface'
+import type { IArchiveStats } from '../../src/interfaces/stats.interface'
+import { MatchEntity } from '../../src/server/database/entities/match.entity'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import {
   SECRET_EDITION_COMMENT,
@@ -29,7 +29,7 @@ const env = requireTestDatabaseEnv()
 describe('public edition reads (B-06)', async () => {
   // La base est préparée avant le démarrage du serveur : migrations, puis fixtures.
   Object.assign(process.env, env)
-  const { default: dataSource } = await import('../../server/database/data-source')
+  const { default: dataSource } = await import('../../src/server/database/data-source')
   await dataSource.initialize()
   await dataSource.dropDatabase()
   await dataSource.runMigrations()

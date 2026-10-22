@@ -1,5 +1,5 @@
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
-import type { IMatchRecord } from '../../../server/interfaces/stats.interface'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
+import type { IMatchRecord } from '../../../src/server/interfaces/stats.interface'
 
 export function duel(
   a: string,

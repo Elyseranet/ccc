@@ -3,11 +3,11 @@ import {
   LEGACY_SNAPSHOT_MAX_BYTES,
   LEGACY_SNAPSHOT_MAX_ROWS_PER_SHEET,
   LEGACY_SNAPSHOT_MAX_SHEETS,
-} from '../../../server/consts/legacy-import.const'
-import { LEGACY_IMPORT_ERROR_CODE } from '../../../server/enums/legacy-import.enum'
-import type { ILegacyWorkbookSnapshot } from '../../../server/database/interfaces/legacy-workbook.interface'
-import { LegacyImportError } from '../../../server/utils/legacy/legacy-import-error.util'
-import { assertSnapshotShape, assertSnapshotSize } from '../../../server/utils/legacy/legacy-snapshot-guard.util'
+} from '../../../src/consts/legacy-import.const'
+import { LEGACY_IMPORT_ERROR_CODE } from '../../../src/enums/legacy-import.enum'
+import type { ILegacyWorkbookSnapshot } from '../../../src/server/database/interfaces/legacy-workbook.interface'
+import { LegacyImportError } from '../../../src/server/utils/legacy/legacy-import-error.util'
+import { assertSnapshotShape, assertSnapshotSize } from '../../../src/server/utils/legacy/legacy-snapshot-guard.util'
 
 const sheet = (rowCount: number, name = 'S') => ({
   name,

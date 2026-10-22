@@ -61,7 +61,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 | # | Décision |
 |---|---|
 | FA-01b | Les 4 écrans sans maquette (face-à-face, règles, admin participants, compte) sont **maquettés en HH avant intégration** (conséquence de la règle iso-visuel). |
-| FA-02 | Interfaces/enums du contrat d'API dans **`shared/interfaces/api/` et `shared/enums/`** (alias `#shared`). Exception documentée dans `CLAUDE.md` du projet. |
+| FA-02 | Interfaces/enums du contrat d'API dans **`../../../src/shared/interfaces/api/` et `../../../src/shared/enums/`** (alias `#shared`). Exception documentée dans `CLAUDE.md` du projet. |
 | FA-04 | Comparaison visuelle : **mesurer l'écart sur l'en-tête de F-00, puis fixer un seuil** soumis à l'utilisateur avant application. |
 | FA-05 | Écran admin « Poules et matchs » : **`/admin/matchs`**. |
 | FA-06 | Page profil participant : **`/profil`**. |

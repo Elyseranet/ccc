@@ -15,7 +15,7 @@ Mis à jour par `backend-lead` le 2026-10-20, après les décisions A1 à A16. I
 | Ticket | Titre | Vague | Dépend de | Bloqué par arbitrage | État |
 |---|---|---|---|---|---|
 | [B-01](B-01.md) | Socle serveur : DataSource runtime, erreurs, validation, logs, rate limit, Vitest | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
-| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
+| [B-02](B-02.md) | Schéma métier TypeORM (M1), enums partagés, DTO `../../src/shared/` | 1 | — (accord front sur les DTO, obtenu) | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-03](B-03.md) | Fonctions de domaine pures RG1–RG10, RG15, RG19 (partiel), RG22, RG36–37 | 1 | — | — | **Fermé** — mergé dans `develop` @ `a188c52` (intégration `57055e5`) |
 | [B-04](B-04.md) | Reprise : des tables d'archive vers les entités métier, avec rapport et vérification | 2 | B-01, B-02, B-03 | — (A5 tranché le 2026-10-20 : lignes 1 à 12 fusionnées, ligne 13 créée) | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-05](B-05.md) | Public : `GET /competiteurs` (`?q=` limité), fiche, face-à-face | 2 | B-01, B-02, B-03 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
@@ -67,12 +67,12 @@ Toutes les branches partent de `develop` @ `e1a2709` (vague 2 mergée).
 Parallélisme maximal : **6 devs** en 3a. Ensuite 1, puis 2, puis 1. Intégration et contrôles par étape, comme en vague 2 : branche d'intégration, test:api ×5 sur base neuve, migrations aller/retour/aller, revue de sécurité, puis merge par le `project-manager` (MERGE-1).
 
 Zones de conflit à surveiller :
-- `server/database/entities/index.ts` (registre des entités) : B-02 le crée, B-08 l'étend.
+- `../../src/server/database/entities/index.ts` (registre des entités) : B-02 le crée, B-08 l'étend.
 - Horodatage des migrations : M1 vient de B-02, M2 de B-08. Chacun génère sa migration sur sa branche, puis rebase avant merge.
-- `shared/enums/api-error-code.enum.ts` : chaque ticket **ajoute** ses codes, sans en renommer aucun.
+- `../../src/enums/api-error-code.enum.ts` : chaque ticket **ajoute** ses codes, sans en renommer aucun.
 - **Vague 3, migrations** : B-09 (table `invitations`) et B-16 (`competitor_avatars`, retrait de `competitors.avatar_url`) en créent une chacun ; B-14 n'en crée aucune a priori. Chacun la génère sur sa branche. À l'intégration, l'horodatage le plus récent passe en dernier, puis `migration:generate` doit répondre « No changes ».
 - **Vague 3, auth** : B-09 (consommation d'invitation : hachage et ouverture de session) et T-SEC-04 (sémaphore scrypt, option `secureCookie`) touchent `password.util.ts`, `session-token.util.ts` et `login.post.ts`. T-SEC-04 livre en premier ses fonctions (`hashPassword` sous sémaphore, `buildSessionCookieOptions(config)`), et B-09 les appelle, sans les réécrire.
-- **Vague 3, profil** : B-16 modifie `server/schemas/auth.schema.ts` (retrait de `avatarUrl`) et `moi.patch.ts` ; B-09 et B-10 n'y touchent pas.
+- **Vague 3, profil** : B-16 modifie `../../src/server/schemas/auth.schema.ts` (retrait de `avatarUrl`) et `moi.patch.ts` ; B-09 et B-10 n'y touchent pas.
 - **Vague 3, corps de requête** : B-16 (multipart) doit contourner explicitement la limite JSON de 16 Ko (M2), et T-SEC-04 (N3) ajoute un délai de lecture dans `readBoundedJsonBody`. Le délai de N3 s'applique aussi au flux multipart de B-16.
 
 Priorité front : B-05, B-06 et B-07 permettent de basculer les pages publiques des fixtures vers les routes réelles. Ils se testent sur des fixtures, sans attendre B-04. En revanche, les données réelles n'existent qu'après B-04.
@@ -169,7 +169,7 @@ Arbitrage ajouté après l'échange avec le front (FA-03) :
 
 ### Constats hors périmètre back, signalés à l'équipe
 
-- `~/CLAUDE.md` décrit un monorepo `packages/webapp` avec Redis et nodemailer, alors que CCC est une application Nuxt unique à la racine, avec `app/` et `server/`. Les tickets suivent la structure réelle.
+- `~/CLAUDE.md` décrit un monorepo `packages/webapp` avec Redis et nodemailer, alors que CCC est une application Nuxt unique à la racine, avec `app/` et `../../src/server/`. Les tickets suivent la structure réelle.
 - `docker-compose.yml` expose 3000 et 5432, et non les ports `Yxxx` de `~/CLAUDE.md`. Je ne sais pas si cette convention s'applique à CCC.
 
 ---
@@ -232,7 +232,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 - `BaseService` et ses services ;
 - `consts/routes.const.ts` et `consts/round-labels.const.ts` (A9 « Barrages ») ;
 - stores `auth` et `admin-edition` ;
-- DTO et enums de `shared/` (#shared).
+- DTO et enums de `../../src/shared/` (#shared).
 
 **Qui touche quoi**, pour éviter les conflits :
 
@@ -249,7 +249,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
 | B-17 et fixtures | B-17 (dev-b12) remplit les fixtures front avec des valeurs techniques (`final: null`, `poolNumber`, `wins`, `losses`, `unknownResults`, `titles`, valeur `NOT_IN_MOCKUP`) pour que le typecheck passe. Après son merge, F-02, F-04 et F-05 y remettent les valeurs des maquettes. |
 | Recettes Origam (mapping.md f88de34, 1787148 et 1b8d7c8, à appliquer partout) | **CTA principal** (`.btn--primary`) : `variant="flat"`, `bg-color="primary"`, `elevation="lg"`, `hover: { elevation: 'xl' }`, **sans `color`**. **Action destructive** (« Valider définitivement ») : `bg-color="danger"`, car `error` n'est pas une intention Origam. **Chips** : pleine = `bg-color` primary ou secondary ; teintée = `color` + `bg-color` sur `feedback…bgSubtle` ; neutre = le défaut du thème (F-00n). **Le premier ticket qui affiche une chip (F-01 ou F-04) vérifie dans son e2e la couleur calculée d'une chip de chaque famille.** Les décalages verticaux au survol et à l'appui de la maquette (−3 px, +4 px) sont **abandonnés** : aucune prop Origam ne les porte, on ne surcharge pas le DOM interne. **Champs** : ne pas poser `variant` (le défaut du thème, `outlined`, fait foi, F-00m). **CTA de formulaire** : `size="x-large"` (48 px). |
 | Limite connue des fixtures | `?fixture=empty|error|rate_limited` dégrade TOUS les endpoints, `GET /moi` compris. Impossible donc de dégrader un seul appel avec une session admin valide en e2e (constat de F-12). Couvert par des tests unitaires avec un store monté ; les échecs par endpoint réels seront testés en LIVE (T-LIVE-01). Un prérequis « variante par endpoint » ne sera ouvert que si un ticket en a besoin. |
-| Contrats back non mergés | Aucun type créé dans `shared/` : on utilise des interfaces de vue dans `app/interfaces/*-view.interface.ts`, mappées au merge. Seule exception : la copie identique de `score.interface.ts` dans F-08, écartée au rebase. |
+| Contrats back non mergés | Aucun type créé dans `../../src/shared/` : on utilise des interfaces de vue dans `app/interfaces/*-view.interface.ts`, mappées au merge. Seule exception : la copie identique de `score.interface.ts` dans F-08, écartée au rebase. |
 | Parallélisme (PAR-1, fabdef3) | **Au plus 3 devs front actifs en même temps**, un nuxt dev chacun. Le lead tient la file. Ordre : F-00g/F-04, F-12 et F-06 actifs, puis F-05 (F-00h), F-10, F-01, F-02, F-07, F-08, F-09, F-11, F-03, F-13. |
 | Serveurs `nuxt dev` | **À arrêter à la fin de chaque vérification**, jamais laissés en tâche de fond. 13 serveurs oubliés faisaient tomber Playwright en délai dépassé (6 échecs) ; après leur arrêt, 46/46. |
 | Layouts, thème, `main.css` | **Aucun ticket ne les modifie.** Un besoin dans la coque se remonte au lead front, qui décide d'un ticket dédié. |
@@ -281,7 +281,7 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
   - `data-cy` sur les éléments interactifs, `aria-label` sur les icônes seules.
 - Zéro chaîne en dur : `t('cle', 'fallback')`, clés `snake_case` ajoutées à `en.json` **et** `fr.json` dans le même commit.
 - Aucune couleur, taille ou espacement en dur : `var(--origam-*)` uniquement.
-- Aucun `$fetch` ni service appelé depuis un composant ou une page : on passe par un composable. Aucun import de `server/` côté client.
+- Aucun `$fetch` ni service appelé depuis un composant ou une page : on passe par un composable. Aucun import de `../../src/server/` côté client.
 - États dégradés de `parcours.md` couverts, avec des fixtures `empty` et `error`.
 - Animations : CSS seulement hors vitrines ; tout est coupé sous `prefers-reduced-motion: reduce`.
 - Security gate : `npm audit` sans `high` ni `critical`, `npm ls axios` vide, gitleaks propre, `/security-review` sur la branche.
@@ -308,7 +308,7 @@ Les 8 écarts sont pris en charge par `backend-lead` (section Back, « Écarts d
 Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « Arbitrages front ». Elles sont reportées dans les tickets :
 - **FA-01** : Gabarito → F-00.
 - **FA-01b** : maquettes livrées (37f4c07) → F-05, F-06, F-09, F-10.
-- **FA-02** : `shared/` → F-00.
+- **FA-02** : `../../src/shared/` → F-00.
 - **FA-04** : seuil mesuré sur l'en-tête dans F-00, puis soumis à l'utilisateur → F-00, et tous les tickets.
 - **FA-05** : `/admin/matchs` → F-00, F-08.
 - **FA-06** : `/profil` → F-00, F-10.

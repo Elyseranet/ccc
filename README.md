@@ -94,7 +94,7 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 | `ccc-ops user:create-admin` | Crée le premier administrateur. | B-08 |
 | `ccc-ops user:unlock` | Déverrouille un compte. | B-08 |
 
-Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
+Les trois dernières commandes n'existent dans l'image qu'une fois leurs tickets intégrés (le build compile `src/server/database/**`) ; avant cela, `ccc-ops` répond que le script est absent. Ordre conseillé : déployer, `db:seed:legacy`, `db:import:legacy`, puis `user:create-admin`.
 
 Les rapports de `db:import:legacy` sont écrits dans `/app/.data/reports/` et sont éphémères (perdus au redémarrage du conteneur) ; les récupérer avec `docker cp <conteneur>:/app/.data/reports ./reports`.
 
@@ -108,7 +108,7 @@ npm run dev
 
 ## Migrations TypeORM
 
-Les migrations sont stockées dans `server/database/migrations/` et le schéma n'est pas synchronisé automatiquement.
+Les migrations sont stockées dans `src/server/database/migrations/` et le schéma n'est pas synchronisé automatiquement.
 
 ```sh
 npm run db:migration:generate -- server/database/migrations/NomMigration
@@ -136,7 +136,7 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 
 ### Charger les archives du classeur
 
-Le snapshot `server/database/seeds/data/ccc-workbook.json` conserve les lignes, les valeurs disponibles, les formules et les indices de format des cellules des onglets fournis. L'import crée les tables d'archive si nécessaire et peut être rejoué sans dupliquer une ligne.
+Le snapshot `src/server/database/seeds/data/ccc-workbook.json` conserve les lignes, les valeurs disponibles, les formules et les indices de format des cellules des onglets fournis. L'import crée les tables d'archive si nécessaire et peut être rejoué sans dupliquer une ligne.
 
 ```sh
 NUXT_DATABASE_HOST=localhost npm run db:seed:legacy
@@ -160,7 +160,7 @@ npm run db:import:legacy   # reprise vers les entités métier
 
 La commande lit l'archive la plus récente, construit tout le plan en mémoire puis écrit en **une seule transaction**. Elle est rejouable : chaque écriture est un upsert sur une clé naturelle (`editions.code`, `competitor_aliases.alias`, `matches.legacy_code`, `pools`/`rounds`/`participations`/`match_sides` sur leur clé unique) et un second passage ne change ni les comptes ni les `id`. Elle n'écrit que des éditions `origin = LEGACY_IMPORT` et s'arrête si une édition `APP` porte le même code. Les compétiteurs ne sont créés qu'une fois : un nom corrigé dans l'application survit à un rejeu.
 
-**Fichier de correspondance** : `server/database/seeds/data/legacy-identity-map.json` (décision A5, `docs/tickets/legacy-identity-map.md`). Chaque graphie de l'onglet `scores` absente de `Data` y figure, soit `{ "alias": "...", "competitor": "<nom Data exact>" }`, soit `{ "alias": "...", "create": true }`. Le rapprochement se fait sur la **graphie exacte, casse et espaces compris** : le script refuse, sans rien écrire, toute graphie sans correspondance exacte. Le fichier n'est jamais deviné par le script.
+**Fichier de correspondance** : `src/server/database/seeds/data/legacy-identity-map.json` (décision A5, `docs/tickets/legacy-identity-map.md`). Chaque graphie de l'onglet `scores` absente de `Data` y figure, soit `{ "alias": "...", "competitor": "<nom Data exact>" }`, soit `{ "alias": "...", "create": true }`. Le rapprochement se fait sur la **graphie exacte, casse et espaces compris** : le script refuse, sans rien écrire, toute graphie sans correspondance exacte. Le fichier n'est jamais deviné par le script.
 
 **Rapport** : `.data/reports/legacy-import-report.json` (dossier gitignoré), plus un résumé JSON journalisé. Il contient les comptes par table, les anomalies (2012a et 2012b : N = 16 pour 11 listés, 2017 : 5,76 hors barème, joueurs sans cellule `Data`) et le diff de vérification : les classements ACP et All Time, les rangs, les participations et les titres recalculés par les fonctions de domaine sont comparés au classeur pour les 145 joueurs. Un écart inattendu **annule la transaction** (code de sortie 1) ; le rapport est écrit quand même. Les écarts attendus restent listés avec leur explication : le V/D des compétiteurs fusionnés (la colonne F du classeur est un `COUNTIF` sur le nom) et une égalité exacte à 8,76 que le `RANK` flottant du classeur départage.
 
@@ -212,7 +212,7 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
 
 ## API serveur
 
-- Toutes les routes vivent sous `/api/v1/` (`server/api/v1/resource.method.ts`).
+- Toutes les routes vivent sous `/api/v1/` (`src/server/api/v1/resource.method.ts`).
 - `GET /api/v1/health` : `200 { "status": "ok" }` si la base répond à `SELECT 1`, `503 { "status": "unavailable" }` sinon. Aucun détail d'infrastructure n'est exposé.
 - Lectures publiques des éditions (`/editions`, `/editions/{id}/…`, `/stats`) : voir `docs/api/editions.md`.
 - Classements publics (B-07), calculés à la lecture à partir de `participations.points` figés ; seules les éditions `CLOSED` comptent (A8), ordonnées par `chronological_rank`. Les participations à `points = null` n'entrent pas dans les sommes. Ex aequo : rang partagé (`1, 2, 2, 4`), ordre d'affichage par `displayName`. Les réponses ne portent que `ICompetitorPublic`.
@@ -220,9 +220,9 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
   - `GET /api/v1/classements/all-time` : `IRankingRow[]`, `points` = somme de toutes les éditions clôturées, `average` = `points` / participations chiffrées.
   - `GET /api/v1/classements/evolution?type=acp|all-time&competiteur={uuid}` : `IRankingEvolutionPoint[]` (RG8, un point par édition clôturée depuis la première participation du joueur ; `[]` s'il n'a aucune participation classée). Sans `competiteur` : `IRankingEvolutionSeries[]` pour tous les joueurs en un seul appel (C5).
   - Erreurs : `type` absent ou hors enum, ou `competiteur` qui n'est pas un UUID : 400 `VALIDATION_FAILED` ; `competiteur` inconnu : 404 `NOT_FOUND`.
-- Toute erreur sous `/api/` a la forme `{ statusCode, code, message, details? }` (`IApiError`, codes dans `shared/enums/api-error-code.enum.ts`). Les erreurs 5xx portent un message générique ; le détail est dans les logs.
+- Toute erreur sous `/api/` a la forme `{ statusCode, code, message, details? }` (`IApiError`, codes dans `src/enums/api-error-code.enum.ts`). Les erreurs 5xx portent un message générique ; le détail est dans les logs.
 - Chaque réponse porte un en-tête `X-Request-Id` ; les logs sont du JSON en ligne (`event`, `level`, `requestId`, `route`, `durationMs`).
-- Les entités TypeORM sont déclarées dans `server/database/entities/index.ts` (registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
+- Les entités TypeORM sont déclarées dans `src/server/database/entities/index.ts` (registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
 
 ## Architecture
 

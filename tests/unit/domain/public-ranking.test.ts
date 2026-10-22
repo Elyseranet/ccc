@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { RANKING_TYPE } from '../../../shared/enums/ranking.enum'
-import type { ICompetitorPublic } from '../../../shared/interfaces/api/competitor.interface'
-import type { IRankingEditionInfo, IRankingSourceParticipation } from '../../../server/interfaces/ranking.interface'
-import { buildEvolutionSeries, buildRankingRows } from '../../../server/utils/ranking/public-ranking.util'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
+import { RANKING_TYPE } from '../../../src/enums/ranking.enum'
+import type { ICompetitorPublic } from '../../../src/interfaces/competitor.interface'
+import type { IRankingEditionInfo, IRankingSourceParticipation } from '../../../src/server/interfaces/ranking.interface'
+import { buildEvolutionSeries, buildRankingRows } from '../../../src/server/utils/ranking/public-ranking.util'
 
 const competitor = (id: string, displayName: string): ICompetitorPublic => ({
   id,

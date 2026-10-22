@@ -3,16 +3,16 @@ import type {
   IRankingEdition,
   IScoredParticipation,
   IStagedParticipation,
-} from '../../../server/interfaces/ranking.interface'
+} from '../../../src/server/interfaces/ranking.interface'
 import {
   computeAcp,
   computeAllTime,
   computeAverage,
   countTitles,
   rankTotals,
-} from '../../../server/utils/ranking/ranking.util'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
+} from '../../../src/server/utils/ranking/ranking.util'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
 import { dataSheet, sheetRows, workbookEditions, workbookParticipations } from './workbook.fixture'
 
 const edition = (id: string, chronologicalRank: number, status = EDITION_STATUS.CLOSED): IRankingEdition => ({

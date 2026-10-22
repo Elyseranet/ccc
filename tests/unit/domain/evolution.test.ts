@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { computeEvolution } from '../../../server/utils/ranking/evolution.util'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
+import { computeEvolution } from '../../../src/server/utils/ranking/evolution.util'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { dataSheet, sheetRows, workbookEditions, workbookParticipations } from './workbook.fixture'
 
 describe('RG8 : évolution (jeu synthétique)', () => {

@@ -1,7 +1,7 @@
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineEventHandler, setResponseStatus } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
+import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
 import { API_SOURCES } from '~/consts/api-sources.const'
 import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
 import { API_SOURCE } from '~/enums/api-source.enum'

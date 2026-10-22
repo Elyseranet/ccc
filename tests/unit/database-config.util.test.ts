@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertDatabaseConfig } from '../../server/utils/database-config.util'
+import { assertDatabaseConfig } from '../../src/server/utils/database-config.util'
 
 const complete = { host: 'db.internal', port: 5432, username: 'ccc', password: 'S3CRET-VALUE', database: 'ccc' }
 

@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
-import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
-import { LOGIN_DELAY_MAX_SECONDS } from '../../server/consts/auth.const'
-import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
-import { UserEntity } from '../../server/database/entities/user.entity'
-import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../server/utils/auth/login-throttle.util'
+import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
+import { LOGIN_DELAY_MAX_SECONDS } from '../../src/consts/auth.const'
+import { LoginDeviceEntity } from '../../src/server/database/entities/login-device.entity'
+import { UserEntity } from '../../src/server/database/entities/user.entity'
+import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../src/server/utils/auth/login-throttle.util'
 import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource

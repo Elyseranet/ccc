@@ -1,8 +1,8 @@
 # Correspondance des identités legacy — brouillon de décision (A5)
 
 - **Statut** : **décidé par l'utilisateur le 2026-10-20** — lignes 1 à 12 fusionnées avec leur candidat, ligne 13 (`Marion Cobra`) créée.
-- **Ticket** : [B-04](B-04.md). L'import réel refuse de tourner tant qu'une ligne n'a pas de décision. Une fois le tableau rempli, B-04 le transcrit dans `server/database/seeds/data/legacy-identity-map.json`.
-- **Source** : snapshot `server/database/seeds/data/ccc-workbook.json`, lu le 2026-10-20 (onglets `scores` et `Data`).
+- **Ticket** : [B-04](B-04.md). L'import réel refuse de tourner tant qu'une ligne n'a pas de décision. Une fois le tableau rempli, B-04 le transcrit dans `../../src/server/database/seeds/data/legacy-identity-map.json`.
+- **Source** : snapshot `../../src/server/database/seeds/data/ccc-workbook.json`, lu le 2026-10-20 (onglets `scores` et `Data`).
 
 ## Comment lire ce tableau
 

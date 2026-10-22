@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
+import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
 import { ApiRequestError, parseRetryAfter, toApiRequestError } from '~/utils/api-request-error.util'
 
 const NOW = Date.parse('2026-10-21T12:00:00Z')

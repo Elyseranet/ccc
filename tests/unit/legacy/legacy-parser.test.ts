@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { COMPETITOR_ALIAS_SOURCE } from '../../../shared/enums/competitor.enum'
-import { MATCH_STATUS } from '../../../shared/enums/match.enum'
-import { FINAL_STAGE, PARTICIPATION_STATUS } from '../../../shared/enums/participation.enum'
-import { ROUND_KIND } from '../../../shared/enums/round.enum'
-import { LEGACY_ANOMALY_CODE, LEGACY_IMPORT_ERROR_CODE } from '../../../server/enums/legacy-import.enum'
-import { LegacyImportError } from '../../../server/utils/legacy/legacy-import-error.util'
-import { parseLegacyWorkbook } from '../../../server/utils/legacy/legacy-workbook-parser.util'
+import { COMPETITOR_ALIAS_SOURCE } from '../../../src/enums/competitor.enum'
+import { MATCH_STATUS } from '../../../src/enums/match.enum'
+import { FINAL_STAGE, PARTICIPATION_STATUS } from '../../../src/enums/participation.enum'
+import { ROUND_KIND } from '../../../src/enums/round.enum'
+import { LEGACY_ANOMALY_CODE, LEGACY_IMPORT_ERROR_CODE } from '../../../src/enums/legacy-import.enum'
+import { LegacyImportError } from '../../../src/server/utils/legacy/legacy-import-error.util'
+import { parseLegacyWorkbook } from '../../../src/server/utils/legacy/legacy-workbook-parser.util'
 import { buildPlan, dataRows, identityMap, scoresRows } from './legacy-import.fixture'
 
 const plan = buildPlan()

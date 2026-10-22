@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { MATCH_PURPOSE } from '../../../shared/enums/match.enum'
-import { LEGACY_VERIFICATION_METRIC } from '../../../server/enums/legacy-import.enum'
-import type { IRankingEdition } from '../../../server/interfaces/ranking.interface'
-import type { IMatchRecord } from '../../../server/interfaces/stats.interface'
-import { verifyAgainstWorkbook } from '../../../server/utils/legacy/legacy-verification.util'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { MATCH_PURPOSE } from '../../../src/enums/match.enum'
+import { LEGACY_VERIFICATION_METRIC } from '../../../src/enums/legacy-import.enum'
+import type { IRankingEdition } from '../../../src/server/interfaces/ranking.interface'
+import type { IMatchRecord } from '../../../src/server/interfaces/stats.interface'
+import { verifyAgainstWorkbook } from '../../../src/server/utils/legacy/legacy-verification.util'
 import { buildPlan } from './legacy-import.fixture'
 
 /** Reconstitue, sans base, les entrées que l importeur relit en base (clé du compétiteur = id). */

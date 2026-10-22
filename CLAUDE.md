@@ -14,4 +14,4 @@ Les specs font foi et vivent dans Obsidian : `~/Library/Mobile Documents/iCloud~
 
 ## Contrat d'API partagé — exception de rangement (décision utilisateur 2026-10-20, FA-02)
 
-Les interfaces et enums **du contrat d'API** (DTO échangés entre `server/` et `app/`) vivent dans `shared/interfaces/api/` et `shared/enums/` (alias Nuxt `#shared`), et **nulle part ailleurs** — pas de copie dans `app/interfaces/`. Les interfaces purement front restent dans `app/interfaces/`, les purement serveur dans `server/`.
+Les interfaces et enums **du contrat d'API** (DTO échangés entre `src/server/` et `app/`) vivent dans `src/shared/interfaces/api/` et `src/shared/enums/` (alias Nuxt `#shared`), et **nulle part ailleurs** — pas de copie dans `app/interfaces/`. Les interfaces purement front restent dans `app/interfaces/`, les purement serveur dans `src/server/`.

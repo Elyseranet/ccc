@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import type { CompetitorEntity } from '../../server/database/entities/competitor.entity'
-import type { MatchEntity } from '../../server/database/entities/match.entity'
-import { MATCH_RECORD_KEY } from '../../server/enums/match-record-key.enum'
-import { toCompetitorPublic } from '../../server/utils/competitor/competitor-public.mapper.util'
-import { toMatchRecord } from '../../server/utils/match/match-record.mapper.util'
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../shared/enums/match.enum'
+import type { CompetitorEntity } from '../../src/server/database/entities/competitor.entity'
+import type { MatchEntity } from '../../src/server/database/entities/match.entity'
+import { MATCH_RECORD_KEY } from '../../src/enums/match-record-key.enum'
+import { toCompetitorPublic } from '../../src/server/utils/competitor/competitor-public.mapper.util'
+import { toMatchRecord } from '../../src/server/utils/match/match-record.mapper.util'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../src/enums/match.enum'
 
 describe('toCompetitorPublic', () => {
   it('exposes only whitelisted fields, even when the entity carries private data', () => {

@@ -7,6 +7,8 @@ export default defineNuxtConfig({
   devtools: { enabled: process.env.E2E !== 'true' },
   modules: ['origam/nuxt', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
+  srcDir: 'src',
+  serverDir: 'src/server',
   app: {
     head: {
       htmlAttrs: { lang: 'fr' },

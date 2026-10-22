@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import { RouterLink } from 'vue-router'
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
+import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
 import AsyncState from '~/components/common/AsyncState.vue'
 import BrandMark from '~/components/common/BrandMark.vue'
 import GoldenRules from '~/components/common/GoldenRules.vue'

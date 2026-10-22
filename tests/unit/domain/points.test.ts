@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { DOMAIN_ERROR_CODE } from '../../../server/enums/domain.enum'
+import { DOMAIN_ERROR_CODE } from '../../../src/enums/domain.enum'
 import {
   computeParticipationPoints,
   computeParticipationPointsCents,
-} from '../../../server/utils/scoring/points.util'
-import { DomainRuleError } from '../../../server/utils/domain/domain-rule-error.util'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
+} from '../../../src/server/utils/scoring/points.util'
+import { DomainRuleError } from '../../../src/server/utils/domain/domain-rule-error.util'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
 import { dataSheet, sheetRows } from './workbook.fixture'
 
 const STAGE_BY_DATA_ROW: Record<number, FINAL_STAGE> = {

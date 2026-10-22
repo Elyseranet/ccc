@@ -1,12 +1,12 @@
 import 'reflect-metadata'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
-import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
-import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
-import { SessionEntity } from '../../server/database/entities/session.entity'
-import { UserEntity } from '../../server/database/entities/user.entity'
-import { applyProfileChanges } from '../../server/utils/auth/profile-update.util'
-import { createSession } from '../../server/utils/auth/session-store.util'
+import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
+import { LoginDeviceEntity } from '../../src/server/database/entities/login-device.entity'
+import { SessionEntity } from '../../src/server/database/entities/session.entity'
+import { UserEntity } from '../../src/server/database/entities/user.entity'
+import { applyProfileChanges } from '../../src/server/utils/auth/profile-update.util'
+import { createSession } from '../../src/server/utils/auth/session-store.util'
 
 let dataSource: DataSource
 let counter = 0
@@ -40,7 +40,7 @@ beforeAll(async () => {
   if (!(process.env.NUXT_DATABASE_DATABASE ?? '').endsWith('_test')) {
     throw new Error('NUXT_DATABASE_DATABASE must name a dedicated test database (suffix _test)')
   }
-  dataSource = (await import('../../server/database/data-source')).default
+  dataSource = (await import('../../src/server/database/data-source')).default
   await dataSource.initialize()
   await dataSource.dropDatabase()
   await dataSource.runMigrations()
