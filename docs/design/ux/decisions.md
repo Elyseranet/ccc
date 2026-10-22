@@ -181,3 +181,5 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-04-ADV — Adversaires sur la fiche joueur (décision utilisateur 2026-10-22)
 - La fiche joueur affiche les **4 adversaires les plus affrontés**, comme la maquette, suivis d'un lien « voir tous » vers le face-à-face (F-05), où l'on peut choisir n'importe quel adversaire. L'ordre est celui que renvoie le serveur (G11).
+
+- **Précision (décision utilisateur 2026-10-22)** : le lien « voir tous » ne s'affiche que si le joueur a **plus de 4 adversaires**.
