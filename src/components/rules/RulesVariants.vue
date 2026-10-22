@@ -107,7 +107,7 @@ defineExpose({})
   }
 
   &__lead {
-    max-width: var(--rules-variants__lead---max-width, 40rem);
+    max-width: var(--rules-variants__lead---max-width, var(--ccc-lead---max-width));
     margin: 0;
     font-size: var(--origam-font__size---xl);
     color: var(--origam-color__text---secondary);
@@ -180,6 +180,5 @@ defineExpose({})
 <style>
 :root {
   --rules-variants---gap: var(--origam-space---4);
-  --rules-variants__lead---max-width: 40rem;
 }
 </style>
