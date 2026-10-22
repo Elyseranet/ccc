@@ -22,4 +22,4 @@
 | #1254 | `field` : `--origam-field---corner-clearance` déclaré sur l'élément, non thémable (champ pilule) | règle `.origam-field.origam-field.origam-field` dans `main.css` (F-00m) |
 | #1261 | `btn` outlined : la bordure s'ajoute au padding, aucune variable propre à la variante | règle centralisée dans `main.css` (F-00o) |
 | #1262 | `table` : séparateur de ligne en `border-bottom` des `td`, côté non thémable | règle `border-top` dans `main.css` (F-00g bis) |
-| à ouvrir | évolution : `line-height: 1.6` en dur sur `.origam-breadcrumb__items`, sans token | règle `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` dans `main.css` (F-00p) |
+| #1265 | évolution : `line-height: 1.6` en dur sur `.origam-breadcrumb__items`, sans token | règle `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` dans `main.css` (F-00p) |
