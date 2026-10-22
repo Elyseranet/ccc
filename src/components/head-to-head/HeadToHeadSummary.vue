@@ -218,6 +218,9 @@ const meetingsText = computed(() => {
  * @description
  * Chiffres de carrière de chaque joueur, depuis sa fiche. Le ratio (victoires / matchs avec score) est calculé ici :
  * sans match avec score, il affiche un tiret et un libellé « indisponible », pas « 0 % ».
+ * Les lignes de `origam-data-list` sont stylées par des `:deep(.origam-data-list__kv-*)` (fond, rayon, grille,
+ * capitales de la clé, chiffres tabulaires de la valeur) : ces propriétés n'ont pas de variable dans Origam, défaut
+ * suivi dans Elyseranet/origam#1267. Tout ce qui a une variable passe par elle.
  ********************************************************/
 const bilansTitle = computed(() => t('head_to_head.bilans.title', 'Bilans'))
 const bilansHint = computed(() => t('head_to_head.bilans.hint', 'Sur toutes les éditions (RG37)'))
