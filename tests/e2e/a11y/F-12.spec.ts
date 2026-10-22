@@ -1,8 +1,8 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { FIXTURE_SESSION_COOKIE } from '../pages.const'
+import { E2E_BASE_URL, E2E_SESSION_COOKIE } from '../helpers/e2e.const'
+import { signIn } from '../helpers/session'
 
-const COOKIE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const ROUTE = '/admin/plus'
 const OTHER_ADMIN_ROUTE = '/admin/matchs'
@@ -11,7 +11,7 @@ test.describe('F-12 admin Plus', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([{ name: FIXTURE_SESSION_COOKIE, value: 'admin', url: COOKIE_URL }])
+    await signIn(context, 'admin')
   })
 
   test('0 violation axe sur le rendu hydraté', async ({ page }) => {
@@ -95,30 +95,33 @@ test.describe('F-12 admin Plus', () => {
     expect(chosen).not.toBe(before)
   })
 
-  // La variante de fixture s'applique à tous les services, `GET /moi` compris : la session de fixture devient vide ou en erreur,
-  // donc l'accès admin est refusé et le middleware renvoie vers /connexion. On vérifie ce repli propre (pas de plantage ni d'erreur
-  // console) ; l'état dégradé du sélecteur seul est couvert en test unitaire (tests/nuxt/front/admin-more.test.ts).
-  for (const variant of ['error', 'empty', 'rate_limited']) {
-    test(`variante ${variant} : repli propre vers /connexion, sans plantage ni erreur console`, async ({ page }) => {
-      const consoleErrors: string[] = []
-      const pageErrors: string[] = []
-      page.on('console', (message) => {
-        if (message.type() === 'error') {
-          consoleErrors.push(message.text())
-        }
-      })
-      page.on('pageerror', error => pageErrors.push(error.message))
-      const response = await page.goto(`${ROUTE}?fixture=${variant}`)
-      await page.waitForLoadState('networkidle')
-      expect(response!.status()).toBeLessThan(500)
-      await expect(page).toHaveURL(/\/connexion/)
-      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-      expect(pageErrors).toEqual([])
-      expect(consoleErrors).toEqual([])
+  // Session inexistante ou révoquée (cookie forgé ou périmé) : `GET /moi` répond 401, la session devient anonyme et le
+  // middleware renvoie vers /connexion. On vérifie ce repli propre, sans plantage ni erreur console. L'état dégradé du
+  // sélecteur seul (liste vide, 500, 429) est couvert en test unitaire (tests/nuxt/front/admin-more.test.ts).
+  test('session inconnue : repli propre vers /connexion, sans plantage ni erreur console', async ({ page, context }) => {
+    await context.clearCookies()
+    await context.addCookies([{ name: E2E_SESSION_COOKIE, value: 'x'.repeat(43), url: E2E_BASE_URL, httpOnly: true, sameSite: 'Lax' }])
+    const consoleErrors: string[] = []
+    const pageErrors: string[] = []
+    page.on('console', (message) => {
+      if (message.type() === 'error') {
+        consoleErrors.push(message.text())
+      }
     })
-  }
+    page.on('pageerror', error => pageErrors.push(error.message))
+    const response = await page.goto(ROUTE)
+    await page.waitForLoadState('networkidle')
+    expect(response!.status()).toBeLessThan(500)
+    await expect(page).toHaveURL(/\/connexion/)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    expect(pageErrors).toEqual([])
+    expect(consoleErrors).toEqual([])
+  })
 
-  test('se déconnecter renvoie vers l’espace public et vide la session', async ({ page }) => {
+  test('se déconnecter renvoie vers l’espace public et vide la session', async ({ page, context }) => {
+    // Session dédiée : la déconnexion la révoque en base, elle ne doit pas couper celle des autres tests.
+    await context.clearCookies()
+    await signIn(context, 'admin-logout')
     await page.goto(ROUTE)
     await page.waitForLoadState('networkidle')
     await page.getByTestId('admin-more-logout').click()

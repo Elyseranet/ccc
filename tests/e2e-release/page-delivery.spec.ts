@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { ADMIN_PAGES, FIXTURE_SESSION_COOKIE, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
+import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
 
 /*********************************************************
  * Masquage des pages non livrées sur le build de production (OPS-3)
  *
  * @description
  * Tant qu'une page n'est pas `delivered` dans `PAGE_DELIVERY`, elle répond 404 (vrai statut HTTP en SSR),
- * sans lien dans la navigation, et la sélection de fixture par cookie ou `?fixture=` reste inerte.
+ * sans lien dans la navigation, même avec un cookie de session présenté.
  * Quand un ticket F-xx livre sa page, il retire la route de `DELIVERED_PAGES` ci-dessous.
  ********************************************************/
 const DELIVERED_PAGES: string[] = []
@@ -28,10 +28,10 @@ test.describe('pages non livrées', () => {
     }
   })
 
-  test('la sélection de fixture par cookie ou par paramètre reste inerte', async ({ request }) => {
-    const response = await request.get('/admin?fixture=error', {
+  test('un cookie de session présenté ne rend pas visible une page non livrée', async ({ request }) => {
+    const response = await request.get('/admin', {
       maxRedirects: 0,
-      headers: { cookie: `${FIXTURE_SESSION_COOKIE}=admin` }
+      headers: { cookie: `__Host-ccc_session=${'x'.repeat(43)}` }
     })
     expect(response.status()).toBe(404)
   })
