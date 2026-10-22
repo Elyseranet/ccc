@@ -14,7 +14,7 @@ import { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
 import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
 import { PoolEntity } from '../../src/server/db/typeorm/entities/pool.entity'
 import { RoundEntity } from '../../src/server/db/typeorm/entities/round.entity'
-import { correctMatch, recordScore, validateMatch } from '../../src/services/match-score.service'
+import { correctMatch, recordScore, validateMatch } from '../../src/services/match.service'
 import { toApiError } from '../../src/utils/api-error.util'
 import { cleanup, resetSchema } from './helpers/test-database'
 
