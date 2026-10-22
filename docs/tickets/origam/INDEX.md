@@ -20,3 +20,5 @@
 | #1252 | évolution : token `line-height` des onglets (`line-height: 1` en dur) | règle `:where(.origam-tab__label)` dans `main.css` (F-00l) |
 | #1253 | `tabs` pills : la prop `color` n'agit pas sur l'onglet actif (repli `action.primary` en dur) | cssVars `--origam-tabs__item--pills--active---*` dans le thème (F-00l) |
 | #1254 | `field` : `--origam-field---corner-clearance` déclaré sur l'élément, non thémable (champ pilule) | règle `.origam-field.origam-field.origam-field` dans `main.css` (F-00m) |
+| #1261 | `btn` outlined : la bordure s'ajoute au padding, aucune variable propre à la variante | règle centralisée dans `main.css` (F-00o) |
+| #1262 | `table` : séparateur de ligne en `border-bottom` des `td`, côté non thémable | règle `border-top` dans `main.css` (F-00g bis) |
