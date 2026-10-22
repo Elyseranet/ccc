@@ -344,3 +344,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-LIVE-01](T-LIVE-01.md) : ouvert, partiellement réalisé par T-ARCH-01. Il reste `delivered: true` sur `/admin/plus` et la preuve dans le conteneur.
 - **Gel levé.** Les branches en cours doivent être reprises sur la nouvelle arborescence (`src/` à plat, sans fixtures) : vague 3a back (B-09, B-10, B-12, B-16, B-17, T-SEC-04, T-OPS-02), F-04, F-05, F-00h et F-00n.
 - [T-ARCH-02](T-ARCH-02.md) : **Fermé** — cause environnementale (`node_modules` en lien symbolique dans un worktree) ; test de non-régression dans `develop`.
+- [T-ARCH-03](T-ARCH-03.md) : **Fermé** — mergé dans `develop` @ `5efed01` (branche `a0a8382`) ; schémas dans `src/server/schemas/`, stores en composables.
