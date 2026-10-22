@@ -1,6 +1,6 @@
 # T-ARCH-02 — Import d'un service fusionné dans l'environnement nuxt de Vitest
 
-- **Statut** : En cours. Ouvert le 2026-10-22 (suite de T-ARCH-01, remontée du front-lead). Cause non établie : non reproduit hors des worktrees du front.
+- **Statut** : **Fermé** (2026-10-22), cause environnementale ; voir « Fermeture ».
 - **Branche** : `feature/T-ARCH-02` depuis `d7a5426` (develop).
 
 ## Signalement
@@ -21,3 +21,15 @@ Dans le projet Vitest `front` (environnement `nuxt`), importer un service fusion
 - [ ] Cause établie, avec reproduction minimale (le test ci-dessus, et la pile d'erreur de l'environnement qui échoue).
 - [ ] Le test minimal passe dans l'environnement des développeurs front.
 - [ ] `test:run`, `typecheck` et `test:bundle` verts ; la garde anti-bundle tient.
+
+## Fermeture — 2026-10-22 (chef de projet)
+- **Cause** : elle vient de l'environnement, pas du code. L'erreur « SyntaxError: Invalid or unexpected token » à l'import statique d'une entité TypeORM n'apparaissait que dans le worktree de dev-f05 (`agent-a70ac359346e804a8`), dont le `node_modules` était un lien symbolique vers celui de la copie principale.
+- **Mesures** :
+  - architecte, worktree propre : test minimal 1/1, aucune SyntaxError sur tout le projet front ;
+  - front-lead, même commit `ac1b265`, `node_modules` également en lien symbolique, dans un autre worktree : 1/1. Le lien seul ne suffit donc pas, et l'état exact du cache en cause n'est pas établi ;
+  - dev-f05, worktree neuf (`npm ci`, ni lien ni copie) : test de `41eab84` à 1/1, son test minimal à 1/1, `api-routes` et `admin-more` à 13 tests verts.
+- **Suites** :
+  - le `vi.mock` de contournement est retiré de F-00h (`2158d28`) ;
+  - le test de non-régression `tests/nuxt/front/merged-service-import.test.ts` entre dans `develop` (cherry-pick de `41eab84`) ;
+  - règle ajoutée au `CLAUDE.md` du projet : chaque worktree d'agent a son propre `node_modules` (`npm ci`), sans lien symbolique.
+- Aucune configuration n'a été modifiée.
