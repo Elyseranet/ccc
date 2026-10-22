@@ -332,3 +332,9 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
+
+### Architecture (chef de projet, 2026-10-22)
+- [T-ARCH-01](T-ARCH-01.md) : **Fermé** — mergé dans `develop` @ `52c54de` (branche `82c51ca`).
+- [T-SEC-05](T-SEC-05.md) : **Fermé, sans objet** (ARCH-5, seed SQL).
+- [T-LIVE-01](T-LIVE-01.md) : ouvert, partiellement réalisé par T-ARCH-01. Il reste `delivered: true` sur `/admin/plus` et la preuve dans le conteneur.
+- **Gel levé.** Les branches en cours doivent être reprises sur la nouvelle arborescence (`src/` à plat, sans fixtures) : vague 3a back (B-09, B-10, B-12, B-16, B-17, T-SEC-04, T-OPS-02), F-04, F-05, F-00h et F-00n.

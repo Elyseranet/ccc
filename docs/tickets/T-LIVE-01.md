@@ -15,3 +15,10 @@
 - [ ] `test:run`, `typecheck` et `test:release` verts ; e2e fixtures (routes, a11y, visuel) verts ; e2e LIVE verts sur base seedée.
 - [ ] `docker build` réussi, et la garde OPS-3 laisse passer `/admin/plus` (sortie réelle).
 - [ ] gitleaks propre, `npm ls axios` vide, revue de sécurité sans high ni medium.
+
+## Point du 2026-10-22 (chef de projet) — ticket **ouvert**, partiellement réalisé par T-ARCH-01 (`52c54de`)
+- **Fait** : les fixtures sont supprimées (ARCH-8). `ME`, `EDITIONS` et `AUTH_LOGOUT` appellent l'API réelle. Les e2e tournent sur une base de test chargée par `archives.sql`, avec des sessions réelles (ARCH-9). La garde OPS-3 prend une forme simple (`API_ROUTES` plus `page-delivery`).
+- **Reste à faire** :
+  - passer `/admin/plus` à `delivered: true` ;
+  - prouver dans le conteneur que la page livrée répond une fois authentifié, et que les pages non livrées répondent 404.
+- La notion de « bascule fixture vers live » n'existe plus : il ne reste que la livraison de la page.
