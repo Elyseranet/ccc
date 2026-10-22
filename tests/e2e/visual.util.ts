@@ -54,6 +54,28 @@ export const PLUS_EDITION_DATA_MASKS: IDataMasks = {
   values: { mockup: ['.plus-ed select'], app: ['.admin-more__edition .admin-edition-select'] }
 }
 
+/** Un texte de la maquette à remplacer par celui de l'application (mêmes positions dans l'ordre du DOM). */
+export interface ITextPair { mockup: string, app: string }
+
+/**
+ * Données réelles contre données de maquette : avant la capture, les valeurs de l'application sont écrites dans le DOM de
+ * la maquette (en mémoire, le fichier n'est pas modifié). Les deux côtés affichent alors le même texte et le renvoient à
+ * la ligne de la même façon : la comparaison ne porte que sur le gabarit.
+ */
+export const alignMockupText = async (mockup: Page, page: Page, pairs: ITextPair[]) => {
+  for (const pair of pairs) {
+    const values = await page.locator(pair.app).allTextContents()
+    await mockup.evaluate(([selector, texts]) => {
+      document.querySelectorAll(selector as string).forEach((node, index) => {
+        const text = (texts as string[])[index]
+        if (text !== undefined) {
+          node.textContent = text.trim()
+        }
+      })
+    }, [pair.mockup, values] as [string, string[]])
+  }
+}
+
 const NO_MASKS: IDataMasks = { mockup: [], app: [] }
 
 export const settle = async (page: Page) => {
