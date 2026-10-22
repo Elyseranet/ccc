@@ -247,6 +247,31 @@ describe('adversaires : ordre du serveur, winRatio null, résultats inconnus (G1
   })
 })
 
+describe('adversaires : lien « Voir tous » (F-04-ADV)', () => {
+  it('absent sans hasMore, présent avec hasMore et pointant vers le face-à-face du joueur', async () => {
+    const without = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS } })
+    expect(without.find('[data-cy="player-opponents-see-all"]').exists()).toBe(false)
+    const withMore = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS, hasMore: true } })
+    expect(withMore.get('[data-cy="player-opponents-see-all"]').attributes('href')).toBe(`/joueurs/face-a-face?a=${PLAYER_ID}`)
+  })
+
+  it('la page n’affiche que 4 adversaires, dans l’ordre reçu, et le lien seulement au-delà', async () => {
+    const many = Array.from({ length: 6 }, (_, index) => summary(`00000000-0000-4000-0001-0000000007${index}`, `Adversaire ${index}`))
+    registerProfile(many)
+    const wrapper = await mountSuspended(PlayerPage, { ...withRouterLink, route: `/joueurs/${PLAYER_ID}` })
+    await flushPromises()
+    const names = wrapper.findAll('[data-cy="player-opponent"] .player-link__name').map(node => node.text())
+    expect(names).toEqual(['Adversaire 0', 'Adversaire 1', 'Adversaire 2', 'Adversaire 3'])
+    expect(wrapper.find('[data-cy="player-opponents-see-all"]').exists()).toBe(true)
+    registerProfile(many.slice(0, 4))
+    clearNuxtData()
+    const four = await mountSuspended(PlayerPage, { ...withRouterLink, route: `/joueurs/${PLAYER_ID}` })
+    await flushPromises()
+    expect(four.findAll('[data-cy="player-opponent"]')).toHaveLength(4)
+    expect(four.find('[data-cy="player-opponents-see-all"]').exists()).toBe(false)
+  })
+})
+
 describe('pages', () => {
   it('/joueurs : titre unique, compteur annoncé en role=status, 20 lignes, pagination', async () => {
     registerDirectory()

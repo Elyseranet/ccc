@@ -26,15 +26,6 @@ export class ApiRequestError extends Error {
     this.isOffline = isOffline
     this.retryAfterSeconds = retryAfterSeconds
   }
-
-  /** Lus par `createError` de Nuxt (`useAsyncData`) : le statut et le corps survivent à la sérialisation du payload (un 404 reste un 404). */
-  get statusCode (): number {
-    return this.error.statusCode
-  }
-
-  get data (): IApiError {
-    return this.error
-  }
 }
 
 /*********************************************************

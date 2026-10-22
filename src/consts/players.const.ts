@@ -65,8 +65,6 @@ export const PLAYER_OPPONENTS_LIMIT = 4
 
 export const PLAYERS_PAGINATION_VISIBLE = 8
 
-export const PLAYERS_HEAD_TO_HEAD_ROUTE = '/joueurs/face-a-face'
-
 export const PLAYERS_HEAD_TO_HEAD_QUERY_KEYS = {
   A: 'a',
   B: 'b'
@@ -99,8 +97,6 @@ export const PLAYERS_COLUMN_VALUES: Record<COMPETITOR_SORT, string> = {
   [COMPETITOR_SORT.TITLES]: 'titles',
   [COMPETITOR_SORT.FIRST_EDITION]: 'firstEditionCode'
 }
-
-export const PLAYER_HTTP_NOT_FOUND = 404
 
 export const PLAYER_POINTS_DECIMALS = 2
 

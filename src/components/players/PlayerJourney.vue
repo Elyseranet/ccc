@@ -132,7 +132,7 @@ const headers = computed(() => PLAYER_JOURNEY_COLUMNS.map(column => ({
 const isChip = (row: IPlayerJourneyRow): boolean => row.kind !== PLAYER_JOURNEY_KIND.REACHED
 const chipColor = (row: IPlayerJourneyRow): string => row.kind === PLAYER_JOURNEY_KIND.CHAMPION ? 'primary' : 'secondary'
 const rowProps = ({ item }: { item: IPlayerJourneyRow }) => ({
-  class: item.kind === PLAYER_JOURNEY_KIND.CHAMPION ? 'player-journey__row--top' : undefined
+  style: item.kind === PLAYER_JOURNEY_KIND.CHAMPION ? { '--origam-data-table-row---background-color': 'var(--origam-color__action--primary---bgSubtle)' } : undefined
 })
 
 /*********************************************************
@@ -226,10 +226,6 @@ defineExpose({})
 
   &__bar--now &__fill {
     background: repeating-linear-gradient(-45deg, var(--origam-color__border---strong) 0 3px, transparent 3px 7px);
-  }
-
-  &__table :deep(.player-journey__row--top td) {
-    background: var(--origam-color__action--primary---bgSubtle);
   }
 
   @media (max-width: 760px) {

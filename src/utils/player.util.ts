@@ -4,7 +4,6 @@ import {
   PLAYERS_DIACRITICS,
   PLAYERS_DEFAULT_SORT,
   PLAYERS_HEAD_TO_HEAD_QUERY_KEYS,
-  PLAYERS_HEAD_TO_HEAD_ROUTE,
   PLAYERS_PAGE_SIZE,
   PLAYERS_SORT_DEFAULT_ORDER,
   PLAYERS_QUERY_KEYS,
@@ -12,6 +11,7 @@ import {
   PLAYERS_SEARCH_MIN_LENGTH,
   PLAYERS_WORD_SEPARATOR
 } from '../consts/players.const.js'
+import { ROUTES } from '../consts/routes.const.js'
 import { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum.js'
 import type { ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import type { IPlayersSearchState } from '../interfaces/players.interface.js'
@@ -95,7 +95,7 @@ export const buildHeadToHeadLink = (a: string, b?: string): string => {
   if (b) {
     params.set(PLAYERS_HEAD_TO_HEAD_QUERY_KEYS.B, b)
   }
-  return `${PLAYERS_HEAD_TO_HEAD_ROUTE}?${params.toString()}`
+  return `${ROUTES.HEAD_TO_HEAD}?${params.toString()}`
 }
 
 export const buildPageItems = (current: number, count: number, maxVisible: number): Array<number | null> => {

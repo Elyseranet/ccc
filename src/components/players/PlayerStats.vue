@@ -15,22 +15,21 @@
         v-for="stat in stats"
         :key="stat.id"
         class="player-stats__cell"
-        :class="`player-stats__cell--${stat.id}`"
+        :class="stat.cellClass"
       >
         <origam-card
           class="player-stats__item"
-          :class="`player-stats__item--${stat.id}`"
-          content-display="flex"
+          :class="stat.itemClass"
           rounded="xl"
           border
           elevation="md"
         >
           <template #default>
-            <p class="player-stats__label">{{ stat.label }}</p>
             <p
               class="player-stats__value font-display"
-              :data-cy="`player-stat-${stat.id}`"
+              :data-cy="stat.dataCy"
             >{{ stat.value }}</p>
+            <p class="player-stats__label">{{ stat.label }}</p>
           </template>
         </origam-card>
       </li>
@@ -71,10 +70,18 @@ const title = computed(() => t('player.stats.title', 'Statistiques'))
 const playedLabel = computed(() => t('player.stats.played', 'Matchs joués'))
 const winsLabel = computed(() => t('player.stats.wins', 'Victoires'))
 const lossesLabel = computed(() => t('player.stats.losses', 'Défaites'))
+const toStat = (id: string, label: string, value: number) => ({
+  id,
+  label,
+  value,
+  cellClass: `player-stats__cell--${id}`,
+  itemClass: `player-stats__item--${id}`,
+  dataCy: `player-stat-${id}`
+})
 const stats = computed(() => [
-  { id: 'played', label: playedLabel.value, value: props.played },
-  { id: 'wins', label: winsLabel.value, value: props.wins },
-  { id: 'losses', label: lossesLabel.value, value: props.losses }
+  toStat('played', playedLabel.value, props.played),
+  toStat('wins', winsLabel.value, props.wins),
+  toStat('losses', lossesLabel.value, props.losses)
 ])
 const hasUnknown = computed(() => props.unknownResults > 0)
 const unknownText = computed(() => props.unknownResults === 1
@@ -106,17 +113,10 @@ defineExpose({})
   &__item {
     height: 100%;
     padding: var(--player-stats__item---padding, var(--origam-space---6));
-
-    :deep(.origam-card__content) {
-      flex-direction: column-reverse;
-      justify-content: flex-end;
-      gap: var(--origam-space---2);
-      height: 100%;
-    }
   }
 
   &__label {
-    margin: 0;
+    margin: var(--origam-space---2) 0 0;
     font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
     letter-spacing: var(--origam-font__letterSpacing---wider);

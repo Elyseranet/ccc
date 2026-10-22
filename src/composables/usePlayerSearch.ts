@@ -6,7 +6,7 @@ import { useT } from '~/composables/useT'
 import { PLAYERS_ALL_EDITIONS, PLAYERS_PAGE_SIZE, PLAYERS_SEARCH_DEBOUNCE_MS } from '~/consts/players.const'
 import { COMPETITOR_SORT } from '~/enums/competitor-sort.enum'
 import type { IPlayersEditionOption, IPlayersSearchState, IPlayersSortChange } from '~/interfaces/players.interface'
-import { unwrapAsyncError } from '~/utils/async-error.util'
+import { fromAsyncDataError } from '~/utils/async-data-error.util'
 import { buildPlayersApiQuery, buildPlayersLocationQuery, parsePlayersState } from '~/utils/player.util'
 
 /*********************************************************
@@ -26,7 +26,7 @@ export const usePlayerSearch = () => {
   const state = computed<IPlayersSearchState>(() => parsePlayersState(route.query))
   const draft = ref(state.value.q)
   const apiQuery = computed(() => buildPlayersApiQuery(state.value))
-  const { data, pending, error, refresh } = useCompetitors(apiQuery)
+  const { data, pending, error, refresh } = useCompetitors(apiQuery, 'players')
   const { data: editions } = useEditions()
   let timer: ReturnType<typeof setTimeout> | undefined
 
@@ -116,7 +116,7 @@ export const usePlayerSearch = () => {
     total,
     pageSize: PLAYERS_PAGE_SIZE,
     pending,
-    error: computed(() => unwrapAsyncError(error.value)),
+    error: computed(() => error.value ? fromAsyncDataError(error.value) : null),
     refresh,
     editionOptions,
     countText,

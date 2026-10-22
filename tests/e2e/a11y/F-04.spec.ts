@@ -6,6 +6,11 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000'
 
+/** Ids figés par le dump des archives (ARCH-9) : Benoit Bastien a 5 adversaires, Céline Toni en a exactement 4. */
+const PLAYER_WITH_FIVE_OPPONENTS = '1a51badd-d10a-4ad2-af69-3db5d49459dc'
+
+const PLAYER_WITH_FOUR_OPPONENTS = '4ea7c348-33a3-45ab-a4fa-ca924c92f522'
+
 const violationsOf = async (page: Page) => {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
   return results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)
@@ -123,6 +128,30 @@ test.describe('fiche joueur : accessibilité', () => {
       await expect(chip).toHaveCSS('color', 'rgb(22, 11, 46)')
       await expect(chip).not.toHaveAttribute('data-origam-contrast-fixed', /.*/)
     }
+  })
+
+  test('au-dessus de 4 adversaires, « Voir tous » existe, pointe vers le face-à-face du joueur et est atteint au clavier', async ({ page }) => {
+    const opponents = await (await page.request.get(`/api/v1/competiteurs/${PLAYER_WITH_FIVE_OPPONENTS}/face-a-face`)).json() as unknown[]
+    expect(opponents).toHaveLength(5)
+    await page.goto(`/joueurs/${PLAYER_WITH_FIVE_OPPONENTS}`)
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('player-opponent')).toHaveCount(4)
+    const link = page.getByTestId('player-opponents-see-all')
+    await expect(link).toBeVisible()
+    await expect(link).toHaveAttribute('href', `/joueurs/face-a-face?a=${PLAYER_WITH_FIVE_OPPONENTS}`)
+    await link.focus()
+    await expect(link).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(new RegExp(`/joueurs/face-a-face\\?a=${PLAYER_WITH_FIVE_OPPONENTS}`))
+  })
+
+  test('avec 4 adversaires ou moins, le lien « Voir tous » est absent', async ({ page }) => {
+    const opponents = await (await page.request.get(`/api/v1/competiteurs/${PLAYER_WITH_FOUR_OPPONENTS}/face-a-face`)).json() as unknown[]
+    expect(opponents).toHaveLength(4)
+    await page.goto(`/joueurs/${PLAYER_WITH_FOUR_OPPONENTS}`)
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('player-opponent')).toHaveCount(4)
+    await expect(page.getByTestId('player-opponents-see-all')).toHaveCount(0)
   })
 
   test('un identifiant inconnu répond 404 et affiche un état « introuvable » accessible', async ({ page }) => {

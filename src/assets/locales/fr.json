@@ -160,6 +160,7 @@
   "player.opponents.matches_one": "1 match",
   "player.opponents.matches_other": "{count} matchs",
   "player.opponents.no_score": "Aucun score connu",
+  "player.opponents.see_all": "Voir tous les face-à-face",
   "player.opponents.title": "Adversaires",
   "player.opponents.unknown_one": "1 match au résultat inconnu",
   "player.opponents.unknown_other": "{count} matchs au résultat inconnu",

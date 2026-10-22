@@ -10,11 +10,11 @@
     >{{ rangeText }}</span>
     <ol class="players-pager__list">
       <template
-        v-for="(item, index) in items"
-        :key="index"
+        v-for="entry in entries"
+        :key="entry.key"
       >
         <li
-          v-if="item === null"
+          v-if="entry.isGap"
           class="players-pager__gap"
           aria-hidden="true"
         >…</li>
@@ -22,13 +22,13 @@
           <origam-btn
             class="players-pager__page"
             rounded="full"
-            :variant="item === page ? 'flat' : 'text'"
-            :bg-color="item === page ? 'primary' : undefined"
-            :aria-current="item === page ? 'page' : undefined"
-            :aria-label="pageLabel(item)"
-            :text="String(item)"
-            :data-cy="`players-pager-page-${item}`"
-            @click="handlePage(item)"
+            :variant="entry.variant"
+            :bg-color="entry.bgColor"
+            :aria-current="entry.ariaCurrent"
+            :aria-label="entry.label"
+            :text="entry.text"
+            :data-cy="entry.dataCy"
+            @click="handlePage(entry.page)"
           />
         </li>
       </template>
@@ -64,13 +64,27 @@ defineSlots<{}>()
  ********************************************************/
 const pageCount = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
 const items = computed(() => buildPageItems(props.page, pageCount.value, PLAYERS_PAGINATION_VISIBLE))
+const entries = computed(() => items.value.map((item, index) => {
+  const current = item === props.page
+  return {
+    key: item === null ? `gap-${index}` : `page-${item}`,
+    isGap: item === null,
+    page: item ?? 0,
+    variant: current ? 'flat' as const : 'text' as const,
+    bgColor: current ? 'primary' : undefined,
+    ariaCurrent: current ? 'page' as const : undefined,
+    label: item === null ? '' : pageLabel(item),
+    text: item === null ? '' : String(item),
+    dataCy: `players-pager-page-${item}`
+  }
+}))
+const pageLabel = (page: number): string => t('players.pagination.page', 'Page {page}', { page })
 const navLabel = computed(() => t('players.pagination.label', 'Pagination'))
 const rangeText = computed(() => {
   const from = (props.page - 1) * props.pageSize + 1
   const to = Math.min(props.page * props.pageSize, props.total)
   return t('players.pagination.range', '{from}–{to} sur {total}', { from, to, total: props.total })
 })
-const pageLabel = (page: number): string => t('players.pagination.page', 'Page {page}', { page })
 const handlePage = (page: number) => {
   emits('update:page', page)
 }

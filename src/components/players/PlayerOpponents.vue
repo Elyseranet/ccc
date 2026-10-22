@@ -76,6 +76,14 @@
         </origam-list-item>
       </template>
     </origam-list>
+    <origam-btn
+      v-if="hasMore"
+      class="player-opponents__see-all"
+      variant="text"
+      :to="seeAllLink"
+      :text="seeAllLabel"
+      data-cy="player-opponents-see-all"
+    />
   </section>
 </template>
 
@@ -98,7 +106,9 @@ import { buildHeadToHeadLink } from '~/utils/player.util'
  * Le ratio n'est pas affiché en chiffres ici (FA-12) : seul le face-à-face le montre ; la barre n'est qu'un repère visuel.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IPlayerOpponentsProps>(), {})
+const props = withDefaults(defineProps<IPlayerOpponentsProps>(), {
+  hasMore: false
+})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 
@@ -137,6 +147,8 @@ const compareWith = (summary: IPlayerOpponent): string => t('player.opponents.co
  ********************************************************/
 const rowPaddingBlock = 'var(--origam-space---3)'
 const rowPaddingInline = 'var(--origam-space---4)'
+const seeAllLabel = computed(() => t('player.opponents.see_all', 'Voir tous les face-à-face'))
+const seeAllLink = computed(() => buildHeadToHeadLink(props.playerId))
 const hasRatio = (summary: IPlayerOpponent): boolean => summary.winRatio !== null
 const barStyle = (summary: IPlayerOpponent) => ({ '--player-opponents__bar---width': Math.round((summary.winRatio ?? 0) * PERCENT) })
 const linkOf = (summary: IPlayerOpponent): string => buildHeadToHeadLink(props.playerId, summary.opponent.id)
@@ -195,6 +207,10 @@ defineExpose({})
     --origam-btn---height: var(--origam-space---11);
     --origam-btn---padding-sm: var(--origam-space---4);
     --origam-btn---font-size: var(--origam-font__size---sm);
+  }
+
+  &__see-all {
+    margin-top: var(--origam-space---3);
   }
 
   &__row {

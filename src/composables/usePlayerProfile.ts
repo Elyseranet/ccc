@@ -6,10 +6,11 @@ import { useCompetitor } from '~/composables/useCompetitor'
 import { useCompetitorOpponents } from '~/composables/useCompetitorOpponents'
 import { usePlayerFormat } from '~/composables/usePlayerFormat'
 import { useT } from '~/composables/useT'
-import { PLAYER_FINAL_STAGE_LABELS, PLAYER_HTTP_NOT_FOUND, PLAYER_OPPONENTS_LIMIT, PLAYER_ONGOING_LEVEL, PLAYER_POINTS_DECIMALS } from '~/consts/players.const'
+import { PLAYER_FINAL_STAGE_LABELS, PLAYER_OPPONENTS_LIMIT, PLAYER_ONGOING_LEVEL, PLAYER_POINTS_DECIMALS } from '~/consts/players.const'
 import { PLAYER_JOURNEY_KIND } from '~/enums/player-journey-kind.enum'
 import type { IPlayerJourneyRow, IPlayerOpponent, IPlayerParticipation } from '~/interfaces/players.interface'
-import { unwrapAsyncError } from '~/utils/async-error.util'
+import { HTTP_STATUS_NOT_FOUND } from '~/consts/http-status.const'
+import { fromAsyncDataError } from '~/utils/async-data-error.util'
 
 /*********************************************************
  * usePlayerProfile
@@ -86,9 +87,10 @@ export const usePlayerProfile = (id: MaybeRefOrGetter<string>) => {
     const first = detail.data.value?.participations[0]
     return first ? editionLabel(first.editionCode) : null
   })
+  const opponentsTotal = computed(() => opponentsData.data.value?.length ?? 0)
   const opponents = computed(() => ((opponentsData.data.value ?? []) as IPlayerOpponent[]).slice(0, PLAYER_OPPONENTS_LIMIT))
-  const error = computed(() => unwrapAsyncError(detail.error.value))
-  const isNotFound = computed(() => error.value?.error.statusCode === PLAYER_HTTP_NOT_FOUND)
+  const error = computed(() => detail.error.value ? fromAsyncDataError(detail.error.value) : null)
+  const isNotFound = computed(() => error.value?.error.statusCode === HTTP_STATUS_NOT_FOUND)
 
   const refresh = async () => {
     await Promise.all([detail.refresh(), opponentsData.refresh()])
@@ -108,10 +110,11 @@ export const usePlayerProfile = (id: MaybeRefOrGetter<string>) => {
     firstEditionLabel,
     participationCount: computed(() => detail.data.value?.participations.length ?? 0),
     opponents,
+    hasMoreOpponents: computed(() => opponentsTotal.value > PLAYER_OPPONENTS_LIMIT),
     pending: computed(() => detail.pending.value),
     error,
     opponentsPending: computed(() => opponentsData.pending.value),
-    opponentsError: computed(() => unwrapAsyncError(opponentsData.error.value)),
+    opponentsError: computed(() => opponentsData.error.value ? fromAsyncDataError(opponentsData.error.value) : null),
     isNotFound,
     refresh
   }

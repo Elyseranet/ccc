@@ -48,6 +48,7 @@
           <player-opponents
             :player-id="competitor.id"
             :opponents="opponents"
+            :has-more="hasMoreOpponents"
           />
         </async-state>
       </template>
@@ -91,7 +92,7 @@ const playerId = computed(() => String(route.params.id))
  * @description
  * Les adversaires ont leur propre état de chargement, d'erreur et de vide.
  ********************************************************/
-const { ready, competitor, journeyRows, tableRows, bestLabel, firstEditionLabel, participationCount, opponents, pending, error, opponentsPending, opponentsError, isNotFound, refresh } = usePlayerProfile(playerId)
+const { ready, competitor, journeyRows, tableRows, bestLabel, firstEditionLabel, participationCount, opponents, hasMoreOpponents, pending, error, opponentsPending, opponentsError, isNotFound, refresh } = usePlayerProfile(playerId)
 const displayedError = computed(() => isNotFound.value ? null : error.value)
 const hasJourney = computed(() => journeyRows.value.length > 0)
 const hasNoOpponents = computed(() => !opponentsPending.value && opponentsError.value === null && opponents.value.length === 0)

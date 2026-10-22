@@ -80,7 +80,8 @@ import { computed } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamForm, OrigamLabel, OrigamSelect, OrigamTextField } from 'origam/components'
 import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
-import { PLAYERS_CTA_HOVER, PLAYERS_HEAD_TO_HEAD_ROUTE } from '~/consts/players.const'
+import { PLAYERS_CTA_HOVER } from '~/consts/players.const'
+import { ROUTES } from '~/consts/routes.const'
 import type { IPlayersSearchEmits, IPlayersSearchProps } from '~/interfaces/players.interface'
 
 /*********************************************************
@@ -107,7 +108,7 @@ const queryPlaceholder = computed(() => t('players.search.query_placeholder', 'E
 const editionLabel = computed(() => t('players.search.edition_label', 'Édition jouée'))
 const submitLabel = computed(() => t('players.search.submit', 'Rechercher'))
 const compareLabel = computed(() => t('players.search.compare', 'Comparer deux joueurs'))
-const compareRoute = PLAYERS_HEAD_TO_HEAD_ROUTE
+const compareRoute = ROUTES.HEAD_TO_HEAD
 const ctaHover = PLAYERS_CTA_HOVER
 
 /*********************************************************
