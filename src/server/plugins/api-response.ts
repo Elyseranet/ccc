@@ -24,6 +24,10 @@ export default defineNitroPlugin((nitroApp) => {
       })
     }
 
+    const retryAfterSeconds = (error.data as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds
+    if (apiError.statusCode === 503 && typeof retryAfterSeconds === 'number' && retryAfterSeconds > 0) {
+      setResponseHeader(event, 'Retry-After', Math.ceil(retryAfterSeconds))
+    }
     setResponseStatus(event, apiError.statusCode)
     setResponseHeader(event, 'Cache-Control', 'no-store')
     return send(event, JSON.stringify(apiError), 'application/json')

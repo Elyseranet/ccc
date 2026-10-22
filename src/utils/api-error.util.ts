@@ -65,6 +65,16 @@ export const internalError = (): H3Error =>
 export const serviceUnavailable = (): H3Error =>
   buildError(503, API_ERROR_CODE.SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE_MESSAGE)
 
+/** 503 transitoire : `retryAfterSeconds` est repris dans l'en-tête `Retry-After` par le plugin api-response. */
+export const serviceBusy = (retryAfterSeconds: number): H3Error => createError({
+  statusCode: 503,
+  message: SERVICE_UNAVAILABLE_MESSAGE,
+  data: { code: API_ERROR_CODE.SERVICE_BUSY, retryAfterSeconds }
+})
+
+export const requestTimeout = (): H3Error =>
+  buildError(408, API_ERROR_CODE.REQUEST_TIMEOUT, API_ERROR_MESSAGE.REQUEST_TIMEOUT)
+
 const defaultMessageForStatus = (statusCode: number): string =>
   DEFAULT_MESSAGE_BY_STATUS[statusCode] ?? API_ERROR_MESSAGE.UNKNOWN
 
@@ -80,7 +90,8 @@ export const toApiError = (error: unknown): IApiError => {
     return { statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: INTERNAL_ERROR_MESSAGE }
   }
   if (statusCode === 503) {
-    return { statusCode, code: API_ERROR_CODE.SERVICE_UNAVAILABLE, message: SERVICE_UNAVAILABLE_MESSAGE }
+    const busy = (candidate?.data as { code?: API_ERROR_CODE } | undefined)?.code === API_ERROR_CODE.SERVICE_BUSY
+    return { statusCode, code: busy ? API_ERROR_CODE.SERVICE_BUSY : API_ERROR_CODE.SERVICE_UNAVAILABLE, message: SERVICE_UNAVAILABLE_MESSAGE }
   }
 
   const data = (candidate?.data ?? {}) as { code?: API_ERROR_CODE, details?: IApiError['details'] }

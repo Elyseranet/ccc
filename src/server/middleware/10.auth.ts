@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     throw forbiddenOrigin()
   }
 
-  const token = getCookie(event, getSessionCookieName(process.env.NODE_ENV === 'production'))
+  const token = getCookie(event, getSessionCookieName(auth))
   if (isWellFormedSessionToken(token)) {
     const user = await resolveSession(await useDataSource(), token)
     if (user) {

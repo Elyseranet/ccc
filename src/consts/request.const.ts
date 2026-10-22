@@ -9,3 +9,12 @@ export const API_PREFIX = '/api/'
  */
 export const API_JSON_BODY_MAX_BYTES = 16 * 1024
 export const JSON_CONTENT_TYPE_PATTERN = /^application\/(?:[\w.+-]+\+)?json(?:\s*;|$)/i
+
+/**
+ * N3 : durée totale maximale de lecture d'un corps (anti slowloris). Un corps JSON de 16 Kio tient dans un
+ * seul paquet pour un client normal ; 10 s laisse passer un mobile à très faible débit (> 1,6 Kio/s) sans
+ * garder une connexion ouverte indéfiniment. C'est un délai TOTAL, pas un délai d'inactivité : un client qui
+ * envoie un octet par seconde ne le repousse pas. Au-delà : 408 `REQUEST_TIMEOUT`, connexion fermée.
+ * Un envoi plus gros (multipart d'avatar, B-16) passe son propre `timeoutMs` à `readRequestBody`.
+ */
+export const API_BODY_READ_TIMEOUT_MS = 10 * 1000

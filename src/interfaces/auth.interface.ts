@@ -22,6 +22,11 @@ export interface IAuthUser {
   sessionId: string
 }
 
+/** Sous-ensemble de `runtimeConfig.auth` qui pilote les attributs des cookies. */
+export interface IAuthCookieConfig {
+  secureCookie?: unknown
+}
+
 export interface ISessionCookieOptions {
   httpOnly: true
   secure: boolean

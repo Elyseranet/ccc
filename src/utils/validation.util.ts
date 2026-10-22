@@ -3,8 +3,9 @@ import type { H3Event } from 'h3'
 import { ZodError } from 'zod'
 import type { ZodType, output } from 'zod'
 import type { IApiErrorDetail } from '../interfaces/error.interface.js'
-import { API_JSON_BODY_MAX_BYTES, JSON_CONTENT_TYPE_PATTERN } from '../consts/request.const.js'
+import { API_BODY_READ_TIMEOUT_MS, API_JSON_BODY_MAX_BYTES, JSON_CONTENT_TYPE_PATTERN } from '../consts/request.const.js'
 import { badRequest, payloadTooLarge, validationFailed } from './api-error.util.js'
+import { readRequestBody } from './request-body.util.js'
 
 export const toValidationDetails = (error: ZodError): IApiErrorDetail[] =>
   error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message }))
@@ -34,7 +35,8 @@ export const parseWithSchema = <TSchema extends ZodType>(schema: TSchema, input:
 
 /**
  * Lit le corps JSON en flux, avec un plafond de `API_JSON_BODY_MAX_BYTES` : 413 dès qu'un
- * `Content-Length` le dépasse (corps non lu), ou dès que les octets reçus le dépassent (envoi par morceaux).
+ * `Content-Length` le dépasse (corps non lu), ou dès que les octets reçus le dépassent (envoi par morceaux), et 408 si la lecture dépasse
+ * `API_BODY_READ_TIMEOUT_MS` (N3).
  * Un corps qui n'est pas du JSON n'est pas lu : il vaut `undefined` et la validation répond 400.
  */
 const readBoundedJsonBody = async (event: H3Event): Promise<unknown> => {
@@ -46,21 +48,12 @@ const readBoundedJsonBody = async (event: H3Event): Promise<unknown> => {
     return undefined
   }
 
-  const chunks: Buffer[] = []
-  let received = 0
-  for await (const chunk of event.node.req) {
-    const buffer = Buffer.from(chunk as Uint8Array)
-    received += buffer.length
-    if (received > API_JSON_BODY_MAX_BYTES) {
-      throw payloadTooLarge()
-    }
-    chunks.push(buffer)
-  }
-  if (received === 0) {
+  const body = await readRequestBody(event, { maxBytes: API_JSON_BODY_MAX_BYTES, timeoutMs: API_BODY_READ_TIMEOUT_MS })
+  if (body.length === 0) {
     return undefined
   }
   try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'))
+    return JSON.parse(body.toString('utf8'))
   } catch {
     throw badRequest()
   }

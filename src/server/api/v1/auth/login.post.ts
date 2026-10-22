@@ -3,7 +3,6 @@ import { USER_STATUS } from '../../../../enums/user.enum'
 import type { IMe } from '../../../../interfaces/me.interface'
 import { normalizeEmail } from '../../../../utils/email.util'
 import { RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../../consts/auth.const'
-import { PRODUCTION_NODE_ENV } from '../../../../consts/node-env.const'
 import { LOG_EVENT } from '../../../../consts/log-event.const'
 import { UserEntity } from '../../../db/typeorm/entities/user.entity'
 import { loginSchema } from '../../../schemas/auth.schema'
@@ -18,7 +17,7 @@ import { findTrustedDevice, registerDevice, resetDeviceFailures } from '../../..
 import { enforceLoginRateLimit, rejectTooManyRequests } from '../../../../utils/login-rate-limit.util'
 import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../../../utils/login-throttle.util'
 import { loadMe } from '../../../../utils/me.util'
-import { burnPasswordCheck, verifyPassword } from '../../../../utils/password.util'
+import { assertPasswordHashCapacity, burnPasswordCheck, verifyPassword } from '../../../../utils/password.util'
 import { createSession, purgeExpiredSessions, revokeSessionByToken } from '../../../../utils/session-store.util'
 import { buildSessionCookieOptions, getSessionCookieName, isWellFormedSessionToken } from '../../../../utils/session-token.util'
 import { invalidCredentials } from '../../../../utils/api-error.util'
@@ -33,9 +32,12 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   const body = await readBodyWithSchema(event, loginSchema)
   const email = normalizeEmail(body.email)
 
-  const isProduction = process.env.NODE_ENV === PRODUCTION_NODE_ENV
-  const deviceSecret = resolveDeviceCookieSecret(String(useRuntimeConfig().auth.deviceCookieSecret))
+  const { auth } = useRuntimeConfig()
+  const deviceSecret = resolveDeviceCookieSecret(String(auth.deviceCookieSecret))
   const now = new Date()
+
+  // L2 : refuser (503) avant de réserver une tentative, pour qu'un serveur saturé ne compte pas comme un échec.
+  assertPasswordHashCapacity()
 
   const dataSource = await useDataSource()
   const user = await dataSource.getRepository(UserEntity).findOne({
@@ -45,7 +47,7 @@ export default defineEventHandler(async (event): Promise<IMe> => {
 
   // SEC-A4 : un appareil de confiance (cookie signé, lié à CE compte, ligne encore présente) n'est pas soumis
   // au délai du compte et n'a que son propre compteur. Tout le reste est « non reconnu ».
-  const claim = verifyDeviceCookie(getCookie(event, getDeviceCookieName(isProduction)), deviceSecret, Math.floor(now.getTime() / 1000))
+  const claim = verifyDeviceCookie(getCookie(event, getDeviceCookieName(auth)), deviceSecret, Math.floor(now.getTime() / 1000))
   const trustedDevice = user && claim ? await findTrustedDevice(dataSource, claim, user.id, now) : null
 
   // SEC-A2 : la tentative est réservée atomiquement AVANT scrypt, sur le compteur de l'appareil de confiance
@@ -80,7 +82,7 @@ export default defineEventHandler(async (event): Promise<IMe> => {
   }
 
   // Rotation : une session présentée avec la requête est révoquée, le jeton émis est toujours neuf.
-  const previousToken = getCookie(event, getSessionCookieName(isProduction))
+  const previousToken = getCookie(event, getSessionCookieName(auth))
   if (isWellFormedSessionToken(previousToken)) {
     await revokeSessionByToken(dataSource, previousToken)
   }
@@ -90,14 +92,14 @@ export default defineEventHandler(async (event): Promise<IMe> => {
     { lastLoginAt: now, failedLoginCount: 0, throttledUntil: null }
   )
   await purgeExpiredSessions(dataSource)
-  setCookie(event, getSessionCookieName(isProduction), token, buildSessionCookieOptions(isProduction))
+  setCookie(event, getSessionCookieName(auth), token, buildSessionCookieOptions(auth))
 
   // Appareil déjà reconnu : son compteur repart de zéro. Sinon, l'appareil devient de confiance.
   if (trustedDevice) {
     await resetDeviceFailures(dataSource, trustedDevice.id)
   } else {
     const device = await registerDevice(dataSource, user.id, now)
-    setCookie(event, getDeviceCookieName(isProduction), signDeviceCookie(device, deviceSecret), buildDeviceCookieOptions(isProduction))
+    setCookie(event, getDeviceCookieName(auth), signDeviceCookie(device, deviceSecret), buildDeviceCookieOptions(auth))
   }
 
   logger.info(LOG_EVENT.AUTH_LOGIN_SUCCEEDED, { requestId: event.context.requestId, userId: user.id, trustedDevice: trustedDevice !== null })

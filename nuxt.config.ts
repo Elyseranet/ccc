@@ -90,6 +90,10 @@ export default defineNuxtConfig({
       allowedOrigins: '',
       // Secret HMAC du cookie d'appareil (NUXT_AUTH_DEVICE_COOKIE_SECRET), 32 caractères minimum, requis en production.
       deviceCookieSecret: '',
+      // Cookies Secure + préfixe __Host- (NUXT_AUTH_SECURE_COOKIE). Vrai par défaut ; `false` seulement en développement local en HTTP.
+      secureCookie: true,
+      // Calculs scrypt simultanés (NUXT_AUTH_PASSWORD_HASH_CONCURRENCY) ; au-delà : 503 SERVICE_BUSY + Retry-After.
+      passwordHashConcurrency: 2,
       loginRateLimit: {
         windowMs: 900000,
         maxIpAttempts: 20,
