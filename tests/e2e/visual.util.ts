@@ -4,6 +4,7 @@ import { expect } from '@playwright/test'
 import type { Browser, Page } from '@playwright/test'
 import pixelmatch from 'pixelmatch'
 import { PNG } from 'pngjs'
+import { VALUE_MASK_INSETS } from './helpers/e2e.const'
 
 /*********************************************************
  * Comparaison visuelle maquette / application (FA-04)
@@ -35,8 +36,6 @@ export interface IClip { x: number, y: number, width: number, height: number }
  */
 export interface IDataMasks { mockup: string[], app: string[], values?: { mockup: string[], app: string[] } }
 
-/** Marges de l'aplat de valeur dans la boîte du champ : padding gauche + filet, padding droit + filet, bords haut et bas. */
-const VALUE_MASK_INSETS = { left: 21, right: 41, vertical: 6 }
 
 /** Aplat des zones masquées : identique des deux côtés, il ne compte donc pas dans l'écart. */
 const DATA_MASK_COLOR = '#FF00FF'
