@@ -63,6 +63,10 @@ export default defineNuxtConfig({
     // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
     // (Dockerfile, étage runner). Indépendant de NODE_ENV : le build des tests d'API est aussi un build de production.
     strictRuntimeConfig: false,
+    // Nombre de reverse proxys de confiance devant le serveur (NUXT_TRUST_PROXY_HOPS, 0 à 5). 0 par défaut : l'IP
+    // client est celle de la socket et X-Forwarded-For est ignoré. Derrière Coolify (proxy devant le conteneur), à
+    // poser au nombre de proxys réellement traversés, sinon tous les clients partagent l'IP du proxy pour les limites de débit.
+    trustProxyHops: 0,
     database: {
       host: '',
       port: 5432,

@@ -84,6 +84,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | `NUXT_AUTH_PASSWORD_HASH_CONCURRENCY` | non (2) | Calculs scrypt simultanés, de 1 à 64 ; au-delà, 503 `SERVICE_BUSY` avec `Retry-After` (T-SEC-04, L2). |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
+| `NUXT_TRUST_PROXY_HOPS` | **oui derrière Coolify** (défaut 0) | Nombre de reverse proxys de confiance devant le conteneur, de 0 à 5. À poser au nombre de proxys réellement traversés (le proxy de Coolify seul : 1 ; un CDN devant en ajoute un). La chaîne exacte du déploiement n'est pas encore connue : à vérifier au premier déploiement. |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
 | `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
@@ -96,7 +97,7 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 
 - Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
 - La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
-- La route est soumise au limiteur de débit par IP : derrière Traefik, tous les clients partagent l'IP du proxy tant que T-SEC-02 n'est pas fait (`X-Forwarded-For` de confiance, SSL PostgreSQL, variables `NUXT_TRUSTED_PROXIES` et `NUXT_DATABASE_SSL` pressenties, pas encore implémentées). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
+- La route est soumise au limiteur de débit par IP. Derrière le proxy de Coolify, poser `NUXT_TRUST_PROXY_HOPS` au nombre de proxys traversés (voir la table des variables) : sans lui, tous les clients partagent l'IP du proxy. Le SSL PostgreSQL (`NUXT_DATABASE_SSL` pressentie) reste à faire (T-SEC-02). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
 
 ### Première mise en route
 
@@ -217,9 +218,10 @@ Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (A
 | `NUXT_MAIL_HOST`, `_PORT`, `_SECURE`, `_USER`, `_PASSWORD`, `_FROM` | `localhost`, `1025`, `false`, vide, vide, `CCC <no-reply@ccc.local>` | Envoi des invitations par SMTP (nodemailer) : Mailpit en local, fournisseur SMTP en production. |
 | `NUXT_RATE_LIMIT_INVITATION_TOKEN_WINDOW_MS`, `_MAX_REQUESTS` | `900000`, `30` | Budget par IP des routes publiques `GET`/`POST /auth/invitation/{jeton}` (clé `invitation-token`). |
 | `NUXT_RATE_LIMIT_AVATAR_UPLOAD_WINDOW_MS`, `_MAX_REQUESTS` | `600000`, `10` | Envois d'avatar (`PUT /moi/avatar`, `PUT /competiteurs/{id}/avatar`, clé `avatar-upload`, par IP). Le limiteur passe avant la lecture du corps : un envoi refusé en 429 (avec `Retry-After`) n'est ni lu ni décodé par sharp. |
+| `NUXT_TRUST_PROXY_HOPS` | `0` | Confiance proxy pour l'IP client des limites de débit. 0 : adresse de la socket, `X-Forwarded-For` ignoré. N > 0 : l'entrée N de `X-Forwarded-For` en partant de la droite, uniquement si la socket vient de la boucle locale ou d'un réseau privé (`TRUSTED_PROXY_SUBNETS`) ; une chaîne trop courte ou invalide retombe sur la socket. Un client ne peut donc pas choisir son IP en forgeant l'en-tête. Valeur hors 0..5 : refus au démarrage. |
 | `NUXT_RATE_LIMIT_MAX_KEYS` | `10000` | Plafond de clés `ip:route` gardées en mémoire ; au-delà, la clé la plus anciennement utilisée est évincée. Les IPv6 sont agrégées par préfixe /64. |
 
-Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy : voir T-SEC-02.
+Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy tant que `NUXT_TRUST_PROXY_HOPS` n'est pas posé.
 
 Corps des requêtes (M2) : les corps JSON sous `/api` sont plafonnés à 16 Kio (`API_JSON_BODY_MAX_BYTES`). Un `Content-Length` supérieur répond 413 `PAYLOAD_TOO_LARGE` sans lire le corps ; un envoi par morceaux est lu en flux et coupé au plafond. Le limiteur par IP du login passe avant la lecture du corps. Un corps qui n'est pas du JSON n'est pas lu (400). L'upload d'avatar multipart (B-16) a son propre plafond de 2 Mio, lu en flux (voir « Avatars »).
 
@@ -227,7 +229,7 @@ En production (`NODE_ENV=production`), le démarrage échoue si `NUXT_DATABASE_H
 
 Les réglages du limiteur doivent être des entiers strictement positifs : le serveur refuse de démarrer sinon (le message nomme le réglage fautif). Un `0`, un négatif ou un `NaN` désactiverait sinon le plafond.
 
-Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémoire. Un attaquant disposant de très nombreuses IPv4 distinctes peut faire évincer des compteurs légitimes, qui repartent alors de zéro. Cette limite est inhérente au stockage en mémoire ; un déploiement multi-instance ou exposé exigera un stockage partagé (ticket T-SEC-02). De plus : les compteurs sont en mémoire du processus. Avec plusieurs instances, chacune compte séparément ; l'IP lue est celle de la connexion socket, donc celle du reverse proxy s'il y en a un. Le mode de déploiement n'étant pas spécifié, ces limites sont acceptées pour une instance unique.
+Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémoire. Un attaquant disposant de très nombreuses IPv4 distinctes peut faire évincer des compteurs légitimes, qui repartent alors de zéro. Cette limite est inhérente au stockage en mémoire ; un déploiement multi-instance ou exposé exigera un stockage partagé (ticket T-SEC-02). De plus : les compteurs sont en mémoire du processus. Avec plusieurs instances, chacune compte séparément ; l'IP lue est celle de la connexion socket, donc celle du reverse proxy s'il y en a un, sauf si `NUXT_TRUST_PROXY_HOPS` est posé. Le mode de déploiement n'étant pas spécifié, ces limites sont acceptées pour une instance unique.
 
 ## API serveur
 

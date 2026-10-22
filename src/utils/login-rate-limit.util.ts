@@ -1,8 +1,9 @@
-import { getRequestIP, setResponseHeader } from 'h3'
+import { setResponseHeader } from 'h3'
 import type { H3Event } from 'h3'
 import { PASSWORD_CHANGE_MAX_ATTEMPTS, RATE_LIMIT_AUTH_ROUTE_KEY } from '../consts/auth.const.js'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import type { ILoginLimiters } from '../interfaces/rate-limit.interface.js'
+import { getClientIp } from './client-ip.util.js'
 import { normalizeIpForRateLimit } from './ip.util.js'
 import { logger } from './logger.util.js'
 import { tooManyRequests } from './api-error.util.js'
@@ -35,7 +36,7 @@ export const rejectTooManyRequests = (event: H3Event, routeKey: string, retryAft
  * Le ralentissement par compte (SEC-A2) est persisté en base, voir `login-throttle.util.ts`.
  */
 export const enforceLoginRateLimit = (event: H3Event): void => {
-  const ip = normalizeIpForRateLimit(getRequestIP(event) ?? 'unknown')
+  const ip = normalizeIpForRateLimit(getClientIp(event) ?? 'unknown')
   const result = useLimiters().byIp.check(ip)
   if (!result.allowed) {
     rejectTooManyRequests(event, RATE_LIMIT_AUTH_ROUTE_KEY.LOGIN_IP, result.retryAfterMs)
