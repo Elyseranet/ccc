@@ -191,7 +191,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, B-17 (parcours, titres de l'adversaire, enums de tri) | En cours (dev-f04), relancé le 2026-10-22 sur `src/`, sans fixtures | `../CCC-F-04` |
-| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | En cours (dev-f05, après F-00h), relancé le 2026-10-22 sur `src/` | `../CCC-F-05` |
+| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | En cours (dev-f05), 0ae6634 sur F-00h 2158d28 : écarts « choix » et « hero » à expliquer ; duel@390 par alignement du texte de la maquette sur les données réelles. **À la validation : supprimer le worktree `agent-a70ac359346e804a8` et le conteneur `ccc-f05-pg`** | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
