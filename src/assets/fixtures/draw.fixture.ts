@@ -1,8 +1,8 @@
-import { DRAW_KIND, DRAW_STATUS } from '#shared/enums/draw.enum'
-import { ROUND_KIND } from '#shared/enums/round.enum'
-import type { IDraw } from '#shared/interfaces/api/draw.interface'
-import { editionDetailFixture } from '~/fixtures/edition.fixture'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
+import { DRAW_KIND, DRAW_STATUS } from '../../enums/draw.enum.js'
+import { ROUND_KIND } from '../../enums/round.enum.js'
+import type { IDraw } from '../../interfaces/draw.interface.js'
+import { editionDetailFixture } from './edition.fixture.js'
+import type { IFixtureSet } from '../../interfaces/fixture.interface.js'
 
 /*********************************************************
  * Fixtures tirages admin

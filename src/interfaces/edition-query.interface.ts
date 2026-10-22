@@ -1,7 +1,7 @@
-import type { MATCH_STATUS } from '../enums/match.enum'
-import type { ROUND_KIND } from '../enums/round.enum'
-import type { MATCH_SORT } from '../enums/match-sort.enum'
-import type { IPaginationParams } from './pagination-params.interface'
+import type { MATCH_STATUS } from '../enums/match.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { MATCH_SORT } from '../enums/match-sort.enum.js'
+import type { IPaginationParams } from './pagination-params.interface.js'
 
 /** Filtres de `GET /editions/{id}/matchs`, déjà validés. `status` est exprimé en statuts publics. */
 export interface IMatchListQuery {

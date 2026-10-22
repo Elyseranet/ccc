@@ -2,8 +2,9 @@ import { HEALTH_STATUS } from '../../../enums/health-status.enum'
 import type { IHealth } from '../../../interfaces/health.interface'
 import { LOG_EVENT } from '../../../consts/log-event.const'
 import { RATE_LIMIT_ROUTE_KEY } from '../../../consts/rate-limit.const'
-import { enforceRateLimit } from '../../utils/http/rate-limit.util'
-import { logger } from '../../utils/logger.util'
+import { enforceRateLimit } from '../../../utils/rate-limit.util'
+import { logger } from '../../../utils/logger.util'
+import { useDataSource } from '../../../utils/database.util'
 
 export default defineEventHandler(async (event): Promise<IHealth> => {
   enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.HEALTH)

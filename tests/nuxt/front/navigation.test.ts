@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ADMIN_BOTTOM_NAVIGATION, ADMIN_NAVIGATION } from '~/consts/admin-navigation.const'
-import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
+import { ADMIN_BOTTOM_NAVIGATION, ADMIN_NAVIGATION } from '../../../src/consts/admin-navigation.const'
+import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '../../../src/consts/public-navigation.const'
 
 describe('navigation publique (A5, E-d)', () => {
   it('4 entrées : Éditions, Joueurs, Palmarès, Règles', () => {

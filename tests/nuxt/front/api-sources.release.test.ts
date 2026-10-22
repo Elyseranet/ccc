@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findDeliveredFixtureUsages } from '~/utils/page-delivery.util'
+import { findDeliveredFixtureUsages } from '../../../src/utils/page-delivery.util'
 
 /*********************************************************
  * Garde de release (T-REL-01, OPS-3)

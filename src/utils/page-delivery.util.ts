@@ -1,11 +1,11 @@
-import { API_SOURCES } from '~/consts/api-sources.const'
-import { LAYOUT_ENDPOINTS } from '~/consts/layout-endpoints.const'
-import { PAGE_DELIVERY } from '~/consts/page-delivery.const'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { API_SOURCE } from '~/enums/api-source.enum'
-import type { INavigationGroup, INavigationItem } from '~/interfaces/navigation.interface'
-import type { IPageDelivery, IPageFixtureUsage } from '~/interfaces/page-delivery.interface'
-import { isFixtureSelectionAllowed } from '~/utils/fixture.util'
+import { API_SOURCES } from '../consts/api-sources.const.js'
+import { LAYOUT_ENDPOINTS } from '../consts/layout-endpoints.const.js'
+import { PAGE_DELIVERY } from '../consts/page-delivery.const.js'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import { API_SOURCE } from '../enums/api-source.enum.js'
+import type { INavigationGroup, INavigationItem } from '../interfaces/navigation.interface.js'
+import type { IPageDelivery, IPageFixtureUsage } from '../interfaces/page-delivery.interface.js'
+import { isFixtureSelectionAllowed } from './fixture.util.js'
 
 /** `/editions/:id()` (vue-router) et `/editions/:id` (table) désignent la même route. */
 export const normalizeRoutePath = (path: string): string => {

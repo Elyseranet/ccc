@@ -1,7 +1,7 @@
-import type { IRankingEvolutionSeries, IRankingRow } from '#shared/interfaces/api/ranking.interface'
-import { editionId } from '~/fixtures/edition-id.fixture'
-import { RANKING_KIND } from '~/enums/ranking-kind.enum'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
+import type { IRankingEvolutionSeries, IRankingRow } from '../../interfaces/ranking.interface.js'
+import { editionId } from './edition-id.fixture.js'
+import { RANKING_KIND } from '../../enums/ranking-kind.enum.js'
+import type { IFixtureSet } from '../../interfaces/fixture.interface.js'
 
 /*********************************************************
  * Fixtures classements

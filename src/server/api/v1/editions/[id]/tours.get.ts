@@ -1,7 +1,7 @@
 import type { IRound } from '../../../../../interfaces/round.interface'
-import { buildRounds } from '../../../../utils/edition/edition-assemble.util'
-import { loadEditionMatches, loadRoundEntities } from '../../../../services/edition.service'
-import { readEditionResource } from '../../../../utils/edition/edition-route.util'
+import { buildRounds } from '../../../../../utils/edition-assemble.util'
+import { loadEditionMatches, loadRoundEntities } from '../../../../../services/edition.service'
+import { readEditionResource } from '../../../../../utils/edition-route.util'
 
 export default defineEventHandler((event) =>
   readEditionResource(event, async (dataSource, edition): Promise<IRound[]> => {

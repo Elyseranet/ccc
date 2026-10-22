@@ -12,7 +12,7 @@ export const resetSchema = async (): Promise<DataSource> => {
   if (!(process.env.NUXT_DATABASE_DATABASE ?? '').endsWith(TEST_DATABASE_SUFFIX)) {
     throw new Error(`NUXT_DATABASE_DATABASE must name a dedicated test database (suffix ${TEST_DATABASE_SUFFIX})`)
   }
-  const dataSource = (await import('../../../src/server/database/data-source')).default
+  const dataSource = (await import('../../../src/server/db/typeorm/data-source')).default
   if (!dataSource.isInitialized) {
     await dataSource.initialize()
   }

@@ -1,7 +1,7 @@
-import type { IAdminMatch } from '#shared/interfaces/api/admin-match.interface'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import type { IAdminMatchesQuery, IBaseServiceOptions } from '~/interfaces/api-client.interface'
-import { BaseService } from '~/services/base.service'
+import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import type { IAdminMatchesQuery, IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import { BaseService } from './base.service.js'
 
 /*********************************************************
  * MatchService
@@ -19,7 +19,7 @@ export class MatchService extends BaseService {
     return this.resolve<IAdminMatch[]>(
       API_ENDPOINT.ADMIN_MATCHES,
       () => this.request<IAdminMatch[]>(`/admin/editions/${encodeURIComponent(editionId)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } }),
-      async () => (await import('~/fixtures/match.fixture')).adminMatchesFixture(editionId)
+      async () => (await import('../assets/fixtures/match.fixture.js')).adminMatchesFixture(editionId)
     )
   }
 }

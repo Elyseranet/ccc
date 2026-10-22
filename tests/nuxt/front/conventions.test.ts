@@ -11,7 +11,7 @@ const walk = (dir: string, extensions: string[]): string[] =>
     return extensions.some(extension => path.endsWith(extension)) ? [path] : []
   })
 
-const APP = 'app'
+const APP = 'src'
 const vueFiles = walk(APP, ['.vue'])
 const styleFiles = walk(APP, ['.vue', '.css', '.scss'])
 const sourceFiles = walk(APP, ['.vue', '.ts'])
@@ -75,9 +75,14 @@ describe('règles du projet', () => {
     expect(offenders).toEqual([])
   })
 
-  it('aucune interface, enum ou type du contrat redéclaré côté app', () => {
+  it('chaque interface, enum ou type du contrat est déclaré une seule fois, dans son dossier dédié (ARCH-4)', () => {
     const contractNames = ['IApiError', 'IPaginated', 'ICompetitorPublic', 'IEditionSummary', 'IEditionDetail', 'IMatch', 'IMatchSide', 'IPool', 'IRound', 'IDraw', 'IRankingRow', 'IHeadToHead', 'USER_ROLE', 'EDITION_STATUS', 'MATCH_STATUS', 'ROUND_KIND']
-    const declared = walk(APP, ['.ts', '.vue']).filter(file => contractNames.some(name => new RegExp(`(interface|type|enum)\\s+${name}\\b`).test(readFileSync(file, 'utf8'))))
-    expect(declared).toEqual([])
+    const sources = walk(APP, ['.ts', '.vue']).map(file => ({ file, source: readFileSync(file, 'utf8') }))
+    const misplaced = contractNames.flatMap((name) => {
+      const declaring = sources.filter(({ source }) => new RegExp(`(interface|type|enum)\\s+${name}\\b`).test(source)).map(({ file }) => file)
+      const dedicated = declaring.length === 1 && /^src\/(interfaces|enums|types)\/[^/]+$/.test(declaring[0]!)
+      return dedicated ? [] : [`${name}: ${declaring.join(', ') || 'non déclaré'}`]
+    })
+    expect(misplaced).toEqual([])
   })
 })

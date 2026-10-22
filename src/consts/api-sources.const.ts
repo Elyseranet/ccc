@@ -1,5 +1,5 @@
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { API_SOURCE } from '~/enums/api-source.enum'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import { API_SOURCE } from '../enums/api-source.enum.js'
 
 /*********************************************************
  * Table endpoint -> source

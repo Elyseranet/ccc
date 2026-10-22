@@ -5,10 +5,10 @@ import RulesGame from '~/components/rules/RulesGame.vue'
 import RulesTournament from '~/components/rules/RulesTournament.vue'
 import RulesVariantFigure from '~/components/rules/RulesVariantFigure.vue'
 import RulesVariants from '~/components/rules/RulesVariants.vue'
-import { RULES_STEPS, RULES_TOURNAMENT_CARDS, RULES_VARIANTS } from '~/consts/rules.const'
-import { GOLDEN_RULES_VARIANT } from '~/enums/golden-rules-variant.enum'
-import { RULES_TAB } from '~/enums/rules-tab.enum'
-import { resolveRulesTab } from '~/utils/rules-tab.util'
+import { RULES_STEPS, RULES_TOURNAMENT_CARDS, RULES_VARIANTS } from '../../../../src/consts/rules.const'
+import { GOLDEN_RULES_VARIANT } from '../../../../src/enums/golden-rules-variant.enum'
+import { RULES_TAB } from '../../../../src/enums/rules-tab.enum'
+import { resolveRulesTab } from '../../../../src/utils/rules-tab.util'
 
 describe('resolveRulesTab', () => {
   it('ouvre l’onglet désigné par le hash', () => {

@@ -1,9 +1,9 @@
-import { USER_ROLE } from '#shared/enums/user.enum'
-import { FIXTURE_ADMIN_INITIALS } from '~/consts/api.const'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import type { IMeServiceOptions } from '~/interfaces/api-client.interface'
-import type { ISessionIdentity } from '~/interfaces/session.interface'
-import { BaseService } from '~/services/base.service'
+import { USER_ROLE } from '../enums/user.enum.js'
+import { FIXTURE_ADMIN_INITIALS } from '../consts/api.const.js'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import type { IMeServiceOptions } from '../interfaces/api-client.interface.js'
+import type { ISessionIdentity } from '../interfaces/session.interface.js'
+import { BaseService } from './base.service.js'
 
 /*********************************************************
  * MeService

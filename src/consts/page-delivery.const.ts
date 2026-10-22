@@ -1,7 +1,7 @@
-import { ROUTES } from '~/consts/routes.const'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { LAYOUT } from '~/enums/layout.enum'
-import type { IPageDelivery } from '~/interfaces/page-delivery.interface'
+import { ROUTES } from './routes.const.js'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import { LAYOUT } from '../enums/layout.enum.js'
+import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
 
 /*********************************************************
  * Table page -> livraison et endpoints (garde de release, OPS-3)

@@ -1,5 +1,6 @@
-import { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum'
-import { MATCH_STATUS } from '../enums/match.enum'
+import { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum.js'
+import { MATCH_STATUS } from '../enums/match.enum.js'
+import type { TCompetitorSortKeyReader } from '../types/competitor-sort-key.type.js'
 
 export const COMPETITOR_SEARCH_MIN_LENGTH = 2
 export const COMPETITOR_SEARCH_MAX_LENGTH = 50
@@ -31,3 +32,14 @@ export const COMPETITOR_PUBLIC_COLUMNS = ['c.id', 'c.displayName', 'c.firstName'
 
 /** Statuts de match qui entrent dans les bilans : avec score, ou résultat inconnu (R-5). */
 export const STATS_MATCH_STATUSES = [MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN]
+
+/** Clé de tri lue sur chaque ligne de l'annuaire, par critère. */
+export const COMPETITOR_SORT_KEY: Record<COMPETITOR_SORT, TCompetitorSortKeyReader> = {
+  [COMPETITOR_SORT.DISPLAY_NAME]: (item) => item.displayName.toLowerCase(),
+  [COMPETITOR_SORT.EDITIONS_PLAYED]: (item) => item.editionsPlayed,
+  [COMPETITOR_SORT.MATCHES_PLAYED]: (item) => item.matchesPlayed,
+  [COMPETITOR_SORT.WINS]: (item) => item.wins,
+  [COMPETITOR_SORT.LOSSES]: (item) => item.losses,
+  [COMPETITOR_SORT.TITLES]: (item) => item.titles,
+  [COMPETITOR_SORT.FIRST_EDITION]: (_item, career) => career?.firstEditionRank ?? null
+}

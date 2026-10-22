@@ -1,8 +1,8 @@
-import type { IApiError } from '#shared/interfaces/api/error.interface'
-import type { MATCH_STATUS } from '#shared/enums/match.enum'
-import type { ROUND_KIND } from '#shared/enums/round.enum'
-import type { USER_ROLE } from '#shared/enums/user.enum'
-import type { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
+import type { IApiError } from './error.interface.js'
+import type { MATCH_STATUS } from '../enums/match.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { USER_ROLE } from '../enums/user.enum.js'
+import type { FIXTURE_VARIANT } from '../enums/fixture-variant.enum.js'
 
 export interface IApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'

@@ -1,7 +1,7 @@
-import { MATCH_PURPOSE, MATCH_STATUS } from '#shared/enums/match.enum'
-import { ROUND_KIND } from '#shared/enums/round.enum'
-import type { IAdminMatch } from '#shared/interfaces/api/admin-match.interface'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../enums/match.enum.js'
+import { ROUND_KIND } from '../../enums/round.enum.js'
+import type { IAdminMatch } from '../../interfaces/admin-match.interface.js'
+import type { IFixtureSet } from '../../interfaces/fixture.interface.js'
 
 /*********************************************************
  * Fixtures file admin des scores

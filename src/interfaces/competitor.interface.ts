@@ -1,8 +1,8 @@
-import type { EDITION_STATUS } from '../enums/edition.enum'
-import type { FINAL_STAGE } from '../enums/participation.enum'
-import type { MatchEntity } from '../server/db/entities/match.entity'
-import type { IMatchRecord } from './stats.interface'
-import type { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum'
+import type { EDITION_STATUS } from '../enums/edition.enum.js'
+import type { FINAL_STAGE } from '../enums/participation.enum.js'
+import type { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
+import type { IMatchRecord } from './stats.interface.js'
+import type { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum.js'
 
 /**
  * Identité publique d'un compétiteur. Ne contient jamais d'email ni de téléphone (invariant 8).

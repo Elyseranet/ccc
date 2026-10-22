@@ -1,4 +1,4 @@
-import type { LOG_LEVEL } from '../enums/log-level.enum'
+import type { LOG_LEVEL } from '../enums/log-level.enum.js'
 
 export interface ILogFields {
   requestId?: string

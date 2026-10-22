@@ -1,5 +1,5 @@
-import type { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import type { LAYOUT } from '~/enums/layout.enum'
+import type { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import type { LAYOUT } from '../enums/layout.enum.js'
 
 export interface IPageDelivery {
   /** `true` quand la page est livrée en production ; sinon elle répond 404 et disparaît de la navigation. */

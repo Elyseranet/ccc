@@ -1,4 +1,4 @@
-import type { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum'
+import type { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 
 /**
  * A16 : `matches` compte les matchs joués (VALIDATED ou RESULT_UNKNOWN) ; `scoredMatches` ceux qui ont
@@ -46,7 +46,7 @@ export interface IPlayerBalance extends IWinLoss {
   differential: number
 }
 
-export interface IHeadToHead {
+export interface IHeadToHeadRecord {
   playerAId: string
   playerBId: string
   encounters: number

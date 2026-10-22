@@ -1,15 +1,6 @@
 import type { Ref } from 'vue'
-import { BUBBLE_COLOR_TOKENS, BUBBLE_DENSITY_DIVISOR, BUBBLE_MAX_DPR } from '../consts/bubbles.const'
-
-interface IBubble {
-  x: number
-  y: number
-  r: number
-  v: number
-  drift: number
-  c: string
-  a: number
-}
+import { BUBBLE_COLOR_TOKENS, BUBBLE_DENSITY_DIVISOR, BUBBLE_MAX_DPR } from '~/consts/bubbles.const'
+import type { IBubble } from '~/interfaces/bubbles.interface'
 
 /*********************************************************
  * useBubbles

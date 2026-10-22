@@ -1,5 +1,5 @@
 import { camelize } from 'vue'
-import { PASSED_LISTENER_PREFIX } from '~/consts/passed-props.const'
+import { PASSED_LISTENER_PREFIX } from '../consts/passed-props.const.js'
 
 /*********************************************************
  * Props réellement passées à un composant

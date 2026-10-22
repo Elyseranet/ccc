@@ -1,5 +1,5 @@
-import type { ICompetitorCareer } from '../server/interfaces/competitor.interface'
-import type { ICompetitorListItem } from '../interfaces/competitor.interface'
+import type { ICompetitorCareer } from '../interfaces/competitor.interface.js'
+import type { ICompetitorListItem } from '../interfaces/competitor.interface.js'
 
 export type TCompetitorSortKeyReader = (
   item: ICompetitorListItem,

@@ -1,4 +1,4 @@
-import type { API_ERROR_CODE } from '../enums/api-error-code.enum'
+import type { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 
 export interface IApiErrorDetail {
   path: string

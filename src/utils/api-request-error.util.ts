@@ -1,7 +1,7 @@
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
-import type { IApiError } from '#shared/interfaces/api/error.interface'
-import { HTTP_DATE, MS_PER_SECOND, RETRY_AFTER_SECONDS } from '~/consts/retry-after.const'
-import type { IFetchErrorLike } from '~/interfaces/api-client.interface'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import type { IApiError } from '../interfaces/error.interface.js'
+import { HTTP_DATE, MS_PER_SECOND, RETRY_AFTER_SECONDS } from '../consts/retry-after.const.js'
+import type { IFetchErrorLike } from '../interfaces/api-client.interface.js'
 
 /*********************************************************
  * Erreur d'appel d'API

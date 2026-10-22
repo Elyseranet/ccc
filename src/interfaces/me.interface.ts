@@ -1,5 +1,5 @@
-import type { USER_ROLE } from '../enums/user.enum'
-import type { ICompetitorPublic } from './competitor.interface'
+import type { USER_ROLE } from '../enums/user.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
 
 /** Seule structure de l'API qui porte des données de contact, et uniquement pour leur titulaire. */
 export interface IMeCompetitor extends ICompetitorPublic {

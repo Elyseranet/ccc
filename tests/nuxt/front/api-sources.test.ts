@@ -1,14 +1,14 @@
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineEventHandler, setResponseStatus } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
-import { API_SOURCES } from '~/consts/api-sources.const'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { API_SOURCE } from '~/enums/api-source.enum'
-import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
-import { EditionService } from '~/services/edition.service'
-import { ApiRequestError, toApiRequestError } from '~/utils/api-request-error.util'
-import { findFixtureEndpoints } from '~/utils/fixture.util'
+import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
+import { API_SOURCES } from '../../../src/consts/api-sources.const'
+import { API_ENDPOINT } from '../../../src/enums/api-endpoint.enum'
+import { API_SOURCE } from '../../../src/enums/api-source.enum'
+import { FIXTURE_VARIANT } from '../../../src/enums/fixture-variant.enum'
+import { EditionService } from '../../../src/services/edition.service'
+import { ApiRequestError, toApiRequestError } from '../../../src/utils/api-request-error.util'
+import { findFixtureEndpoints } from '../../../src/utils/fixture.util'
 
 const original = { ...API_SOURCES }
 
@@ -84,7 +84,7 @@ describe('client HTTP', () => {
 
   it('utilise $fetch et jamais axios', async () => {
     const { readFileSync } = await import('node:fs')
-    const source = readFileSync('app/services/base.service.ts', 'utf8')
+    const source = readFileSync('src/services/base.service.ts', 'utf8')
     expect(source).not.toMatch(/from 'axios'|require\('axios'\)/)
     expect(source).toMatch(/\$fetch/)
   })

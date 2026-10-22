@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { USER_ROLE } from '#shared/enums/user.enum'
+import { USER_ROLE } from '~/enums/user.enum'
 import type { ISessionIdentity } from '~/interfaces/session.interface'
 
 /*********************************************************

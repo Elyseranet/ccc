@@ -1,8 +1,8 @@
 import { RATE_LIMIT_ROUTE_KEY } from '../../../../consts/rate-limit.const'
-import { competitorIdParamsSchema } from '../../../utils/competitor/competitor-query.util'
-import { getCompetitorDetail } from '../../../services/competitor.service'
-import { enforceRateLimit } from '../../../utils/http/rate-limit.util'
-import { getParamsWithSchema } from '../../../utils/http/validation.util'
+import { competitorIdParamsSchema } from '../../../../schemas/competitor.schema'
+import { getCompetitorDetail } from '../../../../services/competitor.service'
+import { enforceRateLimit } from '../../../../utils/rate-limit.util'
+import { getParamsWithSchema } from '../../../../utils/validation.util'
 import type { ICompetitorDetail } from '../../../../interfaces/competitor.interface'
 
 /** GET /api/v1/competiteurs/{id} : fiche publique (identité, historique par édition, statistiques). */

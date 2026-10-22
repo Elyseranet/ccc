@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
-import { toApiError } from '../../src/server/utils/http/api-error.util'
-import { parseWithSchema } from '../../src/server/utils/http/validation.util'
+import { toApiError } from '../../src/utils/api-error.util'
+import { parseWithSchema } from '../../src/utils/validation.util'
 
 const idSchema = z.object({ id: z.coerce.number().int().positive() })
 

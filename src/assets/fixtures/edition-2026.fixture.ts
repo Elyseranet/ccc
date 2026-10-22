@@ -1,13 +1,14 @@
-import { EDITION_STATUS } from '#shared/enums/edition.enum'
-import { MATCH_PURPOSE, MATCH_STATUS } from '#shared/enums/match.enum'
-import { PARTICIPATION_STATUS } from '#shared/enums/participation.enum'
-import { ROUND_KIND, ROUND_STATUS } from '#shared/enums/round.enum'
-import type { IEditionParticipant, IEditionSummary } from '#shared/interfaces/api/edition.interface'
-import type { IMatch } from '#shared/interfaces/api/match.interface'
-import type { IPool } from '#shared/interfaces/api/pool.interface'
-import type { IRound } from '#shared/interfaces/api/round.interface'
-import { editionId } from '~/fixtures/edition-id.fixture'
-import type { TEdition2026Body } from '~/types/edition-2026.type'
+import { EDITION_STATUS } from '../../enums/edition.enum.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../enums/match.enum.js'
+import { PARTICIPATION_STATUS } from '../../enums/participation.enum.js'
+import { ROUND_KIND, ROUND_STATUS } from '../../enums/round.enum.js'
+import type { IEditionParticipant, IEditionSummary } from '../../interfaces/edition.interface.js'
+import type { IMatch } from '../../interfaces/match.interface.js'
+import type { IPool } from '../../interfaces/pool.interface.js'
+import type { IRound } from '../../interfaces/round.interface.js'
+import { editionId } from './edition-id.fixture.js'
+import type { TEdition2026Body } from '../../types/edition-2026.type.js'
+import type { IFixtureSide } from '../../interfaces/fixture.interface.js'
 
 /*********************************************************
  * Fixtures de l'édition 2026
@@ -44,12 +45,6 @@ const participantId = (index: number): string => participationId(2600 + index)
 const matchId = (rank: number): string => `00000000-0000-4000-0009-${String(rank).padStart(12, '0')}`
 
 const poolId = (rank: number): string => `00000000-0000-4000-0008-${String(rank).padStart(12, '0')}`
-
-interface IFixtureSide {
-  id: number
-  name: string
-  score: number
-}
 
 const validated = (sequence: number, poolRank: number, winner: IFixtureSide, loser: IFixtureSide): IMatch => ({
   id: matchId(sequence),

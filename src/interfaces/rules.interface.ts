@@ -1,4 +1,4 @@
-import type { ITranslatableText } from '~/interfaces/common-components.interface'
+import type { ITranslatableText } from './common-components.interface.js'
 
 export interface IRulesFact {
   id: string

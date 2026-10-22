@@ -1,6 +1,7 @@
 import { LOG_EVENT } from '../../consts/log-event.const'
-import { assertDatabaseConfig } from '../utils/database-config.util'
-import { logger } from '../utils/logger.util'
+import { assertDatabaseConfig } from '../../utils/database-config.util'
+import { logger } from '../../utils/logger.util'
+import { useDataSource } from '../../utils/database.util'
 
 /** Initialise la DataSource au démarrage ; l'échec est journalisé sans la chaîne de connexion. */
 export default defineNitroPlugin(async () => {

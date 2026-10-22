@@ -1,4 +1,4 @@
-import { API_ERROR_CODE } from '../enums/api-error-code.enum'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 
 export const INTERNAL_ERROR_MESSAGE = 'Internal server error'
 export const SERVICE_UNAVAILABLE_MESSAGE = 'Service unavailable'

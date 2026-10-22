@@ -1,7 +1,7 @@
-import type { IAdminMatch } from '#shared/interfaces/api/admin-match.interface'
-import { ADMIN_MATCHES_2026_FIXTURE, ADMIN_MATCHES_ARCHIVE_FIXTURE } from '~/fixtures/admin-match-2026.fixture'
-import { editionId } from '~/fixtures/edition-id.fixture'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
+import type { IAdminMatch } from '../../interfaces/admin-match.interface.js'
+import { ADMIN_MATCHES_2026_FIXTURE, ADMIN_MATCHES_ARCHIVE_FIXTURE } from './admin-match-2026.fixture.js'
+import { editionId } from './edition-id.fixture.js'
+import type { IFixtureSet } from '../../interfaces/fixture.interface.js'
 
 /*********************************************************
  * Fixtures file admin des scores

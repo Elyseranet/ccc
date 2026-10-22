@@ -1,4 +1,4 @@
-import type { IMatch, IMatchSide } from './match.interface'
+import type { IMatch, IMatchSide } from './match.interface.js'
 
 export interface IAdminActor {
   id: string

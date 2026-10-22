@@ -1,5 +1,5 @@
-import type { ROUND_KIND } from '../enums/round.enum'
-import type { ICompetitorPublic } from './competitor.interface'
+import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
 
 /**
  * Bilan d'une paire de joueurs, vu du côté de `competitor` (RG36, RG37).

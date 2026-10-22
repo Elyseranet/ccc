@@ -1,6 +1,6 @@
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import type { IBaseServiceOptions } from '~/interfaces/api-client.interface'
-import { BaseService } from '~/services/base.service'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import { BaseService } from './base.service.js'
 
 /*********************************************************
  * AuthService

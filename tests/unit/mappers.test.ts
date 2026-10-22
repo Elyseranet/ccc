@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import type { CompetitorEntity } from '../../src/server/database/entities/competitor.entity'
-import type { MatchEntity } from '../../src/server/database/entities/match.entity'
+import type { CompetitorEntity } from '../../src/server/db/typeorm/entities/competitor.entity'
+import type { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
 import { MATCH_RECORD_KEY } from '../../src/enums/match-record-key.enum'
-import { toCompetitorPublic } from '../../src/server/utils/competitor/competitor-public.mapper.util'
-import { toMatchRecord } from '../../src/server/utils/match/match-record.mapper.util'
+import { toCompetitorPublic } from '../../src/utils/competitor-public.mapper.util'
+import { toMatchRecord } from '../../src/utils/match-record.mapper.util'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../../src/enums/match.enum'
 
 describe('toCompetitorPublic', () => {

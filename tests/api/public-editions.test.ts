@@ -13,7 +13,7 @@ import type { IPaginated } from '../../src/interfaces/pagination.interface'
 import type { IPool } from '../../src/interfaces/pool.interface'
 import type { IRound } from '../../src/interfaces/round.interface'
 import type { IArchiveStats } from '../../src/interfaces/stats.interface'
-import { MatchEntity } from '../../src/server/database/entities/match.entity'
+import { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import {
   SECRET_EDITION_COMMENT,
@@ -29,7 +29,7 @@ const env = requireTestDatabaseEnv()
 describe('public edition reads (B-06)', async () => {
   // La base est préparée avant le démarrage du serveur : migrations, puis fixtures.
   Object.assign(process.env, env)
-  const { default: dataSource } = await import('../../src/server/database/data-source')
+  const { default: dataSource } = await import('../../src/server/db/typeorm/data-source')
   await dataSource.initialize()
   await dataSource.dropDatabase()
   await dataSource.runMigrations()

@@ -1,6 +1,6 @@
 import type { IDraw } from '../../../../../interfaces/draw.interface'
-import { loadValidatedDraws } from '../../../../services/edition.service'
-import { readEditionResource } from '../../../../utils/edition/edition-route.util'
+import { loadValidatedDraws } from '../../../../../services/edition.service'
+import { readEditionResource } from '../../../../../utils/edition-route.util'
 
 /** Uniquement les tirages VALIDATED : un brouillon n'est jamais public. */
 export default defineEventHandler((event) =>

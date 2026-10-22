@@ -1,4 +1,4 @@
-import { FINAL_STAGE } from '../enums/participation.enum'
+import { FINAL_STAGE } from '../enums/participation.enum.js'
 
 /** RG1 : barème de référence pour une édition de 50 participants. */
 export const POINTS_BASE_SCALE: Readonly<Record<FINAL_STAGE, number>> = {

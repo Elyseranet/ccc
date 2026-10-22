@@ -13,26 +13,8 @@
     "types": ["node"]
   },
   "include": [
-    "src/server/database/**/*.ts",
-    "src/server/utils/logger.util.ts",
-    "src/consts/log-event.const.ts",
-    "src/consts/domain-rules.const.ts",
-    "src/consts/legacy-import.const.ts",
-    "src/server/utils/legacy/**/*.ts",
-    "src/server/utils/match/score-rules.util.ts",
-    "src/server/utils/scoring/**/*.ts",
-    "src/server/utils/ranking/**/*.ts",
-    "src/server/utils/stats/**/*.ts",
-    "src/server/utils/domain/**/*.ts",
-    "src/interfaces/legacy-import.interface.ts",
-    "src/server/interfaces/ranking.interface.ts",
-    "src/server/interfaces/stats.interface.ts",
-    "src/server/interfaces/match.interface.ts",
-    "src/types/legacy-import.type.ts",
-    "src/consts/auth.const.ts",
-    "src/server/database/scripts/*.ts",
-    "src/server/enums/**/*.ts",
-    "src/interfaces/log-entry.interface.ts",
-    "src/types/log-sink.type.ts"
+    "src/server/db/typeorm/data-source.ts",
+    "src/server/db/migrations/*.ts",
+    "src/utils/*-cli.util.ts"
   ]
 }

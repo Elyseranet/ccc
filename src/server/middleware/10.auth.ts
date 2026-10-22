@@ -1,12 +1,13 @@
 import { getCookie, getRequestHeader, getRequestURL } from 'h3'
 import { LOG_EVENT } from '../../consts/log-event.const'
 import { API_PREFIX } from '../../consts/request.const'
-import { isCrossSiteWrite, parseAllowedOrigins } from '../utils/auth/csrf.util'
-import { getSessionCookieName, isWellFormedSessionToken } from '../utils/auth/session-token.util'
-import { resolveSession } from '../utils/auth/session-store.util'
-import { forbiddenOrigin } from '../utils/http/api-error.util'
-import { sanitizeRouteForLog } from '../utils/log-sanitize.util'
-import { logger } from '../utils/logger.util'
+import { isCrossSiteWrite, parseAllowedOrigins } from '../../utils/csrf.util'
+import { getSessionCookieName, isWellFormedSessionToken } from '../../utils/session-token.util'
+import { resolveSession } from '../../utils/session-store.util'
+import { forbiddenOrigin } from '../../utils/api-error.util'
+import { sanitizeRouteForLog } from '../../utils/log-sanitize.util'
+import { logger } from '../../utils/logger.util'
+import { useDataSource } from '../../utils/database.util'
 
 /**
  * Sous /api : (1) refuse une écriture venue d'une autre origine, (2) résout la session et pose

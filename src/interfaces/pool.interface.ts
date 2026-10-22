@@ -1,6 +1,6 @@
-import type { PARTICIPATION_STATUS } from '../enums/participation.enum'
-import type { ICompetitorPublic } from './competitor.interface'
-import type { TIEBREAK_FORMAT } from '../enums/domain.enum'
+import type { PARTICIPATION_STATUS } from '../enums/participation.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
+import type { TIEBREAK_FORMAT } from '../enums/domain.enum.js'
 
 export interface IPoolStandingRow {
   rank: number

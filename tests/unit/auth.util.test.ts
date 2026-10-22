@@ -7,21 +7,21 @@ import {
   resolveDeviceCookieSecret,
   signDeviceCookie,
   verifyDeviceCookie
-} from '../../src/server/utils/auth/device-cookie.util'
-import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../src/server/utils/auth/login-throttle.util'
-import { loginSchema, updateMeSchema } from '../../src/server/schemas/auth.schema'
-import { isCrossSiteWrite, parseAllowedOrigins } from '../../src/server/utils/auth/csrf.util'
-import { burnPasswordCheck, hashPassword, verifyPassword } from '../../src/server/utils/auth/password.util'
+} from '../../src/utils/device-cookie.util'
+import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../src/utils/login-throttle.util'
+import { loginSchema, updateMeSchema } from '../../src/schemas/auth.schema'
+import { isCrossSiteWrite, parseAllowedOrigins } from '../../src/utils/csrf.util'
+import { burnPasswordCheck, hashPassword, verifyPassword } from '../../src/utils/password.util'
 import {
   buildSessionCookieOptions,
   getSessionCookieName,
   generateSessionToken,
   hashSessionToken,
   isWellFormedSessionToken
-} from '../../src/server/utils/auth/session-token.util'
+} from '../../src/utils/session-token.util'
 import type { H3Event } from 'h3'
 import { USER_ROLE } from '../../src/enums/user.enum'
-import { requireRole, requireUser } from '../../src/server/utils/auth/require-role.util'
+import { requireRole, requireUser } from '../../src/utils/require-role.util'
 import { normalizeEmail } from '../../src/utils/email.util'
 
 const OWN = 'https://ccc.example'

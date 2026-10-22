@@ -28,7 +28,7 @@ COPY . .
 RUN npm run test:release
 
 RUN npm run build
-# CLI TypeORM et scripts d'exploitation (migrations, user:*, db:import:legacy), compilés en JS.
+# CLI TypeORM et scripts d'exploitation (migrations, user:*, db:seed:archives), compilés en JS.
 RUN npm run db:typeorm:build
 
 # ── Stage 2 : dépendances de production ───────────────────────────────────────
@@ -58,13 +58,11 @@ COPY --from=builder --chown=node:node /app/package.json ./package.json
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/.output ./.output
 COPY --from=builder --chown=node:node /app/.typeorm-dist ./.typeorm-dist
-# Données lues par db:seed:legacy et db:import:legacy (chemins relatifs au répertoire courant).
-COPY --from=builder --chown=node:node /app/server/database/seeds/data ./server/database/seeds/data
+# Dump SQL figé des archives, lu par db:seed:archives (chemin relatif au répertoire courant, ARCH-5).
+COPY --from=builder --chown=node:node /app/src/assets/seeds/archives.sql ./src/assets/seeds/archives.sql
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/ccc-ops.sh /usr/local/bin/ccc-ops
-# .data : rapports écrits par db:import:legacy (.data/reports/).
-RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/ccc-ops && \
-    mkdir -p /app/.data && chown node:node /app/.data
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/ccc-ops
 
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \

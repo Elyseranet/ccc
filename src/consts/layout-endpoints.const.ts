@@ -1,5 +1,5 @@
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { LAYOUT } from '~/enums/layout.enum'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import { LAYOUT } from '../enums/layout.enum.js'
 
 /*********************************************************
  * Endpoints consommés par chaque layout

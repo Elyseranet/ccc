@@ -3,9 +3,9 @@ import IconDraws from '~/components/icons/IconDraws.vue'
 import IconMatches from '~/components/icons/IconMatches.vue'
 import IconMore from '~/components/icons/IconMore.vue'
 import IconParticipants from '~/components/icons/IconParticipants.vue'
-import { ROUTES } from '~/consts/routes.const'
-import type { INavigationGroup, INavigationItem } from '~/interfaces/navigation.interface'
-import { filterDeliveredGroups, filterDeliveredItems } from '~/utils/page-delivery.util'
+import { ROUTES } from './routes.const.js'
+import type { INavigationGroup, INavigationItem } from '../interfaces/navigation.interface.js'
+import { filterDeliveredGroups, filterDeliveredItems } from '../utils/page-delivery.util.js'
 
 export const ADMIN_NAVIGATION: INavigationGroup[] = filterDeliveredGroups([
   {

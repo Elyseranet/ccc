@@ -1,4 +1,4 @@
-import { ROUND_KIND } from '#shared/enums/round.enum'
+import { ROUND_KIND } from '../enums/round.enum.js'
 
 /*********************************************************
  * Libellés des tours (A9)

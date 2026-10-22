@@ -1,7 +1,7 @@
-import type { GOLDEN_RULES_VARIANT } from '~/enums/golden-rules-variant.enum'
-import type { ICompetitorPublic } from '#shared/interfaces/api/competitor.interface'
+import type { GOLDEN_RULES_VARIANT } from '../enums/golden-rules-variant.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
 import type { TSize } from 'origam/types'
-import type { ApiRequestError } from '~/utils/api-request-error.util'
+import type { ApiRequestError } from '../utils/api-request-error.util.js'
 
 export interface ITranslatableText {
   key: string

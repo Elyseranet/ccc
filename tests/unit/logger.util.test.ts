@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LOG_LEVEL } from '../../src/enums/log-level.enum'
-import { createLogger } from '../../src/server/utils/logger.util'
+import { createLogger } from '../../src/utils/logger.util'
 
 describe('createLogger', () => {
   it('writes one JSON line with event, level, timestamp and the given fields', () => {

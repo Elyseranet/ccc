@@ -1,13 +1,13 @@
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
-import { EDITION_STATUS } from '#shared/enums/edition.enum'
-import { FINAL_STAGE } from '#shared/enums/participation.enum'
-import { ApiRequestError } from '~/utils/api-request-error.util'
-import type { ICompetitorDetail, ICompetitorListItem, ICompetitorPublic } from '#shared/interfaces/api/competitor.interface'
-import type { IHeadToHead } from '#shared/interfaces/api/head-to-head.interface'
-import type { IPaginated } from '#shared/interfaces/api/pagination.interface'
-import type { ICompetitorsQuery } from '~/interfaces/api-client.interface'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
-import { editionId } from '~/fixtures/edition-id.fixture'
+import { API_ERROR_CODE } from '../../enums/api-error-code.enum.js'
+import { EDITION_STATUS } from '../../enums/edition.enum.js'
+import { FINAL_STAGE } from '../../enums/participation.enum.js'
+import { ApiRequestError } from '../../utils/api-request-error.util.js'
+import type { ICompetitorDetail, ICompetitorListItem, ICompetitorPublic } from '../../interfaces/competitor.interface.js'
+import type { IHeadToHead } from '../../interfaces/head-to-head.interface.js'
+import type { IPaginated } from '../../interfaces/pagination.interface.js'
+import type { ICompetitorsQuery } from '../../interfaces/api-client.interface.js'
+import type { IFixtureSet } from '../../interfaces/fixture.interface.js'
+import { editionId } from './edition-id.fixture.js'
 
 /*********************************************************
  * Fixtures compétiteurs

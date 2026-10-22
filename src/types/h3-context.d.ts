@@ -1,4 +1,4 @@
-import type { IAuthUser } from '../server/interfaces/auth.interface'
+import type { IAuthUser } from '../interfaces/auth.interface'
 
 declare module 'h3' {
   interface H3EventContext {

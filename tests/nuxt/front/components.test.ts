@@ -1,14 +1,14 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import { RouterLink } from 'vue-router'
-import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
+import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import AsyncState from '~/components/common/AsyncState.vue'
 import BrandMark from '~/components/common/BrandMark.vue'
 import GoldenRules from '~/components/common/GoldenRules.vue'
 import PageHero from '~/components/common/PageHero.vue'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import SkipLink from '~/components/common/SkipLink.vue'
-import { ApiRequestError } from '~/utils/api-request-error.util'
+import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 
 const withRouterLink = { global: { components: { RouterLink } } }
 

@@ -1,4 +1,4 @@
-import type { IGoldenRule } from '~/interfaces/common-components.interface'
+import type { IGoldenRule } from '../interfaces/common-components.interface.js'
 
 /*********************************************************
  * Les huit règles d'or (RG25 à RG32)

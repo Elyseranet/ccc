@@ -1,4 +1,4 @@
-import { EDITION_STATUS } from '#shared/enums/edition.enum'
+import { EDITION_STATUS } from '../enums/edition.enum.js'
 
 export const EDITION_STATUS_LABELS: Record<EDITION_STATUS, { key: string, label: string }> = {
   [EDITION_STATUS.CREATED]: { key: 'edition.status.created', label: 'création' },

@@ -1,8 +1,8 @@
 import IconAccount from '~/components/icons/IconAccount.vue'
 import IconExternal from '~/components/icons/IconExternal.vue'
 import IconParticipants from '~/components/icons/IconParticipants.vue'
-import { ROUTES } from '~/consts/routes.const'
-import type { IAdminMoreItem } from '~/interfaces/admin-more.interface'
+import { ROUTES } from './routes.const.js'
+import type { IAdminMoreItem } from '../interfaces/admin-more.interface.js'
 
 export const ADMIN_MORE_ITEMS: IAdminMoreItem[] = [
   {

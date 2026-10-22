@@ -1,7 +1,7 @@
 import type { IPool } from '../../../../../interfaces/pool.interface'
-import { buildPools } from '../../../../utils/edition/edition-assemble.util'
-import { loadEditionMatches, loadParticipations, loadPoolEntities } from '../../../../services/edition.service'
-import { readEditionResource } from '../../../../utils/edition/edition-route.util'
+import { buildPools } from '../../../../../utils/edition-assemble.util'
+import { loadEditionMatches, loadParticipations, loadPoolEntities } from '../../../../../services/edition.service'
+import { readEditionResource } from '../../../../../utils/edition-route.util'
 
 /** Poules et classements (RG19, A10), sur les seuls matchs validés. */
 export default defineEventHandler((event) =>

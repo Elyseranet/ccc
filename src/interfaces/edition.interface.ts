@@ -1,10 +1,10 @@
-import type { EDITION_ORIGIN, EDITION_STATUS } from '../enums/edition.enum'
-import type { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum'
-import type { ICompetitorPublic } from './competitor.interface'
-import type { IDraw } from './draw.interface'
-import type { IMatch } from './match.interface'
-import type { IPool } from './pool.interface'
-import type { IBracketRound, IRound } from './round.interface'
+import type { EDITION_ORIGIN, EDITION_STATUS } from '../enums/edition.enum.js'
+import type { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
+import type { ICompetitorPublic } from './competitor.interface.js'
+import type { IDraw } from './draw.interface.js'
+import type { IMatch } from './match.interface.js'
+import type { IPool } from './pool.interface.js'
+import type { IBracketRound, IRound } from './round.interface.js'
 
 export interface IEditionChampion {
   competitor: ICompetitorPublic

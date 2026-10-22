@@ -1,14 +1,14 @@
 import { readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { LAYOUT_ENDPOINTS } from '~/consts/layout-endpoints.const'
-import { PAGE_DELIVERY } from '~/consts/page-delivery.const'
-import { ROUTES } from '~/consts/routes.const'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { API_SOURCE } from '~/enums/api-source.enum'
-import { LAYOUT } from '~/enums/layout.enum'
-import type { IPageDelivery } from '~/interfaces/page-delivery.interface'
-import type { INavigationGroup, INavigationItem } from '~/interfaces/navigation.interface'
+import { LAYOUT_ENDPOINTS } from '../../../src/consts/layout-endpoints.const'
+import { PAGE_DELIVERY } from '../../../src/consts/page-delivery.const'
+import { ROUTES } from '../../../src/consts/routes.const'
+import { API_ENDPOINT } from '../../../src/enums/api-endpoint.enum'
+import { API_SOURCE } from '../../../src/enums/api-source.enum'
+import { LAYOUT } from '../../../src/enums/layout.enum'
+import type { IPageDelivery } from '../../../src/interfaces/page-delivery.interface'
+import type { INavigationGroup, INavigationItem } from '../../../src/interfaces/navigation.interface'
 import {
   filterDeliveredGroups,
   filterDeliveredItems,
@@ -18,9 +18,9 @@ import {
   findUndeclaredPages,
   isPageAccessible,
   normalizeRoutePath
-} from '~/utils/page-delivery.util'
+} from '../../../src/utils/page-delivery.util'
 
-const PAGES_DIRECTORY = join(process.cwd(), 'app/pages')
+const PAGES_DIRECTORY = join(process.cwd(), 'src/pages')
 
 const listPageFiles = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap(entry =>

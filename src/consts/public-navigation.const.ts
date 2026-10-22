@@ -1,6 +1,6 @@
-import { ROUTES } from '~/consts/routes.const'
-import type { INavigationItem } from '~/interfaces/navigation.interface'
-import { filterDeliveredItems } from '~/utils/page-delivery.util'
+import { ROUTES } from './routes.const.js'
+import type { INavigationItem } from '../interfaces/navigation.interface.js'
+import { filterDeliveredItems } from '../utils/page-delivery.util.js'
 
 export const PUBLIC_NAVIGATION: INavigationItem[] = filterDeliveredItems([
   { key: 'layout.header.nav_editions', label: 'Éditions', to: ROUTES.EDITIONS },

@@ -5,11 +5,11 @@ import type { DataSource } from 'typeorm'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
 import { LOGIN_DELAY_MAX_SECONDS } from '../../src/consts/auth.const'
-import { LoginDeviceEntity } from '../../src/server/database/entities/login-device.entity'
-import { generateDeviceNonce, signDeviceCookie } from '../../src/server/utils/auth/device-cookie.util'
-import { unlockUser } from '../../src/server/database/scripts/unlock-user.util'
-import { SessionEntity } from '../../src/server/database/entities/session.entity'
-import { UserEntity } from '../../src/server/database/entities/user.entity'
+import { LoginDeviceEntity } from '../../src/server/db/typeorm/entities/login-device.entity'
+import { generateDeviceNonce, signDeviceCookie } from '../../src/utils/device-cookie.util'
+import { unlockUser } from '../../src/utils/unlock-user.util'
+import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
+import { UserEntity } from '../../src/server/db/typeorm/entities/user.entity'
 import {
   cookieHeaderOf, deviceCookieHeaderOf, deviceSetCookieOf, getWith, jsonPatch, jsonPost, login, resetTestDatabase, seedUser, setCookieOf,
   TEST_DEVICE_SECRET

@@ -3,9 +3,9 @@ import type { DataSource } from 'typeorm'
 import { fetch } from '@nuxt/test-utils/e2e'
 import { USER_ROLE, USER_STATUS } from '../../../src/enums/user.enum'
 import { TEST_DEVICE_COOKIE_SECRET } from './test-database'
-import { CompetitorEntity } from '../../../src/server/database/entities/competitor.entity'
-import { UserEntity } from '../../../src/server/database/entities/user.entity'
-import { hashPassword } from '../../../src/server/utils/auth/password.util'
+import { CompetitorEntity } from '../../../src/server/db/typeorm/entities/competitor.entity'
+import { UserEntity } from '../../../src/server/db/typeorm/entities/user.entity'
+import { hashPassword } from '../../../src/utils/password.util'
 
 export const SESSION_COOKIE = '__Host-ccc_session'
 
@@ -18,7 +18,7 @@ export interface ISeededUser {
 
 /** Repart d'une base `_test` vierge, migrations M0 à M2 appliquées. Le nom `_test` est vérifié par `requireTestDatabaseEnv`. */
 export const resetTestDatabase = async (): Promise<DataSource> => {
-  const dataSource = (await import('../../../src/server/database/data-source')).default
+  const dataSource = (await import('../../../src/server/db/typeorm/data-source')).default
   if (!dataSource.isInitialized) {
     await dataSource.initialize()
   }

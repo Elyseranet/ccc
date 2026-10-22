@@ -1,8 +1,9 @@
 import { deleteCookie, getCookie, setResponseHeader, setResponseStatus } from 'h3'
 import { LOG_EVENT } from '../../../../consts/log-event.const'
-import { revokeSessionByToken } from '../../../utils/auth/session-store.util'
-import { buildSessionCookieOptions, getSessionCookieName, isWellFormedSessionToken } from '../../../utils/auth/session-token.util'
-import { logger } from '../../../utils/logger.util'
+import { revokeSessionByToken } from '../../../../utils/session-store.util'
+import { buildSessionCookieOptions, getSessionCookieName, isWellFormedSessionToken } from '../../../../utils/session-token.util'
+import { logger } from '../../../../utils/logger.util'
+import { useDataSource } from '../../../../utils/database.util'
 
 /** Idempotent : sans session, avec une session expirée ou déjà révoquée, la réponse reste 204. */
 export default defineEventHandler(async (event) => {

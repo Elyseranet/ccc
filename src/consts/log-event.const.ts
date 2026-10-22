@@ -13,8 +13,6 @@ export const LOG_EVENT = {
   AUTH_PASSWORD_CHANGED: 'auth_password_changed',
   AUTH_CROSS_ORIGIN_REFUSED: 'auth_cross_origin_refused',
   ADMIN_CREATED: 'admin_created',
-  LEGACY_WORKBOOK_IMPORT_COMPLETED: 'legacy_workbook_import_completed',
-  LEGACY_WORKBOOK_IMPORT_FAILED: 'legacy_workbook_import_failed',
-  LEGACY_DOMAIN_IMPORT_COMPLETED: 'legacy_domain_import_completed',
-  LEGACY_DOMAIN_IMPORT_FAILED: 'legacy_domain_import_failed'
+  ARCHIVES_SEED_APPLIED: 'archives_seed_applied',
+  ARCHIVES_SEED_FAILED: 'archives_seed_failed'
 } as const

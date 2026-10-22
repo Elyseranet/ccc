@@ -1,14 +1,14 @@
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
-import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
-import { USER_ROLE } from '~~/src/enums/user.enum'
-import { useLogout } from '~/composables/useLogout'
-import { ROUTES } from '~/consts/routes.const'
-import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
-import { AuthService } from '~/services/auth.service'
-import { useAuthStore } from '~/stores/auth.store'
-import { ApiRequestError } from '~/utils/api-request-error.util'
+import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
+import { USER_ROLE } from '../../../src/enums/user.enum'
+import { useLogout } from '../../../src/composables/useLogout'
+import { ROUTES } from '../../../src/consts/routes.const'
+import { FIXTURE_VARIANT } from '../../../src/enums/fixture-variant.enum'
+import { AuthService } from '../../../src/services/auth.service'
+import { useAuthStore } from '../../../src/stores/auth.store'
+import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)

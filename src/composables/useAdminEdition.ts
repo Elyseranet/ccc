@@ -1,5 +1,5 @@
 import { computed, watchEffect } from 'vue'
-import { EDITION_STATUS } from '#shared/enums/edition.enum'
+import { EDITION_STATUS } from '~/enums/edition.enum'
 import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
 import { EDITION_STATUS_LABELS } from '~/consts/edition-status.const'

@@ -5,7 +5,7 @@ import {
   buildRounds,
   toEditionParticipant,
   toPublicMatches
-} from '../../../../utils/edition/edition-assemble.util'
+} from '../../../../../utils/edition-assemble.util'
 import {
   loadEditionMatches,
   loadEditionSummaries,
@@ -13,8 +13,8 @@ import {
   loadPoolEntities,
   loadRoundEntities,
   loadValidatedDraws
-} from '../../../../services/edition.service'
-import { readEditionResource } from '../../../../utils/edition/edition-route.util'
+} from '../../../../../services/edition.service'
+import { readEditionResource } from '../../../../../utils/edition-route.util'
 
 /** Vue complète d'une édition. `comment` d'édition (R-4) et `comment` de match (A13) n'en font jamais partie. */
 export default defineEventHandler((event) =>

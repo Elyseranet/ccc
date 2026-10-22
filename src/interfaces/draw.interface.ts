@@ -1,5 +1,5 @@
-import type { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum'
-import type { ROUND_KIND } from '../enums/round.enum'
+import type { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
 
 export interface IDrawParameters {
   poolCount: number

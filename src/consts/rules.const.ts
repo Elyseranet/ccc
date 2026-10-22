@@ -1,5 +1,5 @@
-import { RULES_TAB } from '~/enums/rules-tab.enum'
-import type { IRulesFact, IRulesStep, IRulesTournamentCard, IRulesVariant } from '~/interfaces/rules.interface'
+import { RULES_TAB } from '../enums/rules-tab.enum.js'
+import type { IRulesFact, IRulesStep, IRulesTournamentCard, IRulesVariant } from '../interfaces/rules.interface.js'
 
 export const RULES_DEFAULT_TAB = RULES_TAB.GAME
 export const RULES_TAB_VALUES: string[] = Object.values(RULES_TAB)

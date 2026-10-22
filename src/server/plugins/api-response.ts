@@ -1,9 +1,9 @@
 import { send, setResponseHeader, setResponseStatus } from 'h3'
 import { LOG_EVENT } from '../../consts/log-event.const'
 import { API_PREFIX } from '../../consts/request.const'
-import { toApiError } from '../utils/http/api-error.util'
-import { sanitizeRouteForLog } from '../utils/log-sanitize.util'
-import { logger } from '../utils/logger.util'
+import { toApiError } from '../../utils/api-error.util'
+import { sanitizeRouteForLog } from '../../utils/log-sanitize.util'
+import { logger } from '../../utils/logger.util'
 
 export default defineNitroPlugin((nitroApp) => {
   const originalOnError = nitroApp.h3App.options.onError

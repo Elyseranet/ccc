@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { USER_ROLE } from '~~/src/enums/user.enum'
-import { useAuthStore } from '~/stores/auth.store'
+import { USER_ROLE } from '../../../src/enums/user.enum'
+import { useAuthStore } from '../../../src/stores/auth.store'
 
 describe('store d’authentification', () => {
   beforeEach(() => {

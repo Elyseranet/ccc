@@ -3,11 +3,11 @@ import { COMPETITOR_SORT, SORT_ORDER } from '../../src/enums/competitor-sort.enu
 import { SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS } from '../../src/consts/competitor.const'
 import {
   buildContainsPattern,
-  competitorListQuerySchema,
   escapeLikePattern,
   foldSearchText
-} from '../../src/server/utils/competitor/competitor-query.util'
-import { sortCompetitors } from '../../src/server/utils/competitor/competitor-sort.util'
+} from '../../src/utils/competitor-query.util'
+import { competitorListQuerySchema } from '../../src/schemas/competitor.schema'
+import { sortCompetitors } from '../../src/utils/competitor-sort.util'
 import type { ICompetitorListItem } from '../../src/interfaces/competitor.interface'
 
 describe('competitor search helpers', () => {

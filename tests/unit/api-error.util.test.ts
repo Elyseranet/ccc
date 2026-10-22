@@ -15,7 +15,7 @@ import {
   unauthorized,
   unprocessable,
   validationFailed
-} from '../../src/server/utils/http/api-error.util'
+} from '../../src/utils/api-error.util'
 
 describe('api-error factories', () => {
   it.each([

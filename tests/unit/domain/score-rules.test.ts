@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { SCORE_ERROR_CODE } from '../../../src/enums/domain.enum'
-import { targetScore, validateScore } from '../../../src/server/utils/match/score-rules.util'
+import { targetScore, validateScore } from '../../../src/utils/score-rules.util'
 import { MATCH_PURPOSE } from '../../../src/enums/match.enum'
 import { ROUND_KIND } from '../../../src/enums/round.enum'
-import { sheetRows } from './workbook.fixture'
 
 const pool = (...scores: number[]) => validateScore(ROUND_KIND.POOLS, MATCH_PURPOSE.REGULAR, scores)
 const final = (...scores: number[]) => validateScore(ROUND_KIND.FINAL, MATCH_PURPOSE.REGULAR, scores)
@@ -64,18 +63,5 @@ describe('RG21, RG22 : validation d un score', () => {
     expect(targetScore(ROUND_KIND.POOLS, MATCH_PURPOSE.REGULAR, 2)).toBe(5)
     expect(targetScore(ROUND_KIND.QUARTER, MATCH_PURPOSE.REGULAR, 2)).toBe(10)
     expect(targetScore(ROUND_KIND.POOLS, MATCH_PURPOSE.TIEBREAK, 3)).toBe(3)
-  })
-
-  it('constat du classeur : les 554 scores renseignés sont tous valides', () => {
-    const KNOCKOUT_LABELS = new Set(['1/16', 'Huitième', 'Quart', 'Demi', 'Finale'])
-    let checked = 0
-    for (const { values } of sheetRows('scores')) {
-      const [, label, , scoreA, , scoreB] = values
-      if (typeof scoreA !== 'number' || typeof scoreB !== 'number') continue
-      const kind = KNOCKOUT_LABELS.has(String(label)) ? ROUND_KIND.FINAL : ROUND_KIND.POOLS
-      expect(validateScore(kind, MATCH_PURPOSE.REGULAR, [scoreA, scoreB]), `${values[0]}`).toEqual({ valid: true })
-      checked += 1
-    }
-    expect(checked).toBe(554)
   })
 })

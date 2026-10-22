@@ -5,5 +5,3 @@ export const DATABASE_CONFIG_ENV_VARIABLES = {
   password: 'NUXT_DATABASE_PASSWORD',
   database: 'NUXT_DATABASE_DATABASE'
 } as const
-
-export const PRODUCTION_NODE_ENV = 'production'

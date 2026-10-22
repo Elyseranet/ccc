@@ -1,7 +1,7 @@
-import type { IDraw } from '#shared/interfaces/api/draw.interface'
-import { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import type { IBaseServiceOptions } from '~/interfaces/api-client.interface'
-import { BaseService } from '~/services/base.service'
+import type { IDraw } from '../interfaces/draw.interface.js'
+import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import { BaseService } from './base.service.js'
 
 /*********************************************************
  * DrawService
@@ -18,7 +18,7 @@ export class DrawService extends BaseService {
     return this.resolve<IDraw[]>(
       API_ENDPOINT.ADMIN_DRAWS,
       () => this.request<IDraw[]>(`/admin/editions/${encodeURIComponent(editionId)}/tirages`),
-      async () => (await import('~/fixtures/draw.fixture')).adminDrawsFixture(editionId)
+      async () => (await import('../assets/fixtures/draw.fixture.js')).adminDrawsFixture(editionId)
     )
   }
 }

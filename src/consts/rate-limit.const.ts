@@ -15,3 +15,8 @@ export const IPV6_PREFIX_GROUPS = 4
 export const IPV6_TOTAL_GROUPS = 8
 
 export const RATE_LIMIT_OPTION_NAMES = ['windowMs', 'maxRequests', 'maxKeys'] as const
+
+/** Adresse IPv4 encapsulée en IPv6 (`::ffff:a.b.c.d`). */
+export const IPV4_MAPPED_PATTERN = /^::ffff:\d{1,3}(\.\d{1,3}){3}$/i
+/** IPv4 : capture le préfixe /24. */
+export const IPV4_PATTERN = /^(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}$/

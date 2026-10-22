@@ -1,9 +1,9 @@
 import { RATE_LIMIT_ROUTE_KEY } from '../../../../../consts/rate-limit.const'
-import { badRequest } from '../../../../utils/http/api-error.util'
-import { competitorIdParamsSchema, headToHeadQuerySchema } from '../../../../utils/competitor/competitor-query.util'
-import { getHeadToHead, listHeadToHeadSummaries } from '../../../../services/competitor.service'
-import { enforceRateLimit } from '../../../../utils/http/rate-limit.util'
-import { getParamsWithSchema, getQueryWithSchema } from '../../../../utils/http/validation.util'
+import { badRequest } from '../../../../../utils/api-error.util'
+import { competitorIdParamsSchema, headToHeadQuerySchema } from '../../../../../schemas/competitor.schema'
+import { getHeadToHead, listHeadToHeadSummaries } from '../../../../../services/competitor.service'
+import { enforceRateLimit } from '../../../../../utils/rate-limit.util'
+import { getParamsWithSchema, getQueryWithSchema } from '../../../../../utils/validation.util'
 import type { IHeadToHead, IHeadToHeadSummary } from '../../../../../interfaces/head-to-head.interface'
 
 /**

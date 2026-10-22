@@ -1,7 +1,7 @@
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineEventHandler, getHeader, readRawBody } from 'h3'
 import { describe, expect, it, vi } from 'vitest'
-import { BaseService } from '~/services/base.service'
+import { BaseService } from '../../../src/services/base.service'
 
 class ProbeService extends BaseService {
   constructor () {
@@ -40,7 +40,7 @@ describe('BaseService : corps de requête', () => {
 
   it('ne pose aucun en-tête Content-Type à la main', async () => {
     const { readFileSync } = await import('node:fs')
-    const code = readFileSync('app/services/base.service.ts', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const code = readFileSync('src/services/base.service.ts', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     expect(code).not.toMatch(/headers|Content-Type/i)
   })
 })

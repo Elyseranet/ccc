@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { API_ERROR_CODE } from '~~/src/enums/api-error-code.enum'
-import { USER_ROLE } from '~~/src/enums/user.enum'
-import { MATCH_STATUS } from '~~/src/enums/match.enum'
-import { editionId } from '~/fixtures/edition-id.fixture'
-import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
-import { RANKING_KIND } from '~/enums/ranking-kind.enum'
-import { CompetitorService } from '~/services/competitor.service'
-import { EditionService } from '~/services/edition.service'
-import { MatchService } from '~/services/match.service'
-import { MeService } from '~/services/me.service'
-import { RankingService } from '~/services/ranking.service'
-import { ApiRequestError } from '~/utils/api-request-error.util'
-import { parseFixtureRole, parseFixtureVariant } from '~/utils/fixture.util'
+import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
+import { USER_ROLE } from '../../../src/enums/user.enum'
+import { MATCH_STATUS } from '../../../src/enums/match.enum'
+import { editionId } from '../../../src/assets/fixtures/edition-id.fixture'
+import { FIXTURE_VARIANT } from '../../../src/enums/fixture-variant.enum'
+import { RANKING_KIND } from '../../../src/enums/ranking-kind.enum'
+import { CompetitorService } from '../../../src/services/competitor.service'
+import { EditionService } from '../../../src/services/edition.service'
+import { MatchService } from '../../../src/services/match.service'
+import { MeService } from '../../../src/services/me.service'
+import { RankingService } from '../../../src/services/ranking.service'
+import { ApiRequestError } from '../../../src/utils/api-request-error.util'
+import { parseFixtureRole, parseFixtureVariant } from '../../../src/utils/fixture.util'
 
 describe('sélection des variantes et de la session de fixture', () => {
   it('ignore la sélection hors dev et test', () => {
@@ -89,7 +89,7 @@ describe('fixtures issues des maquettes', () => {
   })
 
   it('une paire sans match avec score a un ratio null, jamais 0 %', async () => {
-    const { COMPETITORS_FIXTURE } = await import('~/fixtures/competitor.fixture')
+    const { COMPETITORS_FIXTURE } = await import('../../../src/assets/fixtures/competitor.fixture')
     const sam = COMPETITORS_FIXTURE.find(item => item.displayName === 'Sam Dupont')!
     const opponent = COMPETITORS_FIXTURE.find(item => item.displayName === 'Côme Garnier')!
     const summary = await new CompetitorService().headToHead(sam.id, opponent.id)

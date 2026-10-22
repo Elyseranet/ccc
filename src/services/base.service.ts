@@ -1,13 +1,13 @@
-import { API_ERROR_CODE } from '#shared/enums/api-error-code.enum'
-import { API_BASE_URL, API_TIMEOUT_MS } from '~/consts/api.const'
-import { HTTP_STATUS_TOO_MANY_REQUESTS } from '~/consts/async-state.const'
-import { API_SOURCES } from '~/consts/api-sources.const'
-import type { API_ENDPOINT } from '~/enums/api-endpoint.enum'
-import { API_SOURCE } from '~/enums/api-source.enum'
-import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
-import type { IApiRequestOptions, IBaseServiceOptions } from '~/interfaces/api-client.interface'
-import type { IFixtureSet } from '~/interfaces/fixture.interface'
-import { ApiRequestError, toApiRequestError } from '~/utils/api-request-error.util'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import { API_BASE_URL, API_TIMEOUT_MS } from '../consts/api.const.js'
+import { HTTP_STATUS_TOO_MANY_REQUESTS } from '../consts/async-state.const.js'
+import { API_SOURCES } from '../consts/api-sources.const.js'
+import type { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
+import { API_SOURCE } from '../enums/api-source.enum.js'
+import { FIXTURE_VARIANT } from '../enums/fixture-variant.enum.js'
+import type { IApiRequestOptions, IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import type { IFixtureSet } from '../interfaces/fixture.interface.js'
+import { ApiRequestError, toApiRequestError } from '../utils/api-request-error.util.js'
 
 /*********************************************************
  * BaseService

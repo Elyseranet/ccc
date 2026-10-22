@@ -1,4 +1,4 @@
-import type { USER_ROLE } from '../enums/user.enum'
+import type { USER_ROLE } from '../enums/user.enum.js'
 
 export interface ILoginRequest {
   email: string

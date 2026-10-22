@@ -75,4 +75,14 @@ export const DEVICE_NONCE_BYTES = 16
 export const DEVICE_SECRET_MIN_LENGTH = 32
 export const MAX_DEVICES_PER_USER = 20
 export const DEVICE_COOKIE_SEPARATOR = '.'
-export const PRODUCTION_NODE_ENV = 'production'
+
+/** Format du nonce et de l'id utilisateur d'un cookie d'appareil (SEC-A4). */
+export const DEVICE_NONCE_PATTERN = /^[0-9a-f]{32}$/
+export const DEVICE_USER_ID_PATTERN = /^[0-9a-f-]{36}$/
+/** Jeton de session : 32 octets en base64url, soit 43 caractères. */
+export const SESSION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
+/** Au-delà de cet exposant, 2^n dépasse largement le plafond : on borne pour éviter un nombre démesuré. */
+export const LOGIN_DELAY_MAX_EXPONENT = 30
+/** Format stocké d'un hash scrypt : `scrypt$N$r$p$sel$hash`, six parties. */
+export const PASSWORD_HASH_SEPARATOR = '$'
+export const PASSWORD_HASH_PART_COUNT = 6

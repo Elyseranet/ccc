@@ -1,8 +1,8 @@
-import { USER_ROLE } from '#shared/enums/user.enum'
-import { API_SOURCES } from '~/consts/api-sources.const'
-import { FIXTURE_SESSION_ADMIN, FIXTURE_SESSION_PARTICIPANT } from '~/consts/api.const'
-import { API_SOURCE } from '~/enums/api-source.enum'
-import { FIXTURE_VARIANT } from '~/enums/fixture-variant.enum'
+import { USER_ROLE } from '../enums/user.enum.js'
+import { API_SOURCES } from '../consts/api-sources.const.js'
+import { FIXTURE_SESSION_ADMIN, FIXTURE_SESSION_PARTICIPANT } from '../consts/api.const.js'
+import { API_SOURCE } from '../enums/api-source.enum.js'
+import { FIXTURE_VARIANT } from '../enums/fixture-variant.enum.js'
 
 export const findFixtureEndpoints = (table: Record<string, API_SOURCE> = API_SOURCES): string[] =>
   Object.entries(table).filter(([, source]) => source === API_SOURCE.FIXTURE).map(([endpoint]) => endpoint)

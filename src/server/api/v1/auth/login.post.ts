@@ -2,27 +2,29 @@ import { getCookie, setCookie, setResponseHeader } from 'h3'
 import { USER_STATUS } from '../../../../enums/user.enum'
 import type { IMe } from '../../../../interfaces/me.interface'
 import { normalizeEmail } from '../../../../utils/email.util'
-import { PRODUCTION_NODE_ENV, RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../../consts/auth.const'
+import { RATE_LIMIT_AUTH_ROUTE_KEY } from '../../../../consts/auth.const'
+import { PRODUCTION_NODE_ENV } from '../../../../consts/node-env.const'
 import { LOG_EVENT } from '../../../../consts/log-event.const'
-import { UserEntity } from '../../../database/entities/user.entity'
-import { loginSchema } from '../../../schemas/auth.schema'
+import { UserEntity } from '../../../db/typeorm/entities/user.entity'
+import { loginSchema } from '../../../../schemas/auth.schema'
 import {
   buildDeviceCookieOptions,
   getDeviceCookieName,
   resolveDeviceCookieSecret,
   signDeviceCookie,
   verifyDeviceCookie
-} from '../../../utils/auth/device-cookie.util'
-import { findTrustedDevice, registerDevice, resetDeviceFailures } from '../../../utils/auth/device-store.util'
-import { enforceLoginRateLimit, rejectTooManyRequests } from '../../../utils/auth/login-rate-limit.util'
-import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../../utils/auth/login-throttle.util'
-import { loadMe } from '../../../utils/auth/me.util'
-import { burnPasswordCheck, verifyPassword } from '../../../utils/auth/password.util'
-import { createSession, purgeExpiredSessions, revokeSessionByToken } from '../../../utils/auth/session-store.util'
-import { buildSessionCookieOptions, getSessionCookieName, isWellFormedSessionToken } from '../../../utils/auth/session-token.util'
-import { invalidCredentials } from '../../../utils/http/api-error.util'
-import { readBodyWithSchema } from '../../../utils/http/validation.util'
-import { logger } from '../../../utils/logger.util'
+} from '../../../../utils/device-cookie.util'
+import { findTrustedDevice, registerDevice, resetDeviceFailures } from '../../../../utils/device-store.util'
+import { enforceLoginRateLimit, rejectTooManyRequests } from '../../../../utils/login-rate-limit.util'
+import { reserveDeviceLoginAttempt, reserveLoginAttempt } from '../../../../utils/login-throttle.util'
+import { loadMe } from '../../../../utils/me.util'
+import { burnPasswordCheck, verifyPassword } from '../../../../utils/password.util'
+import { createSession, purgeExpiredSessions, revokeSessionByToken } from '../../../../utils/session-store.util'
+import { buildSessionCookieOptions, getSessionCookieName, isWellFormedSessionToken } from '../../../../utils/session-token.util'
+import { invalidCredentials } from '../../../../utils/api-error.util'
+import { readBodyWithSchema } from '../../../../utils/validation.util'
+import { logger } from '../../../../utils/logger.util'
+import { useDataSource } from '../../../../utils/database.util'
 
 export default defineEventHandler(async (event): Promise<IMe> => {
   setResponseHeader(event, 'Cache-Control', 'no-store')

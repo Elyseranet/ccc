@@ -1,6 +1,6 @@
-import type { ICompetitorPublic } from './competitor.interface'
-import type { EDITION_STATUS } from '../enums/edition.enum'
-import type { FINAL_STAGE } from '../enums/participation.enum'
+import type { ICompetitorPublic } from './competitor.interface.js'
+import type { EDITION_STATUS } from '../enums/edition.enum.js'
+import type { FINAL_STAGE } from '../enums/participation.enum.js'
 
 export interface IRankingRow {
   rank: number
