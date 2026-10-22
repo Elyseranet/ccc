@@ -1,12 +1,12 @@
 # API publique : éditions (B-06)
 
-Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO sont dans `../../src/shared/interfaces/api/`. Les erreurs ont la forme `IApiError`.
+Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO sont dans `../../src/interfaces/`. Les erreurs ont la forme `IApiError`.
 
 `{id}` accepte l'UUID de l'édition ou son `code` (`2012a`, `2026`). L'année n'identifie pas une édition : 2012 en porte deux.
 
 | Route | Réponse | Notes |
 |---|---|---|
-| `GET /editions` | `IEditionSummary[]` | ordre `chronological_rank` décroissant, sans pagination ; champion et compteurs embarqués |
+| `GET /editions` | `IEditionSummary[]` | ordre `chronological_rank` décroissant, sans pagination ; champion, finale (`final`) et compteurs embarqués |
 | `GET /stats` | `IArchiveStats` | `matches` = matchs joués (`VALIDATED` + `RESULT_UNKNOWN`), `scoredMatches` = avec score, `unknownResultMatches` (A16, R-5) |
 | `GET /editions/{id}` | `IEditionDetail` | participants, poules et classements, tours, matchs, tirages validés, tableau final |
 | `GET /editions/{id}/participants` | `IEditionParticipant[]` | aucun champ de contact |
@@ -26,6 +26,28 @@ Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO so
 | `tri` | `validated_at_desc` (derniers scores validés d'abord) | `sequence` croissant |
 
 `RECORDED` n'est pas un statut public : le demander répond 400. Un filtre `tour` inconnu ou un `poule` non entier répond 400 `VALIDATION_FAILED`.
+
+## Finale d'une édition (`final`, G4)
+
+`IEditionSummary.final` vaut `null` tant que l'édition n'a pas de finaliste, sinon `{ runnerUp, score }` :
+
+- `runnerUp` : la participation de stade `FINALIST` (identité publique) ;
+- `score` : `{ champion, runnerUp }`, scores validés du match de la finale (`ROUND_KIND.FINAL`, `VALIDATED`) ; `null` si la finale d'archive n'a pas de score (`RESULT_UNKNOWN`).
+
+Le calcul est fait en une passe pour toute la liste (deux requêtes quel que soit le nombre d'éditions).
+
+## Affectations d'un tirage (`IDrawAssignment`)
+
+- `drawnOrder` : l'ordre global du tirage (1..N), qui conserve « poule après poule » (RG11). Il n'existe pas de place dans la poule : elle n'a pas de sens sportif (round-robin).
+- `poolNumber` : numéro de la poule de destination (1-based), dérivé de `poolId`. Dans un brouillon de tirage de poules (B-11), il est connu alors que `poolId` est encore `null`. `null` pour un tirage de tour.
+- `pairingIndex` (1..k) et `sidePosition` (1 ou 2) : tirages de **tour** uniquement ; `null` pour un tirage de poules.
+
+## Contrat anticipé de B-11 et B-15 (interfaces seulement, aucune route)
+
+Rangé dans `src/interfaces`, `src/enums` et `src/types` pour que le front avance sur fixtures. B-11 et B-15 implémentent ces formes ou les amendent en revue, en prévenant le front.
+
+- B-11 (`src/interfaces/draw.interface.ts`) : `ICreatePoolDrawRequest { poolCount, seedCount, seeds: string[] }` ; `IUpdateDrawAssignmentsRequest { assignments: { participationId, poolNumber, drawnOrder }[] }` ; `IAdminDraw` (`IDraw` plus `createdBy` et `validatedBy`, `IAdminActor | null`) ; `ISeedProposal { seeds: { participationId, competitor, rank, acp }[], unresolvedTies }`, où `acp` est le score ACP qui a servi au classement (RG9, A8).
+- B-15 (`src/interfaces/admin-activity.interface.ts`, `src/types/admin-activity.type.ts`, `src/enums/admin-activity.enum.ts`) : `IAdminActivityItem { kind, at, actor, target }`, triée du plus récent au plus ancien, `?limit=` défaut 20, maximum 100. `target` est l'union discriminée `TAdminActivityTarget` sur `type` : `MATCH` (`matchSequence`, `roundKind`, `poolNumber`, `sides: [IMatchSide, IMatchSide]` dans l'ordre des positions, `score` = score validé ou corrigé) ou `DRAW` (`drawKind`, `roundKind`, `poolCount` et `seedCount` pour un tirage de poules, `null` pour un tirage de tour). Aucune chaîne n'est construite par le serveur.
 
 ## Règles de visibilité
 
@@ -62,6 +84,7 @@ L'empreinte de l'ETag est calculée sur le contenu public : dernier `validated_a
   "scoredMatchCount": 1,
   "unknownResultMatchCount": 0,
   "champion": null,
+  "final": null,
   "description": null,
   "participants": [
     {
@@ -115,7 +138,7 @@ L'empreinte de l'ETag est calculée sur le contenu public : dernier `validated_a
       "parameters": { "poolCount": 1, "seedCount": 1 },
       "createdAt": "2026-09-30T17:55:00.000Z", "validatedAt": "2026-09-30T18:00:00.000Z",
       "assignments": [
-        { "participationId": "0e1f...", "competitorId": "a1...", "displayName": "Alice", "poolId": "77aa...", "pairingIndex": null, "sidePosition": null, "drawnOrder": 1, "assignedAt": "2026-09-30T18:00:00.000Z" }
+        { "participationId": "0e1f...", "competitorId": "a1...", "displayName": "Alice", "poolId": "77aa...", "poolNumber": 1, "pairingIndex": null, "sidePosition": null, "drawnOrder": 1, "assignedAt": "2026-09-30T18:00:00.000Z" }
       ]
     }
   ],

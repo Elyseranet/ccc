@@ -64,6 +64,8 @@ GET /api/v1/competiteurs?q=dese&sort=wins
 
 ## `GET /competiteurs/{id}`
 
+Chaque participation porte (G2) : `poolNumber` (numéro de la poule de l'édition, 1-based, `null` si le joueur n'a pas de poule), `poolRank` (sa **place** dans la poule, inchangé), et `wins`, `losses`, `unknownResults` de l'édition. Ces trois compteurs viennent de `computeWinLoss` sur les matchs `REGULAR` de l'édition (R-5) ; leur somme sur toutes les éditions égale `stats.wins` et `stats.losses`.
+
 Réponse : `ICompetitorDetail` (identité publique, `participations` triées par ordre chronologique avec stade final et points figés, `stats`). `id` mal formé : 400. Inconnu : 404 `COMPETITOR_NOT_FOUND`. Un compétiteur sans match avec score renvoie des statistiques à 0.
 
 ```json
@@ -75,7 +77,7 @@ Réponse : `ICompetitorDetail` (identité publique, `participations` triées par
   "nickname": null,
   "avatarUrl": null,
   "participations": [
-    { "editionId": "…", "editionCode": "2020", "year": 2020, "editionName": "Édition 2020", "editionStatus": "CLOSED", "finalStage": "FINALIST", "points": 12.5, "poolRank": null }
+    { "editionId": "…", "editionCode": "2020", "year": 2020, "editionName": "Édition 2020", "editionStatus": "CLOSED", "finalStage": "FINALIST", "points": 12.5, "poolNumber": 2, "poolRank": 1, "wins": 3, "losses": 1, "unknownResults": 0 }
   ],
   "stats": { "played": 4, "wins": 3, "losses": 1, "unknownResults": 1, "pointsFor": 19, "pointsAgainst": 11, "titles": 1 }
 }
@@ -85,7 +87,9 @@ Réponse : `ICompetitorDetail` (identité publique, `participations` triées par
 
 RG36, RG37. Avec `?adversaire={id}` : `IHeadToHead` (bilan de la paire vu du côté de `{id}`, plus la liste des matchs comptés). `adversaire` mal formé ou égal à `{id}` : 400 ; l'un des deux joueurs inconnu : 404 `COMPETITOR_NOT_FOUND`. Une paire qui ne s'est jamais rencontrée renvoie `played: 0`, `winRatio: null`, `matches: []`.
 
-Sans `adversaire` : `IHeadToHeadSummary[]`, une entrée par adversaire déjà rencontré (au moins un match avec score), les plus fréquents d'abord.
+`opponent` est un `ICompetitorWithTitles` (identité publique plus `titles`, G3) : les titres sont comptés comme dans la liste (éditions `CLOSED`, `countTitles`). `unknownResults` (G9) est le nombre de matchs `REGULAR` de la paire au résultat inconnu (R-5) : `played + unknownResults` est le nombre total de matchs `REGULAR` de la paire. Chaque match porte `poolNumber` (G10), `null` hors poule.
+
+Sans `adversaire` : `IHeadToHeadSummary[]`, une entrée par adversaire déjà rencontré, y compris quand tous les matchs de la paire ont un résultat inconnu (`played: 0`, `wins: 0`, `losses: 0`, `unknownResults: n`, `winRatio: null`, G11). Tri côté serveur : `wins + losses + unknownResults` décroissant, puis `displayName` de l'adversaire.
 
 ```
 GET /api/v1/competiteurs/{id}/face-a-face?adversaire={id2}
@@ -94,11 +98,11 @@ GET /api/v1/competiteurs/{id}/face-a-face?adversaire={id2}
 ```json
 {
   "competitor": { "id": "…", "displayName": "Nicolas Deseine", "firstName": "Nicolas", "lastName": "Deseine", "nickname": null, "avatarUrl": null },
-  "opponent": { "id": "…", "displayName": "Rémi Durand", "firstName": "Rémi", "lastName": "Durand", "nickname": null, "avatarUrl": null },
-  "played": 3, "wins": 2, "losses": 1, "winRatio": 0.6666666666666666,
+  "opponent": { "id": "…", "displayName": "Rémi Durand", "firstName": "Rémi", "lastName": "Durand", "nickname": null, "avatarUrl": null, "titles": 1 },
+  "played": 3, "wins": 2, "losses": 1, "unknownResults": 0, "winRatio": 0.6666666666666666,
   "pointsFor": 14, "pointsAgainst": 10, "differential": 4,
   "matches": [
-    { "matchId": "…", "editionId": "…", "editionCode": "2020", "roundKind": "POOLS", "competitorScore": 5, "opponentScore": 3, "winnerCompetitorId": "…" }
+    { "matchId": "…", "editionId": "…", "editionCode": "2020", "roundKind": "POOLS", "poolNumber": 2, "competitorScore": 5, "opponentScore": 3, "winnerCompetitorId": "…" }
   ]
 }
 ```

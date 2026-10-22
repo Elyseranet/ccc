@@ -13,6 +13,15 @@ export interface IEditionChampion {
   titlesToDate: number
 }
 
+/**
+ * Finale de l'édition (chronologie, F-02). `runnerUp` : le finaliste (stade FINALIST). `score` : les scores validés
+ * du match de finale ; null si la finale est d'archive sans score (RESULT_UNKNOWN).
+ */
+export interface IEditionFinal {
+  runnerUp: ICompetitorPublic
+  score: { champion: number, runnerUp: number } | null
+}
+
 export interface IEditionSummary {
   id: string
   code: string
@@ -33,6 +42,8 @@ export interface IEditionSummary {
   /** R-5 : matchs RESULT_UNKNOWN, ni victoire ni défaite dans les bilans. */
   unknownResultMatchCount: number
   champion: IEditionChampion | null
+  /** null tant que l'édition n'a pas de finaliste. */
+  final: IEditionFinal | null
 }
 
 export interface IEditionParticipant {

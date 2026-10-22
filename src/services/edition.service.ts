@@ -1,4 +1,4 @@
-import type { IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest } from '../interfaces/edition.interface.js'
+import type { IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IArchiveStats } from '../interfaces/stats.interface.js'
@@ -10,6 +10,7 @@ import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../enums/edition.enum.js'
 import { FINAL_STAGE } from '../enums/participation.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import type { IDraw } from '../interfaces/draw.interface.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
@@ -141,7 +142,7 @@ export const loadValidatedDraws = async (dataSource: DataSource, editionId: stri
   }
   const assignments = await dataSource.getRepository(DrawAssignmentEntity).find({
     where: { drawId: In(draws.map((draw) => draw.id)) },
-    relations: { participation: { competitor: true } }
+    relations: { participation: { competitor: true }, pool: true }
   })
   return draws.map((draw) => toPublicDraw(draw, assignments.filter((assignment) => assignment.drawId === draw.id)))
 }
@@ -188,6 +189,45 @@ const loadChampions = async (dataSource: DataSource): Promise<Map<string, IEditi
   return champions
 }
 
+/**
+ * G4 : finale de chaque édition, en deux requêtes quel que soit le nombre d'éditions (champion et finaliste, puis
+ * matchs de finale VALIDATED avec leurs côtés). Pas de finaliste : pas de `final`. Finale d'archive sans score
+ * (RESULT_UNKNOWN) ou score non rattachable aux deux finalistes : `score` vaut null.
+ */
+const loadFinals = async (dataSource: DataSource, editionIds: string[]): Promise<Map<string, IEditionFinal>> => {
+  const finalists = await dataSource.getRepository(ParticipationEntity).find({
+    where: { editionId: In(editionIds), finalStage: In([FINAL_STAGE.CHAMPION, FINAL_STAGE.FINALIST]) },
+    relations: { competitor: true },
+    order: { id: 'ASC' }
+  })
+  const finalMatches = await dataSource.getRepository(MatchEntity).find({
+    where: { editionId: In(editionIds), round: { kind: ROUND_KIND.FINAL }, status: MATCH_STATUS.VALIDATED },
+    relations: { sides: true },
+    order: { sequence: 'DESC' }
+  })
+  const finals = new Map<string, IEditionFinal>()
+  for (const editionId of editionIds) {
+    const runnerUp = finalists.find((p) => p.editionId === editionId && p.finalStage === FINAL_STAGE.FINALIST)
+    if (!runnerUp) {
+      continue
+    }
+    const champion = finalists.find((p) => p.editionId === editionId && p.finalStage === FINAL_STAGE.CHAMPION)
+    const scoreOf = (participationId: string | undefined, match: MatchEntity): number | null =>
+      match.sides.find((side) => side.participationId === participationId)?.validatedScore ?? null
+    let score: IEditionFinal['score'] = null
+    for (const match of finalMatches.filter((m) => m.editionId === editionId)) {
+      const championScore = scoreOf(champion?.id, match)
+      const runnerUpScore = scoreOf(runnerUp.id, match)
+      if (championScore !== null && runnerUpScore !== null) {
+        score = { champion: championScore, runnerUp: runnerUpScore }
+        break
+      }
+    }
+    finals.set(editionId, { runnerUp: toCompetitorPublic(runnerUp.competitor), score })
+  }
+  return finals
+}
+
 export const loadEditionSummaries = async (
   dataSource: DataSource,
   editions: EditionEntity[]
@@ -196,10 +236,11 @@ export const loadEditionSummaries = async (
     return []
   }
   const ids = editions.map((edition) => edition.id)
-  const [matchCounts, participationCounts, champions] = await Promise.all([
+  const [matchCounts, participationCounts, champions, finals] = await Promise.all([
     loadMatchCounts(dataSource, ids),
     loadParticipationCounts(dataSource, ids),
-    loadChampions(dataSource)
+    loadChampions(dataSource),
+    loadFinals(dataSource, ids)
   ])
   return editions.map((edition) => {
     const counts = matchCounts.get(edition.id)
@@ -220,7 +261,8 @@ export const loadEditionSummaries = async (
       matchCount: counts?.total ?? 0,
       scoredMatchCount: counts?.scored ?? 0,
       unknownResultMatchCount: counts?.unknown ?? 0,
-      champion: champions.get(edition.id) ?? null
+      champion: champions.get(edition.id) ?? null,
+      final: finals.get(edition.id) ?? null
     }
   })
 }

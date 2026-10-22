@@ -16,7 +16,12 @@ export interface ICompetitorPublic {
   avatarUrl: string | null
 }
 
-export interface ICompetitorListItem extends ICompetitorPublic {
+/** Identité publique et titres (A8 : éditions CLOSED, comptés par `countTitles`). */
+export interface ICompetitorWithTitles extends ICompetitorPublic {
+  titles: number
+}
+
+export interface ICompetitorListItem extends ICompetitorWithTitles {
   editionsPlayed: number
   /** R-5 : matchs avec score uniquement (victoires + défaites). */
   matchesPlayed: number
@@ -24,7 +29,6 @@ export interface ICompetitorListItem extends ICompetitorPublic {
   losses: number
   /** R-5 : matchs REGULAR au résultat inconnu, ni victoire ni défaite. */
   unknownResults: number
-  titles: number
   firstEditionCode: string | null
 }
 
@@ -36,7 +40,16 @@ export interface ICompetitorParticipation {
   editionStatus: EDITION_STATUS
   finalStage: FINAL_STAGE | null
   points: number | null
+  /** Numéro de la poule de l'édition (1-based) ; null si l'édition n'a pas de poule pour ce joueur. */
+  poolNumber: number | null
+  /** Place dans la poule (inchangé : ce n'est PAS le numéro de la poule). */
   poolRank: number | null
+  /** Victoires de l'édition, matchs REGULAR avec score (R-5). */
+  wins: number
+  /** Défaites de l'édition, matchs REGULAR avec score (R-5). */
+  losses: number
+  /** R-5 : matchs REGULAR au résultat inconnu dans l'édition, ni victoire ni défaite. */
+  unknownResults: number
 }
 
 export interface ICompetitorStats {
