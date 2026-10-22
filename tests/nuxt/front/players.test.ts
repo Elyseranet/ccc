@@ -12,7 +12,6 @@ import type { IHeadToHeadSummary } from '../../../src/interfaces/head-to-head.in
 import { CompetitorService } from '../../../src/services/competitor.service'
 import {
   buildHeadToHeadLink,
-  buildPageItems,
   buildPlayersApiQuery,
   buildPlayersLocationQuery,
   getInitials,
@@ -155,16 +154,12 @@ describe('état de la recherche dans l’URL', () => {
     expect(buildPlayersApiQuery({ ...base, order: SORT_ORDER.DESC })).toMatchObject({ order: 'desc', pageSize: 20 })
   })
 
-  it('formate les éditions, les initiales et la pagination', () => {
+  it('formate les éditions, et les initiales', () => {
     expect(splitEditionCode('2012b')).toEqual({ year: '2012', suffix: 'b' })
     expect(splitEditionCode('2024')).toEqual({ year: '2024', suffix: null })
     expect(getInitials('Maël Bonnet')).toBe('MB')
     expect(buildHeadToHeadLink('a', 'b')).toBe('/joueurs/face-a-face?a=a&b=b')
     expect(buildHeadToHeadLink('a')).toBe('/joueurs/face-a-face?a=a')
-    expect(buildPageItems(1, 8, 8)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
-    expect(buildPageItems(1, 20, 8)).toEqual([1, 2, 3, 4, 5, 6, 7, null, 20])
-    expect(buildPageItems(10, 20, 8)).toEqual([1, null, 7, 8, 9, 10, 11, 12, null, 20])
-    expect(buildPageItems(20, 20, 8)).toEqual([1, null, 14, 15, 16, 17, 18, 19, 20])
   })
 })
 

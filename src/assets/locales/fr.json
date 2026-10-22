@@ -202,7 +202,6 @@
   "players.nickname": " « {nickname} »",
   "players.no_value": "—",
   "players.pagination.label": "Pagination",
-  "players.pagination.page": "Page {page}",
   "players.pagination.range": "{from}–{to} sur {total}",
   "players.search.all_editions": "Toutes",
   "players.search.compare": "Comparer deux joueurs",

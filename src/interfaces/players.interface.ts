@@ -128,13 +128,3 @@ export interface IPlayerOpponentsProps {
   opponents: IPlayerOpponent[]
   hasMore?: boolean
 }
-
-export interface IPlayersPagerProps {
-  page: number
-  total: number
-  pageSize: number
-}
-
-export interface IPlayersPagerEmits {
-  (event: 'update:page', value: number): void
-}

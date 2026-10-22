@@ -97,25 +97,3 @@ export const buildHeadToHeadLink = (a: string, b?: string): string => {
   }
   return `${ROUTES.HEAD_TO_HEAD}?${params.toString()}`
 }
-
-export const buildPageItems = (current: number, count: number, maxVisible: number): Array<number | null> => {
-  if (count <= maxVisible) {
-    return Array.from({ length: count }, (_, index) => index + 1)
-  }
-  const inner = maxVisible - 2
-  let start = Math.max(2, current - Math.floor(inner / 2))
-  const end = Math.min(count - 1, start + inner - 1)
-  start = Math.max(2, end - inner + 1)
-  const items: Array<number | null> = [1]
-  if (start > 2) {
-    items.push(null)
-  }
-  for (let page = start; page <= end; page += 1) {
-    items.push(page)
-  }
-  if (end < count - 1) {
-    items.push(null)
-  }
-  items.push(count)
-  return items
-}
