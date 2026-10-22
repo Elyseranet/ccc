@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { RANKING_TYPE } from '../../../shared/enums/ranking.enum'
-import type { ICompetitorPublic } from '../../../shared/interfaces/api/competitor.interface'
-import type { IRankingEditionInfo, IRankingSourceParticipation } from '../../../server/interfaces/ranking.interface'
-import { buildEvolutionSeries, buildRankingRows } from '../../../server/utils/ranking/public-ranking.util'
+import { EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
+import { RANKING_KIND } from '../../../src/enums/ranking-kind.enum'
+import type { ICompetitorPublic } from '../../../src/interfaces/competitor.interface'
+import type { IRankingEditionInfo, IRankingSourceParticipation } from '../../../src/interfaces/ranking.interface'
+import { buildEvolutionSeries, buildRankingRows } from '../../../src/utils/public-ranking.util'
 
 const competitor = (id: string, displayName: string): ICompetitorPublic => ({
   id,
@@ -62,7 +62,7 @@ const participations = [
 
 describe('buildRankingRows', () => {
   it('ACP : ne somme que les 5 dernières éditions clôturées (2013..2017), pas les années', () => {
-    const rows = buildRankingRows(RANKING_TYPE.ACP, competitors, editions, participations)
+    const rows = buildRankingRows(RANKING_KIND.ACP, competitors, editions, participations)
     const byId = new Map(rows.map((row) => [row.competitor.id, row]))
     expect(byId.get('a')!.points).toBe(50)
     expect(byId.get('b')!.points).toBe(20)
@@ -70,14 +70,14 @@ describe('buildRankingRows', () => {
   })
 
   it('All Time : somme tout, édition en cours et points null exclus', () => {
-    const rows = buildRankingRows(RANKING_TYPE.ALL_TIME, competitors, editions, participations)
+    const rows = buildRankingRows(RANKING_KIND.ALL_TIME, competitors, editions, participations)
     const byId = new Map(rows.map((row) => [row.competitor.id, row]))
     expect(byId.get('a')).toMatchObject({ points: 70, participations: 7, average: 10, titles: 1 })
     expect(byId.get('c')).toMatchObject({ points: 24, participations: 2, average: 12, titles: 0 })
   })
 
   it('ex aequo : rang partagé (1, 2, 2) et ordre d\'affichage par displayName', () => {
-    const rows = buildRankingRows(RANKING_TYPE.ALL_TIME, competitors, editions, participations)
+    const rows = buildRankingRows(RANKING_KIND.ALL_TIME, competitors, editions, participations)
     expect(rows.map((row) => [row.rank, row.competitor.displayName])).toEqual([
       [1, 'Alice'],
       [2, 'Bob'],
@@ -86,12 +86,12 @@ describe('buildRankingRows', () => {
   })
 
   it('une édition en cours ne compte pas, y compris pour les titres', () => {
-    const rows = buildRankingRows(RANKING_TYPE.ALL_TIME, competitors, editions, participations)
+    const rows = buildRankingRows(RANKING_KIND.ALL_TIME, competitors, editions, participations)
     expect(rows.find((row) => row.competitor.id === 'c')!.titles).toBe(0)
   })
 
   it('ne porte que ICompetitorPublic', () => {
-    const rows = buildRankingRows(RANKING_TYPE.ACP, competitors, editions, participations)
+    const rows = buildRankingRows(RANKING_KIND.ACP, competitors, editions, participations)
     expect(Object.keys(rows[0]!.competitor).sort()).toEqual(
       ['avatarUrl', 'displayName', 'firstName', 'id', 'lastName', 'nickname'],
     )
@@ -100,7 +100,7 @@ describe('buildRankingRows', () => {
 
 describe('buildEvolutionSeries', () => {
   it('un point par édition clôturée dès la première participation, dans l\'ordre chronologique', () => {
-    const [alice] = buildEvolutionSeries(RANKING_TYPE.ALL_TIME, competitors, editions, participations, 'a')
+    const [alice] = buildEvolutionSeries(RANKING_KIND.ALL_TIME, competitors, editions, participations, 'a')
     expect(alice!.points.map((point) => point.editionCode)).toEqual(
       ['2012a', '2012b', '2013', '2014', '2015', '2016', '2017'],
     )
@@ -109,17 +109,17 @@ describe('buildEvolutionSeries', () => {
   })
 
   it('ACP : fenêtre glissante de 5 éditions', () => {
-    const [alice] = buildEvolutionSeries(RANKING_TYPE.ACP, competitors, editions, participations, 'a')
+    const [alice] = buildEvolutionSeries(RANKING_KIND.ACP, competitors, editions, participations, 'a')
     expect(alice!.points.map((point) => point.points)).toEqual([10, 20, 30, 40, 50, 50, 50])
   })
 
   it('l\'édition en cours n\'apparaît pas', () => {
-    const series = buildEvolutionSeries(RANKING_TYPE.ACP, competitors, editions, participations)
+    const series = buildEvolutionSeries(RANKING_KIND.ACP, competitors, editions, participations)
     expect(series.flatMap((s) => s.points).some((point) => point.editionCode === '2018')).toBe(false)
   })
 
   it('sans filtre : tous les joueurs en un appel, triés par nom', () => {
-    const series = buildEvolutionSeries(RANKING_TYPE.ALL_TIME, competitors, editions, participations)
+    const series = buildEvolutionSeries(RANKING_KIND.ALL_TIME, competitors, editions, participations)
     expect(series.map((s) => s.competitor.displayName)).toEqual(['Alice', 'Bob', 'Chloé'])
   })
 })

@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { COMPETITOR_SORT, SORT_ORDER } from '../../server/enums/competitor-sort.enum'
-import { SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS } from '../../server/consts/competitor.const'
+import { COMPETITOR_SORT, SORT_ORDER } from '../../src/enums/competitor-sort.enum'
+import { SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS } from '../../src/consts/competitor.const'
 import {
   buildContainsPattern,
-  competitorListQuerySchema,
   escapeLikePattern,
   foldSearchText
-} from '../../server/utils/competitor/competitor-query.util'
-import { sortCompetitors } from '../../server/utils/competitor/competitor-sort.util'
-import type { ICompetitorListItem } from '../../shared/interfaces/api/competitor.interface'
+} from '../../src/utils/competitor-query.util'
+import { competitorListQuerySchema } from '../../src/schemas/competitor.schema'
+import { sortCompetitors } from '../../src/utils/competitor-sort.util'
+import type { ICompetitorListItem } from '../../src/interfaces/competitor.interface'
 
 describe('competitor search helpers', () => {
   it('folds case and accents', () => {

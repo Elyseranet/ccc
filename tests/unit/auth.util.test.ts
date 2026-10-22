@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LOGIN_DELAY_MAX_SECONDS, PASSWORD_MIN_LENGTH } from '../../server/consts/auth.const'
+import { LOGIN_DELAY_MAX_SECONDS, PASSWORD_MIN_LENGTH } from '../../src/consts/auth.const'
 import {
   buildDeviceCookieOptions,
   generateDeviceNonce,
@@ -7,22 +7,22 @@ import {
   resolveDeviceCookieSecret,
   signDeviceCookie,
   verifyDeviceCookie
-} from '../../server/utils/auth/device-cookie.util'
-import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../server/utils/auth/login-throttle.util'
-import { loginSchema, updateMeSchema } from '../../server/schemas/auth.schema'
-import { isCrossSiteWrite, parseAllowedOrigins } from '../../server/utils/auth/csrf.util'
-import { burnPasswordCheck, hashPassword, verifyPassword } from '../../server/utils/auth/password.util'
+} from '../../src/utils/device-cookie.util'
+import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../src/utils/login-throttle.util'
+import { loginSchema, updateMeSchema } from '../../src/schemas/auth.schema'
+import { isCrossSiteWrite, parseAllowedOrigins } from '../../src/utils/csrf.util'
+import { burnPasswordCheck, hashPassword, verifyPassword } from '../../src/utils/password.util'
 import {
   buildSessionCookieOptions,
   getSessionCookieName,
   generateSessionToken,
   hashSessionToken,
   isWellFormedSessionToken
-} from '../../server/utils/auth/session-token.util'
+} from '../../src/utils/session-token.util'
 import type { H3Event } from 'h3'
-import { USER_ROLE } from '../../shared/enums/user.enum'
-import { requireRole, requireUser } from '../../server/utils/auth/require-role.util'
-import { normalizeEmail } from '../../shared/utils/email.util'
+import { USER_ROLE } from '../../src/enums/user.enum'
+import { requireRole, requireUser } from '../../src/utils/require-role.util'
+import { normalizeEmail } from '../../src/utils/email.util'
 
 const OWN = 'https://ccc.example'
 

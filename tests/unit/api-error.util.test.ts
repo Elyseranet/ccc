@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
-import { API_ERROR_MESSAGE, INTERNAL_ERROR_MESSAGE } from '../../server/consts/api-error.const'
+import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
+import { API_ERROR_MESSAGE, INTERNAL_ERROR_MESSAGE } from '../../src/consts/api-error.const'
 import {
   badRequest,
   conflict,
@@ -15,7 +15,7 @@ import {
   unauthorized,
   unprocessable,
   validationFailed
-} from '../../server/utils/http/api-error.util'
+} from '../../src/utils/api-error.util'
 
 describe('api-error factories', () => {
   it.each([

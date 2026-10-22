@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { HEALTH_STATUS } from '../../shared/enums/health-status.enum'
+import { HEALTH_STATUS } from '../../src/enums/health-status.enum'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 

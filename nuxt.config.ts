@@ -1,4 +1,5 @@
-import { CCC_HH_THEMES } from './app/themes/ccc.theme'
+import { CCC_HH_THEMES } from './src/themes/ccc.theme'
+import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
@@ -7,6 +8,27 @@ export default defineNuxtConfig({
   devtools: { enabled: process.env.E2E !== 'true' },
   modules: ['origam/nuxt', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
+  srcDir: 'src',
+  serverDir: 'src/server',
+  // T-ARCH-01 (ARCH-1) : `src/utils/` mêle utils navigateur et serveur. Aucun scan d'auto-import
+  // (ni côté app, ni côté Nitro) : chaque fichier importe explicitement ce qu'il utilise, un util
+  // serveur ne peut donc pas entrer dans le bundle navigateur par un auto-import.
+  imports: { scan: false },
+  hooks: {
+    // T-ARCH-01 (ARCH-2) : un service fusionné exporte sa classe navigateur et ses fonctions serveur. Côté client,
+    // les modules serveur sont déclarés sans effet de bord : inutilisés, ils sont élagués avec les fonctions
+    // serveur ; utilisés par erreur, `clientBundleGuard` fait échouer le build.
+    'vite:extendConfig' (config, { isClient }) {
+      if (!isClient) {
+        return
+      }
+      const target = config as { build?: Record<string, unknown>, plugins?: unknown[] }
+      const build = (target.build ??= {})
+      const rolldownOptions = (build.rolldownOptions ??= {}) as Record<string, unknown>
+      rolldownOptions.treeshake = { moduleSideEffects: (id: string) => !isServerOnlyModule(id) }
+      target.plugins = [...(target.plugins ?? []), clientBundleGuard()]
+    }
+  },
   app: {
     head: {
       htmlAttrs: { lang: 'fr' },

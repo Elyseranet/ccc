@@ -1,6 +1,6 @@
 # API publique : éditions (B-06)
 
-Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO sont dans `shared/interfaces/api/`. Les erreurs ont la forme `IApiError`.
+Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO sont dans `../../src/shared/interfaces/api/`. Les erreurs ont la forme `IApiError`.
 
 `{id}` accepte l'UUID de l'édition ou son `code` (`2012a`, `2026`). L'année n'identifie pas une édition : 2012 en porte deux.
 

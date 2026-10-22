@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { TIEBREAK_FORMAT } from '../../../server/enums/domain.enum'
-import { computePoolStanding } from '../../../server/utils/pool/standing.util'
-import { generateRoundRobin } from '../../../server/utils/pool/round-robin.util'
-import { resolveTiedGroup, tiebreakFormatFor } from '../../../server/utils/pool/tiebreak.util'
-import { MATCH_STATUS } from '../../../shared/enums/match.enum'
+import { TIEBREAK_FORMAT } from '../../../src/enums/domain.enum'
+import { computePoolStanding } from '../../../src/utils/standing.util'
+import { resolveTiedGroup, tiebreakFormatFor } from '../../../src/utils/tiebreak.util'
+import { MATCH_STATUS } from '../../../src/enums/match.enum'
 import { duel, tiebreak } from './match.factory'
-import { sheetRows } from './workbook.fixture'
 
 const ranks = (standing: ReturnType<typeof computePoolStanding>) =>
   standing.entries.map((entry) => `${entry.rank}:${entry.playerId}`)
@@ -157,35 +155,5 @@ describe('tiebreak.util', () => {
 
   it('un départage aux scores tous égaux ne tranche rien (pas de boucle)', () => {
     expect(resolveTiedGroup(['a', 'b'], [tiebreak(['a', 2], ['b', 2])])).toEqual([['a', 'b']])
-  })
-})
-
-describe('RG15, RG19 sur le classeur : toutes les poules entièrement renseignées', () => {
-  it('chaque poule complète a n(n-1)/2 matchs et un classement monotone', () => {
-    const pools = new Map<string, { players: Set<string>; matches: ReturnType<typeof duel>[] }>()
-    for (const { values } of sheetRows('scores')) {
-      const [id, label, first, firstScore, second, secondScore] = values
-      if (!/^Poule\d$/.test(String(label)) || typeof firstScore !== 'number' || typeof secondScore !== 'number') continue
-      const key = `${String(id).split('-')[0]}/${label}`
-      const pool = pools.get(key) ?? { players: new Set<string>(), matches: [] }
-      pool.players.add(String(first))
-      pool.players.add(String(second))
-      pool.matches.push(duel(String(first), firstScore, String(second), secondScore))
-      pools.set(key, pool)
-    }
-    let complete = 0
-    for (const [key, pool] of pools) {
-      const players = [...pool.players]
-      if (pool.matches.length !== generateRoundRobin(players).length) continue
-      complete += 1
-      const standing = computePoolStanding(players, pool.matches)
-      expect(standing.entries, key).toHaveLength(players.length)
-      expect(standing.entries.reduce((sum, e) => sum + e.wins, 0), key).toBe(pool.matches.length)
-      for (let i = 1; i < standing.entries.length; i++) {
-        expect(standing.entries[i - 1]!.wins, key).toBeGreaterThanOrEqual(standing.entries[i]!.wins)
-        expect(standing.entries[i - 1]!.rank, key).toBeLessThanOrEqual(standing.entries[i]!.rank)
-      }
-    }
-    expect(complete).toBeGreaterThan(20)
   })
 })

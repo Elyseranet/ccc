@@ -1,17 +1,17 @@
 import 'reflect-metadata'
 import type { DataSource } from 'typeorm'
-import { COMPETITOR_ALIAS_SOURCE } from '../../../shared/enums/competitor.enum'
-import { EDITION_ORIGIN, EDITION_STATUS } from '../../../shared/enums/edition.enum'
-import { MATCH_PURPOSE, MATCH_STATUS } from '../../../shared/enums/match.enum'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
-import { ROUND_KIND } from '../../../shared/enums/round.enum'
-import { CompetitorAliasEntity } from '../../../server/database/entities/competitor-alias.entity'
-import { CompetitorEntity } from '../../../server/database/entities/competitor.entity'
-import { EditionEntity } from '../../../server/database/entities/edition.entity'
-import { MatchSideEntity } from '../../../server/database/entities/match-side.entity'
-import { MatchEntity } from '../../../server/database/entities/match.entity'
-import { ParticipationEntity } from '../../../server/database/entities/participation.entity'
-import { RoundEntity } from '../../../server/database/entities/round.entity'
+import { COMPETITOR_ALIAS_SOURCE } from '../../../src/enums/competitor.enum'
+import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
+import { ROUND_KIND } from '../../../src/enums/round.enum'
+import { CompetitorAliasEntity } from '../../../src/server/db/typeorm/entities/competitor-alias.entity'
+import { CompetitorEntity } from '../../../src/server/db/typeorm/entities/competitor.entity'
+import { EditionEntity } from '../../../src/server/db/typeorm/entities/edition.entity'
+import { MatchSideEntity } from '../../../src/server/db/typeorm/entities/match-side.entity'
+import { MatchEntity } from '../../../src/server/db/typeorm/entities/match.entity'
+import { ParticipationEntity } from '../../../src/server/db/typeorm/entities/participation.entity'
+import { RoundEntity } from '../../../src/server/db/typeorm/entities/round.entity'
 
 export const PRIVATE_PHONE = '+33600000042'
 
@@ -28,7 +28,7 @@ export interface ICompetitorFixtures {
 
 /** Recrée le schéma sur la base `_test` puis y pose un jeu de données minimal. */
 export const resetAndSeedCompetitors = async (): Promise<{ dataSource: DataSource, ids: ICompetitorFixtures }> => {
-  const dataSource = (await import('../../../server/database/data-source')).default
+  const dataSource = (await import('../../../src/server/db/typeorm/data-source')).default
   await dataSource.initialize()
   await dataSource.dropDatabase()
   await dataSource.runMigrations()

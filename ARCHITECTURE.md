@@ -101,7 +101,7 @@ Les règles numériques (barème, scores cibles, départages, qualifications) do
 
 Les classements et statistiques sont des projections des matchs et participations, pas des données d'entrée indépendantes. La proposition est de les recalculer à la lecture ou depuis des services de calcul partagés ; leur matérialisation est à décider uniquement après mesure.
 
-La reprise des archives est un chantier séparé de la modélisation métier. L'export XLSX fourni est conservé sous forme d'un snapshot JSON rejouable ; toutes les feuilles (y compris les onglets de synthèse et de configuration), les lignes non vides, les formules et les indices de format sont chargés dans `legacy_workbook_imports` et `legacy_workbook_rows`. Cela préserve la source sans présenter les tableaux calculés comme des données métier. Le décompte de référence dans la spécification est de 16 éditions et 145 compétiteurs. La normalisation vers les entités métier demandera une table de correspondance contrôlée pour les variantes de noms et les tours ambigus, ainsi qu'un rapport rejouable. Les scores manquants restent inconnus : ne pas les reconstituer.
+La reprise des archives a été faite une fois (B-04), puis figée (ARCH-5, ARCH-10, 2026-10-22). Les archives sont livrées dans un dump SQL versionné, `src/assets/seeds/archives.sql`, appliqué par `db:seed:archives` sur une base migrée et vide. Il contient les entités métier reprises (16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score) et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes), qui préserve l'original sans présenter les tableaux calculés comme des données métier. Le test `tests/db/archives-seed.test.ts` revérifie sur la base, après application du dump, que les classements recalculés égalent le classeur (0 écart bloquant, Nicolas Deseine 39/13). Le convertisseur XLSX, le snapshot JSON et les scripts de seed et de reprise ont été supprimés. Les scores manquants restent inconnus : ils ne sont pas reconstitués.
 
 ## Décisions en attente
 
@@ -129,3 +129,7 @@ La reprise des archives est un chantier séparé de la modélisation métier. L'
 5. Maquettes retrouvées dans `CCC.zip` : 27 vues couvrant le site public, le back-office et les étapes de tirage. Les premières pages front suivent cette direction visuelle. Les parcours détaillés de tirage restent à intégrer.
 
 Cette séquence ne constitue pas un engagement de livraison ; elle ordonne le travail restant à partir des informations présentes.
+
+## Arborescence du code (T-ARCH-01)
+
+Un dossier par nature sous `src/`, à plat ; `src/server/` ne garde que ce que Nitro impose et la base (`db/migrations`, `db/typeorm`, `db/typeorm/entities`). Les services d'un domaine réunissent la classe navigateur et les lectures serveur ; une garde de build interdit tout code serveur dans les chunks client. Détail : `CLAUDE.md` du dépôt et décisions ARCH-1 à ARCH-12 (`docs/design/ux/decisions.md`).

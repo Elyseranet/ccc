@@ -6,8 +6,8 @@
 
 ## Périmètre
 1. Un environnement e2e sur une **base de test seedée** (migrations, puis `db:seed:legacy` et `db:import:legacy`). Les variables passent en ligne de commande, jamais de `.env` dans un worktree.
-2. Passage de `ME`, `EDITIONS` et `AUTH_LOGOUT` en `API_SOURCE.LIVE` dans `app/consts/api-sources.const.ts`.
-3. `delivered: true` pour `/admin/plus` dans `app/consts/page-delivery.const.ts`.
+2. Passage de `ME`, `EDITIONS` et `AUTH_LOGOUT` en `API_SOURCE.LIVE` dans `src/consts/api-sources.const.ts`.
+3. `delivered: true` pour `/admin/plus` dans `src/consts/page-delivery.const.ts`.
 4. Stratégie e2e et visuelle : les mesures pixel perfect restent sur fixtures (données de maquette), et les parcours LIVE tournent sur la base seedée. Les deux modes doivent coexister sans se casser.
 5. Preuve de la garde OPS-3 en conditions réelles : `docker build`, puis l'image contre la base seedée. `/admin/plus` répond une fois authentifié, les pages non livrées répondent 404.
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateRoundRobin } from '../../../server/utils/pool/round-robin.util'
+import { generateRoundRobin } from '../../../src/utils/round-robin.util'
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `p${i + 1}`)
 

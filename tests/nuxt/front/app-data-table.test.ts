@@ -3,7 +3,7 @@ import { h } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import { OrigamDataTable } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
-import { pickPassedListeners, pickPassedProps } from '~/utils/passed-props.util'
+import { pickPassedListeners, pickPassedProps } from '../../../src/utils/passed-props.util'
 
 const HEADERS = [
   { key: 'name', title: 'Nom', sortable: true },

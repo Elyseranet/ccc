@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { TIEBREAK_FORMAT } from '../../../server/enums/domain.enum'
-import type { IPoolStanding } from '../../../server/interfaces/pool.interface'
-import { selectQualifiers } from '../../../server/utils/pool/qualification.util'
+import { TIEBREAK_FORMAT } from '../../../src/enums/domain.enum'
+import type { IPoolStanding } from '../../../src/interfaces/pool.interface'
+import { selectQualifiers } from '../../../src/utils/qualification.util'
 import { tiebreak } from './match.factory'
 
 /** [playerId, wins, played, capsAverage] dans l ordre du classement. */

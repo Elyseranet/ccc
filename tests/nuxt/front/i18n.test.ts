@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { useT } from '~/composables/useT'
+import { useT } from '../../../src/composables/useT'
 
 const SEGMENT = /^[a-z0-9]+(_[a-z0-9]+)*$/
 
@@ -15,8 +15,8 @@ const walk = (dir: string): string[] =>
   })
 
 const read = (file: string): Record<string, string> => JSON.parse(readFileSync(file, 'utf8'))
-const fr = read('app/locales/fr.json')
-const en = read('app/locales/en.json')
+const fr = read('src/assets/locales/fr.json')
+const en = read('src/assets/locales/en.json')
 
 describe('i18n (skill i18n-keys)', () => {
   it('chaque segment de clé est en snake_case', () => {
@@ -34,7 +34,7 @@ describe('i18n (skill i18n-keys)', () => {
   })
 
   it('toute clé utilisée dans le code existe dans en.json, et toute clé de en.json est utilisée', () => {
-    const files = walk('app')
+    const files = walk('src')
     const used = new Set<string>()
     for (const file of files) {
       const source = readFileSync(file, 'utf8')

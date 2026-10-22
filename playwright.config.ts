@@ -5,6 +5,8 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
 
 export default defineConfig({
   testDir: 'tests/e2e',
+  // ARCH-9 : base de test réelle (suffixe _test), chargée par le seed SQL des archives, comptes et sessions de test.
+  globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: true,
   reporter: [['list']],
   use: {

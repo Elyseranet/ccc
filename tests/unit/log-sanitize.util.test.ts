@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { LOG_MAX_VALUE_LENGTH } from '../../server/consts/log.const'
-import { sanitizeRouteForLog, truncateLogValue } from '../../server/utils/log-sanitize.util'
+import { LOG_MAX_VALUE_LENGTH } from '../../src/consts/log.const'
+import { sanitizeRouteForLog, truncateLogValue } from '../../src/utils/log-sanitize.util'
 
 describe('log sanitizing', () => {
   it('truncates a long value to the fixed bound', () => {

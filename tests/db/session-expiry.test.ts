@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
-import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
-import { SESSION_ABSOLUTE_TIMEOUT_SECONDS, SESSION_IDLE_TIMEOUT_SECONDS } from '../../server/consts/auth.const'
-import { SessionEntity } from '../../server/database/entities/session.entity'
-import { UserEntity } from '../../server/database/entities/user.entity'
-import { createSession, resolveSession } from '../../server/utils/auth/session-store.util'
+import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
+import { SESSION_ABSOLUTE_TIMEOUT_SECONDS, SESSION_IDLE_TIMEOUT_SECONDS } from '../../src/consts/auth.const'
+import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
+import { UserEntity } from '../../src/server/db/typeorm/entities/user.entity'
+import { createSession, resolveSession } from '../../src/utils/session-store.util'
 import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource

@@ -3,9 +3,9 @@ import {
   PAGINATION_DEFAULT_PAGE,
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_MAX_PAGE_SIZE
-} from '../../server/consts/pagination.const'
-import { toApiError } from '../../server/utils/http/api-error.util'
-import { buildPaginated, parsePagination } from '../../server/utils/http/pagination.util'
+} from '../../src/consts/pagination.const'
+import { toApiError } from '../../src/utils/api-error.util'
+import { buildPaginated, parsePagination } from '../../src/utils/pagination.util'
 
 const statusOf = (query: Record<string, unknown>): number => {
   try {

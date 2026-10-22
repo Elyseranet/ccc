@@ -1,0 +1,106 @@
+import type {
+  IPoolStanding,
+  IPoolStandingEntry,
+  ITiebreakRequirement,
+} from '../interfaces/pool.interface.js'
+import type { IMatchRecord } from '../interfaces/stats.interface.js'
+import { splitByKey } from './group.util.js'
+import { countedOutcomes } from './record.util.js'
+import { resolveTiedGroup, tiebreakFormatFor } from './tiebreak.util.js'
+
+/**
+ * RG19, A10 : classement d'une poule.
+ * Ordre : victoires, puis cap's average (points marqués - encaissés), puis confrontation
+ * directe (victoires dans les matchs joués entre les seuls joueurs concernés). Ce qui reste à
+ * égalité n'est jamais tranché : il est renvoyé dans `requiresTiebreak`, sauf si un match
+ * TIEBREAK validé le départage (A11). Les joueurs encore à égalité partagent le même rang.
+ *
+ * R-6 : confrontation directe = mini-poule des joueurs concernés (pour deux joueurs, leur match) ;
+ * si elle laisse un sous-groupe à égalité, elle est réappliquée à ce sous-groupe, puis le match
+ * de départage à N côtés (R-1) tranche ce qui reste.
+ * Les matchs dont un joueur n'est pas dans `playerIds` sont ignorés.
+ */
+export function computePoolStanding(
+  playerIds: readonly string[],
+  matches: readonly IMatchRecord[],
+): IPoolStanding {
+  const inPool = new Set(playerIds)
+  const outcomes = countedOutcomes(matches).filter(
+    ({ winner, loser }) => inPool.has(winner.playerId) && inPool.has(loser.playerId),
+  )
+  const stats = new Map<string, IPoolStandingEntry>(
+    playerIds.map((playerId) => [
+      playerId,
+      { playerId, rank: 0, played: 0, wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0, capsAverage: 0 },
+    ]),
+  )
+  for (const { winner, loser } of outcomes) {
+    const w = stats.get(winner.playerId)!
+    const l = stats.get(loser.playerId)!
+    w.played += 1
+    l.played += 1
+    w.wins += 1
+    l.losses += 1
+    w.pointsFor += winner.score
+    w.pointsAgainst += loser.score
+    l.pointsFor += loser.score
+    l.pointsAgainst += winner.score
+  }
+  for (const entry of stats.values()) {
+    entry.capsAverage = entry.pointsFor - entry.pointsAgainst
+  }
+
+  const directWins = (group: readonly IPoolStandingEntry[]): Map<string, number> => {
+    const ids = new Set(group.map((entry) => entry.playerId))
+    const wins = new Map<string, number>(group.map((entry) => [entry.playerId, 0]))
+    for (const { winner, loser } of outcomes) {
+      if (ids.has(winner.playerId) && ids.has(loser.playerId)) {
+        wins.set(winner.playerId, wins.get(winner.playerId)! + 1)
+      }
+    }
+    return wins
+  }
+
+  // R-6 : mini-poule d'abord ; si elle laisse un sous-groupe à égalité, on réapplique la
+  // confrontation directe à ce sous-groupe seul (matchs entre ses membres) tant qu'elle départage.
+  const resolveByDirect = (block: IPoolStandingEntry[]): IPoolStandingEntry[][] => {
+    const direct = directWins(block)
+    const sorted = [...block].sort((a, b) => direct.get(b.playerId)! - direct.get(a.playerId)!)
+    const parts = splitByKey(sorted, (entry) => direct.get(entry.playerId)!)
+    return parts.length === 1 ? [block] : parts.flatMap(resolveByDirect)
+  }
+
+  const entries: IPoolStandingEntry[] = []
+  const requiresTiebreak: ITiebreakRequirement[] = []
+  const place = (tied: IPoolStandingEntry[]): void => {
+    const startRank = entries.length + 1
+    for (const entry of tied) {
+      entry.rank = startRank
+      entries.push(entry)
+    }
+    if (tied.length > 1) {
+      requiresTiebreak.push({
+        playerIds: tied.map((entry) => entry.playerId),
+        startRank,
+        format: tiebreakFormatFor(tied.length),
+      })
+    }
+  }
+
+  const byWins = [...stats.values()].sort((a, b) => b.wins - a.wins)
+  for (const winsBlock of splitByKey(byWins, (entry) => entry.wins)) {
+    const byCaps = [...winsBlock].sort((a, b) => b.capsAverage - a.capsAverage)
+    for (const capsBlock of splitByKey(byCaps, (entry) => entry.capsAverage)) {
+      for (const directBlock of resolveByDirect(capsBlock)) {
+        const resolved = resolveTiedGroup(
+          directBlock.map((entry) => entry.playerId),
+          matches,
+        )
+        for (const group of resolved) {
+          place(group.map((playerId) => stats.get(playerId)!))
+        }
+      }
+    }
+  }
+  return { entries, requiresTiebreak }
+}

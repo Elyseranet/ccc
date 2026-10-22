@@ -1,14 +1,15 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { ADMIN_PAGES, FIXTURE_SESSION_COOKIE, PUBLIC_PAGES } from './pages.const'
-
-const COOKIE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`
+import { markAwaitingRoutes } from './helpers/pending-routes'
+import { signIn } from './helpers/session'
+import { ADMIN_PAGES, PUBLIC_PAGES } from './pages.const'
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 test.describe('accessibilité des pages squelettes', () => {
   for (const path of PUBLIC_PAGES) {
     test(`${path} : 0 violation axe`, async ({ page }) => {
+      markAwaitingRoutes(path)
       await page.goto(path)
       await page.waitForLoadState('networkidle')
       const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
@@ -18,7 +19,8 @@ test.describe('accessibilité des pages squelettes', () => {
 
   for (const path of ADMIN_PAGES) {
     test(`${path} : 0 violation axe`, async ({ page, context }) => {
-      await context.addCookies([{ name: FIXTURE_SESSION_COOKIE, value: 'admin', url: COOKIE_URL }])
+      markAwaitingRoutes(path)
+      await signIn(context, 'admin')
       await page.goto(path)
       await page.waitForLoadState('networkidle')
       const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()

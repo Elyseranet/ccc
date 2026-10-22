@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { API_ERROR_CODE } from '../../shared/enums/api-error-code.enum'
-import { HEALTH_STATUS } from '../../shared/enums/health-status.enum'
+import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
+import { HEALTH_STATUS } from '../../src/enums/health-status.enum'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { SlidingWindowRateLimiter, assertRateLimitConfig, resolveRateLimitOptions } from '../../server/utils/http/rate-limit.util'
+import { SlidingWindowRateLimiter, assertRateLimitConfig, resolveRateLimitOptions } from '../../src/utils/rate-limit.util'
 
 const createClock = (start = 1_000_000) => {
   let current = start

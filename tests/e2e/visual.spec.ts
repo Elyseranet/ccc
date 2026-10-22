@@ -1,8 +1,8 @@
 import { test } from '@playwright/test'
-import { box, compare, COOKIE_URL, open } from './visual.util'
-import { FIXTURE_SESSION_COOKIE } from './pages.const'
+import { signIn } from './helpers/session'
+import { ADMIN_TOP_DATA_MASKS, box, compare, open } from './visual.util'
 
-const EDITION_ROUTE = '/editions/00000000-0000-4000-0002-000000000002'
+const EDITION_ROUTE = '/editions/2025'
 
 const VIEWPORTS = [
   { name: '1440', width: 1440, height: 900 },
@@ -59,14 +59,14 @@ for (const entry of ADMIN_CASES) {
     test.use({ viewport: { width: 1440, height: 900 } })
 
     test('tiroir et barre haute', async ({ page, browser, context }) => {
-      await context.addCookies([{ name: FIXTURE_SESSION_COOKIE, value: 'admin', url: COOKIE_URL }])
+      await signIn(context, 'admin')
       const { mockup, mockContext } = await open(page, browser, { width: 1440, height: 900 }, entry.mockup, entry.route)
       const mockSide = await box(mockup, '.adm-side')
       const appSide = await box(page, '.admin-drawer')
       await compare(page, mockup, `tiroir-${entry.zone}`, '1440', { x: 0, y: 0, width: mockSide.width, height: 900 }, { x: 0, y: 0, width: appSide.width, height: 900 })
       const mockTop = await box(mockup, '.adm-top')
       const appTop = await box(page, '.admin-top')
-      await compare(page, mockup, `barre-haute-${entry.zone}`, '1440', { x: mockSide.width, y: 0, width: 1440 - mockSide.width, height: Math.ceil(mockTop.y + mockTop.height) }, { x: appSide.width, y: 0, width: 1440 - appSide.width, height: Math.ceil(appTop.y + appTop.height) })
+      await compare(page, mockup, `barre-haute-${entry.zone}`, '1440', { x: mockSide.width, y: 0, width: 1440 - mockSide.width, height: Math.ceil(mockTop.y + mockTop.height) }, { x: appSide.width, y: 0, width: 1440 - appSide.width, height: Math.ceil(appTop.y + appTop.height) }, ADMIN_TOP_DATA_MASKS)
       await mockContext.close()
     })
   })
@@ -75,14 +75,14 @@ for (const entry of ADMIN_CASES) {
     test.use({ viewport: { width: 390, height: 844 } })
 
     test('barre haute et barre basse', async ({ page, browser, context }) => {
-      await context.addCookies([{ name: FIXTURE_SESSION_COOKIE, value: 'admin', url: COOKIE_URL }])
+      await signIn(context, 'admin')
       const { mockup, mockContext } = await open(page, browser, { width: 390, height: 844 }, entry.mockup, entry.route)
       const mockBottom = await box(mockup, '.adm-bottom')
       const appBottom = await box(page, '.admin-bottom')
       await compare(page, mockup, `barre-basse-${entry.zone}`, '390', mockBottom, appBottom)
       const mockTop = await box(mockup, '.adm-top')
       const appTop = await box(page, '.admin-top')
-      await compare(page, mockup, `barre-haute-${entry.zone}`, '390', { x: 0, y: 0, width: 390, height: Math.ceil(mockTop.y + mockTop.height) }, { x: 0, y: 0, width: 390, height: Math.ceil(appTop.y + appTop.height) })
+      await compare(page, mockup, `barre-haute-${entry.zone}`, '390', { x: 0, y: 0, width: 390, height: Math.ceil(mockTop.y + mockTop.height) }, { x: 0, y: 0, width: 390, height: Math.ceil(appTop.y + appTop.height) }, ADMIN_TOP_DATA_MASKS)
       await mockContext.close()
     })
   })

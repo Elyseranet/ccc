@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { ISeedCandidate } from '../../../server/interfaces/draw.interface'
-import { countStagesReached, rankSeedCandidates } from '../../../server/utils/draw/seeding.util'
-import { FINAL_STAGE } from '../../../shared/enums/participation.enum'
+import type { ISeedCandidate } from '../../../src/interfaces/draw.interface'
+import { countStagesReached, rankSeedCandidates } from '../../../src/utils/seeding.util'
+import { FINAL_STAGE } from '../../../src/enums/participation.enum'
 
 const candidate = (playerId: string, overrides: Partial<ISeedCandidate> = {}): ISeedCandidate => ({
   playerId,

@@ -12,7 +12,7 @@
    - aucune borne sur la taille décompressée des membres de l'archive, ni sur le ratio de compression (bombe de décompression) ;
    - le XML est lu par `xml.etree.ElementTree`, qui repose sur Expat. La documentation Python (https://docs.python.org/3/library/xml.html, consultée le 2026-10-20) indique : « Expat versions lower than 2.7.2 may be vulnerable to the "billion laughs", "quadratic blowup" and "large tokens" vulnerabilities ». Le Python de la machine de développement embarque Expat 2.2.8 (`pyexpat.EXPAT_VERSION`, mesuré le 2026-10-20) ;
    - les cibles de relations (`xl/_rels/workbook.xml.rels`) ne sont pas contrôlées : un `..` ou un chemin absolu doit être refusé.
-2. **`runMigrations()` hors transaction**, dans `server/database/seeds/seed-legacy-workbook.ts` : le seed applique les migrations avant d'ouvrir sa transaction. Un échec de migration ne doit pas laisser l'import à moitié appliqué. Il faut soit exiger que les migrations soient déjà appliquées (et échouer sinon), soit documenter et tester ce comportement.
+2. **`runMigrations()` hors transaction**, dans `../../src/server/database/seeds/seed-legacy-workbook.ts` : le seed applique les migrations avant d'ouvrir sa transaction. Un échec de migration ne doit pas laisser l'import à moitié appliqué. Il faut soit exiger que les migrations soient déjà appliquées (et échouer sinon), soit documenter et tester ce comportement.
 
 ## Correctifs
 

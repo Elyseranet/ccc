@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
-import { USER_ROLE, USER_STATUS } from '../../shared/enums/user.enum'
-import { CompetitorEntity } from '../../server/database/entities/competitor.entity'
-import { LoginDeviceEntity } from '../../server/database/entities/login-device.entity'
-import { SessionEntity } from '../../server/database/entities/session.entity'
-import { UserEntity } from '../../server/database/entities/user.entity'
+import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
+import { CompetitorEntity } from '../../src/server/db/typeorm/entities/competitor.entity'
+import { LoginDeviceEntity } from '../../src/server/db/typeorm/entities/login-device.entity'
+import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
+import { UserEntity } from '../../src/server/db/typeorm/entities/user.entity'
 import { cleanup, resetSchema } from './helpers/test-database'
 
 let dataSource: DataSource

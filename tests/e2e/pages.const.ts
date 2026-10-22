@@ -1,12 +1,11 @@
-export const FIXTURE_SESSION_COOKIE = 'ccc_fixture_session'
-
+/** Identifiants réels, figés par le dump des archives : édition 2025, Nicolas Deseine (ARCH-9). */
 export const PUBLIC_PAGES = [
   '/',
   '/palmares',
   '/editions',
-  '/editions/00000000-0000-4000-0002-000000000002',
+  '/editions/2025',
   '/joueurs',
-  '/joueurs/00000000-0000-4000-0001-000000000001',
+  '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca',
   '/joueurs/face-a-face',
   '/regles',
   '/connexion',

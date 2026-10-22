@@ -15,15 +15,37 @@ import { PNG } from 'pngjs'
  * en plus d'une relecture humaine de l'image d'écart (`visual-results/<zone>-<viewport>-ecart.png`) avant merge.
  * La note « Maquette haute fidélité… » du pied de page de la maquette est un artefact : elle est exclue de la découpe.
  * La boîte de saisie de score ouverte (`.sheet`, `.sheet-scrim`) de admin-matchs.html est masquée : elle recouvre la coque.
+ * ARCH-9 : l'application tourne sur les vraies données. Les zones de DONNÉES (édition choisie, initiales du compte…)
+ * sont masquées des deux côtés par un aplat de même couleur (`DATA_MASK_COLOR`) : le pixel perfect ne porte que sur
+ * les zones fixes (structure, gabarits, en-tête, pied, typographie). Seuil inchangé : 1 % par zone.
  ********************************************************/
 export const MOCKUP_DIR = resolve('docs/design/ui/happy-hour')
 export const OUTPUT_DIR = resolve('visual-results')
-export const COOKIE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`
 const PIXELMATCH_THRESHOLD = 0.1
 const DEFAULT_MAX_DIFF_RATIO = 0.01
 const MAX_DIFF_RATIO = process.env.VISUAL_MAX_DIFF_RATIO ? Number(process.env.VISUAL_MAX_DIFF_RATIO) : DEFAULT_MAX_DIFF_RATIO
 
 export interface IClip { x: number, y: number, width: number, height: number }
+
+/** Sélecteurs des zones de données à masquer, côté maquette et côté application. */
+export interface IDataMasks { mockup: string[], app: string[] }
+
+/** Aplat des zones masquées : identique des deux côtés, il ne compte donc pas dans l'écart. */
+const DATA_MASK_COLOR = '#FF00FF'
+
+/** Barre haute admin : sélecteur d'édition (liste réelle des éditions) et initiales du compte connecté. */
+export const ADMIN_TOP_DATA_MASKS: IDataMasks = {
+  mockup: ['.adm-top select', '.adm-top .avatar'],
+  app: ['.admin-top .admin-edition-select', '[data-cy="admin-avatar"]']
+}
+
+/** Carte « Édition active » de la page Plus : sélecteur d'édition. */
+export const PLUS_EDITION_DATA_MASKS: IDataMasks = {
+  mockup: ['.plus-ed select'],
+  app: ['.admin-more__edition .admin-edition-select']
+}
+
+const NO_MASKS: IDataMasks = { mockup: [], app: [] }
 
 export const settle = async (page: Page) => {
   await page.evaluate(() => document.fonts.ready)
@@ -39,10 +61,10 @@ export const box = async (page: Page, selector: string): Promise<IClip> => {
   return found
 }
 
-export const compare = async (page: Page, mockup: Page, name: string, viewport: string, mockClip: IClip, appClip: IClip) => {
+export const compare = async (page: Page, mockup: Page, name: string, viewport: string, mockClip: IClip, appClip: IClip, masks: IDataMasks = NO_MASKS) => {
   mkdirSync(OUTPUT_DIR, { recursive: true })
-  const mockBuffer = await mockup.screenshot({ clip: mockClip, fullPage: true })
-  const appBuffer = await page.screenshot({ clip: appClip, fullPage: true })
+  const mockBuffer = await mockup.screenshot({ clip: mockClip, fullPage: true, mask: masks.mockup.map(selector => mockup.locator(selector)), maskColor: DATA_MASK_COLOR })
+  const appBuffer = await page.screenshot({ clip: appClip, fullPage: true, mask: masks.app.map(selector => page.locator(selector)), maskColor: DATA_MASK_COLOR })
   writeFileSync(join(OUTPUT_DIR, `${name}-${viewport}-maquette.png`), mockBuffer)
   writeFileSync(join(OUTPUT_DIR, `${name}-${viewport}-app.png`), appBuffer)
   const a = PNG.sync.read(mockBuffer)
