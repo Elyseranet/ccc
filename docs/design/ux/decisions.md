@@ -155,3 +155,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
   - `mail.host` vaut localhost ;
   - `mail.from` est vide.
 - Le premier déploiement Coolify réussi attend que l'utilisateur fournisse le domaine (OPS-4) et un compte SMTP, renseignés dans les variables Coolify. Le garde-fou n'a pas de mode « recette » qui le désactiverait.
+
+## ARCH-1 à ARCH-5 — Remise en ordre de l'arborescence (décisions utilisateur 2026-10-22)
+- **ARCH-0** : l'utilisateur a constaté des violations des règles de rangement. Le chef de projet et les leads les avaient laissé passer en revue. Le déplacement vers `src/` que l'utilisateur avait commencé est conservé tel quel sur `feature/T-ARCH-01` (`0394424`), et T-ARCH-01 le poursuit. **Aucun merge** n'a lieu dans `develop` avant la fin de T-ARCH-01.
+- **ARCH-1** : **tous les utils** (front et serveur) vont dans `src/utils/`, **à plat**, sans aucun sous-dossier. Les « scripts » serveur (`create-admin`, `unlock-user`…) sont des utils. Un garde-fou empêche le code serveur (TypeORM, scrypt, Node) de finir dans le bundle navigateur.
+- **ARCH-2** : **tous les services** vont dans `src/services/`, à plat. Quand un service existe à la fois côté navigateur et côté serveur, les deux fichiers **fusionnent**. Deux fonctions qui font la même chose sont **unifiées** en une seule. Deux fonctions de même nom et de code différent sont **renommées**.
+- **ARCH-3** : les **migrations et les seeds** sont des assets et vont dans `src/assets/`. Aucun d'eux ne doit être importé côté client ni publié.
+- **ARCH-4** : les **interfaces, consts, enums et types** vont uniquement dans `src/interfaces/`, `src/consts/`, `src/enums/` et `src/types/`, à plat. L'exception `shared/` (FA-02) est abandonnée.
+- **ARCH-5** : le **seed des archives** devient un **fichier SQL figé**, généré une fois depuis la base importée et vérifiée, versionné et appliqué par une commande. Le convertisseur Python, le JSON de 2 478 lignes, les scripts TypeScript de seed et d'import et leurs tests sont **supprimés**. T-SEC-05 devient sans objet. Un test garde les contrôles sur les vraies données (Deseine 39/13, 729 matchs) après l'import du SQL.
