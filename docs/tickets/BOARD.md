@@ -176,7 +176,7 @@ Arbitrage ajouté après l'échange avec le front (FA-03) :
 
 ## Front
 
-Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code applicatif n'est écrit.
+Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `src/` à plat, aucune donnée fictive : ARCH-1 à ARCH-12, `CLAUDE.md` du projet).
 
 ### Tickets
 
@@ -186,8 +186,8 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | À faire | `../CCC-F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
-| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, B-17 (parcours, titres de l'adversaire, enums de tri) | À faire | `../CCC-F-04` |
-| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00 | À faire (débloqué par 37f4c07) | `../CCC-F-05` |
+| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, B-17 (parcours, titres de l'adversaire, enums de tri) | En cours (dev-f04), relancé le 2026-10-22 sur `src/`, sans fixtures | `../CCC-F-04` |
+| [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | En cours (dev-f05, après F-00h), relancé le 2026-10-22 sur `src/` | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
@@ -196,10 +196,10 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 | [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00, B-17 (DTO), B-11 (routes) | À faire (créé, FA-09) | `../CCC-F-11` |
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | **Fermé** — squash dans `develop` @ `ef81699` (branche `3d1e91a`) | `../CCC-F-12` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
-| [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | À faire (4a2dea5) ; premier créneau PAR-1 libre après le merge de F-12 | à créer |
+| [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Partiel** : ME, EDITIONS et AUTH_LOGOUT en route réelle par T-ARCH-01 ; reste `delivered: true` sur `/admin/plus` et la preuve dans le conteneur. Premier créneau PAR-1 libre | à créer |
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | À faire, ouvert le 2026-10-22 (relecture humaine des écarts après ARCH-9) ; en file PAR-1 | `../CCC-F-14` |
 
-**Compteur** (2026-10-20) : 14 tickets front ouverts (1 en cours, 12 à faire), 0 fermé, 0 bloqué par le design. Tous les arbitrages front sont tranchés (`docs/design/ux/decisions.md`, « Arbitrages front »). Une seule validation reste attendue : le **seuil FA-04**, à proposer par F-00 après mesure. Le libellé A16 (« 729 matchs joués depuis 2012, dont 554 avec score ») attend aussi la validation du chef de projet.
+**Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
 ### Ordre et parallélisme
 
@@ -207,11 +207,11 @@ Mis à jour le 2026-10-20 par `frontend-lead`. Plan seulement : aucun code appli
 B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets en parallèle (13 si F-03 est scindé)
 ```
 
-- Aucun ticket F-01 à F-12 ne touche un fichier d'un autre. F-00 crée toutes les routes (`/admin/matchs`, `/admin/tirages`, `/admin/plus` et `/profil` compris), les layouts, services, fixtures, composants transverses et la table des libellés de tours.
+- Aucun ticket F-01 à F-12 ne touche un fichier d'un autre. F-00 crée toutes les routes (`/admin/matchs`, `/admin/tirages`, `/admin/plus` et `/profil` compris), les layouts, services, composants transverses et la table des libellés de tours (ses fixtures ont été supprimées par ARCH-8).
 - Seul fichier partagé ensuite : les locales `en.json` / `fr.json`. Chaque ticket ajoute ses clés dans **son** namespace, insérées à leur place alphabétique.
-- **Bascule fixture → live**, route par route : une ligne de `app/consts/api-sources.const.ts`, une fois la route back mergée.
+- **Plus de bascule fixture → live** (ARCH-8) : un écran appelle toujours la route réelle. Tant qu'elle n'existe pas (`pendingTicket` dans `src/consts/api-routes.const.ts`), il affiche l'état d'erreur d'AsyncState et ses e2e sont annotés `awaiting-route` avec le ticket back (ARCH-11). À la livraison de la route, le back retire `pendingTicket` dans le même commit.
 
-| Ticket front | Routes back nécessaires à la bascule |
+| Ticket front | Routes back attendues par l'écran |
 |---|---|
 | F-01, F-03 | B-06 (+ B-04 pour les données) |
 | F-02 | B-07 |
@@ -228,51 +228,51 @@ B-01, B-02 ──► F-00 (1 dev, en cours) ──► F-01 … F-12 : 12 tickets
 Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensemble**, un dev par ticket, chacun dans son worktree.
 
 **Réutiliser ce que F-00 livre, ne jamais le recréer** :
-- composants `app/components/common/` (PageHero, GoldenRules, BubblesBackdrop, PlayerLink, AsyncState, BrandMark, SkipLink) et `app/components/icons/` ;
+- composants `src/components/common/` (PageHero, GoldenRules, BubblesBackdrop, PlayerLink, AsyncState, BrandMark, SkipLink, AppDataTable) et `src/components/icons/` ;
 - composables de données (`useEditions`, `useEdition`, `useCompetitors`, `useCompetitor`, `useHeadToHead`, `useRankings`, `useMe`, `useAdminEdition`, `useNavigationState`) ;
-- `BaseService` et ses services ;
-- `consts/routes.const.ts` et `consts/round-labels.const.ts` (A9 « Barrages ») ;
+- `BaseService` et ses services (`src/services/`, fusionnés navigateur et serveur, ARCH-2 : un composant n'importe jamais leurs fonctions serveur) ;
+- `src/consts/routes.const.ts` et `src/consts/round-labels.const.ts` (A9 « Barrages ») ;
 - stores `auth` et `admin-edition` ;
-- DTO et enums de `../../src/shared/` (#shared).
+- DTO et enums du contrat dans `src/interfaces/` et `src/enums/` (FA-02 abandonnée, ARCH-4).
 
 **Qui touche quoi**, pour éviter les conflits :
 
 | Fichier partagé | Règle |
 |---|---|
-| `app/consts/page-delivery.const.ts` (T-OPS-01, après son merge) | Toutes les routes y sont pré-déclarées. Un ticket passe **sa** ligne à `delivered: true` dans le même commit que la bascule LIVE de ses endpoints. |
-| `app/enums/api-endpoint.enum.ts`, `app/consts/api-sources.const.ts` | Clés pré-déclarées par F-00. Un ticket ne change que la valeur FIXTURE → LIVE de ses propres endpoints, au moment de la bascule. |
+| `src/consts/page-delivery.const.ts` (T-OPS-01) | Toutes les routes y sont pré-déclarées. Un ticket passe **sa** ligne à `delivered: true` quand l'écran est branché et qu'aucun de ses endpoints n'a de `pendingTicket` (`npm run test:release`). |
+| `src/enums/api-endpoint.enum.ts`, `src/consts/api-routes.const.ts` | Clés pré-déclarées. Le front n'y touche pas : le back retire `pendingTicket` à la livraison de la route. |
 | Services | F-09 crée `participant.service.ts`, F-10 crée `auth.service.ts`. F-08 ajoute les écritures dans `match.service.ts`, F-11 dans `draw.service.ts`. Aucun autre ticket ne modifie un service. |
-| Fixtures | Un ticket qui a besoin de nouvelles données crée `app/fixtures/<ticket-feature>.fixture.ts`. Il ne modifie une fixture existante que si c'est **sa** ressource (F-08 : `match`, F-11 : `draw`). |
-| `app/locales/en.json` et `fr.json` | Clés ajoutées **uniquement** dans le namespace du ticket (`home.*`, `palmares.*`, `edition.*`, `players.*`, `player.*`, `head_to_head.*`, `rules.*`, `admin.dashboard.*`, `admin.matches.*`, `admin.participants.*`, `account.*`, `admin.draws.*`, `admin.more.*`), insérées à leur place alphabétique, dans les deux fichiers. |
+| Données de test | **Aucune fixture** (ARCH-8). Les e2e lisent la base `_test` chargée par `src/assets/seeds/archives.sql`, avec des sessions réelles (`signIn(context, role)`). Les états dégradés (vide, erreur, 404, 409, 429…) se testent en unitaire, la réponse du service étant simulée dans le test, jamais dans un fichier de `src/`. |
+| `src/assets/locales/en.json` et `fr.json` | Clés ajoutées **uniquement** dans le namespace du ticket (`home.*`, `palmares.*`, `edition.*`, `players.*`, `player.*`, `head_to_head.*`, `rules.*`, `admin.dashboard.*`, `admin.matches.*`, `admin.participants.*`, `account.*`, `admin.draws.*`, `admin.more.*`), insérées à leur place alphabétique, dans les deux fichiers. |
 | e2e | Chaque ticket ajoute `tests/e2e/visual/<ticket>.spec.ts` et, au besoin, `tests/e2e/a11y/<ticket>.spec.ts`, en s'appuyant sur `tests/e2e/visual.util.ts` (F-00). Il ne modifie ni `visual.spec.ts` ni `a11y.spec.ts`. Seul F-03 modifie `tests/e2e/pages.const.ts`, pour passer l'URL d'édition au code (R-9). |
-| Prérequis partagés (cherry-pickés dans develop) | **Mergés** : F-00b → 0636c05 ; F-00c → 26107be ; F-00d → 4c92de2, 39e12d3 ; F-00e → 2bab527, 5074a4f ; F-00f → 5626ea8, 2489908 ; F-00g → ed0a5e7 ; F-00i (filtre Origam du typecheck) → 8b8ef5f ; F-00j (AppDataTable, #1246, #1250) → 23b6524, af2dfc8 ; F-00k (font: inherit) → 0c25157 ; **F-00l** (halo public sur une couche fixe, fond admin sur le conteneur, onglets en pilule dans le thème, #1252, #1253) → **088919b**. **En cours** : F-00h (useCompetitor(s), dev-f05) ; F-00m (champs et boutons dans le thème) → 9f027c5 ; F-00n (chip neutre par défaut, dev-f06). F-02, F-03, F-04, F-05, F-08 et F-09 utilisent AppDataTable, **sans cast local**. Au rebase sur F-00l, F-02 et F-03 remesurent leurs onglets. |
+| Prérequis partagés (cherry-pickés dans develop) | **Mergés** : F-00b → 0636c05 ; F-00c → 26107be ; F-00d → 4c92de2, 39e12d3 ; F-00e → 2bab527, 5074a4f ; F-00f → 5626ea8, 2489908 ; F-00g → ed0a5e7 ; F-00i (filtre Origam du typecheck) → 8b8ef5f ; F-00j (AppDataTable, #1246, #1250) → 23b6524, af2dfc8 ; F-00k (font: inherit) → 0c25157 ; **F-00l** (halo public sur une couche fixe, fond admin sur le conteneur, onglets en pilule dans le thème, #1252, #1253) → **088919b**. **F-00m** (champs et boutons dans le thème) → **9f027c5**. **En cours** : F-00h (useCompetitor(s), statuts HTTP réunis dans `http-status.const.ts`, dev-f05) ; F-00n (chip neutre par défaut, 3 champs dans `src/themes/ccc.theme.ts`, dev-f06) ; F-14 D1 (dev-f06, après F-00n). F-02, F-03, F-04, F-05, F-08 et F-09 utilisent AppDataTable, **sans cast local**. Au rebase sur F-00l, F-02 et F-03 remesurent leurs onglets. |
 | Propriétaires de fichiers partagés pour la vague F | `competitor.service.ts` → F-04 ; `base.service.ts` et `api-client.interface.ts` → F-08 (`headers`) ; `GoldenRules.vue` → F-06 (variante `cards`) ; `auth.service.ts` → F-00d, puis F-10. Les nouvelles clés d'endpoint sont insérées dans l'ordre alphabétique. |
-| B-17 et fixtures | B-17 (dev-b12) remplit les fixtures front avec des valeurs techniques (`final: null`, `poolNumber`, `wins`, `losses`, `unknownResults`, `titles`, valeur `NOT_IN_MOCKUP`) pour que le typecheck passe. Après son merge, F-02, F-04 et F-05 y remettent les valeurs des maquettes. |
+| B-17 | Les fixtures ayant disparu (ARCH-8), il n'y a plus de valeurs techniques à remplacer. Tant que B-17 n'est pas mergé, un champ absent des DTO n'est ni inventé ni simulé dans l'écran : le dev le liste au lead (champ, zone, maquette). |
 | Recettes Origam (mapping.md f88de34, 1787148 et 1b8d7c8, à appliquer partout) | **CTA principal** (`.btn--primary`) : `variant="flat"`, `bg-color="primary"`, `elevation="lg"`, `hover: { elevation: 'xl' }`, **sans `color`**. **Action destructive** (« Valider définitivement ») : `bg-color="danger"`, car `error` n'est pas une intention Origam. **Chips** : pleine = `bg-color` primary ou secondary ; teintée = `color` + `bg-color` sur `feedback…bgSubtle` ; neutre = le défaut du thème (F-00n). **Le premier ticket qui affiche une chip (F-01 ou F-04) vérifie dans son e2e la couleur calculée d'une chip de chaque famille.** Les décalages verticaux au survol et à l'appui de la maquette (−3 px, +4 px) sont **abandonnés** : aucune prop Origam ne les porte, on ne surcharge pas le DOM interne. **Champs** : ne pas poser `variant` (le défaut du thème, `outlined`, fait foi, F-00m). **CTA de formulaire** : `size="x-large"` (48 px). |
-| Limite connue des fixtures | `?fixture=empty|error|rate_limited` dégrade TOUS les endpoints, `GET /moi` compris. Impossible donc de dégrader un seul appel avec une session admin valide en e2e (constat de F-12). Couvert par des tests unitaires avec un store monté ; les échecs par endpoint réels seront testés en LIVE (T-LIVE-01). Un prérequis « variante par endpoint » ne sera ouvert que si un ticket en a besoin. |
-| Contrats back non mergés | Aucun type créé dans `../../src/shared/` : on utilise des interfaces de vue dans `app/interfaces/*-view.interface.ts`, mappées au merge. Seule exception : la copie identique de `score.interface.ts` dans F-08, écartée au rebase. |
-| Parallélisme (PAR-1, fabdef3) | **Au plus 3 devs front actifs en même temps**, un nuxt dev chacun. Le lead tient la file. Ordre : F-00g/F-04, F-12 et F-06 actifs, puis F-05 (F-00h), F-10, F-01, F-02, F-07, F-08, F-09, F-11, F-03, F-13. |
+| Masques du contrôle visuel (ARCH-9) | On masque les **valeurs** de données (noms, scores, compteurs, initiales), jamais la structure : filet, fond, rayon, chevron et gabarit restent comparés. Les masques actuels du sélecteur d'édition couvrent tout le champ et cachent un défaut réel (F-14, M1). |
+| Contrats back non mergés | On n'anticipe pas un DTO back : on attend qu'il soit dans `src/interfaces/`. Si un écran en a besoin avant, interface de vue `src/interfaces/*-view.interface.ts`, mappée au merge. |
+| Parallélisme (PAR-1, fabdef3) | **Au plus 3 devs front actifs en même temps**, un nuxt dev chacun. Le lead tient la file. Actifs au 2026-10-22 : dev-f04 (F-04), dev-f05 (F-00h puis F-05), dev-f06 (F-00n puis F-14 D1). File : T-LIVE-01, F-14 (D2 à M1), F-10, F-01, F-02, F-07, F-08, F-09, F-11, F-03, F-13. |
 | Serveurs `nuxt dev` | **À arrêter à la fin de chaque vérification**, jamais laissés en tâche de fond. 13 serveurs oubliés faisaient tomber Playwright en délai dépassé (6 échecs) ; après leur arrêt, 46/46. |
 | Layouts, thème, `main.css` | **Aucun ticket ne les modifie.** Un besoin dans la coque se remonte au lead front, qui décide d'un ticket dédié. |
 
 **Points d'attention par ticket** :
 - F-03 : l'URL porte le code d'édition (R-9) ; carte « Matchs » selon R-10.
 - F-04 et F-05 : R-5 (V/D sur les matchs avec score uniquement) et `winRatio` à null.
-- F-07 : flux d'activité dérivé (A17), sur fixture jusqu'au merge de B-15.
+- F-07 : flux d'activité dérivé (A17) ; état d'erreur d'AsyncState jusqu'au merge de B-15 (ARCH-11).
 - F-09 et F-10 : avatar téléversé et stocké en base (AV-1), via `origam-file-field` limité à 2 Mo ; ils dépendent de **B-16** pour la bascule. F-10 supprime `ISessionIdentity` au profit d'`IMe` (B-08).
 - F-01, F-03, F-04, F-05 : un avatar de joueur public = `ICompetitorPublic.avatarUrl` (route publique B-16, cache immuable par `?v=`), sinon les initiales (`origam-avatar` `text`). Affichage carré, recadré par CSS, avec un `alt` traduit ou `aria-hidden` si le nom est déjà à côté.
 - Tous : à la livraison, **confirmer ou corriger sa ligne `PAGE_DELIVERY`** (endpoints réellement consommés par la page ; ceux du layout sont déclarés à part) avant de passer `delivered: true` (T-OPS-01).
-- Tous les écrans de lecture : l'erreur **429** (limite de 300 requêtes par minute et par IP sur les lectures publiques) passe par `AsyncState`, qui affiche un message dédié avec « Réessayer » (fourni par F-00). On la teste avec la variante de fixture `rate_limited`.
+- Tous les écrans de lecture : l'erreur **429** (limite de 300 requêtes par minute et par IP sur les lectures publiques) passe par `AsyncState`, qui affiche un message dédié avec « Réessayer » (fourni par F-00). On la teste en unitaire, réponse 429 simulée dans le test (ARCH-8).
 - F-08 à F-11 (écritures) : corps JSON avec `Content-Type: application/json` (posé par `$fetch`), sous 16 Ko ; 400 et 413 traduits. L'avatar part en multipart (2 Mo).
 - Tous : tests a11y des formulaires sur le rendu hydraté, à cause de l'id d'input qui change entre serveur et client (Origam #1226).
 
 ### Definition of Done commune (en plus des critères de chaque ticket)
 
-- Travail dans son worktree `../CCC-F-xx`, branche `feature/F-xx-…`. **Jamais de copie de `.env`** : `find ../CCC-F-xx -maxdepth 2 -name ".env"` doit être vide.
+- Travail dans son worktree `../CCC-F-xx`, branche `feature/F-xx-…`. e2e : variables de base en ligne de commande (README, « e2e sur les vraies données »). **Jamais de copie de `.env`** : `find ../CCC-F-xx -maxdepth 2 -name ".env"` doit être vide.
 - **Iso-visuel** :
   - captures Playwright de la maquette et de l'app à **1440 et 390 px**, en `reducedMotion: 'reduce'`, jointes côte à côte à la PR ;
   - **écart ≤ 1 % par zone** (FA-04, validé), et image d'écart relue par un humain avant le merge ;
-  - fixtures = données de la maquette.
+  - captures sur les vraies données (base `_test`), pixel perfect sur les zones fixes, seules les **valeurs** de données masquées (ARCH-9).
 - `npm run test:run` vert (tests des composables de l'écran) ; `npm run test:a11y` : 0 violation axe sur les routes du ticket ; `npx nuxi typecheck` vert.
 - Origam partout où un composant existe (skill `origam`), sans aucune prop inventée : chaque prop non listée dans `mapping.md` est vérifiée dans `~/Projects/origam/packages/ds/src/interfaces`.
 - Checks des skills `vue-conventions` et `semantic-html` :
@@ -282,8 +282,8 @@ Ordre : la vague 2 back, puis F-00 (squash), puis **F-01 à F-12 lancés ensembl
   - `data-cy` sur les éléments interactifs, `aria-label` sur les icônes seules.
 - Zéro chaîne en dur : `t('cle', 'fallback')`, clés `snake_case` ajoutées à `en.json` **et** `fr.json` dans le même commit.
 - Aucune couleur, taille ou espacement en dur : `var(--origam-*)` uniquement.
-- Aucun `$fetch` ni service appelé depuis un composant ou une page : on passe par un composable. Aucun import de `../../src/server/` côté client.
-- États dégradés de `parcours.md` couverts, avec des fixtures `empty` et `error`.
+- Aucun `$fetch` ni service appelé depuis un composant ou une page : on passe par un composable. Aucun import de `src/server/` ni des fonctions serveur d'un service fusionné côté client (`npm run test:bundle`).
+- États dégradés de `parcours.md` couverts : en unitaire (réponse du service simulée dans le test) et, quand la base de test les contient, en e2e. Un écran dont la route manque affiche l'erreur d'AsyncState, e2e annoté `awaiting-route`.
 - Animations : CSS seulement hors vitrines ; tout est coupé sous `prefers-reduced-motion: reduce`.
 - Security gate : `npm audit` sans `high` ni `critical`, `npm ls axios` vide, gitleaks propre, `/security-review` sur la branche.
 - Perf : poids JS initial de la route comparé à la référence mesurée dans F-00. Toute hausse est justifiée dans la PR.
@@ -309,7 +309,7 @@ Les 8 écarts sont pris en charge par `backend-lead` (section Back, « Écarts d
 Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « Arbitrages front ». Elles sont reportées dans les tickets :
 - **FA-01** : Gabarito → F-00.
 - **FA-01b** : maquettes livrées (37f4c07) → F-05, F-06, F-09, F-10.
-- **FA-02** : `../../src/shared/` → F-00.
+- **FA-02** : `shared/` → F-00. **Abandonnée** le 2026-10-22 (ARCH-4) : le contrat vit dans `src/interfaces/` et `src/enums/`.
 - **FA-04** : seuil mesuré sur l'en-tête dans F-00, puis soumis à l'utilisateur → F-00, et tous les tickets.
 - **FA-05** : `/admin/matchs` → F-00, F-08.
 - **FA-06** : `/profil` → F-00, F-10.
