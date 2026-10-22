@@ -16,6 +16,8 @@ Les specs font foi et vivent dans Obsidian : `~/Library/Mobile Documents/iCloud~
 
 Détail et justification : `docs/design/ux/decisions.md`. L'exception FA-02 (`shared/`, alias `#shared`) est **abandonnée** (ARCH-4).
 
+**La section « Project Structure » de `~/CLAUDE.md` (monorepo `packages/…`, `src/server/utils/`, `server/db/index.ts`) ne s'applique pas à CCC** : pour ce projet, seule l'arborescence ci-dessous fait foi (décision utilisateur 2026-10-22).
+
 ```
 src/
   assets/        css/, locales/, seeds/archives.sql (dump SQL figé des archives, ARCH-5)
