@@ -113,9 +113,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
     '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)',
-    // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, 8 px entre les éléments, page courante
+    // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, page courante
     // en text.tertiary sans soulignement (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
-    '--origam-breadcrumb---gap': 'var(--origam-space---2)',
+    // Le séparateur d'Origam porte déjà 8 px de chaque côté : la maquette (8 px entre l'élément et le séparateur, 8 px après) n'en veut pas de plus.
+    '--origam-breadcrumb---gap': '0px',
     '--origam-breadcrumb-item---color': 'var(--origam-color__text---secondary)',
     '--origam-breadcrumb-item---text-decoration': 'underline',
     '--origam-breadcrumb-item---opacity-disabled': '1',
