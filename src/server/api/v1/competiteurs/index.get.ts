@@ -1,7 +1,7 @@
 import { COMPETITOR_DEFAULT_ORDER } from '../../../../consts/competitor.const'
 import { LOG_EVENT } from '../../../../consts/log-event.const'
 import { RATE_LIMIT_ROUTE_KEY } from '../../../../consts/rate-limit.const'
-import { competitorListQuerySchema } from '../../../../schemas/competitor.schema'
+import { competitorListQuerySchema } from '../../../schemas/competitor.schema'
 import { listCompetitors } from '../../../../services/competitor.service'
 import { parsePagination } from '../../../../utils/pagination.util'
 import { enforceRateLimit } from '../../../../utils/rate-limit.util'

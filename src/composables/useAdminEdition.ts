@@ -3,7 +3,7 @@ import { EDITION_STATUS } from '~/enums/edition.enum'
 import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
 import { EDITION_STATUS_LABELS } from '~/consts/edition-status.const'
-import { useAdminEditionStore } from '~/stores/admin-edition.store'
+import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 
 /*********************************************************
  * useAdminEdition

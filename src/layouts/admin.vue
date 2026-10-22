@@ -118,7 +118,7 @@ import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
 import { ADMIN_BOTTOM_NAVIGATION, ADMIN_NAVIGATION } from '~/consts/admin-navigation.const'
 import { ROUTES } from '~/consts/routes.const'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/composables/useAuthStore'
 
 /*********************************************************
  * Global

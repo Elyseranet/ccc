@@ -113,7 +113,7 @@ import { useT } from '~/composables/useT'
 import { INTENT, VARIANT } from 'origam/enums'
 import { ROUTES } from '~/consts/routes.const'
 import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/composables/useAuthStore'
 
 /*********************************************************
  * Global

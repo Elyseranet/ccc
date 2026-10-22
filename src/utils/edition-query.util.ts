@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { MATCH_STATUS } from '../enums/match.enum.js'
-import { matchListQuerySchema } from '../schemas/edition.schema.js'
+import { matchListQuerySchema } from '../server/schemas/edition.schema.js'
 import type { IMatchListQuery } from '../interfaces/edition-query.interface.js'
 import { parsePagination } from './pagination.util.js'
 import { parseWithSchema } from './validation.util.js'

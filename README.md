@@ -183,6 +183,8 @@ Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabari
 
 `src/utils/` et `src/services/` mêlent code navigateur et code serveur : un service fusionné exporte sa classe `$fetch` et ses fonctions TypeORM. Le build client déclare sans effet de bord les modules serveur (typeorm, pg, reflect-metadata, `src/server/**`, `node:*`), qui sont élagués avec les fonctions serveur inutilisées. Le plugin `clientBundleGuard` fait échouer `nuxt build` si l'un d'eux reste dans un chunk client. `npm run test:bundle` vérifie le résultat octet par octet. Il n'y a aucun scan d'auto-import (`imports.scan: false`) : chaque fichier importe explicitement ce qu'il utilise.
 
+Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (ARCH-13) : ils sont couverts par la garde, et un schéma importé par du code navigateur fait échouer le build. Les stores Pinia sont des composables (`src/composables/useAuthStore.ts`, `useAdminEditionStore.ts`, ARCH-14).
+
 **Limite acceptée (ARCH-12)** : en `nuxt dev`, Vite ne fait pas de tree-shaking. Un service fusionné charge donc TypeORM et les entités dans le navigateur, environ 5,5 Mo mesurés, sans erreur. Cela ne concerne que le développement : en production, la garde de build interdit tout code serveur dans les chunks client.
 
 ## Variables d'environnement du serveur

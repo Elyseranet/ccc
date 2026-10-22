@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { MATCH_STATUS } from '../enums/match.enum.js'
-import { ROUND_KIND } from '../enums/round.enum.js'
-import { MATCH_SORT } from '../enums/match-sort.enum.js'
-import { EDITION_CODE_PATTERN } from '../consts/edition.const.js'
+import { MATCH_STATUS } from '../../enums/match.enum.js'
+import { ROUND_KIND } from '../../enums/round.enum.js'
+import { MATCH_SORT } from '../../enums/match-sort.enum.js'
+import { EDITION_CODE_PATTERN } from '../../consts/edition.const.js'
 
 export const editionParamsSchema = z.object({
   id: z.string().refine(

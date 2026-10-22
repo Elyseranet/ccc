@@ -9,7 +9,7 @@ import {
   verifyDeviceCookie
 } from '../../src/utils/device-cookie.util'
 import { computeLoginDelaySeconds, remainingThrottleSeconds } from '../../src/utils/login-throttle.util'
-import { loginSchema, updateMeSchema } from '../../src/schemas/auth.schema'
+import { loginSchema, updateMeSchema } from '../../src/server/schemas/auth.schema'
 import { isCrossSiteWrite, parseAllowedOrigins } from '../../src/utils/csrf.util'
 import { burnPasswordCheck, hashPassword, verifyPassword } from '../../src/utils/password.util'
 import {

@@ -3,8 +3,8 @@ import {
   COMPETITOR_DEFAULT_SORT,
   COMPETITOR_SEARCH_MAX_LENGTH,
   COMPETITOR_SEARCH_MIN_LENGTH
-} from '../consts/competitor.const.js'
-import { COMPETITOR_SORT, SORT_ORDER } from '../enums/competitor-sort.enum.js'
+} from '../../consts/competitor.const.js'
+import { COMPETITOR_SORT, SORT_ORDER } from '../../enums/competitor-sort.enum.js'
 
 /** `?q=` : 2 à 50 caractères une fois les espaces de bord retirés. */
 export const competitorListQuerySchema = z.object({

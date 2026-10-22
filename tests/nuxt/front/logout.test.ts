@@ -7,7 +7,7 @@ import { USER_ROLE } from '../../../src/enums/user.enum'
 import { useLogout } from '../../../src/composables/useLogout'
 import { ROUTES } from '../../../src/consts/routes.const'
 import { AuthService } from '../../../src/services/auth.service'
-import { useAuthStore } from '../../../src/stores/auth.store'
+import { useAuthStore } from '../../../src/composables/useAuthStore'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))

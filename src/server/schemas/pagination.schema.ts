@@ -3,7 +3,7 @@ import {
   PAGINATION_DEFAULT_PAGE,
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_MAX_PAGE_SIZE
-} from '../consts/pagination.const.js'
+} from '../../consts/pagination.const.js'
 
 /** Entiers stricts : "abc", "1.5", "" et "-1" sont rejetés (400), pas silencieusement corrigés. */
 export const paginationQuerySchema = z.object({

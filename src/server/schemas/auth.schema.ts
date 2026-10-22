@@ -6,7 +6,7 @@ import {
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   PHONE_PATTERN
-} from '../consts/auth.const.js'
+} from '../../consts/auth.const.js'
 
 /** Pas de contrainte de longueur minimale au login : on ne révèle pas la politique à un attaquant. */
 export const loginSchema = z.object({
