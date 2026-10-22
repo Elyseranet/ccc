@@ -1,4 +1,4 @@
-import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats } from '../interfaces/competitor.interface.js'
+import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest } from '../interfaces/competitor.interface.js'
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
@@ -117,7 +117,7 @@ const titlesByCompetitor = (rows: Array<{ competitorId: string, finalStage: FINA
     .map((row) => ({ playerId: row.competitorId, editionId: '', finalStage: row.finalStage! })))
     .map(({ playerId, titles }) => [playerId, titles]))
 
-const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCareer>> => {
+export const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCareer>> => {
   const rows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
     .innerJoin('pt.edition', 'e')
     .select('pt.competitorId', 'competitorId')
@@ -378,4 +378,23 @@ export const createCompetitorWithAccount = async (
     // Collision concurrente sur l'email entre le contrôle et l'insertion.
     throw isEmailCollision(error) ? emailAlreadyUsed() : error
   }
+}
+
+/** Corrige l'identité d'un compétiteur (liste blanche du schéma). 404 `COMPETITOR_NOT_FOUND` s'il n'existe pas. */
+export const updateCompetitorIdentity = async (
+  dataSource: DataSource,
+  competitorId: string,
+  patch: IUpdateCompetitorRequest
+): Promise<ICompetitorPublic> => {
+  const repository = dataSource.getRepository(CompetitorEntity)
+  const competitor = await repository.findOneBy({ id: competitorId })
+  if (!competitor) {
+    throw competitorNotFound()
+  }
+  const changes: Partial<CompetitorEntity> = {}
+  if (patch.displayName !== undefined) changes.displayName = patch.displayName
+  if (patch.firstName !== undefined) changes.firstName = patch.firstName
+  if (patch.lastName !== undefined) changes.lastName = patch.lastName
+  if (patch.nickname !== undefined) changes.nickname = patch.nickname
+  return toCompetitorPublic(await repository.save(Object.assign(competitor, changes)))
 }

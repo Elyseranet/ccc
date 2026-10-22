@@ -37,6 +37,10 @@ export const competitorNotFound = (): H3Error =>
 export const conflict = (message: string = API_ERROR_MESSAGE.CONFLICT, details?: TApiErrorDetails): H3Error =>
   buildError(409, API_ERROR_CODE.CONFLICT, message, details)
 
+/** 409 avec un code métier précis (le client distingue « déjà inscrit » de « tirage validé »). */
+export const conflictWithCode = (code: API_ERROR_CODE, message: string): H3Error =>
+  buildError(409, code, message)
+
 export const emailAlreadyUsed = (): H3Error =>
   buildError(409, API_ERROR_CODE.EMAIL_ALREADY_USED, API_ERROR_MESSAGE.EMAIL_ALREADY_USED)
 

@@ -19,6 +19,10 @@ export interface IEditionContentStamp {
   publicMatchCount: number
   lastDrawValidatedAt: string | null
   participationCount: number
+  /** Informations générales modifiables (PATCH /editions) : un changement de nom doit invalider l'ETag. */
+  generalInfo: [string | null, string | null, string | null, string | null]
+  /** Dernière correction d'identité (PATCH /competiteurs) parmi les inscrits. */
+  lastCompetitorUpdatedAt: string | null
 }
 
 export interface IEditionMatchCounts {

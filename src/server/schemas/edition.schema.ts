@@ -2,7 +2,16 @@ import { z } from 'zod'
 import { MATCH_STATUS } from '../../enums/match.enum.js'
 import { ROUND_KIND } from '../../enums/round.enum.js'
 import { MATCH_SORT } from '../../enums/match-sort.enum.js'
-import { EDITION_CODE_PATTERN } from '../../consts/edition.const.js'
+import {
+  EDITION_CODE_PATTERN,
+  EDITION_DATE_PATTERN,
+  EDITION_DESCRIPTION_MAX_LENGTH,
+  EDITION_LOCATION_MAX_LENGTH,
+  EDITION_NAME_MAX_LENGTH,
+  EDITION_YEAR_MAX,
+  EDITION_YEAR_MIN
+} from '../../consts/edition.const.js'
+import { newCompetitorSchema } from './competitor.schema.js'
 
 export const editionParamsSchema = z.object({
   id: z.string().refine(
@@ -32,3 +41,37 @@ export const matchListQuerySchema = z.object({
   statut: matchStatusListSchema.optional(),
   tri: z.enum(MATCH_SORT).optional()
 })
+
+const requiredText = (max: number) => z.string().trim().min(1).max(max)
+const optionalText = (max: number) => z.string().trim().min(1).max(max).nullable()
+
+/** Une date calendaire réelle : `2026-02-30` est refusée alors que le motif seul la laisserait passer. */
+const heldOnSchema = z.string().regex(EDITION_DATE_PATTERN, 'Expected YYYY-MM-DD').refine((value) => {
+  const date = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value)
+}, 'Not a valid calendar date')
+
+/** `.strict()` : un champ inconnu (`code`, `status`…) est refusé en 400, jamais ignoré. */
+export const createEditionSchema = z.object({
+  year: z.number().int().min(EDITION_YEAR_MIN).max(EDITION_YEAR_MAX),
+  name: requiredText(EDITION_NAME_MAX_LENGTH),
+  heldOn: heldOnSchema.nullable().optional(),
+  description: optionalText(EDITION_DESCRIPTION_MAX_LENGTH).optional(),
+  location: optionalText(EDITION_LOCATION_MAX_LENGTH).optional()
+}).strict()
+
+/** R-9 : ni `code`, ni `year`, ni `chronologicalRank`, ni `status` ne figurent dans la liste blanche. */
+export const updateEditionSchema = z.object({
+  name: requiredText(EDITION_NAME_MAX_LENGTH).optional(),
+  heldOn: heldOnSchema.nullable().optional(),
+  description: optionalText(EDITION_DESCRIPTION_MAX_LENGTH).optional(),
+  location: optionalText(EDITION_LOCATION_MAX_LENGTH).optional()
+}).strict().refine((value) => Object.keys(value).length > 0, 'At least one field is required')
+
+/** Exactement l'une des deux formes ; tout autre champ (avatar compris, AV-1) est refusé en 400. */
+export const addParticipantSchema = z.union([
+  z.object({ competitorId: z.uuid() }).strict(),
+  z.object({ newCompetitor: newCompetitorSchema }).strict()
+])
+
+export const participationParamsSchema = editionParamsSchema.extend({ participationId: z.uuid() })

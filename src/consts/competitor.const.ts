@@ -46,3 +46,5 @@ export const COMPETITOR_SORT_KEY: Record<COMPETITOR_SORT, TCompetitorSortKeyRead
 
 /** Longueur maximale d'un nom, d'un prénom ou d'un pseudo (colonnes `varchar(80)`). */
 export const COMPETITOR_NAME_PART_MAX_LENGTH = 80
+
+export const COMPETITOR_DISPLAY_NAME_MAX_LENGTH = 160

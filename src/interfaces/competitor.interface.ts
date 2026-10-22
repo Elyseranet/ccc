@@ -78,3 +78,14 @@ export interface IMatchContext {
   match: MatchEntity
   record: IMatchRecord
 }
+
+/**
+ * `PATCH /competiteurs/{id}` (administrateur) : corriger une identité. L'avatar passe par
+ * `PUT /competiteurs/{id}/avatar` (B-16), pas par cette route.
+ */
+export interface IUpdateCompetitorRequest {
+  displayName?: string
+  firstName?: string | null
+  lastName?: string | null
+  nickname?: string | null
+}
