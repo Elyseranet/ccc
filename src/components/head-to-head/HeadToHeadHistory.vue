@@ -58,6 +58,11 @@
       class="head-to-head-history__note"
       data-cy="head-to-head-note"
     >
+      <span
+        v-if="unknownText"
+        class="head-to-head-history__unknown"
+        data-cy="head-to-head-unknown-results"
+      >{{ unknownText }}</span>
       {{ note }}
     </p>
   </section>
@@ -72,6 +77,7 @@ import type { IDataTableHeader } from 'origam/interfaces'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import { useT } from '~/composables/useT'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
+import { ROUND_KIND } from '~/enums/round.enum'
 import { HEAD_TO_HEAD_SCORE_SEPARATOR, HEAD_TO_HEAD_TABLE_BREAKPOINT } from '~/consts/head-to-head.const'
 import { HEAD_TO_HEAD_COLUMN } from '~/enums/head-to-head.enum'
 import type { IHeadToHeadHistoryProps, IHeadToHeadRow } from '~/interfaces/head-to-head-page.interface'
@@ -116,10 +122,11 @@ const rows = computed<IHeadToHeadRow[]>(() => props.comparison.matches.map((matc
   const high = Math.max(match.competitorScore, match.opponentScore)
   const low = Math.min(match.competitorScore, match.opponentScore)
   const round = ROUND_LABELS[match.roundKind].match
+  const pool = match.roundKind === ROUND_KIND.POOLS ? match.poolNumber : null
   return {
     id: match.matchId,
     edition: match.editionCode,
-    round: t(round.key, round.label),
+    round: pool !== null ? t('head_to_head.history.round_pool', 'Poule {pool}', { pool }) : t(round.key, round.label),
     score: `${high} ${HEAD_TO_HEAD_SCORE_SEPARATOR} ${low}`,
     winner: firstWon ? props.comparison.competitor : props.comparison.opponent,
     winnerTitles: (firstWon ? props.detailA : props.detailB)?.stats.titles ?? 0
@@ -132,10 +139,19 @@ const emptyText = computed(() => t('head_to_head.history.empty', 'Aucune rencont
  * Résultats inconnus
  *
  * @description
- * R-5 exige le nombre de matchs sans score DE LA PAIRE, que `IHeadToHead` ne fournit pas (écart de contrat transmis
- * au back). Rien n'est affiché à la place : un compteur par joueur, toutes éditions confondues, serait trompeur ici.
+ * R-5 : les matchs de la paire sans score connu (`comparison.unknownResults`, G9) sont comptés à part, jamais comme
+ * victoire, défaite ou nul. La phrase n'existe que s'il y en a au moins un (rendu en attente de la réponse de `ui`).
  ********************************************************/
 const note = computed(() => t('head_to_head.history.note', 'Les rencontres sans score connu sont comptées à part, jamais comme des nuls.'))
+const unknownText = computed(() => {
+  const count = props.comparison.unknownResults
+  if (count <= 0) {
+    return ''
+  }
+  return count === 1
+    ? t('head_to_head.unknown_results_one', '1 rencontre au résultat inconnu.')
+    : t('head_to_head.unknown_results_other', '{count} rencontres au résultat inconnu.', { count })
+})
 
 /*********************************************************
  * Expose
@@ -182,6 +198,10 @@ defineExpose({})
   &__empty {
     margin: 0;
     color: var(--origam-color__text---secondary);
+  }
+
+  &__unknown {
+    font-variant-numeric: tabular-nums;
   }
 
   &__note {
