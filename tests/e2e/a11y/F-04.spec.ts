@@ -73,6 +73,19 @@ test.describe('joueurs : accessibilité et recherche', () => {
     await expect(page).toHaveURL(/tri=wins/)
   })
 
+  test('la pagination se parcourt au clavier (un bouton de page prend le focus, Entrée change de page)', async ({ page }) => {
+    await page.goto('/joueurs')
+    await page.waitForLoadState('networkidle')
+    const pagination = page.getByTestId('players-pagination')
+    const third = pagination.getByRole('button', { name: /page 3$/i })
+    await third.focus()
+    await expect(third).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/page=3/)
+    await expect(page.getByTestId('players-pager-range')).toHaveText('41–60 sur 146')
+    await expect(pagination.getByRole('button', { name: /page 3$/i })).toHaveAttribute('aria-current', 'page')
+  })
+
   test('le filtre d’édition ne filtre que les inscrits et précise que les statistiques sont celles de la carrière', async ({ page }) => {
     await page.goto('/joueurs')
     await page.waitForLoadState('networkidle')
