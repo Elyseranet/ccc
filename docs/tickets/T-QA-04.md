@@ -1,6 +1,6 @@
 # T-QA-04 — Test sensible à la charge : « keeps at most 20 devices per account »
 
-- **Statut** : Correctif prêt (piste 3), en attente de la preuve de 5 passes sous charge. Ouvert le 2026-10-28 par `backend-lead`, à la demande du `project-manager` (règle : signaler tout test instable).
+- **Statut** : **Fermé** (2026-10-28), mergé dans `develop` @ `1148710` ; voir « Fermeture ».
 - **Test** : `tests/api/auth.test.ts`, `trusted device cookie (SEC-A4) > keeps at most 20 devices per account`.
 
 ## Constat
@@ -33,3 +33,15 @@ Mesure, test seul (`npx vitest run --config vitest.api.config.ts tests/api/auth.
 - après : 710 ms (2 connexions).
 
 Contrôle de mutation : en inversant l'ordre d'éviction (`createdAt` croissant au lieu de décroissant) dans `device-store.util.ts`, le nouveau test échoue (« expected […] to not include » le nonce du plus ancien) ; l'ordre a été remis.
+
+## Fermeture — 2026-10-28 (chef de projet)
+- `feature/T-QA-04-r` @ `c1b06c3` (cherry-pick de a0aa079 sur develop 566525c), mergé dans `develop` @ `1148710`. Seuls `tests/api/auth.test.ts` et ce ticket sont touchés. Aucun code de production, scrypt et timeout inchangés.
+- **Correctif** (piste 3) : 19 appareils semés en base dans l'ordre d'éviction, puis 2 vraies connexions. Le test vérifie qu'il reste 20 appareils, que le plus ancien est évincé et que le nonce de la dernière connexion est conservé. Contrôle de mutation : avec l'ordre d'éviction inversé, le test échoue.
+- **Mesures** (dev-b09) :
+  - test seul : 5 156 ms avant, 710 ms après ;
+  - **5 passes test:api complètes** sur a0aa079, chacune sur base neuve, toutes 24/24 et 243/243. Durées : 1 174,8 / 1 039,2 / 825,6 / 769,7 / 699,6 s. Test « 20 devices » : 960 / 1 096 / 956 / 726 / 860 ms ;
+  - **sous charge parallèle** : la passe 1 (20:47:20–21:06:56) a recouvert pendant environ 18 min le test:api de B-19 de dev-b12 (20:48:41–21:09:44, heures rapportées par dev-b12) ;
+  - tête rebasée c1b06c3 : test:run 593, typecheck vert, gitleaks propre, passe test:api complète 25/25 et 250/250 (865,2 s, test « 20 devices » 823 ms).
+- **Revue** : backend-lead. Pas de Playwright, puisque seuls des tests d'API changent (règle précisée par le chef de projet).
+- **Après le merge** : typecheck vert, test:run 602.
+- **Reste ailleurs** : T-QA-05 (`request-body-timeout`), autre test sensible au temps.
