@@ -1,4 +1,5 @@
 import { API_ROUTES } from '../consts/api-routes.const.js'
+import { ENDPOINTS_WITHOUT_PAGE } from '../consts/endpoints-without-page.const.js'
 import { LAYOUT_ENDPOINTS } from '../consts/layout-endpoints.const.js'
 import { PAGE_DELIVERY } from '../consts/page-delivery.const.js'
 import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
@@ -65,10 +66,22 @@ export const findStalePages = (routes: string[], table: Record<string, IPageDeli
   return Object.keys(table).filter(route => !known.has(route))
 }
 
-/** Endpoints qu'aucune page ne déclare. */
-export const findOrphanEndpoints = (table: Record<string, IPageDelivery> = PAGE_DELIVERY): API_ENDPOINT[] => {
+/** Endpoints qu'aucune page ne déclare et que la liste `ENDPOINTS_WITHOUT_PAGE` (ARCH-11 bis) n'accepte pas. */
+export const findOrphanEndpoints = (
+  table: Record<string, IPageDelivery> = PAGE_DELIVERY,
+  withoutPage: Partial<Record<API_ENDPOINT, string>> = ENDPOINTS_WITHOUT_PAGE
+): API_ENDPOINT[] => {
   const used = new Set(Object.values(table).flatMap(getPageEndpoints))
-  return Object.values(API_ENDPOINT).filter(endpoint => !used.has(endpoint))
+  return Object.values(API_ENDPOINT).filter(endpoint => !used.has(endpoint) && !(endpoint in withoutPage))
+}
+
+/** Endpoints de la liste « sans page » qu'une page déclare pourtant : la liste est périmée. */
+export const findStaleWithoutPage = (
+  table: Record<string, IPageDelivery> = PAGE_DELIVERY,
+  withoutPage: Partial<Record<API_ENDPOINT, string>> = ENDPOINTS_WITHOUT_PAGE
+): API_ENDPOINT[] => {
+  const used = new Set(Object.values(table).flatMap(getPageEndpoints))
+  return (Object.keys(withoutPage) as API_ENDPOINT[]).filter(endpoint => used.has(endpoint))
 }
 
 export const filterDeliveredItems = (

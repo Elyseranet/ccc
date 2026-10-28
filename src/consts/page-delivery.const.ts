@@ -42,7 +42,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.EDITION]: {
     delivered: true,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_POOLS, API_ENDPOINT.EDITION_DRAWS]
+    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.EDITION]
   },
   [ROUTES.PLAYERS]: {
     delivered: false,

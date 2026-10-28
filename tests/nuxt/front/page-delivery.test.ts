@@ -15,6 +15,7 @@ import {
   findDeliveredPendingUsages,
   findPagePendingTickets,
   findOrphanEndpoints,
+  findStaleWithoutPage,
   findStalePages,
   findUndeclaredPages,
   isPageAccessible,
@@ -58,6 +59,7 @@ describe('table PAGE_DELIVERY', () => {
 
   it('rattache chaque endpoint à au moins une page', () => {
     expect(findOrphanEndpoints()).toEqual([])
+    expect(findStaleWithoutPage()).toEqual([])
   })
 
   it('ne déclare que des endpoints connus', () => {
@@ -81,6 +83,14 @@ describe('détection des erreurs de table', () => {
     expect(findStalePages(['/a'], table(true))).toEqual(['/b'])
     expect(findOrphanEndpoints(table(true))).toContain(API_ENDPOINT.COMPETITORS)
     expect(findOrphanEndpoints(table(true))).not.toContain(API_ENDPOINT.ME)
+  })
+
+  it('la liste « endpoints sans page » (ARCH-11 bis) accepte ses entrées et reste stricte pour le reste', () => {
+    const withoutPage = { [API_ENDPOINT.COMPETITORS]: 'raison' }
+    expect(findOrphanEndpoints(table(true), withoutPage)).not.toContain(API_ENDPOINT.COMPETITORS)
+    expect(findOrphanEndpoints(table(true), withoutPage)).toContain(API_ENDPOINT.ME_UPDATE)
+    expect(findStaleWithoutPage(table(true), { [API_ENDPOINT.EDITIONS]: 'raison' })).toEqual([API_ENDPOINT.EDITIONS])
+    expect(findStaleWithoutPage(table(true), withoutPage)).toEqual([])
   })
 
   it('reconnaît une route vue-router et ses variantes', () => {
