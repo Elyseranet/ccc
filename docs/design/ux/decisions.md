@@ -208,3 +208,12 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
     - aucun statut existant ne masque les phases finales ;
     - aucun code ne crée de tour hors du dump. Le moment de création des tours en fonctionnement réel n'est donc pas encore défini.
 - **Tours non tirés (décision utilisateur 2026-10-28, B-18)** : en fonctionnement réel, **un tour de phase finale n'existe jamais avant son tirage**. Le tirage d'un tour (B-13) le crée au moment du tirage. Un tour `PENDING` portant des matchs ne vient donc que des données reprises (dump) ou de l'état de test de T-QA-03. B-18 filtre ces tours sans changer le contrat de l'API. Aucun squelette « à tirer » côté front.
+
+## AUDIT-1 — remesure (chef de projet, 2026-10-28)
+- `npm audit` complet : **12 vulnérabilités** (4 low, 3 moderate, **3 high, 2 critical**), contre « 12 high + 2 critical » à l'ouverture du waiver. `package-lock.json` n'a pas changé depuis a90f586 : c'est la base d'avis qui a évolué.
+- **High et critical**, tous dans la chaîne de développement :
+  - `@nuxt/devtools` (high) ;
+  - `simple-git` et `@simple-git/argv-parser` (critical) ;
+  - `node-forge` (high) ;
+  - `undici` (high, nouveau dans la liste).
+- `npm audit --omit=dev` : **0**. Le waiver couvre toujours la situation : moins de high, même nombre de critical, aucune vulnérabilité en production. Mesure : frontend-lead (F-03a) et backend-lead (vague 3a, liste identique à develop).
