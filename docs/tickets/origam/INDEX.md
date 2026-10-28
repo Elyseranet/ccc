@@ -27,3 +27,4 @@
 | #1267 | évolution : ligne `kv` de `data-list` (grille, fond, rayon, écart, filet) et casse de la clé non thémables | `:deep` restreint dans `HeadToHeadSummary.vue` (F-05) |
 | #1276 | `card` cliquable : `.origam-card > *` écrase l opacité de l overlay, carte noire au repos | règle `.origam-card > .origam-card__overlay.origam-card__overlay` dans `main.css` (F-00t) |
 | #1278 | `pagination` : précédent/suivant non masquables, `with-info` limité à la page courante, page courante illisible en neutre, couleurs par règle à identifiant | règles `main.css` (dont un `!important`) et compteur local (F-04, F-04-PAG) |
+| #1280 | `field` : retrait de 2 px de l'`<input>` jamais remis à zéro, hauteur minimale avec un interligne en `1.5rem` | règle `.origam-field.origam-field.origam-field input` dans `main.css` et variables du thème (F-15) |
