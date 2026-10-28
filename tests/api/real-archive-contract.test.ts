@@ -140,6 +140,9 @@ describe('B-17 contract on the real archive', async () => {
     expect(editions).toHaveLength(REAL_EDITION_COUNT)
     for (const edition of editions) {
       expect(edition.final?.runnerUp, edition.code).toBeTruthy()
+      // B-19 : titres à date du finaliste et deux demi-finalistes, jamais null.
+      expect(Number.isInteger(edition.final!.runnerUpTitlesToDate), edition.code).toBe(true)
+      expect(edition.semiFinalists, edition.code).toHaveLength(2)
     }
     const scored = await dataSource.query<Array<{ code: string }>>(
       `SELECT DISTINCT e.code

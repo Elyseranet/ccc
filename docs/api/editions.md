@@ -34,7 +34,13 @@ Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO so
 - `runnerUp` : la participation de stade `FINALIST` (identité publique) ;
 - `score` : `{ champion, runnerUp }`, scores validés du match de la finale (`ROUND_KIND.FINAL`, `VALIDATED`) ; `null` si la finale d'archive n'a pas de score (`RESULT_UNKNOWN`).
 
-Le calcul est fait en une passe pour toute la liste (deux requêtes quel que soit le nombre d'éditions).
+Le calcul est fait en une passe pour toute la liste (le nombre de requêtes ne dépend pas du nombre d'éditions).
+
+`final.runnerUpTitlesToDate` (B-19) est le nombre de titres du finaliste jusqu'à cette édition comprise (par `chronologicalRank`), avec le même calcul que `champion.titlesToDate`.
+
+### Demi-finalistes (`semiFinalists`, B-19)
+
+`IEditionSummary.semiFinalists` liste les perdants des demi-finales (participations de stade `SEMI`) : `{ competitor, titlesToDate }`, avec les titres jusqu'à cette édition comprise. C'est `[]`, jamais `null`, tant qu'aucun n'est connu. **L'ordre est fixé par le serveur et ne doit pas être retrié côté front** : `sequence` du match de demi-finale où le joueur a été éliminé (tours publics seulement, B-18), puis `displayName`. Un joueur sans match de demi-finale passe après ceux qui en ont un.
 
 ## Affectations d'un tirage (`IDrawAssignment`)
 
