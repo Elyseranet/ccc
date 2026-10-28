@@ -7,6 +7,10 @@ import type { DataSource } from 'typeorm'
 import { AVATAR_MAX_BYTES, AVATAR_MULTIPART_OVERHEAD_BYTES } from '../../src/consts/avatar.const'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { USER_ROLE } from '../../src/enums/user.enum'
+import { EDITION_ORIGIN, EDITION_STATUS } from '../../src/enums/edition.enum'
+import type { IEditionParticipant } from '../../src/interfaces/edition.interface'
+import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
+import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
 import { buildMultipart, fileUpload, makeGif, makeJpegWithGps, makePng, makeWebp } from '../helpers/avatar-fixtures'
 import { cookieHeaderOf, getWith, login, resetTestDatabase, seedUser } from './helpers/auth-fixtures'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
@@ -309,6 +313,37 @@ describe('avatar upload (B-16)', async () => {
       const me = await (await getWith('/api/v1/moi', cookie)).json() as { competitor: { avatarUrl: string | null } }
       expect(me.competitor.avatarUrl).toBeNull()
       expect((await getWith(`/api/v1/competiteurs/${alice.competitorId}/avatar`)).status).toBe(404)
+    })
+  })
+  describe('edition ETag after an avatar change (wave 3a review, M1)', () => {
+    it('changes the participants ETag after a PUT and after a DELETE, so no 304 serves a stale avatarUrl', async () => {
+      const carol = await seedUser(dataSource, { email: 'carol@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT, withCompetitor: true })
+      const edition = await dataSource.getRepository(EditionEntity).save({
+        code: '2041', year: 2041, chronologicalRank: 2041, origin: EDITION_ORIGIN.APP, status: EDITION_STATUS.CLOSED, name: 'Édition 2041'
+      })
+      await dataSource.getRepository(ParticipationEntity).save({ editionId: edition.id, competitorId: carol.competitorId!, finalStage: null, points: null })
+      const path = `/api/v1/editions/${edition.id}/participants`
+      const avatarOf = async (response: Response): Promise<string | null> =>
+        ((await response.json()) as IEditionParticipant[]).find((item) => item.competitor.id === carol.competitorId)!.competitor.avatarUrl
+
+      const before = await fetch(path)
+      expect(before.status).toBe(200)
+      const etagBefore = before.headers.get('etag')!
+      expect(await avatarOf(before)).toBeNull()
+
+      const cookie = await cookieOf(admin)
+      expect((await put(`/api/v1/competiteurs/${carol.competitorId}/avatar`, fileUpload(await makePng()), cookie)).status).toBe(200)
+      const afterUpload = await fetch(path, { headers: { 'If-None-Match': etagBefore } })
+      expect(afterUpload.status).toBe(200)
+      const etagAfterUpload = afterUpload.headers.get('etag')!
+      expect(etagAfterUpload).not.toBe(etagBefore)
+      expect(await avatarOf(afterUpload)).toMatch(AVATAR_URL_PATTERN)
+
+      expect((await del(`/api/v1/competiteurs/${carol.competitorId}/avatar`, cookie)).status).toBe(204)
+      const afterDelete = await fetch(path, { headers: { 'If-None-Match': etagAfterUpload } })
+      expect(afterDelete.status).toBe(200)
+      expect(afterDelete.headers.get('etag')).not.toBe(etagAfterUpload)
+      expect(await avatarOf(afterDelete)).toBeNull()
     })
   })
 })
