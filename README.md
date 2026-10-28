@@ -45,6 +45,20 @@ L'image (`Dockerfile`) est agnostique de l'environnement : aucune valeur n'est c
 
 Mode recommandé (décision OPS-1 et OPS-2) : Coolify construit l'image depuis le dépôt (`https://github.com/Elyseranet/ccc`, privé) avec le `Dockerfile` seul, et PostgreSQL est une **ressource Coolify séparée** (sauvegardes gérées par Coolify). Renseigner `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD` et `_DATABASE` avec les valeurs de cette ressource. Il n'y a pas de registre d'images ni de workflow de publication.
 
+### Variables obligatoires en production (garde-fou PROD-1)
+
+L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) : **ne pas la retirer ni la mettre à `false` dans Coolify**, il n'existe pas de mode recette. Avec cet indicateur, le serveur **et** `ccc-ops user:create-admin` refusent de démarrer, avec un message qui nomme la variable fautive (jamais sa valeur), si l'une de ces variables manque ou est locale :
+
+| Variable | Exigence |
+|---|---|
+| `NUXT_PUBLIC_SITE_URL` | URL en `https:`, qui ne désigne ni `localhost` ni `127.0.0.1` ; base des liens d'invitation |
+| `NUXT_MAIL_TRANSPORT` | `smtp` (`capture` est réservé aux tests d'API) |
+| `NUXT_MAIL_HOST` | serveur SMTP réel, ni `localhost` ni `127.0.0.1` |
+| `NUXT_MAIL_PORT`, `NUXT_MAIL_SECURE`, `NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD` | à renseigner selon le fournisseur SMTP (le garde-fou ne contrôle que `host`, `transport`, `from` et `siteUrl`) |
+| `NUXT_MAIL_FROM` | expéditeur non vide, par ex. `CCC <no-reply@votre-domaine>` |
+
+L'indicateur est faux par défaut et ne dépend pas de `NODE_ENV` : le développement local et le build des tests d'API ne le posent pas.
+
 Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comme ressource « Docker Compose ». Aucun port n'y est publié : Coolify route le domaine vers le port 3000 du service `app`.
 
 Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
@@ -56,7 +70,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 - `src/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`src/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
 - `src/consts/api-routes.const.ts` (`API_ROUTES`) associe chaque endpoint à son fichier de route Nitro. Une route pas encore écrite porte le ticket back qui la livre (`pendingTicket`) : l'écran répond en erreur (état AsyncState) jusqu'au merge de ce ticket, sans route provisoire ni fausse donnée (ARCH-11). Un test vérifie que le fichier existe si et seulement si `pendingTicket` est absent : à la livraison d'une route, retirer son `pendingTicket` dans le même commit.
 - Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
-- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
+- En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404. Le 404 d'une page non livrée n'est pas un contrôle d'accès ; l'autorisation reste portée par le middleware `admin` et par le serveur.
 - Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
 - `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Ajouter à `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre ; le test de la page livrée exige une session administrateur (`E2E_ADMIN_SESSION`) et échoue sans elle.
 
@@ -66,12 +80,15 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 |---|---|---|
 | `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Obligatoire dans le compose ; l'application refuse de démarrer en production sans lui (SEC-A4). Disponible après intégration de B-08. |
+| `NUXT_AUTH_SECURE_COOKIE` | non (vrai) | Cookies `Secure` + préfixe `__Host-` (T-SEC-04, L3). **Ne jamais positionner `false` sur un déploiement Coolify en HTTPS** (laisser la variable absente) ; `false` ne sert qu'au développement local en HTTP. |
+| `NUXT_AUTH_PASSWORD_HASH_CONCURRENCY` | non (2) | Calculs scrypt simultanés, de 1 à 64 ; au-delà, 503 `SERVICE_BUSY` avec `Retry-After` (T-SEC-04, L2). |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
+| `NUXT_TRUST_PROXY_HOPS` | **oui derrière Coolify** (défaut 0) | Nombre de reverse proxys de confiance devant le conteneur, de 0 à 5. À poser au nombre de proxys réellement traversés (le proxy de Coolify seul : 1 ; un CDN devant en ajoute un). La chaîne exacte du déploiement n'est pas encore connue : à vérifier au premier déploiement. |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
 | `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
-| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). |
+| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). Derrière le proxy de Coolify, l'origine propre du serveur est reconstruite depuis l'en-tête `Host` et `X-Forwarded-Proto` (h3 `getRequestURL`). À vérifier au premier déploiement : si une écriture légitime (connexion, admin) répond 403 `FORBIDDEN_ORIGIN`, poser ici `https://<domaine>`. |
 | `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS` | non (3600) | `Cache-Control` public des lectures d'une édition CLOSED (vague 2). |
 
 Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
@@ -80,16 +97,16 @@ Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à c
 
 - Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
 - La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
-- La route est soumise au limiteur de débit par IP : derrière Traefik, tous les clients partagent l'IP du proxy tant que T-SEC-02 n'est pas fait (`X-Forwarded-For` de confiance, SSL PostgreSQL, variables `NUXT_TRUSTED_PROXIES` et `NUXT_DATABASE_SSL` pressenties, pas encore implémentées). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
+- La route est soumise au limiteur de débit par IP. Derrière le proxy de Coolify, poser `NUXT_TRUST_PROXY_HOPS` au nombre de proxys traversés (voir la table des variables) : sans lui, tous les clients partagent l'IP du proxy. Le SSL PostgreSQL (`NUXT_DATABASE_SSL` pressentie) reste à faire (T-SEC-02). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
 
 ### Première mise en route
 
-1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique `migration:run` avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
+1. Définir les variables ci-dessus dans Coolify, puis déployer. Au démarrage, `entrypoint.sh` applique les migrations (`ccc-ops migrate`, qui journalise en JSON `migrations_applied` ou `migrations_up_to_date`, sans les requêtes SQL de la CLI TypeORM) avant le serveur ; si la base est injoignable ou si une migration échoue, le conteneur s'arrête en erreur et le serveur n'est pas lancé. `synchronize` n'est jamais activé.
 2. Ouvrir le terminal du conteneur dans Coolify, ou `docker exec -it <conteneur> ...`, et lancer les commandes d'exploitation avec `ccc-ops` :
 
 | Commande | Rôle | Disponibilité |
 |---|---|---|
-| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration. | image actuelle |
+| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration (`src/utils/run-migrations-cli.util.ts`, sans journal des requêtes SQL). | image actuelle |
 | `ccc-ops db:seed:archives` | Applique le dump SQL figé des archives 2012-2026 (`src/assets/seeds/archives.sql`), en une transaction, sur une base migrée et vide. | image actuelle |
 | `ccc-ops user:create-admin` | Crée le premier administrateur. | image actuelle |
 | `ccc-ops user:unlock` | Déverrouille un compte. | image actuelle |
@@ -203,17 +220,22 @@ Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (A
 | `NUXT_RATE_LIMIT_MAX_REQUESTS` | `60` | Nombre de requêtes autorisées par IP et par clé de route dans la fenêtre. |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `30` | Réglages propres à la recherche publique `GET /api/v1/competiteurs?q=` (clé `competitors-search`) ; surchargent les valeurs par défaut ci-dessus. |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `300` | Budget unique, partagé par toutes les routes publiques en lecture (clé `public-read`) : liste des compétiteurs (hors `?q=`), fiche, face-à-face, éditions et sous-ressources, stats, classements. `/health` et la recherche `?q=` gardent leur clé. |
+| `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000` | URL publique du site : base des liens d'invitation (jamais l'en-tête `Host`). À renseigner en production. |
+| `NUXT_MAIL_HOST`, `_PORT`, `_SECURE`, `_USER`, `_PASSWORD`, `_FROM` | `localhost`, `1025`, `false`, vide, vide, `CCC <no-reply@ccc.local>` | Envoi des invitations par SMTP (nodemailer) : Mailpit en local, fournisseur SMTP en production. |
+| `NUXT_RATE_LIMIT_INVITATION_TOKEN_WINDOW_MS`, `_MAX_REQUESTS` | `900000`, `30` | Budget par IP des routes publiques `GET`/`POST /auth/invitation/{jeton}` (clé `invitation-token`). |
+| `NUXT_RATE_LIMIT_AVATAR_UPLOAD_WINDOW_MS`, `_MAX_REQUESTS` | `600000`, `10` | Envois d'avatar (`PUT /moi/avatar`, `PUT /competiteurs/{id}/avatar`, clé `avatar-upload`, par IP). Le limiteur passe avant la lecture du corps : un envoi refusé en 429 (avec `Retry-After`) n'est ni lu ni décodé par sharp. |
+| `NUXT_TRUST_PROXY_HOPS` | `0` | Confiance proxy pour l'IP client des limites de débit. 0 : adresse de la socket, `X-Forwarded-For` ignoré. N > 0 : l'entrée N de `X-Forwarded-For` en partant de la droite, uniquement si la socket vient de la boucle locale ou d'un réseau privé (`TRUSTED_PROXY_SUBNETS`) ; une chaîne trop courte ou invalide retombe sur la socket. Un client ne peut donc pas choisir son IP en forgeant l'en-tête. Valeur hors 0..5 : refus au démarrage. |
 | `NUXT_RATE_LIMIT_MAX_KEYS` | `10000` | Plafond de clés `ip:route` gardées en mémoire ; au-delà, la clé la plus anciennement utilisée est évincée. Les IPv6 sont agrégées par préfixe /64. |
 
-Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy : voir T-SEC-02.
+Budget public (M3) : 300 requêtes par minute et par IP, partagées entre toutes les lectures publiques, pour qu'un client ne multiplie pas son budget par le nombre de routes. Les calculs portent sur environ 146 compétiteurs et 729 matchs, donc quelques millisecondes : une limite suffit contre l'abus, sans cache d'agrégats ni logique d invalidation ; les éditions closes ont déjà l'ETag (B-06). Le budget est généreux parce que, le soir du tournoi, le public est souvent derrière une seule IP (wifi du lieu). Derrière un proxy, l'IP lue est celle du proxy tant que `NUXT_TRUST_PROXY_HOPS` n'est pas posé.
 
-Corps des requêtes (M2) : les corps JSON sous `/api` sont plafonnés à 16 Kio (`API_JSON_BODY_MAX_BYTES`). Un `Content-Length` supérieur répond 413 `PAYLOAD_TOO_LARGE` sans lire le corps ; un envoi par morceaux est lu en flux et coupé au plafond. Le limiteur par IP du login passe avant la lecture du corps. Un corps qui n'est pas du JSON n'est pas lu (400). L'upload d'avatar multipart (B-16) aura son propre plafond.
+Corps des requêtes (M2) : les corps JSON sous `/api` sont plafonnés à 16 Kio (`API_JSON_BODY_MAX_BYTES`). Un `Content-Length` supérieur répond 413 `PAYLOAD_TOO_LARGE` sans lire le corps ; un envoi par morceaux est lu en flux et coupé au plafond. Le limiteur par IP du login passe avant la lecture du corps. Un corps qui n'est pas du JSON n'est pas lu (400). L'upload d'avatar multipart (B-16) a son propre plafond de 2 Mio, lu en flux (voir « Avatars »).
 
 En production (`NODE_ENV=production`), le démarrage échoue si `NUXT_DATABASE_HOST`, `_USERNAME`, `_PASSWORD` ou `_DATABASE` est vide ; le message nomme la variable, jamais sa valeur.
 
 Les réglages du limiteur doivent être des entiers strictement positifs : le serveur refuse de démarrer sinon (le message nomme le réglage fautif). Un `0`, un négatif ou un `NaN` désactiverait sinon le plafond.
 
-Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémoire. Un attaquant disposant de très nombreuses IPv4 distinctes peut faire évincer des compteurs légitimes, qui repartent alors de zéro. Cette limite est inhérente au stockage en mémoire ; un déploiement multi-instance ou exposé exigera un stockage partagé (ticket T-SEC-02). De plus : les compteurs sont en mémoire du processus. Avec plusieurs instances, chacune compte séparément ; l'IP lue est celle de la connexion socket, donc celle du reverse proxy s'il y en a un. Le mode de déploiement n'étant pas spécifié, ces limites sont acceptées pour une instance unique.
+Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémoire. Un attaquant disposant de très nombreuses IPv4 distinctes peut faire évincer des compteurs légitimes, qui repartent alors de zéro. Cette limite est inhérente au stockage en mémoire ; un déploiement multi-instance ou exposé exigera un stockage partagé (ticket T-SEC-02). De plus : les compteurs sont en mémoire du processus. Avec plusieurs instances, chacune compte séparément ; l'IP lue est celle de la connexion socket, donc celle du reverse proxy s'il y en a un, sauf si `NUXT_TRUST_PROXY_HOPS` est posé. Le mode de déploiement n'étant pas spécifié, ces limites sont acceptées pour une instance unique.
 
 ## API serveur
 
@@ -251,12 +273,34 @@ Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké)
 | `POST /api/v1/auth/login` `{ email, password }` | public, limité par IP et ralenti par compte | 200 `IMe` + cookie ; 401 `INVALID_CREDENTIALS` identique pour email inconnu et mot de passe faux ; 429 avec `Retry-After` (limite par IP, ou délai du compte) |
 | `POST /api/v1/auth/logout` | public, idempotent | 204, session révoquée, cookie effacé |
 | `GET /api/v1/moi` | authentifié | 200 `IMe` (seule route qui expose `phone`, à son titulaire) |
-| `PATCH /api/v1/moi` | authentifié | liste blanche `avatarUrl`, `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
+| `PATCH /api/v1/moi` | authentifié | liste blanche `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
 
 Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. **Une écriture sans en-tête `Origin` (ni `Sec-Fetch-Site`) est acceptée** : une telle requête ne vient pas d'un navigateur, et la défense CSRF repose sur `SameSite=Lax` plus la vérification d'`Origin` quand il est présent. Mots de passe : scrypt (`node:crypto`), 15 caractères minimum (OWASP Authentication Cheat Sheet, sans MFA), 128 maximum. Le limiteur de débit par IP est en mémoire (une instance).
+
+**Cookie `Secure` (T-SEC-04, L3).** L'attribut `Secure` et le préfixe `__Host-` des cookies de session et d'appareil dépendent de `runtimeConfig.auth.secureCookie` (**`NUXT_AUTH_SECURE_COOKIE`**), et non de `NODE_ENV`. Il est **vrai par défaut** ; seule une valeur explicitement fausse (`false` ou `0`) le désactive, toute autre valeur reste vraie. **Ne le désactiver qu'en développement local en HTTP** (sans lui, le navigateur refuse un cookie `Secure` sur `http://`) : en production, un cookie sans `Secure` circulerait en clair.
+
+**Concurrence de scrypt (T-SEC-04, L2).** `hashPassword`, `verifyPassword` et `burnPasswordCheck` passent par un sémaphore global, sans file d'attente : au plus `runtimeConfig.auth.passwordHashConcurrency` (**`NUXT_AUTH_PASSWORD_HASH_CONCURRENCY`**, défaut 2, entier de 1 à 64, vérifié au démarrage) calculs simultanés. Chaque calcul occupe un thread du pool libuv (4 par défaut) et 64 Mio ; le défaut en laisse la moitié libre au système de fichiers et au DNS. Au-delà, la requête reçoit **503 `SERVICE_BUSY` avec `Retry-After`**. À la connexion, la saturation est détectée avant la réservation de la tentative (SEC-A2) : un refus 503 n'allonge pas le délai du compte.
+
+Conséquence pratique : avec 2 calculs simultanés par défaut, une troisième connexion strictement simultanée reçoit un 503 avec `Retry-After: 1` et le client doit réessayer ; il n'y a pas de file d'attente (elle garderait des requêtes ouvertes). Valeur 2, mesurée le 2026-10-21 (node 22, macOS, 15 cœurs, N=2^16, r=8, p=2) : un calcul seul coûte 168 ms (médiane de 8), 2 ou 4 en parallèle 184-185 ms chacun, 8 en parallèle 355 ms chacun (le pool libuv n'en exécute que 4 à la fois). Relever la valeur n'a de sens qu'avec `UV_THREADPOOL_SIZE` relevé en proportion.
+
+**Déploiement (Coolify) : ne jamais positionner `NUXT_AUTH_SECURE_COOKIE=false` sur un déploiement en HTTPS** (ni en production ni en préproduction) ; laisser la variable absente. À reporter dans la documentation de déploiement de T-OPS-01.
+
+**Délai de lecture du corps (T-SEC-04, N3).** Le corps d'une requête JSON doit arriver en `API_BODY_READ_TIMEOUT_MS` (10 s au total, pas un délai d'inactivité) : au-delà, 408 `REQUEST_TIMEOUT` et connexion fermée (anti slowloris). La lecture passe par `readRequestBody(event, { maxBytes, timeoutMs })` (`src/utils/request-body.util.ts`), que le multipart doit réutiliser avec son propre plafond et son propre délai.
 
 Échecs de connexion par compte (SEC-A2, migration M3, colonnes `users.failed_login_count` et `users.throttled_until`) : aucun blocage dur. Jusqu'à 5 échecs consécutifs, aucun délai ; au-delà, un délai de 2^(échecs - 5) secondes, **plafonné à 300 s** (`LOGIN_FREE_FAILURES`, `LOGIN_DELAY_BASE_SECONDS`, `LOGIN_DELAY_MAX_SECONDS`). Pendant le délai, le login répond 429 avec `Retry-After` sans vérifier le mot de passe ; une connexion réussie remet le compteur à zéro. Un email inconnu ne crée aucun état (seule la limite par IP s'applique). **Risque accepté (SEC-A3, décision utilisateur 2026-10-20) : énumération de comptes.** Un 429 de délai ne se produit que pour un compte qui existe. Après 6 échecs sur un même email, un tiers peut donc savoir si cet email a un compte. Aucune parade n'est prévue. Déblocage immédiat par un opérateur : `npm run user:unlock -- <email>`, qui révoque aussi les appareils de confiance du compte.
 
 Cookie d'appareil de confiance (SEC-A4, migration M4, table `login_devices` ; méthode OWASP « Slow Down Online Guessing Attacks with Device Cookies », https://community.owasp.org/Slow_Down_Online_Guessing_Attacks_with_Device_Cookies) : après une connexion réussie, le serveur émet `ccc_device` (`__Host-ccc_device` en production), `HttpOnly`, `SameSite=Lax`, `Secure` en production, 90 jours. Sa valeur est `base64url(JSON{u: id du compte, n: nonce, e: expiration})` suivie d'un HMAC-SHA256 ; le secret vient de **`NUXT_AUTH_DEVICE_COOKIE_SECRET`** (32 caractères minimum, `openssl rand -hex 32`), **obligatoire en production : l'application refuse de démarrer sans lui**. Hors production, un secret aléatoire propre au processus sert de repli. Un cookie valide pour CE compte, dont la ligne existe encore et n'a pas expiré, désigne un appareil reconnu : il n'est pas soumis au délai posé par les clients non reconnus et a son propre compteur d'échecs (mêmes règles : 5 échecs libres, puis 2^(n−5) s plafonnés à 300 s). Un cookie falsifié, expiré, révoqué ou appartenant à un autre compte est traité comme « non reconnu ». La limite par IP s'applique toujours. Au plus 20 appareils par compte (les plus anciens sont supprimés). **Un changement de mot de passe révoque aussi les appareils de confiance** du compte, dans la même transaction que la mise à jour du hash et la révocation des autres sessions (tout ou rien) : un cookie d'appareil volé perd son passe-droit, et l'appareil qui a fait le changement le retrouve à sa prochaine connexion réussie.
 
-Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard) crée un compte `INVITED` sans mot de passe ; le lien d'invitation qui lui permet d'en définir un arrive avec B-09.
+**Risque accepté (N1, décision utilisateur 2026-10-21, `docs/design/ux/decisions.md`).** Un attaquant qui possède l'email ET un cookie d'appareil valide (le cookie est `HttpOnly` : il ne peut être volé que sur l'appareil lui-même) obtient un second flux d'essais, avec son propre compteur. Ce flux est ralenti comme les autres (5 essais libres, puis un délai de 2^(n−5) s plafonné à 300 s) et borné par la limite par IP. Un changement de mot de passe révoque tous les appareils de confiance du compte (N2). **Aucun plafond global d'essais par compte n'est appliqué.**
+
+Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard, `NUXT_PUBLIC_SITE_URL` requis) crée un compte `INVITED` sans mot de passe et affiche une fois, sur la sortie standard, son lien de première connexion (7 jours, usage unique). Invitations, envoi d'email (SMTP, `NUXT_MAIL_*`) et routes : voir `docs/api/invitations.md`.
+
+## Avatars (B-16)
+
+Contrat complet : [docs/api/avatar.md](docs/api/avatar.md). Routes : `PUT` et `DELETE /api/v1/moi/avatar`, `PUT`, `DELETE` et `GET /api/v1/competiteurs/{id}/avatar` (le `GET` est public).
+
+- La photo est stockée en base (`competitor_avatars`, AV-1), au plus 2 Mio envoyés (`AVATAR_MAX_BYTES`), lus en flux. Type vérifié par signature (JPEG, PNG, WebP), puis ré-encodée par `sharp` : orientation appliquée, 512 px au plus, **EXIF, GPS, XMP et IPTC supprimés**.
+- `sharp` est épinglé à `0.35.5` (sans `^` : le binaire natif libvips suit la version). Les binaires sont précompilés par plateforme (`@img/sharp-<os>-<arch>`) : l'image Docker (`node:22-alpine`, musl) installe la variante `linuxmusl`, et Nitro l'embarque dans `.output`.
+- **Rollback de la migration `CreateCompetitorAvatars`** : `down` supprime `competitor_avatars` et recrée `competitors.avatar_url` (vide). **Les images téléversées sont perdues.** `up` refuse de s'exécuter si une `avatar_url` est encore renseignée.
+- Le dump `src/assets/seeds/archives.sql` ne référence plus `avatar_url` (les 146 valeurs étaient NULL).
+- Mentions de licences : `sharp` est sous Apache-2.0 ; `@img/sharp-libvips-*` (libvips) sous LGPL-3.0-or-later, chargée dynamiquement et sans modification (AV-2).

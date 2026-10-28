@@ -1,8 +1,9 @@
-import { getRequestIP, setResponseHeader } from 'h3'
+import { setResponseHeader } from 'h3'
 import type { H3Event } from 'h3'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { RATE_LIMIT_OPTION_NAMES, RATE_LIMIT_ROUTE_CONFIG_KEY, RATE_LIMIT_ROUTE_KEY } from '../consts/rate-limit.const.js'
 import type { IRateLimitOptions, IRateLimitResult } from '../interfaces/rate-limit.interface.js'
+import { getClientIp } from './client-ip.util.js'
 import { normalizeIpForRateLimit, truncateIpForLog } from './ip.util.js'
 import { logger } from './logger.util.js'
 import { tooManyRequests } from './api-error.util.js'
@@ -125,7 +126,7 @@ const useRateLimiter = (routeKey: string): SlidingWindowRateLimiter => {
 
 /** À appeler en tête de handler : lève une 429 avec `Retry-After` au dépassement. */
 export const enforceRateLimit = (event: H3Event, routeKey: string): void => {
-  const ip = normalizeIpForRateLimit(getRequestIP(event) ?? 'unknown')
+  const ip = normalizeIpForRateLimit(getClientIp(event) ?? 'unknown')
   const result = useRateLimiter(routeKey).check(`${ip}:${routeKey}`)
 
   if (!result.allowed) {

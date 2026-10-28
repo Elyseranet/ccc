@@ -1,8 +1,10 @@
 import { CompetitorAliasEntity } from '../server/db/typeorm/entities/competitor-alias.entity.js'
+import { CompetitorAvatarEntity } from '../server/db/typeorm/entities/competitor-avatar.entity.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { DrawAssignmentEntity } from '../server/db/typeorm/entities/draw-assignment.entity.js'
 import { DrawEntity } from '../server/db/typeorm/entities/draw.entity.js'
 import { EditionEntity } from '../server/db/typeorm/entities/edition.entity.js'
+import { InvitationEntity } from '../server/db/typeorm/entities/invitation.entity.js'
 import { LegacyWorkbookImportEntity } from '../server/db/typeorm/entities/legacy-workbook-import.entity.js'
 import { LegacyWorkbookRowEntity } from '../server/db/typeorm/entities/legacy-workbook-row.entity.js'
 import { LoginDeviceEntity } from '../server/db/typeorm/entities/login-device.entity.js'
@@ -23,6 +25,7 @@ export const ENTITIES = [
   LegacyWorkbookRowEntity,
   CompetitorEntity,
   CompetitorAliasEntity,
+  CompetitorAvatarEntity,
   EditionEntity,
   PoolEntity,
   RoundEntity,
@@ -33,5 +36,6 @@ export const ENTITIES = [
   DrawAssignmentEntity,
   UserEntity,
   SessionEntity,
-  LoginDeviceEntity
+  LoginDeviceEntity,
+  InvitationEntity
 ]

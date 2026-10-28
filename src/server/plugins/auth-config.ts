@@ -1,6 +1,12 @@
 import { resolveDeviceCookieSecret } from '../../utils/device-cookie.util'
+import { configurePasswordHashConcurrency } from '../../utils/password.util'
 
-/** En production, un secret de cookie d'appareil absent ou trop court empêche le démarrage. */
+/**
+ * Au démarrage : un secret de cookie d'appareil absent ou trop court en production, ou une limite de
+ * concurrence scrypt invalide, empêchent le démarrage.
+ */
 export default defineNitroPlugin(() => {
-  resolveDeviceCookieSecret(String(useRuntimeConfig().auth.deviceCookieSecret))
+  const { auth } = useRuntimeConfig()
+  resolveDeviceCookieSecret(String(auth.deviceCookieSecret))
+  configurePasswordHashConcurrency(auth.passwordHashConcurrency)
 })

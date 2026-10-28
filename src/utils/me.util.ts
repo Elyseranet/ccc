@@ -1,6 +1,7 @@
 import type { DataSource } from 'typeorm'
 import type { IMe } from '../interfaces/me.interface.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
+import { buildAvatarUrl } from './avatar-url.util.js'
 import { notFound } from './api-error.util.js'
 
 /**
@@ -27,7 +28,7 @@ export const loadMe = async (dataSource: DataSource, userId: string): Promise<IM
           firstName: competitor.firstName,
           lastName: competitor.lastName,
           nickname: competitor.nickname,
-          avatarUrl: competitor.avatarUrl,
+          avatarUrl: buildAvatarUrl(competitor.id, competitor.avatarVersion),
           phone: competitor.phone
         }
       : null

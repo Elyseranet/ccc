@@ -1,12 +1,18 @@
 import { resolve } from 'node:path'
+import { getSessionCookieName } from '../../../src/utils/session-token.util'
 
 /** Jetons des sessions de test écrits par `prepare-database.ts` (dossier gitignoré). */
 export const E2E_SESSIONS_FILE = resolve('test-results', 'e2e-sessions.json')
 
 export const E2E_TEST_DATABASE_SUFFIX = '_test'
 
-/** Nom du cookie de session hors production (`SESSION_COOKIE_NAME`) : les e2e tournent sur `nuxt dev`. */
-export const E2E_SESSION_COOKIE = 'ccc_session'
+/**
+ * Les e2e tournent sur `nuxt dev` en HTTP : `playwright.config.ts` démarre le serveur avec
+ * `NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE}` (L3, T-SEC-04 : sinon le défaut `true` donne `__Host-ccc_session`).
+ * Le nom du cookie est dérivé de la même fonction que le serveur, pour la même valeur : il ne peut pas diverger.
+ */
+export const E2E_SECURE_COOKIE = false
+export const E2E_SESSION_COOKIE = getSessionCookieName({ secureCookie: String(E2E_SECURE_COOKIE) })
 
 export const E2E_BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`
 

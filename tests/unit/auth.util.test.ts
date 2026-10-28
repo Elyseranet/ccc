@@ -26,6 +26,9 @@ import { normalizeEmail } from '../../src/utils/email.util'
 
 const OWN = 'https://ccc.example'
 
+const SECURE = { secureCookie: true }
+const INSECURE = { secureCookie: false }
+
 describe('login throttle delay (SEC-A2)', () => {
   it('has no delay up to 5 failures', () => {
     for (const failures of [0, 1, 2, 3, 4, 5]) {
@@ -100,9 +103,9 @@ describe('session token', () => {
     expect(isWellFormedSessionToken(`${'a'.repeat(42)}!`)).toBe(false)
   })
 
-  it('cookie: HttpOnly, SameSite=Lax, Path=/, Secure only in production', () => {
-    expect(buildSessionCookieOptions(true)).toMatchObject({ httpOnly: true, sameSite: 'lax', path: '/', secure: true })
-    expect(buildSessionCookieOptions(false)).toMatchObject({ httpOnly: true, sameSite: 'lax', secure: false })
+  it('cookie: HttpOnly, SameSite=Lax, Path=/, Secure follows auth.secureCookie', () => {
+    expect(buildSessionCookieOptions(SECURE)).toMatchObject({ httpOnly: true, sameSite: 'lax', path: '/', secure: true })
+    expect(buildSessionCookieOptions(INSECURE)).toMatchObject({ httpOnly: true, sameSite: 'lax', secure: false })
   })
 })
 
@@ -147,15 +150,15 @@ describe('schemas', () => {
     expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78', [field]: 'x' }).success).toBe(false)
   })
 
-  it('PATCH /moi accepts avatar and phone, and null to clear them', () => {
-    expect(updateMeSchema.safeParse({ avatarUrl: 'https://img.test/a.png', phone: '+33 6 12 34 56 78' }).success).toBe(true)
-    expect(updateMeSchema.safeParse({ avatarUrl: null, phone: null }).success).toBe(true)
+  it('PATCH /moi accepts a phone, and null to clear it', () => {
+    expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78' }).success).toBe(true)
+    expect(updateMeSchema.safeParse({ phone: null }).success).toBe(true)
   })
 
-  it('PATCH /moi refuses a non-https avatar or one with credentials, a bad phone and an empty body', () => {
-    expect(updateMeSchema.safeParse({ avatarUrl: 'javascript:alert(1)' }).success).toBe(false)
-    expect(updateMeSchema.safeParse({ avatarUrl: 'http://img.test/a.png' }).success).toBe(false)
-    expect(updateMeSchema.safeParse({ avatarUrl: 'https://u:p@img.test/a.png' }).success).toBe(false)
+  it('PATCH /moi refuses avatarUrl (B-16, closes L7: the avatar is only set by upload), a bad phone and an empty body', () => {
+    expect(updateMeSchema.safeParse({ avatarUrl: 'https://img.test/a.png' }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ avatarUrl: null }).success).toBe(false)
+    expect(updateMeSchema.safeParse({ phone: '+33 6 12 34 56 78', avatarUrl: 'https://img.test/a.png' }).success).toBe(false)
     expect(updateMeSchema.safeParse({ phone: 'call me' }).success).toBe(false)
     expect(updateMeSchema.safeParse({}).success).toBe(false)
   })
@@ -207,21 +210,21 @@ describe('device cookie (SEC-A4)', () => {
   })
 
   it('cookie: __Host- prefix and Secure in production, HttpOnly, SameSite=Lax, 90 days', () => {
-    expect(getDeviceCookieName(true)).toBe('__Host-ccc_device')
-    expect(getDeviceCookieName(false)).toBe('ccc_device')
-    expect(buildDeviceCookieOptions(true)).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 90 * 24 * 3600 })
-    expect(buildDeviceCookieOptions(false).secure).toBe(false)
+    expect(getDeviceCookieName(SECURE)).toBe('__Host-ccc_device')
+    expect(getDeviceCookieName(INSECURE)).toBe('ccc_device')
+    expect(buildDeviceCookieOptions(SECURE)).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 90 * 24 * 3600 })
+    expect(buildDeviceCookieOptions(INSECURE).secure).toBe(false)
   })
 })
 
 describe('session cookie name', () => {
-  it('uses the __Host- prefix in production only', () => {
-    expect(getSessionCookieName(true)).toBe('__Host-ccc_session')
-    expect(getSessionCookieName(false)).toBe('ccc_session')
+  it('uses the __Host- prefix when secureCookie is true', () => {
+    expect(getSessionCookieName(SECURE)).toBe('__Host-ccc_session')
+    expect(getSessionCookieName(INSECURE)).toBe('ccc_session')
   })
 
   it('production cookie satisfies the __Host- requirements: Secure, Path=/, no Domain', () => {
-    const options = buildSessionCookieOptions(true)
+    const options = buildSessionCookieOptions(SECURE)
     expect(options).toMatchObject({ secure: true, path: '/' })
     expect(options).not.toHaveProperty('domain')
   })

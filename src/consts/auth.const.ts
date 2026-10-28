@@ -43,7 +43,6 @@ export const PASSWORD_MAX_LENGTH = 128
 export const EMAIL_MAX_LENGTH = 254
 export const PHONE_MAX_LENGTH = 32
 export const PHONE_PATTERN = /^\+?[0-9 .()-]{6,32}$/
-export const AVATAR_URL_MAX_LENGTH = 2048
 
 export const RATE_LIMIT_AUTH_ROUTE_KEY = {
   LOGIN_IP: 'auth-login-ip',
@@ -55,7 +54,6 @@ export const CSRF_SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'] as const
 export const FETCH_SITE_SAME_ORIGIN = ['same-origin', 'none'] as const
 
 export const PASSWORD_CHANGE_MAX_ATTEMPTS = 5
-export const AVATAR_ALLOWED_PROTOCOLS = ['https:']
 
 /**
  * SEC-A2 : ralentissement progressif par compte, sans blocage dur. Aucun délai jusqu'à 5 échecs
@@ -88,6 +86,21 @@ export const LOGIN_DELAY_MAX_EXPONENT = 30
 /** Format stocké d'un hash scrypt : `scrypt$N$r$p$sel$hash`, six parties. */
 export const PASSWORD_HASH_SEPARATOR = '$'
 export const PASSWORD_HASH_PART_COUNT = 6
+
+/**
+ * L2 (T-SEC-04) : nombre maximal de calculs scrypt simultanés (surcharge : NUXT_AUTH_PASSWORD_HASH_CONCURRENCY).
+ * Chaque calcul occupe un thread du pool libuv (4 par défaut) et 64 Mio : en laisser la moitié libre
+ * préserve le système de fichiers et le DNS. Au-delà, la requête reçoit 503 avec `Retry-After`.
+ * Mesure (2026-10-21, node 22, macOS, 15 cœurs, N=2^16 r=8 p=2) : 168 ms seul (médiane de 8) ; 2 ou 4 calculs
+ * parallèles : 184-185 ms chacun ; 8 parallèles : 355 ms chacun, car 4 seulement tournent à la fois dans le pool.
+ * 2 calculs parallèles coûtent donc ~10 % de latence en plus et laissent deux threads au reste du serveur.
+ */
+export const PASSWORD_HASH_DEFAULT_CONCURRENCY = 2
+export const PASSWORD_HASH_MAX_CONCURRENCY = 64
+export const PASSWORD_HASH_RETRY_AFTER_SECONDS = 1
+
+/** L3 (T-SEC-04) : valeurs qui désactivent `runtimeConfig.auth.secureCookie` (NUXT_AUTH_SECURE_COOKIE). */
+export const SECURE_COOKIE_FALSE_VALUES = ['false', '0'] as const
 
 /** Session d'un visiteur sans compte (`GET /moi` répond 401). */
 export const ANONYMOUS_SESSION: ISessionIdentity = Object.freeze({ role: null, initials: null })

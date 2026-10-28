@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import { E2E_SECURE_COOKIE } from './tests/e2e/helpers/e2e.const'
 
 const PORT = Number(process.env.E2E_PORT ?? 3100)
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
@@ -16,7 +17,9 @@ export default defineConfig({
     testIdAttribute: 'data-cy'
   },
   webServer: {
-    command: `E2E=true npx nuxt dev --port ${PORT}`,
+    // HTTP local : cookies sans Secure ni préfixe __Host- (L3), le nom du cookie e2e en est dérivé (E2E_SESSION_COOKIE).
+    // Un serveur déjà lancé (reuseExistingServer) doit l'avoir été avec la même valeur.
+    command: `E2E=true NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE} npx nuxt dev --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: true,
     timeout: 120000

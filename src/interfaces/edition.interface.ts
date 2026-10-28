@@ -1,5 +1,7 @@
 import type { EDITION_ORIGIN, EDITION_STATUS } from '../enums/edition.enum.js'
+import type { ACCOUNT_STATE, USER_STATUS } from '../enums/user.enum.js'
 import type { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
+import type { INewCompetitor } from './competitor-creation.interface.js'
 import type { ICompetitorPublic } from './competitor.interface.js'
 import type { IDraw } from './draw.interface.js'
 import type { IMatch } from './match.interface.js'
@@ -9,6 +11,15 @@ import type { IBracketRound, IRound } from './round.interface.js'
 export interface IEditionChampion {
   competitor: ICompetitorPublic
   titlesToDate: number
+}
+
+/**
+ * Finale de l'édition (chronologie, F-02). `runnerUp` : le finaliste (stade FINALIST). `score` : les scores validés
+ * du match de finale ; null si la finale est d'archive sans score (RESULT_UNKNOWN).
+ */
+export interface IEditionFinal {
+  runnerUp: ICompetitorPublic
+  score: { champion: number, runnerUp: number } | null
 }
 
 export interface IEditionSummary {
@@ -31,6 +42,8 @@ export interface IEditionSummary {
   /** R-5 : matchs RESULT_UNKNOWN, ni victoire ni défaite dans les bilans. */
   unknownResultMatchCount: number
   champion: IEditionChampion | null
+  /** null tant que l'édition n'a pas de finaliste. */
+  final: IEditionFinal | null
 }
 
 export interface IEditionParticipant {
@@ -56,4 +69,63 @@ export interface IEditionDetail extends IEditionSummary {
   matches: IMatch[]
   draws: IDraw[]
   bracket: IBracketRound[]
+}
+
+/** `POST /editions` (administrateur). `code` et `chronologicalRank` sont calculés par le serveur. */
+export interface ICreateEditionRequest {
+  year: number
+  name: string
+  /** Date au format `YYYY-MM-DD`. */
+  heldOn?: string | null
+  description?: string | null
+  location?: string | null
+}
+
+/**
+ * `PATCH /editions/{id}` : informations générales uniquement. `code` (R-9), `year`,
+ * `chronologicalRank` et `status` sont refusés en 400.
+ */
+export interface IUpdateEditionRequest {
+  name?: string
+  heldOn?: string | null
+  description?: string | null
+  location?: string | null
+}
+
+/** `POST /editions/{id}/participants` : `{ competitorId }` rattache un compétiteur existant. */
+export interface IAddExistingParticipantRequest {
+  competitorId: string
+}
+
+/** `POST /editions/{id}/participants` : `{ newCompetitor }` crée compétiteur, compte, invitation et participation (C8). */
+export interface IAddNewParticipantRequest {
+  newCompetitor: INewCompetitor
+}
+
+/** Réponse de `POST /editions/{id}/participants`. `invitationSent` est `null` quand aucune invitation n'est en jeu (compétiteur existant). */
+export interface IAddParticipantResult extends IEditionParticipant {
+  invitationSent: boolean | null
+}
+
+export interface IAdminParticipantAccount {
+  state: ACCOUNT_STATE
+  /** Expiration de l'invitation la plus récente ; `null` pour un compte actif. */
+  invitationExpiresAt: string | null
+}
+
+/**
+ * `GET /admin/editions/{id}/participants` : la liste des inscrits vue par l'administrateur.
+ * Ne contient ni email ni téléphone.
+ */
+export interface IAdminParticipant extends IEditionParticipant {
+  /** Éditions jouées, toutes éditions confondues (même calcul que `ICompetitorListItem.editionsPlayed`). */
+  editionsPlayed: number
+  /** `null` pour un compétiteur sans compte (archive). */
+  account: IAdminParticipantAccount | null
+}
+
+/** Ce que la décision d'état d'un compte lit du compte et de son invitation la plus récente. */
+export interface IAccountStateInput {
+  status: USER_STATUS
+  latestInvitation: { expiresAt: Date, consumedAt: Date | null } | null
 }

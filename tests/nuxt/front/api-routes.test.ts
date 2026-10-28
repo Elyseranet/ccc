@@ -23,9 +23,9 @@ describe('table endpoint -> route (ARCH-8, ARCH-11)', () => {
     expect(mismatches).toEqual([])
   })
 
-  it('liste les 15 endpoints attendus de la vague 3a, avec leur ticket back', () => {
+  it('liste les 5 endpoints encore attendus de la vague 3, avec leur ticket back', () => {
     const byTicket = findPendingEndpoints().reduce<Record<string, number>>((count, { ticket }) => ({ ...count, [ticket]: (count[ticket] ?? 0) + 1 }), {})
-    expect(byTicket).toEqual({ 'B-09': 2, 'B-10': 2, 'B-11': 5, 'B-12': 3, 'B-16': 3 })
+    expect(byTicket).toEqual({ 'B-11': 5 })
   })
 })
 

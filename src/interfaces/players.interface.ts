@@ -13,12 +13,8 @@ export interface IPlayersSearchState {
   page: number
 }
 
-export interface IPlayerParticipation extends ICompetitorParticipation {
-  poolNumber?: number | null
-  wins?: number
-  losses?: number
-  unknownResults?: number
-}
+/** Participation affichée dans le parcours : `poolNumber`, `wins`, `losses` et `unknownResults` viennent du contrat (B-17, G2). */
+export interface IPlayerParticipation extends ICompetitorParticipation {}
 
 export interface IPlayerDetail extends ICompetitorDetail {
   participations: IPlayerParticipation[]
@@ -119,9 +115,8 @@ export interface IPlayerJourneyProps {
   bestLabel: string | null
 }
 
-export interface IPlayerOpponent extends IHeadToHeadSummary {
-  unknownResults?: number
-}
+/** Adversaire de la fiche joueur : `unknownResults` vient du contrat (B-17, G9). */
+export interface IPlayerOpponent extends IHeadToHeadSummary {}
 
 export interface IPlayerOpponentsProps {
   playerId: string

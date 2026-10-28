@@ -1,7 +1,8 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import { DEVICE_COOKIE_NAME, DEVICE_COOKIE_NAME_PRODUCTION, DEVICE_COOKIE_SEPARATOR, DEVICE_COOKIE_TTL_SECONDS, DEVICE_NONCE_BYTES, DEVICE_SECRET_MIN_LENGTH, DEVICE_NONCE_PATTERN, DEVICE_USER_ID_PATTERN } from '../consts/auth.const.js'
 import { PRODUCTION_NODE_ENV } from '../consts/node-env.const.js'
-import type { IDeviceCookiePayload, ISessionCookieOptions } from '../interfaces/auth.interface.js'
+import type { IAuthCookieConfig, IDeviceCookiePayload, ISessionCookieOptions } from '../interfaces/auth.interface.js'
+import { resolveSecureCookie } from './cookie-config.util.js'
 
 let ephemeralSecret: string | undefined
 
@@ -61,12 +62,12 @@ export const verifyDeviceCookie = (value: string | undefined, secret: string, no
   }
 }
 
-export const getDeviceCookieName = (isProduction: boolean): string =>
-  isProduction ? DEVICE_COOKIE_NAME_PRODUCTION : DEVICE_COOKIE_NAME
+export const getDeviceCookieName = (auth: IAuthCookieConfig | undefined): string =>
+  resolveSecureCookie(auth) ? DEVICE_COOKIE_NAME_PRODUCTION : DEVICE_COOKIE_NAME
 
-export const buildDeviceCookieOptions = (isProduction: boolean): ISessionCookieOptions => ({
+export const buildDeviceCookieOptions = (auth: IAuthCookieConfig | undefined): ISessionCookieOptions => ({
   httpOnly: true,
-  secure: isProduction,
+  secure: resolveSecureCookie(auth),
   sameSite: 'lax',
   path: '/',
   maxAge: DEVICE_COOKIE_TTL_SECONDS

@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
+import type { IEditionSummary } from '../../src/interfaces/edition.interface'
 import type { ICompetitorDetail, ICompetitorListItem } from '../../src/interfaces/competitor.interface'
 import type { IHeadToHead, IHeadToHeadSummary } from '../../src/interfaces/head-to-head.interface'
 import type { IPaginated } from '../../src/interfaces/pagination.interface'
@@ -60,10 +61,10 @@ describe('public competitor routes', async () => {
     it('reports R-5 balances: only scored matches, unknown results aside', async () => {
       const { body } = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?pageSize=100')
       const nicolas = body.items.find((item) => item.id === ids.nicolas)!
-      expect(nicolas).toMatchObject({ wins: 3, losses: 1, matchesPlayed: 4, unknownResults: 1, titles: 1, editionsPlayed: 2, firstEditionCode: ids.editionACode })
+      expect(nicolas).toMatchObject({ wins: 3, losses: 1, matchesPlayed: 4, unknownResults: 2, titles: 1, editionsPlayed: 2, firstEditionCode: ids.editionACode })
       expect(nicolas).not.toHaveProperty('winRatio')
       const lonely = body.items.find((item) => item.id === ids.lonely)!
-      expect(lonely).toMatchObject({ wins: 0, losses: 0, matchesPlayed: 0, unknownResults: 0 })
+      expect(lonely).toMatchObject({ wins: 0, losses: 0, matchesPlayed: 0, unknownResults: 1 })
     })
 
     it('sorts by a statistic column and rejects an unknown sort', async () => {
@@ -129,14 +130,23 @@ describe('public competitor routes', async () => {
         ['2020', 'FINALIST', 12.5],
         ['2021', 'CHAMPION', 30]
       ])
-      expect(body.stats).toEqual({ played: 4, wins: 3, losses: 1, unknownResults: 1, pointsFor: 19, pointsAgainst: 11, titles: 1 })
+      expect(body.stats).toEqual({ played: 4, wins: 3, losses: 1, unknownResults: 2, pointsFor: 19, pointsAgainst: 11, titles: 1 })
       expect(body.stats).not.toHaveProperty('winRatio')
+    })
+
+    it('G2: gives each participation its pool number, its place and its edition balance (R-5)', async () => {
+      const { body } = await json<ICompetitorDetail>(`/api/v1/competiteurs/${ids.nicolas}`)
+      const [first, second] = body.participations
+      expect(first).toMatchObject({ editionCode: '2020', poolNumber: 2, poolRank: 1, wins: 2, losses: 1, unknownResults: 1 })
+      expect(second).toMatchObject({ editionCode: '2021', poolNumber: null, poolRank: null, wins: 1, losses: 0, unknownResults: 1 })
+      const sum = (key: 'wins' | 'losses') => body.participations.reduce((total, p) => total + p[key], 0)
+      expect([sum('wins'), sum('losses')]).toEqual([body.stats.wins, body.stats.losses])
     })
 
     it('returns zero statistics and a readable history for a player without any score', async () => {
       const { status, body } = await json<ICompetitorDetail>(`/api/v1/competiteurs/${ids.lonely}`)
       expect(status).toBe(200)
-      expect(body.stats).toEqual({ played: 0, wins: 0, losses: 0, unknownResults: 0, pointsFor: 0, pointsAgainst: 0, titles: 0 })
+      expect(body.stats).toEqual({ played: 0, wins: 0, losses: 0, unknownResults: 1, pointsFor: 0, pointsAgainst: 0, titles: 0 })
       expect(body.participations).toHaveLength(1)
     })
 
@@ -159,6 +169,19 @@ describe('public competitor routes', async () => {
       expect(body.matches[0]).toMatchObject({ editionCode: '2020', competitorScore: 5, opponentScore: 3 })
     })
 
+    it('G3, G9, G10: opponent titles match the list, unknown results are counted apart, matches carry the pool number', async () => {
+      const { body } = await json<IHeadToHead>(`/api/v1/competiteurs/${ids.nicolas}/face-a-face?adversaire=${ids.remi}`)
+      const list = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?pageSize=100')
+      expect(body.opponent.titles).toBe(list.body.items.find((item) => item.id === ids.remi)!.titles)
+      expect(body.opponent.titles).toBe(1)
+      expect(body.unknownResults).toBe(1)
+      // 4 matchs REGULAR dans la paire (3 avec score, 1 inconnu) ; le départage et le score non validé sont exclus.
+      expect(body.played + body.unknownResults).toBe(4)
+      expect(body.matches.map((match) => match.poolNumber)).toEqual([2, 2, null])
+      const pairs = await json<IHeadToHeadSummary[]>(`/api/v1/competiteurs/${ids.nicolas}/face-a-face`)
+      expect(pairs.body.map((pair) => [pair.opponent.titles, pair.unknownResults])).toEqual([[1, 1], [0, 0], [0, 1]])
+    })
+
     it('has a null ratio and no match for a pair that never played', async () => {
       const { body } = await json<IHeadToHead>(`/api/v1/competiteurs/${ids.lonely}/face-a-face?adversaire=${ids.nicolas}`)
       expect(body).toMatchObject({ played: 0, wins: 0, losses: 0, winRatio: null, matches: [] })
@@ -168,8 +191,19 @@ describe('public competitor routes', async () => {
       const { body } = await json<IHeadToHeadSummary[]>(`/api/v1/competiteurs/${ids.nicolas}/face-a-face`)
       expect(body.map((pair) => [pair.opponent.id, pair.played, pair.wins, pair.losses])).toEqual([
         [ids.remi, 3, 2, 1],
-        [ids.paul, 1, 1, 0]
+        [ids.paul, 1, 1, 0],
+        [ids.lonely, 0, 0, 0]
       ])
+    })
+
+    it('G11: lists a pair with only unknown results, sorted by wins + losses + unknownResults then by name', async () => {
+      const { body } = await json<IHeadToHeadSummary[]>(`/api/v1/competiteurs/${ids.nicolas}/face-a-face`)
+      const unknownOnly = body.find((pair) => pair.opponent.id === ids.lonely)!
+      expect(unknownOnly).toMatchObject({ played: 0, wins: 0, losses: 0, unknownResults: 1, winRatio: null })
+      const totals = body.map((pair) => pair.wins + pair.losses + pair.unknownResults)
+      expect(totals).toEqual([...totals].sort((a, b) => b - a))
+      // Paul (1 match) et Zoé (1 match inconnu) sont à égalité : le nom de l'adversaire départage.
+      expect(body.map((pair) => pair.opponent.displayName)).toEqual(['Rémi Durand', 'Paul Martin', 'Zoé Sansscore'])
     })
 
     it('rejects a malformed or identical opponent and an unknown player', async () => {
@@ -181,9 +215,19 @@ describe('public competitor routes', async () => {
     })
   })
 
+  describe('GET /editions (G4)', () => {
+    it('gives the runner-up and the final score, or null without finalist', async () => {
+      const { body } = await json<IEditionSummary[]>('/api/v1/editions')
+      const byCode = new Map(body.map((edition) => [edition.code, edition]))
+      expect(byCode.get('2020')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.nicolas }), score: null })
+      expect(byCode.get('2021')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.remi }), score: { champion: 5, runnerUp: 2 } })
+    })
+  })
+
   describe('privacy', () => {
     it('never serialises email, phone, password hash or admin comment on any route', async () => {
       const paths = [
+        '/api/v1/editions',
         '/api/v1/competiteurs?pageSize=100',
         '/api/v1/competiteurs?q=rem',
         `/api/v1/competiteurs/${ids.nicolas}`,

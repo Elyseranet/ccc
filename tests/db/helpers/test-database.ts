@@ -1,6 +1,7 @@
 import type { DataSource } from 'typeorm'
 
 const TEST_DATABASE_SUFFIX = '_test'
+const MIGRATION_TIMESTAMP_SUFFIX = /\d+$/
 
 let current: DataSource | null = null
 
@@ -33,4 +34,33 @@ export const cleanup = async (): Promise<void> => {
     await current.destroy()
   }
   current = null
+}
+
+const appliedMigrationNames = async (dataSource: DataSource): Promise<string[]> => {
+  const rows: Array<{ name: string }> = await dataSource.query(`SELECT name FROM migrations ORDER BY id DESC`)
+  return rows.map((row) => row.name)
+}
+
+/**
+ * Annule les migrations une à une, de la dernière vers la plus ancienne, jusqu'à ce que `migrationName` soit la
+ * dernière appliquée (elle reste appliquée). Le nom s'écrit avec ou sans horodatage (`CreateIdentitySchema` ou
+ * `CreateIdentitySchema1792509943930`). Aucun test ne suppose ainsi la position de la dernière migration : une
+ * migration ajoutée plus tard ne casse pas les tests de réversibilité des précédentes.
+ */
+export const revertMigrationsUntil = async (dataSource: DataSource, migrationName: string): Promise<void> => {
+  const matches = (applied: string): boolean =>
+    applied === migrationName || applied.replace(MIGRATION_TIMESTAMP_SUFFIX, '') === migrationName
+  if (!(await appliedMigrationNames(dataSource)).some(matches)) {
+    throw new Error(`Migration ${migrationName} is not applied`)
+  }
+  while (!matches((await appliedMigrationNames(dataSource))[0]!)) {
+    await dataSource.undoLastMigration()
+  }
+}
+
+/** Annule toutes les migrations appliquées. */
+export const revertAllMigrations = async (dataSource: DataSource): Promise<void> => {
+  while ((await appliedMigrationNames(dataSource)).length > 0) {
+    await dataSource.undoLastMigration()
+  }
 }

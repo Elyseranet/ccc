@@ -7,6 +7,7 @@ const toPublicAssignment = (assignment: DrawAssignmentEntity): IDrawAssignment =
   competitorId: assignment.participation.competitorId,
   displayName: assignment.participation.competitor.displayName,
   poolId: assignment.poolId,
+  poolNumber: assignment.pool?.rank ?? null,
   pairingIndex: assignment.pairingIndex,
   sidePosition: assignment.sidePosition,
   drawnOrder: assignment.drawnOrder,
@@ -15,7 +16,7 @@ const toPublicAssignment = (assignment: DrawAssignmentEntity): IDrawAssignment =
 
 /**
  * DTO d'un tirage. L'appelant ne passe que des tirages VALIDATED : un brouillon n'est jamais public.
- * Le tirage est chargé avec `round` ; les affectations avec `participation.competitor`.
+ * Le tirage est chargé avec `round` ; les affectations avec `participation.competitor` et `pool`.
  */
 export const toPublicDraw = (draw: DrawEntity, assignments: DrawAssignmentEntity[]): IDraw => ({
   id: draw.id,

@@ -1,9 +1,10 @@
-import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats } from '../interfaces/competitor.interface.js'
+import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest, ICompetitorWithTitles } from '../interfaces/competitor.interface.js'
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
-import type { DataSource } from 'typeorm'
+import { QueryFailedError } from 'typeorm'
+import type { DataSource, EntityManager } from 'typeorm'
 import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { MatchSideEntity } from '../server/db/typeorm/entities/match-side.entity.js'
@@ -15,14 +16,23 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_PURPOSE } from '../enums/match.enum.js'
 import { toMatchRecord } from '../utils/match-record.mapper.util.js'
-import { competitorNotFound } from '../utils/api-error.util.js'
+import { competitorNotFound, emailAlreadyUsed } from '../utils/api-error.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { countTitles } from '../utils/ranking.util.js'
-import { computeHeadToHead, computePlayerBalance, countedOutcomes, resolveMatchOutcome } from '../utils/record.util.js'
+import { computeHeadToHead, computePlayerBalance, computeWinLoss, countedOutcomes, countUnknownResults, resolveMatchOutcome } from '../utils/record.util.js'
 import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { buildContainsPattern } from '../utils/competitor-query.util.js'
 import { sortCompetitors } from '../utils/competitor-sort.util.js'
 import { useDataSource } from '../utils/database.util.js'
+import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
+import { PG_UNIQUE_VIOLATION, USER_EMAIL_UNIQUE_CONSTRAINT } from '../consts/invitation.const.js'
+import { LOG_EVENT } from '../consts/log-event.const.js'
+import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
+import type { INewCompetitor } from '../interfaces/competitor-creation.interface.js'
+import type { ICompetitorWithAccount } from '../interfaces/invitation.interface.js'
+import { buildDisplayName } from '../utils/display-name.util.js'
+import { normalizeEmail } from '../utils/email.util.js'
+import { logger } from '../utils/logger.util.js'
 
 /*********************************************************
  * competitor.service
@@ -83,7 +93,8 @@ const loadRegularMatches = async (db: DataSource, competitorId?: string): Promis
     .innerJoin('s.participation', 'p')
     .innerJoin('m.edition', 'e')
     .innerJoin('m.round', 'r')
-    .select(['m.id', 'm.status', 'm.purpose', 'm.sequence', 's.id', 's.participationId', 's.validatedScore', 'p.id', 'p.competitorId', 'e.id', 'e.code', 'e.chronologicalRank', 'r.id', 'r.kind'])
+    .leftJoin('m.pool', 'po')
+    .select(['m.id', 'm.status', 'm.purpose', 'm.sequence', 's.id', 's.participationId', 's.validatedScore', 'p.id', 'p.competitorId', 'e.id', 'e.code', 'e.chronologicalRank', 'r.id', 'r.kind', 'po.id', 'po.rank'])
     .where('m.purpose = :purpose', { purpose: MATCH_PURPOSE.REGULAR })
     .andWhere('m.status IN (:...statuses)', { statuses: STATS_MATCH_STATUSES })
     .orderBy('e.chronologicalRank', 'ASC')
@@ -110,7 +121,7 @@ const titlesByCompetitor = (rows: Array<{ competitorId: string, finalStage: FINA
     .map((row) => ({ playerId: row.competitorId, editionId: '', finalStage: row.finalStage! })))
     .map(({ playerId, titles }) => [playerId, titles]))
 
-const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCareer>> => {
+export const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCareer>> => {
   const rows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
     .innerJoin('pt.edition', 'e')
     .select('pt.competitorId', 'competitorId')
@@ -137,6 +148,24 @@ const loadCareers = async (db: DataSource): Promise<Map<string, ICompetitorCaree
   }
   return careers
 }
+
+/** Titres (A8, `countTitles`) de plusieurs compétiteurs en une requête ; un compétiteur sans titre vaut 0. */
+const loadTitles = async (db: DataSource, competitorIds: string[]): Promise<Map<string, number>> => {
+  if (competitorIds.length === 0) {
+    return new Map()
+  }
+  const rows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
+    .innerJoin('pt.edition', 'e')
+    .select('pt.competitorId', 'competitorId')
+    .addSelect('pt.finalStage', 'finalStage')
+    .addSelect('e.status', 'editionStatus')
+    .where('pt.competitorId IN (:...competitorIds)', { competitorIds })
+    .getRawMany<{ competitorId: string, finalStage: FINAL_STAGE | null, editionStatus: EDITION_STATUS }>()
+  return titlesByCompetitor(rows)
+}
+
+const withTitles = (competitor: ICompetitorPublic, titles: Map<string, number>): ICompetitorWithTitles =>
+  ({ ...competitor, titles: titles.get(competitor.id) ?? 0 })
 
 const findCompetitors = async (db: DataSource, query: Pick<ICompetitorListQuery, 'q' | 'edition'>): Promise<CompetitorEntity[]> => {
   const builder = db.getRepository(CompetitorEntity).createQueryBuilder('c').select(PUBLIC_COLUMNS)
@@ -211,23 +240,37 @@ export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail
 
   const participationRows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
     .innerJoin('pt.edition', 'e')
-    .select(['pt.id', 'pt.finalStage', 'pt.points', 'pt.poolRank', 'e.id', 'e.code', 'e.year', 'e.name', 'e.status'])
+    .leftJoin('pt.pool', 'po')
+    .select(['pt.id', 'pt.finalStage', 'pt.points', 'pt.poolRank', 'po.id', 'po.rank', 'e.id', 'e.code', 'e.year', 'e.name', 'e.status'])
     .where('pt.competitorId = :id', { id })
     .orderBy('e.chronologicalRank', 'ASC')
     .getMany()
 
-  const participations = participationRows.map((row): ICompetitorParticipation => ({
-    editionId: row.edition.id,
-    editionCode: row.edition.code,
-    year: row.edition.year,
-    editionName: row.edition.name,
-    editionStatus: row.edition.status,
-    finalStage: row.finalStage,
-    points: row.points,
-    poolRank: row.poolRank
-  }))
-
   const matches = await loadRegularMatches(db, id)
+  // G2 : bilan par édition, par la même `computeWinLoss` que le bilan global (matchs REGULAR, R-5).
+  const recordsByEdition = new Map<string, IMatchRecord[]>()
+  for (const { match, record } of matches) {
+    recordsByEdition.set(match.edition.id, [...(recordsByEdition.get(match.edition.id) ?? []), record])
+  }
+
+  const participations = participationRows.map((row): ICompetitorParticipation => {
+    const balance = computeWinLoss(recordsByEdition.get(row.edition.id) ?? []).find((entry) => entry.playerId === id)
+    return {
+      editionId: row.edition.id,
+      editionCode: row.edition.code,
+      year: row.edition.year,
+      editionName: row.edition.name,
+      editionStatus: row.edition.status,
+      finalStage: row.finalStage,
+      points: row.points,
+      poolNumber: row.pool?.rank ?? null,
+      poolRank: row.poolRank,
+      wins: balance?.wins ?? 0,
+      losses: balance?.losses ?? 0,
+      unknownResults: balance?.unknownResults ?? 0
+    }
+  })
+
   const balance = computePlayerBalance(matches.map(({ record }) => record)).find((entry) => entry.playerId === id)
   const stats: ICompetitorStats = {
     ...emptyStats(),
@@ -247,7 +290,7 @@ export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail
 
 const toSummary = (
   competitor: ICompetitorPublic,
-  opponent: ICompetitorPublic,
+  opponent: ICompetitorWithTitles,
   records: IMatchRecord[]
 ): IHeadToHeadSummary => {
   const result = computeHeadToHead(records, competitor.id, opponent.id)
@@ -257,6 +300,8 @@ const toSummary = (
     played: result.encounters,
     wins: result.winsA,
     losses: result.winsB,
+    // R-5 : `records` ne porte que les matchs de la paire ; un match RESULT_UNKNOWN y compte pour les deux côtés.
+    unknownResults: countUnknownResults(records).get(competitor.id) ?? 0,
     winRatio: result.encounters === 0 ? null : result.winsA / result.encounters,
     pointsFor: result.pointsA,
     pointsAgainst: result.pointsB,
@@ -266,11 +311,15 @@ const toSummary = (
 
 export const getHeadToHead = async (id: string, opponentId: string): Promise<IHeadToHead> => {
   const db = await useDataSource()
-  const [competitor, opponent] = await Promise.all([findPublicCompetitor(db, id), findPublicCompetitor(db, opponentId)])
+  const [competitor, opponent, titles] = await Promise.all([
+    findPublicCompetitor(db, id),
+    findPublicCompetitor(db, opponentId),
+    loadTitles(db, [opponentId])
+  ])
   const encounters = (await loadRegularMatches(db, id)).filter(({ record }) =>
     record.sides.some((side) => side.playerId === opponentId))
 
-  const summary = toSummary(competitor, opponent, encounters.map(({ record }) => record))
+  const summary = toSummary(competitor, withTitles(opponent, titles), encounters.map(({ record }) => record))
   const matches = encounters
     .filter(({ record }) => countedOutcomes([record]).length === 1)
     .map(({ match, record }): IHeadToHeadMatch => {
@@ -281,6 +330,7 @@ export const getHeadToHead = async (id: string, opponentId: string): Promise<IHe
         editionId: match.edition.id,
         editionCode: match.edition.code,
         roundKind: match.round.kind,
+        poolNumber: match.pool?.rank ?? null,
         competitorScore: score(id),
         opponentScore: score(opponentId),
         winnerCompetitorId: winner.playerId
@@ -289,7 +339,12 @@ export const getHeadToHead = async (id: string, opponentId: string): Promise<IHe
   return { ...summary, matches }
 }
 
-/** Toutes les paires du joueur (`n (v/d)`), les adversaires les plus rencontrés d'abord. */
+const totalMatches = (summary: IHeadToHeadSummary): number => summary.wins + summary.losses + summary.unknownResults
+
+/**
+ * Toutes les paires du joueur (`n (v/d)`), y compris celles dont tous les matchs ont un résultat inconnu (G11).
+ * Tri côté serveur : `wins + losses + unknownResults` décroissant, puis nom de l'adversaire.
+ */
 export const listHeadToHeadSummaries = async (id: string): Promise<IHeadToHeadSummary[]> => {
   const db = await useDataSource()
   const competitor = await findPublicCompetitor(db, id)
@@ -310,8 +365,87 @@ export const listHeadToHeadSummaries = async (id: string): Promise<IHeadToHeadSu
     .where('c.id IN (:...ids)', { ids: [...byOpponent.keys()] })
     .getMany()
 
+  const titles = await loadTitles(db, opponents.map((opponent) => opponent.id))
   return opponents
-    .map((opponent) => toSummary(competitor, toCompetitorPublic(opponent), byOpponent.get(opponent.id)!))
-    .filter((summary) => summary.played > 0)
-    .sort((a, b) => b.played - a.played || a.opponent.displayName.localeCompare(b.opponent.displayName))
+    .map((opponent) => toSummary(competitor, withTitles(toCompetitorPublic(opponent), titles), byOpponent.get(opponent.id)!))
+    .sort((a, b) => totalMatches(b) - totalMatches(a) || a.opponent.displayName.localeCompare(b.opponent.displayName))
+}
+
+const isEmailCollision = (error: unknown): boolean => {
+  if (!(error instanceof QueryFailedError)) {
+    return false
+  }
+  const driverError = error.driverError as { code?: string, constraint?: string } | undefined
+  return driverError?.code === PG_UNIQUE_VIOLATION && driverError.constraint === USER_EMAIL_UNIQUE_CONSTRAINT
+}
+
+const toNullable = (value: string | null | undefined): string | null => {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : null
+}
+
+/**
+ * P1, cas 2 : crée le compétiteur, le compte `INVITED` (rôle PARTICIPANT, sans mot de passe) et l'invitation.
+ * S'exécute dans la transaction de l'appelant (`manager`), qui reste maître du commit : l'envoi de l'email
+ * doit partir APRÈS ce commit. Un email déjà rattaché à un compte donne 409 `EMAIL_ALREADY_USED`, et la
+ * transaction de l'appelant n'a alors rien écrit de durable. Pas d'avatar : il se téléverse ensuite (`PUT /competiteurs/{id}/avatar`, B-16).
+ */
+export const createCompetitorWithAccount = async (
+  manager: EntityManager,
+  input: INewCompetitor,
+  now = new Date()
+): Promise<ICompetitorWithAccount> => {
+  const email = normalizeEmail(input.email)
+  const users = manager.getRepository(UserEntity)
+  if (await users.exists({ where: { email } })) {
+    throw emailAlreadyUsed()
+  }
+
+  const firstName = input.firstName.trim()
+  const lastName = input.lastName.trim()
+  try {
+    const competitor = await manager.getRepository(CompetitorEntity).save({
+      displayName: buildDisplayName(firstName, lastName),
+      firstName,
+      lastName,
+      nickname: toNullable(input.nickname),
+      phone: toNullable(input.phone)
+    })
+    const user = await users.save({
+      email,
+      role: USER_ROLE.PARTICIPANT,
+      status: USER_STATUS.INVITED,
+      passwordHash: null,
+      competitorId: competitor.id
+    })
+    // Import dynamique : ce service est aussi chargé par le navigateur (classe CompetitorService, ARCH-2). Un import
+    // statique ferait entrer `node:crypto` (invitation-token.util) dans le graphe client, ce qui casse `nuxt dev`
+    // (module externalisé par Vite, export nommé introuvable). Côté serveur, l'appel ne change pas.
+    const { issueInvitation } = await import('../utils/invitation-store.util.js')
+    const invitation = await issueInvitation(manager, user.id, now)
+    logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_CREATED, { competitorId: competitor.id, userId: user.id })
+    return { competitorId: competitor.id, userId: user.id, ...invitation }
+  } catch (error) {
+    // Collision concurrente sur l'email entre le contrôle et l'insertion.
+    throw isEmailCollision(error) ? emailAlreadyUsed() : error
+  }
+}
+
+/** Corrige l'identité d'un compétiteur (liste blanche du schéma). 404 `COMPETITOR_NOT_FOUND` s'il n'existe pas. */
+export const updateCompetitorIdentity = async (
+  dataSource: DataSource,
+  competitorId: string,
+  patch: IUpdateCompetitorRequest
+): Promise<ICompetitorPublic> => {
+  const repository = dataSource.getRepository(CompetitorEntity)
+  const competitor = await repository.findOneBy({ id: competitorId })
+  if (!competitor) {
+    throw competitorNotFound()
+  }
+  const changes: Partial<CompetitorEntity> = {}
+  if (patch.displayName !== undefined) changes.displayName = patch.displayName
+  if (patch.firstName !== undefined) changes.firstName = patch.firstName
+  if (patch.lastName !== undefined) changes.lastName = patch.lastName
+  if (patch.nickname !== undefined) changes.nickname = patch.nickname
+  return toCompetitorPublic(await repository.save(Object.assign(competitor, changes)))
 }

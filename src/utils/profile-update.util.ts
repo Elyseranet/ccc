@@ -13,10 +13,9 @@ import { revokeOtherSessions } from './session-store.util.js'
  */
 export const applyProfileChanges = async (dataSource: DataSource, changes: IProfileChanges, now = new Date()): Promise<void> => {
   await dataSource.transaction(async (manager) => {
-    if (changes.competitorId && (changes.avatarUrl !== undefined || changes.phone !== undefined)) {
+    if (changes.competitorId && changes.phone !== undefined) {
       await manager.getRepository(CompetitorEntity).update({ id: changes.competitorId }, {
-        ...(changes.avatarUrl !== undefined ? { avatarUrl: changes.avatarUrl } : {}),
-        ...(changes.phone !== undefined ? { phone: changes.phone } : {})
+        phone: changes.phone
       })
     }
     if (changes.newPasswordHash) {

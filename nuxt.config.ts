@@ -1,5 +1,6 @@
 import { CCC_HH_THEMES } from './src/themes/ccc.theme'
 import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
+import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
@@ -59,6 +60,13 @@ export default defineNuxtConfig({
     '/admin/draws': { redirect: { to: '/admin/tirages', statusCode: 301 } }
   },
   runtimeConfig: {
+    // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
+    // (Dockerfile, étage runner). Indépendant de NODE_ENV : le build des tests d'API est aussi un build de production.
+    strictRuntimeConfig: false,
+    // Nombre de reverse proxys de confiance devant le serveur (NUXT_TRUST_PROXY_HOPS, 0 à 5). 0 par défaut : l'IP
+    // client est celle de la socket et X-Forwarded-For est ignoré. Derrière Coolify (proxy devant le conteneur), à
+    // poser au nombre de proxys réellement traversés, sinon tous les clients partagent l'IP du proxy pour les limites de débit.
+    trustProxyHops: 0,
     database: {
       host: '',
       port: 5432,
@@ -83,13 +91,46 @@ export default defineNuxtConfig({
       publicRead: {
         windowMs: 60000,
         maxRequests: 300
+      },
+      // Routes publiques portant un jeton d'invitation (GET et POST partagent le budget) : freine le devinage.
+      invitationToken: {
+        windowMs: 900000,
+        maxRequests: 30
+      },
+      // Envois d'avatar (B-16) : sharp décode et ré-encode, ce qui coûte du CPU. 10 envois par 10 minutes et
+      // par IP laissent largement la place à un administrateur qui photographie une soirée d'inscriptions
+      // (une photo par participant), et bornent le coût d'un client qui boucle.
+      avatarUpload: {
+        windowMs: 600000,
+        maxRequests: 10
       }
+    },
+    // Envoi d'email (A3, B-09). Surcharge : NUXT_MAIL_HOST, NUXT_MAIL_PORT, NUXT_MAIL_SECURE, NUXT_MAIL_USER,
+    // NUXT_MAIL_PASSWORD, NUXT_MAIL_FROM. Valeurs par défaut = Mailpit local (SMTP 1025, sans authentification).
+    // `transport: 'capture'` (NUXT_MAIL_TRANSPORT) est réservé aux tests d'API : il écrit dans `captureFile`.
+    mail: {
+      transport: DEFAULT_MAIL_TRANSPORT,
+      host: DEFAULT_MAIL_HOST,
+      port: 1025,
+      secure: false,
+      user: '',
+      password: '',
+      from: DEFAULT_MAIL_FROM,
+      captureFile: ''
+    },
+    public: {
+      // URL publique du site (NUXT_PUBLIC_SITE_URL) : base des liens d'invitation, jamais déduite de l'en-tête Host.
+      siteUrl: DEFAULT_SITE_URL
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
     auth: {
       allowedOrigins: '',
       // Secret HMAC du cookie d'appareil (NUXT_AUTH_DEVICE_COOKIE_SECRET), 32 caractères minimum, requis en production.
       deviceCookieSecret: '',
+      // Cookies Secure + préfixe __Host- (NUXT_AUTH_SECURE_COOKIE). Vrai par défaut ; `false` seulement en développement local en HTTP.
+      secureCookie: true,
+      // Calculs scrypt simultanés (NUXT_AUTH_PASSWORD_HASH_CONCURRENCY) ; au-delà : 503 SERVICE_BUSY + Retry-After.
+      passwordHashConcurrency: 2,
       loginRateLimit: {
         windowMs: 900000,
         maxIpAttempts: 20,

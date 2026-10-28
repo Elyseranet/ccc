@@ -53,18 +53,19 @@ const DETAIL: ICompetitorDetail = {
   ...identity(PLAYER_ID, 'Alix Bernard', 'Rebond'),
   stats: { played: 79, wins: 56, losses: 23, unknownResults: 0, pointsFor: 400, pointsAgainst: 300, titles: 1 },
   participations: [
-    { editionId: 'e-2014', editionCode: '2014', year: 2014, editionName: null, editionStatus: EDITION_STATUS.CLOSED, finalStage: FINAL_STAGE.QUARTER, points: 2.88, poolRank: 1 },
-    { editionId: 'e-2020', editionCode: '2020', year: 2020, editionName: null, editionStatus: EDITION_STATUS.CLOSED, finalStage: FINAL_STAGE.CHAMPION, points: 14.4, poolRank: 1 },
-    { editionId: 'e-2026', editionCode: '2026', year: 2026, editionName: null, editionStatus: EDITION_STATUS.POOLS_PLAYING, finalStage: null, points: null, poolRank: 5 }
+    { editionId: 'e-2014', editionCode: '2014', year: 2014, editionName: null, editionStatus: EDITION_STATUS.CLOSED, finalStage: FINAL_STAGE.QUARTER, points: 2.88, poolRank: 1, poolNumber: 1, wins: 3, losses: 1, unknownResults: 0 },
+    { editionId: 'e-2020', editionCode: '2020', year: 2020, editionName: null, editionStatus: EDITION_STATUS.CLOSED, finalStage: FINAL_STAGE.CHAMPION, points: 14.4, poolRank: 1, poolNumber: 2, wins: 7, losses: 0, unknownResults: 0 },
+    { editionId: 'e-2026', editionCode: '2026', year: 2026, editionName: null, editionStatus: EDITION_STATUS.POOLS_PLAYING, finalStage: null, points: null, poolRank: 5, poolNumber: 3, wins: 0, losses: 2, unknownResults: 0 }
   ]
 }
 
 const summary = (id: string, name: string, overrides: Partial<IHeadToHeadSummary> = {}): IHeadToHeadSummary => ({
   competitor: identity(PLAYER_ID, DETAIL.displayName),
-  opponent: identity(id, name),
+  opponent: { ...identity(id, name), titles: 0 },
   played: 4,
   wins: 2,
   losses: 2,
+  unknownResults: 0,
   winRatio: 0.5,
   pointsFor: 0,
   pointsAgainst: 0,

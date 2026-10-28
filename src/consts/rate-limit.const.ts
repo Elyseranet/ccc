@@ -1,13 +1,17 @@
 export const RATE_LIMIT_ROUTE_KEY = {
   HEALTH: 'health',
   COMPETITORS_SEARCH: 'competitors-search',
-  PUBLIC_READ: 'public-read'
+  PUBLIC_READ: 'public-read',
+  INVITATION_TOKEN: 'invitation-token',
+  AVATAR_UPLOAD: 'avatar-upload'
 } as const
 
 /** Clé de `runtimeConfig.rateLimit` portant les réglages propres à une route (surcharge des défauts). */
 export const RATE_LIMIT_ROUTE_CONFIG_KEY = {
   [RATE_LIMIT_ROUTE_KEY.COMPETITORS_SEARCH]: 'competitorsSearch',
-  [RATE_LIMIT_ROUTE_KEY.PUBLIC_READ]: 'publicRead'
+  [RATE_LIMIT_ROUTE_KEY.PUBLIC_READ]: 'publicRead',
+  [RATE_LIMIT_ROUTE_KEY.INVITATION_TOKEN]: 'invitationToken',
+  [RATE_LIMIT_ROUTE_KEY.AVATAR_UPLOAD]: 'avatarUpload'
 } as const
 
 /** Nombre de groupes de 16 bits conservés pour agréger une IPv6 (4 groupes = préfixe /64). */
