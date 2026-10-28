@@ -1,5 +1,7 @@
 # ds(pagination) : pas de prop pour masquer précédent/suivant, mode `with-info` limité à la page courante, page courante illisible en mode neutre, texte des pages non réglable
 
+Ticket Origam : #1278.
+
 ## Constat
 
 Mesuré sur `/joueurs` (F-04, liste des joueurs, 146 compétiteurs, 8 pages), contre `docs/design/ui/happy-hour/joueurs.html` (`.pager`).

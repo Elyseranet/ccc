@@ -49,13 +49,10 @@ defineExpose({})
   :deep(.origam-field) {
     --origam-input__control---height: var(--admin-edition-select---height, var(--origam-space---11));
     --origam-field---corner-clearance: var(--origam-space---5);
-    --origam-field---padding-start: calc(var(--origam-space---5) + var(--origam-border__width---thin));
     --origam-field---padding-end: 0;
-    --origam-field---letter-spacing: normal;
-    --origam-field__input---opacity: 1;
     --origam-field---append-inner-icon-opacity: 1;
-    --origam-field__input---padding-top: calc((var(--origam-input__control---height) - 1.5rem) / 2 - var(--admin-edition-select---text-shift));
-    --origam-field__input---padding-bottom: calc((var(--origam-input__control---height) - 1.5rem) / 2 + var(--admin-edition-select---text-shift));
+    --origam-field__input---padding-top: calc((var(--origam-input__control---height) - var(--admin-edition-select---line-height)) / 2 - var(--admin-edition-select---text-shift));
+    --origam-field__input---padding-bottom: calc((var(--origam-input__control---height) - var(--admin-edition-select---line-height)) / 2 + var(--admin-edition-select---text-shift));
 
     background: var(--origam-color__surface---sunken);
     color: var(--origam-color__text---primary);
@@ -64,10 +61,6 @@ defineExpose({})
   :deep(.origam-field__append-inner) {
     padding-inline: 0 var(--origam-space---3);
   }
-
-  :deep(.origam-select__selection-text) {
-    letter-spacing: normal;
-  }
 }
 </style>
 
@@ -75,5 +68,6 @@ defineExpose({})
 :root {
   --admin-edition-select---height: var(--origam-space---11);
   --admin-edition-select---text-shift: var(--origam-border__width---thin);
+  --admin-edition-select---line-height: calc(1rem * var(--origam-font__lineHeight---normal));
 }
 </style>
