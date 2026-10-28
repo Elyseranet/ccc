@@ -92,3 +92,6 @@ export const buildHomeOverview = (sources: IHomeOverviewSources): IHomeOverview 
     archive: toArchive(sources)
   }
 }
+
+/** Première lettre en majuscule (les libellés de statut d'édition sont écrits en minuscules). */
+export const capitalizeFirst = (text: string): string => text.charAt(0).toLocaleUpperCase('fr') + text.slice(1)

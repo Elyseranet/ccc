@@ -39,3 +39,9 @@ export const HOME_ACP_WINDOW_EDITIONS = 5
 export const HOME_POINTS_DECIMALS = 2
 
 export const HOME_EMPTY_ARCHIVE = { editions: 0, competitors: 0, matches: 0, scoredMatches: 0, firstYear: null }
+
+/** Épaisseur (px) de la barre d'avancement des poules : `--origam-space---2` de la maquette. */
+export const HOME_PROGRESS_THICKNESS = 8
+
+/** Fond de la piste de la barre d'avancement : surface « creusée » de la maquette. */
+export const HOME_PROGRESS_TRACK_COLOR = 'var(--origam-color__surface---sunken)'

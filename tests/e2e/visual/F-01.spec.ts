@@ -29,19 +29,27 @@ const TEXT_PAIRS: ITextPair[] = [
   { mockup: '.t-champ .eyebrow', app: '[data-cy="home-tile-champion"] .home-bento__eyebrow' },
   { mockup: '.t-champ__name', app: '.home-bento__champion-name' },
   { mockup: '.mini-rank__n', app: '.home-bento__rank-number' },
-  { mockup: '.mini-rank .num', app: '[data-cy="home-rank-row"] .num' }
+  { mockup: '.mini-rank .num', app: '[data-cy="home-rank-row"] .num' },
+  { mockup: '.section__head .h-section', app: '.home-bento__head h2' },
+  { mockup: '.t-now__meta', app: '[data-cy="home-current-meta"]' },
+  { mockup: '.result__p.is-win a', app: '[data-cy="home-current-score"] .home-current__player--win .player-link__name' },
+  { mockup: '.result__p:not(.is-win) a', app: '[data-cy="home-current-score"] .home-current__player:not(.home-current__player--win) .player-link__name' },
+  { mockup: '.result__s', app: '[data-cy="home-current-score"] .home-current__score' },
+  { mockup: '.result .chip', app: '[data-cy="home-current-score"] .home-current__pool' }
 ]
 
 const MOCKUP_INK = [
   '.home-hero__kicker .chip', '.home-hero__kicker .eyebrow',
   '.t-stat__n', '.t-stat--ed .t-stat__l', '.t-stat--m .t-stat__l', '.t-champ .eyebrow', '.t-champ__name', '.t-champ__meta',
-  '.mini-rank li > span:not(.mini-rank__n)', '.mini-rank li a', '.mini-rank .stars'
+  '.mini-rank li > span:not(.mini-rank__n)', '.mini-rank li a', '.mini-rank .stars',
+  '.section__head .h-section', '.t-now__meta', '.result__p a', '.result__s', '.result .chip'
 ]
 const APP_INK = [
   '[data-cy="home-hero-chip"]', '.home-hero__eyebrow',
   '.home-bento__number', '[data-cy="home-tile-editions"] .home-bento__label', '[data-cy="home-tile-matches"] .home-bento__label',
   '[data-cy="home-tile-champion"] .home-bento__eyebrow', '.home-bento__champion-name', '.home-bento__champion-meta',
-  '[data-cy="home-rank-row"] .num', '[data-cy="home-rank-row"] a', '[data-cy="home-rank-row"] a *'
+  '[data-cy="home-rank-row"] .num', '[data-cy="home-rank-row"] a', '[data-cy="home-rank-row"] a *',
+  '.home-bento__head h2', '[data-cy="home-current-meta"]', '[data-cy="home-current-score"] a', '[data-cy="home-current-score"] a *', '.home-current__score', '.home-current__pool'
 ]
 const INK_RULE = '{ color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent !important; }'
 
@@ -60,6 +68,8 @@ const alignToPixel = async (page: Page, selector: string) => {
 
 const ZONES = [
   { name: 'accueil-hero', mock: '.home-hero', app: '[data-cy="home-hero"]' },
+  { name: 'accueil-entete-section', mock: '.section__head', app: '.home-bento__head' },
+  { name: 'accueil-tuile-en-cours', mock: '.t-now', app: '[data-cy="home-current"]' },
   { name: 'accueil-regles-d-or', mock: '.ticker', app: '[data-cy="golden-rules"]' },
   { name: 'accueil-tuile-editions', mock: '.t-stat--ed', app: '[data-cy="home-tile-editions"]' },
   { name: 'accueil-tuile-competiteurs', mock: '.t-stat--pl', app: '[data-cy="home-tile-players"]' },
@@ -78,6 +88,11 @@ for (const viewport of VIEWPORTS) {
         const { mockup, mockContext } = await open(page, browser, viewport, 'index.html', '/')
         await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
         await alignMockupText(mockup, page, TEXT_PAIRS)
+        // `alignMockupText` écrit du texte brut : le score perd son <i> (séparateur, avec son espacement). On le rétablit pour comparer la même structure.
+        await mockup.evaluate(() => document.querySelectorAll('.result__s').forEach((node) => {
+          const [winner = '', loser = ''] = (node.textContent ?? '').split('–')
+          node.innerHTML = `${winner}<i>–</i>${loser}`
+        }))
         await hideInk(mockup, MOCKUP_INK)
         await hideInk(page, APP_INK)
         await alignToPixel(mockup, zone.mock)
