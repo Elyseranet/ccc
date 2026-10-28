@@ -31,14 +31,16 @@ const mayaDetail = detail(maya, { played: 70, wins: 50, losses: 20, pointsFor: 3
 const comeDetail = detail(come, {})
 
 const match = (matchId: string, editionCode: string, roundKind: ROUND_KIND, competitorScore: number, opponentScore: number, winner: string) => ({
-  matchId, editionId: `edition-${editionCode}`, editionCode, roundKind, competitorScore, opponentScore, winnerCompetitorId: winner
+  matchId, editionId: `edition-${editionCode}`, editionCode, roundKind, competitorScore, opponentScore, winnerCompetitorId: winner,
+  poolNumber: roundKind === ROUND_KIND.POOLS ? 1 : null
 })
 const samVsMaya: IHeadToHead = {
   competitor: sam,
-  opponent: maya,
+  opponent: { ...maya, titles: 1 },
   played: 4,
   wins: 2,
   losses: 2,
+  unknownResults: 0,
   winRatio: 0.5,
   pointsFor: 28,
   pointsAgainst: 31,
@@ -50,7 +52,7 @@ const samVsMaya: IHeadToHead = {
     match('m4', '2014', ROUND_KIND.POOLS, 5, 3, SAM)
   ]
 }
-const samVsCome: IHeadToHead = { competitor: sam, opponent: come, played: 0, wins: 0, losses: 0, winRatio: null, pointsFor: 0, pointsAgainst: 0, differential: 0, matches: [] }
+const samVsCome: IHeadToHead = { competitor: sam, opponent: { ...come, titles: 0 }, played: 0, wins: 0, losses: 0, unknownResults: 0, winRatio: null, pointsFor: 0, pointsAgainst: 0, differential: 0, matches: [] }
 
 describe('utilitaires du face-à-face', () => {
   it('lit un identifiant de l’URL : première valeur, vide ignoré', () => {
