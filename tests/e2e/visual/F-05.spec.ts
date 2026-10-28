@@ -41,7 +41,8 @@ const TEXT_PAIRS: ITextPair[] = [
   { mockup: '.table tbody td:nth-child(1)', app: '[data-cy="head-to-head-table"] tbody td:nth-child(1)' },
   { mockup: '.table tbody td:nth-child(2)', app: '[data-cy="head-to-head-table"] tbody td:nth-child(2)' },
   { mockup: '.table tbody td:nth-child(3)', app: '[data-cy="head-to-head-table"] tbody td:nth-child(3)' },
-  { mockup: '.table tbody td.win a', app: '[data-cy="head-to-head-table"] .player-link__name' }
+  { mockup: '.table tbody td.win a', app: '[data-cy="head-to-head-table"] .player-link__name' },
+  { mockup: '.ff-note', app: '[data-cy="head-to-head-note"]' }
 ]
 const INK_RULE = '{ color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent !important; }'
 

@@ -126,6 +126,25 @@ describe('HeadToHeadHistory', () => {
     expect(wrapper.get('[data-cy="head-to-head-note"]').text()).toContain('jamais comme des nuls')
   })
 
+  it('G10 : un match de poule affiche « Poule n » dans la colonne Tour, les autres le libellé du tour', async () => {
+    const wrapper = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: samVsMaya, detailA: samDetail, detailB: mayaDetail } })
+    const rounds = wrapper.findAll('tbody tr').map(row => row.findAll('td')[1]!.text())
+    expect(rounds).toContain('Poule 1')
+    expect(rounds.filter(round => round === 'Poule 1')).toHaveLength(samVsMaya.matches.filter(item => item.roundKind === ROUND_KIND.POOLS).length)
+    expect(rounds).toContain('Quart de finale')
+  })
+
+  it('G9 : les résultats inconnus de la paire sont annoncés à part, seulement s’il y en a', async () => {
+    const none = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: samVsMaya, detailA: samDetail, detailB: mayaDetail } })
+    expect(none.find('[data-cy="head-to-head-unknown-results"]').exists()).toBe(false)
+    expect(none.get('[data-cy="head-to-head-note"]').text()).toBe('Les rencontres sans score connu sont comptées à part, jamais comme des nuls.')
+    const one = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: { ...samVsMaya, unknownResults: 1 }, detailA: samDetail, detailB: mayaDetail } })
+    expect(one.get('[data-cy="head-to-head-note"]').text()).toBe('1 rencontre au résultat inconnu. Les rencontres sans score connu sont comptées à part, jamais comme des nuls.')
+    const three = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: { ...samVsMaya, unknownResults: 3 }, detailA: samDetail, detailB: mayaDetail } })
+    expect(three.get('[data-cy="head-to-head-note"]').text()).toBe('3 rencontres au résultat inconnu. Les rencontres sans score connu sont comptées à part, jamais comme des nuls.')
+    expect(three.findAll('tbody tr')).toHaveLength(samVsMaya.matches.length)
+  })
+
   it('sans rencontre avec score : message vide, aucun tableau', async () => {
     const wrapper = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: samVsCome, detailA: null, detailB: null } })
     expect(wrapper.find('table').exists()).toBe(false)
