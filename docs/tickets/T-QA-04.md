@@ -1,6 +1,6 @@
 # T-QA-04 — Test sensible à la charge : « keeps at most 20 devices per account »
 
-- **Statut** : À faire. Ouvert le 2026-10-28 par `backend-lead`, à la demande du `project-manager` (règle : signaler tout test instable).
+- **Statut** : Correctif prêt (piste 3), en attente de la preuve de 5 passes sous charge. Ouvert le 2026-10-28 par `backend-lead`, à la demande du `project-manager` (règle : signaler tout test instable).
 - **Test** : `tests/api/auth.test.ts`, `trusted device cookie (SEC-A4) > keeps at most 20 devices per account`.
 
 ## Constat
@@ -23,3 +23,13 @@ Je penche pour la piste 3 : elle supprime la cause sans toucher à la configurat
 - [ ] Le test garantit toujours qu'un compte garde au plus 20 appareils, les plus anciens étant évincés.
 - [ ] Sa durée est mesurée avant et après, et notée dans ce ticket.
 - [ ] 5 passes `test:api` vertes avec une autre suite lourde en parallèle.
+
+## Traitement (dev-b09, 2026-10-28, piste 3)
+
+Le test sème 19 appareils de confiance directement en base (`createdAt` échelonnés, une minute d'écart, tous plus anciens que les connexions réelles), puis fait 2 vraies connexions. `registerDevice` évince par `createdAt` décroissant au-delà de `MAX_DEVICES_PER_USER` : le plafond est franchi à la seconde connexion. Il vérifie qu'il reste exactement 20 appareils, que le plus ancien semé est évincé, que le deuxième et le dernier semés restent, et que l'appareil de la dernière connexion (nonce lu dans son cookie signé) est conservé. Scrypt et le timeout ne changent pas.
+
+Mesure, test seul (`npx vitest run --config vitest.api.config.ts tests/api/auth.test.ts -t "keeps at most 20 devices"`, machine à charge moyenne ~20) :
+- avant : 5156 ms (22 connexions) ;
+- après : 710 ms (2 connexions).
+
+Contrôle de mutation : en inversant l'ordre d'éviction (`createdAt` croissant au lieu de décroissant) dans `device-store.util.ts`, le nouveau test échoue (« expected […] to not include » le nonce du plus ancien) ; l'ordre a été remis.
