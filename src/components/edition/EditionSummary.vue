@@ -239,14 +239,12 @@ defineExpose({})
   gap: var(--edition-summary---gap, var(--origam-space---4));
 
   &__podium {
+    --origam-card---display: grid;
+
     grid-area: pod;
     background:
       radial-gradient(30rem 18rem at 0% 0%, color-mix(in srgb, var(--origam-color__bar---amber) 22%, transparent), transparent 70%),
       var(--origam-color__surface---raised);
-  }
-
-  &__podium :deep(.origam-card__content) {
-    height: 100%;
   }
 
   &__podium-body {

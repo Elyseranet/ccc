@@ -227,7 +227,7 @@ defineExpose({})
   }
 }
 
-@media (min-width: 961px) {
+@media (min-width: 1200px) {
   .edition-page__row {
     position: relative;
   }
