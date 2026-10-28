@@ -20,7 +20,7 @@ const withRouterLink = { global: { components: { RouterLink } } }
 const person = (id: string, name: string) => ({ id, displayName: name, firstName: null, lastName: null, nickname: null, avatarUrl: null })
 const edition = (code: string, year: number, status: EDITION_STATUS, champion: IEditionSummary['champion'] = null): IEditionSummary => ({
   id: `id-${code}`, code, year, name: null, heldOn: null, location: null, status, origin: EDITION_ORIGIN.LEGACY_IMPORT,
-  participantCount: 45, unidentifiedParticipantCount: 0, matchCount: 105, scoredMatchCount: 68, unknownResultMatchCount: 0, champion
+  participantCount: 45, unidentifiedParticipantCount: 0, matchCount: 105, scoredMatchCount: 68, unknownResultMatchCount: 0, champion, final: null
 })
 const closed2025 = edition('2025', 2025, EDITION_STATUS.CLOSED, { competitor: person('c1', 'Lou Bernard'), titlesToDate: 4 })
 const closed2024 = edition('2024', 2024, EDITION_STATUS.CLOSED, { competitor: person('c2', 'Nina Perrin'), titlesToDate: 3 })
