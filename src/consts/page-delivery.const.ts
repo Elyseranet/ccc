@@ -40,18 +40,9 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     endpoints: [API_ENDPOINT.EDITIONS]
   },
   [ROUTES.EDITION]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
-    endpoints: [
-      API_ENDPOINT.EDITIONS,
-      API_ENDPOINT.EDITION,
-      API_ENDPOINT.EDITION_MATCHES,
-      API_ENDPOINT.EDITION_PARTICIPANTS,
-      API_ENDPOINT.EDITION_POOLS,
-      API_ENDPOINT.EDITION_ROUNDS,
-      API_ENDPOINT.EDITION_DRAWS,
-      API_ENDPOINT.RANKING_ACP
-    ]
+    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.EDITION]
   },
   [ROUTES.PLAYERS]: {
     delivered: false,

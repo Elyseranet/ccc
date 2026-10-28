@@ -5,12 +5,16 @@ import { useEditions } from '~/composables/useEditions'
 import { fromAsyncDataError } from '~/utils/async-data-error.util'
 import {
   buildEditionFacts,
+  buildEditionBracket,
   buildEditionHeroMeta,
+  buildEditionMatchRows,
   buildEditionParticipants,
+  buildEditionPoolTables,
   buildEditionPodium,
   buildEditionRoundDraws,
   buildEditionSeeds,
   buildEditionSteps,
+  editionMatchFilterCounts,
   editionOption,
   findPoolsDraw
 } from '~/utils/edition-view.util'
@@ -40,6 +44,10 @@ export const useEditionView = async (code: MaybeRefOrGetter<string>) => {
   const seeds = computed(() => (edition.value ? buildEditionSeeds(edition.value) : []))
   const poolsDraw = computed(() => (edition.value ? findPoolsDraw(edition.value) : null))
   const roundDraws = computed(() => (edition.value ? buildEditionRoundDraws(edition.value) : []))
+  const poolTables = computed(() => (edition.value ? buildEditionPoolTables(edition.value) : []))
+  const bracket = computed(() => (edition.value ? buildEditionBracket(edition.value) : []))
+  const matchRows = computed(() => (edition.value ? buildEditionMatchRows(edition.value) : []))
+  const matchCounts = computed(() => editionMatchFilterCounts(matchRows.value))
   const options = computed(() => [...(editions.value ?? [])].sort((a, b) => b.year - a.year || b.code.localeCompare(a.code)).map(editionOption))
-  return { edition, pending, pageError, refresh, hasEdition, heroMeta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, options }
+  return { edition, pending, pageError, refresh, hasEdition, heroMeta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, poolTables, bracket, matchRows, matchCounts, options }
 }

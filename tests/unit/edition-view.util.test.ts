@@ -76,6 +76,7 @@ const detail = (overrides: Partial<IEditionDetail> = {}): IEditionDetail => ({
     }
   ] as IEditionDetail['draws'],
   bracket: [],
+  final: { runnerUp: person('c2', 'Inès Perrin'), score: { champion: 10, runnerUp: 7 } },
   ...overrides
 })
 

@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const EDITION = '/editions/2025'
@@ -65,15 +65,48 @@ test.describe('édition : accessibilité et comportement (F-03a)', () => {
     await expect(page.getByTestId('async-state-retry')).toBeVisible()
   })
 
-  test('onglets à venir (Poules, Bracket, Matchs) : état traduit, sans donnée fictive', async ({ page }) => {
-    for (const query of ['poules', 'bracket', 'matchs']) {
-      await page.goto(`${EDITION}?onglet=${query}`)
-      await expect(page.getByTestId('async-state-empty')).toBeVisible()
-    }
+  const open = async (page: Page, query: string): Promise<void> => {
+    await page.goto(`${EDITION}?onglet=${query}`)
+    await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+  }
+
+  test('Poules : un tableau légendé par poule, en-têtes de colonne, région défilante au clavier', async ({ page }) => {
+    await open(page, 'poules')
+    const tables = page.locator('[data-cy^="edition-pool-"] table')
+    expect(await tables.count()).toBeGreaterThan(0)
+    await expect(tables.first().locator('caption')).toBeVisible()
+    await expect(tables.first().locator('thead th[scope="col"]').first()).toBeVisible()
+    await expect(page.locator('[data-cy="edition-groups"] section[tabindex="0"]').first()).toBeVisible()
+  })
+
+  test('Bracket : région nommée et focalisable, seulement les tours publiés, liste alternative', async ({ page }) => {
+    await open(page, 'bracket')
+    const region = page.getByTestId('edition-bracket-region')
+    await expect(region).toHaveAttribute('role', 'region')
+    await expect(region).toHaveAttribute('tabindex', '0')
+    expect(await region.getAttribute('aria-label')).toBeTruthy()
+    const columns = await region.locator('h3').count()
+    expect(columns).toBeGreaterThan(0)
+    expect(await region.locator('ol').count()).toBe(columns)
+    await expect(page.getByTestId('edition-bracket-list')).toBeAttached()
+  })
+
+  test('Matchs : filtres, numéro {code}-{séquence}, pagination à 16 par page', async ({ page }) => {
+    await open(page, 'matchs')
+    const rows = page.locator('[data-cy="edition-matches-table"] tbody tr')
+    await expect(rows).toHaveCount(16)
+    await expect(rows.first().locator('td').first()).toContainText(/^2025-\d+$/)
+    const all = await page.getByTestId('edition-matches-range').innerText()
+    await page.getByTestId('edition-matches-filter-pools').click()
+    await expect(page.getByTestId('edition-matches-range')).not.toHaveText(all)
+    await page.getByTestId('edition-matches-filter-all').click()
+    await expect(page.getByTestId('edition-matches-range')).toHaveText(all)
+    await page.getByTestId('edition-matches-pagination').getByRole('button', { name: /2/ }).first().click()
+    await expect(rows.first().locator('td').first()).not.toContainText('2025-1')
   })
 
   test('hiérarchie h1 > h2 > h3 sans saut, un seul h1', async ({ page }) => {
-    for (const tab of TABS.slice(0, 3)) {
+    for (const tab of TABS) {
       await page.goto(`${EDITION}?onglet=${tab.query}`)
       await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
       const levels = await page.locator('main h1, main h2, main h3, main h4').evaluateAll(nodes => nodes.filter(node => node.closest('[hidden], [aria-hidden="true"]') === null).map(node => Number(node.tagName.slice(1))))
