@@ -13,12 +13,21 @@ export interface IEditionChampion {
   titlesToDate: number
 }
 
+/** Un joueur du podium d'une édition avec ses titres à la date de l'édition. */
+export interface IEditionPodiumEntry {
+  competitor: ICompetitorPublic
+  /** Titres remportés jusqu'à cette édition comprise (`chronologicalRank`), même calcul que `champion.titlesToDate`. */
+  titlesToDate: number
+}
+
 /**
  * Finale de l'édition (chronologie, F-02). `runnerUp` : le finaliste (stade FINALIST). `score` : les scores validés
  * du match de finale ; null si la finale est d'archive sans score (RESULT_UNKNOWN).
  */
 export interface IEditionFinal {
   runnerUp: ICompetitorPublic
+  /** Titres du finaliste jusqu'à cette édition comprise. */
+  runnerUpTitlesToDate: number
   score: { champion: number, runnerUp: number } | null
 }
 
@@ -44,6 +53,13 @@ export interface IEditionSummary {
   champion: IEditionChampion | null
   /** null tant que l'édition n'a pas de finaliste. */
   final: IEditionFinal | null
+  /**
+   * Perdants des demi-finales (`finalStage` SEMI). `[]` tant qu'aucun n'est connu, jamais `null`.
+   * Ordre FIXÉ PAR LE SERVEUR, à ne pas retrier côté front : `sequence` du match de demi-finale où le joueur a été
+   * éliminé, puis `displayName` (égalité ou absence de match). La ligne « Demi-finale » n° 1 est donc le même joueur
+   * que dans le tableau.
+   */
+  semiFinalists: IEditionPodiumEntry[]
 }
 
 export interface IEditionParticipant {

@@ -1,4 +1,4 @@
-import type { IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
+import type { IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IArchiveStats } from '../interfaces/stats.interface.js'
@@ -177,28 +177,34 @@ const loadParticipationCounts = async (dataSource: DataSource, editionIds: strin
   return new Map(rows.map((row) => [row.edition_id, Number(row.total)]))
 }
 
-/** Champion de chaque édition close, avec ses titres cumulés à la date de l'édition (C1). */
-const loadChampions = async (dataSource: DataSource): Promise<Map<string, IEditionChampion>> => {
-  const winners = await dataSource.getRepository(ParticipationEntity).find({
+/** Toutes les participations victorieuses (une requête), base du calcul des titres à date (C1, A8). */
+const loadChampionParticipations = (dataSource: DataSource): Promise<ParticipationEntity[]> =>
+  dataSource.getRepository(ParticipationEntity).find({
     where: { finalStage: FINAL_STAGE.CHAMPION },
     relations: { competitor: true, edition: true }
   })
-  const champions = new Map<string, IEditionChampion>()
-  for (const winner of winners) {
-    const titlesToDate = winners.filter((other) =>
-      other.competitorId === winner.competitorId
-      && other.edition.chronologicalRank <= winner.edition.chronologicalRank).length
-    champions.set(winner.editionId, { competitor: toCompetitorPublic(winner.competitor), titlesToDate })
-  }
-  return champions
-}
+
+/** Titres remportés par un joueur jusqu'à un rang chronologique compris : la règle unique de `titlesToDate`. */
+const countTitlesToDate = (winners: ParticipationEntity[], competitorId: string, chronologicalRank: number): number =>
+  winners.filter((other) => other.competitorId === competitorId && other.edition.chronologicalRank <= chronologicalRank).length
+
+/** Champion de chaque édition close, avec ses titres cumulés à la date de l'édition (C1). */
+const toChampions = (winners: ParticipationEntity[]): Map<string, IEditionChampion> =>
+  new Map(winners.map((winner) => [winner.editionId, {
+    competitor: toCompetitorPublic(winner.competitor),
+    titlesToDate: countTitlesToDate(winners, winner.competitorId, winner.edition.chronologicalRank)
+  }]))
 
 /**
  * G4 : finale de chaque édition, en deux requêtes quel que soit le nombre d'éditions (champion et finaliste, puis
  * matchs de finale VALIDATED avec leurs côtés). Pas de finaliste : pas de `final`. Finale d'archive sans score
  * (RESULT_UNKNOWN) ou score non rattachable aux deux finalistes : `score` vaut null.
  */
-const loadFinals = async (dataSource: DataSource, editionIds: string[]): Promise<Map<string, IEditionFinal>> => {
+const loadFinals = async (
+  dataSource: DataSource,
+  editionIds: string[],
+  titlesFor: (competitorId: string, editionId: string) => number
+): Promise<Map<string, IEditionFinal>> => {
   const finalists = await dataSource.getRepository(ParticipationEntity).find({
     where: { editionId: In(editionIds), finalStage: In([FINAL_STAGE.CHAMPION, FINAL_STAGE.FINALIST]) },
     relations: { competitor: true },
@@ -227,9 +233,47 @@ const loadFinals = async (dataSource: DataSource, editionIds: string[]): Promise
         break
       }
     }
-    finals.set(editionId, { runnerUp: toCompetitorPublic(runnerUp.competitor), score })
+    finals.set(editionId, {
+      runnerUp: toCompetitorPublic(runnerUp.competitor),
+      runnerUpTitlesToDate: titlesFor(runnerUp.competitorId, editionId),
+      score
+    })
   }
   return finals
+}
+
+/**
+ * B-19 : perdants des demi-finales de chaque édition (participations SEMI), en deux requêtes pour toute la liste.
+ * Ordre fixé ici : `sequence` du match de demi-finale public où le joueur a été éliminé (sans match : en dernier),
+ * puis `displayName`. Un tour SEMI non publié (PENDING, B-18) ne fournit aucun ordre.
+ */
+const loadSemiFinalists = async (
+  dataSource: DataSource,
+  editionIds: string[],
+  titlesFor: (competitorId: string, editionId: string) => number
+): Promise<Map<string, IEditionPodiumEntry[]>> => {
+  const semifinalists = await dataSource.getRepository(ParticipationEntity).find({
+    where: { editionId: In(editionIds), finalStage: FINAL_STAGE.SEMI },
+    relations: { competitor: true },
+    order: { id: 'ASC' }
+  })
+  const semiMatches = await dataSource.getRepository(MatchEntity).find({
+    where: { editionId: In(editionIds), round: { kind: ROUND_KIND.SEMI, status: In(PUBLIC_ROUND_STATUSES) } },
+    relations: { sides: true },
+    order: { sequence: 'ASC' }
+  })
+  const sequenceOf = (participation: ParticipationEntity): number =>
+    semiMatches.find((match) => match.editionId === participation.editionId
+      && match.sides.some((side) => side.participationId === participation.id))?.sequence ?? Number.POSITIVE_INFINITY
+  const podium = new Map<string, IEditionPodiumEntry[]>()
+  for (const participation of [...semifinalists].sort((a, b) =>
+    sequenceOf(a) - sequenceOf(b) || a.competitor.displayName.localeCompare(b.competitor.displayName) || a.id.localeCompare(b.id))) {
+    podium.set(participation.editionId, [...(podium.get(participation.editionId) ?? []), {
+      competitor: toCompetitorPublic(participation.competitor),
+      titlesToDate: titlesFor(participation.competitorId, participation.editionId)
+    }])
+  }
+  return podium
 }
 
 export const loadEditionSummaries = async (
@@ -240,12 +284,20 @@ export const loadEditionSummaries = async (
     return []
   }
   const ids = editions.map((edition) => edition.id)
-  const [matchCounts, participationCounts, champions, finals] = await Promise.all([
+  const [matchCounts, participationCounts, winners] = await Promise.all([
     loadMatchCounts(dataSource, ids),
     loadParticipationCounts(dataSource, ids),
-    loadChampions(dataSource),
-    loadFinals(dataSource, ids)
+    loadChampionParticipations(dataSource)
   ])
+  // Rang chronologique de chaque édition demandée : même base que `champion.titlesToDate`, sans requête de plus.
+  const rankByEdition = new Map(editions.map((edition) => [edition.id, edition.chronologicalRank]))
+  const titlesFor = (competitorId: string, editionId: string): number =>
+    countTitlesToDate(winners, competitorId, rankByEdition.get(editionId) ?? 0)
+  const [finals, semiFinalists] = await Promise.all([
+    loadFinals(dataSource, ids, titlesFor),
+    loadSemiFinalists(dataSource, ids, titlesFor)
+  ])
+  const champions = toChampions(winners)
   return editions.map((edition) => {
     const counts = matchCounts.get(edition.id)
     const listed = participationCounts.get(edition.id) ?? 0
@@ -266,7 +318,8 @@ export const loadEditionSummaries = async (
       scoredMatchCount: counts?.scored ?? 0,
       unknownResultMatchCount: counts?.unknown ?? 0,
       champion: champions.get(edition.id) ?? null,
-      final: finals.get(edition.id) ?? null
+      final: finals.get(edition.id) ?? null,
+      semiFinalists: semiFinalists.get(edition.id) ?? []
     }
   })
 }

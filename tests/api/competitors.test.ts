@@ -219,8 +219,8 @@ describe('public competitor routes', async () => {
     it('gives the runner-up and the final score, or null without finalist', async () => {
       const { body } = await json<IEditionSummary[]>('/api/v1/editions')
       const byCode = new Map(body.map((edition) => [edition.code, edition]))
-      expect(byCode.get('2020')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.nicolas }), score: null })
-      expect(byCode.get('2021')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.remi }), score: { champion: 5, runnerUp: 2 } })
+      expect(byCode.get('2020')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.nicolas }), runnerUpTitlesToDate: 0, score: null })
+      expect(byCode.get('2021')!.final).toEqual({ runnerUp: expect.objectContaining({ id: ids.remi }), runnerUpTitlesToDate: 1, score: { champion: 5, runnerUp: 2 } })
     })
   })
 
