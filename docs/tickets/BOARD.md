@@ -189,6 +189,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | Id | Titre | Maquette HH | Dépend de | Statut | Worktree |
 |---|---|---|---|---|---|
 | [F-00](F-00.md) | Lot 0 : socle (Origam 2.37.3, sass, thème, CSS, layouts, routes, a11y de base, stores, services et fixtures, composants transverses, outillage de test) | en-tête, pied, `admin.html`, `admin-matchs.html`, `admin-plus.html` | B-01 (Vitest), B-02 (DTO) | **Fermé** — squash dans `develop` @ `a90f586` (branche `0e6c965`) | `../CCC-F-00` |
+| [T-QA-03](T-QA-03.md) | Base de test : état commun « 2026 en phase de poules » (QA-2) | — | — | À faire (dev-f05), prérequis de F-01, F-07, F-08, F-11 | worktree de dev-f05 |
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | En cours (dev-f05), lancé le 2026-10-22 sur develop 67270bd ; routes publiques toutes livrées | worktree de dev-f05 (`agent-a70ac359346e804a8`), branche `feature/F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00 | À faire (scindable en F-03a et F-03b) | `../CCC-F-03` |
