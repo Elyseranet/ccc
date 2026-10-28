@@ -35,12 +35,14 @@ for (const viewport of VIEWPORTS) {
 
       test('pied de page', async ({ page, browser }) => {
         const { mockup, mockContext } = await open(page, browser, viewport, entry.mockup, entry.route)
-        await mockup.evaluate(() => {
+        const alignFooter = () => {
           const footer = document.querySelector('footer') as HTMLElement
           const fraction = footer.getBoundingClientRect().top + window.scrollY
           const delta = Math.ceil(fraction) - fraction
           footer.style.marginTop = `calc(${getComputedStyle(footer).marginTop} + ${delta}px)`
-        })
+        }
+        await mockup.evaluate(alignFooter)
+        await page.evaluate(alignFooter)
         const mockFooter = await box(mockup, 'footer')
         const mockGrid = await box(mockup, '.hh-footer__grid')
         const appFooter = await box(page, 'footer')
