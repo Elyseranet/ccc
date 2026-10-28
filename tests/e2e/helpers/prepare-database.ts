@@ -6,11 +6,13 @@ import { UserEntity } from '../../../src/server/db/typeorm/entities/user.entity'
 import { createSession } from '../../../src/utils/session-store.util'
 import { seedArchives } from '../../db/helpers/archives'
 import { E2E_SESSIONS_FILE, E2E_TEST_DATABASE_SUFFIX } from './e2e.const'
+import { rewindEditionToPoolsPhase } from './in-progress-edition'
 
 /*********************************************************
  * Base des e2e (ARCH-9)
  *
  * @description
+ * QA-2 : après le dump, 2026 est remise en phase de poules (`in-progress-edition.ts`, règle et constantes dans `e2e.const.ts`).
  * Lancé par `global-setup.ts` (via vite-node, qui lit les décorateurs TypeORM comme Vitest). Refuse toute base dont le
  * nom ne finit pas par `_test`, puis : schéma neuf (drop + migrations), archives réelles (`archives.sql`), un compte
  * administrateur et un compte participant actifs, sans mot de passe utilisable (hash d'un aléa jeté aussitôt), et une
@@ -26,6 +28,7 @@ const run = async (): Promise<void> => {
   await dataSource.dropDatabase()
   await dataSource.runMigrations()
   const counts = await seedArchives(dataSource)
+  const inProgress = await rewindEditionToPoolsPhase(dataSource)
   const { hashPassword } = await import('../../../src/utils/password.util')
   const account = async (email: string, role: USER_ROLE): Promise<string> => {
     const user = await dataSource.getRepository(UserEntity).save({
@@ -44,7 +47,7 @@ const run = async (): Promise<void> => {
   }
   writeFileSync(E2E_SESSIONS_FILE, JSON.stringify(sessions))
   await dataSource.destroy()
-  process.stdout.write(`${JSON.stringify({ e2eDatabase: 'ready', ...counts })}\n`)
+  process.stdout.write(`${JSON.stringify({ e2eDatabase: 'ready', ...counts, inProgressEdition: { code: inProgress.code, status: inProgress.status, matches: inProgress.matches } })}\n`)
 }
 
 run().catch((error: unknown) => {

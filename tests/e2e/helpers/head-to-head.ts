@@ -5,10 +5,11 @@ import type { APIRequestContext } from '@playwright/test'
  *
  * @description
  * Aucune donnée fictive : les joueurs sont ceux des archives chargées dans la base de test. La paire de référence est
- * celle qui ressemble le plus à la maquette (4 rencontres avec score, 2 victoires chacun), retrouvée par son nom ; les
+ * celle qui ressemble le plus à la maquette (4 rencontres avec score, 2 victoires chacun) dans l'état de la base de test après la remise de
+ * 2026 en phase de poules (QA-2) : sur le dump seul c'était Arthur Vaur, dont une rencontre de 2026 repasse à jouer. Retrouvée par son nom ; les
  * identifiants sont lus dans l'API, jamais écrits en dur (le seed SQL ne garantit pas des UUID stables).
  ********************************************************/
-export const PAIR_NAME_A = 'Arthur Vaur'
+export const PAIR_NAME_A = 'Clément Fossati'
 export const PAIR_NAME_B = 'Nicolas Deseine'
 export const UNKNOWN_ID = '00000000-0000-4000-8000-999999999999'
 export const BASE = '/joueurs/face-a-face'
