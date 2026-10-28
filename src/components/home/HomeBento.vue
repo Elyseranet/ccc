@@ -111,13 +111,19 @@
         elevation="md"
         hover
         class="home-bento__tile home-bento__tile--matches"
-        :aria-label="matchesFull"
         data-cy="home-tile-matches"
       >
         <template #default>
           <div class="home-bento__tile-body home-bento__tile-body--stat">
-            <span class="home-bento__number home-bento__number--secondary font-display num">{{ archive.matches }}</span>
-            <span class="home-bento__label">{{ matchesLabel }}</span>
+            <span class="sr-only">{{ matchesFull }}</span>
+            <span
+              class="home-bento__number home-bento__number--secondary font-display num"
+              aria-hidden="true"
+            >{{ archive.matches }}</span>
+            <span
+              class="home-bento__label"
+              aria-hidden="true"
+            >{{ matchesLabel }}</span>
           </div>
         </template>
       </origam-card>
@@ -261,7 +267,7 @@ const introAfter = computed(() => t('home.section.intro_after', ' par l’organi
  *
  * @description
  * A16 : le libellé validé est `home.bento.matches_played` ; le nombre est affiché en grand, donc le libellé visible
- * (`matches_detail`) ne le répète pas. Le libellé complet sert de nom accessible à la tuile.
+ * (`matches_detail`) ne le répète pas. Le libellé complet, lu par les lecteurs d'écran, est dans un texte masqué : les deux parties visibles sont `aria-hidden`.
  ********************************************************/
 const editionsLabel = computed(() => t('home.bento.editions_since', 'éditions depuis {first_year}', { first_year: archive.value.firstYear ?? '' }))
 const playersLabel = computed(() => t('home.bento.competitors', 'compétiteurs'))

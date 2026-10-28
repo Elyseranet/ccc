@@ -10,6 +10,11 @@ const hydrated = async (page: Page, url = '/') => {
   await page.waitForLoadState('networkidle')
 }
 
+/** Navigation côté client (le rendu serveur ne peut pas être intercepté) : on part d'une autre page, puis on pousse l'accueil. */
+const pushHome = async (page: Page) => {
+  await page.evaluate(() => (window as unknown as { useNuxtApp: () => { $router: { push: (to: string) => Promise<void> } } }).useNuxtApp().$router.push('/'))
+}
+
 const violations = async (page: Page) => {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
   return results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)
@@ -22,9 +27,9 @@ test.describe('accueil : a11y sur le rendu hydraté, données réelles', () => {
   })
 
   test('erreur serveur (réponse interceptée) : 0 violation axe, alerte avec Réessayer, le hero reste affiché', async ({ page }) => {
+    await hydrated(page, '/regles')
     await page.route('**/api/v1/editions', route => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' }) }))
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await pushHome(page)
     await expect(page.getByTestId('async-state-error')).toBeVisible()
     await expect(page.getByTestId('async-state-retry')).toBeVisible()
     await expect(page.getByTestId('home-hero')).toBeVisible()
@@ -32,9 +37,9 @@ test.describe('accueil : a11y sur le rendu hydraté, données réelles', () => {
   })
 
   test('429 (réponse interceptée) : message dédié', async ({ page }) => {
+    await hydrated(page, '/regles')
     await page.route('**/api/v1/editions', route => route.fulfill({ status: 429, headers: { 'retry-after': '30' }, contentType: 'application/json', body: JSON.stringify({ statusCode: 429, code: 'RATE_LIMITED', message: 'x' }) }))
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await pushHome(page)
     await expect(page.getByTestId('async-state-error')).toContainText('Trop de requêtes')
   })
 })
@@ -46,7 +51,7 @@ test.describe('accueil : comportements sur les vraies données', () => {
     const tile = page.getByTestId('home-tile-matches')
     await expect(tile).toContainText(String(stats.matches))
     await expect(tile).toContainText(`dont ${stats.scoredMatches} avec score`)
-    await expect(tile).toHaveAttribute('aria-label', new RegExp(`^${stats.matches} matchs joués depuis \\d{4}, dont ${stats.scoredMatches} avec score$`))
+    await expect(tile.locator('.sr-only')).toHaveText(new RegExp(`^${stats.matches} matchs joués depuis \\d{4}, dont ${stats.scoredMatches} avec score$`))
   })
 
   test('le bandeau des règles d’or ne défile jamais automatiquement', async ({ page }) => {

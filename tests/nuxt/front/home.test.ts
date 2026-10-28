@@ -103,7 +103,7 @@ describe('HomeBento : tuile d’archive (A16)', () => {
   it('le libellé validé est composé de paramètres, le nom accessible reprend les valeurs de GET /stats', async () => {
     const wrapper = await mountSuspended(HomeBento, { ...withRouterLink, props: { overview: overviewOf([current2026, closed2025]) } })
     const tile = wrapper.get('[data-cy="home-tile-matches"]')
-    expect(tile.attributes('aria-label')).toBe(`${stats.matches} matchs joués depuis 2025, dont ${stats.scoredMatches} avec score`)
+    expect(tile.get('.sr-only').text()).toBe(`${stats.matches} matchs joués depuis 2025, dont ${stats.scoredMatches} avec score`)
     expect(tile.text()).toContain(String(stats.matches))
     expect(wrapper.get('[data-cy="home-tile-editions"]').text()).toContain(String(stats.editions))
   })
