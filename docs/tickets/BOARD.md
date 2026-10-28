@@ -355,3 +355,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-14](F-14.md) : **Fermé** — D3 mergé @ `5b52e83` ; M1, D1, D2, D3 mergés, D4 réglé par F-00r.
 - [F-05](F-05.md) : **Fermé** — mergé @ `67270bd` ; Origam #1267.
 - [B-18](B-18.md) : ouvert — ne pas publier les tours PENDING (QA-2) ; bloque T-QA-03 et F-01.
+- **F-00t** (cartes cliquables noires au repos, Origam #1276) : **mergé** @ `cb89a56` (branche 33cc2ac). Contrôles : frontend-lead (typecheck 0, test:run 388, Playwright 114, gitleaks propre), chef de projet après le merge (typecheck vert, test:run 388). La vérification de l'opacité calculée dans le navigateur se fera dans les e2e de F-01.
