@@ -19,6 +19,20 @@ import type { IOrigamTheme } from 'origam/interfaces'
  * la police display Bagel Fat One est appliquée par une CLASSE CSS LOCALE (`.font-display`)
  * car `fontFamily` (TFontFamily) n'accepte que sans | serif | mono. Rien d'autre ne sort
  * des props et des tokens. Suivi DS : Elyseranet/origam#1212 (slot de police display).
+ *
+ * @description
+ * Contournements Origam portés par `src/assets/css/main.css` (le CSS ne prend pas de commentaire) ; chacun se
+ * retire quand le défaut suivi est corrigé dans Origam (docs/tickets/origam/INDEX.md) :
+ *   - `:where(.origam-tab__label)` (interligne des onglets) : Elyseranet/origam#1252 ;
+ *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
+ *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
+ *     Elyseranet/origam#1261 ;
+ *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
+ *     Elyseranet/origam#1262 ;
+ *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,
+ *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
+ *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
+ *     token) : Elyseranet/origam#1266.
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
@@ -32,7 +46,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Contournement Origam #1227 : `components.global.density` (valeur par défaut du DS) retiré ; il déclenchait un avertissement `density` sur chaque composant.
 
     // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (ambre + ombre néon via elevation).
-    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold', letterSpacing: 'normal' },
+    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold', letterSpacing: 'normal', lineHeight: 'normal' },
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
@@ -57,7 +71,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-bracket': { variant: 'single-elimination', color: 'primary', density: 'compact', showScores: true, showSeed: false, showRoundTitles: true, elevation: 'md' },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
     'origam-pagination': { density: 'compact', showFirstLastPage: false },
-    'origam-breadcrumb': { density: 'compact' },
+    'origam-breadcrumb': { density: 'compact', divider: '›' },
     'origam-avatar': { rounded: 'full', size: 'default' },
     'origam-empty-state': { size: 'lg', align: 'center' },
     'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
@@ -113,6 +127,15 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
     '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)',
+    // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, page courante
+    // en text.tertiary sans soulignement (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
+    // Le séparateur d'Origam porte déjà 8 px de chaque côté : la maquette (8 px entre l'élément et le séparateur, 8 px après) n'en veut pas de plus.
+    '--origam-breadcrumb---gap': '0px',
+    '--origam-breadcrumb-item---color': 'var(--origam-color__text---secondary)',
+    '--origam-breadcrumb-item---text-decoration': 'underline',
+    '--origam-breadcrumb-item---opacity-disabled': '1',
+    '--origam-breadcrumb-divider---color': 'var(--origam-color__text---tertiary)',
+    '--origam-breadcrumb-divider---opacity': '1',
     // Champs (F-00m) : hauteur 48 px (le défaut « default » d'Origam vaut 36 px), retrait du texte 20 px.
     '--origam-input__control---height-md': 'var(--origam-space---12)',
     '--origam-field---padding-start': 'var(--origam-space---5)',
@@ -130,7 +153,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Boutons « x-large » (F-00m, appels à l'action des formulaires) : 48 px de haut (défaut Origam : 52 px) ; outlined : filet strong de 2 px.
     '--origam-btn---height-xl': 'var(--origam-space---12)',
     '--origam-btn---border-color': 'var(--origam-color__border---strong)',
-    '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)'
+    '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)',
+    // Pastilles (F-00q) : la maquette donne 4 px / 12 px de padding et une interligne de 1,3 (snug) pour du texte xs, soit 24,64 px de haut ; Origam fixe line-height: 1 et mesure la hauteur en content-box (`size` small : 24 px, padding 0 10 px).
+    '--origam-chip---height-sm': 'calc(var(--origam-font__size---xs) * var(--origam-font__lineHeight---snug) + 2 * var(--origam-space---1))',
+    '--origam-chip---padding-sm': 'var(--origam-space---3)'
   },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────

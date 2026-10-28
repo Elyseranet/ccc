@@ -5,7 +5,6 @@
     :label="label"
     single-line
     hide-details
-    variant="solo"
     rounded="full"
     :menu-icon="CaretDown"
     class="admin-edition-select"

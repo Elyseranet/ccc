@@ -4,26 +4,29 @@
       v-if="hasBreadcrumb"
       :items="breadcrumbItems"
       density="compact"
+      class="page-hero__breadcrumb"
       :aria-label="breadcrumbLabel"
       data-cy="page-hero-breadcrumb"
     />
-    <slot name="eyebrow" />
-    <origam-title
-      tag="h1"
-      font-size="5xl"
-      line-height="none"
-      class="page-hero__title font-display neon"
-      data-cy="page-title"
-      :text="titleText"
-    />
-    <p
-      v-if="subtitleText"
-      class="page-hero__lead"
-      data-cy="page-hero-lead"
-    >
-      {{ subtitleText }}
-    </p>
-    <slot name="after-lead" />
+    <div class="page-hero__body">
+      <slot name="eyebrow" />
+      <origam-title
+        tag="h1"
+        font-size="5xl"
+        line-height="none"
+        class="page-hero__title font-display neon"
+        data-cy="page-title"
+        :text="titleText"
+      />
+      <p
+        v-if="subtitleText"
+        class="page-hero__lead"
+        data-cy="page-hero-lead"
+      >
+        {{ subtitleText }}
+      </p>
+      <slot name="after-lead" />
+    </div>
   </header>
 </template>
 
@@ -76,14 +79,21 @@ defineExpose({})
 <style scoped lang="scss">
 .page-hero {
   position: relative;
-  padding-block: var(--page-hero---padding-block, var(--origam-space---12) var(--origam-space---10));
+
+  &__breadcrumb {
+    padding-top: var(--page-hero__breadcrumb---padding-top, var(--origam-space---8));
+  }
+
+  &__body {
+    padding-block: var(--page-hero---padding-block, var(--origam-space---12) var(--origam-space---10));
+  }
 
   &__title {
     margin-top: var(--origam-space---4);
   }
 
   &__lead {
-    max-width: 40rem;
+    max-width: var(--page-hero__lead---max-width, var(--ccc-lead---max-width));
     margin: var(--origam-space---6) 0 0;
     font-size: var(--origam-font__size---xl);
     color: var(--origam-color__text---secondary);
@@ -94,5 +104,6 @@ defineExpose({})
 <style>
 :root {
   --page-hero---padding-block: var(--origam-space---12) var(--origam-space---10);
+  --page-hero__breadcrumb---padding-top: var(--origam-space---8);
 }
 </style>

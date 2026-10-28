@@ -18,9 +18,13 @@ button, input, select, textarea { font: inherit; }
 
 .font-display { --origam-title---font-family: var(--origam-font__family---display); --origam-title---font-weight: var(--origam-font__weight---regular); --origam-title---letter-spacing: -0.01em; font-family: var(--origam-font__family---display); font-weight: var(--origam-font__weight---regular); letter-spacing: -0.01em; }
 :where(.origam-tab__label) { line-height: var(--origam-font__lineHeight---normal); }
+.origam-field.origam-field.origam-field.origam-field input::placeholder { color: var(--origam-color__text---tertiary); opacity: 1; }
 .origam-field.origam-field.origam-field { --origam-field---corner-clearance: var(--origam-space---5); }
 .origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large { padding-inline: calc(var(--origam-btn---padding-xl, var(--origam-space---6)) + var(--origam-btn---density-padding-x, 0px) - var(--origam-btn---border-width-outlined, var(--origam-border__width---thin))); }
 .origam-table .origam-table__wrapper.origam-table__wrapper td { border-top: var(--origam-table__cell---border-width, var(--origam-border__width---thin)) solid var(--origam-table__cell---border-color, var(--origam-color__border---subtle)); border-bottom: 0; }
+:where(.origam-breadcrumb) { font-size: var(--origam-font__size---sm); }
+.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items { line-height: var(--origam-font__lineHeight---normal); }
+.origam-breadcrumb-item--disabled { --origam-breadcrumb-item---color: var(--origam-color__text---tertiary); --origam-breadcrumb-item---text-decoration: none; }
 :where(.origam-table) th { text-transform: uppercase; letter-spacing: var(--origam-font__letterSpacing---wide); }
 .neon { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon), 0 6px 0 var(--origam-color__bar---neon), 0 8px 0 var(--origam-color__bar---neon), 0 22px 40px color-mix(in srgb, var(--origam-color__bar---neon) 45%, transparent); }
 .neon--sm { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon); }
@@ -40,3 +44,4 @@ button, input, select, textarea { font: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+:root { --ccc-lead---max-width: 40rem; }

@@ -7,7 +7,7 @@
           tag="header"
           height="auto"
           flat
-          rounded="full"
+          rounded="var(--public-header---radius)"
           border
           border-color="var(--origam-color__border---default)"
           class="public-header"
@@ -319,7 +319,7 @@ defineExpose({})
     flex-wrap: wrap;
     gap: 0;
     padding: var(--origam-space---1) var(--origam-space---2) var(--origam-space---1) var(--origam-space---4);
-    border-radius: var(--origam-radius---xl);
+    --public-header---radius: var(--origam-radius---xl);
 
     &__nav {
       order: 3;
@@ -347,6 +347,7 @@ defineExpose({})
 <style>
 :root {
   --public-header---blur: 16px;
+  --public-header---radius: var(--origam-radius---full);
   --public-main---reserved-height: 20rem;
 }
 </style>

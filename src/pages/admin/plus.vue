@@ -119,7 +119,8 @@ const links = computed(() => ADMIN_MORE_ITEMS.map(item => ({
   subtitle: t(item.description.key, item.description.label),
   to: item.to,
   prependIcon: item.icon,
-  appendIcon: IconChevronRight
+  appendIcon: IconChevronRight,
+  rounded: 'xl'
 })))
 
 /*********************************************************
@@ -191,7 +192,6 @@ defineExpose({})
       --origam-list-item---border-style: solid;
       --origam-list-item---border-color: var(--origam-color__border---default);
 
-      border-radius: var(--origam-radius---xl);
       background: var(--origam-color__surface---raised);
     }
 

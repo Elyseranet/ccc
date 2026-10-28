@@ -230,7 +230,7 @@ defineExpose({})
   }
 
   &__lead {
-    max-width: 40rem;
+    max-width: var(--rules-game__lead---max-width, var(--ccc-lead---max-width));
     margin: var(--origam-space---6) 0 0;
     font-size: var(--origam-font__size---xl);
     color: var(--origam-color__text---secondary);

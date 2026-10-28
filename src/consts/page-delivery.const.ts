@@ -66,7 +66,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.HEAD_TO_HEAD]: {
     delivered: false,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.HEAD_TO_HEAD]
+    endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.COMPETITOR, API_ENDPOINT.HEAD_TO_HEAD]
   },
   [ROUTES.RULES]: {
     delivered: false,
@@ -136,7 +136,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_MORE]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [API_ENDPOINT.AUTH_LOGOUT]
   }

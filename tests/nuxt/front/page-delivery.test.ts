@@ -69,8 +69,9 @@ describe('table PAGE_DELIVERY', () => {
     }
   })
 
-  it('toutes les pages de l’état actuel sont masquées en production', () => {
-    expect(Object.values(PAGE_DELIVERY).every(page => !page.delivered)).toBe(true)
+  it('seule la page Plus de l’admin est livrée (T-LIVE-01), toutes les autres sont masquées en production', () => {
+    const delivered = Object.entries(PAGE_DELIVERY).filter(([, page]) => page.delivered).map(([route]) => route)
+    expect(delivered).toEqual([ROUTES.ADMIN_MORE])
   })
 })
 

@@ -72,7 +72,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 - Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
 - En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404. Le 404 d'une page non livrée n'est pas un contrôle d'accès ; l'autorisation reste portée par le middleware `admin` et par le serveur.
 - Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
-- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
+- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Ajouter à `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre ; le test de la page livrée exige une session administrateur (`E2E_ADMIN_SESSION`) et échoue sans elle.
 
 ### Variables d'environnement
 
@@ -191,7 +191,13 @@ Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUX
 
 ```sh
 E2E_PORT=3971 NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
-NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_e2e_test npx playwright test --config playwright.config.ts
+NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_<agent>_test npx playwright test --config playwright.config.ts
+```
+
+**Une base e2e par agent ou par worktree** (`ccc_<agent>_test`, par exemple `ccc_f04_test`, `ccc_lead_test`) : chaque lancement de Playwright passe par `global-setup`, qui remet la base à neuf et **recrée les sessions**. Deux agents sur la même base invalident mutuellement leurs sessions : les pages admin redirigent alors vers `/connexion` et les tests échouent en délai dépassé, sans rapport avec le code testé. Créer sa base une fois, dans le conteneur de développement :
+
+```sh
+docker exec ccc-db psql -U ccc -d ccc -c "create database ccc_<agent>_test owner ccc"
 ```
 
 Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
