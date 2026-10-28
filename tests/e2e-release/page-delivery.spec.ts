@@ -36,7 +36,7 @@ test.describe('pages non livrées', () => {
   test('un cookie de session présenté ne rend pas visible une page non livrée', async ({ request }) => {
     const response = await request.get('/admin', {
       maxRedirects: 0,
-      headers: { cookie: `__Host-ccc_session=${'x'.repeat(43)}` }
+      headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${'x'.repeat(43)}` }
     })
     expect(response.status()).toBe(404)
   })
