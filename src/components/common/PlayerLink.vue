@@ -81,7 +81,7 @@ defineExpose({})
     --origam-btn---line-height: var(--origam-font__lineHeight---normal);
     padding-inline: 0;
 
-    /* `wrap` (Origam) centre les lignes : un nom de joueur coule comme du texte, aligné au début. */
+    // `wrap` (Origam) centre les lignes : un nom de joueur coule comme du texte, aligné au début.
     :deep(.origam-btn__content) {
       justify-content: flex-start;
       text-align: start;
