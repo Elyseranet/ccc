@@ -4,9 +4,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { DataSource } from 'typeorm'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
-import { LOGIN_DELAY_MAX_SECONDS } from '../../src/consts/auth.const'
+import { LOGIN_DELAY_MAX_SECONDS, MAX_DEVICES_PER_USER } from '../../src/consts/auth.const'
 import { LoginDeviceEntity } from '../../src/server/db/typeorm/entities/login-device.entity'
-import { generateDeviceNonce, signDeviceCookie } from '../../src/utils/device-cookie.util'
+import { generateDeviceNonce, signDeviceCookie, verifyDeviceCookie } from '../../src/utils/device-cookie.util'
 import { unlockUser } from '../../src/utils/unlock-user.util'
 import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
 import { UserEntity } from '../../src/server/db/typeorm/entities/user.entity'
@@ -357,12 +357,34 @@ describe('auth (login, logout, /moi, roles)', async () => {
       expect((await login(owner.email, NEW_PASSWORD, oldDeviceCookie)).status).toBe(429)
     })
 
-    it('keeps at most 20 devices per account', async () => {
+    it('keeps at most 20 devices per account, evicting the oldest first', async () => {
+      // T-QA-04 : 19 appareils semés en base (leur création ne dépend pas de scrypt), puis 2 vraies connexions. Le plafond
+      // est franchi à la seconde : 2 hachages scrypt au lieu de 22. `registerDevice` évince par `createdAt` croissant.
       const owner = await newOwner()
-      for (let index = 0; index < 22; index += 1) {
-        await login(owner.email, PASSWORD)
-      }
-      expect(await dataSource.getRepository(LoginDeviceEntity).countBy({ userId: owner.id })).toBe(20)
+      const repository = dataSource.getRepository(LoginDeviceEntity)
+      const seededCount = MAX_DEVICES_PER_USER - 1
+      const baseTime = Date.now() - 24 * 3600 * 1000
+      const seededNonces = Array.from({ length: seededCount }, () => generateDeviceNonce())
+      await repository.insert(seededNonces.map((nonce, index) => ({
+        userId: owner.id,
+        nonce,
+        expiresAt: new Date(Date.now() + 3600 * 1000),
+        createdAt: new Date(baseTime + index * 60_000)
+      })))
+
+      await login(owner.email, PASSWORD)
+      expect(await repository.countBy({ userId: owner.id })).toBe(MAX_DEVICES_PER_USER)
+
+      const last = deviceCookieHeaderOf(await login(owner.email, PASSWORD))
+      const lastNonce = verifyDeviceCookie(last.slice(last.indexOf('=') + 1), TEST_DEVICE_SECRET, Math.floor(Date.now() / 1000))?.nonce
+
+      const remaining = (await repository.find({ where: { userId: owner.id } })).map((device) => device.nonce)
+      expect(remaining).toHaveLength(MAX_DEVICES_PER_USER)
+      expect(remaining).not.toContain(seededNonces[0])
+      expect(remaining).toContain(seededNonces[1])
+      expect(remaining).toContain(seededNonces[seededCount - 1])
+      expect(lastNonce).toBeDefined()
+      expect(remaining).toContain(lastNonce)
     })
   })
 
