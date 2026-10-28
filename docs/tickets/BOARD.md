@@ -354,3 +354,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-14](F-14.md) : ouvert — D4 résolu par F-00r (9253c71) ; reste D3.
 - [F-14](F-14.md) : **Fermé** — D3 mergé @ `5b52e83` ; M1, D1, D2, D3 mergés, D4 réglé par F-00r.
 - [F-05](F-05.md) : **Fermé** — mergé @ `67270bd` ; Origam #1267.
+- [B-18](B-18.md) : ouvert — ne pas publier les tours PENDING (QA-2) ; bloque T-QA-03 et F-01.
