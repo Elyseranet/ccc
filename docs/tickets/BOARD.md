@@ -31,7 +31,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | — (AV-1 tranché le 2026-10-20) | En cours : validé sur l'ancienne arborescence (`feature/B-16` @ `4e39f80`) ; à réappliquer par dev-b16 sur `feature/wave3a-identity`, après B-10 |
 | [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | — | En cours : validé sur l'ancienne arborescence (`feature/B-17` @ `27ee5cd`, G11 compris) ; réappliqué par dev-b12 (`feature/B-17-r` @ `8517bc5`, légers verts), test:db et test:api sur `archives.sql` en cours |
-| [B-19](B-19.md) | Titres à date du finaliste dans le résumé d'édition (podium F-03a) | 3 | vague 3a (B-17, G4) | — | À faire |
+| [B-19](B-19.md) | Titres à date du finaliste et des demi-finalistes dans le résumé d'édition (podium F-03a), contrat figé avec le front | 3 | vague 3a (B-17, G4) | — | À faire |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
