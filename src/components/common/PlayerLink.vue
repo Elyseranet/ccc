@@ -52,6 +52,9 @@ defineSlots<{}>()
  * Fiche et titres
  *
  * @description
+ * En mode `inline`, le nom coule comme du texte : la prop `wrap` d'OrigamBtn l'autorise à passer à la ligne, mais Origam
+ * centre alors les lignes et fixe `justify-content: center` en dur sur `__content` (OrigamBtn.vue:1185-1188, sans variable).
+ * Le bloc style remet donc l'alignement au début par `:deep`, justifié par docs/tickets/origam/btn-content-alignement-non-themable.md.
  * Le singulier et le pluriel ont chacun leur clé : pas de syntaxe de pluriel i18n dans ce projet.
  ********************************************************/
 const profilePath = computed(() => `/joueurs/${encodeURIComponent(props.competitor.id)}`)
@@ -81,7 +84,6 @@ defineExpose({})
     --origam-btn---line-height: var(--origam-font__lineHeight---normal);
     padding-inline: 0;
 
-    // `wrap` (Origam) centre les lignes : un nom de joueur coule comme du texte, aligné au début.
     :deep(.origam-btn__content) {
       justify-content: flex-start;
       text-align: start;
