@@ -51,11 +51,18 @@ export const matchListQuerySchema = z.object({
 const requiredText = (max: number) => z.string().trim().min(1).max(max)
 const optionalText = (max: number) => z.string().trim().min(1).max(max).nullable()
 
-/** Une date calendaire réelle : `2026-02-30` est refusée alors que le motif seul la laisserait passer. */
+/**
+ * Une date calendaire réelle : `2026-02-30` est refusée alors que le motif seul la laisserait passer. Son année reste
+ * dans les bornes d'une édition (`EDITION_YEAR_MIN`..`EDITION_YEAR_MAX`) : `0000-01-01` passerait le motif mais ferait
+ * échouer PostgreSQL (année 0 inexistante), soit une 500 au lieu d'une 400.
+ */
 const heldOnSchema = z.string().regex(EDITION_DATE_PATTERN, 'Expected YYYY-MM-DD').refine((value) => {
   const date = new Date(`${value}T00:00:00Z`)
   return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value)
-}, 'Not a valid calendar date')
+}, 'Not a valid calendar date').refine((value) => {
+  const year = Number(value.slice(0, 4))
+  return year >= EDITION_YEAR_MIN && year <= EDITION_YEAR_MAX
+}, `Expected a year from ${EDITION_YEAR_MIN} to ${EDITION_YEAR_MAX}`)
 
 /** `.strict()` : un champ inconnu (`code`, `status`…) est refusé en 400, jamais ignoré. */
 export const createEditionSchema = z.object({

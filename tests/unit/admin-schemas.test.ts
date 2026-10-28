@@ -14,7 +14,9 @@ describe('createEditionSchema', () => {
     ['year out of range', { year: 1999, name: 'x' }],
     ['empty name', { year: 2027, name: '   ' }],
     ['impossible date', { year: 2027, name: 'x', heldOn: '2027-02-30' }],
-    ['wrong date format', { year: 2027, name: 'x', heldOn: '27/02/2027' }]
+    ['wrong date format', { year: 2027, name: 'x', heldOn: '27/02/2027' }],
+    ['year 0 date (PostgreSQL would answer 500)', { year: 2027, name: 'x', heldOn: '0000-01-01' }],
+    ['date year above the edition range', { year: 2027, name: 'x', heldOn: '2101-01-01' }]
   ])('rejects %s', (_label, body) => {
     expect(createEditionSchema.safeParse(body).success).toBe(false)
   })
@@ -23,6 +25,11 @@ describe('createEditionSchema', () => {
 describe('updateEditionSchema (R-9)', () => {
   it.each(['code', 'year', 'chronologicalRank', 'status'])('rejects %s', (field) => {
     expect(updateEditionSchema.safeParse({ name: 'x', [field]: 1 }).success).toBe(false)
+  })
+
+  it('rejects a date outside the edition year range and accepts one inside it', () => {
+    expect(updateEditionSchema.safeParse({ heldOn: '1999-12-31' }).success).toBe(false)
+    expect(updateEditionSchema.parse({ heldOn: '2027-03-14' })).toEqual({ heldOn: '2027-03-14' })
   })
 
   it('rejects an empty body and accepts a null location', () => {
