@@ -1,4 +1,5 @@
 import type { IApiError } from './error.interface.js'
+import type { SORT_ORDER } from '../enums/competitor-sort.enum.js'
 import type { MATCH_STATUS } from '../enums/match.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { TApiFetcher } from '../types/api-fetcher.type.js'
@@ -21,6 +22,7 @@ export interface ICompetitorsQuery {
   page?: number
   pageSize?: number
   sort?: string
+  order?: SORT_ORDER
 }
 
 export interface IEditionMatchesQuery {

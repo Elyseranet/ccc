@@ -32,7 +32,12 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,
  *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
  *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
- *     token) : Elyseranet/origam#1266.
+ *     token) : Elyseranet/origam#1266 ;
+ *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
+ *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276 ;
+ *   - les 6 règles `.origam-pagination.origam-pagination.origam-pagination …` (pagination de l'annuaire : flèches
+ *     masquées, liste qui passe à la ligne, couleurs des pages, dont un `!important` imposé par la règle à identifiant
+ *     qu'Origam injecte sur chaque bouton) : Elyseranet/origam#1278 (remédiation : docs/tickets/F-04-PAG.md).
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
@@ -70,7 +75,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-data-list': { density: 'compact', rounded: 'lg', border: true },
     'origam-bracket': { variant: 'single-elimination', color: 'primary', density: 'compact', showScores: true, showSeed: false, showRoundTitles: true, elevation: 'md' },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
-    'origam-pagination': { density: 'compact', showFirstLastPage: false },
+    'origam-pagination': { density: 'default', size: 'large', color: 'primary', bgColor: 'primary', showFirstLastPage: false },
     'origam-breadcrumb': { density: 'compact', divider: '›' },
     'origam-avatar': { rounded: 'full', size: 'default' },
     'origam-empty-state': { size: 'lg', align: 'center' },
@@ -156,7 +161,13 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-btn---border-width-outlined': 'var(--origam-border__width---2)',
     // Pastilles (F-00q) : la maquette donne 4 px / 12 px de padding et une interligne de 1,3 (snug) pour du texte xs, soit 24,64 px de haut ; Origam fixe line-height: 1 et mesure la hauteur en content-box (`size` small : 24 px, padding 0 10 px).
     '--origam-chip---height-sm': 'calc(var(--origam-font__size---xs) * var(--origam-font__lineHeight---snug) + 2 * var(--origam-space---1))',
-    '--origam-chip---padding-sm': 'var(--origam-space---3)'
+    '--origam-chip---padding-sm': 'var(--origam-space---3)',
+    // Pagination (F-04-PAG) : page courante en ambre plein, les autres en texte secondaire.
+    '--origam-pagination--primary---background-color': 'transparent',
+    '--origam-pagination--primary---color': 'var(--origam-color__text---secondary)',
+    '--origam-pagination---background-color-hover': 'var(--origam-color__action--ghost---bgHover)',
+    '--origam-pagination__item--is-active---background-color': 'var(--origam-color__action--primary---bg)',
+    '--origam-pagination__item--is-active---color': 'var(--origam-color__action--primary---fg)'
   },
 
   // ── 2) TOKENS SÉMANTIQUES (communs) ────────────────────────────

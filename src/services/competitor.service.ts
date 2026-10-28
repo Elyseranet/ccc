@@ -63,6 +63,10 @@ export class CompetitorService extends BaseService {
     return this.request<ICompetitorDetail>(`/competiteurs/${encodeURIComponent(id)}`)
   }
 
+  opponents (id: string): Promise<IHeadToHeadSummary[]> {
+    return this.request<IHeadToHeadSummary[]>(`/competiteurs/${encodeURIComponent(id)}/face-a-face`)
+  }
+
   headToHead (id: string, opponentId: string): Promise<IHeadToHead> {
     return this.request<IHeadToHead>(`/competiteurs/${encodeURIComponent(id)}/face-a-face`, { query: { adversaire: opponentId } })
   }

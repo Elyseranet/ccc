@@ -199,3 +199,12 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Ce ne sont pas des données fictives (ARCH-8) : c'est la vraie édition 2026, rembobinée à un moment de sa saison, comme `global-setup` crée déjà les comptes de test.
 - Un seul état, partagé par tous les tests (pas de mutation propre à un test). Il sert F-01, F-07, F-08 et F-11.
 - Conséquence : les zones qui lisent 2026 (F-03 page édition, parcours joueurs de F-04) se remesurent sur cet état.
+- **Précision QA-2 (décision utilisateur 2026-10-28)** : **aucune suppression**. On ne supprime aucune ligne du dump d'archives, même dans la base de test. La mise en place de l'édition en cours ne fait que des mises à jour. Les options qui supprimaient des matchs, des côtés ou des tours (proposées par le chef de projet) sont refusées.
+- **Mise en œuvre de QA-2 (décision utilisateur 2026-10-28)** :
+  - le serveur **ne publie plus les tours encore « en attente »** (`ROUND_STATUS.PENDING`) : ni dans le tableau de `GET /editions/{id}`, ni dans la liste des matchs. Ticket back **B-18** ;
+  - ensuite, T-QA-03 remet 2026 en phase de poules par **mises à jour seules**, sans aucune suppression.
+  - Faits établis à la lecture du code par dev-f05 et le chef de projet :
+    - `buildBracket` (`edition-assemble.util.ts:86-90`) ne filtre pas sur `round.status`, et `ROUND_STATUS` n'est lu par aucun service ;
+    - aucun statut existant ne masque les phases finales ;
+    - aucun code ne crée de tour hors du dump. Le moment de création des tours en fonctionnement réel n'est donc pas encore défini.
+- **Tours non tirés (décision utilisateur 2026-10-28, B-18)** : en fonctionnement réel, **un tour de phase finale n'existe jamais avant son tirage**. Le tirage d'un tour (B-13) le crée au moment du tirage. Un tour `PENDING` portant des matchs ne vient donc que des données reprises (dump) ou de l'état de test de T-QA-03. B-18 filtre ces tours sans changer le contrat de l'API. Aucun squelette « à tirer » côté front.
