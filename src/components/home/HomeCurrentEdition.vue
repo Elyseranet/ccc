@@ -65,7 +65,7 @@
             data-cy="home-current-score"
           >
             <span class="home-current__player home-current__player--win">
-              <player-link :competitor="score.winner" inline />
+              <player-link :competitor="score.winner" inline wrap />
             </span>
             <span class="home-current__score num font-display">
               {{ score.winnerScore }}<span
@@ -74,7 +74,7 @@
               >{{ separator }}</span>{{ score.loserScore }}
             </span>
             <span class="home-current__player">
-              <player-link :competitor="score.loser" inline />
+              <player-link :competitor="score.loser" inline wrap />
             </span>
             <origam-chip
               v-if="score.poolText"
