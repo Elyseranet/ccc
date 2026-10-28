@@ -302,6 +302,8 @@ describe('pages', () => {
     expect(wrapper.get('[data-cy="player-stats"]').text()).not.toContain('%')
     const years = wrapper.findAll('[data-cy="player-journey-table"] tbody tr td:first-child').map(cell => cell.text())
     expect(years).toEqual(['2026', '2020', '2014'])
+    const records = wrapper.findAll('[data-cy="player-journey-table"] tbody tr td:nth-child(4)').map(cell => cell.text())
+    expect(records).toEqual(['0 V – 2 D', '7 V – 0 D', '3 V – 1 D'])
     expect(wrapper.findAll('[data-cy="player-opponent"]')).toHaveLength(2)
     expect(wrapper.get('[data-cy="player-compare"]').attributes('href')).toBe(`/joueurs/face-a-face?a=${PLAYER_ID}`)
     expect(wrapper.html()).not.toMatch(/@|\b0\d \d\d \d\d\b/)

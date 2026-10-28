@@ -130,12 +130,12 @@ const title = computed(() => t('player.opponents.title', 'Adversaires'))
 const lead = computed(() => t('player.opponents.lead', 'Les plus souvent affrontés (RG36)'))
 const compareLabel = computed(() => t('player.opponents.compare', 'Face-à-face'))
 const noScoreText = computed(() => t('player.opponents.no_score', 'Aucun score connu'))
-const totalOf = (summary: IPlayerOpponent): number => summary.played + (summary.unknownResults ?? 0)
+const totalOf = (summary: IPlayerOpponent): number => summary.played + summary.unknownResults
 const countText = (summary: IPlayerOpponent): string => totalOf(summary) === 1
   ? t('player.opponents.matches_one', '1 match')
   : t('player.opponents.matches_other', '{count} matchs', { count: totalOf(summary) })
 const withoutRatioText = (summary: IPlayerOpponent): string => {
-  const unknown = summary.unknownResults ?? 0
+  const unknown = summary.unknownResults
   if (unknown === 0) {
     return noScoreText.value
   }

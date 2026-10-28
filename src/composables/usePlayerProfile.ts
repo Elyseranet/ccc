@@ -55,12 +55,9 @@ export const usePlayerProfile = (id: MaybeRefOrGetter<string>) => {
         ? t('player.journey.pool_and_rank', 'Poule {pool} · {rank}', { pool: participation.poolNumber, rank: rankLabel })
         : rankLabel
     }
-    let bilan = t('player.journey.no_bilan', '—')
-    if (participation.wins !== undefined && participation.losses !== undefined) {
-      bilan = t('player.journey.bilan', '{wins} V – {losses} D', { wins: participation.wins, losses: participation.losses })
-      if (participation.unknownResults) {
-        bilan = `${bilan} ${t('player.journey.bilan_unknown', '(+{count} au résultat inconnu)', { count: participation.unknownResults })}`
-      }
+    let bilan = t('player.journey.bilan', '{wins} V – {losses} D', { wins: participation.wins, losses: participation.losses })
+    if (participation.unknownResults > 0) {
+      bilan = `${bilan} ${t('player.journey.bilan_unknown', '(+{count} au résultat inconnu)', { count: participation.unknownResults })}`
     }
     return {
       editionId: participation.editionId,

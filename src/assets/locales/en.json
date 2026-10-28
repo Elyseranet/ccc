@@ -230,7 +230,6 @@
   "player.journey.column.result": "Result",
   "player.journey.lead": "Round reached in each edition",
   "player.journey.lead_best": "Round reached in each edition · best: {best}",
-  "player.journey.no_bilan": "—",
   "player.journey.no_points": "—",
   "player.journey.no_pool": "—",
   "player.journey.pool_and_rank": "Pool {pool} · {rank}",
