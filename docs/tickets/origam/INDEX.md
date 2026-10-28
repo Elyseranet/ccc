@@ -25,3 +25,4 @@
 | #1265 | évolution : `line-height: 1.6` en dur sur `.origam-breadcrumb__items`, sans token | règle `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` dans `main.css` (F-00p) |
 | #1266 | `field` : couleur du placeholder figée à `currentColor` 50 %, sans variable | règle `text.tertiary` à opacité 1 dans `main.css` (F-00s) |
 | #1267 | évolution : ligne `kv` de `data-list` (grille, fond, rayon, écart, filet) et casse de la clé non thémables | `:deep` restreint dans `HeadToHeadSummary.vue` (F-05) |
+| à ouvrir | `card` cliquable : `.origam-card > *` écrase l opacité de l overlay, carte noire au repos | règle `.origam-card > .origam-card__overlay.origam-card__overlay` dans `main.css` (F-00t) |
