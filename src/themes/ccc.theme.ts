@@ -33,6 +33,10 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
  *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
  *     token) : Elyseranet/origam#1266 ;
+ *   - `.origam-field.origam-field.origam-field input` (retrait de 2 px de l'`<input>`, jamais remis à zéro) : fiche
+ *     docs/tickets/origam/field-input-padding-ua-et-hauteur-en-rem.md (numéro Origam à renseigner) ;
+ *   - `.origam-field.origam-field.origam-field input` (retrait de 2 px de l'`<input>`, jamais remis à zéro) : fiche
+ *     docs/tickets/origam/field-input-padding-ua-et-hauteur-en-rem.md (numéro Origam à renseigner) ;
  *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
  *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276.
  ********************************************************/
@@ -140,8 +144,12 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-breadcrumb-divider---opacity': '1',
     // Champs (F-00m) : hauteur 48 px (le défaut « default » d'Origam vaut 36 px), retrait du texte 20 px.
     '--origam-input__control---height-md': 'var(--origam-space---12)',
-    '--origam-field---padding-start': 'var(--origam-space---5)',
-    '--origam-field---padding-end': 'var(--origam-space---5)',
+    '--origam-field---padding-start': 'calc(var(--origam-space---5) + var(--origam-border__width---thin))',
+    '--origam-field---padding-end': 'calc(var(--origam-space---5) + var(--origam-border__width---thin))',
+    // Texte des champs (F-15) : interligne du texte courant (1,55, comme la maquette ; Origam met 1,5) interlettrage normal (Origam met 0,009375 em) et opacité pleine du conteneur de saisie (Origam met 0,7, ce qui assombrit la valeur et le placeholder).
+    '--origam-input---line-height': 'var(--origam-font__lineHeight---normal)',
+    '--origam-field---letter-spacing': 'normal',
+    '--origam-field__input---opacity': '1',
     // Champs outlined : fond surface.sunken, filet 1 px border.default, sans atténuation d'opacité.
     '--origam-field---background-color': 'var(--origam-color__surface---sunken)',
     '--origam-field---border-color': 'var(--origam-color__border---default)',
