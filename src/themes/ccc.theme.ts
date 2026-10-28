@@ -34,7 +34,10 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
  *     token) : Elyseranet/origam#1266 ;
  *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
- *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276.
+ *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276 ;
+ *   - les 6 règles `.origam-pagination.origam-pagination.origam-pagination …` (pagination de l'annuaire : flèches
+ *     masquées, liste qui passe à la ligne, couleurs des pages, dont un `!important` imposé par la règle à identifiant
+ *     qu'Origam injecte sur chaque bouton) : Elyseranet/origam#1278 (remédiation : docs/tickets/F-04-PAG.md).
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
