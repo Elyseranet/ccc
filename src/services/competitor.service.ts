@@ -32,7 +32,6 @@ import type { INewCompetitor } from '../interfaces/competitor-creation.interface
 import type { ICompetitorWithAccount } from '../interfaces/invitation.interface.js'
 import { buildDisplayName } from '../utils/display-name.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
-import { issueInvitation } from '../utils/invitation-store.util.js'
 import { logger } from '../utils/logger.util.js'
 
 /*********************************************************
@@ -419,6 +418,10 @@ export const createCompetitorWithAccount = async (
       passwordHash: null,
       competitorId: competitor.id
     })
+    // Import dynamique : ce service est aussi chargé par le navigateur (classe CompetitorService, ARCH-2). Un import
+    // statique ferait entrer `node:crypto` (invitation-token.util) dans le graphe client, ce qui casse `nuxt dev`
+    // (module externalisé par Vite, export nommé introuvable). Côté serveur, l'appel ne change pas.
+    const { issueInvitation } = await import('../utils/invitation-store.util.js')
     const invitation = await issueInvitation(manager, user.id, now)
     logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_CREATED, { competitorId: competitor.id, userId: user.id })
     return { competitorId: competitor.id, userId: user.id, ...invitation }
