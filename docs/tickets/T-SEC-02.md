@@ -25,3 +25,7 @@
 - [ ] Test : la DataSource active `ssl` quand la variable est positionnée.
 - [ ] Le README documente les deux variables.
 - [ ] `/security-review` est relancé sur la branche.
+
+## Point 2026-10-28 (chef de projet) — **laissé ouvert**
+- **Fait** : la moitié IP. Une politique de confiance du proxy est en place (`NUXT_TRUST_PROXY_HOPS`, défaut 0, plage 0 à 5). On prend l'IP de X-Forwarded-For seulement si la socket est privée ou en boucle locale. Correctif f4dd3e1, mergé avec la vague 3a @ `640842b`, avec tests unitaires et d'API.
+- **Reste** : SSL vers PostgreSQL.
