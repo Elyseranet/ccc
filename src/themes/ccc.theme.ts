@@ -32,7 +32,9 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,
  *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
  *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
- *     token) : Elyseranet/origam#1266.
+ *     token) : Elyseranet/origam#1266 ;
+ *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
+ *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276.
  ********************************************************/
 
 export const CCC_HH_BASE: IOrigamTheme = {
