@@ -28,3 +28,6 @@
 | #1276 | `card` cliquable : `.origam-card > *` écrase l opacité de l overlay, carte noire au repos | règle `.origam-card > .origam-card__overlay.origam-card__overlay` dans `main.css` (F-00t) |
 | #1278 | `pagination` : précédent/suivant non masquables, `with-info` limité à la page courante, page courante illisible en neutre, couleurs par règle à identifiant | règles `main.css` (dont un `!important`) et compteur local (F-04, F-04-PAG) |
 | #1280 | `field` : retrait de 2 px de l'`<input>` jamais remis à zéro, hauteur minimale avec un interligne en `1.5rem` | règle `.origam-field.origam-field.origam-field input` dans `main.css` et variables du thème (F-15) |
+| #1282 | évolution : `bracket`, largeur et hauteur de tour en style en ligne, titre centré en dur, slot `connector` vide sans effet | tableau maison conservé (F-03b, F-03-BRK) |
+| #1283 | évolution : `table`, la légende visible n'a pas de variable de graisse | aucun contournement, zone poules-tableau à 0,94 % (F-03b) |
+| #1284 | évolution : `chip-group`, pas de retour à la ligne, prop `column` sans effet | `:deep` limité à `.origam-slide-group__container` dans EditionMatches (F-03b) |
