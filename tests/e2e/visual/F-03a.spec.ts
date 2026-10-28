@@ -11,7 +11,8 @@ import type { ITextPair } from '../visual.util'
  * deux côtés (encre transparente) : filet, fond, rayon, gabarit et positions restent comparés. Les onglets Tirages,
  * Poules, Bracket et Matchs ne sont pas comparés ici : les archives n'ont aucun tirage (T-QA-03 en ajoutera pour 2026),
  * et Poules, Bracket et Matchs appartiennent à F-03b. Les étoiles de titres de la maquette (finaliste) sont retirées de la
- * maquette : le DTO public n'expose les titres à date que du champion, qui n'a pas d'étoile dans la maquette.
+ * maquette : le DTO public n'expose pas les titres à date des finalistes et demi-finalistes (B-19, back). Le champion est un
+ * texte de titre (pas un PlayerLink) et n'a pas d'étoile.
  ********************************************************/
 const EDITION_CODE = '2025'
 const VIEWPORTS = [
@@ -24,12 +25,12 @@ const MOCKUP_INK = [
   '.ed-hero__sel select', '.ppl__i .avatar', '.ppl__n a', '.ppl__n small'
 ]
 const APP_INK = [
-  '.edition-summary__champ-name *', '[data-cy="edition-final-line"]', '.edition-summary__place .player-link__name',
+  '.edition-summary__champ-name', '[data-cy="edition-final-line"]', '.edition-summary__place .player-link__name',
   '.edition-summary__fact-value', '.edition-summary__small', '.edition-page__summary', '.edition-selector .origam-select__selection-text',
   '.edition-selector input', '.edition-participants__avatar', '.edition-participants__name *'
 ]
 const TEXT_PAIRS: ITextPair[] = [
-  { mockup: '.ed-podium__name', app: '.edition-summary__champ-name .player-link__name' },
+  { mockup: '.ed-podium__name', app: '.edition-summary__champ-name' },
   { mockup: '.ed-podium__champ .muted', app: '[data-cy="edition-final-line"]' },
   { mockup: '.ed-podium__rest a', app: '.edition-summary__place .player-link__name' },
   { mockup: '.ed-facts dd', app: '.edition-summary__fact-value' },
@@ -69,10 +70,10 @@ const equalizeHeights = async (mockup: Page, page: Page) => {
 const ZONES = [
   { zone: 'edition-fil', tab: null, mockTab: null, mockup: '.crumbs', app: '[data-cy="page-hero-breadcrumb"] .origam-breadcrumb__items' },
   { zone: 'edition-titre', tab: null, mockTab: null, mockup: '.page-hero__title', app: '[data-cy="page-title"]', narrow: true },
-  { zone: 'edition-meta', tab: null, mockTab: null, mockup: '.meta-row', app: '[data-cy="edition-meta"]', narrow: true, gaps: { '1440': 'dégradé du halo de fond différent sur cette bande à 1440 px (15 %, 1211 px) ; la zone du titre juste au-dessus est à 0,000 %, cause non établie' } },
+  { zone: 'edition-meta', tab: null, mockTab: null, mockup: '.meta-row', app: '[data-cy="edition-meta"]', narrow: true },
   { zone: 'edition-selecteur', tab: null, mockTab: null, mockup: '.ed-hero__sel', app: '.edition-selector' },
   { zone: 'edition-onglets', tab: null, mockTab: null, mockup: '.ed-tabs .tabs', app: '[data-cy="edition-tabs"]' },
-  { zone: 'edition-podium', tab: 'edition-tab-summary', mockTab: '#ed-t-syn', mockup: '.ed-podium', app: '[data-cy="edition-podium"]', gaps: { '1440': 'bloc du champion 1,3 px plus bas dans la maquette (hauteur de la ligne 116,28 px contre 113,7 px de son contenu), cause non établie : 2 % des pixels' } },
+  { zone: 'edition-podium', tab: 'edition-tab-summary', mockTab: '#ed-t-syn', mockup: '.ed-podium', app: '[data-cy="edition-podium"]' },
   { zone: 'edition-chiffres', tab: 'edition-tab-summary', mockTab: '#ed-t-syn', mockup: '.ed-facts', app: '.edition-summary__facts' },
   { zone: 'edition-deroule', tab: 'edition-tab-summary', mockTab: '#ed-t-syn', mockup: '.ed-steps', app: '[data-cy="edition-steps"]' },
   { zone: 'edition-participant', tab: 'edition-tab-participants', mockTab: '#ed-t-par', mockup: '.ppl__i:first-child', app: '.edition-participants__item:first-child' }
@@ -84,8 +85,6 @@ for (const viewport of VIEWPORTS) {
 
     for (const entry of ZONES) {
       test(entry.zone, async ({ page, browser }) => {
-        const gap = (entry as { gaps?: Record<string, string> }).gaps?.[viewport.name]
-        test.fail(gap !== undefined, gap)
         const { mockup, mockContext } = await open(page, browser, viewport, 'edition.html', `/editions/${EDITION_CODE}`)
         await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
         if (entry.tab) {

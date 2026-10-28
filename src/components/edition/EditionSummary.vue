@@ -55,11 +55,10 @@
           </svg>
           <p class="edition-summary__champ-text">
             <span class="edition-summary__eyebrow">{{ championLabel }}</span>
-            <common-player-link
-              :competitor="podium.champion"
-              inline
+            <span
               class="edition-summary__champ-name font-display neon--sm"
-            />
+              data-cy="edition-champion"
+            >{{ podium.champion.displayName }}</span>
             <span
               v-if="finalLine"
               class="edition-summary__final"
@@ -246,8 +245,13 @@ defineExpose({})
       var(--origam-color__surface---raised);
   }
 
+  &__podium :deep(.origam-card__content) {
+    height: 100%;
+  }
+
   &__podium-body {
     display: grid;
+    height: 100%;
     gap: var(--origam-space---6);
   }
 

@@ -26,6 +26,7 @@ describe('EditionSummary', () => {
         ]
       }
     })
+    expect(wrapper.get('[data-cy="edition-champion"]').element.tagName).toBe('SPAN')
     expect(wrapper.get('[data-cy="edition-final-line"]').text()).toBe('Finale gagnée 10–7 contre Inès Perrin')
     expect(wrapper.get('[data-cy="edition-fact-matches"]').text()).toContain('120 matchs, dont 2 au résultat inconnu')
     const steps = wrapper.get('[data-cy="edition-steps"]')

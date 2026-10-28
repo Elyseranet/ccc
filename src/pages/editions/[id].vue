@@ -21,6 +21,7 @@
             v-if="hasOptions"
             :options="options"
             :current="code"
+            class="edition-page__selector"
             @select="handleSelectEdition"
           />
         </div>
@@ -183,13 +184,16 @@ defineExpose({})
 
 <style scoped lang="scss">
 .edition-page {
+  --page-hero__breadcrumb---padding-top: var(--origam-space---12);
+  --page-hero---padding-block: 0 var(--origam-space---10);
+
   &__row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--edition-page---gap, var(--origam-space---5));
-    margin-top: var(--origam-space---6);
+    margin-top: var(--origam-space---5);
   }
 
   &__meta {
@@ -220,6 +224,18 @@ defineExpose({})
     overflow-x: auto;
     scrollbar-width: none;
     box-shadow: var(--origam-shadow---md);
+  }
+}
+
+@media (min-width: 961px) {
+  .edition-page__row {
+    position: relative;
+  }
+
+  .edition-page__selector {
+    position: absolute;
+    right: 0;
+    bottom: 0;
   }
 }
 
