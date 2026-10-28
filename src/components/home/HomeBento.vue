@@ -27,12 +27,14 @@
         border
         elevation="md"
         hover
-        class="home-bento__tile home-bento__tile--editions home-bento__stat"
+        class="home-bento__tile home-bento__tile--editions"
         data-cy="home-tile-editions"
       >
         <template #default>
-          <span class="home-bento__number home-bento__number--amber font-display num">{{ archive.editions }}</span>
-          <span class="home-bento__label">{{ editionsLabel }}</span>
+          <div class="home-bento__tile-body home-bento__tile-body--stat">
+            <span class="home-bento__number home-bento__number--amber font-display num">{{ archive.editions }}</span>
+            <span class="home-bento__label">{{ editionsLabel }}</span>
+          </div>
         </template>
       </origam-card>
       <origam-card
@@ -41,12 +43,14 @@
         border
         elevation="md"
         hover
-        class="home-bento__tile home-bento__tile--players home-bento__stat"
+        class="home-bento__tile home-bento__tile--players"
         data-cy="home-tile-players"
       >
         <template #default>
-          <span class="home-bento__number home-bento__number--ice font-display num">{{ archive.competitors }}</span>
-          <span class="home-bento__label">{{ playersLabel }}</span>
+          <div class="home-bento__tile-body home-bento__tile-body--stat">
+            <span class="home-bento__number home-bento__number--ice font-display num">{{ archive.competitors }}</span>
+            <span class="home-bento__label">{{ playersLabel }}</span>
+          </div>
         </template>
       </origam-card>
       <origam-card
@@ -59,43 +63,45 @@
         data-cy="home-tile-champion"
       >
         <template #default>
-          <span class="home-bento__eyebrow">{{ championEyebrow }}</span>
-          <span
-            v-if="champion"
-            class="home-bento__champion-name font-display neon--sm"
-          >{{ champion.competitor.displayName }}</span>
-          <span
-            v-else
-            class="home-bento__label"
-          >{{ championNone }}</span>
-          <span
-            v-if="champion"
-            class="home-bento__champion-meta"
-          >
-            <span v-if="championNickname">{{ championNickname }}</span>
+          <div class="home-bento__tile-body home-bento__tile-body--champion">
+            <span class="home-bento__eyebrow">{{ championEyebrow }}</span>
             <span
-              class="home-bento__stars"
+              v-if="champion"
+              class="home-bento__champion-name font-display neon--sm"
+            >{{ champion.competitor.displayName }}</span>
+            <span
+              v-else
+              class="home-bento__label"
+            >{{ championNone }}</span>
+            <span
+              v-if="champion"
+              class="home-bento__champion-meta"
+            >
+              <span v-if="championNickname">{{ championNickname }}</span>
+              <span
+                class="home-bento__stars"
+                aria-hidden="true"
+              >{{ championStars }}</span>
+              {{ championTitles }}
+            </span>
+            <svg
+              class="home-bento__cap"
+              viewBox="0 0 100 100"
               aria-hidden="true"
-            >{{ championStars }}</span>
-            {{ championTitles }}
-          </span>
-          <svg
-            class="home-bento__cap"
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <polygon
-              class="home-bento__cap-body"
-              :points="capPoints"
-            />
-            <circle
-              class="home-bento__cap-inner"
-              cx="50"
-              cy="50"
-              r="31"
-            />
-          </svg>
+              focusable="false"
+            >
+              <polygon
+                class="home-bento__cap-body"
+                :points="capPoints"
+              />
+              <circle
+                class="home-bento__cap-inner"
+                cx="50"
+                cy="50"
+                r="31"
+              />
+            </svg>
+          </div>
         </template>
       </origam-card>
       <origam-card
@@ -104,13 +110,15 @@
         border
         elevation="md"
         hover
-        class="home-bento__tile home-bento__tile--matches home-bento__stat"
+        class="home-bento__tile home-bento__tile--matches"
         :aria-label="matchesFull"
         data-cy="home-tile-matches"
       >
         <template #default>
-          <span class="home-bento__number home-bento__number--secondary font-display num">{{ archive.matches }}</span>
-          <span class="home-bento__label">{{ matchesLabel }}</span>
+          <div class="home-bento__tile-body home-bento__tile-body--stat">
+            <span class="home-bento__number home-bento__number--secondary font-display num">{{ archive.matches }}</span>
+            <span class="home-bento__label">{{ matchesLabel }}</span>
+          </div>
         </template>
       </origam-card>
       <origam-card
@@ -123,52 +131,62 @@
         data-cy="home-tile-ranking"
       >
         <template #default>
-          <origam-title
-            id="home-rank-title"
-            tag="h3"
-            font-size="xl"
-            font-weight="bold"
-            line-height="tight"
-            :text="rankTitle"
-          />
-          <p class="home-bento__eyebrow">
-            {{ rankEyebrow }}
-          </p>
-          <ol
-            v-if="hasRanking"
-            class="home-bento__rank"
-          >
-            <li
-              v-for="entry in ranking"
-              :key="entry.competitor.id"
-              class="home-bento__rank-row"
-              data-cy="home-rank-row"
+          <div class="home-bento__tile-body home-bento__tile-body--rank">
+            <origam-title
+              id="home-rank-title"
+              tag="h3"
+              font-size="xl"
+              font-weight="bold"
+              line-height="tight"
+              letter-spacing="normal"
+              :text="rankTitle"
+            />
+            <p class="home-bento__eyebrow">
+              {{ rankEyebrow }}
+            </p>
+            <ol
+              v-if="hasRanking"
+              class="home-bento__rank"
             >
-              <span class="home-bento__rank-number font-display">{{ entry.rank }}</span>
-              <player-link
-                :competitor="entry.competitor"
-                :titles="entry.titles"
-              />
-              <span class="num">{{ entry.points }}</span>
-            </li>
-          </ol>
-          <p
-            v-else
-            class="home-bento__none"
-            data-cy="home-rank-none"
-          >
-            {{ rankNone }}
-          </p>
-          <origam-btn
-            :to="ROUTES.HALL_OF_FAME"
-            variant="text"
-            class="home-bento__more"
-            data-cy="home-rank-more"
-          >
-            <template #default>
-              {{ rankMore }} <span aria-hidden="true">{{ arrow }}</span>
-            </template>
-          </origam-btn>
+              <li
+                v-for="entry in ranking"
+                :key="entry.competitor.id"
+                class="home-bento__rank-row"
+                data-cy="home-rank-row"
+              >
+                <span class="home-bento__rank-number font-display">{{ entry.rank }}</span>
+                <player-link
+                  :competitor="entry.competitor"
+                  :titles="entry.titles"
+                inline
+                class="home-bento__rank-link"
+                />
+                <span class="num">{{ entry.points }}</span>
+              </li>
+            </ol>
+            <p
+              v-else
+              class="home-bento__none"
+              data-cy="home-rank-none"
+            >
+              {{ rankNone }}
+            </p>
+            <origam-btn
+              :to="ROUTES.HALL_OF_FAME"
+              variant="text"
+              color="primary"
+              padding-inline="3"
+              class="home-bento__more"
+              data-cy="home-rank-more"
+            >
+              <template #default>
+                {{ rankMore }} <span
+                class="home-bento__arrow"
+                aria-hidden="true"
+              >{{ arrow }}</span>
+              </template>
+            </origam-btn>
+          </div>
         </template>
       </origam-card>
       <origam-card
@@ -182,9 +200,14 @@
         data-cy="home-tile-head-to-head"
       >
         <template #default>
-          <span class="home-bento__eyebrow">{{ headEyebrow }}</span>
-          <span class="home-bento__question font-display">{{ headQuestion }}</span>
-          <span class="home-bento__label">{{ headAction }} <span aria-hidden="true">{{ arrow }}</span></span>
+          <div class="home-bento__tile-body home-bento__tile-body--rule">
+            <span class="home-bento__eyebrow">{{ headEyebrow }}</span>
+            <span class="home-bento__question font-display">{{ headQuestion }}</span>
+            <span class="home-bento__label">{{ headAction }} <span
+                class="home-bento__arrow"
+                aria-hidden="true"
+              >{{ arrow }}</span></span>
+          </div>
         </template>
       </origam-card>
     </div>
@@ -306,6 +329,10 @@ defineExpose({})
 .home-bento {
   padding-block: var(--home-bento---padding-block, var(--origam-space---20) 0);
 
+  &__arrow {
+    margin-inline-start: var(--origam-space---2);
+  }
+
   &__head {
     display: flex;
     flex-wrap: wrap;
@@ -332,6 +359,7 @@ defineExpose({})
   }
 
   &__tile {
+    display: grid;
     padding: var(--home-bento---tile-padding, var(--origam-space---6));
     text-decoration: none;
 
@@ -344,11 +372,28 @@ defineExpose({})
     &--rule { grid-area: rule; }
   }
 
-  &__stat {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--origam-space---3);
+  &__tile-body {
+    height: 100%;
+
+    &--stat,
+    &--rule {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--origam-space---3);
+    }
+
+    &--champion {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--origam-space---2);
+    }
+
+    &--rank {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   &__number {
@@ -375,10 +420,6 @@ defineExpose({})
   }
 
   &__tile--champion {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--origam-space---2);
     overflow: hidden;
     background:
       radial-gradient(28rem 16rem at 100% 0%, color-mix(in srgb, var(--origam-color__bar---neon) 30%, transparent), transparent 70%),
@@ -418,11 +459,6 @@ defineExpose({})
     fill: var(--origam-color__surface---default);
   }
 
-  &__tile--rank {
-    display: flex;
-    flex-direction: column;
-  }
-
   &__rank {
     display: grid;
     gap: var(--origam-space---2);
@@ -441,6 +477,10 @@ defineExpose({})
     background: var(--origam-color__surface---sunken);
   }
 
+  &__rank-link {
+    justify-self: start;
+  }
+
   &__rank-number {
     font-size: var(--origam-font__size---2xl);
     color: var(--origam-color__action--secondary---fgSubtle);
@@ -457,10 +497,6 @@ defineExpose({})
   }
 
   &__tile--rule {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--origam-space---3);
     border-color: transparent;
 
     .home-bento__eyebrow,

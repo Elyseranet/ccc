@@ -47,7 +47,10 @@
             data-cy="home-cta-primary"
           >
             <template #default>
-              {{ primaryText }} <span aria-hidden="true">{{ arrow }}</span>
+              {{ primaryText }} <span
+                class="home-hero__arrow"
+                aria-hidden="true"
+              >{{ arrow }}</span>
             </template>
           </origam-btn>
           <origam-btn
@@ -134,6 +137,10 @@ defineExpose({})
   isolation: isolate;
   overflow: hidden;
   padding-block: var(--home-hero---padding-block, var(--origam-space---12) var(--origam-space---16));
+
+  &__arrow {
+    margin-inline-start: var(--origam-space---2);
+  }
 
   &__grid {
     position: relative;

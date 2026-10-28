@@ -6,105 +6,111 @@
     data-cy="home-current"
   >
     <template #default>
-      <div class="home-current__head">
-        <origam-title
-          id="home-current-title"
-          tag="h3"
-          font-size="xl"
-          font-weight="bold"
-          line-height="tight"
-          :text="title"
-        />
-        <origam-chip
-          v-if="hasCurrent"
-          color="secondary"
-          bg-color="secondary"
-          size="small"
-          pill
-          data-cy="home-current-status"
-          :text="statusText"
-        />
-      </div>
-      <p
-        v-if="!hasCurrent"
-        class="home-current__empty"
-        data-cy="home-current-none"
-      >
-        {{ noneText }}
-      </p>
-      <template v-if="hasProgress">
-        <origam-progress
-          :model-value="percent"
-          color="primary"
-          rounded
-          class="home-current__progress"
-          :label="progressLabel"
-          data-cy="home-current-progress"
-        />
+      <div class="home-current__body">
+        <div class="home-current__head">
+          <origam-title
+            id="home-current-title"
+            tag="h3"
+            font-size="xl"
+            font-weight="bold"
+            line-height="tight"
+            letter-spacing="normal"
+            :text="title"
+          />
+          <origam-chip
+            v-if="hasCurrent"
+            color="secondary"
+            bg-color="secondary"
+            size="small"
+            pill
+            data-cy="home-current-status"
+            :text="statusText"
+          />
+        </div>
         <p
-          class="home-current__meta num"
-          data-cy="home-current-meta"
+          v-if="!hasCurrent"
+          class="home-current__empty"
+          data-cy="home-current-none"
         >
-          {{ metaText }}
+          {{ noneText }}
         </p>
-      </template>
-      <origam-list
-        v-if="hasScores"
-        density="comfortable"
-        rounded="lg"
-        class="home-current__results"
-        aria-labelledby="home-current-title"
-        data-cy="home-current-scores"
-      >
-        <template #default>
-          <origam-list-item
-            v-for="score in scores"
-            :key="score.id"
-            class="home-current__result"
-            data-cy="home-current-score"
+        <template v-if="hasProgress">
+          <origam-progress
+            :model-value="percent"
+            color="primary"
+            rounded
+            class="home-current__progress"
+            :label="progressLabel"
+            data-cy="home-current-progress"
+          />
+          <p
+            class="home-current__meta num"
+            data-cy="home-current-meta"
           >
-            <template #default>
-              <span class="home-current__player home-current__player--win">
-                <player-link :competitor="score.winner" />
-              </span>
-              <span class="home-current__score num font-display">
-                {{ score.winnerScore }}<span
-                  class="home-current__sep"
-                  aria-hidden="true"
-                >{{ separator }}</span>{{ score.loserScore }}
-              </span>
-              <span class="home-current__player">
-                <player-link :competitor="score.loser" />
-              </span>
-              <origam-chip
-                v-if="score.poolText"
-                size="small"
-                pill
-                class="home-current__pool"
-                :text="score.poolText"
-              />
-            </template>
-          </origam-list-item>
+            {{ metaText }}
+          </p>
         </template>
-      </origam-list>
-      <p
-        v-else-if="hasCurrent"
-        class="home-current__empty"
-        data-cy="home-current-no-scores"
-      >
-        {{ noScoresText }}
-      </p>
-      <origam-btn
-        v-if="hasCurrent"
-        :to="matchesTo"
-        variant="text"
-        class="home-current__more"
-        data-cy="home-current-more"
-      >
-        <template #default>
-          {{ moreText }} <span aria-hidden="true">{{ arrow }}</span>
-        </template>
-      </origam-btn>
+        <origam-list
+          v-if="hasScores"
+          density="comfortable"
+          rounded="lg"
+          class="home-current__results"
+          aria-labelledby="home-current-title"
+          data-cy="home-current-scores"
+        >
+          <template #default>
+            <origam-list-item
+              v-for="score in scores"
+              :key="score.id"
+              class="home-current__result"
+              data-cy="home-current-score"
+            >
+              <template #default>
+                <span class="home-current__player home-current__player--win">
+                  <player-link :competitor="score.winner" />
+                </span>
+                <span class="home-current__score num font-display">
+                  {{ score.winnerScore }}<span
+                    class="home-current__sep"
+                    aria-hidden="true"
+                  >{{ separator }}</span>{{ score.loserScore }}
+                </span>
+                <span class="home-current__player">
+                  <player-link :competitor="score.loser" />
+                </span>
+                <origam-chip
+                  v-if="score.poolText"
+                  size="small"
+                  pill
+                  class="home-current__pool"
+                  :text="score.poolText"
+                />
+              </template>
+            </origam-list-item>
+          </template>
+        </origam-list>
+        <p
+          v-else-if="hasCurrent"
+          class="home-current__empty"
+          data-cy="home-current-no-scores"
+        >
+          {{ noScoresText }}
+        </p>
+        <origam-btn
+          v-if="hasCurrent"
+          :to="matchesTo"
+          variant="text"
+          class="home-current__more"
+          data-cy="home-current-more"
+        >
+          <template #default>
+            {{ moreText }} <span
+                class="home-current__arrow"
+                aria-hidden="true"
+              >{{ arrow }}</span>
+          </template>
+        </origam-btn>
+      </div>
     </template>
   </origam-card>
 </template>
@@ -190,9 +196,18 @@ defineExpose({})
 
 <style scoped lang="scss">
 .home-current {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   padding: var(--home-current---padding, var(--origam-space---6));
+
+  &__arrow {
+    margin-inline-start: var(--origam-space---2);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 
   &__head {
     display: flex;
