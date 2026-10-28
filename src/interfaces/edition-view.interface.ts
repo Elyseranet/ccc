@@ -1,5 +1,6 @@
 import type { DRAW_STATUS } from '../enums/draw.enum.js'
 import type { EDITION_CHIP_FAMILY, EDITION_STEP_STATE } from '../enums/edition-tab.enum.js'
+import type { MATCH_STATUS } from '../enums/match.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 import type { ITranslatableText } from './common-components.interface.js'
@@ -95,7 +96,73 @@ export interface IEditionDrawsProps {
   roundDraws: IEditionDrawView[]
 }
 
-export interface IEditionUpcomingProps {
-  heading: ITranslatableText
-  dataCy: string
+export interface IEditionPoolRow {
+  participationId: string
+  competitor: TEditionPerson
+  rank: number
+  played: number
+  wins: number
+  losses: number
+  pointsFor: number
+  pointsAgainst: number
+  capsAverage: number
+  qualified: boolean
+}
+
+export interface IEditionPoolTable {
+  id: string
+  rank: number
+  rows: IEditionPoolRow[]
+}
+
+export interface IEditionBracketSide {
+  participationId: string
+  competitor: TEditionPerson
+  score: number | null
+  isWinner: boolean
+}
+
+export interface IEditionBracketMatch {
+  id: string
+  sides: IEditionBracketSide[]
+}
+
+export interface IEditionBracketRound {
+  kind: ROUND_KIND
+  matches: IEditionBracketMatch[]
+}
+
+export interface IEditionMatchRow {
+  id: string
+  sequence: number
+  number: string
+  roundKind: ROUND_KIND
+  poolRank: number | null
+  isTiebreak: boolean
+  first: TEditionPerson | null
+  second: TEditionPerson | null
+  firstScore: number | null
+  secondScore: number | null
+  hasWinner: boolean
+  status: MATCH_STATUS
+}
+
+export interface IEditionMatchFilterCounts {
+  all: number
+  pools: number
+  knockout: number
+}
+
+export interface IEditionGroupsProps {
+  tables: IEditionPoolTable[]
+}
+
+export interface IEditionBracketProps {
+  rounds: IEditionBracketRound[]
+}
+
+export interface IEditionMatchesProps {
+  rows: IEditionMatchRow[]
+  counts: IEditionMatchFilterCounts
+  code: string
 }

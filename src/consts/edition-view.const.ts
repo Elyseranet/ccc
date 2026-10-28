@@ -1,5 +1,7 @@
 import { DRAW_STATUS } from '../enums/draw.enum.js'
-import { EDITION_CHIP_FAMILY, EDITION_STEP_STATE, EDITION_TAB } from '../enums/edition-tab.enum.js'
+import { MATCH_STATUS } from '../enums/match.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
+import { EDITION_CHIP_FAMILY, EDITION_MATCH_FILTER, EDITION_STEP_STATE, EDITION_TAB } from '../enums/edition-tab.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
@@ -17,8 +19,8 @@ export const EDITION_TABS: Array<{ value: EDITION_TAB, label: ITranslatableText,
   { value: EDITION_TAB.MATCHES, label: { key: 'edition.tab_matches', fallback: 'Matchs' }, dataCy: 'edition-tab-matches' }
 ]
 
-/** Onglets dont le contenu arrive avec F-03b : un état « à venir » les remplace dans F-03a. */
-export const EDITION_UPCOMING_TABS: EDITION_TAB[] = [EDITION_TAB.POOLS, EDITION_TAB.BRACKET, EDITION_TAB.MATCHES]
+/** Sous cette largeur, les tableaux passent en lecture mobile sans perte d'information (même réglage que le face-à-face). */
+export const EDITION_TABLE_BREAKPOINT = 1
 
 /** Statut de l'édition dans l'en-tête : libellé court et famille de pastille (recette des chips, mapping.md F-13). */
 export const EDITION_HERO_STATUS: Record<EDITION_STATUS, { label: ITranslatableText, family: EDITION_CHIP_FAMILY }> = {
@@ -112,4 +114,24 @@ export const EDITION_DRAW_STATUS_VIEW: Record<DRAW_STATUS, { family: EDITION_CHI
     pools: { key: 'edition.draws_status_draft', fallback: 'Brouillon' },
     round: { key: 'edition.draws_status_draft', fallback: 'Brouillon' }
   }
+}
+
+/** Tours du tableau, dans l'ordre de la phase finale. Le tour des poules n'en fait pas partie. */
+export const EDITION_BRACKET_ROUND_ORDER: ROUND_KIND[] = [ROUND_KIND.PLAYOFF, ROUND_KIND.ROUND_OF_16, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL]
+
+export const EDITION_MATCHES_PAGE_SIZE = 16
+export const EDITION_MATCHES_PAGINATION_VISIBLE = 4
+
+export const EDITION_MATCH_FILTERS: Array<{ value: EDITION_MATCH_FILTER, label: ITranslatableText, dataCy: string }> = [
+  { value: EDITION_MATCH_FILTER.ALL, label: { key: 'edition.matches_filter_all', fallback: 'Tous' }, dataCy: 'edition-matches-filter-all' },
+  { value: EDITION_MATCH_FILTER.POOLS, label: { key: 'edition.matches_filter_pools', fallback: 'Poules' }, dataCy: 'edition-matches-filter-pools' },
+  { value: EDITION_MATCH_FILTER.KNOCKOUT, label: { key: 'edition.matches_filter_knockout', fallback: 'Phase finale' }, dataCy: 'edition-matches-filter-knockout' }
+]
+
+/** Statut d'un match public : pastille. Un score saisi mais non validé compte comme « à jouer » (jamais public). */
+export const EDITION_MATCH_STATUS_VIEW: Record<MATCH_STATUS, { label: ITranslatableText, family: EDITION_CHIP_FAMILY }> = {
+  [MATCH_STATUS.VALIDATED]: { label: { key: 'edition.match_status_validated', fallback: 'Validé' }, family: EDITION_CHIP_FAMILY.TINTED_SUCCESS },
+  [MATCH_STATUS.RESULT_UNKNOWN]: { label: { key: 'edition.match_status_unknown', fallback: 'Résultat inconnu' }, family: EDITION_CHIP_FAMILY.TINTED_INFO },
+  [MATCH_STATUS.SCHEDULED]: { label: { key: 'edition.match_status_scheduled', fallback: 'À jouer' }, family: EDITION_CHIP_FAMILY.NEUTRAL },
+  [MATCH_STATUS.RECORDED]: { label: { key: 'edition.match_status_scheduled', fallback: 'À jouer' }, family: EDITION_CHIP_FAMILY.NEUTRAL }
 }

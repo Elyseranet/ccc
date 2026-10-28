@@ -69,9 +69,9 @@ describe('table PAGE_DELIVERY', () => {
     }
   })
 
-  it('seule la page Plus de l’admin est livrée (T-LIVE-01), toutes les autres sont masquées en production', () => {
+  it('seules la page Plus de l’admin (T-LIVE-01) et la page Édition (F-03) sont livrées, toutes les autres sont masquées en production', () => {
     const delivered = Object.entries(PAGE_DELIVERY).filter(([, page]) => page.delivered).map(([route]) => route)
-    expect(delivered).toEqual([ROUTES.ADMIN_MORE])
+    expect(delivered.sort()).toEqual([ROUTES.ADMIN_MORE, ROUTES.EDITION].sort())
   })
 })
 

@@ -74,14 +74,17 @@
                 :round-draws="roundDraws"
               />
             </origam-tab-panel>
-            <origam-tab-panel
-              v-for="upcoming in upcomingPanels"
-              :key="upcoming.value"
-              :value="upcoming.value"
-            >
-              <edition-upcoming
-                :heading="upcoming.heading"
-                :data-cy="upcoming.dataCy"
+            <origam-tab-panel :value="poolsTab">
+              <edition-groups :tables="poolTables" />
+            </origam-tab-panel>
+            <origam-tab-panel :value="bracketTab">
+              <edition-bracket :rounds="bracket" />
+            </origam-tab-panel>
+            <origam-tab-panel :value="matchesTab">
+              <edition-matches
+                :rows="matchRows"
+                :counts="matchCounts"
+                :code="code"
               />
             </origam-tab-panel>
           </origam-tab-panels>
@@ -96,16 +99,18 @@ import { computed } from 'vue'
 import { OrigamTab, OrigamTabPanel, OrigamTabPanels, OrigamTabs } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPageHero from '~/components/common/PageHero.vue'
+import EditionBracket from '~/components/edition/EditionBracket.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import EditionDraws from '~/components/edition/EditionDraws.vue'
+import EditionGroups from '~/components/edition/EditionGroups.vue'
+import EditionMatches from '~/components/edition/EditionMatches.vue'
 import EditionParticipants from '~/components/edition/EditionParticipants.vue'
 import EditionSelector from '~/components/edition/EditionSelector.vue'
 import EditionSummary from '~/components/edition/EditionSummary.vue'
-import EditionUpcoming from '~/components/edition/EditionUpcoming.vue'
 import { useEditionTabs } from '~/composables/useEditionTabs'
 import { useEditionView } from '~/composables/useEditionView'
 import { useT } from '~/composables/useT'
-import { EDITION_TABS, EDITION_UPCOMING_TABS } from '~/consts/edition-view.const'
+import { EDITION_TABS } from '~/consts/edition-view.const'
 import { ROUTES } from '~/consts/routes.const'
 import { EDITION_TAB } from '~/enums/edition-tab.enum'
 import type { IBreadcrumbEntry, ITranslatableText } from '~/interfaces/common-components.interface'
@@ -115,8 +120,7 @@ import type { IBreadcrumbEntry, ITranslatableText } from '~/interfaces/common-co
  *
  * @description
  * Édition : en-tête (statut, chiffres, sélecteur), puis six onglets. L'URL porte le `code` de l'édition (R-9) et
- * `?onglet=` ; changer d'édition garde l'onglet. Synthèse, Participants et Tirages sont rendus par F-03a ; Poules,
- * Bracket et Matchs montrent un état « à venir » en attendant F-03b.
+ * `?onglet=` ; changer d'édition garde l'onglet.
  ********************************************************/
 definePageMeta({ layout: 'default' })
 const { t } = useT()
@@ -133,7 +137,7 @@ useHead({ title: computed(() => t('edition.page_title', 'Édition {code}', { cod
  * @description
  * La page ne fait que brancher `useEditionView` (mise en forme testée en unitaire) sur les composants.
  ********************************************************/
-const { pending, pageError, refresh, heroMeta: meta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, options } = await useEditionView(code)
+const { pending, pageError, refresh, heroMeta: meta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, poolTables, bracket, matchRows, matchCounts, options } = await useEditionView(code)
 const { activeTab } = useEditionTabs()
 const poolsStatus = computed(() => poolsDraw.value?.status ?? null)
 const hasOptions = computed(() => options.value.length > 0)
@@ -169,9 +173,9 @@ const tabs = computed(() => EDITION_TABS.map(tab => ({ value: tab.value, text: t
 const summaryTab = EDITION_TAB.SUMMARY
 const participantsTab = EDITION_TAB.PARTICIPANTS
 const drawsTab = EDITION_TAB.DRAWS
-const upcomingPanels = computed(() => EDITION_TABS
-  .filter(tab => EDITION_UPCOMING_TABS.includes(tab.value))
-  .map(tab => ({ value: tab.value, dataCy: `${tab.dataCy}-upcoming`, heading: tab.label })))
+const poolsTab = EDITION_TAB.POOLS
+const bracketTab = EDITION_TAB.BRACKET
+const matchesTab = EDITION_TAB.MATCHES
 
 /*********************************************************
  * Expose

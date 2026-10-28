@@ -5,7 +5,6 @@ import EditionDraws from '~/components/edition/EditionDraws.vue'
 import EditionParticipants from '~/components/edition/EditionParticipants.vue'
 import EditionSelector from '~/components/edition/EditionSelector.vue'
 import EditionSummary from '~/components/edition/EditionSummary.vue'
-import EditionUpcoming from '~/components/edition/EditionUpcoming.vue'
 import { DRAW_STATUS } from '~/enums/draw.enum'
 import { EDITION_CHIP_FAMILY, EDITION_STEP_STATE } from '~/enums/edition-tab.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
@@ -85,13 +84,5 @@ describe('EditionSelector', () => {
     })
     expect(wrapper.find('[data-cy="edition-selector"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Changer d’édition')
-  })
-})
-
-describe('EditionUpcoming', () => {
-  it('état « à venir » traduit', async () => {
-    const wrapper = await mountSuspended(EditionUpcoming, { props: { heading: { key: 'edition.tab_pools', fallback: 'Poules' }, dataCy: 'edition-tab-pools-upcoming' } })
-    expect(wrapper.text()).toContain('Bientôt disponible')
-    expect(wrapper.find('[data-cy="edition-tab-pools-upcoming"]').exists()).toBe(true)
   })
 })

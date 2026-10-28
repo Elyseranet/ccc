@@ -1,5 +1,6 @@
 import { CENTS_PER_POINT, POINTS_BASE_SCALE, POINTS_REFERENCE_PARTICIPANTS } from '../consts/domain-rules.const.js'
 import {
+  EDITION_BRACKET_ROUND_ORDER,
   EDITION_FINAL_STAGE_LABELS,
   EDITION_HERO_STATUS,
   EDITION_PARTICIPATION_STATUS_LABELS,
@@ -10,20 +11,25 @@ import {
   EDITION_TAB_VALUES
 } from '../consts/edition-view.const.js'
 import { DRAW_KIND } from '../enums/draw.enum.js'
-import { EDITION_CHIP_FAMILY, EDITION_STEP_STATE } from '../enums/edition-tab.enum.js'
+import { MATCH_PURPOSE } from '../enums/match.enum.js'
+import { EDITION_CHIP_FAMILY, EDITION_MATCH_FILTER, EDITION_STEP_STATE } from '../enums/edition-tab.enum.js'
 import type { EDITION_TAB } from '../enums/edition-tab.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
-import { FINAL_STAGE } from '../enums/participation.enum.js'
+import { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import type { IEditionDetail, IEditionSummary } from '../interfaces/edition.interface.js'
 import type {
+  IEditionBracketRound,
   IEditionDrawView,
   IEditionFact,
   IEditionHeroMeta,
+  IEditionMatchFilterCounts,
+  IEditionMatchRow,
   IEditionOption,
   IEditionParticipantRow,
   IEditionPodium,
+  IEditionPoolTable,
   IEditionSeedRow,
   IEditionStep
 } from '../interfaces/edition-view.interface.js'
@@ -223,4 +229,101 @@ export const currentEditionCode = (editions: Array<Pick<IEditionSummary, 'code' 
   }
   const sorted = [...editions].sort((a, b) => b.year - a.year || b.code.localeCompare(a.code))
   return (sorted.find(edition => edition.status !== EDITION_STATUS.CLOSED) ?? sorted[0] as typeof sorted[number]).code
+}
+
+/** Un participant est qualifié s'il a dépassé les poules (édition close) ou si son statut le dit (édition en cours). RG18 : le nombre vient des données. */
+const isQualified = (participant: IEditionDetail['participants'][number] | undefined): boolean => {
+  if (!participant) {
+    return false
+  }
+  if (participant.finalStage !== null) {
+    return participant.finalStage !== FINAL_STAGE.POOL_ELIMINATED
+  }
+  return participant.status === PARTICIPATION_STATUS.QUALIFIED || participant.status === PARTICIPATION_STATUS.WINNER
+}
+
+/** Classements de poule (RG19) : l'ordre est celui de l'API (victoires, cap's average, confrontation), jamais recalculé. */
+export const buildEditionPoolTables = (detail: IEditionDetail): IEditionPoolTable[] => {
+  const participants = new Map(detail.participants.map(participant => [participant.participationId, participant]))
+  return [...detail.pools]
+    .sort((a, b) => a.rank - b.rank)
+    .map(pool => ({
+      id: pool.id,
+      rank: pool.rank,
+      rows: [...pool.standing]
+        .sort((a, b) => a.rank - b.rank)
+        .map(row => ({
+          participationId: row.participationId,
+          competitor: toPerson(row.competitor),
+          rank: row.rank,
+          played: row.played,
+          wins: row.wins,
+          losses: row.losses,
+          pointsFor: row.pointsFor,
+          pointsAgainst: row.pointsAgainst,
+          capsAverage: row.capsAverage,
+          qualified: isQualified(participants.get(row.participationId))
+        }))
+    }))
+}
+
+/** Tableau : seulement les tours que l'API publie (B-18), jamais un tour vide inventé. Un score non validé n'est jamais public. */
+export const buildEditionBracket = (detail: IEditionDetail): IEditionBracketRound[] => EDITION_BRACKET_ROUND_ORDER
+  .map(kind => ({ kind, matches: detail.bracket.filter(round => round.kind === kind).flatMap(round => round.matches) }))
+  .filter(round => round.matches.length > 0)
+  .map(round => ({
+    kind: round.kind,
+    matches: round.matches.map(match => ({
+      id: match.id,
+      sides: match.sides.map(side => ({
+        participationId: side.participationId,
+        competitor: { id: side.competitorId, displayName: side.displayName },
+        score: side.score,
+        isWinner: match.winnerParticipationId !== null && side.participationId === match.winnerParticipationId
+      }))
+    }))
+  }))
+
+/** Matchs, du plus récent au plus ancien. N° = `{code}-{rang}` (RG24) ; vainqueur en premier quand il y en a un. */
+export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[] => [...detail.matches]
+  .sort((a, b) => b.sequence - a.sequence)
+  .map((match) => {
+    const winner = match.sides.find(side => side.participationId === match.winnerParticipationId)
+    const first = winner ?? match.sides[0]
+    const second = match.sides.find(side => side !== first)
+    const scored = (side: IEditionDetail['matches'][number]['sides'][number] | undefined): number | null => (match.winnerParticipationId !== null && side ? side.score : null)
+    return {
+      id: match.id,
+      sequence: match.sequence,
+      number: `${detail.code}-${match.sequence}`,
+      roundKind: match.roundKind,
+      poolRank: match.poolRank,
+      isTiebreak: match.purpose === MATCH_PURPOSE.TIEBREAK,
+      first: first ? { id: first.competitorId, displayName: first.displayName } : null,
+      second: second ? { id: second.competitorId, displayName: second.displayName } : null,
+      firstScore: scored(first),
+      secondScore: scored(second),
+      hasWinner: winner !== undefined,
+      status: match.status
+    }
+  })
+
+export const editionMatchFilterCounts = (rows: Array<Pick<IEditionMatchRow, 'roundKind'>>): IEditionMatchFilterCounts => ({
+  all: rows.length,
+  pools: rows.filter(row => row.roundKind === ROUND_KIND.POOLS).length,
+  knockout: rows.filter(row => row.roundKind !== ROUND_KIND.POOLS).length
+})
+
+export const filterEditionMatchRows = <T extends Pick<IEditionMatchRow, 'roundKind'>>(rows: T[], filter: EDITION_MATCH_FILTER): T[] => {
+  if (filter === EDITION_MATCH_FILTER.POOLS) {
+    return rows.filter(row => row.roundKind === ROUND_KIND.POOLS)
+  }
+  return filter === EDITION_MATCH_FILTER.KNOCKOUT ? rows.filter(row => row.roundKind !== ROUND_KIND.POOLS) : rows
+}
+
+/** Page `page` (1 pour la première) de `pageSize` éléments, bornée aux pages existantes. */
+export const pageSlice = <T>(items: T[], page: number, pageSize: number): { items: T[], page: number, pageCount: number } => {
+  const pageCount = Math.max(1, Math.ceil(items.length / pageSize))
+  const current = Math.min(Math.max(1, page), pageCount)
+  return { items: items.slice((current - 1) * pageSize, current * pageSize), page: current, pageCount }
 }
