@@ -5,6 +5,7 @@ import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-c
 import { BaseService } from './base.service.js'
 import { QueryFailedError } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
+import { PUBLIC_ROUND_STATUSES } from '../consts/match-score.const.js'
 import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { MatchSideEntity } from '../server/db/typeorm/entities/match-side.entity.js'
@@ -97,6 +98,7 @@ const loadRegularMatches = async (db: DataSource, competitorId?: string): Promis
     .select(['m.id', 'm.status', 'm.purpose', 'm.sequence', 's.id', 's.participationId', 's.validatedScore', 'p.id', 'p.competitorId', 'e.id', 'e.code', 'e.chronologicalRank', 'r.id', 'r.kind', 'po.id', 'po.rank'])
     .where('m.purpose = :purpose', { purpose: MATCH_PURPOSE.REGULAR })
     .andWhere('m.status IN (:...statuses)', { statuses: STATS_MATCH_STATUSES })
+    .andWhere('r.status IN (:...roundStatuses)', { roundStatuses: PUBLIC_ROUND_STATUSES })
     .orderBy('e.chronologicalRank', 'ASC')
     .addOrderBy('m.sequence', 'ASC')
     .addOrderBy('s.position', 'ASC')

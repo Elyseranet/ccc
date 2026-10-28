@@ -15,6 +15,7 @@ import { MATCH_STATUS } from '../enums/match.enum.js'
 import type { IDraw } from '../interfaces/draw.interface.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
 import { EDITION_COMPUTED_UNIQUE_CONSTRAINTS, EDITION_CREATION_LOCK_KEY, MATCH_PUBLIC_RELATIONS, PARTICIPANT_EDITABLE_STATUSES } from '../consts/edition.const.js'
+import { PUBLIC_ROUND_STATUSES } from '../consts/match-score.const.js'
 import { PG_UNIQUE_VIOLATION } from '../consts/invitation.const.js'
 import { InvitationEntity } from '../server/db/typeorm/entities/invitation.entity.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
@@ -96,13 +97,14 @@ export const loadParticipations = (dataSource: DataSource, editionId: string): P
 export const loadPoolEntities = (dataSource: DataSource, editionId: string): Promise<PoolEntity[]> =>
   dataSource.getRepository(PoolEntity).find({ where: { editionId }, order: { rank: 'ASC' } })
 
+/** Tours publics d'une édition (B-18) : un tour PENDING n'est pas encore tiré, il n'est pas publié. */
 export const loadRoundEntities = (dataSource: DataSource, editionId: string): Promise<RoundEntity[]> =>
-  dataSource.getRepository(RoundEntity).find({ where: { editionId }, order: { sequence: 'ASC' } })
+  dataSource.getRepository(RoundEntity).find({ where: { editionId, status: In(PUBLIC_ROUND_STATUSES) }, order: { sequence: 'ASC' } })
 
-/** Tous les matchs d'une édition, avec de quoi construire le DTO public. */
+/** Tous les matchs publics d'une édition (ceux des tours non PENDING, B-18), avec de quoi construire le DTO public. */
 export const loadEditionMatches = (dataSource: DataSource, editionId: string): Promise<MatchEntity[]> =>
   dataSource.getRepository(MatchEntity).find({
-    where: { editionId },
+    where: { editionId, round: { status: In(PUBLIC_ROUND_STATUSES) } },
     relations: MATCH_PUBLIC_RELATIONS,
     order: { sequence: 'ASC' }
   })
@@ -116,7 +118,7 @@ export const loadPublicMatchPage = async (
   const [matches, total] = await dataSource.getRepository(MatchEntity).findAndCount({
     where: {
       editionId,
-      ...(roundKind ? { round: { kind: roundKind } } : {}),
+      round: { status: In(PUBLIC_ROUND_STATUSES), ...(roundKind ? { kind: roundKind } : {}) },
       ...(poolRank === undefined ? {} : { pool: { rank: poolRank } }),
       ...(statuses ? { status: In(statuses.flatMap(toStoredMatchStatuses)) } : {})
     },
@@ -149,11 +151,13 @@ export const loadValidatedDraws = async (dataSource: DataSource, editionId: stri
 
 const loadMatchCounts = async (dataSource: DataSource, editionIds: string[]): Promise<Map<string, IEditionMatchCounts>> => {
   const rows = await dataSource.getRepository(MatchEntity).createQueryBuilder('m')
+    .innerJoin('m.round', 'r')
     .select('m.editionId', 'edition_id')
     .addSelect('COUNT(*)', 'total')
     .addSelect('COUNT(*) FILTER (WHERE m.status = :validated)', 'scored')
     .addSelect('COUNT(*) FILTER (WHERE m.status = :unknown)', 'unknown')
     .where('m.editionId IN (:...editionIds)', { editionIds })
+    .andWhere('r.status IN (:...roundStatuses)', { roundStatuses: PUBLIC_ROUND_STATUSES })
     .setParameters({ validated: MATCH_STATUS.VALIDATED, unknown: MATCH_STATUS.RESULT_UNKNOWN })
     .groupBy('m.editionId')
     .getRawMany<{ edition_id: string, total: string, scored: string, unknown: string }>()
@@ -201,7 +205,7 @@ const loadFinals = async (dataSource: DataSource, editionIds: string[]): Promise
     order: { id: 'ASC' }
   })
   const finalMatches = await dataSource.getRepository(MatchEntity).find({
-    where: { editionId: In(editionIds), round: { kind: ROUND_KIND.FINAL }, status: MATCH_STATUS.VALIDATED },
+    where: { editionId: In(editionIds), round: { kind: ROUND_KIND.FINAL, status: In(PUBLIC_ROUND_STATUSES) }, status: MATCH_STATUS.VALIDATED },
     relations: { sides: true },
     order: { sequence: 'DESC' }
   })
@@ -277,8 +281,8 @@ export const loadArchiveStats = async (dataSource: DataSource): Promise<IArchive
   const [editions, competitors, scoredMatches, unknownResultMatches] = await Promise.all([
     dataSource.getRepository(EditionEntity).count(),
     dataSource.getRepository(CompetitorEntity).count(),
-    dataSource.getRepository(MatchEntity).countBy({ status: MATCH_STATUS.VALIDATED }),
-    dataSource.getRepository(MatchEntity).countBy({ status: MATCH_STATUS.RESULT_UNKNOWN })
+    dataSource.getRepository(MatchEntity).countBy({ status: MATCH_STATUS.VALIDATED, round: { status: In(PUBLIC_ROUND_STATUSES) } }),
+    dataSource.getRepository(MatchEntity).countBy({ status: MATCH_STATUS.RESULT_UNKNOWN, round: { status: In(PUBLIC_ROUND_STATUSES) } })
   ])
   return { editions, competitors, matches: scoredMatches + unknownResultMatches, scoredMatches, unknownResultMatches }
 }
@@ -299,12 +303,18 @@ export const loadEditionContentStamp = async (
   edition: EditionEntity
 ): Promise<IEditionContentStamp> => {
   const publicStatuses = In([MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN])
+  const publicRound = { status: In(PUBLIC_ROUND_STATUSES) }
   const matchRepo = dataSource.getRepository(MatchEntity)
   const drawRepo = dataSource.getRepository(DrawEntity)
-  const [lastMatchValidatedAt, publicMatchCount, lastDrawValidatedAt, participationCount, lastCompetitorUpdatedAt] = await Promise.all([
-    maxOf(matchRepo.createQueryBuilder('m').select('MAX(m.validatedAt)', 'latest')
-      .where({ editionId: edition.id, status: publicStatuses })),
-    matchRepo.countBy({ editionId: edition.id, status: publicStatuses }),
+  const [lastMatchValidatedAt, publicMatchCount, publicRounds, lastDrawValidatedAt, participationCount, lastCompetitorUpdatedAt] = await Promise.all([
+    maxOf(matchRepo.createQueryBuilder('m').innerJoin('m.round', 'r').select('MAX(m.validatedAt)', 'latest')
+      .where('m.editionId = :editionId AND m.status IN (:...statuses) AND r.status IN (:...roundStatuses)', {
+        editionId: edition.id,
+        statuses: [MATCH_STATUS.VALIDATED, MATCH_STATUS.RESULT_UNKNOWN],
+        roundStatuses: PUBLIC_ROUND_STATUSES
+      })),
+    matchRepo.count({ where: { editionId: edition.id, status: publicStatuses, round: publicRound } }),
+    dataSource.getRepository(RoundEntity).find({ select: { kind: true, status: true }, where: { editionId: edition.id, ...publicRound } }),
     maxOf(drawRepo.createQueryBuilder('d').select('MAX(d.validatedAt)', 'latest')
       .where({ editionId: edition.id, status: DRAW_STATUS.VALIDATED })),
     dataSource.getRepository(ParticipationEntity).countBy({ editionId: edition.id }),
@@ -316,6 +326,8 @@ export const loadEditionContentStamp = async (
     status: edition.status,
     lastMatchValidatedAt,
     publicMatchCount: publicMatchCount,
+    // B-18 : un tour qui passe de PENDING à DRAWN (ou change de statut) rend l'empreinte différente, donc l'ETag aussi.
+    publicRounds: publicRounds.map((round) => `${round.kind}:${round.status}`).sort(),
     lastDrawValidatedAt,
     participationCount,
     generalInfo: [edition.name, edition.heldOn, edition.location, edition.description],

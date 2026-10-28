@@ -3,7 +3,8 @@ import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { afterAll, describe, expect, it } from 'vitest'
 import type { ICompetitorDetail, ICompetitorListItem } from '../../src/interfaces/competitor.interface'
-import type { IEditionSummary } from '../../src/interfaces/edition.interface'
+import type { IEditionDetail, IEditionSummary } from '../../src/interfaces/edition.interface'
+import type { IArchiveStats } from '../../src/interfaces/stats.interface'
 import type { IHeadToHead, IHeadToHeadSummary } from '../../src/interfaces/head-to-head.interface'
 import type { IPaginated } from '../../src/interfaces/pagination.interface'
 import { seedArchives } from '../db/helpers/archives'
@@ -156,5 +157,18 @@ describe('B-17 contract on the real archive', async () => {
       expect(edition.final!.score.runnerUp, edition.code).toBeLessThan(10)
     }
     expect(editions.filter((edition) => edition.final!.score !== null).length).toBeGreaterThan(0)
+  })
+
+  it('B-18: the archive has no PENDING round, so the public outputs are unchanged (16 editions, 729 matches)', async () => {
+    const pending = await dataSource.query<Array<{ n: string }>>(`SELECT count(*) AS n FROM rounds WHERE status = 'PENDING'`)
+    expect(Number(pending[0]!.n)).toBe(0)
+    const editions = await getJson<IEditionSummary[]>('/api/v1/editions')
+    expect(editions).toHaveLength(REAL_EDITION_COUNT)
+    expect(editions.reduce((total, edition) => total + edition.matchCount, 0)).toBe(729)
+    const stats = await getJson<IArchiveStats>('/api/v1/stats')
+    expect(stats).toMatchObject({ editions: 16, matches: 729, scoredMatches: 554, unknownResultMatches: 175 })
+    const [first] = editions
+    const detail = await getJson<IEditionDetail>(`/api/v1/editions/${first!.id}`)
+    expect(detail.matches).toHaveLength(first!.matchCount)
   })
 })
