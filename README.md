@@ -88,7 +88,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
 | `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
-| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). |
+| `NUXT_AUTH_ALLOWED_ORIGINS` | non (vide) | Origines supplémentaires autorisées en écriture, séparées par des virgules (B-08). Derrière le proxy de Coolify, l'origine propre du serveur est reconstruite depuis l'en-tête `Host` et `X-Forwarded-Proto` (h3 `getRequestURL`). À vérifier au premier déploiement : si une écriture légitime (connexion, admin) répond 403 `FORBIDDEN_ORIGIN`, poser ici `https://<domaine>`. |
 | `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS` | non (3600) | `Cache-Control` public des lectures d'une édition CLOSED (vague 2). |
 
 Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
