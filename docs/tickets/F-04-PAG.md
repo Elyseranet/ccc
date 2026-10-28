@@ -27,3 +27,8 @@ Ces chiffres diffèrent de ceux du ticket (7,36 % et 66,8 %, mesurés sur la v3 
 - Point 2 (fiche Origam) : `docs/tickets/origam/pagination-pas-de-controle-sans-theme.md` (le numéro du ticket Origam reste à renseigner).
 - Point 3 (correction par thème) : fait pour `density`, `size`, `color` / `bgColor`, jetons existants. Le reste est dans `main.css` (règles à trois classes) faute de prop ou de jeton : précédent / suivant, retour à la ligne, taille du texte, pages inactives.
 - Point 4 : **aucune dérogation de seuil n'est posée** dans le test visuel, la zone passe à 0,000 % aux deux largeurs. Il reste à retirer les règles `main.css` quand Origam livre les props et jetons de la fiche, puis à fermer.
+
+## Point 2026-10-28 (chef de projet) — **laissé ouvert**
+- F-04 est mergé @ `ebf3e94`. La zone de pagination est à 0,000 / 0,000 % grâce au thème et à 6 règles `main.css`, dont un `!important` justifié par la mesure. Aucune dérogation de seuil n'a été posée.
+- Fiche Origam déposée : **#1278**.
+- **Reste** : retirer les règles `main.css` quand Origam livrera les props et jetons. C'est la condition de fermeture.

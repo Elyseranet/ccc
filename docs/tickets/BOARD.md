@@ -193,7 +193,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | En cours (dev-f05), lancé le 2026-10-22 sur develop 67270bd ; routes publiques toutes livrées | worktree de dev-f05 (`agent-a70ac359346e804a8`), branche `feature/F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00, T-QA-03 (zones « en cours ») | En cours (dev-f06), **scindé** le 2026-10-28 : F-03a (page, redirection, PageHero, sélecteur, onglets, Synthèse, Participants, Tirages ; `feature/F-03a`) puis F-03b (Poules, Tableau, Matchs ; `feature/F-03b` après le merge de F-03a) | worktree de dev-f06 |
-| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | En cours (dev-f04) : prérequis F-00q/r/s et T-ARCH-03 mergés (fd76ba2), rebase en cours ; pagination tranchée F-04-PAG (`origam-pagination`, dérogation visuelle de la seule zone, remédiation F-04-PAG.md) ; F-04-ADV : lien « Voir les N adversaires → » validé, au-delà de 4 | `../CCC-F-04` |
+| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | **Mergé, ouvert** @ `ebf3e94` (branche 7d28dcc) ; reste la remesure des zones 2026 après T-QA-03 ; Origam #1278 ; suite F-15 | `../CCC-F-04` |
 | [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | **Fermé** (2026-10-22) : mergé @ `67270bd` (branche abf0653) ; Origam #1267 | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
@@ -357,3 +357,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-05](F-05.md) : **Fermé** — mergé @ `67270bd` ; Origam #1267.
 - [B-18](B-18.md) : ouvert — ne pas publier les tours PENDING (QA-2) ; bloque T-QA-03 et F-01.
 - **F-00t** (cartes cliquables noires au repos, Origam #1276) : **mergé** @ `cb89a56` (branche 33cc2ac). Contrôles : frontend-lead (typecheck 0, test:run 388, Playwright 114, gitleaks propre), chef de projet après le merge (typecheck vert, test:run 388). La vérification de l'opacité calculée dans le navigateur se fera dans les e2e de F-01.
+- [F-04-PAG](F-04-PAG.md) : ouvert — Origam #1278 déposée ; fermeture au retrait des règles `main.css`.
