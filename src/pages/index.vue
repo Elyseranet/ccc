@@ -59,7 +59,7 @@ useHead({ title: computed(() => t('pages.home.title', 'Championnat de Caps')) })
  * @description
  * Sans données (chargement, erreur), le hero reste affiché avec des compteurs à zéro : la pastille du nombre d'éditions est alors masquée.
  ********************************************************/
-const { data: overview, pending, apiError, refresh } = await useHomeOverview()
+const { data: overview, pending, apiError, refresh } = useHomeOverview()
 const archive = computed(() => overview.value?.archive ?? HOME_EMPTY_ARCHIVE)
 const target = computed(() => overview.value?.target ?? null)
 const isEmpty = computed(() => overview.value !== null && overview.value !== undefined && !overview.value.hasEditions)
