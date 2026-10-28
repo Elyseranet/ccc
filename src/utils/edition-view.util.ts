@@ -62,23 +62,18 @@ export const initialsOf = (displayName: string): string => displayName
 
 const toPerson = (person: TEditionPerson): TEditionPerson => ({ id: person.id, displayName: person.displayName })
 
-/** Podium : seulement quand l'édition a un·e champion·ne (RG6). Le score de la finale n'est lu que sur un match validé. */
+/** Podium : seulement quand l'édition a un·e champion·ne (RG6). Finaliste et score de la finale viennent de `final` (B-17), le score seulement sur un match validé. */
 export const buildEditionPodium = (detail: IEditionDetail): IEditionPodium | null => {
   if (!detail.champion) {
     return null
   }
   const champion = detail.champion.competitor
-  const finalMatch = detail.matches.find(match => match.roundKind === ROUND_KIND.FINAL && match.winnerParticipationId !== null)
-  const scores = finalMatch ? finalMatch.sides.map(side => side.score) : []
-  const winnerSide = finalMatch?.sides.find(side => side.participationId === finalMatch.winnerParticipationId)
-  const loserSide = finalMatch?.sides.find(side => side.participationId !== finalMatch.winnerParticipationId)
-  const finalist = detail.participants.find(participant => participant.finalStage === FINAL_STAGE.FINALIST)
   return {
     champion: toPerson(champion),
     titlesToDate: detail.champion.titlesToDate,
-    finalWinnerScore: scores.length > 0 && winnerSide ? winnerSide.score : null,
-    finalLoserScore: scores.length > 0 && loserSide ? loserSide.score : null,
-    finalist: finalist ? toPerson(finalist.competitor) : null,
+    finalWinnerScore: detail.final?.score?.champion ?? null,
+    finalLoserScore: detail.final?.score?.runnerUp ?? null,
+    finalist: detail.final ? toPerson(detail.final.runnerUp) : null,
     semifinalists: detail.participants.filter(participant => participant.finalStage === FINAL_STAGE.SEMI).map(participant => toPerson(participant.competitor))
   }
 }
