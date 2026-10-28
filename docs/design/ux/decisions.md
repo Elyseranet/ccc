@@ -207,3 +207,4 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
     - `buildBracket` (`edition-assemble.util.ts:86-90`) ne filtre pas sur `round.status`, et `ROUND_STATUS` n'est lu par aucun service ;
     - aucun statut existant ne masque les phases finales ;
     - aucun code ne crée de tour hors du dump. Le moment de création des tours en fonctionnement réel n'est donc pas encore défini.
+- **Tours non tirés (décision utilisateur 2026-10-28, B-18)** : en fonctionnement réel, **un tour de phase finale n'existe jamais avant son tirage**. Le tirage d'un tour (B-13) le crée au moment du tirage. Un tour `PENDING` portant des matchs ne vient donc que des données reprises (dump) ou de l'état de test de T-QA-03. B-18 filtre ces tours sans changer le contrat de l'API. Aucun squelette « à tirer » côté front.
