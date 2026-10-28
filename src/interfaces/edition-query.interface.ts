@@ -17,6 +17,8 @@ export interface IEditionContentStamp {
   status: string
   lastMatchValidatedAt: string | null
   publicMatchCount: number
+  /** Tours publics (hors PENDING, B-18) sous la forme `KIND:STATUS`, triés. */
+  publicRounds: string[]
   lastDrawValidatedAt: string | null
   participationCount: number
   /** Informations générales modifiables (PATCH /editions) : un changement de nom doit invalider l'ETag. */

@@ -4,7 +4,7 @@ import { COMPETITOR_ALIAS_SOURCE } from '../../../src/enums/competitor.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
 import { FINAL_STAGE } from '../../../src/enums/participation.enum'
-import { ROUND_KIND } from '../../../src/enums/round.enum'
+import { ROUND_KIND, ROUND_STATUS } from '../../../src/enums/round.enum'
 import { CompetitorAliasEntity } from '../../../src/server/db/typeorm/entities/competitor-alias.entity'
 import { CompetitorEntity } from '../../../src/server/db/typeorm/entities/competitor.entity'
 import { EditionEntity } from '../../../src/server/db/typeorm/entities/edition.entity'
@@ -77,8 +77,8 @@ export const resetAndSeedCompetitors = async (): Promise<{ dataSource: DataSourc
   }
   const lonelyB = await participation(editionB.id, lonely.id)
 
-  const roundA = await dataSource.getRepository(RoundEntity).save({ editionId: editionA.id, kind: ROUND_KIND.POOLS, sequence: 1 })
-  const roundB = await dataSource.getRepository(RoundEntity).save({ editionId: editionB.id, kind: ROUND_KIND.FINAL, sequence: 1 })
+  const roundA = await dataSource.getRepository(RoundEntity).save({ editionId: editionA.id, kind: ROUND_KIND.POOLS, sequence: 1, status: ROUND_STATUS.COMPLETED })
+  const roundB = await dataSource.getRepository(RoundEntity).save({ editionId: editionB.id, kind: ROUND_KIND.FINAL, sequence: 1, status: ROUND_STATUS.COMPLETED })
 
   let sequence = 0
   const match = async (

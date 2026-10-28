@@ -111,9 +111,10 @@ describe('public edition reads (B-06)', async () => {
       expect(byCode).toEqual(byId)
       expect(byId.participants).toHaveLength(4)
       expect(byId.pools).toHaveLength(1)
-      expect(byId.rounds).toHaveLength(2)
+      // B-18 : la finale du jeu de test est PENDING (pas encore tirée), elle n'est donc pas publiée.
+      expect(byId.rounds).toHaveLength(1)
       expect(byId.matches).toHaveLength(3)
-      expect(byId.bracket.map((round) => round.kind)).toEqual([ROUND_KIND.FINAL])
+      expect(byId.bracket).toEqual([])
     })
 
     it('returns 404 for an unknown edition and 400 for a malformed id', async () => {
@@ -163,9 +164,8 @@ describe('public edition reads (B-06)', async () => {
 
     it('exposes round counters (C3)', async () => {
       const rounds = await getJson<IRound[]>(`/api/v1/editions/${live.id}/tours`)
-      expect(rounds.map((round) => round.kind)).toEqual([ROUND_KIND.POOLS, ROUND_KIND.FINAL])
+      expect(rounds.map((round) => round.kind)).toEqual([ROUND_KIND.POOLS])
       expect(rounds[0]).toMatchObject({ matchCount: 3, validatedMatchCount: 1 })
-      expect(rounds[1]).toMatchObject({ matchCount: 0, validatedMatchCount: 0 })
     })
 
     it('lists a unknown result apart from a match to play, and keeps it out of the V/D (R-5)', async () => {

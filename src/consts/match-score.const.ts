@@ -5,6 +5,12 @@ import { ROUND_STATUS } from '../enums/round.enum.js'
 export const OPEN_ROUND_STATUSES: readonly ROUND_STATUS[] = [ROUND_STATUS.DRAWN, ROUND_STATUS.PLAYING]
 
 /**
+ * B-18 : seuls les tours tirés (DRAWN, PLAYING) ou terminés (COMPLETED) sont publics. Un tour PENDING n'est pas encore
+ * tiré (B-13 le crée au tirage) : ni lui ni ses matchs ne sortent de l'API publique. Les routes admin n'utilisent pas ce filtre.
+ */
+export const PUBLIC_ROUND_STATUSES: readonly ROUND_STATUS[] = [ROUND_STATUS.DRAWN, ROUND_STATUS.PLAYING, ROUND_STATUS.COMPLETED]
+
+/**
  * R-3 : pour un match de poule, la qualification est « arrêtée » dès que l'édition a dépassé POOLS_PLAYING.
  * Le statut d'édition est posé par B-13 ; B-12 ne fait que le lire.
  */
