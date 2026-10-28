@@ -202,7 +202,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | À faire | `../CCC-F-08` |
 | [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-09` |
-| [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-16 (avatar) | À faire (débloqué par 37f4c07) | `../CCC-F-10` |
+| [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-09, B-16 (mergés, vague 3a 640842b) | En cours (dev-f05), lancé le 2026-10-28 en attendant B-18 ; T-QA-03 et F-01 repassent devant dès le merge de B-18 | worktree de dev-f05, branche `feature/F-10` |
 | [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00, B-17 (DTO), B-11 (routes) | À faire (créé, FA-09) | `../CCC-F-11` |
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | **Fermé** — squash dans `develop` @ `ef81699` (branche `3d1e91a`) | `../CCC-F-12` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
