@@ -4,7 +4,7 @@
 
 ## Constat
 
-`OrigamChipGroup` repose sur `OrigamSlideGroup` : les puces sont dans `.origam-slide-group__container`, un conteneur flex qui défile sur une seule ligne. Un groupe de filtres qui doit passer à la ligne sur mobile (comme la maquette de l'édition à 390 px) n'a aucun moyen de le demander. La prop `column` ajoute la classe `origam-chip-group--column` (`OrigamChipGroup.vue:154`), mais aucune règle CSS ne la lit : elle est inerte. Il n'existe aucune variable pour `flex-wrap`, `overflow` ou l'écart entre puces.
+`OrigamChipGroup` repose sur `OrigamSlideGroup` : les puces sont dans `.origam-slide-group__container`, un conteneur flex qui défile sur une seule ligne. Un groupe de filtres qui doit passer à la ligne sur mobile (comme la maquette de l'édition à 390 px) n'a aucun moyen de le demander. La prop `column` ajoute la classe `origam-chip-group--column` (`OrigamChipGroup.vue:158`), mais aucune règle CSS ne la lit : elle est inerte. Il n'existe aucune variable pour `flex-wrap`, `overflow` ou l'écart entre puces.
 
 Constaté dans CCC (F-03b, filtres de l'onglet Matchs) en 2.37.3.
 

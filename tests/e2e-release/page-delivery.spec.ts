@@ -13,7 +13,8 @@ import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
  * sans lien dans la navigation, même avec un cookie de session présenté.
  * Quand un ticket F-xx livre sa page, il **ajoute** sa route à `DELIVERED_PAGES` ci-dessous : elle n'est alors plus attendue en 404.
  ********************************************************/
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE]
+const EDITION_PAGE = '/editions/2025'
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, EDITION_PAGE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
 
 const hidden = (pages: string[]): string[] => pages.filter(page => !DELIVERED_PAGES.includes(page))
@@ -67,5 +68,20 @@ test.describe(`page livrée ${ROUTES.ADMIN_MORE} (T-LIVE-01)`, () => {
     const response = await request.get(ROUTES.ADMIN_MORE, { maxRedirects: 0, headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${token}` } })
     expect(response.status()).toBe(200)
     expect(await response.text()).toContain(`data-cy="${ADMIN_MORE_NAV_DATA_CY}"`)
+  })
+})
+
+test.describe(`page livrée ${ROUTES.EDITION} (F-03)`, () => {
+  test('publique : répond 200 sans session, avec ses onglets et son titre', async ({ request }) => {
+    const response = await request.get(EDITION_PAGE, { maxRedirects: 0 })
+    expect(response.status()).toBe(200)
+    const html = await response.text()
+    expect(html).toContain('data-cy="edition-tab-matches"')
+    expect(html).toContain('<h1')
+  })
+
+  test('l’index des éditions, non livré, reste en 404', async ({ request }) => {
+    const response = await request.get(ROUTES.EDITIONS, { maxRedirects: 0 })
+    expect(response.status()).toBe(404)
   })
 })

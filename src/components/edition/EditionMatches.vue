@@ -148,6 +148,11 @@ import { editionMatchFilterCounts, filterEditionMatchRows, pageSlice } from '~/u
  * publie tous ses matchs publics : filtre et pagination se font ici, sans nouvelle requête (« Phase finale » regroupe plusieurs
  * tours, ce que `?tour=` d'une seule valeur ne sait pas faire). N° = `{édition}-{rang}` (RG24). Aucun score non validé
  * n'est affiché : sans vainqueur, ni vainqueur ni score ne sont montrés, les deux joueurs restent dans l'ordre de l'API.
+ *
+ * Retour à la ligne des filtres : `origam-chip-group` repose sur `origam-slide-group`, un conteneur qui défile sur une seule ligne
+ * (`OrigamSlideGroup.vue:463-468`, `flex-wrap` sans variable) dont le contenu est `white-space: nowrap` (`:456`). La prop `column`
+ * ne fait qu'ajouter la classe `origam-chip-group--column` (`OrigamChipGroup.vue:158`), qu'aucune règle ne lit : elle est inerte.
+ * D'où les `:deep` ci-dessous (fiche `docs/tickets/origam/chip-group-retour-a-la-ligne-evolution.md`).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IEditionMatchesProps>(), {})

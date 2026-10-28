@@ -110,10 +110,9 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-table__header-cell---border-bottom-width': 'var(--origam-border__width---thin)',
     '--origam-data-table-header-cell---color': 'var(--origam-color__text---tertiary)',
     '--origam-data-table-header-cell---background': 'transparent',
-    // Légende visible (F-03b) : titre de tableau de la maquette (`.table caption`), 700, taille « lg », texte primaire.
+    // Légende visible (F-03b) : titre de tableau de la maquette (`.table caption`), taille « lg », texte primaire (la graisse 700 n'a pas de variable : fiche Origam).
     '--origam-table__caption---padding': 'var(--origam-space---4) var(--origam-space---5) var(--origam-space---2)',
     '--origam-table__caption---font-size': 'var(--origam-font__size---lg)',
-    '--origam-table__caption---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-table__caption---color': 'var(--origam-color__text---primary)',
     // Lignes : transparentes sur la surface de la table ; survol = fantôme du thème.
     '--origam-data-table-row---background-color': 'transparent',
