@@ -364,3 +364,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-04-PAG](F-04-PAG.md) : ouvert — Origam #1278 déposée ; fermeture au retrait des règles `main.css`.
 - [F-03-BRK](F-03-BRK.md) : ouvert — migrer le tableau vers origam-bracket quand Origam livre les variables (décision F-03-BRK).
 - **Vague 3a mergée** @ `640842b` (2026-10-28) : **B-09, B-10, B-12, B-16, B-17, T-SEC-04, T-OPS-02 fermés** ; T-SEC-02 commenté et laissé ouvert (SSL PostgreSQL).
+- **Contrôle après merge de la vague 3a** (frontend-lead, develop @ `7165cf5`, npm ci) : typecheck vert, test:run 591, Playwright complet **182 verts, 0 échec, 0 instable**. F-15 retrouve ses valeurs (recherche 0,039 / 0,052 %). Zone `edition-selecteur` à 0,273 / 0,229 % contre 0,000 avant (sous le seuil, cause à établir dans F-03b).
