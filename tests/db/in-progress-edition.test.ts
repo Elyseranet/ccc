@@ -59,6 +59,16 @@ describe('2026 remise en phase de poules', () => {
     expect(first.rounds.slice(1).every(round => round.status === ROUND_STATUS.PENDING)).toBe(true)
   })
 
+  it('lu en base : le tour de poules de 2026 est PLAYING, tous les autres tours sont PENDING (B-18 masque un tour PENDING et ses matchs)', async () => {
+    const rounds: Array<{ kind: string, status: string }> = await dataSource.query(
+      `SELECT r.kind, r.status FROM rounds r JOIN editions e ON e.id = r.edition_id WHERE e.code = $1`, [E2E_IN_PROGRESS_EDITION_CODE]
+    )
+    expect(rounds.filter(round => round.kind === ROUND_KIND.POOLS)).toEqual([{ kind: ROUND_KIND.POOLS, status: ROUND_STATUS.PLAYING }])
+    const others = rounds.filter(round => round.kind !== ROUND_KIND.POOLS)
+    expect(others.length).toBeGreaterThan(0)
+    expect(others.every(round => round.status === ROUND_STATUS.PENDING)).toBe(true)
+  })
+
   it('aucune ligne n’est créée ni supprimée', () => {
     expect(rowsAfterRewind).toEqual(rowsAfterSeedOnly)
   })
