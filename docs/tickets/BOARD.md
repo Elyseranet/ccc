@@ -361,3 +361,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [B-18](B-18.md) : ouvert — ne pas publier les tours PENDING (QA-2) ; bloque T-QA-03 et F-01.
 - **F-00t** (cartes cliquables noires au repos, Origam #1276) : **mergé** @ `cb89a56` (branche 33cc2ac). Contrôles : frontend-lead (typecheck 0, test:run 388, Playwright 114, gitleaks propre), chef de projet après le merge (typecheck vert, test:run 388). La vérification de l'opacité calculée dans le navigateur se fera dans les e2e de F-01.
 - [F-04-PAG](F-04-PAG.md) : ouvert — Origam #1278 déposée ; fermeture au retrait des règles `main.css`.
+- [F-03-BRK](F-03-BRK.md) : ouvert — migrer le tableau vers origam-bracket quand Origam livre les variables (décision F-03-BRK).

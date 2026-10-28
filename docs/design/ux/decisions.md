@@ -217,3 +217,17 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
   - `node-forge` (high) ;
   - `undici` (high, nouveau dans la liste).
 - `npm audit --omit=dev` : **0**. Le waiver couvre toujours la situation : moins de high, même nombre de critical, aucune vulnérabilité en production. Mesure : frontend-lead (F-03a) et backend-lead (vague 3a, liste identique à develop).
+
+## F-03-BRK — Tableau des phases finales (décision utilisateur 2026-10-28, F-03b)
+- Le tableau des phases finales reste **écrit à la main** : 0,019 / 0,000 % d'écart avec la maquette. `origam-bracket` donne 23,2 / 41,0 % (mesure de dev-f06, branche de mesure `wip/F-03b-origam-bracket` adf07fa).
+- Causes de l'écart côté Origam, sans variable :
+  - largeur de tour fixée à 240 px en style en ligne (`OrigamBracket.vue:611-621`, constante l. 435) ;
+  - hauteur minimale calculée en dur (`:452`, `:612`) ;
+  - titre de tour centré en dur (`OrigamBracketRound.vue:137`).
+- Une fiche Origam demande ces trois réglages en variables. Le ticket CCC **F-03-BRK** suit la migration vers `origam-bracket` quand Origam les livre.
+- Précision sur FA-11 : un slot `connector` **vide** ne supprime pas les traits, car Vue rend le contenu de repli. Il faut un nœud (`<template #connector><g /></template>`).
+
+## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
+- ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
+- Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
+- Il est interdit de déclarer un endpoint sur une page qui ne l'appelle pas.
