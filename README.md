@@ -58,7 +58,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 - Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
 - En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404.
 - Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
-- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Retirer de `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre.
+- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Ajouter à `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre ; le test de la page livrée exige une session administrateur (`E2E_ADMIN_SESSION`) et échoue sans elle.
 
 ### Variables d'environnement
 
