@@ -212,6 +212,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
 | [F-15](F-15.md) | Texte des champs (valeur, placeholder) environ 1 px plus bas que la maquette | maquettes à champs (joueurs, face-à-face) | F-00m | **Fermé** (2026-10-28) : mergé @ `7ee8aad` (branche 8188eae) ; Origam #1280 | à créer |
 | [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | **Fermé** (2026-10-28) : mergé @ `e61fe43` | à créer |
+| [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | À faire, ouvert le 2026-10-28 ; après le merge de F-03b (dev-f06) | worktree de dev-f06 |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
