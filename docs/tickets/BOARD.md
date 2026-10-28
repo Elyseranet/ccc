@@ -31,7 +31,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | À faire |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-16` @ `4e39f80`) ; à réappliquer par dev-b16 sur `feature/wave3a-identity`, après B-10 |
 | [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-17` @ `27ee5cd`, G11 compris) ; réappliqué par dev-b12 (`feature/B-17-r` @ `8517bc5`, légers verts), test:db et test:api sur `archives.sql` en cours |
-| [B-19](B-19.md) | Titres à date du finaliste et des demi-finalistes dans le résumé d'édition (podium F-03a), contrat figé avec le front | 3 | vague 3a (B-17, G4) | — | À faire |
+| [B-19](B-19.md) | Titres à date du finaliste et des demi-finalistes dans le résumé d'édition (podium F-03a), contrat figé avec le front | 3 | vague 3a (B-17, G4) | **Fermé** (2026-10-28) : mergé @ `566525c` | À faire |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -211,7 +211,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Fermé** (2026-10-28) : mergé @ `88da4af` (branche 7ef01ec) ; preuve conteneur 200/302/404 | à créer |
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
 | [F-15](F-15.md) | Texte des champs (valeur, placeholder) environ 1 px plus bas que la maquette | maquettes à champs (joueurs, face-à-face) | F-00m | **Fermé** (2026-10-28) : mergé @ `7ee8aad` (branche 8188eae) ; Origam #1280 | à créer |
-| [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | À faire, ouvert le 2026-10-28 ; en file PAR-1 | à créer |
+| [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | **Fermé** (2026-10-28) : mergé @ `e61fe43` | à créer |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
