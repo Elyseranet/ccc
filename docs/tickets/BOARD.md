@@ -205,6 +205,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Fermé** (2026-10-28) : mergé @ `88da4af` (branche 7ef01ec) ; preuve conteneur 200/302/404 | à créer |
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
+| [F-15](F-15.md) | Texte des champs (valeur, placeholder) environ 1 px plus bas que la maquette | maquettes à champs (joueurs, face-à-face) | F-00m | À faire, ouvert le 2026-10-28 (relecture des écarts de F-04 v4) ; en file PAR-1 | à créer |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
