@@ -193,3 +193,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - La pagination utilise **`origam-pagination`**, pas le pager maison.
 - L'écart visuel avec la maquette (7,36 % et 66,8 % sur les deux zones de la pagination) fait l'objet d'une **dérogation documentée** au contrôle visuel. Cette dérogation est suivie par le ticket `docs/tickets/F-04-PAG.md`, avec une fiche Origam à déposer.
 - **Précision SEED-1 (décision utilisateur 2026-10-22)** : la régénération se fait par **export outillé du dump actuel**. On charge `archives.sql` sur une base au schéma d'avant la migration, on applique les migrations, puis `pg_dump --data-only --column-inserts` produit le fichier, dans le même ordre de tables. Les UUID et les dates sont conservés. Aucune édition manuelle. Raison : l'outil d'import du classeur brut n'existe plus dans le dépôt (ARCH-5, ARCH-10), et un réimport changerait les 3 097 UUID, dont certains sont figés dans les e2e.
+
+## QA-2 — Édition en cours dans la base de test (décision utilisateur 2026-10-28, F-01)
+- Complète ARCH-9. Les 16 éditions du dump d'archives sont clôturées. Après le seed, la préparation de la base de test (`global-setup`, `prepare-database`) remet donc **l'édition 2026 en phase de poules** : une part **fixe et documentée** de ses matchs de poule repasse à « programmé ». La règle est écrite une seule fois et elle est reproductible.
+- Ce ne sont pas des données fictives (ARCH-8) : c'est la vraie édition 2026, rembobinée à un moment de sa saison, comme `global-setup` crée déjà les comptes de test.
+- Un seul état, partagé par tous les tests (pas de mutation propre à un test). Il sert F-01, F-07, F-08 et F-11.
+- Conséquence : les zones qui lisent 2026 (F-03 page édition, parcours joueurs de F-04) se remesurent sur cet état.
