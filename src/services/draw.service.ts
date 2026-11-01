@@ -11,6 +11,7 @@ import type {
 } from '../interfaces/draw.interface.js'
 import type { IRankingEdition, IScoredParticipation, IStagedParticipation } from '../interfaces/ranking.interface.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
+import { ADMIN_DRAW_RELATIONS, ASSIGNMENT_RELATIONS } from '../consts/draw.const.js'
 import { PARTICIPANT_EDITABLE_STATUSES } from '../consts/edition.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
@@ -53,9 +54,6 @@ export class DrawService extends BaseService {
     return this.request<IAdminDraw[]>(`/admin/editions/${encodeURIComponent(editionId)}/tirages`)
   }
 }
-
-const ADMIN_DRAW_RELATIONS = { round: true, createdBy: { competitor: true }, validatedBy: { competitor: true } } as const
-const ASSIGNMENT_RELATIONS = { participation: { competitor: true }, pool: true } as const
 
 const drawAlreadyValidated = () =>
   conflictWithCode(API_ERROR_CODE.DRAW_ALREADY_VALIDATED, API_ERROR_MESSAGE.DRAW_ALREADY_VALIDATED)
