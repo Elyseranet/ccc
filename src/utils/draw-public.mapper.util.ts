@@ -1,13 +1,14 @@
 import type { DrawAssignmentEntity } from '../server/db/typeorm/entities/draw-assignment.entity.js'
 import type { DrawEntity } from '../server/db/typeorm/entities/draw.entity.js'
-import type { IDraw, IDrawAssignment } from '../interfaces/draw.interface.js'
+import type { IAdminDraw, IDraw, IDrawAssignment } from '../interfaces/draw.interface.js'
+import { toAdminActor } from './admin-actor.mapper.util.js'
 
 const toPublicAssignment = (assignment: DrawAssignmentEntity): IDrawAssignment => ({
   participationId: assignment.participationId,
   competitorId: assignment.participation.competitorId,
   displayName: assignment.participation.competitor.displayName,
   poolId: assignment.poolId,
-  poolNumber: assignment.pool?.rank ?? null,
+  poolNumber: assignment.poolNumber ?? assignment.pool?.rank ?? null,
   pairingIndex: assignment.pairingIndex,
   sidePosition: assignment.sidePosition,
   drawnOrder: assignment.drawnOrder,
@@ -28,4 +29,15 @@ export const toPublicDraw = (draw: DrawEntity, assignments: DrawAssignmentEntity
   createdAt: draw.createdAt.toISOString(),
   validatedAt: draw.validatedAt?.toISOString() ?? null,
   assignments: [...assignments].sort((a, b) => a.drawnOrder - b.drawnOrder).map(toPublicAssignment)
+})
+
+/**
+ * DTO admin d'un tirage (C7) : brouillons compris, avec l'auteur de la création et de la validation. Le tirage est chargé
+ * avec `round`, `createdBy` et `validatedBy` (chacun avec son `competitor`). Ne jamais le renvoyer hors de `/api/v1/admin/`
+ * et des routes d'écriture du tirage.
+ */
+export const toAdminDraw = (draw: DrawEntity, assignments: DrawAssignmentEntity[]): IAdminDraw => ({
+  ...toPublicDraw(draw, assignments),
+  createdBy: toAdminActor(draw.createdBy),
+  validatedBy: toAdminActor(draw.validatedBy)
 })
