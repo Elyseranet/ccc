@@ -30,6 +30,8 @@ export interface IPlayerLinkProps {
   titles?: number
   size?: TSize
   inline?: boolean
+  /** Le nom peut passer à la ligne (sinon il reste sur une ligne, comme un bouton). */
+  wrap?: boolean
 }
 
 export interface IAsyncStateProps {

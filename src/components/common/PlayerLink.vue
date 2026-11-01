@@ -4,6 +4,7 @@
     variant="text"
     :size="size"
     rounded="full"
+    :wrap="wrap"
     font-weight="semibold"
     class="player-link"
     :class="linkClasses"
@@ -42,7 +43,8 @@ const { t } = useT()
 const props = withDefaults(defineProps<IPlayerLinkProps>(), {
   titles: 0,
   size: PLAYER_LINK_DEFAULT_SIZE,
-  inline: false
+  inline: false,
+  wrap: false
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
@@ -51,10 +53,14 @@ defineSlots<{}>()
  * Fiche et titres
  *
  * @description
+ * Avec `wrap`, le nom coule comme du texte et passe à la ligne (prop `wrap` d'OrigamBtn). C'est un choix de l'appelant, jamais du mode
+ * `inline` : l'annuaire des joueurs garde son nom sur une ligne (mesuré : 0,2 % contre 3,4 % à 390 px). Origam
+ * centre alors les lignes et fixe `justify-content: center` en dur sur `__content` (OrigamBtn.vue:1185-1188, sans variable).
+ * Le bloc style remet donc l'alignement au début par `:deep`, justifié par docs/tickets/origam/btn-content-alignement-non-themable.md.
  * Le singulier et le pluriel ont chacun leur clé : pas de syntaxe de pluriel i18n dans ce projet.
  ********************************************************/
 const profilePath = computed(() => `/joueurs/${encodeURIComponent(props.competitor.id)}`)
-const linkClasses = computed(() => ({ 'player-link--inline': props.inline }))
+const linkClasses = computed(() => ({ 'player-link--inline': props.inline, 'player-link--wrap': props.wrap }))
 const hasTitles = computed(() => props.titles > 0)
 const stars = computed(() => '*'.repeat(props.titles))
 const titlesLabel = computed(() => props.titles === 1
@@ -79,6 +85,11 @@ defineExpose({})
     --origam-btn---font-size: 1em;
     --origam-btn---line-height: var(--origam-font__lineHeight---normal);
     padding-inline: 0;
+  }
+
+  &--wrap :deep(.origam-btn__content) {
+    justify-content: flex-start;
+    text-align: start;
   }
 
   &__stars {
