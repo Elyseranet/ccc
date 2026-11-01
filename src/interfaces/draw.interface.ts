@@ -1,3 +1,4 @@
+import type { ParticipationEntity } from '../server/db/typeorm/entities/participation.entity.js'
 import type { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { IAdminActor } from './admin-match.interface.js'
@@ -97,4 +98,21 @@ export interface ISeedRanking {
   ranked: ISeedCandidate[]
   /** Groupes de candidats à égalité parfaite sur tous les critères (RG10) : jamais tranchés. */
   unresolvedTies: string[][]
+}
+
+/** Résultat d'une écriture de tirage : le DTO admin, plus de quoi journaliser (aucune donnée personnelle). */
+export interface IDrawWriteOutcome {
+  draw: IAdminDraw
+  editionId: string
+  /** true quand la validation était déjà faite : aucun match n'a été regénéré (invariant 6). */
+  replayed: boolean
+  matchCount: number
+}
+
+/** Candidats aux têtes de série d'une édition (`playerId` = participationId) et leurs participations. */
+export interface ISeedRankingContext {
+  ranked: ISeedCandidate[]
+  unresolvedTies: string[][]
+  acpByParticipation: Map<string, number>
+  participations: ParticipationEntity[]
 }

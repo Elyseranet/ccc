@@ -443,7 +443,7 @@ export const createEdition = (dataSource: DataSource, input: ICreateEditionReque
     throw isComputedFieldCollision(error) ? conflictWithCode(API_ERROR_CODE.EDITION_CONFLICT, API_ERROR_MESSAGE.EDITION_CONFLICT) : error
   })
 
-const findEditionLocked = async (manager: EntityManager, idOrCode: string): Promise<EditionEntity> => {
+export const findEditionLocked = async (manager: EntityManager, idOrCode: string): Promise<EditionEntity> => {
   const edition = await manager.getRepository(EditionEntity).findOne({
     where: isEditionUuid(idOrCode) ? { id: idOrCode } : { code: idOrCode },
     lock: { mode: 'pessimistic_write' }
