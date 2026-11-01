@@ -32,7 +32,7 @@ const UNKNOWN_UUID = '00000000-0000-4000-8000-000000000000'
 let dataSource: DataSource
 let adminCookie: string
 let participantCookie: string
-let year = 2100
+let year = 2030
 let competitorSerial = 0
 
 const send = (method: string, path: string, body?: unknown, cookie?: string): Promise<Response> =>
