@@ -33,3 +33,10 @@ Par ailleurs, `NUXT_STRICT_RUNTIME_CONFIG=false`, `0` ou vide désactive toute l
 - [ ] Preuve Docker : refus au démarrage avec une configuration fautive, démarrage réussi avec une configuration valide.
 
 - **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».
+
+## Traitement (dev-b09, 2026-11-01)
+
+- **Q1 (tranchée)** : un fichier marqueur `/app/.ccc-production-image`, posé par le Dockerfile dans l'étage runner et propriété de root, désigne l'image de production. `assertStrictRuntimeConfig` reçoit `productionImage` (calculé par `isProductionImage()`, le même appel pour le plugin Nitro et `user:create-admin`). Marqueur présent et `NUXT_STRICT_RUNTIME_CONFIG` éteint ou absent : le démarrage échoue avec un message qui nomme la variable. Marqueur absent : comportement inchangé (faux par défaut). Limite assumée : root dans le conteneur ou une reconstruction de l'image peut retirer le marqueur.
+- Hôtes locaux refusés : `localhost`, `127.0.0.1`, `::1`, `[::1]`, `0.0.0.0`, `*.localhost` (site et SMTP) ; hôte SMTP vide ou sans point (`mailpit`). `from` vide ou resté au défaut (`@ccc.local`) refusé. `secureCookie=false` refusé.
+- **Identifiants SMTP non rendus obligatoires** : le fournisseur de production n'est pas choisi (A3) et certains relais n'exigent pas d'identifiants. À revoir quand il le sera.
+- Commentaires inexacts corrigés (`runtime-config-guard.util.ts`, `Dockerfile`). Les messages nomment les variables, jamais leurs valeurs (testé avec un faux secret).

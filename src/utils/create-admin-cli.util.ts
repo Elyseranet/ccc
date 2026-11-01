@@ -4,6 +4,8 @@ import { normalizeEmail } from './email.util.js'
 import { adminEmailSchema } from '../server/schemas/auth.schema.js'
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT } from '../consts/runtime-config.const.js'
 import { createAdminWithInvitation } from './create-admin.util.js'
+import { isEmailCollision } from './email-collision.util.js'
+import { isProductionImage } from './production-image.util.js'
 import { assertStrictRuntimeConfig } from './runtime-config-guard.util.js'
 import dataSource from '../server/db/typeorm/data-source.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
@@ -30,11 +32,16 @@ const createAdmin = async (): Promise<void> => {
   // PROD-1 : hors de Nitro, la même fonction pure garde la configuration (défauts de nuxt.config si une variable est absente).
   assertStrictRuntimeConfig({
     strictRuntimeConfig: process.env.NUXT_STRICT_RUNTIME_CONFIG,
+    productionImage: isProductionImage(),
     public: { siteUrl },
     mail: {
       transport: process.env.NUXT_MAIL_TRANSPORT ?? DEFAULT_MAIL_TRANSPORT,
       host: process.env.NUXT_MAIL_HOST ?? DEFAULT_MAIL_HOST,
       from: process.env.NUXT_MAIL_FROM ?? DEFAULT_MAIL_FROM
+    },
+    auth: {
+      secureCookie: process.env.NUXT_AUTH_SECURE_COOKIE,
+      deviceCookieSecret: process.env.NUXT_AUTH_DEVICE_COOKIE_SECRET ?? ''
     }
   })
   const parsed = adminEmailSchema.safeParse(await readEmail())
@@ -45,7 +52,13 @@ const createAdmin = async (): Promise<void> => {
   if (await dataSource.getRepository(UserEntity).exists({ where: { email: parsed.data } })) {
     throw new Error('Un compte existe déjà pour cet email.')
   }
-  const link = await createAdminWithInvitation(dataSource, parsed.data, siteUrl)
+  let link: string
+  try {
+    link = await createAdminWithInvitation(dataSource, parsed.data, siteUrl)
+  } catch (error) {
+    // T-SEC-12 (L8) : une course sur l'email donne la violation d'unicité de la base ; on affiche le même message clair.
+    throw isEmailCollision(error) ? new Error('Un compte existe déjà pour cet email.') : error
+  }
   process.stdout.write(`Lien de première connexion (valable 7 jours, usage unique) :\n${link}\n`)
 }
 

@@ -34,3 +34,6 @@ visual-results
 
 # Outils locaux
 .impeccable
+
+# Marqueur de l'image de production (T-SEC-06) : posé par le Dockerfile, jamais committé ni copié depuis le contexte
+.ccc-production-image

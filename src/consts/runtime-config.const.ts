@@ -9,8 +9,19 @@ export const DEFAULT_MAIL_FROM = 'CCC <no-reply@ccc.local>'
 /** `NUXT_PUBLIC_SITE_INDEXABLE` (T-SEO-01) : faux par défaut, une instance non configurée (la dev) n'est jamais indexable. */
 export const DEFAULT_SITE_INDEXABLE = false
 
-/** Hôtes qui désignent la machine locale : jamais acceptés en mode strict. */
-export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1'] as const
+/** Hôtes qui désignent la machine locale : jamais acceptés en mode strict (`URL.hostname` écrit l'IPv6 entre crochets). */
+export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '::1', '[::1]', '0.0.0.0'] as const
+/** Tout sous-domaine de `localhost` désigne aussi la machine locale. */
+export const LOCAL_HOSTNAME_SUFFIX = '.localhost'
+/** Domaine de l'expéditeur par défaut : un `from` qui en vient n'a jamais été configuré. */
+export const DEFAULT_MAIL_FROM_DOMAIN = '@ccc.local'
+
+/**
+ * Marqueur posé par le Dockerfile (étage runner, propriété de root) : sa présence désigne l'image de production. Une
+ * variable d'environnement ne peut pas le retirer, contrairement à `ENV NUXT_STRICT_RUNTIME_CONFIG=true` (T-SEC-06, Q1).
+ * Le chemin est celui du `WORKDIR` de l'image.
+ */
+export const PRODUCTION_IMAGE_MARKER_PATH = '/app/.ccc-production-image'
 
 /**
  * `NUXT_STRICT_RUNTIME_CONFIG` : seules ces valeurs désactivent le mode strict. Toute autre valeur l'active
@@ -29,5 +40,8 @@ export const STRICT_CONFIG_VARIABLE = {
   SITE_URL: 'NUXT_PUBLIC_SITE_URL',
   MAIL_TRANSPORT: 'NUXT_MAIL_TRANSPORT',
   MAIL_HOST: 'NUXT_MAIL_HOST',
-  MAIL_FROM: 'NUXT_MAIL_FROM'
+  MAIL_FROM: 'NUXT_MAIL_FROM',
+  STRICT: 'NUXT_STRICT_RUNTIME_CONFIG',
+  SECURE_COOKIE: 'NUXT_AUTH_SECURE_COOKIE',
+  DEVICE_COOKIE_SECRET: 'NUXT_AUTH_DEVICE_COOKIE_SECRET'
 } as const

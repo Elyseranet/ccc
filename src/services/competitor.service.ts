@@ -6,7 +6,6 @@ import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
 import type { IInvitationResent } from '../interfaces/invitation.interface.js'
 import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
 import { BaseService } from './base.service.js'
-import { QueryFailedError } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
 import { PUBLIC_ROUND_STATUSES } from '../consts/match-score.const.js'
 import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const.js'
@@ -29,12 +28,12 @@ import { buildContainsPattern } from '../utils/competitor-query.util.js'
 import { sortCompetitors } from '../utils/competitor-sort.util.js'
 import { useDataSource } from '../utils/database.util.js'
 import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
-import { PG_UNIQUE_VIOLATION, USER_EMAIL_UNIQUE_CONSTRAINT } from '../consts/invitation.const.js'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import type { INewCompetitor } from '../interfaces/competitor-creation.interface.js'
 import type { ICompetitorWithAccount } from '../interfaces/invitation.interface.js'
 import { buildDisplayName } from '../utils/display-name.util.js'
+import { isEmailCollision } from '../utils/email-collision.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
 import { logger } from '../utils/logger.util.js'
 
@@ -388,14 +387,6 @@ export const listHeadToHeadSummaries = async (id: string): Promise<IHeadToHeadSu
   return opponents
     .map((opponent) => toSummary(competitor, withTitles(toCompetitorPublic(opponent), titles), byOpponent.get(opponent.id)!))
     .sort((a, b) => totalMatches(b) - totalMatches(a) || a.opponent.displayName.localeCompare(b.opponent.displayName))
-}
-
-const isEmailCollision = (error: unknown): boolean => {
-  if (!(error instanceof QueryFailedError)) {
-    return false
-  }
-  const driverError = error.driverError as { code?: string, constraint?: string } | undefined
-  return driverError?.code === PG_UNIQUE_VIOLATION && driverError.constraint === USER_EMAIL_UNIQUE_CONSTRAINT
 }
 
 const toNullable = (value: string | null | undefined): string | null => {

@@ -44,3 +44,11 @@
 - [ ] L12 : test de la garde stricte.
 
 - **Q1 tranchée par l'utilisateur (2026-11-01)** : accepter tel quel et documenter. Voir `decisions.md`, « SEC-Q ».
+
+## Traitement (dev-b09, 2026-11-01)
+
+- **L8** : `createAdminWithInvitation` normalise l'email ; `user:create-admin` traduit la violation d'unicité 23505 de `users.email` (`isEmailCollision`, partagé avec `createCompetitorWithAccount`) en « Un compte existe déjà pour cet email. ». Tests : normalisation et course sur deux créations concurrentes (base).
+- **L9** : runbook ajouté au README (section Authentification, après « Premier administrateur »).
+- **L10** : accepté tel quel (SEC-Q Q1), documenté dans le README avec la raison.
+- **L11** : déjà documenté (README, `NUXT_AUTH_ALLOWED_ORIGINS`) ; la vérification réelle reste à faire au premier déploiement.
+- **L12** : `NUXT_AUTH_DEVICE_COOKIE_SECRET` d'au moins 32 caractères exigé par la garde stricte (voir T-SEC-06).
