@@ -203,3 +203,18 @@ Tous les tirages de l'édition, **brouillons compris**, du plus ancien au plus r
 ## Données
 
 La migration M6 (`1793180000000-AddDrawAssignmentPoolNumber`) ajoute `draw_assignments.pool_number integer NULL` avec `CHECK (pool_number IS NULL OR pool_number >= 1)` : le tirage physique est enregistré avant que les poules existent, donc avant que `pool_id` puisse l'être. Le DTO publie `poolNumber ?? pools.rank`, si bien que les tirages repris de l'archive (sans `pool_number`) publient le même numéro qu'avant. **Rollback** : `db:migration:revert` supprime la colonne et sa contrainte ; les numéros de poule des brouillons en cours sont perdus, les tirages validés gardent leur `pool_id`.
+
+## Codes d'erreur ajoutés à `API_ERROR_CODE` (4, ajouts seuls)
+
+| Code | Statut | Sens |
+|---|---|---|
+| `DRAW_ALREADY_VALIDATED` | 409 | le tirage des poules est validé (ou l'édition l'a dépassé) : plus de modification, pas d'annulation |
+| `DRAW_SEEDS_INVALID` | 409 | les têtes de série ne sont pas celles que RG9 et RG10 exigent |
+| `DRAW_INCOMPLETE` | 409 | un inscrit de l'édition n'est pas affecté (Q2) |
+| `DRAW_INCONSISTENT` | 409 | brouillon incohérent (RG11, participation étrangère, doublon, numéro de poule hors bornes) |
+
+Aucun autre code : les 400 réutilisent `VALIDATION_FAILED` et `BAD_REQUEST`, les 404 `NOT_FOUND`.
+
+## Hors périmètre strict
+
+`src/utils/admin-actor.mapper.util.ts` (auteur d'une action administrateur) est partagé avec B-12 : `match-admin.mapper.util.ts` l'utilise au lieu de sa copie locale, sans changement de comportement.
