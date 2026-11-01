@@ -21,3 +21,39 @@
 - [ ] Contrat front mis à jour (`docs/api/matchs.md`), coordonné avec le `frontend-lead`.
 
 - **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».
+
+## Contrat figé avec le `frontend-lead` (2026-11-01), commun à T-SEC-08 et T-SEC-10 L1
+
+Décision utilisateur SEC-Q (T-SEC-08 Q1, T-SEC-10 Q1) : contrôle de version **obligatoire**. Un seul dev, `dev-b12`, porte les deux tickets dans une seule branche.
+
+**Routes concernées** :
+- `PUT /matchs/{id}/score` ;
+- `POST /matchs/{id}/validation` ;
+- `PATCH /competiteurs/{id}` ;
+- `POST /matchs/{id}/correction` (§) : son alignement sur 428 et 412 attend la décision du `project-manager`. Aujourd'hui, elle répond 400 sans en-tête et 409 `MATCH_VERSION_CONFLICT` si la version est périmée. Le `frontend-lead` est favorable à l'alignement.
+
+**Source de la version** : un champ `version: number` dans le DTO lu, pas d'ETag par élément (une liste ne peut pas en porter).
+- Matchs : `IAdminMatch.version` (existe, `GET /admin/editions/{id}/matchs`).
+- Compétiteur : `ICompetitorDetail.version` (ajout, `GET /competiteurs/{id}`), adossé à une nouvelle colonne `competitors.version` (`@VersionColumn`, migration avec `up`, `down` et rollback documenté). C'est **la version de l'identité** : nom affiché, prénom, nom et pseudo, c'est-à-dire ce qu'écrit le PATCH.
+- **L'avatar n'avance pas la version.** La mise à jour de `competitors.updated_at` par l'avatar (M1, pour l'ETag des éditions) fixe la colonne `version` explicitement pour empêcher l'incrément automatique de TypeORM. Les routes avatar sont inchangées : `PUT` répond `{ avatarUrl }`, `DELETE` répond 204, sans If-Match.
+
+**Format** : le front envoie `If-Match: "<version>"`, un ETag fort entre guillemets. Le serveur accepte aussi `<version>` et `W/"<version>"` (`IF_MATCH_VERSION_PATTERN`). Une valeur mal formée donne 400 `BAD_REQUEST`.
+
+**Erreurs** (nouveaux membres de `API_ERROR_CODE`) :
+
+| Cas | Statut | `code` | Corps |
+|---|---|---|---|
+| `If-Match` absent | **428** | `PRECONDITION_REQUIRED` | message seul |
+| Version périmée | **412** | `VERSION_CONFLICT` | `details: { currentVersion: number }`. Pas l'état complet : le front recharge |
+
+**Réponse d'une écriture réussie** : la nouvelle version est dans le corps, sans en-tête ETag.
+- `PUT /matchs/{id}/score` répond `IAdminMatch`, avec `version` à jour.
+- `POST /matchs/{id}/validation` et `/correction` répondent `IMatchValidationResult`, avec `match.version` à jour.
+- `PATCH /competiteurs/{id}` répond **`ICompetitorIdentity extends ICompetitorPublic { version: number }`** (ajout ; la réponse était `ICompetitorPublic`).
+
+**Tests attendus en plus des critères ci-dessus** :
+- 428 et 412 sur chaque route concernée ;
+- `details.currentVersion` exact ;
+- une saisie puis une validation enchaînées avec la version renvoyée ;
+- un PUT puis un DELETE d'avatar laissent `version` inchangée, mais changent l'ETag de l'édition ;
+- la migration fait aller, retour et aller, puis `migration:generate` répond « No changes », et `db:seed:archives` s'applique toujours.

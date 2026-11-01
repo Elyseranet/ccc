@@ -13,6 +13,8 @@
 
 - **Q1** : faut-il un contrôle de version (`If-Match`, 412/428) sur la correction d'identité, comme celui qui sera décidé pour les scores dans T-SEC-08 ? Ou accepter « le dernier écrit gagne » ?
 
+**Q1 tranchée (SEC-Q, 2026-10-28)** : contrôle de version obligatoire. Contrat figé avec le `frontend-lead` le 2026-11-01, commun avec T-SEC-08 : voir la section « Contrat figé » de [T-SEC-08](T-SEC-08.md) (`ICompetitorDetail.version`, `ICompetitorIdentity`, 428 `PRECONDITION_REQUIRED`, 412 `VERSION_CONFLICT`, l'avatar n'avance pas la version). L1 est porté par le même dev et dans la même branche que T-SEC-08.
+
 ## L2 — `loadCareers` calcule les carrières de tous les compétiteurs
 
 - **Où** : `src/services/competitor.service.ts:121`, appelé par `src/services/edition.service.ts:493` (participants admin, G1) pour `editionsPlayed`.
