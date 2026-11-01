@@ -373,4 +373,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - **Correction (frontend-lead, 2026-10-28)** : `edition-selecteur` n'a jamais été à 0,000 % après F-03a. Le « 0,000 » venait d'un log tronqué (`tail -80` dans le script de gates, corrigé depuis). La valeur réelle est 0,329 / 0,285 % → 0,273 / 0,229 % avec F-15, et elle reste identique après la vague 3a : **aucune régression**. L'écart restant (44 px) vient de l'anti-crénelage du filet et du chevron Origam. La ligne « Contrôle après merge de la vague 3a » ci-dessus et la fermeture de F-15 sont corrigées sur ce point.
 - [B-18](B-18.md) : **Fermé** — mergé @ `42b7d83` ; débloque T-QA-03.
 - [T-QA-04](T-QA-04.md) : **Fermé** — mergé @ `1148710` (5 passes test:api vertes, dont une sous charge).
-- [T-SEC-13](T-SEC-13.md) : ouvert — 3 moderate en production via typeorm (glob, minimatch), seuil respecté, remédiation à évaluer.
+- [T-SEC-14](T-SEC-14.md) : ouvert — 3 moderate en production via typeorm (glob, minimatch), seuil respecté, remédiation à évaluer.
