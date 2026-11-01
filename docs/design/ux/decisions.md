@@ -237,3 +237,4 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **T-SEC-07 Q1** : avatars servis avec un **cache court et revalidation** (ETag, 304), sans `immutable`. Une photo supprimée disparaît vite des caches.
 - **T-SEC-08 Q1** : **contrôle de version obligatoire** (`If-Match`) sur la saisie et la validation des scores. 428 sans en-tête, 412 si la version a changé. Le front envoie la version lue (F-08).
 - **T-SEC-10 Q1** : la correction d'identité d'un compétiteur suit **la même règle que les scores**, donc contrôle de version obligatoire.
+- **T-SEC-12 Q1** : les écritures sans `Origin` ni `Sec-Fetch-Site` restent **acceptées**. Ce comportement est documenté : aucun scénario navigateur identifié, et SameSite=Lax couvre les sites tiers.

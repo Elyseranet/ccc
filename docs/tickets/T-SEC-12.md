@@ -42,3 +42,5 @@
 - [ ] L10 conforme à Q1.
 - [ ] L11 : vérifié au premier déploiement, résultat consigné dans ce ticket.
 - [ ] L12 : test de la garde stricte.
+
+- **Q1 tranchée par l'utilisateur (2026-11-01)** : accepter tel quel et documenter. Voir `decisions.md`, « SEC-Q ».
