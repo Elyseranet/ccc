@@ -123,6 +123,8 @@ Constats LOW de la revue de sécurité de la vague 3a (2026-10-22), hors vague 3
 
 Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier unique front et back, ARCH-2), proposé par le `frontend-lead` : [T-HTTP-01](T-HTTP-01.md), **À faire**, après le merge de F-00h et de la vague 3a.
 
+Revue de sécurité de B-11 (2026-11-01), LOW L4, hors B-11 : [T-SEC-13](T-SEC-13.md), limite de débit des routes de tirage et coût de la proposition de têtes de série, **À faire**.
+
 Test unitaire sensible au temps (`request-body-timeout.test.ts`, délais réels de 20 à 150 ms, échec sous charge) : [T-QA-05](T-QA-05.md), **À faire**.
 
 Test d'API sensible à la charge (« keeps at most 20 devices per account », 22 hachages scrypt, 149 s sous charge concurrente) : [T-QA-04](T-QA-04.md), **À faire**.

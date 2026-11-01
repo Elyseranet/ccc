@@ -30,7 +30,7 @@ Décision utilisateur SEC-Q (T-SEC-08 Q1, T-SEC-10 Q1) : contrôle de version **
 - `PUT /matchs/{id}/score` ;
 - `POST /matchs/{id}/validation` ;
 - `PATCH /competiteurs/{id}` ;
-- `POST /matchs/{id}/correction` (§) : son alignement sur 428 et 412 attend la décision du `project-manager`. Aujourd'hui, elle répond 400 sans en-tête et 409 `MATCH_VERSION_CONFLICT` si la version est périmée. Le `frontend-lead` est favorable à l'alignement.
+- `POST /matchs/{id}/correction` : **alignée sur 428 et 412** (décision utilisateur, `decisions.md`, f924eda). Elle répondait 400 sans en-tête et 409 `MATCH_VERSION_CONFLICT` si la version était périmée. `MATCH_VERSION_CONFLICT` disparaît au profit de `VERSION_CONFLICT`. Amender `docs/api/matchs.md` dans la branche ; l'amendement de la Spec API sera soumis à l'utilisateur au merge.
 
 **Source de la version** : un champ `version: number` dans le DTO lu, pas d'ETag par élément (une liste ne peut pas en porter).
 - Matchs : `IAdminMatch.version` (existe, `GET /admin/editions/{id}/matchs`).
