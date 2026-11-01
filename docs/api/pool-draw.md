@@ -97,7 +97,9 @@ Réponse **201** `IAdminDraw` (les têtes de série en premier, `poolNumber` enc
 | 400 | `BAD_REQUEST` | plus de poules que d'inscrits |
 | 404 | `NOT_FOUND` | édition inconnue |
 | 409 | `DRAW_SEEDS_INVALID` | `seedCount ≠ poolCount` ; `seeds` de taille différente de `seedCount`, doublon, identifiant inconnu ou étranger à l'édition, ou qui n'est pas le haut du classement (RG9, RG10) |
-| 409 | `DRAW_ALREADY_VALIDATED` | les poules sont déjà tirées (édition au-delà de `REGISTRATION`) : pas d'annulation |
+| 409 | `DRAW_ALREADY_VALIDATED` | le tirage des poules est validé : pas d'annulation |
+| 409 | `REGISTRATION_CLOSED` | l'édition a dépassé `REGISTRATION` sans tirage de poules validé |
+| 409 | `EDITION_CLOSED` | l'édition est close |
 
 ## `PUT /api/v1/tirages/{id}/affectations` (ajout à la Spec API)
 
@@ -144,7 +146,9 @@ Réponse **200** `IAdminDraw` (même forme que ci-dessus, `poolNumber` renseign�
 | 400 | `VALIDATION_FAILED` | corps hors schéma (champ inconnu comme `poolRank`, entier hors bornes, UUID invalide, plus de 200 lignes) ; `{id}` invalide |
 | 404 | `NOT_FOUND` | tirage inconnu, ou qui n'est pas un tirage de poules |
 | 409 | `DRAW_INCONSISTENT` | participation étrangère à l'édition ; `participationId` ou `drawnOrder` en double ; `poolNumber` > `poolCount` ; têtes de série changées ; deux têtes de série dans la même poule (RG11) |
+| 409 | `DRAW_SEED_WITHDRAWN` | une tête de série s'est retirée pendant le brouillon : recommencer le tirage |
 | 409 | `DRAW_ALREADY_VALIDATED` | le tirage est validé : il ne change plus |
+| 409 | `REGISTRATION_CLOSED` / `EDITION_CLOSED` | l'édition a dépassé `REGISTRATION` / est close |
 
 ## `POST /api/v1/tirages/{id}/validation`
 
@@ -183,10 +187,12 @@ Réponse **200** `IAdminDraw` (`status: "VALIDATED"`, `validatedAt` et `validate
 | 400 | `VALIDATION_FAILED` | `{id}` invalide |
 | 404 | `NOT_FOUND` | tirage inconnu, ou qui n'est pas un tirage de poules |
 | 409 | `DRAW_INCOMPLETE` | un inscrit de l'édition n'a pas d'affectation (Q2), par exemple ajouté pendant le brouillon |
+| 409 | `DRAW_SEED_WITHDRAWN` | une tête de série s'est retirée pendant le brouillon : recommencer le tirage (contrôlé avant tout autre) |
 | 409 | `DRAW_INCONSISTENT` | une affectation sans `poolNumber`, `poolNumber` > `poolCount`, `seedCount ≠ poolCount`, ou une poule sans tête de série, ou avec deux (RG11) |
-| 409 | `DRAW_ALREADY_VALIDATED` | l'édition a déjà des poules ou un tour de poules, ou est au-delà de `REGISTRATION` |
+| 409 | `DRAW_ALREADY_VALIDATED` | l'édition a déjà des poules ou un tour de poules |
+| 409 | `REGISTRATION_CLOSED` / `EDITION_CLOSED` | l'édition a dépassé `REGISTRATION` sans tirage de poules validé / est close |
 
-**Q1** : le retrait d'un inscrit pendant le brouillon (`DELETE /editions/{id}/participants/{participationId}`, B-10) supprime son affectation ; la validation se fait sans lui. Retirer une tête de série laisse le brouillon incomplet : la validation répond `DRAW_INCONSISTENT` et il faut rouvrir le brouillon (`POST …/tirages/poules`). **Q2** : l'ajout d'un inscrit reste permis jusqu'à la validation ; la validation refuse tant qu'il n'est pas affecté.
+**Q1** : le retrait d'un inscrit pendant le brouillon (`DELETE /editions/{id}/participants/{participationId}`, B-10) supprime son affectation ; la validation se fait sans lui. Retirer une tête de série ne peut pas se compenser : la validation et le `PUT` suivant répondent `DRAW_SEED_WITHDRAWN` (« A seed has withdrawn: restart the draw ») ; il faut rouvrir le brouillon (`POST …/tirages/poules`, qui remplace l'ancien) avec des têtes de série recalculées (`GET …/tetes-de-serie`). **Q2** : l'ajout d'un inscrit reste permis jusqu'à la validation ; la validation refuse tant qu'il n'est pas affecté.
 
 ## `GET /api/v1/admin/editions/{id}/tirages` (ajout à la Spec API)
 
@@ -204,7 +210,7 @@ Tous les tirages de l'édition, **brouillons compris**, du plus ancien au plus r
 
 La migration M6 (`1793180000000-AddDrawAssignmentPoolNumber`) ajoute `draw_assignments.pool_number integer NULL` avec `CHECK (pool_number IS NULL OR pool_number >= 1)` : le tirage physique est enregistré avant que les poules existent, donc avant que `pool_id` puisse l'être. Le DTO publie `poolNumber ?? pools.rank`, si bien que les tirages repris de l'archive (sans `pool_number`) publient le même numéro qu'avant. **Rollback** : `db:migration:revert` supprime la colonne et sa contrainte ; les numéros de poule des brouillons en cours sont perdus, les tirages validés gardent leur `pool_id`.
 
-## Codes d'erreur ajoutés à `API_ERROR_CODE` (4, ajouts seuls)
+## Codes d'erreur ajoutés à `API_ERROR_CODE` (5, ajouts seuls)
 
 | Code | Statut | Sens |
 |---|---|---|
@@ -212,9 +218,18 @@ La migration M6 (`1793180000000-AddDrawAssignmentPoolNumber`) ajoute `draw_assig
 | `DRAW_SEEDS_INVALID` | 409 | les têtes de série ne sont pas celles que RG9 et RG10 exigent |
 | `DRAW_INCOMPLETE` | 409 | un inscrit de l'édition n'est pas affecté (Q2) |
 | `DRAW_INCONSISTENT` | 409 | brouillon incohérent (RG11, participation étrangère, doublon, numéro de poule hors bornes) |
+| `DRAW_SEED_WITHDRAWN` | 409 | une tête de série s'est retirée pendant le brouillon : recommencer le tirage (décision utilisateur, L1) |
 
-Aucun autre code : les 400 réutilisent `VALIDATION_FAILED` et `BAD_REQUEST`, les 404 `NOT_FOUND`.
+Les cas « édition close » et « édition au-delà de l'inscription » réutilisent `EDITION_CLOSED` et `REGISTRATION_CLOSED` (B-10). Les 400 réutilisent `VALIDATION_FAILED` et `BAD_REQUEST`, les 404 `NOT_FOUND`.
 
 ## Hors périmètre strict
 
 `src/utils/admin-actor.mapper.util.ts` (auteur d'une action administrateur) est partagé avec B-12 : `match-admin.mapper.util.ts` l'utilise au lieu de sa copie locale, sans changement de comportement.
+
+## Concurrence
+
+Toutes les écritures verrouillent dans le **même ordre : l'édition, puis le tirage** (`SELECT … FOR UPDATE`). Une route qui part d'un `drawId` lit son `editionId` sans verrou, verrouille l'édition, puis le tirage, et revérifie que le tirage existe encore et appartient à cette édition. Deux requêtes simultanées se sérialisent donc sans interblocage :
+- `POST …/tirages/poules` contre `PUT …/affectations` : le `POST` répond 201 ; le `PUT` répond 200 s'il passe avant le remplacement du brouillon, 404 s'il arrive après ;
+- `POST …/tirages/poules` contre `POST …/validation` : soit la validation passe (200) et le `POST` répond 409 `DRAW_ALREADY_VALIDATED`, soit le `POST` passe (201) et la validation répond 404 (brouillon remplacé).
+
+Les identifiants des poules et des matchs créés à la validation sont générés par le serveur avant l'insertion, pour relier les lignes sans dépendre de l'ordre du `RETURNING`.

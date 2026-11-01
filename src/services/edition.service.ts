@@ -395,8 +395,8 @@ export const loadEditionContentStamp = async (
 const isUniqueViolation = (error: unknown): boolean =>
   error instanceof QueryFailedError && (error.driverError as { code?: string } | undefined)?.code === PG_UNIQUE_VIOLATION
 
-const editionClosed = () => conflictWithCode(API_ERROR_CODE.EDITION_CLOSED, API_ERROR_MESSAGE.EDITION_CLOSED)
-const registrationClosed = () => conflictWithCode(API_ERROR_CODE.REGISTRATION_CLOSED, API_ERROR_MESSAGE.REGISTRATION_CLOSED)
+export const editionClosed = () => conflictWithCode(API_ERROR_CODE.EDITION_CLOSED, API_ERROR_MESSAGE.EDITION_CLOSED)
+export const registrationClosed = () => conflictWithCode(API_ERROR_CODE.REGISTRATION_CLOSED, API_ERROR_MESSAGE.REGISTRATION_CLOSED)
 const alreadyRegistered = () =>
   conflictWithCode(API_ERROR_CODE.PARTICIPANT_ALREADY_REGISTERED, API_ERROR_MESSAGE.PARTICIPANT_ALREADY_REGISTERED)
 

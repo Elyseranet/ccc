@@ -441,6 +441,93 @@ describe('pools draw (B-11)', async () => {
     })
   })
 
+  describe('a seed withdraws during the draft (L1)', () => {
+    it('answers 409 DRAW_SEED_WITHDRAWN on validation and on the next PUT, and lets the administrator restart', async () => {
+      const { edition, draft, ids } = await readyDraft()
+      expect((await asAdmin('DELETE', `/api/v1/editions/${edition.id}/participants/${ids.a}`)).status).toBe(204)
+
+      const validation = await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
+      expect(validation.status).toBe(409)
+      expect((await errorOf(validation)).code).toBe(API_ERROR_CODE.DRAW_SEED_WITHDRAWN)
+      const put = await putAssignments(draft.id, [{ participationId: ids.b, poolNumber: 2, drawnOrder: 2 }])
+      expect(put.status).toBe(409)
+      expect((await errorOf(put)).code).toBe(API_ERROR_CODE.DRAW_SEED_WITHDRAWN)
+      expect(await dataSource.getRepository(MatchEntity).countBy({ editionId: edition.id })).toBe(0)
+
+      // On recommence : les têtes de série sont recalculées sans le joueur retiré.
+      const proposal = await (await asAdmin('GET', `/api/v1/editions/${edition.id}/tetes-de-serie?poules=2`)).json() as ISeedProposal
+      const restarted = await asAdmin('POST', `/api/v1/editions/${edition.id}/tirages/poules`, {
+        poolCount: 2, seedCount: 2, seeds: proposal.seeds.map((seed) => seed.participationId)
+      })
+      expect(restarted.status).toBe(201)
+    })
+  })
+
+  describe('closed or advanced editions (L2)', () => {
+    const forceStatus = (editionId: string, status: EDITION_STATUS) =>
+      dataSource.getRepository(EditionEntity).update({ id: editionId }, { status })
+
+    it('answers EDITION_CLOSED, not DRAW_ALREADY_VALIDATED, on a closed edition', async () => {
+      const { edition, draft, ids } = await readyDraft()
+      await forceStatus(edition.id, EDITION_STATUS.CLOSED)
+      const created = await asAdmin('POST', `/api/v1/editions/${edition.id}/tirages/poules`, { poolCount: 2, seedCount: 2, seeds: [ids.a, ids.b] })
+      expect([created.status, (await errorOf(created)).code]).toEqual([409, API_ERROR_CODE.EDITION_CLOSED])
+      const put = await putAssignments(draft.id, [])
+      expect([put.status, (await errorOf(put)).code]).toEqual([409, API_ERROR_CODE.EDITION_CLOSED])
+      const validation = await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
+      expect([validation.status, (await errorOf(validation)).code]).toEqual([409, API_ERROR_CODE.EDITION_CLOSED])
+    })
+
+    it('answers REGISTRATION_CLOSED when the edition moved on without a validated pools draw', async () => {
+      const { edition, draft, ids } = await readyDraft()
+      await forceStatus(edition.id, EDITION_STATUS.POOLS_PLAYING)
+      const created = await asAdmin('POST', `/api/v1/editions/${edition.id}/tirages/poules`, { poolCount: 2, seedCount: 2, seeds: [ids.a, ids.b] })
+      expect([created.status, (await errorOf(created)).code]).toEqual([409, API_ERROR_CODE.REGISTRATION_CLOSED])
+      const validation = await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
+      expect([validation.status, (await errorOf(validation)).code]).toEqual([409, API_ERROR_CODE.REGISTRATION_CLOSED])
+    })
+  })
+
+  describe('concurrent writes (M1: one lock order, edition then draw)', () => {
+    it('serialises POST of a new draft against PUT of assignments: no 5xx, one coherent draft', async () => {
+      for (let round = 0; round < 4; round += 1) {
+        const { edition, draft, ids, poolOne, poolTwo } = await readyDraft()
+        const [post, put] = await Promise.all([
+          asAdmin('POST', `/api/v1/editions/${edition.id}/tirages/poules`, { poolCount: 2, seedCount: 2, seeds: [ids.a, ids.b] }),
+          putAssignments(draft.id, fullAssignments(poolOne, poolTwo))
+        ])
+        expect(post.status).toBe(201)
+        // Le PUT passe avant le remplacement du brouillon (200), ou arrive après (404 : le brouillon n'existe plus).
+        expect([200, 404]).toContain(put.status)
+        const drafts = await (await asAdmin('GET', `/api/v1/admin/editions/${edition.id}/tirages`)).json() as IAdminDraw[]
+        expect(drafts.map((draw) => draw.status)).toEqual([DRAW_STATUS.DRAFT])
+      }
+    })
+
+    it('serialises POST of a new draft against the validation: no 5xx, either a validated draw or a fresh draft', async () => {
+      for (let round = 0; round < 4; round += 1) {
+        const { edition, draft, ids } = await readyDraft()
+        const [post, validation] = await Promise.all([
+          asAdmin('POST', `/api/v1/editions/${edition.id}/tirages/poules`, { poolCount: 2, seedCount: 2, seeds: [ids.a, ids.b] }),
+          asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
+        ])
+        const outcome = [post.status, validation.status]
+        // Validation d'abord : 200, puis le POST se heurte au tirage validé (409). POST d'abord : 201, puis la validation
+        // vise un brouillon remplacé (404).
+        expect([[409, 200], [201, 404]]).toContainEqual(outcome)
+        const matches = await dataSource.getRepository(MatchEntity).countBy({ editionId: edition.id })
+        const draws = await (await asAdmin('GET', `/api/v1/admin/editions/${edition.id}/tirages`)).json() as IAdminDraw[]
+        if (validation.status === 200) {
+          expect(matches).toBe(6)
+          expect(draws.map((draw) => draw.status)).toEqual([DRAW_STATUS.VALIDATED])
+        } else {
+          expect(matches).toBe(0)
+          expect(draws.map((draw) => draw.status)).toEqual([DRAW_STATUS.DRAFT])
+        }
+      }
+    })
+  })
+
   describe('visibility', () => {
     it('keeps a DRAFT out of the public API, shows it to the administrator, and publishes the draw once validated', async () => {
       const { edition, draft } = await readyDraft()

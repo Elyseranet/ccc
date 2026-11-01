@@ -25,6 +25,7 @@ export const API_ERROR_MESSAGE = {
   DRAW_SEEDS_INVALID: 'The seeds do not match the required top seeds',
   DRAW_INCOMPLETE: 'Every registered participant must be assigned before validation',
   DRAW_INCONSISTENT: 'The draw assignments are inconsistent',
+  DRAW_SEED_WITHDRAWN: 'A seed has withdrawn: restart the draw',
   DRAW_POOL_COUNT_INVALID: 'The pool count must be between 1 and the number of participants',
   GONE: 'Resource is no longer available',
   UNPROCESSABLE: 'Unprocessable entity',

@@ -35,7 +35,8 @@ import { targetScore } from '../utils/score-rules.util.js'
 import { boundaryTies, competitionRank, isValidSeedSelection, rankSeedCandidates, countStagesReached } from '../utils/seeding.util.js'
 import { computeAcp } from '../utils/ranking.util.js'
 import { BaseService } from './base.service.js'
-import { findEditionLocked, findEditionOrThrow } from './edition.service.js'
+import { generateUuids } from '../utils/uuid.util.js'
+import { editionClosed, findEditionLocked, findEditionOrThrow, registrationClosed } from './edition.service.js'
 
 /*********************************************************
  * DrawService
@@ -60,6 +61,7 @@ const drawAlreadyValidated = () =>
 const seedsInvalid = () => conflictWithCode(API_ERROR_CODE.DRAW_SEEDS_INVALID, API_ERROR_MESSAGE.DRAW_SEEDS_INVALID)
 const drawIncomplete = () => conflictWithCode(API_ERROR_CODE.DRAW_INCOMPLETE, API_ERROR_MESSAGE.DRAW_INCOMPLETE)
 const drawInconsistent = () => conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, API_ERROR_MESSAGE.DRAW_INCONSISTENT)
+const seedWithdrawn = () => conflictWithCode(API_ERROR_CODE.DRAW_SEED_WITHDRAWN, API_ERROR_MESSAGE.DRAW_SEED_WITHDRAWN)
 
 /** Le tirage chargé avec ses relations d'affichage, ses affectations triées et leurs relations. */
 const loadAdminDraw = async (manager: EntityManager, drawId: string): Promise<IAdminDraw> => {
@@ -72,13 +74,38 @@ const loadAdminDraw = async (manager: EntityManager, drawId: string): Promise<IA
   return toAdminDraw(draw, assignments)
 }
 
-/** Verrouille le tirage (FOR UPDATE) : deux écritures simultanées se sérialisent. 404 s'il n'existe pas ou n'est pas un tirage de poules. */
-const lockPoolDraw = async (manager: EntityManager, drawId: string): Promise<DrawEntity> => {
-  const draw = await manager.getRepository(DrawEntity).findOne({ where: { id: drawId }, lock: { mode: 'pessimistic_write' } })
-  if (!draw || draw.kind !== DRAW_KIND.POOLS) {
+/**
+ * Verrous dans UN SEUL ordre partout : l'édition, puis le tirage (`FOR UPDATE` chacun). Une écriture qui part d'un
+ * `drawId` lit d'abord son `editionId` sans verrou, verrouille l'édition, verrouille le tirage, puis revérifie que le
+ * tirage existe encore (un brouillon remplacé entre-temps disparaît : 404) et appartient bien à cette édition. Aucun
+ * verrou n'est pris dans l'ordre inverse, donc deux écritures simultanées se sérialisent sans interblocage.
+ * 404 si le tirage n'existe pas ou n'est pas un tirage de poules.
+ */
+const lockEditionThenDraw = async (manager: EntityManager, drawId: string): Promise<{ draw: DrawEntity, edition: EditionEntity }> => {
+  const peek = await manager.getRepository(DrawEntity).findOne({ where: { id: drawId }, select: { id: true, editionId: true, kind: true } })
+  if (!peek || peek.kind !== DRAW_KIND.POOLS) {
     throw notFound(API_ERROR_MESSAGE.DRAW_NOT_FOUND)
   }
-  return draw
+  const edition = await manager.getRepository(EditionEntity).findOneOrFail({ where: { id: peek.editionId }, lock: { mode: 'pessimistic_write' } })
+  const draw = await manager.getRepository(DrawEntity).findOne({ where: { id: drawId }, lock: { mode: 'pessimistic_write' } })
+  if (!draw || draw.editionId !== edition.id || draw.kind !== DRAW_KIND.POOLS) {
+    throw notFound(API_ERROR_MESSAGE.DRAW_NOT_FOUND)
+  }
+  return { draw, edition }
+}
+
+/**
+ * Une édition close ne se tire plus (EDITION_CLOSED). Au-delà de l'inscription, la réponse dit si c'est parce que le
+ * tirage des poules est validé (DRAW_ALREADY_VALIDATED) ou parce que l'édition a simplement avancé (REGISTRATION_CLOSED).
+ */
+const assertEditionOpenForDraw = async (manager: EntityManager, edition: EditionEntity): Promise<void> => {
+  if (edition.status === EDITION_STATUS.CLOSED) {
+    throw editionClosed()
+  }
+  if (!PARTICIPANT_EDITABLE_STATUSES.includes(edition.status)) {
+    const validated = await manager.getRepository(DrawEntity).existsBy({ editionId: edition.id, kind: DRAW_KIND.POOLS, status: DRAW_STATUS.VALIDATED })
+    throw validated ? drawAlreadyValidated() : registrationClosed()
+  }
 }
 
 const toRankingEdition = (edition: EditionEntity): IRankingEdition =>
@@ -160,9 +187,7 @@ export const createPoolDraw = (
 ): Promise<IDrawWriteOutcome> =>
   dataSource.transaction(async (manager) => {
     const edition = await findEditionLocked(manager, idOrCode)
-    if (!PARTICIPANT_EDITABLE_STATUSES.includes(edition.status)) {
-      throw drawAlreadyValidated()
-    }
+    await assertEditionOpenForDraw(manager, edition)
     const context = await loadSeedRanking(manager, edition.id)
     if (request.poolCount > context.participations.length) {
       throw badRequest(API_ERROR_MESSAGE.DRAW_POOL_COUNT_INVALID)
@@ -218,11 +243,11 @@ export const saveDrawAssignments = (
   request: IUpdateDrawAssignmentsRequest
 ): Promise<IDrawWriteOutcome> =>
   dataSource.transaction(async (manager) => {
-    const draw = await lockPoolDraw(manager, drawId)
+    const { draw, edition } = await lockEditionThenDraw(manager, drawId)
     if (draw.status === DRAW_STATUS.VALIDATED) {
       throw drawAlreadyValidated()
     }
-    await manager.getRepository(EditionEntity).findOneOrFail({ where: { id: draw.editionId }, lock: { mode: 'pessimistic_write' } })
+    await assertEditionOpenForDraw(manager, edition)
     const { poolCount, seedCount } = draw.parameters
     const { assignments } = request
 
@@ -233,6 +258,10 @@ export const saveDrawAssignments = (
       .filter((assignment) => assignment.drawnOrder <= seedCount)
       .map((assignment) => assignment.participationId))
 
+    // Un retrait de tête de série (B-10) a supprimé son affectation : le brouillon ne peut plus se compléter.
+    if (seedIds.size < seedCount) {
+      throw seedWithdrawn()
+    }
     const sentSeeds = new Set(assignments.filter((assignment) => assignment.drawnOrder <= seedCount).map((assignment) => assignment.participationId))
     const sameSeeds = sentSeeds.size === seedIds.size && [...seedIds].every((id) => sentSeeds.has(id))
     if (!assignments.every((assignment) => participantIds.has(assignment.participationId)) || !sameSeeds) {
@@ -260,16 +289,17 @@ export const saveDrawAssignments = (
  */
 export const validatePoolDraw = (dataSource: DataSource, drawId: string, userId: string, now = new Date()): Promise<IDrawWriteOutcome> =>
   dataSource.transaction(async (manager) => {
-    const draw = await lockPoolDraw(manager, drawId)
+    const { draw, edition } = await lockEditionThenDraw(manager, drawId)
     if (draw.status === DRAW_STATUS.VALIDATED) {
       return { draw: await loadAdminDraw(manager, drawId), editionId: draw.editionId, replayed: true, matchCount: 0 }
     }
-    const edition = await manager.getRepository(EditionEntity).findOneOrFail({ where: { id: draw.editionId }, lock: { mode: 'pessimistic_write' } })
-    if (!PARTICIPANT_EDITABLE_STATUSES.includes(edition.status)) {
-      throw drawAlreadyValidated()
-    }
+    await assertEditionOpenForDraw(manager, edition)
     const { poolCount, seedCount } = draw.parameters
     const assignments = await manager.getRepository(DrawAssignmentEntity).find({ where: { drawId }, order: { drawnOrder: 'ASC' } })
+    // Une tête de série retirée pendant le brouillon (B-10) : il faut recommencer le tirage, avant tout autre contrôle.
+    if (assignments.filter((assignment) => assignment.drawnOrder <= seedCount).length < seedCount) {
+      throw seedWithdrawn()
+    }
     const participations = await manager.getRepository(ParticipationEntity).find({ where: { editionId: edition.id } })
 
     const assigned = new Set(assignments.map((assignment) => assignment.participationId))
@@ -300,8 +330,9 @@ export const validatePoolDraw = (dataSource: DataSource, drawId: string, userId:
       throw drawAlreadyValidated()
     }
 
-    const poolInsert = await poolsRepository.insert(Array.from({ length: poolCount }, (_, index) => ({ editionId: edition.id, rank: index + 1 })))
-    const poolIdByNumber = new Map(poolInsert.identifiers.map((identifier, index) => [index + 1, identifier.id as string]))
+    const poolIds = await generateUuids(poolCount)
+    await poolsRepository.insert(poolIds.map((id, index) => ({ id, editionId: edition.id, rank: index + 1 })))
+    const poolIdByNumber = new Map(poolIds.map((id, index) => [index + 1, id]))
 
     const members = new Map<number, string[]>()
     for (const assignment of ordered) {
@@ -337,12 +368,13 @@ export const validatePoolDraw = (dataSource: DataSource, drawId: string, userId:
       }
     }
     if (pairs.length > 0) {
-      const matchInsert = await manager.getRepository(MatchEntity).insert(pairs.map(({ poolId }) => {
+      const matchIds = await generateUuids(pairs.length)
+      await manager.getRepository(MatchEntity).insert(pairs.map(({ poolId }, index) => {
         sequence += 1
-        return { editionId: edition.id, roundId: round.id, poolId, sequence, purpose: MATCH_PURPOSE.REGULAR, targetScore: target }
+        return { id: matchIds[index]!, editionId: edition.id, roundId: round.id, poolId, sequence, purpose: MATCH_PURPOSE.REGULAR, targetScore: target }
       }))
       await manager.getRepository(MatchSideEntity).insert(pairs.flatMap(({ pair }, index) =>
-        pair.map((participationId, side) => ({ matchId: matchInsert.identifiers[index]!.id as string, position: side + 1, participationId }))))
+        pair.map((participationId, side) => ({ matchId: matchIds[index]!, position: side + 1, participationId }))))
     }
 
     await manager.getRepository(EditionEntity).update({ id: edition.id }, { status: EDITION_STATUS.POOLS_DRAWN })
