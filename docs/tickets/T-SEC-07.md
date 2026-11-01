@@ -23,3 +23,5 @@
 
 - [ ] L2 : test de la porte de concurrence (503 et `Retry-After` au-delà du plafond), et test du plafond de pixels si retenu.
 - [ ] L3 : en-têtes conformes à la décision Q1, avec un test d'API.
+
+- **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».

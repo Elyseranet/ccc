@@ -38,3 +38,5 @@
 - [ ] L2 : le calcul ne porte plus que sur les compétiteurs demandés (test de service).
 - [ ] L3 : test de concurrence (clôture contre correction) avec B-14.
 - [ ] L5 : tests unitaires des schémas et test d'API du `PATCH`.
+
+- **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».

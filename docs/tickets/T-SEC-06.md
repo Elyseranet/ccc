@@ -31,3 +31,5 @@ Par ailleurs, `NUXT_STRICT_RUNTIME_CONFIG=false`, `0` ou vide désactive toute l
 - [ ] Tests unitaires de `assertStrictRuntimeConfig` pour chaque valeur listée ci-dessus.
 - [ ] Les messages nomment les variables, jamais leurs valeurs.
 - [ ] Preuve Docker : refus au démarrage avec une configuration fautive, démarrage réussi avec une configuration valide.
+
+- **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».

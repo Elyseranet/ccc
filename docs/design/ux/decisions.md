@@ -231,3 +231,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
 - Il est interdit de déclarer un endpoint sur une page qui ne l'appelle pas.
+
+## SEC-Q — Questions ouvertes des tickets de sécurité (décisions utilisateur 2026-10-28)
+- **T-SEC-06 Q1** : l'image de production **refuse de démarrer** si `NUXT_STRICT_RUNTIME_CONFIG` est désactivé. La garde PROD-1 n'est pas contournable par variable d'environnement. Une recette sur cette image demande une vraie configuration.
+- **T-SEC-07 Q1** : avatars servis avec un **cache court et revalidation** (ETag, 304), sans `immutable`. Une photo supprimée disparaît vite des caches.
+- **T-SEC-08 Q1** : **contrôle de version obligatoire** (`If-Match`) sur la saisie et la validation des scores. 428 sans en-tête, 412 si la version a changé. Le front envoie la version lue (F-08).
+- **T-SEC-10 Q1** : la correction d'identité d'un compétiteur suit **la même règle que les scores**, donc contrôle de version obligatoire.

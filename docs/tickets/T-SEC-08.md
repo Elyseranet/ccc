@@ -19,3 +19,5 @@
 
 - [ ] Comportement conforme à Q1, couvert par des tests d'API (sans en-tête, ETag périmé, ETag à jour).
 - [ ] Contrat front mis à jour (`docs/api/matchs.md`), coordonné avec le `frontend-lead`.
+
+- **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».
