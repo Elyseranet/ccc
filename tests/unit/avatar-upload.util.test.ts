@@ -8,8 +8,9 @@ import { fileUpload, makePng } from '../helpers/avatar-fixtures'
 const eventWith = (headers: Record<string, string>, body: AsyncIterable<Uint8Array>): H3Event =>
   ({
     node: {
-      req: Object.assign({ headers }, { [Symbol.asyncIterator]: () => body[Symbol.asyncIterator]() }),
-      res: { setHeader: () => undefined }
+      // pause/destroy et res.once : `readRequestBody` arrête la lecture après le délai (T-SEC-09, L6).
+      req: Object.assign({ headers, pause: () => undefined, destroy: () => undefined }, { [Symbol.asyncIterator]: () => body[Symbol.asyncIterator]() }),
+      res: { setHeader: () => undefined, writableFinished: false, once: () => undefined }
     }
   }) as unknown as H3Event
 
