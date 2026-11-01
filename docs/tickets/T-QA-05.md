@@ -1,6 +1,6 @@
 # T-QA-05 — Test unitaire sensible au temps : `request-body-timeout.test.ts`
 
-- **Statut** : À faire. Ouvert le 2026-10-28 par `backend-lead` (règle : signaler tout test instable).
+- **Statut** : **Fermé** (2026-11-01), mergé dans `develop` @ `09b73de` ; voir « Fermeture ».
 - **Test** : `tests/unit/request-body-timeout.test.ts` (délai N3 de lecture du corps, T-SEC-04). Il ouvre un vrai serveur h3 en local et envoie les corps octet par octet, avec des délais réels : 150 ms de délai total sur la route `/raw`, des écarts de 20 à 80 ms entre les morceaux.
 
 ## Constat
@@ -28,3 +28,13 @@
 2. le client du test rejetait sur `error` : après un 408 ou un 413, le serveur ferme la socket alors que le client écrit encore, et le système peut renvoyer un ECONNRESET, même si la réponse est déjà arrivée.
 
 **Correctif (piste 2, test seul).** Délai `/json` de 1,5 s et `/raw` de 1 s ; écarts entre morceaux de 400 ms (cas lent, corps complet ~8 s) et 100 ms (délai total, corps complet ~4 s), chacun inférieur au délai (un délai d'inactivité ne se déclencherait jamais) ; durées 408 bornées des deux côtés ; le client ignore une erreur de socket quand la réponse est déjà arrivée. Même test avec le même blocage de 400 ms de la boucle : 4 cas sur 4 passent, trois fois de suite. Les quatre garanties sont conservées. Pas de timers simulés : ils ne pilotent pas le flux de la vraie socket. Aucun code de production touché.
+
+## Fermeture — 2026-11-01 (chef de projet)
+- `feature/T-QA-05` @ `8f8d3d7`, mergé dans `develop` @ `09b73de`. Seuls `tests/unit/request-body-timeout.test.ts` et ce ticket changent. Aucun code de production.
+- **Cause établie** (dev-b09) :
+  - l'échec n'a pas été reproduit naturellement : 120 exécutions sous charge, 0 échec ;
+  - un blocage forcé de 400 ms de la boucle d'événements fait échouer 2 cas sur 4 de la version d'origine ;
+  - deux causes : des marges trop étroites (300 ms et 150 ms), et un client de test qui rejetait sur `error` alors que la réponse 408 ou 413 était déjà arrivée (ECONNRESET après la fermeture de la socket).
+- **Correctif** : marges élargies (délais de 1,5 s et 1 s, écarts de 400 ms et 100 ms), client tolérant l'erreur de socket après la réponse, sans timers simulés. Les 4 garanties sont conservées. Sous le même blocage de 400 ms : 4 cas sur 4, 3 fois de suite.
+- **Preuve de stabilité** : **10 passages de `test:run`**, de 22:12:12 à 22:14:53, pendant les suites lourdes de B-11 (charge de 12,2 à 23,7). 10 fois sur 10 : 68/68 fichiers, 602 tests, 0 échec ; `request-body-timeout` 4/4 à chaque passage.
+- **Après le merge** : test:run ci-dessus.

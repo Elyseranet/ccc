@@ -375,3 +375,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-QA-04](T-QA-04.md) : **Fermé** — mergé @ `1148710` (5 passes test:api vertes, dont une sous charge).
 - [T-SEC-14](T-SEC-14.md) : ouvert — 3 moderate en production via typeorm (glob, minimatch), seuil respecté, remédiation à évaluer.
 - [T-QA-06](T-QA-06.md) : ouvert — capture visuelle instable joueur-stats @390.
+- [T-QA-05](T-QA-05.md) : **Fermé** — mergé @ `09b73de` (10 passages test:run verts sous charge).
