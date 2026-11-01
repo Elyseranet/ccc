@@ -279,6 +279,7 @@
   "player.journey.no_points": "—",
   "player.journey.no_pool": "—",
   "player.journey.pool_and_rank": "Pool {pool} · {rank}",
+  "player.journey.pool_only": "Pool {pool}",
   "player.journey.rank_first": "1st",
   "player.journey.rank_other": "{rank}th",
   "player.journey.table_caption": "Journey by edition",
