@@ -33,7 +33,7 @@ describe('runMigrationsCommand', () => {
     const dataSource = fakeDataSource({ runMigrations: vi.fn().mockRejectedValue(new Error('relation already exists')) })
 
     expect(await runMigrationsCommand(dataSource, 'up')).toBe(1)
-    expect(error).toHaveBeenCalledExactlyOnceWith(LOG_EVENT.MIGRATIONS_FAILED, { message: 'relation already exists' })
+    expect(error).toHaveBeenCalledExactlyOnceWith(LOG_EVENT.MIGRATIONS_FAILED, { errorName: 'Error', errorCode: null })
     expect(info).not.toHaveBeenCalled()
   })
 
@@ -55,7 +55,7 @@ describe('runMigrationsCommand', () => {
     })
 
     expect(await runMigrationsCommand(dataSource, 'revert')).toBe(1)
-    expect(error).toHaveBeenCalledExactlyOnceWith(LOG_EVENT.MIGRATIONS_FAILED, { message: 'down failed' })
+    expect(error).toHaveBeenCalledExactlyOnceWith(LOG_EVENT.MIGRATIONS_FAILED, { errorName: 'Error', errorCode: null })
   })
 
   it('refuse une sous-commande inconnue sans toucher à la base', async () => {
@@ -65,5 +65,25 @@ describe('runMigrationsCommand', () => {
     expect(await runMigrationsCommand(fakeDataSource({ runMigrations }), 'drop')).toBe(1)
     expect(runMigrations).not.toHaveBeenCalled()
     expect(error).toHaveBeenCalledOnce()
+  })
+
+  it('T-SEC-09 L5 : n\'écrit jamais le message de l\'erreur pg (utilisateur, base, hôte), seulement son type et son code SQLSTATE', async () => {
+    const lines: string[] = []
+    const sink = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => { lines.push(String(chunk)); return true })
+    const pgError = Object.assign(new Error('password authentication failed for user=ccc database=ccc_prod host=db.internal.example'), { name: 'error', code: '28P01' })
+    const dataSource = fakeDataSource({ runMigrations: vi.fn().mockRejectedValue(pgError) })
+
+    expect(await runMigrationsCommand(dataSource, 'up')).toBe(1)
+    sink.mockRestore()
+    const output = lines.join('')
+    expect(output).toContain('migrations_failed')
+    expect(output).toContain('28P01')
+    expect(output).not.toMatch(/user=|database=|host=|ccc_prod|internal\.example/)
+  })
+
+  it('une sous-commande inconnue journalise l\'usage, pas l\'entrée de l\'utilisateur', async () => {
+    const error = vi.spyOn(logger, 'error').mockImplementation(() => undefined)
+    await runMigrationsCommand(fakeDataSource({}), 'drop-everything')
+    expect(error).toHaveBeenCalledExactlyOnceWith(LOG_EVENT.MIGRATIONS_FAILED, { errorName: 'UsageError', usage: 'run-migrations {up|revert}' })
   })
 })

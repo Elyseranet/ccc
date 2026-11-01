@@ -1,6 +1,7 @@
 import type { DataSource } from 'typeorm'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { MIGRATION_COMMAND } from '../enums/migration-command.enum.js'
+import { describeErrorForLog } from './log-sanitize.util.js'
 import { logger } from './logger.util.js'
 
 /**
@@ -25,9 +26,11 @@ export async function runMigrationsCommand(dataSource: DataSource, command: stri
       logger.info(LOG_EVENT.MIGRATIONS_REVERTED, { migrations: executed.map((migration) => migration.name) })
       return 0
     }
-    throw new Error(`Usage : run-migrations {${MIGRATION_COMMAND.UP}|${MIGRATION_COMMAND.REVERT}}`)
+    logger.error(LOG_EVENT.MIGRATIONS_FAILED, { errorName: 'UsageError', usage: `run-migrations {${MIGRATION_COMMAND.UP}|${MIGRATION_COMMAND.REVERT}}` })
+    return 1
   } catch (error) {
-    logger.error(LOG_EVENT.MIGRATIONS_FAILED, { message: error instanceof Error ? error.message : 'Unknown error' })
+    // T-SEC-09 (L5) : type et code seulement, jamais le message (il peut citer utilisateur, base et hôte).
+    logger.error(LOG_EVENT.MIGRATIONS_FAILED, describeErrorForLog(error))
     return 1
   }
 }

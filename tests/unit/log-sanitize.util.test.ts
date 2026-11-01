@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LOG_MAX_VALUE_LENGTH, LOG_SECRET_SEGMENT_PLACEHOLDER } from '../../src/consts/log.const'
-import { sanitizeRouteForLog, truncateLogValue } from '../../src/utils/log-sanitize.util'
+import { describeErrorForLog, sanitizeRouteForLog, truncateLogValue } from '../../src/utils/log-sanitize.util'
 
 describe('log sanitizing', () => {
   it('truncates a long value to the fixed bound', () => {
@@ -47,3 +47,20 @@ describe('log sanitizing', () => {
     })
   })
 })
+
+describe('describeErrorForLog (T-SEC-09, L5)', () => {
+  it('keeps the error type and the SQLSTATE code, never the message', () => {
+    const error = Object.assign(new Error('no pg_hba.conf entry for host=10.0.0.5 user=ccc database=prod'), { name: 'error', code: '28000' })
+    const fields = describeErrorForLog(error)
+    expect(fields).toEqual({ errorName: 'error', errorCode: '28000' })
+    expect(JSON.stringify(fields)).not.toMatch(/host=|user=|database=|10\.0\.0\.5/)
+  })
+
+  it('falls back to errno, then to null, and survives a non-Error value', () => {
+    expect(describeErrorForLog(Object.assign(new Error('x'), { errno: -111 }))).toEqual({ errorName: 'Error', errorCode: -111 })
+    expect(describeErrorForLog(new TypeError('x'))).toEqual({ errorName: 'TypeError', errorCode: null })
+    expect(describeErrorForLog('boom')).toEqual({ errorName: 'UnknownError', errorCode: null })
+    expect(describeErrorForLog(undefined)).toEqual({ errorName: 'UnknownError', errorCode: null })
+  })
+})
+

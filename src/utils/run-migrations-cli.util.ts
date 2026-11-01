@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { MIGRATION_COMMAND } from '../enums/migration-command.enum.js'
 import dataSource from '../server/db/typeorm/data-source.js'
+import { describeErrorForLog } from './log-sanitize.util.js'
 import { logger } from './logger.util.js'
 import { runMigrationsCommand } from './run-migrations.util.js'
 
@@ -14,7 +15,7 @@ const main = async (): Promise<void> => {
   try {
     await dataSource.initialize()
   } catch (error) {
-    logger.error(LOG_EVENT.MIGRATIONS_FAILED, { message: error instanceof Error ? error.message : 'Unknown error' })
+    logger.error(LOG_EVENT.MIGRATIONS_FAILED, describeErrorForLog(error))
     process.exitCode = 1
     return
   }
