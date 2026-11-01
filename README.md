@@ -202,6 +202,22 @@ docker exec ccc-db psql -U ccc -d ccc -c "create database ccc_<agent>_test owner
 
 Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
 
+### Édition en cours dans la base de test (QA-2, T-QA-03)
+
+Le dump `archives.sql` clôture les 16 éditions, 2026 comprise : sans autre étape, aucun écran ne pourrait montrer une édition en cours (accueil, tableau de bord, saisie des scores, tirages). Après le dump, `prepare-database` (`tests/e2e/helpers/in-progress-edition.ts`) remet donc **l'édition 2026 en phase de poules**, une seule fois et pour tous les tests (aucune mutation propre à un test, décision utilisateur QA-2). Ce ne sont pas des données fictives (ARCH-8) : ce sont les lignes de 2026, rembobinées à un moment de sa saison. **Aucune ligne n'est créée ni supprimée** : uniquement des `UPDATE`, dans une transaction.
+
+| Donnée | État produit |
+|---|---|
+| Édition 2026 | `POOLS_PLAYING`, `closed_at` vide |
+| Tour de poules | `PLAYING` ; les tours de phase finale sont `PENDING` |
+| Matchs de phase finale (15) | `SCHEDULED`, sans score ni date de saisie ou de validation |
+| Matchs de poule | pour chaque poule, le tiers des matchs à la plus forte séquence (arrondi à l'inférieur) repasse à `SCHEDULED` : 24 sur 72, soit 48 validés |
+| Participations de 2026 | statut `IN_POOL`, ni étape finale, ni points, ni rang de poule : pas de champion 2026 |
+
+La règle est la même à chaque exécution : classement des matchs par numéro de séquence décroissant dans chaque poule, valeurs `E2E_IN_PROGRESS_EDITION_CODE`, `E2E_POOL_REWIND_NUMERATOR` et `E2E_POOL_REWIND_DENOMINATOR` dans `tests/e2e/helpers/e2e.const.ts`. La sortie JSON de `prepare-database` indique l'état produit (`inProgressEdition`). Les champs `matches` et `validatedMatches` de cette sortie comptent le dump **avant** la remise en phase de poules ; GET /stats en donne les valeurs après (A16 : 729 matchs joués et 554 avec score dans le dump ; 690 et 515 une fois les 39 matchs à jouer retirés).
+
+`tests/db/in-progress-edition.test.ts` vérifie le déterminisme (deux préparations successives, mêmes ids de matchs programmés), l'absence de création ou de suppression, et la cohérence de ce que l'API calcule pour 2026 (statut, avancement des poules, champion, compteurs d'archive). Les zones visuelles qui lisent 2026 se mesurent sur cet état.
+
 ### Garde anti-code-serveur dans le navigateur (ARCH-1, ARCH-2, ARCH-12)
 
 `src/utils/` et `src/services/` mêlent code navigateur et code serveur : un service fusionné exporte sa classe `$fetch` et ses fonctions TypeORM. Le build client déclare sans effet de bord les modules serveur (typeorm, pg, reflect-metadata, `src/server/**`, `node:*`), qui sont élagués avec les fonctions serveur inutilisées. Le plugin `clientBundleGuard` fait échouer `nuxt build` si l'un d'eux reste dans un chunk client. `npm run test:bundle` vérifie le résultat octet par octet. Il n'y a aucun scan d'auto-import (`imports.scan: false`) : chaque fichier importe explicitement ce qu'il utilise.

@@ -6,8 +6,8 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000'
 
-/** Ids figés par le dump des archives (ARCH-9) : Benoit Bastien a 5 adversaires, Céline Toni en a exactement 4. */
-const PLAYER_WITH_FIVE_OPPONENTS = '1a51badd-d10a-4ad2-af69-3db5d49459dc'
+/** Ids figés par le dump des archives (ARCH-9) : Aurélie Jochel a 5 adversaires, Céline Toni en a exactement 4, dans l'état « 2026 en phase de poules » (T-QA-03 : Benoit Bastien, qui en avait 5 avant la remise en phase de poules, n'en a plus 5). */
+const PLAYER_WITH_FIVE_OPPONENTS = 'adeecb22-279f-4bc1-b661-df63abb19fae'
 
 const PLAYER_WITH_FOUR_OPPONENTS = '4ea7c348-33a3-45ab-a4fa-ca924c92f522'
 

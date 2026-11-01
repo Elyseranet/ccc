@@ -22,3 +22,20 @@ export const E2E_BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${proc
  * est à 22 px du bord droit, il reste donc visible) ; `vertical` = marge haute et basse, pour laisser filet et arcs.
  */
 export const VALUE_MASK_INSETS = { left: 21, right: 41, vertical: 6 }
+
+/*********************************************************
+ * Édition en cours dans la base de test (QA-2, T-QA-03)
+ *
+ * @description
+ * Le dump d'archives clôture les 16 éditions, 2026 comprise. La préparation de la base remet 2026 en phase de poules, une
+ * seule fois et pour tous les tests. La règle : l'édition passe en `POOLS_PLAYING`, le tour de poules en `PLAYING`, les
+ * autres tours en `PENDING` ; leurs matchs repassent à « programmé » sans score ; pour chaque poule, la fraction
+ * `numérateur / dénominateur` de ses matchs (les derniers par numéro de séquence, arrondi à l'inférieur) repasse aussi à
+ * « programmé » ; les participations perdent leur issue (étape finale, points, rang de poule). Aucune ligne n'est créée ni supprimée.
+ * Avec les poules de 2026 (21, 15, 21 et 15 matchs) et un tiers, 24 matchs de poule sur 72 sont à jouer : 48 validés.
+ ********************************************************/
+export const E2E_IN_PROGRESS_EDITION_CODE = '2026'
+
+export const E2E_POOL_REWIND_NUMERATOR = 1
+
+export const E2E_POOL_REWIND_DENOMINATOR = 3
