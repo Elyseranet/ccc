@@ -5,7 +5,7 @@ import { useDataSource } from '../../../../../utils/database.util.js'
 
 /** « Enregistrer » un score sans le rendre opposable : aucun effet public. Réservé à l'administrateur. */
 export default defineEventHandler(async (event): Promise<IAdminMatch> => {
-  const command = await readScoreCommand(event, { ifMatchRequired: false })
+  const command = await readScoreCommand(event)
   const dataSource = await useDataSource()
   await recordScore(dataSource, command)
   return loadAdminMatch(dataSource, command.matchId)

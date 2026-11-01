@@ -1,4 +1,5 @@
 import type { DataSource } from 'typeorm'
+import { COMPETITOR_KEEP_VERSION } from '../consts/competitor.const.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import { LoginDeviceEntity } from '../server/db/typeorm/entities/login-device.entity.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
@@ -15,7 +16,9 @@ export const applyProfileChanges = async (dataSource: DataSource, changes: IProf
   await dataSource.transaction(async (manager) => {
     if (changes.competitorId && changes.phone !== undefined) {
       await manager.getRepository(CompetitorEntity).update({ id: changes.competitorId }, {
-        phone: changes.phone
+        phone: changes.phone,
+        // Le téléphone n'est pas l'identité : la version du PATCH admin n'avance pas.
+        version: COMPETITOR_KEEP_VERSION
       })
     }
     if (changes.newPasswordHash) {

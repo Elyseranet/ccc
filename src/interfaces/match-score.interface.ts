@@ -17,8 +17,8 @@ export interface IScoreCommand {
   userId: string
   requestId?: string
   scores: IScoreSideInput[]
-  /** Version attendue (`If-Match`) ; absente si l'en-tête n'est pas fourni. */
-  expectedVersion?: number
+  /** Version attendue (`If-Match`, obligatoire : 428 sans en-tête). */
+  expectedVersion: number
 }
 
 export interface IScoreWriteOutcome {

@@ -7,7 +7,7 @@ import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { DRAW_KIND, DRAW_STATUS } from '../../src/enums/draw.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../src/enums/edition.enum'
 import { ACCOUNT_STATE, USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
-import type { ICompetitorPublic } from '../../src/interfaces/competitor.interface'
+import type { ICompetitorDetail, ICompetitorIdentity } from '../../src/interfaces/competitor.interface'
 import type { IAdminParticipant, IEditionParticipant, IEditionSummary } from '../../src/interfaces/edition.interface'
 import type { IApiError } from '../../src/interfaces/error.interface'
 import { CompetitorEntity } from '../../src/server/db/typeorm/entities/competitor.entity'
@@ -41,7 +41,9 @@ const send = (method: string, path: string, body?: unknown, cookie?: string, ext
     body: body === undefined ? undefined : JSON.stringify(body)
   })
 
-const asAdmin = (method: string, path: string, body?: unknown) => send(method, path, body, adminCookie)
+const asAdmin = (method: string, path: string, body?: unknown, extraHeaders: Record<string, string> = {}) =>
+  send(method, path, body, adminCookie, extraHeaders)
+const IF_MATCH_ONE = { 'If-Match': '"1"' }
 
 const createEdition = async (year: number, name = `CCC ${year}`): Promise<IEditionSummary> => {
   const response = await asAdmin('POST', '/api/v1/editions', { year, name })
@@ -209,10 +211,10 @@ describe('admin editions, identity and participants (B-10)', async () => {
   describe('PATCH /competiteurs/{id}', () => {
     it('corrects the identity and exposes no private field', async () => {
       const competitor = await createCompetitor('Rémy Duran')
-      const response = await asAdmin('PATCH', `/api/v1/competiteurs/${competitor.id}`, { displayName: 'Rémi Durand', firstName: 'Rémi', nickname: null })
+      const response = await asAdmin('PATCH', `/api/v1/competiteurs/${competitor.id}`, { displayName: 'Rémi Durand', firstName: 'Rémi', nickname: null }, IF_MATCH_ONE)
       expect(response.status).toBe(200)
-      const body = await response.json() as ICompetitorPublic
-      expect(body).toMatchObject({ id: competitor.id, displayName: 'Rémi Durand', firstName: 'Rémi', nickname: null })
+      const body = await response.json() as ICompetitorIdentity
+      expect(body).toMatchObject({ id: competitor.id, displayName: 'Rémi Durand', firstName: 'Rémi', nickname: null, version: 2 })
       expect(JSON.stringify(body)).not.toContain('11 22')
       const stored = await dataSource.getRepository(CompetitorEntity).findOneByOrFail({ id: competitor.id })
       expect(stored.displayName).toBe('Rémi Durand')
@@ -221,15 +223,61 @@ describe('admin editions, identity and participants (B-10)', async () => {
 
     it.each([['avatarUrl', 'https://example.com/a.png'], ['phone', '+33 6 00'], ['email', 'a@b.fr']])('refuses %s with a 400', async (field, value) => {
       const competitor = await createCompetitor(`Strict ${field}`)
-      const response = await asAdmin('PATCH', `/api/v1/competiteurs/${competitor.id}`, { displayName: 'x', [field]: value })
+      const response = await asAdmin('PATCH', `/api/v1/competiteurs/${competitor.id}`, { displayName: 'x', [field]: value }, IF_MATCH_ONE)
       expect(response.status).toBe(400)
     })
 
+    it('requires If-Match: 428 without it, 412 with the exact current version when stale, 400 when malformed', async () => {
+      const competitor = await createCompetitor('Version Test')
+      const path = `/api/v1/competiteurs/${competitor.id}`
+      const missing = await asAdmin('PATCH', path, { displayName: 'Version Un' })
+      expect(missing.status).toBe(428)
+      expect((await errorOf(missing)).code).toBe(API_ERROR_CODE.PRECONDITION_REQUIRED)
+      expect((await asAdmin('PATCH', path, { displayName: 'Version Un' }, { 'If-Match': 'abc' })).status).toBe(400)
+
+      const stale = await asAdmin('PATCH', path, { displayName: 'Version Un' }, { 'If-Match': '"7"' })
+      expect(stale.status).toBe(412)
+      expect(await errorOf(stale)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: 1 } })
+      expect((await dataSource.getRepository(CompetitorEntity).findOneByOrFail({ id: competitor.id })).displayName).toBe('Version Test')
+    })
+
+    it('chains two corrections with the version returned by the first, and refuses the first version afterwards', async () => {
+      const competitor = await createCompetitor('Chaine Test')
+      const path = `/api/v1/competiteurs/${competitor.id}`
+      const detailVersion = async (): Promise<number> => (await (await fetch(path)).json() as ICompetitorDetail).version
+      expect(await detailVersion()).toBe(1)
+
+      const first = await asAdmin('PATCH', path, { nickname: 'Un' }, { 'If-Match': '"1"' })
+      expect(first.status).toBe(200)
+      const identity = await first.json() as ICompetitorIdentity
+      expect(identity.version).toBe(2)
+      expect(await detailVersion()).toBe(2)
+
+      const second = await asAdmin('PATCH', path, { nickname: 'Deux' }, { 'If-Match': `"${identity.version}"` })
+      expect(second.status).toBe(200)
+      expect((await second.json() as ICompetitorIdentity).version).toBe(3)
+
+      const replayOfFirst = await asAdmin('PATCH', path, { nickname: 'Un' }, { 'If-Match': '"1"' })
+      expect(replayOfFirst.status).toBe(412)
+      expect(await errorOf(replayOfFirst)).toMatchObject({ details: { currentVersion: 3 } })
+    })
+
+    it('serialises two simultaneous corrections: one wins, the other gets 412', async () => {
+      const competitor = await createCompetitor('Course Test')
+      const path = `/api/v1/competiteurs/${competitor.id}`
+      const [one, two] = await Promise.all([
+        asAdmin('PATCH', path, { nickname: 'A' }, IF_MATCH_ONE),
+        asAdmin('PATCH', path, { nickname: 'B' }, IF_MATCH_ONE)
+      ])
+      expect([one.status, two.status].sort()).toEqual([200, 412])
+      expect((await dataSource.getRepository(CompetitorEntity).findOneByOrFail({ id: competitor.id })).version).toBe(2)
+    })
+
     it('answers 404 COMPETITOR_NOT_FOUND for an unknown competitor and 400 for a bad id', async () => {
-      const missing = await asAdmin('PATCH', `/api/v1/competiteurs/${UNKNOWN_UUID}`, { displayName: 'x' })
+      const missing = await asAdmin('PATCH', `/api/v1/competiteurs/${UNKNOWN_UUID}`, { displayName: 'x' }, IF_MATCH_ONE)
       expect(missing.status).toBe(404)
       expect((await errorOf(missing)).code).toBe(API_ERROR_CODE.COMPETITOR_NOT_FOUND)
-      expect((await asAdmin('PATCH', '/api/v1/competiteurs/not-a-uuid', { displayName: 'x' })).status).toBe(400)
+      expect((await asAdmin('PATCH', '/api/v1/competiteurs/not-a-uuid', { displayName: 'x' }, IF_MATCH_ONE)).status).toBe(400)
     })
   })
 

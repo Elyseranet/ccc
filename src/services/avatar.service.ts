@@ -1,5 +1,6 @@
 import type { DataSource, EntityManager } from 'typeorm'
 import { AVATAR_VERSION_LENGTH } from '../consts/avatar.const.js'
+import { COMPETITOR_KEEP_VERSION } from '../consts/competitor.const.js'
 import { CompetitorAvatarEntity } from '../server/db/typeorm/entities/competitor-avatar.entity.js'
 import { CompetitorEntity } from '../server/db/typeorm/entities/competitor.entity.js'
 import type { IProcessedAvatar, IStoredAvatar } from '../interfaces/avatar.interface.js'
@@ -13,7 +14,7 @@ import { avatarUnsupportedType, competitorNotFound, notFound } from '../utils/ap
  * (`CURRENT_TIMESTAMP`), comme les autres écritures de cette colonne, pour que la date ne recule jamais.
  */
 const touchCompetitor = (manager: EntityManager, competitorId: string): Promise<unknown> =>
-  manager.getRepository(CompetitorEntity).update({ id: competitorId }, { updatedAt: () => 'CURRENT_TIMESTAMP' })
+  manager.getRepository(CompetitorEntity).update({ id: competitorId }, { updatedAt: () => 'CURRENT_TIMESTAMP', version: COMPETITOR_KEEP_VERSION })
 
 /**
  * Valide la signature (415), ré-encode (422 si illisible), puis remplace l'avatar du compétiteur (upsert) et avance son

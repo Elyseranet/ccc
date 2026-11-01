@@ -24,9 +24,9 @@ import {
   conflict,
   matchAlreadyValidated,
   matchNotFound,
-  matchVersionConflict,
   nextRoundEngaged,
-  scoreInconsistent
+  scoreInconsistent,
+  versionConflict
 } from '../utils/api-error.util.js'
 import { logger } from '../utils/logger.util.js'
 import { toAdminMatch } from '../utils/match-admin.mapper.util.js'
@@ -77,9 +77,10 @@ const assertWritable = ({ match, edition }: ILockedMatch): void => {
   }
 }
 
-const assertVersion = (match: MatchEntity, expected: number | undefined): void => {
-  if (expected !== undefined && expected !== match.version) {
-    throw matchVersionConflict()
+/** Contrôle de version obligatoire (SEC-Q) : 412 `VERSION_CONFLICT` avec la version courante. */
+const assertVersion = (match: MatchEntity, expected: number): void => {
+  if (expected !== match.version) {
+    throw versionConflict(match.version)
   }
 }
 
@@ -127,10 +128,11 @@ export const recordScore = (dataSource: DataSource, command: IScoreCommand): Pro
       throw matchAlreadyValidated()
     }
     assertWritable(locked)
-    assertVersion(match, command.expectedVersion)
+    // Un rejeu (mêmes scores déjà enregistrés) ne change rien : il réussit même avec une version périmée, comme la validation.
     const unchanged = match.status === MATCH_STATUS.RECORDED
       && hasSameScores(sidesInOrder(match).map((side) => side.recordedScore), scores)
     if (!unchanged) {
+      assertVersion(match, command.expectedVersion)
       await writeSides(manager, match, (_side, score) => ({ recordedScore: score }), scores)
       await manager.update(MatchEntity, { id: match.id }, { status: MATCH_STATUS.RECORDED, recordedAt: new Date() })
       logger.info(LOG_EVENT.MATCH_RECORDED, {
@@ -143,7 +145,7 @@ export const recordScore = (dataSource: DataSource, command: IScoreCommand): Pro
 /**
  * « Valider » : copie `recorded_score` vers `validated_score`. Un rejeu (match déjà VALIDATED, mêmes scores)
  * renvoie l'état courant sans effet ; d'autres scores donnent MATCH_ALREADY_VALIDATED. Les scores du corps sont
- * ce que l'organisateur a vu : s'ils diffèrent du score saisi, ou si `If-Match` est périmé, MATCH_VERSION_CONFLICT.
+ * ce que l'organisateur a vu : s'ils diffèrent du score saisi, ou si `If-Match` est périmé, 412 VERSION_CONFLICT.
  */
 export const validateMatch = (dataSource: DataSource, command: IScoreCommand): Promise<IScoreWriteOutcome> =>
   dataSource.transaction(async (manager) => {
@@ -161,7 +163,7 @@ export const validateMatch = (dataSource: DataSource, command: IScoreCommand): P
       throw conflict('No recorded score to validate')
     }
     if (!hasSameScores(sidesInOrder(match).map((side) => side.recordedScore), scores)) {
-      throw matchVersionConflict()
+      throw versionConflict(match.version)
     }
     assertVersion(match, command.expectedVersion)
     assertConsistent(match, scores)

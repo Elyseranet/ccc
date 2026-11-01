@@ -51,6 +51,7 @@ const DIRECTORY_PAGE = Array.from({ length: 20 }, (_, index) => listItem(index +
 
 const DETAIL: ICompetitorDetail = {
   ...identity(PLAYER_ID, 'Alix Bernard', 'Rebond'),
+  version: 1,
   stats: { played: 79, wins: 56, losses: 23, unknownResults: 0, pointsFor: 400, pointsAgainst: 300, titles: 1 },
   participations: [
     { editionId: 'e-2014', editionCode: '2014', year: 2014, editionName: null, editionStatus: EDITION_STATUS.CLOSED, finalStage: FINAL_STAGE.QUARTER, points: 2.88, poolRank: 1, poolNumber: 1, wins: 3, losses: 1, unknownResults: 0 },

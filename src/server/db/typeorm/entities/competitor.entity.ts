@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, UpdateDateColumn, VirtualColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, UpdateDateColumn, VersionColumn, VirtualColumn } from 'typeorm'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
 @Entity({ name: 'competitors' })
@@ -34,4 +34,11 @@ export class CompetitorEntity extends UuidPrimaryEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date
+
+  /**
+   * Version de l'IDENTITÉ (nom affiché, prénom, nom, pseudo), base du contrôle `If-Match` du PATCH admin (T-SEC-10 L1).
+   * Les écritures qui ne touchent pas l'identité (avatar, téléphone) la figent avec `COMPETITOR_KEEP_VERSION`.
+   */
+  @VersionColumn()
+  version!: number
 }

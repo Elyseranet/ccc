@@ -71,8 +71,13 @@ export const matchNotFound = (): H3Error =>
 export const matchAlreadyValidated = (): H3Error =>
   buildError(409, API_ERROR_CODE.MATCH_ALREADY_VALIDATED, API_ERROR_MESSAGE.MATCH_ALREADY_VALIDATED)
 
-export const matchVersionConflict = (): H3Error =>
-  buildError(409, API_ERROR_CODE.MATCH_VERSION_CONFLICT, API_ERROR_MESSAGE.MATCH_VERSION_CONFLICT)
+/** 428 : l'écriture exige un `If-Match` (contrôle de version obligatoire, SEC-Q). */
+export const preconditionRequired = (): H3Error =>
+  buildError(428, API_ERROR_CODE.PRECONDITION_REQUIRED, API_ERROR_MESSAGE.PRECONDITION_REQUIRED)
+
+/** 412 : la version lue est périmée. `currentVersion` permet au client de recharger ; pas l'état complet. */
+export const versionConflict = (currentVersion: number): H3Error =>
+  buildError(412, API_ERROR_CODE.VERSION_CONFLICT, API_ERROR_MESSAGE.VERSION_CONFLICT, { currentVersion })
 
 export const nextRoundEngaged = (): H3Error =>
   buildError(409, API_ERROR_CODE.NEXT_ROUND_ENGAGED, API_ERROR_MESSAGE.NEXT_ROUND_ENGAGED)

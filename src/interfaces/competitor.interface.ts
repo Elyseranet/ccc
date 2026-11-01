@@ -64,6 +64,8 @@ export interface ICompetitorStats {
 }
 
 export interface ICompetitorDetail extends ICompetitorPublic {
+  /** Version de l'identité (nom affiché, prénom, nom, pseudo) : à renvoyer dans `If-Match` de `PATCH /competiteurs/{id}`. L'avatar ne la fait pas avancer. */
+  version: number
   participations: ICompetitorParticipation[]
   stats: ICompetitorStats
 }
@@ -96,6 +98,11 @@ export interface IMatchContext {
  * `PATCH /competiteurs/{id}` (administrateur) : corriger une identité. L'avatar passe par
  * `PUT /competiteurs/{id}/avatar` (B-16), pas par cette route.
  */
+/** Réponse de `PATCH /competiteurs/{id}` : l'identité corrigée avec sa nouvelle version. */
+export interface ICompetitorIdentity extends ICompetitorPublic {
+  version: number
+}
+
 export interface IUpdateCompetitorRequest {
   displayName?: string
   firstName?: string | null

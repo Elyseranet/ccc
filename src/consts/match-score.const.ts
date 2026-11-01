@@ -20,11 +20,6 @@ export const QUALIFICATION_STOPPED_EDITION_STATUSES: readonly EDITION_STATUS[] =
   EDITION_STATUS.CLOSED
 ]
 
-export const IF_MATCH_HEADER = 'if-match'
-
-/** Version d'un match dans `If-Match` : entier, avec ou sans guillemets ni préfixe `W/`. */
-export const IF_MATCH_VERSION_PATTERN = /^(?:W\/)?"?(\d{1,9})"?$/
-
 /** Plafond défensif d'un score saisi ; les cibles valent 3, 5 ou 10. */
 export const SCORE_INPUT_MAX = 99
 
