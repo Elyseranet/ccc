@@ -12,7 +12,15 @@ export interface IEditionPodium {
   finalWinnerScore: number | null
   finalLoserScore: number | null
   finalist: TEditionPerson | null
-  semifinalists: TEditionPerson[]
+  /** Titres du finaliste à la date de l'édition (B-19) ; 0 sans finaliste. */
+  finalistTitles: number
+  /** Demi-finalistes dans l'ordre du serveur, jamais retriés ; vide tant qu'aucune demi-finale n'est jouée. */
+  semifinalists: IEditionPodiumPlace[]
+}
+
+export interface IEditionPodiumPlace {
+  person: TEditionPerson
+  titles: number
 }
 
 export interface IEditionFact {

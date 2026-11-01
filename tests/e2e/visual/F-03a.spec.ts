@@ -101,7 +101,29 @@ for (const viewport of VIEWPORTS) {
             document.querySelectorAll('.ed-facts .card')[2]?.appendChild(small)
           }, extra[0] as string)
         }
-        await mockup.addStyleTag({ content: '.stars { display: none !important; }' })
+        await mockup.addStyleTag({ content: '.stars { display: none !important; } .stars.podium-stars { display: inline !important; }' })
+        // F-03c (B-19) : les étoiles du podium sont celles de l'API. La maquette porte des étoiles d'exemple : on y met celles de l'app, rang par rang
+        // (la hauteur du podium décide de celle des chiffres, donc toutes les zones de la Synthèse en dépendent).
+        const stars = await page.locator('.edition-summary__place').evaluateAll(
+          places => places.map(place => place.querySelector('.player-link__stars')?.textContent?.trim().length ?? 0)
+        )
+        if (stars.length > 0) {
+          await mockup.evaluate((counts) => {
+            const rows = [...document.querySelectorAll('.ed-podium__rest li')]
+            rows.forEach((row, index) => {
+              row.querySelector('.stars')?.remove()
+              if (index >= counts.length) {
+                row.remove()
+              } else if (counts[index]! > 0) {
+                const span = document.createElement('span')
+                span.className = 'stars podium-stars'
+                span.textContent = '*'.repeat(counts[index]!)
+                row.appendChild(document.createTextNode(' '))
+                row.appendChild(span)
+              }
+            })
+          }, stars)
+        }
         await hideInk(mockup, MOCKUP_INK)
         await hideInk(page, APP_INK)
         await mockup.evaluate(() => window.scrollTo(0, 0))

@@ -76,7 +76,8 @@ const detail = (overrides: Partial<IEditionDetail> = {}): IEditionDetail => ({
     }
   ] as IEditionDetail['draws'],
   bracket: [],
-  final: { runnerUp: person('c2', 'Inès Perrin'), score: { champion: 10, runnerUp: 7 } },
+  final: { runnerUp: person('c2', 'Inès Perrin'), runnerUpTitlesToDate: 1, score: { champion: 10, runnerUp: 7 } },
+  semiFinalists: [{ competitor: person('c3', 'Mila Simon'), titlesToDate: 0 }, { competitor: person('c5', 'Eliott Duval'), titlesToDate: 2 }],
   ...overrides
 })
 
@@ -150,7 +151,18 @@ describe('podium', () => {
     expect(podium?.titlesToDate).toBe(4)
     expect([podium?.finalWinnerScore, podium?.finalLoserScore]).toEqual([10, 7])
     expect(podium?.finalist?.displayName).toBe('Inès Perrin')
-    expect(podium?.semifinalists.map(person => person.displayName)).toEqual(['Mila Simon'])
+    expect(podium?.finalistTitles).toBe(1)
+    expect(podium?.semifinalists.map(place => [place.person.displayName, place.titles])).toEqual([['Mila Simon', 0], ['Eliott Duval', 2]])
+  })
+
+  it('demi-finalistes : ordre du serveur conservé, aucune ligne si la liste est vide', () => {
+    const reversed = [{ competitor: person('c9', 'Zoé Zola'), titlesToDate: 0 }, { competitor: person('c1', 'Abel Abel'), titlesToDate: 3 }]
+    expect(buildEditionPodium(detail({ semiFinalists: reversed }))?.semifinalists.map(place => place.person.displayName)).toEqual(['Zoé Zola', 'Abel Abel'])
+    expect(buildEditionPodium(detail({ semiFinalists: [] }))?.semifinalists).toEqual([])
+  })
+
+  it('finaliste : 0 étoile sans finale', () => {
+    expect(buildEditionPodium(detail({ final: null }))?.finalistTitles).toBe(0)
   })
 
   it('aucun podium sans champion', () => {

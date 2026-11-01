@@ -152,7 +152,7 @@ import { editionMatchFilterCounts, filterEditionMatchRows, pageSlice } from '~/u
  * Retour à la ligne des filtres : `origam-chip-group` repose sur `origam-slide-group`, un conteneur qui défile sur une seule ligne
  * (`OrigamSlideGroup.vue:463-468`, `flex-wrap` sans variable) dont le contenu est `white-space: nowrap` (`:456`). La prop `column`
  * ne fait qu'ajouter la classe `origam-chip-group--column` (`OrigamChipGroup.vue:158`), qu'aucune règle ne lit : elle est inerte.
- * D'où les `:deep` ci-dessous (fiche `docs/tickets/origam/chip-group-retour-a-la-ligne-evolution.md`).
+ * D'où les `:deep` ci-dessous (Elyseranet/origam#1284, fiche `docs/tickets/origam/chip-group-retour-a-la-ligne-evolution.md`).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IEditionMatchesProps>(), {})

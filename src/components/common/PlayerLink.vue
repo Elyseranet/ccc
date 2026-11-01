@@ -92,8 +92,16 @@ defineExpose({})
     text-align: start;
   }
 
+  // Disposition du contenu (nom et étoiles) pilotée par variables : OrigamBtn n'expose ni la direction, ni l'alignement, ni l'écart de son
+  // `.origam-btn__content` (flex, `OrigamBtn.vue:1162-1169`) : Elyseranet/origam#1304. Les valeurs par défaut sont celles d'Origam.
+  :deep(.origam-btn__content) {
+    flex-direction: var(--player-link---content-direction, row);
+    align-items: var(--player-link---content-align, center);
+    gap: var(--player-link---content-gap, 0);
+  }
+
   &__stars {
-    margin-inline-start: var(--origam-space---1);
+    margin-inline-start: var(--player-link---stars-margin, var(--origam-space---1));
     color: var(--player-link---stars-color, var(--origam-color__bar---amber));
     letter-spacing: 0.08em;
     font-weight: var(--origam-font__weight---bold);

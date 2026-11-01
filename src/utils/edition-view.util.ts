@@ -74,7 +74,8 @@ export const buildEditionPodium = (detail: IEditionDetail): IEditionPodium | nul
     finalWinnerScore: detail.final?.score?.champion ?? null,
     finalLoserScore: detail.final?.score?.runnerUp ?? null,
     finalist: detail.final ? toPerson(detail.final.runnerUp) : null,
-    semifinalists: detail.participants.filter(participant => participant.finalStage === FINAL_STAGE.SEMI).map(participant => toPerson(participant.competitor))
+    finalistTitles: detail.final?.runnerUpTitlesToDate ?? 0,
+    semifinalists: detail.semiFinalists.map(entry => ({ person: toPerson(entry.competitor), titles: entry.titlesToDate }))
   }
 }
 
