@@ -41,3 +41,17 @@ test('au moins une des éditions testées a un finaliste et un demi-finaliste av
   expect(editions.some(edition => (edition.final?.runnerUpTitlesToDate ?? 0) > 0)).toBe(true)
   expect(editions.some(edition => edition.semiFinalists.some(entry => entry.titlesToDate > 0))).toBe(true)
 })
+
+test('édition en phase de poules (2026) : aucun podium, aucune ligne de finaliste ni de demi-finaliste, aucune étoile', async ({ page, request }) => {
+  const data = await (await request.get('/api/v1/editions/2026')).json() as IEditionPodiumData
+  expect(data.champion).toBeNull()
+  expect(data.final).toBeNull()
+  expect(data.semiFinalists).toEqual([])
+  await page.goto('/editions/2026')
+  await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+  await expect(page.getByTestId('edition-podium')).toHaveCount(0)
+  await expect(page.locator('.edition-summary__place')).toHaveCount(0)
+  await expect(page.locator('.edition-summary .player-link__stars')).toHaveCount(0)
+  await expect(page.getByText('Demi-finale', { exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('edition-steps')).toBeVisible()
+})
