@@ -31,4 +31,4 @@
 | #1282 | évolution : `bracket`, largeur et hauteur de tour en style en ligne, titre centré en dur, slot `connector` vide sans effet | tableau maison conservé (F-03b, F-03-BRK) |
 | #1283 | évolution : `table`, la légende visible n'a pas de variable de graisse | aucun contournement, zone poules-tableau à 0,94 % (F-03b) |
 | #1284 | évolution : `chip-group`, pas de retour à la ligne, prop `column` sans effet | `:deep` limité à `.origam-slide-group__container` dans EditionMatches (F-03b) |
-| à ouvrir | évolution : alignement du contenu de `btn` (`justify-content`, `text-align` avec `wrap`) en dur, sans token | `:deep(.origam-btn__content)` dans `PlayerLink.vue` (F-01) |
+| #1304 | évolution : alignement du contenu de `btn` (`justify-content`, `text-align` avec `wrap`) en dur, sans token | `:deep(.origam-btn__content)` dans `PlayerLink.vue` (F-01) |
