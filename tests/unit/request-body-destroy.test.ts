@@ -5,6 +5,7 @@ import type { AddressInfo } from 'node:net'
 import { once } from 'node:events'
 import { createApp, defineEventHandler, toNodeListener } from 'h3'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { REQUEST_BODY_DRAIN_GRACE_MS } from '../../src/consts/request.const'
 import { readRequestBody } from '../../src/utils/request-body.util'
 
 /*********************************************************
@@ -25,6 +26,7 @@ const BOUND_MAX_BYTES = 16 * 1024
 let server: Server
 let port: number
 const captured: Record<string, IncomingMessage | undefined> = {}
+let holdStartedAt = 0
 
 beforeAll(async () => {
   const app = createApp()
@@ -37,6 +39,17 @@ beforeAll(async () => {
     captured.bound = event.node.req
     const body = await readRequestBody(event, { maxBytes: BOUND_MAX_BYTES, timeoutMs: BOUND_DEADLINE_MS })
     return { length: body.length }
+  }))
+  // La réponse n'est jamais écrite : seule la borne de durée de vidange peut détruire la requête.
+  app.use('/hold', defineEventHandler(async (event) => {
+    captured.hold = event.node.req
+    holdStartedAt = Date.now()
+    try {
+      await readRequestBody(event, { maxBytes: 10 * 1024 * 1024, timeoutMs: BOUND_DEADLINE_MS })
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 10_000))
+    }
+    return null
   }))
   server = createServer(toNodeListener(app))
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
@@ -118,4 +131,26 @@ describe('readRequestBody after the deadline (L6, T-SEC-15)', () => {
     // Le plafond de 16 Kio, plus un morceau de lecture de Node (64 Kio) et ce qui précède le délai : très en deçà de 1 Mio.
     expect(request.socket.bytesRead).toBeLessThan(256 * 1024)
   })
+
+  it('destroys the request within the drain grace even when the client keeps sending slowly and the response is not written', async () => {
+    const socket = connect(port, '127.0.0.1')
+    socket.on('error', () => undefined)
+    socket.write('POST /hold HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nContent-Length: 50000000\r\n\r\n')
+    const sender = setInterval(() => { if (!socket.destroyed) { socket.write('x') } }, 100)
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      const request = captured.hold!
+      if (!request.destroyed) {
+        await once(request, 'close')
+      }
+      const elapsed = Date.now() - holdStartedAt
+      expect(request.destroyed).toBe(true)
+      // Délai de lecture + délai de grâce, plus une large marge ; très en deçà des 10 s de la réponse retenue.
+      expect(elapsed).toBeGreaterThanOrEqual(BOUND_DEADLINE_MS + REQUEST_BODY_DRAIN_GRACE_MS - 200)
+      expect(elapsed).toBeLessThan(BOUND_DEADLINE_MS + REQUEST_BODY_DRAIN_GRACE_MS + 4000)
+    } finally {
+      clearInterval(sender)
+      socket.destroy()
+    }
+  }, 15000)
 })

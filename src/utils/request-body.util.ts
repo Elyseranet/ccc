@@ -1,5 +1,6 @@
 import { setResponseHeader } from 'h3'
 import type { H3Event } from 'h3'
+import { REQUEST_BODY_DRAIN_GRACE_MS } from '../consts/request.const.js'
 import type { IReadRequestBodyOptions } from '../interfaces/request-body.interface.js'
 import { payloadTooLarge, requestTimeout } from './api-error.util.js'
 
@@ -8,12 +9,13 @@ import { payloadTooLarge, requestTimeout } from './api-error.util.js'
  * Point d'entrée unique pour les corps JSON (`readBoundedJsonBody`) et le multipart (B-16).
  *
  * Après le délai (T-SEC-09 L6, corrigé par T-SEC-15) : la réponse 408 porte `Connection: close`, et la lecture CONTINUE,
- * mais les octets sont jetés sans être conservés ni traités, au plus `maxBytes` ; au-delà, la requête est détruite. Pourquoi :
+ * mais les octets sont jetés sans être conservés ni traités, au plus `maxBytes` octets et au plus `REQUEST_BODY_DRAIN_GRACE_MS`
+ * millisecondes ; au premier des deux seuils, la requête est détruite. Pourquoi :
  * Node ferme la socket dès que la réponse est écrite, et fermer une socket qui a encore des octets non lus dans son tampon
  * de réception envoie un RST au lieu d'un FIN, ce qui peut faire perdre au client le 408 encore en transit. En vidant le
  * tampon pendant que la réponse part, la fermeture est ordinaire. Un client qui continue d'écrire après la fermeture
  * reçoit un RST, mais après avoir reçu le 408. L'écart avec L6 (« plus aucun octet lu ») est donc borné : au plus `maxBytes`
- * octets lus puis jetés, pendant la durée de l'envoi de la réponse.
+ * octets lus puis jetés, pendant au plus `REQUEST_BODY_DRAIN_GRACE_MS`, sans aucun traitement.
  */
 export const readRequestBody = async (event: H3Event, { maxBytes, timeoutMs }: IReadRequestBodyOptions): Promise<Buffer> => {
   const { req, res } = event.node
@@ -48,7 +50,12 @@ export const readRequestBody = async (event: H3Event, { maxBytes, timeoutMs }: I
     timer = setTimeout(() => {
       timedOut = true
       setResponseHeader(event, 'Connection', 'close')
-      res.once('close', () => req.destroy())
+      // Borne de durée : un client lent ne tient pas la connexion en continuant d'écrire après le 408.
+      const grace = setTimeout(() => req.destroy(), REQUEST_BODY_DRAIN_GRACE_MS)
+      res.once('close', () => {
+        clearTimeout(grace)
+        req.destroy()
+      })
       reject(requestTimeout())
     }, timeoutMs)
   })
