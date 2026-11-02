@@ -64,7 +64,14 @@ const hydrated = async (page: Page) => {
   await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
 }
 
-interface IZone { zone: string, mockup: string, app: string, masks?: IDataMasks }
+/**
+ * `mockupStart` : sélecteur du champ dont le bas ouvre la zone côté maquette. La barre de force et la liste d'exigences sont dessinées dans
+ * `.pw-meter` (50 px) à 4 px sous le champ ; côté Origam elles vivent dans la zone de détails du champ (54 px, 6 px de padding haut compris).
+ * Le champ de la maquette est à une position y fractionnaire (#pw1 @390 : 834,77) : un texte rastérisé à un autre décalage de sous-pixel
+ * donne jusqu'à 3 % sur cette bande fine sans aucune différence de mise en page (mesure de ui, 77f497c). On aligne donc le champ au pixel
+ * des deux côtés, comme pour le pied de page (F-03a), plutôt que de toucher à la mise en page.
+ */
+interface IZone { zone: string, mockup: string, app: string, masks?: IDataMasks, mockupStart?: string }
 
 const HERO: IZone = { zone: 'compte-hero', mockup: '.page-hero', app: '.page-hero' }
 
@@ -75,9 +82,14 @@ const compareZone = async (page: Page, mockup: Page, viewport: string, entry: IZ
   await alignMockupText(mockup, page, TEXT_PAIRS)
   await hideInk(mockup, MOCKUP_INK)
   await hideInk(page, APP_INK)
-  await alignToPixel(mockup, entry.mockup)
+  await alignToPixel(mockup, entry.mockupStart ?? entry.mockup)
   await alignToPixel(page, entry.app)
   const mockBox = await box(mockup, entry.mockup)
+  if (entry.mockupStart) {
+    const start = await box(mockup, entry.mockupStart)
+    mockBox.height = mockBox.y + mockBox.height - (start.y + start.height)
+    mockBox.y = start.y + start.height
+  }
   if (entry.mockup === HERO.mockup) {
     // Le hero de la maquette est pleine largeur (le contenu est dans `.wrap`) ; celui de l'application est déjà `page-wrap`.
     const wrap = await box(mockup, '.page-hero .wrap')
@@ -101,7 +113,7 @@ const INVITATION_ZONES: IZone[] = [
   { zone: 'compte-invitation-titre', mockup: '#h-first', app: '#invitation-title' },
   { zone: 'compte-invitation-intro', mockup: '#ac-p-first .acc-card > p.muted', app: '.invitation-form__intro' },
   { zone: 'compte-invitation-mot-de-passe', mockup: '#pw1', app: appField('invitation-password') },
-  { zone: 'compte-invitation-force', mockup: '#ac-p-first .pw-meter', app: '.form-field:has(#invitation-password) .origam-password-field__inline-footer' },
+  { zone: 'compte-invitation-force', mockup: '#ac-p-first .pw-meter', mockupStart: '#pw1', app: '.form-field:has(#invitation-password) .origam-input__details' },
   { zone: 'compte-invitation-confirmation', mockup: '#pw2', app: appField('invitation-confirm') },
   { zone: 'compte-invitation-indice', mockup: '#pw-hint', app: '#invitation-hint' },
   { zone: 'compte-invitation-avatar', mockup: '#ac-p-first .acc-avatar', app: '[data-cy="avatar-field"]' },
@@ -112,7 +124,7 @@ const INVITATION_ZONES: IZone[] = [
 const PROFILE_ZONES: IZone[] = [
   { zone: 'compte-profil-entete', mockup: '.acc-prof-h', app: '.profile-form__header' },
   { zone: 'compte-profil-lecture-seule', mockup: '.acc-ro', app: '.profile-readonly' },
-  { zone: 'compte-profil-force', mockup: '#ac-p-prof .pw-meter', app: '.form-field:has(#profile-new-password) .origam-password-field__inline-footer' },
+  { zone: 'compte-profil-force', mockup: '#ac-p-prof .pw-meter', mockupStart: '#pw3', app: '.form-field:has(#profile-new-password) .origam-input__details' },
   { zone: 'compte-profil-avatar', mockup: '#ac-p-prof .acc-avatar', app: '[data-cy="avatar-field"]' },
   { zone: 'compte-profil-telephone', mockup: '#tel2', app: appField('profile-phone') },
   { zone: 'compte-profil-nouveau-mot-de-passe', mockup: '#pw3', app: appField('profile-new-password') },
