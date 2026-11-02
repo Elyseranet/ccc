@@ -152,7 +152,7 @@ Réponse **200** `IAdminDraw` (même forme que ci-dessus, `poolNumber` renseign�
 
 ## `POST /api/v1/tirages/{id}/validation`
 
-Fige le tirage des poules. Une seule transaction, sous `SELECT … FOR UPDATE` sur le tirage puis sur l'édition :
+Fige le tirage des poules. Une seule transaction, sous `SELECT … FOR UPDATE` sur l'édition, puis sur le tirage (`lockEditionThenDraw`) :
 
 - crée les `pools` (rang = `poolNumber`), renseigne `draw_assignments.pool_id` et `participations.pool_id`, marque les têtes de série (`isSeed`, `seedRank` = `drawnOrder`) et passe les participations à `IN_POOL` ;
 - crée le tour `POOLS` avec le statut **`DRAWN`** (explicite : un tour `PENDING` serait invisible du public, et seuls `DRAWN` et `PLAYING` ouvrent la saisie des scores, B-12) ;
