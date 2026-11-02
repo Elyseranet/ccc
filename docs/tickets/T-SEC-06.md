@@ -48,4 +48,5 @@ Par ailleurs, `NUXT_STRICT_RUNTIME_CONFIG=false`, `0` ou vide désactive toute l
 - **M2** : l'hôte SMTP passe par la même normalisation et le même prédicat ; une IPv6 sans crochets (valeur acceptée par nodemailer) est reconnue ; une adresse IP publique reste acceptée.
 - **L1** : le `from` par défaut est comparé sur le domaine **exact** `ccc.local` (avec ou sans nom affiché, sans point final, insensible à la casse), plus sur une fin de chaîne.
 - **Hors périmètre, non traité** : refuser les plages privées (10/8, 172.16/12, 192.168/16, fc00::/7) et link-local (169.254/16, fe80::/10) est une décision remontée au team-lead ; un relais SMTP du réseau interne de Coolify peut être légitime. Un test garde ce comportement (`10.0.0.25` accepté).
-- **L2, L3, I4** : non bloquants, listés par le team-lead (leur contenu ne m'a pas été communiqué).
+- **L2** (non bloquant) : les noms de service SMTP nus (sans point, comme `mailpit`) sont refusés. C'est voulu en production ; un relais interne nommé par un nom de service Docker ne passerait pas. À reconsidérer si le fournisseur choisi (A3) l'exige.
+- **L3 et I4** : non bloquants, listés par le team-lead ; leur contenu exact ne m'a pas été communiqué (à compléter quand il le sera).
