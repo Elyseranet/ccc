@@ -176,7 +176,7 @@ test.describe('parcours de connexion', () => {
     await expect(page).toHaveURL(/\/connexion$/)
   })
 
-  test('déconnexion depuis l’en-tête, sur n’importe quelle page publique : même arrivée, message retiré dès qu’on quitte l’accueil', async ({ page, context }) => {
+  test('déconnexion depuis l’en-tête, sur n’importe quelle page publique : même arrivée, message absent après un rechargement et dès qu’on quitte l’accueil', async ({ page, context }) => {
     await signIn(context, 'member-logout-header')
     await hydrated(page, '/editions/2025')
     await expect(page.getByTestId('account-link')).toHaveText('Mon profil')
@@ -184,6 +184,8 @@ test.describe('parcours de connexion', () => {
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByTestId('logged-out-notice')).toHaveText('Vous êtes déconnecté·e')
     await expect(page.getByTestId('logout-link')).toHaveCount(0)
+    await page.reload()
+    await expect(page.getByTestId('logged-out-notice')).toHaveCount(0)
     await page.getByTestId('nav-/regles').click()
     await expect(page).toHaveURL(/\/regles$/)
     await expect(page.getByTestId('logged-out-notice')).toHaveCount(0)
