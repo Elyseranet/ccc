@@ -38,7 +38,8 @@ export class CompetitorEntity extends UuidPrimaryEntity {
   /**
    * Version de l'IDENTITÉ (nom affiché, prénom, nom, pseudo), base du contrôle `If-Match` du PATCH admin (T-SEC-10 L1).
    * Les écritures qui ne touchent pas l'identité (avatar, téléphone) la figent avec `COMPETITOR_KEEP_VERSION`.
+   * Le défaut 1 reste en base : le dump `archives.sql` insère les compétiteurs sans cette colonne.
    */
-  @VersionColumn()
+  @VersionColumn({ default: 1 })
   version!: number
 }
