@@ -265,6 +265,8 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:api
 
 Le nom de la base doit se terminer par `_test` : sinon la suite refuse de démarrer, pour ne jamais toucher une base réelle.
 
+**Conteneurs de test (PostgreSQL jetable, image du projet).** Les lancer avec `docker run --rm` et les supprimer avec `docker rm -fv` : l'image PostgreSQL déclare un volume, et sans `-v` chaque conteneur laisse un volume anonyme orphelin sur la machine (755 constatés le 2026-11-02). Nommer les conteneurs et réseaux avec un préfixe propre à l'agent, et vérifier en fin de session avec `docker ps -a`, `docker images`, `docker network ls`.
+
 ### e2e sur les vraies données (ARCH-9)
 
 Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUXT_DATABASE_DATABASE` (suffixe `_test` obligatoire). Il applique les migrations et le dump des archives, puis crée des comptes de test (administrateur, participant) avec une session réelle. Aucun mot de passe utilisable n'est créé. Les specs posent le cookie `ccc_session` avec `signIn(context, role)`. Lancer sur un port libre, avec les seules variables nécessaires :

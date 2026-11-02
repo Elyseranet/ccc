@@ -44,6 +44,17 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['[::1] site URL', { siteUrl: 'https://[::1]:3000' }, 'NUXT_PUBLIC_SITE_URL'],
     ['0.0.0.0 site URL', { siteUrl: 'https://0.0.0.0' }, 'NUXT_PUBLIC_SITE_URL'],
     ['*.localhost site URL', { siteUrl: 'https://ccc.localhost' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['localhost. (trailing dot) site URL', { siteUrl: 'https://localhost.' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['a.localhost. (trailing dot) site URL', { siteUrl: 'https://a.localhost.' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::ffff:127.0.0.1] site URL', { siteUrl: 'https://[::ffff:127.0.0.1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::ffff:7f00:1] site URL', { siteUrl: 'https://[::ffff:7f00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[0:0:0:0:0:ffff:7f00:1] site URL', { siteUrl: 'https://[0:0:0:0:0:ffff:7f00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::] site URL', { siteUrl: 'https://[::]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['127.0.0.2 site URL (127.0.0.0/8)', { siteUrl: 'https://127.0.0.2' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['127.255.255.254 site URL', { siteUrl: 'https://127.255.255.254' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['127.1 shorthand site URL', { siteUrl: 'https://127.1' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['decimal 2130706433 site URL', { siteUrl: 'https://2130706433' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['LOCALHOST. mixed case site URL', { siteUrl: 'https://LocalHost.' }, 'NUXT_PUBLIC_SITE_URL'],
     ['default site URL', { siteUrl: DEFAULT_SITE_URL }, 'NUXT_PUBLIC_SITE_URL'],
     ['unparsable site URL', { siteUrl: 'not a url' }, 'NUXT_PUBLIC_SITE_URL'],
     ['empty site URL', { siteUrl: '' }, 'NUXT_PUBLIC_SITE_URL'],
@@ -55,6 +66,15 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['[::1] SMTP host', { host: '[::1]' }, 'NUXT_MAIL_HOST'],
     ['0.0.0.0 SMTP host', { host: '0.0.0.0' }, 'NUXT_MAIL_HOST'],
     ['*.localhost SMTP host', { host: 'smtp.localhost' }, 'NUXT_MAIL_HOST'],
+    ['localhost. (trailing dot) SMTP host', { host: 'localhost.' }, 'NUXT_MAIL_HOST'],
+    ['a.localhost. (trailing dot) SMTP host', { host: 'a.localhost.' }, 'NUXT_MAIL_HOST'],
+    ['[::ffff:127.0.0.1] SMTP host', { host: '[::ffff:127.0.0.1]' }, 'NUXT_MAIL_HOST'],
+    ['::ffff:7f00:1 SMTP host (no brackets)', { host: '::ffff:7f00:1' }, 'NUXT_MAIL_HOST'],
+    ['[::] SMTP host', { host: '[::]' }, 'NUXT_MAIL_HOST'],
+    ['127.0.0.2 SMTP host', { host: '127.0.0.2' }, 'NUXT_MAIL_HOST'],
+    ['LOCALHOST SMTP host with a port', { host: 'LocalHost:1025' }, 'NUXT_MAIL_HOST'],
+    ['dotless service name with a trailing dot', { host: 'mailpit.' }, 'NUXT_MAIL_HOST'],
+    ['unparsable SMTP host', { host: 'bad host' }, 'NUXT_MAIL_HOST'],
     ['SMTP service name without a dot', { host: 'mailpit' }, 'NUXT_MAIL_HOST'],
     ['default SMTP host', { host: DEFAULT_MAIL_HOST }, 'NUXT_MAIL_HOST'],
     ['empty SMTP host', { host: ' ' }, 'NUXT_MAIL_HOST'],
@@ -62,6 +82,9 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['blank sender', { from: '   ' }, 'NUXT_MAIL_FROM'],
     ['default sender', { from: DEFAULT_MAIL_FROM }, 'NUXT_MAIL_FROM'],
     ['default sender address alone', { from: 'no-reply@ccc.local' }, 'NUXT_MAIL_FROM'],
+    ['default sender domain, other local part', { from: 'CCC <admin@ccc.local>' }, 'NUXT_MAIL_FROM'],
+    ['default sender domain, upper case', { from: 'CCC <No-Reply@CCC.LOCAL>' }, 'NUXT_MAIL_FROM'],
+    ['default sender domain, trailing dot', { from: 'no-reply@ccc.local.' }, 'NUXT_MAIL_FROM'],
     ['cookies without Secure (boolean)', { secureCookie: false }, 'NUXT_AUTH_SECURE_COOKIE'],
     ['cookies without Secure (string false)', { secureCookie: 'false' }, 'NUXT_AUTH_SECURE_COOKIE'],
     ['cookies without Secure (string 0)', { secureCookie: '0' }, 'NUXT_AUTH_SECURE_COOKIE'],
@@ -72,7 +95,29 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     expect(() => assertStrictRuntimeConfig(configWith(patch))).toThrow(variable)
   })
 
-  it('accepts a 32 character device cookie secret and an IPv6-free fully qualified SMTP host', () => {
+  it.each([
+    ['https://ccc.example.org', {}],
+    ['https URL with a port', { siteUrl: 'https://ccc.example.org:8443' }],
+    ['https public IPv6 site URL', { siteUrl: 'https://[2001:db8::1]' }],
+    ['https public IPv4 site URL', { siteUrl: 'https://203.0.113.10' }],
+    ['https URL whose name merely contains localhost', { siteUrl: 'https://notlocalhost.example.org' }],
+    ['https URL on 128.0.0.1 (outside 127/8)', { siteUrl: 'https://128.0.0.1' }],
+    ['smtp.example.org', { host: 'smtp.example.org' }],
+    ['SMTP host with a port', { host: 'smtp.example.org:587' }],
+    ['SMTP host in upper case', { host: 'SMTP.Example.ORG' }],
+    ['SMTP host with a trailing dot', { host: 'smtp.example.org.' }],
+    ['public IPv6 SMTP host', { host: '[2001:db8::25]' }],
+    ['public IPv6 SMTP host without brackets', { host: '2001:db8::25' }],
+    ['public IPv4 SMTP host', { host: '203.0.113.25' }],
+    ['private network SMTP relay (out of scope, undecided)', { host: '10.0.0.25' }],
+    ['sender on a similar domain', { from: 'CCC <no-reply@notccc.local.example.org>' }],
+    ['sender whose display name mentions ccc.local', { from: 'ccc.local <no-reply@example.org>' }],
+    ['sender on a ccc.local subdomain name inside another domain', { from: 'no-reply@evilccc.local.test' }]
+  ] as Array<[string, IPatch]>)('accepts %s', (_label, patch) => {
+    expect(() => assertStrictRuntimeConfig(configWith(patch))).not.toThrow()
+  })
+
+  it('accepts a 32 character device cookie secret and a fully qualified SMTP host', () => {
     expect(() => assertStrictRuntimeConfig(configWith({ deviceSecret: 's'.repeat(32), host: 'relay.mail.example.org' }))).not.toThrow()
   })
 

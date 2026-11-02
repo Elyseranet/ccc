@@ -1,8 +1,10 @@
+import { BlockList, isIP } from 'node:net'
 import { DEVICE_SECRET_MIN_LENGTH } from '../consts/auth.const.js'
 import {
   DEFAULT_MAIL_FROM_DOMAIN,
+  LOCAL_ADDRESS_RANGES,
+  LOCAL_HOSTNAME,
   LOCAL_HOSTNAME_SUFFIX,
-  LOCAL_HOSTNAMES,
   STRICT_CONFIG_VARIABLE,
   STRICT_RUNTIME_CONFIG_OFF_VALUES
 } from '../consts/runtime-config.const.js'
@@ -11,10 +13,32 @@ import { resolveSecureCookie } from './cookie-config.util.js'
 
 const asText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '')
 
-/** `localhost`, `127.0.0.1`, `::1`, `[::1]`, `0.0.0.0` et tout `*.localhost`. */
+const localRanges = new BlockList()
+for (const { network, prefix, family } of LOCAL_ADDRESS_RANGES) {
+  localRanges.addSubnet(network, prefix, family)
+}
+
+/**
+ * Hôte normalisé par `URL` (minuscules, formes numériques `127.1` ou `2130706433` ramenées à `127.0.0.1`), sans point final
+ * ni crochets IPv6. Vide si l'hôte n'est pas analysable.
+ */
+const normalizeHostname = (host: string): string => {
+  try {
+    // Une IPv6 sans crochets (valeur de NUXT_MAIL_HOST acceptée par nodemailer) n'est pas une URL valide : on la met entre crochets.
+    const authority = isIP(host) === 6 ? `[${host}]` : host
+    return new URL(`smtp://${authority}`).hostname.replace(/^\[|\]$/g, '').replace(/\.+$/, '').toLowerCase()
+  } catch {
+    return ''
+  }
+}
+
+/** Machine locale : `localhost` et `*.localhost`, plages de `LOCAL_ADDRESS_RANGES`, IPv4 mappées comprises. */
 const isLocalHostname = (hostname: string): boolean => {
-  const lower = hostname.toLowerCase()
-  return (LOCAL_HOSTNAMES as readonly string[]).includes(lower) || lower.endsWith(LOCAL_HOSTNAME_SUFFIX)
+  const family = isIP(hostname)
+  if (family !== 0) {
+    return localRanges.check(hostname, family === 4 ? 'ipv4' : 'ipv6')
+  }
+  return hostname === LOCAL_HOSTNAME || hostname.endsWith(LOCAL_HOSTNAME_SUFFIX)
 }
 
 /** Mode strict actif ? Faux par défaut ; seules `false`, `0` ou la chaîne vide l'éteignent explicitement. */
@@ -31,21 +55,33 @@ export const isStrictRuntimeConfig = (value: unknown): boolean => {
 const siteUrlViolation = (value: unknown): boolean => {
   try {
     const url = new URL(asText(value))
-    return url.protocol !== 'https:' || isLocalHostname(url.hostname)
+    return url.protocol !== 'https:' || isLocalHostname(normalizeHostname(url.host))
   } catch {
     return true
   }
 }
 
-/** Un hôte SMTP vide, local, ou sans point (nom de service comme `mailpit`) n'est pas un serveur réel. */
+/**
+ * Un hôte SMTP vide, non analysable, local (même normalisation que le site : `localhost.`, `[::ffff:127.0.0.1]`, `127.0.0.2`…)
+ * ou un nom sans point (nom de service comme `mailpit`) n'est pas un serveur réel. Une adresse IP publique reste acceptée.
+ */
 const smtpHostViolation = (value: unknown): boolean => {
-  const host = asText(value)
-  return host === '' || isLocalHostname(host) || !host.includes('.')
+  const host = normalizeHostname(asText(value))
+  if (host === '' || isLocalHostname(host)) {
+    return true
+  }
+  return isIP(host) === 0 && !host.includes('.')
+}
+
+/** Adresse de l'expéditeur, avec ou sans nom affiché (`CCC <no-reply@ccc.local>`) : domaine exact, sans `>` ni point final. */
+const mailFromDomain = (from: string): string => {
+  const address = /<([^<>]*)>\s*$/.exec(from)?.[1] ?? from
+  return address.slice(address.lastIndexOf('@') + 1).trim().replace(/\.+$/, '').toLowerCase()
 }
 
 const mailFromViolation = (value: unknown): boolean => {
   const from = asText(value)
-  return from === '' || from.toLowerCase().includes(DEFAULT_MAIL_FROM_DOMAIN)
+  return from === '' || mailFromDomain(from) === DEFAULT_MAIL_FROM_DOMAIN
 }
 
 /**

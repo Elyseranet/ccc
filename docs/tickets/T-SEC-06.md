@@ -41,3 +41,11 @@ Par ailleurs, `NUXT_STRICT_RUNTIME_CONFIG=false`, `0` ou vide désactive toute l
 - **Identifiants SMTP non rendus obligatoires** : le fournisseur de production n'est pas choisi (A3) et certains relais n'exigent pas d'identifiants. À revoir quand il le sera.
 - Commentaires inexacts corrigés (`runtime-config-guard.util.ts`, `Dockerfile`). Les messages nomment les variables, jamais leurs valeurs (testé avec un faux secret).
 - **`docker-compose.local.yml` supprimé** (décision utilisateur, usage local de l'image : `npm run dev` seulement, voir `decisions.md`). Il ne servait qu'au démarrage local de l'image, désormais impossible sans configuration stricte valide. Le commentaire de `docker-compose.yml` qui y renvoyait est retiré. `docs/tickets/T-OPS-01.md` (archive d'un ticket fermé) n'est pas modifié.
+
+## Revue de sécurité de f2bbb02 (2026-11-02), corrections de dev-b09
+
+- **M1** : les hôtes sont normalisés par `URL` avant comparaison (minuscules, point final et crochets IPv6 retirés, formes numériques comme `127.1` ou `2130706433` ramenées à `127.0.0.1`) puis comparés par `net.BlockList` aux plages `LOCAL_ADDRESS_RANGES` (`src/consts/runtime-config.const.ts`) : tout `127.0.0.0/8`, `0.0.0.0`, `::`, `::1`, et les IPv4 mappées sous toutes leurs formes. Restent refusés par nom : `localhost` et `*.localhost`. Cas couverts par les tests : `localhost.`, `a.localhost.`, `[::ffff:127.0.0.1]`, `[::ffff:7f00:1]`, `[0:0:0:0:0:ffff:7f00:1]`, `[::]`, `127.0.0.2`, `127.255.255.254`, `127.1`, `2130706433`.
+- **M2** : l'hôte SMTP passe par la même normalisation et le même prédicat ; une IPv6 sans crochets (valeur acceptée par nodemailer) est reconnue ; une adresse IP publique reste acceptée.
+- **L1** : le `from` par défaut est comparé sur le domaine **exact** `ccc.local` (avec ou sans nom affiché, sans point final, insensible à la casse), plus sur une fin de chaîne.
+- **Hors périmètre, non traité** : refuser les plages privées (10/8, 172.16/12, 192.168/16, fc00::/7) et link-local (169.254/16, fe80::/10) est une décision remontée au team-lead ; un relais SMTP du réseau interne de Coolify peut être légitime. Un test garde ce comportement (`10.0.0.25` accepté).
+- **L2, L3, I4** : non bloquants, listés par le team-lead (leur contenu ne m'a pas été communiqué).

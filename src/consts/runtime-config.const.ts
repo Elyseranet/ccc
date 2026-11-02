@@ -9,12 +9,23 @@ export const DEFAULT_MAIL_FROM = 'CCC <no-reply@ccc.local>'
 /** `NUXT_PUBLIC_SITE_INDEXABLE` (T-SEO-01) : faux par défaut, une instance non configurée (la dev) n'est jamais indexable. */
 export const DEFAULT_SITE_INDEXABLE = false
 
-/** Hôtes qui désignent la machine locale : jamais acceptés en mode strict (`URL.hostname` écrit l'IPv6 entre crochets). */
-export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '::1', '[::1]', '0.0.0.0'] as const
-/** Tout sous-domaine de `localhost` désigne aussi la machine locale. */
+/** Nom d'hôte qui désigne la machine locale ; tout sous-domaine `*.localhost` aussi. Jamais accepté en mode strict. */
+export const LOCAL_HOSTNAME = 'localhost'
 export const LOCAL_HOSTNAME_SUFFIX = '.localhost'
-/** Domaine de l'expéditeur par défaut : un `from` qui en vient n'a jamais été configuré. */
-export const DEFAULT_MAIL_FROM_DOMAIN = '@ccc.local'
+/**
+ * Plages d'adresses qui désignent la machine locale (T-SEC-06 M1) : tout `127.0.0.0/8`, `0.0.0.0`, `::` et `::1`. Les
+ * IPv4 mappées en IPv6 (`::ffff:127.0.0.1`, `::ffff:7f00:1`, toutes leurs écritures) sont rapprochées des plages IPv4 par
+ * `net.BlockList`. Les plages privées (10/8, 172.16/12, 192.168/16, fc00::/7) et link-local ne sont PAS refusées : un relais SMTP
+ * du réseau interne peut être légitime (décision en attente).
+ */
+export const LOCAL_ADDRESS_RANGES = [
+  { network: '127.0.0.0', prefix: 8, family: 'ipv4' },
+  { network: '0.0.0.0', prefix: 32, family: 'ipv4' },
+  { network: '::1', prefix: 128, family: 'ipv6' },
+  { network: '::', prefix: 128, family: 'ipv6' }
+] as const
+/** Domaine de l'expéditeur par défaut (comparé EXACTEMENT) : un `from` sur ce domaine n'a jamais été configuré. */
+export const DEFAULT_MAIL_FROM_DOMAIN = 'ccc.local'
 
 /**
  * Marqueur posé par le Dockerfile (étage runner, propriété de root) : sa présence désigne l'image de production. Une
