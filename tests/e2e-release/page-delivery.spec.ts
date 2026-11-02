@@ -18,7 +18,7 @@ const EDITIONS_INDEX = '/editions'
 const PLAYER_PAGE = '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca'
 const INVITATION_PAGE = '/invitation/jeton-de-test'
 /** Pages livrées, sauf l'admin et le profil : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5 ; un jeton d'invitation inconnu donne l'état « lien inconnu »). */
-const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE]
+const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE, ROUTES.HALL_OF_FAME]
 /** `/profil` est livré mais réservé à un compte : sans session il redirige vers `/connexion` (testé plus bas). */
 const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
@@ -34,13 +34,13 @@ test.describe('pages non livrées', () => {
     })
   }
 
-  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` tant qu’il n’est pas livré (T-REL-02, ab1a6b4)', async ({ request }) => {
+  test('aucun lien vers une page non livrée dans l’accueil ; `/palmares` livré (F-02), ses liens d’accueil sont présents (T-REL-02, ab1a6b4)', async ({ request }) => {
     const html = await (await request.get('/', { maxRedirects: 0 })).text()
     for (const href of hidden([ROUTES.HALL_OF_FAME, ROUTES.LOGIN, ROUTES.ADMIN])) {
       expect(html).not.toContain(`href="${href}"`)
     }
     for (const dataCy of ['home-cta-secondary', 'home-rank-more']) {
-      expect(html).not.toContain(`data-cy="${dataCy}"`)
+      expect(html).toContain(`data-cy="${dataCy}"`)
     }
     expect(html).toContain('data-cy="home-tile-champion"')
   })
@@ -148,5 +148,23 @@ test.describe(`pages livrées ${ROUTES.LOGIN}, ${ROUTES.INVITATION} et ${ROUTES.
     const response = await request.get(ROUTES.PROFILE, { maxRedirects: 0 })
     expect(response.status()).toBe(302)
     expect(response.headers().location).toBe(ROUTES.LOGIN)
+  })
+})
+
+test.describe(`page livrée ${ROUTES.HALL_OF_FAME} (F-02)`, () => {
+  test('publique : répond 200 sans session, avec ses classements, son titre et le lien de navigation', async ({ request }) => {
+    const response = await request.get(ROUTES.HALL_OF_FAME, { maxRedirects: 0 })
+    expect(response.status()).toBe(200)
+    const html = await response.text()
+    expect(html).toContain('data-cy="palmares-tabs"')
+    expect(html).toContain('data-cy="palmares-titles"')
+    expect(html).toContain('<h1')
+    expect(html).toContain(`href="${ROUTES.HALL_OF_FAME}"`)
+  })
+
+  test('l’ancienne adresse /hall-of-fame mène au palmarès (200)', async ({ request }) => {
+    const response = await request.get('/hall-of-fame')
+    expect(response.status()).toBe(200)
+    expect(response.url()).toContain(ROUTES.HALL_OF_FAME)
   })
 })

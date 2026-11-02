@@ -29,9 +29,9 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.HALL_OF_FAME]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.RANKING_ALL_TIME, API_ENDPOINT.RANKING_EVOLUTION]
+    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.RANKING_ACP, API_ENDPOINT.RANKING_ALL_TIME, API_ENDPOINT.RANKING_EVOLUTION]
   },
   [ROUTES.EDITIONS]: {
     delivered: true,

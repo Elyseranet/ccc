@@ -12,6 +12,9 @@
   >
     <template #default>
       <span class="player-link__name">{{ competitor.displayName }}</span>
+      <template v-if="hasTitles && flow">
+        {{ ' ' }}
+      </template>
       <span
         v-if="hasTitles"
         class="player-link__stars"
@@ -44,7 +47,8 @@ const props = withDefaults(defineProps<IPlayerLinkProps>(), {
   titles: 0,
   size: PLAYER_LINK_DEFAULT_SIZE,
   inline: false,
-  wrap: false
+  wrap: false,
+  flow: false
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
@@ -57,10 +61,12 @@ defineSlots<{}>()
  * `inline` : l'annuaire des joueurs garde son nom sur une ligne (mesuré : 0,2 % contre 3,4 % à 390 px). Origam
  * centre alors les lignes et fixe `justify-content: center` en dur sur `__content` (OrigamBtn.vue:1185-1188, sans variable).
  * Le bloc style remet donc l'alignement au début par `:deep`, justifié par docs/tickets/origam/btn-content-alignement-non-themable.md.
+ * Avec `flow`, le lien n'est plus un bouton en ligne (boîte atomique) mais du texte en ligne : le nom, ses étoiles et le texte voisin
+ * passent à la ligne comme dans une phrase (chronologie des titres, maquette `.champ__final`). Le focus se dessine autour de chaque fragment.
  * Le singulier et le pluriel ont chacun leur clé : pas de syntaxe de pluriel i18n dans ce projet.
  ********************************************************/
 const profilePath = computed(() => `/joueurs/${encodeURIComponent(props.competitor.id)}`)
-const linkClasses = computed(() => ({ 'player-link--inline': props.inline, 'player-link--wrap': props.wrap }))
+const linkClasses = computed(() => ({ 'player-link--inline': props.inline, 'player-link--wrap': props.wrap, 'player-link--flow': props.flow }))
 const hasTitles = computed(() => props.titles > 0)
 const stars = computed(() => '*'.repeat(props.titles))
 const titlesLabel = computed(() => props.titles === 1
@@ -85,6 +91,22 @@ defineExpose({})
     --origam-btn---font-size: 1em;
     --origam-btn---line-height: var(--origam-font__lineHeight---normal);
     padding-inline: 0;
+  }
+
+  &.player-link--flow {
+    display: inline;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    vertical-align: baseline;
+
+    :deep(.origam-btn__loader),
+    :deep(.origam-btn__content) {
+      display: inline;
+    }
+
+    .player-link__stars {
+      margin-inline-start: 0;
+    }
   }
 
   &--wrap :deep(.origam-btn__content) {
