@@ -5,10 +5,12 @@ import { defineComponent } from 'vue'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { USER_ROLE } from '../../../src/enums/user.enum'
 import { useLogout } from '../../../src/composables/useLogout'
+import { LOGGED_OUT_STATE_KEY } from '../../../src/consts/auth-session.const'
 import { ROUTES } from '../../../src/consts/routes.const'
 import { AuthService } from '../../../src/services/auth.service'
 import { useAuthStore } from '../../../src/composables/useAuthStore'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
+import { buildMe } from '../../helpers/me'
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)
@@ -48,9 +50,34 @@ describe('useLogout', () => {
     registerEndpoint('/api/v1/auth/logout', { method: 'POST', handler: defineEventHandler(() => null) })
   })
 
+  it('annonce la déconnexion sur l’accueil, quel que soit le rôle (état partagé lu par le layout)', async () => {
+    const auth = useAuthStore(useNuxtApp().$pinia)
+    for (const role of [USER_ROLE.ADMIN, USER_ROLE.PARTICIPANT]) {
+      useState<boolean>(LOGGED_OUT_STATE_KEY).value = false
+      auth.setMe(buildMe(role))
+      const { logout } = await mountLogout()
+      await logout()
+      expect(useState<boolean>(LOGGED_OUT_STATE_KEY).value).toBe(true)
+      expect(navigateToMock).toHaveBeenLastCalledWith(ROUTES.HOME)
+    }
+  })
+
+  it('un échec garde la session et n’annonce aucune déconnexion', async () => {
+    useState<boolean>(LOGGED_OUT_STATE_KEY).value = false
+    registerEndpoint('/api/v1/auth/logout', { method: 'POST', handler: defineEventHandler((event) => {
+      setResponseStatus(event, 500)
+      return { statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'x' }
+    }) })
+    useAuthStore(useNuxtApp().$pinia).setMe(buildMe(USER_ROLE.ADMIN))
+    const { logout, failed } = await mountLogout()
+    await logout()
+    expect(failed.value).toBe(true)
+    expect(useState<boolean>(LOGGED_OUT_STATE_KEY).value).toBe(false)
+  })
+
   it('vide la session puis renvoie vers l’accueil', async () => {
     const auth = useAuthStore(useNuxtApp().$pinia)
-    auth.setSession({ role: USER_ROLE.ADMIN, initials: 'AD' })
+    auth.setMe(buildMe(USER_ROLE.ADMIN))
     const { logout, failed } = await mountLogout()
     await logout()
     expect(auth.isAuthenticated).toBe(false)
@@ -61,7 +88,7 @@ describe('useLogout', () => {
 
   it('traite un 401 comme un succès : la session serveur n’existe déjà plus', async () => {
     const auth = useAuthStore(useNuxtApp().$pinia)
-    auth.setSession({ role: USER_ROLE.ADMIN, initials: 'AD' })
+    auth.setMe(buildMe(USER_ROLE.ADMIN))
     const spy = vi.spyOn(AuthService.prototype, 'logout').mockRejectedValueOnce(
       new ApiRequestError({ statusCode: 401, code: API_ERROR_CODE.UNAUTHORIZED, message: 'Unauthorized' })
     )
@@ -75,7 +102,7 @@ describe('useLogout', () => {
 
   it('garde la session sur un 5xx', async () => {
     const auth = useAuthStore(useNuxtApp().$pinia)
-    auth.setSession({ role: USER_ROLE.ADMIN, initials: 'AD' })
+    auth.setMe(buildMe(USER_ROLE.ADMIN))
     const spy = vi.spyOn(AuthService.prototype, 'logout').mockRejectedValueOnce(
       new ApiRequestError({ statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'boom' })
     )
@@ -89,7 +116,7 @@ describe('useLogout', () => {
 
   it('garde la session et signale l’échec quand l’appel échoue', async () => {
     const auth = useAuthStore(useNuxtApp().$pinia)
-    auth.setSession({ role: USER_ROLE.ADMIN, initials: 'AD' })
+    auth.setMe(buildMe(USER_ROLE.ADMIN))
     const spy = vi.spyOn(AuthService.prototype, 'logout').mockRejectedValueOnce(new Error('boom'))
     const { logout, failed, pending } = await mountLogout()
     await logout()

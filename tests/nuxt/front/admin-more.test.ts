@@ -11,6 +11,7 @@ import AdminMorePage from '~/pages/admin/plus.vue'
 import { AuthService } from '../../../src/services/auth.service'
 import { useAuthStore } from '../../../src/composables/useAuthStore'
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
+import { buildMe } from '../../helpers/me'
 
 const mountPage = () => mountSuspended(AdminMorePage, { route: ROUTES.ADMIN_MORE, global: { components: { RouterLink } } })
 
@@ -36,7 +37,7 @@ describe('page « Plus » de l’admin (F-12)', () => {
 
 describe('états dégradés de la page « Plus » (F-12)', () => {
   beforeEach(() => {
-    useAuthStore(useNuxtApp().$pinia).setSession({ role: USER_ROLE.ADMIN, initials: 'AD' })
+    useAuthStore(useNuxtApp().$pinia).setMe(buildMe(USER_ROLE.ADMIN))
   })
 
   it('un échec de déconnexion affiche l’alerte et garde la session', async () => {

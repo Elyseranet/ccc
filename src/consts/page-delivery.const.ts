@@ -64,17 +64,17 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     endpoints: []
   },
   [ROUTES.LOGIN]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [API_ENDPOINT.AUTH_LOGIN]
   },
   [ROUTES.INVITATION]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
-    endpoints: [API_ENDPOINT.INVITATION_CHECK, API_ENDPOINT.INVITATION_ACCEPT]
+    endpoints: [API_ENDPOINT.INVITATION_CHECK, API_ENDPOINT.INVITATION_ACCEPT, API_ENDPOINT.ME_AVATAR_UPLOAD]
   },
   [ROUTES.PROFILE]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [
       API_ENDPOINT.ME_UPDATE,

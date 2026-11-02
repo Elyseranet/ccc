@@ -1,5 +1,3 @@
-import type { ISessionIdentity } from '../interfaces/session.interface.js'
-
 export const SESSION_COOKIE_NAME = 'ccc_session'
 /** En production : préfixe `__Host-` (OWASP Session Management) qui impose Secure, Path=/ et aucun Domain. */
 export const SESSION_COOKIE_NAME_PRODUCTION = `__Host-${SESSION_COOKIE_NAME}`
@@ -102,5 +100,3 @@ export const PASSWORD_HASH_RETRY_AFTER_SECONDS = 1
 /** L3 (T-SEC-04) : valeurs qui désactivent `runtimeConfig.auth.secureCookie` (NUXT_AUTH_SECURE_COOKIE). */
 export const SECURE_COOKIE_FALSE_VALUES = ['false', '0'] as const
 
-/** Session d'un visiteur sans compte (`GET /moi` répond 401). */
-export const ANONYMOUS_SESSION: ISessionIdentity = Object.freeze({ role: null, initials: null })

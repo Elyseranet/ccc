@@ -57,7 +57,11 @@ export default defineNuxtConfig({
     '/variants': { redirect: { to: '/regles#variantes', statusCode: 301 } },
     '/admin/scores': { redirect: { to: '/admin/matchs', statusCode: 301 } },
     '/admin/groups': { redirect: { to: '/admin/matchs', statusCode: 301 } },
-    '/admin/draws': { redirect: { to: '/admin/tirages', statusCode: 301 } }
+    '/admin/draws': { redirect: { to: '/admin/tirages', statusCode: 301 } },
+    // Politique de référent (F-10, revue de sécurité M1) : ailleurs, seule l'origine part vers un site tiers ; sur le lien d'invitation, dont le
+    // jeton est dans le chemin, jamais rien (la page charge des polices de Google), et la réponse ne se met pas en cache.
+    '/**': { headers: { 'referrer-policy': 'strict-origin-when-cross-origin' } },
+    '/invitation/**': { headers: { 'referrer-policy': 'no-referrer', 'cache-control': 'no-store' } }
   },
   runtimeConfig: {
     // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
