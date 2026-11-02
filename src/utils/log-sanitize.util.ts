@@ -19,3 +19,17 @@ const maskSecretSegment = (path: string): string => {
 /** Chemin seul : sans query string (contrôlée par le client), segment secret masqué, tronqué. */
 export const sanitizeRouteForLog = (path: string | undefined): string | undefined =>
   path === undefined ? undefined : truncateLogValue(maskSecretSegment(path.split('?')[0]!))
+
+/**
+ * Champs journalisables d'une erreur : son type (`name`) et son code (SQLSTATE PostgreSQL, code Node comme
+ * `ECONNREFUSED`, ou `errno`), JAMAIS son `message`. Le message d'une erreur `pg` peut citer l'utilisateur, la base
+ * et l'hôte (T-SEC-09, L5), et finirait dans `docker logs`.
+ */
+export const describeErrorForLog = (error: unknown): { errorName: string, errorCode: string | number | null } => {
+  const { code, errno } = (error ?? {}) as { code?: unknown, errno?: unknown }
+  const candidate = typeof code === 'string' || typeof code === 'number' ? code : errno
+  return {
+    errorName: error instanceof Error ? error.name : 'UnknownError',
+    errorCode: typeof candidate === 'string' || typeof candidate === 'number' ? candidate : null
+  }
+}

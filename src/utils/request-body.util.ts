@@ -4,6 +4,22 @@ import type { IReadRequestBodyOptions } from '../interfaces/request-body.interfa
 import { payloadTooLarge, requestTimeout } from './api-error.util.js'
 
 /**
+ * T-SEC-09 (L6) : après le délai, plus aucun octet n'est lu. Le flux est mis en pause tout de suite (plus de lecture,
+ * la contre-pression retient le client), puis détruit dès que la réponse 408 est écrite : détruire la requête
+ * ferme la socket, et le faire avant l'écriture ferait perdre le 408.
+ */
+const stopReading = (event: H3Event): void => {
+  const { req, res } = event.node
+  req.pause()
+  if (res.writableFinished) {
+    req.destroy()
+  } else {
+    res.once('finish', () => req.destroy())
+    res.once('close', () => req.destroy())
+  }
+}
+
+/**
  * Lit le corps brut en flux avec un plafond de taille (413) ET un délai total (408, N3).
  * Point d'entrée unique pour les corps JSON (`readBoundedJsonBody`) et le multipart (B-16).
  * Sur délai, la réponse porte `Connection: close` : Node ferme la socket une fois la réponse écrite,
@@ -30,6 +46,7 @@ export const readRequestBody = async (event: H3Event, { maxBytes, timeoutMs }: I
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
       setResponseHeader(event, 'Connection', 'close')
+      stopReading(event)
       reject(requestTimeout())
     }, timeoutMs)
   })

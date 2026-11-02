@@ -19,3 +19,7 @@
 
 - [ ] L5 : test unitaire. Une erreur dont le message contient `user=`, `database=` ou `host=` n'apparaît pas dans le log.
 - [ ] L6 : test unitaire. Après le délai, le flux est détruit et plus aucun octet n'est lu.
+
+## Traitement (dev-b09, 2026-11-01)
+
+L5 : `describeErrorForLog` (`log-sanitize.util.ts`) ne renvoie que `errorName` et `errorCode` (SQLSTATE, sinon `errno`) ; une sous-commande inconnue journalise un texte d'usage constant. L6 : écart avec le libellé du ticket, le flux est mis en pause au dépassement du délai puis détruit une fois la réponse 408 écrite, car `req.destroy()` ferme la socket et ferait perdre le 408 si on l'appelait avant l'écriture.
