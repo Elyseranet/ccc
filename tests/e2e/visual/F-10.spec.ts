@@ -101,6 +101,7 @@ const INVITATION_ZONES: IZone[] = [
   { zone: 'compte-invitation-titre', mockup: '#h-first', app: '#invitation-title' },
   { zone: 'compte-invitation-intro', mockup: '#ac-p-first .acc-card > p.muted', app: '.invitation-form__intro' },
   { zone: 'compte-invitation-mot-de-passe', mockup: '#pw1', app: appField('invitation-password') },
+  { zone: 'compte-invitation-force', mockup: '#ac-p-first .pw-meter', app: '.form-field:has(#invitation-password) .origam-password-field__inline-footer' },
   { zone: 'compte-invitation-confirmation', mockup: '#pw2', app: appField('invitation-confirm') },
   { zone: 'compte-invitation-indice', mockup: '#pw-hint', app: '#invitation-hint' },
   { zone: 'compte-invitation-avatar', mockup: '#ac-p-first .acc-avatar', app: '[data-cy="avatar-field"]' },
@@ -111,6 +112,7 @@ const INVITATION_ZONES: IZone[] = [
 const PROFILE_ZONES: IZone[] = [
   { zone: 'compte-profil-entete', mockup: '.acc-prof-h', app: '.profile-form__header' },
   { zone: 'compte-profil-lecture-seule', mockup: '.acc-ro', app: '.profile-readonly' },
+  { zone: 'compte-profil-force', mockup: '#ac-p-prof .pw-meter', app: '.form-field:has(#profile-new-password) .origam-password-field__inline-footer' },
   { zone: 'compte-profil-avatar', mockup: '#ac-p-prof .acc-avatar', app: '[data-cy="avatar-field"]' },
   { zone: 'compte-profil-telephone', mockup: '#tel2', app: appField('profile-phone') },
   { zone: 'compte-profil-nouveau-mot-de-passe', mockup: '#pw3', app: appField('profile-new-password') },
