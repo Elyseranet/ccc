@@ -13,6 +13,7 @@
       font-size="xl"
       font-weight="bold"
       line-height="tight"
+      letter-spacing="normal"
       class="participant-form__title"
       :text="title"
     />
@@ -369,13 +370,17 @@ defineExpose({})
 
   &__cta {
     display: grid;
-    grid-template-columns: 1fr 1.6fr;
+    grid-template-columns: 1fr minmax(max-content, 1.6fr);
     gap: var(--origam-space---3);
   }
 
   @media (max-width: 760px) {
     &__grid {
       grid-template-columns: 1fr;
+    }
+
+    &__cta {
+      grid-template-columns: 1fr 1.6fr;
     }
   }
 }

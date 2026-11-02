@@ -8,6 +8,7 @@
       <origam-title
         :id="titleId"
         tag="h2"
+        letter-spacing="normal"
         class="participant-list__title"
         :text="title"
       />

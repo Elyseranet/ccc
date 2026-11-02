@@ -88,7 +88,7 @@ for (const viewport of VIEWPORTS) {
           (document.querySelector('#n-em') as HTMLInputElement).value = email
         }, seed.email)
         await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
-        await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .pa-add > * { min-width: 0; } .adm-bottom { display: none !important; } @media (max-width: 760px) { .pa-form__grid { grid-template-columns: minmax(0, 1fr) !important; } }' })
+        await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .pa-add > * { min-width: 0; } .pa-form { grid-template-columns: minmax(0, 1fr); } .adm-bottom { display: none !important; } @media (max-width: 760px) { .pa-form__grid { grid-template-columns: minmax(0, 1fr) !important; } }' })
         await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
         await mockup.evaluate(() => {
           const rule = document.querySelector('.pa-form .rule')
