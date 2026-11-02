@@ -44,10 +44,10 @@
             :label="passwordLabel"
           >
             <template #default>
-              <origam-text-field
+              <origam-password-field
                 id="login-password"
                 v-model="password"
-                type="password"
+                :min-length="fieldMinLength"
                 name="password"
                 autocomplete="current-password"
                 single-line
@@ -88,13 +88,13 @@
 
 <script setup lang="ts">
 import { computed, ref, toRef } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamForm, OrigamTextField, OrigamTitle } from 'origam/components'
+import { OrigamAlert, OrigamBtn, OrigamForm, OrigamPasswordField, OrigamTextField, OrigamTitle } from 'origam/components'
 import AccountCard from '~/components/account/AccountCard.vue'
 import FormField from '~/components/common/FormField.vue'
 import { useAccountError } from '~/composables/useAccountError'
 import { useAccountRules } from '~/composables/useAccountRules'
 import { useT } from '~/composables/useT'
-import { ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
+import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
 import type { IFormSubmitEvent, ILoginFormEmits, ILoginFormProps } from '~/interfaces/account.interface'
 
 /*********************************************************
@@ -113,6 +113,7 @@ const props = withDefaults(defineProps<ILoginFormProps>(), {
 const emits = defineEmits<ILoginFormEmits>()
 defineSlots<{}>()
 const submitHover = ACCOUNT_SUBMIT_HOVER
+const fieldMinLength = ACCOUNT_PASSWORD_FIELD_MIN_LENGTH
 const title = computed(() => t('account.login.title', 'Connexion'))
 const intro = computed(() => t('account.login.intro', 'Pour les participants et l’organisation.'))
 const emailLabel = { key: 'account.login.email', fallback: 'Email' }

@@ -89,10 +89,10 @@
             :label="currentPasswordLabel"
           >
             <template #default>
-              <origam-text-field
+              <origam-password-field
                 id="profile-current-password"
                 v-model="currentPassword"
-                type="password"
+                :min-length="fieldMinLength"
                 name="current-password"
                 autocomplete="current-password"
                 single-line
@@ -109,10 +109,13 @@
             :label="newPasswordLabel"
           >
             <template #default>
-              <origam-text-field
+              <origam-password-field
                 id="profile-new-password"
                 v-model="newPassword"
-                type="password"
+                strength-bar
+                :requirement-rules="requirements"
+                requirements-layout="list"
+                :min-length="fieldMinLength"
                 name="new-password"
                 autocomplete="new-password"
                 single-line
@@ -129,10 +132,10 @@
             :label="confirmPasswordLabel"
           >
             <template #default>
-              <origam-text-field
+              <origam-password-field
                 id="profile-confirm-password"
                 v-model="confirmPassword"
-                type="password"
+                :min-length="fieldMinLength"
                 name="confirm-password"
                 autocomplete="new-password"
                 single-line
@@ -204,7 +207,7 @@
 
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamDivider, OrigamForm, OrigamTextField, OrigamTitle } from 'origam/components'
+import { OrigamAlert, OrigamBtn, OrigamDivider, OrigamForm, OrigamPasswordField, OrigamTextField, OrigamTitle } from 'origam/components'
 import AccountAvatar from '~/components/account/AccountAvatar.vue'
 import AccountCard from '~/components/account/AccountCard.vue'
 import AvatarField from '~/components/account/AvatarField.vue'
@@ -212,8 +215,9 @@ import ProfileReadonly from '~/components/account/ProfileReadonly.vue'
 import FormField from '~/components/common/FormField.vue'
 import { useAccountError } from '~/composables/useAccountError'
 import { useAccountRules } from '~/composables/useAccountRules'
+import { usePasswordRequirements } from '~/composables/usePasswordRequirements'
 import { useT } from '~/composables/useT'
-import { ACCOUNT_SUBMIT_HOVER, PROFILE_FIELD_MESSAGES } from '~/consts/account.const'
+import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER, PROFILE_FIELD_MESSAGES } from '~/consts/account.const'
 import { PASSWORD_MAX_LENGTH } from '~/consts/auth.const'
 import { ROUTES } from '~/consts/routes.const'
 import { ACCOUNT_ERROR } from '~/enums/account.enum'
@@ -229,9 +233,8 @@ import { missingProfileFields } from '~/utils/profile-form.util'
  * le téléphone et le mot de passe. L'avatar part dès qu'il est choisi (`PUT /moi/avatar`), le téléphone et le mot de passe avec
  * le bouton « Enregistrer » (`PATCH /moi`). Une bannière non bloquante dit ce qui manque au profil (pseudo, téléphone, photo), lu sur l'`IMe`. Changer le mot de passe demande l'actuel. Un compte sans fiche de joueur (un
  * administrateur) ne voit ni avatar, ni téléphone, ni lien vers une fiche publique : seul le mot de passe se change. Les champs de mot
- * de passe (actuel, nouveau, confirmation) sont des champs texte de type `password` : `origam-password-field` impose toujours sa propre longueur minimale, même à vide
- * (défaut suivi dans Origam, voir docs/tickets/origam/password-field-longueur-minimale-toujours-imposee.md), ce qui interdit un
- * mot de passe facultatif. Le composant
+ * de passe sont des `origam-password-field` à `min-length` 0 : Origam impose sinon sa propre longueur minimale, même à vide
+ * (docs/tickets/origam/password-field-regle-longueur-forcee.md) ; la longueur passe par nos `rules`, et le mot de passe reste facultatif. Le composant
  * ne connaît ni l'API ni la navigation.
  ********************************************************/
 const { t } = useT()
@@ -244,6 +247,8 @@ const props = withDefaults(defineProps<IProfileFormProps>(), {
 const emits = defineEmits<IProfileFormEmits>()
 defineSlots<{}>()
 const submitHover = ACCOUNT_SUBMIT_HOVER
+const fieldMinLength = ACCOUNT_PASSWORD_FIELD_MIN_LENGTH
+const requirements = usePasswordRequirements()
 const maxLength = PASSWORD_MAX_LENGTH
 const competitor = computed(() => props.me.competitor)
 const hasCompetitor = computed(() => competitor.value !== null)

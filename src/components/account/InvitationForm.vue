@@ -45,7 +45,7 @@
                 strength-bar
                 :requirement-rules="requirements"
                 requirements-layout="list"
-                :min-length="minLength"
+                :min-length="fieldMinLength"
                 :maxlength="maxLength"
                 :rules="passwordRules"
                 :disabled="pending"
@@ -65,8 +65,7 @@
                 autocomplete="new-password"
                 single-line
                 hide-details="auto"
-                minimal
-                :min-length="minLength"
+                :min-length="fieldMinLength"
                 :rules="confirmRules"
                 :disabled="pending"
                 data-cy="invitation-confirm"
@@ -144,8 +143,8 @@ import { useAccountError } from '~/composables/useAccountError'
 import { useAccountRules } from '~/composables/useAccountRules'
 import { usePasswordRequirements } from '~/composables/usePasswordRequirements'
 import { useT } from '~/composables/useT'
-import { ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '~/consts/auth.const'
+import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
+import { PASSWORD_MAX_LENGTH } from '~/consts/auth.const'
 import type { ACCOUNT_ERROR } from '~/enums/account.enum'
 import type { IFormSubmitEvent, IInvitationFormEmits, IInvitationFormProps } from '~/interfaces/account.interface'
 
@@ -167,7 +166,7 @@ const emits = defineEmits<IInvitationFormEmits>()
 defineSlots<{}>()
 const submitHover = ACCOUNT_SUBMIT_HOVER
 const requirements = usePasswordRequirements()
-const minLength = PASSWORD_MIN_LENGTH
+const fieldMinLength = ACCOUNT_PASSWORD_FIELD_MIN_LENGTH
 const maxLength = PASSWORD_MAX_LENGTH
 const chipText = computed(() => t('account.invitation.chip', 'Invitation · valable 7 jours'))
 const title = computed(() => t('account.invitation.title', 'Bienvenue au CCC'))
