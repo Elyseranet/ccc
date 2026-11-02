@@ -200,7 +200,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-01](F-01.md) | Accueil | `index.html` | F-00 | **Fermé** (2026-11-01) : mergé @ `11cd852` | worktree de dev-f05 (`agent-a70ac359346e804a8`), branche `feature/F-01` |
 | [F-02](F-02.md) | Palmarès | `palmares.html` | F-00, B-17 (finale) | À faire | `../CCC-F-02` |
 | [F-03](F-03.md) | Édition, 6 onglets | `edition.html` | F-00, T-QA-03 (zones « en cours ») | **Fermé** (2026-10-28) : F-03a `cabfd4a`, F-03b `baa4adf`, page livrée ; suites F-03c, F-03-BRK | worktree de dev-f06 |
-| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | **Mergé, ouvert** @ `ebf3e94` (branche 7d28dcc) ; reste la remesure des zones 2026 après T-QA-03 ; Origam #1278 ; suite F-15 | `../CCC-F-04` |
+| [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | **Fermé** (2026-11-02) : dernier lot @ `60d9987` ; suite F-04-PAG, T-QA-06 | `../CCC-F-04` |
 | [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | **Fermé** (2026-10-22) : mergé @ `67270bd` (branche abf0653) ; Origam #1267 | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
 | [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
@@ -214,7 +214,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
 | [F-15](F-15.md) | Texte des champs (valeur, placeholder) environ 1 px plus bas que la maquette | maquettes à champs (joueurs, face-à-face) | F-00m | **Fermé** (2026-10-28) : mergé @ `7ee8aad` (branche 8188eae) ; Origam #1280 | à créer |
 | [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | **Fermé** (2026-10-28) : mergé @ `e61fe43` | à créer |
-| [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | À faire, ouvert le 2026-10-28 ; après le merge de F-03b (dev-f06) | worktree de dev-f06 |
+| [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | **Fermé** (2026-11-02) : mergé @ `819bc3f` | worktree de dev-f06 |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
