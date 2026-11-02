@@ -332,9 +332,9 @@
 .acc-state { display: grid; gap: var(--origam-space---3); justify-items: start; border-style: dashed; }
 .acc-state__ic { display: grid; place-items: center; width: var(--origam-space---12); aspect-ratio: 1; border-radius: var(--origam-radius---full); background: var(--origam-color__feedback--danger---bgSubtle); color: var(--origam-color__feedback--danger---fgSubtle); font-size: var(--origam-font__size---xl); }
 .acc-state--ok .acc-state__ic { background: var(--origam-color__feedback--success---bgSubtle); color: var(--origam-color__feedback--success---fgSubtle); }
-/* Rendu origam-alert status="error" density="compact" rounded="lg", mesuré sur origam 2.37.4 : fond = repli d’Origam (bgHover absent du thème) */
+/* Rendu origam-alert status="error" density="compact" rounded="lg", mesuré sur origam 2.37.4. Fond = danger.bg au repos (couleur voulue) ; Origam 2.37.4 l’assombrit à tort, voir docs/tickets/origam/alert-etat-survol-au-repos.md */
 .alert { display: flex; align-items: center; gap: var(--origam-space---2); margin: 0; padding: var(--origam-space---2); border-radius: var(--origam-radius---lg); font-size: var(--origam-font__size---md); line-height: var(--origam-font__lineHeight---normal); }
-.alert--error { background: color-mix(in srgb, var(--origam-color__feedback--danger---bg), black 20%); color: var(--origam-color__feedback--danger---fg); }
+.alert--error { background: var(--origam-color__feedback--danger---bg); color: var(--origam-color__feedback--danger---fg); }
 .alert__ic { flex: none; width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
 .acc-aside { display: grid; gap: var(--origam-space---4); align-self: center; }
 .acc-aside__big { font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); }
