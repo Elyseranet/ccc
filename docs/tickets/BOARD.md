@@ -377,3 +377,4 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-QA-06](T-QA-06.md) : ouvert — capture visuelle instable joueur-stats @390.
 - [T-QA-05](T-QA-05.md) : **Fermé** — mergé @ `09b73de` (10 passages test:run verts sous charge).
 - [T-SEC-09](T-SEC-09.md) : **Fermé** — mergé @ `5779571`.
+- [T-SEC-09](T-SEC-09.md) : **rouvert** (2026-11-02) — test L6 `request-body-destroy` instable sur develop (ECONNRESET, 2/5), bloque les gates.

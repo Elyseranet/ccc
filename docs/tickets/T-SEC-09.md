@@ -1,7 +1,7 @@
 # T-SEC-09 — Logs de migration et lecture du corps après un 408
 
 - **Origine** : revue de sécurité de la vague 3a, findings LOW L5 et L6, le 2026-10-22.
-- **Statut** : **Fermé** (2026-11-02), mergé dans `develop` @ `5779571` ; voir « Fermeture ».
+- **Statut** : **Rouvert** (2026-11-02) : test L6 instable sur develop, voir « Réouverture ». Mergé @ `5779571`.
 
 ## L5 — Message brut de PostgreSQL dans les logs de migration
 
@@ -33,3 +33,13 @@ L5 : `describeErrorForLog` (`log-sanitize.util.ts`) ne renvoie que `errorName` e
   - frontend-lead : Playwright complet **202 verts, 0 échec, 0 instable**, les 110 zones identiques à develop, et les écritures couvertes par l'e2e inchangées ;
   - chef de projet après le merge : typecheck vert, test:run 620.
 - **Reste ailleurs** : rien.
+
+## Réouverture — 2026-11-02 (chef de projet)
+- **Défaut** : `tests/unit/request-body-destroy.test.ts` (« answers 408 first, then destroys the request stream and stops reading the body », L6) est **instable sur develop** : `Error: read ECONNRESET`.
+- **Mesures** :
+  - frontend-lead : 3 échecs sur 4 rejeux du fichier seul, échecs vers 410 ms ;
+  - chef de projet, sur develop cf01fa5 : **2 échecs sur 5 rejeux**.
+  - Le test:run vert après le merge (620) était donc chanceux.
+- **Cause probable** (à établir) : course entre l'envoi du 408 et `req.destroy()`. Le client du test lit un ECONNRESET quand le serveur détruit le flux juste après la réponse. C'est le même mécanisme que celui corrigé dans T-QA-05 côté client de test.
+- **Impact** : `test:run` est rouge par intermittence sur develop, ce qui bloque les gates de toutes les branches.
+- **À faire, en priorité** : établir la cause (test ou code de production), corriger, puis prouver la stabilité par 10 passages de `test:run` sous charge.
