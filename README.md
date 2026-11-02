@@ -23,7 +23,13 @@ Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
 
 ## Docker
 
-En local, on développe avec `npm run dev` seulement (décision utilisateur 2026-11-01). L'image (`Dockerfile`, `docker/`) et `docker-compose.yml` servent au déploiement Coolify, décrit plus bas. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur ; les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
+L'image Docker et `docker-compose.yml` servent au **déploiement** (voir « Déploiement Coolify »). Ils ne servent pas au développement local (décision utilisateur 2026-11-01) : l'image refuse de démarrer sans une configuration de production valide (site en https, SMTP réel, secret d'appareil), sans mode recette. En local, utiliser `npm run dev` (voir « Développement ») avec une base PostgreSQL locale, en passant les variables sur la ligne de commande, sans copier de `.env` ailleurs :
+
+```sh
+NUXT_DATABASE_HOST=localhost NUXT_DATABASE_PORT=5432 NUXT_DATABASE_USERNAME=ccc NUXT_DATABASE_PASSWORD=<mot de passe> NUXT_DATABASE_DATABASE=ccc npm run dev
+```
+
+Les migrations TypeORM s'appliquent avec `npm run db:migration:run` (voir « Migrations TypeORM »). Dans le conteneur de production, elles s'appliquent au démarrage, avant le serveur ; les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
 
 ## Déploiement Coolify
 
