@@ -333,6 +333,6 @@ describe('composants des inscrits', () => {
     expect(alert.attributes('role')).toBe('alert')
     expect(alert.text()).toContain('déjà rattaché à un autre compte')
     expect(wrapper.get('[data-cy="participant-form-email"] input').attributes('aria-describedby')).toBe(alert.attributes('id'))
-    expect(wrapper.get('[data-cy="participant-form-last-name"] input').element.value).toBe('Cam')
+    expect((wrapper.get('[data-cy="participant-form-last-name"] input').element as HTMLInputElement).value).toBe('Cam')
   })
 })
