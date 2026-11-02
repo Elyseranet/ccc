@@ -27,3 +27,13 @@
 - [ ] Les garanties de L6 restent tenues, ou l'écart est documenté avec sa borne.
 
 - **Lien** : T-SEC-09 est rouvert pour ce défaut (c55bdf4). Les deux tickets se ferment ensemble au merge du correctif. Mesure du chef de projet sur develop cf01fa5 : 2 échecs sur 5 rejeux du fichier seul.
+
+## Traitement (dev-b09, 2026-11-02)
+
+**Cause mesurée.** Sonde jetable, un processus par essai, avec l'implémentation de T-SEC-09 (pause puis `destroy` à `finish`) : 16 essais, le client reçoit le 408 complet 16 fois sur 16, sans erreur avant la réponse, puis un `read ECONNRESET` après la réponse 13 fois sur 16. L'instabilité du test venait du test : `once(socket, 'close')` rejette sur tout événement `error`, même après un 408 complet. Le RST réel vient de la fermeture d'une socket dont le tampon de réception contient le corps non lu (retenu par la pause) : Node ferme dès que la réponse est écrite (`Connection: close`).
+
+**Un vrai client reçoit-il un RST au lieu du 408 ?** Sur loopback, non : 56 essais sur 56 ont reçu le 408 complet avant tout reset. Sur un lien réel plus lent, je ne sais pas : non mesuré.
+
+**Correctif.** `readRequestBody` ne met plus la requête en pause après le délai : la lecture continue, les octets sont jetés sans être conservés ni traités, au plus `maxBytes` (au-delà, la requête est détruite), et la requête est détruite à la fermeture de la réponse. Le tampon de réception est vide à la fermeture : FIN ordinaire. Mesure : 16 essais, 408 complet 16 sur 16, aucune erreur avant la réponse, reset après la réponse 2 fois sur 16 (contre 13).
+
+**Écart avec L6** (« plus aucun octet lu ») : au plus `maxBytes` octets lus puis jetés, pendant l'envoi du 408. **Test** : le client ne rejette plus sur une erreur de socket ; il exige un 408 complet avant toute erreur, et un second cas borne la lecture après le délai. Limite : sur loopback le test ne distingue pas l'ancienne implémentation de la nouvelle ; la preuve de l'amélioration est la mesure ci-dessus.
