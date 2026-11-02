@@ -320,7 +320,11 @@
 .acc-form { display: grid; gap: var(--origam-space---4); margin-top: var(--origam-space---2); }
 .acc-form .input { width: 100%; }
 .acc-form .btn { justify-self: start; }
-.input--file { padding-block: var(--origam-space---3); }
+/* Rendu origam-file-field (thème CCC : outlined, rounded full, 48 px), mesuré sur origam 2.37.4 */
+.file-field { position: relative; display: flex; align-items: center; min-height: var(--origam-space---12); padding-inline: calc(var(--origam-space---3) - 1px) var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---sunken); color: var(--origam-color__text---primary); }
+.file-field__ic { width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; opacity: .7; }
+.file-field__input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.file-field:has(:focus-visible) { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
 .hint { font-size: var(--origam-font__size---sm); margin-top: calc(-1 * var(--origam-space---2)); }
 .acc-avatar { display: flex; align-items: end; gap: var(--origam-space---4); }
 .acc-avatar .field { flex: 1; }
@@ -328,7 +332,10 @@
 .acc-state { display: grid; gap: var(--origam-space---3); justify-items: start; border-style: dashed; }
 .acc-state__ic { display: grid; place-items: center; width: var(--origam-space---12); aspect-ratio: 1; border-radius: var(--origam-radius---full); background: var(--origam-color__feedback--danger---bgSubtle); color: var(--origam-color__feedback--danger---fgSubtle); font-size: var(--origam-font__size---xl); }
 .acc-state--ok .acc-state__ic { background: var(--origam-color__feedback--success---bgSubtle); color: var(--origam-color__feedback--success---fgSubtle); }
-.acc-error { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); color: var(--origam-color__feedback--danger---fgSubtle); font-weight: var(--origam-font__weight---semibold); font-size: var(--origam-font__size---sm); }
+/* Rendu origam-alert status="error" density="compact" rounded="lg", mesuré sur origam 2.37.4 : fond = repli d’Origam (bgHover absent du thème) */
+.alert { display: flex; align-items: center; gap: var(--origam-space---2); margin: 0; padding: var(--origam-space---2); border-radius: var(--origam-radius---lg); font-size: var(--origam-font__size---md); line-height: var(--origam-font__lineHeight---normal); }
+.alert--error { background: color-mix(in srgb, var(--origam-color__feedback--danger---bg), black 20%); color: var(--origam-color__feedback--danger---fg); }
+.alert__ic { flex: none; width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
 .acc-aside { display: grid; gap: var(--origam-space---4); align-self: center; }
 .acc-aside__big { font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); }
 .acc-prof-h { display: flex; align-items: center; gap: var(--origam-space---5); }

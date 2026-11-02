@@ -1,7 +1,7 @@
-# Happy Hour — mapping composants Origam 2.37.3
+# Happy Hour — mapping composants Origam 2.37.19
 
 Chaque bloc des maquettes `docs/design/ui/happy-hour/*.html` est relié à son composant Origam et à ses props.
-**Toutes les props listées ont été vérifiées par script** contre les interfaces de `~/Projects/origam/packages/ds/src` (version 2.37.3, résolution des `extends` / `Pick` / `Omit`) : 0 écart.
+**Toutes les props listées ont été vérifiées** contre les interfaces de `~/Projects/origam/packages/ds/src` : par script sur la version 2.37.3 (résolution des `extends` / `Pick` / `Omit`, 0 écart), puis à la main sur la version **2.37.19** pour les lignes ajoutées depuis (F-10 : mot de passe actuel, confirmation, déconnexion).
 Les valeurs `[…]` sont des données branchées par le front. Les props non citées prennent les défauts du thème (`theme.ts`, bloc `components`).
 
 ## Fichiers
@@ -103,10 +103,10 @@ Les valeurs `[…]` sont des données branchées par le front. Les props non cit
 | Règles | Règles d’or (RG25–RG32) | `origam-list` | `items`<br>Grille statique, aucun défilement automatique. |
 | Règles | Schéma d’une variante | `origam-card` | `rounded: "xl"`, `border: true`<br>Schéma SVG `role="img"` + `aria-label` décrivant la disposition ; textes repris de app/pages/variants.vue. |
 | Compte | Mot de passe (1re connexion) | `origam-password-field` | `label: "Mot de passe"`, `rounded: "full"`, `strengthBar: true`, `persistentRequirements: true`<br>Lien d’invitation valable 7 jours, usage unique (A14). Ne pas poser `variant` : le défaut du thème fait foi (outlined, F-00m). |
-| Compte | Avatar | `origam-file-field` | `label: "Avatar"`, `rounded: "full"`, `maxFileSize: 2000000`, `showSize: true`<br>Le mapping fait foi sur la maquette, qui dessine un input natif (51 px). La hauteur est celle du champ Origam du thème (48 px). A4 : le participant modifie avatar, téléphone, mot de passe. Ne pas poser `variant` : le défaut du thème fait foi (outlined, ajouté par F-00n, commit 44b9baa). |
+| Compte | Avatar | `origam-file-field` | `label: "Avatar"`, `rounded: "full"`, `maxFileSize: 2000000`, `showSize: true`<br>Hauteur 48 px (champ Origam du thème), reproduite dans `compte.html` (décision utilisateur, `decisions.md` 4b3d7c3). A4 : le participant modifie avatar, téléphone, mot de passe. Ne pas poser `variant` : le défaut du thème fait foi (outlined, ajouté par F-00n, commit 44b9baa). |
 | Compte | Téléphone | `origam-text-field` | `type: "tel"`, `label: "Téléphone"`, `rounded: "full"`, `hint: "Privé, jamais public"`<br>Ne pas poser `variant` : le défaut du thème fait foi (outlined, F-00m). |
 | Compte | Champs en lecture seule (/profil) | `origam-data-list` | `items`, `density: "compact"`, `rounded: "lg"`<br>Nom, prénom, pseudo (réservé à l’admin, A4), email masqué. |
-| Compte | Erreur de connexion | `origam-alert` | `status: "error"`, `text: "Email ou mot de passe incorrect."`, `rounded: "lg"`, `density: "compact"` <br>Le mapping fait foi sur la maquette, qui dessine une pastille « Erreur » suivie du texte. |
+| Compte | Erreur de connexion | `origam-alert` | `status: "error"`, `text: "Email ou mot de passe incorrect."`, `rounded: "lg"`, `density: "compact"` <br>Rendu reproduit dans `compte.html` (décision utilisateur, `decisions.md` 4b3d7c3). |
 | Compte | Mot de passe actuel (/profil) | `origam-password-field` | `label: "Mot de passe actuel"`, `rounded: "full"`, `requirements: false`<br>Absent de la maquette, exigé par F-10 (`currentPassword`) et par `parcours.md` 3b.5. Premier des trois champs du changement de mot de passe, sous le téléphone. Attribut HTML `autocomplete="current-password"`. En cas d’échec : `errorMessages: "Mot de passe actuel incorrect"` sur ce champ, sans vider les autres. Ne pas poser `variant`. |
 | Compte | Nouveau mot de passe (/profil) | `origam-password-field` | `label: "Nouveau mot de passe"`, `rounded: "full"`, `strengthBar: true`, `persistentRequirements: true`, `minLength: 15`<br>15 caractères minimum (F-10). Attribut HTML `autocomplete="new-password"`. Ne pas poser `variant`. |
 | Compte | Confirmation (/profil) | `origam-password-field` | `label: "Confirmer le nouveau mot de passe"`, `rounded: "full"`, `requirements: false`<br>Absent de la maquette, prévu par `parcours.md` 3b.5. Ne pas poser `variant`. |
