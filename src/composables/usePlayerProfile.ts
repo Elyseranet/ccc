@@ -47,7 +47,9 @@ export const usePlayerProfile = (id: MaybeRefOrGetter<string>) => {
       chartLabel = t(stage.chart.key, stage.chart.fallback)
     }
     let poolLabel = t('player.journey.no_pool', '—')
-    if (rank !== null) {
+    if (rank === null && participation.poolNumber !== null) {
+      poolLabel = t('player.journey.pool_only', 'Poule {pool}', { pool: participation.poolNumber })
+    } else if (rank !== null) {
       const rankLabel = rank === 1
         ? t('player.journey.rank_first', '1er')
         : t('player.journey.rank_other', '{rank}e', { rank })

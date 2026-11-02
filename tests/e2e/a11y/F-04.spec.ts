@@ -11,6 +11,9 @@ const PLAYER_WITH_FIVE_OPPONENTS = 'adeecb22-279f-4bc1-b661-df63abb19fae'
 
 const PLAYER_WITH_FOUR_OPPONENTS = '4ea7c348-33a3-45ab-a4fa-ca924c92f522'
 
+/** Arnaud Prioul : participant de l'édition 2026 en phase de poules (T-QA-03), poule 4, sans place de poule connue. */
+const PLAYER_IN_2026 = 'd27955a6-b693-4759-95ea-0e17ad7d2309'
+
 const violationsOf = async (page: Page) => {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
   return results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)
@@ -118,6 +121,24 @@ test.describe('fiche joueur : accessibilité', () => {
     expect(years.length).toBeGreaterThan(0)
     expect([...years].sort((a, b) => b - a)).toEqual(years)
     await expect(page.getByTestId('player-journey-chart')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  test('édition en cours : la ligne 2026 du parcours affiche « En cours », la poule, le bilan provisoire de l’API et des points « — »', async ({ page }) => {
+    const detail = await (await page.request.get(`/api/v1/competiteurs/${PLAYER_IN_2026}`)).json() as { participations: Array<{ editionCode: string, poolNumber: number | null, wins: number, losses: number, unknownResults: number, points: number | null }> }
+    const participation = detail.participations.find(item => item.editionCode === '2026')!
+    expect(participation.points).toBeNull()
+    await page.goto(`/joueurs/${PLAYER_IN_2026}`)
+    await page.waitForLoadState('networkidle')
+    const row = page.locator('[data-cy="player-journey-table"] tbody tr').filter({ has: page.locator('td:first-child', { hasText: /^2026$/ }) })
+    await expect(row).toHaveCount(1)
+    const cells = await row.locator('td').allInnerTexts()
+    expect(cells.map(cell => cell.trim())).toEqual([
+      '2026',
+      `Poule ${participation.poolNumber}`,
+      'En cours',
+      `${participation.wins} V – ${participation.losses} D${participation.unknownResults > 0 ? ` (+${participation.unknownResults} au résultat inconnu)` : ''}`,
+      '—'
+    ])
   })
 
   test('chaque adversaire a un lien « Face-à-face avec X » au nom accessible complet', async ({ page }) => {
