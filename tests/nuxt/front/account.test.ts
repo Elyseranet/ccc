@@ -286,6 +286,31 @@ describe('formulaires du compte', () => {
     expect(wrapper.emitted('submit')?.[0]).toEqual([{ email: 'a@example.test', password: 'un-mot-de-passe' }])
   })
 
+  it('aucune longueur n’est imposée par Origam à la connexion (min-length 0) : un mot de passe de 3 caractères part au serveur, qui tranche', async () => {
+    const wrapper = await mountSuspended(LoginForm, withRouterLink)
+    await wrapper.get('#login-email').setValue('a@example.test')
+    await wrapper.get('#login-password').setValue('abc')
+    await wrapper.get('[data-cy="login-form"]').trigger('submit')
+    await flushPromises()
+    expect(wrapper.emitted('submit')?.[0]).toEqual([{ email: 'a@example.test', password: 'abc' }])
+    expect(wrapper.text()).not.toContain('characters')
+  })
+
+  it('le profil accepte un nouveau mot de passe vide (facultatif) et refuse 14 caractères avec notre message', async () => {
+    const wrapper = await mountSuspended(ProfileForm, { ...withRouterLink, props: { me: buildMeWithCompetitor() } })
+    await wrapper.get('[data-cy="profile-form"]').trigger('submit')
+    await flushPromises()
+    expect(wrapper.emitted('submit')).toHaveLength(1)
+    await wrapper.get('#profile-current-password').setValue('actuel')
+    await wrapper.get('#profile-new-password').setValue('x'.repeat(14))
+    await wrapper.get('#profile-confirm-password').setValue('x'.repeat(14))
+    await wrapper.get('[data-cy="profile-form"]').trigger('submit')
+    await flushPromises()
+    expect(wrapper.emitted('submit')).toHaveLength(1)
+    expect(wrapper.text()).toContain('au moins 15 caractères')
+    expect(wrapper.text()).not.toContain('characters')
+  })
+
   it('l’erreur de connexion est annoncée dans une alerte, avec le message de la cause', async () => {
     const wrapper = await mountSuspended(LoginForm, { ...withRouterLink, props: { error: ACCOUNT_ERROR.INVALID_CREDENTIALS } })
     const alert = wrapper.get('[data-cy="login-error"]')
