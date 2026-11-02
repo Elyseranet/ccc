@@ -6,9 +6,13 @@
     data-cy="participant-form"
     @submit="handleSubmit"
   >
+    <div class="participant-form__body">
     <origam-title
       :id="titleId"
       tag="h3"
+      font-size="xl"
+      font-weight="bold"
+      line-height="tight"
       class="participant-form__title"
       :text="title"
     />
@@ -74,15 +78,10 @@
           show-size
           :max-file-size="maxFileSize"
           :accept="avatarAccept"
-          :aria-describedby="avatarHintId"
+          :placeholder="avatarHint"
+          :prepend-inner-aria-label="avatarLabel"
           data-cy="participant-form-avatar"
         />
-        <p
-          :id="avatarHintId"
-          class="participant-form__hint"
-        >
-          {{ avatarHint }}
-        </p>
       </div>
       <div class="participant-form__field">
         <origam-label
@@ -98,7 +97,7 @@
           hide-details="auto"
           autocomplete="off"
           :error="emailTaken"
-          :error-messages="emailErrors"
+          :aria-describedby="emailTaken ? emailErrorId : undefined"
           :rules="emailRules"
           data-cy="participant-form-email"
           @update:model-value="handleEmail"
@@ -122,20 +121,33 @@
         />
       </div>
     </div>
-    <origam-alert
+    <p
       v-if="emailTaken"
-      status="error"
-      rounded="lg"
-      :text="emailTakenText"
+      :id="emailErrorId"
+      class="participant-form__error"
+      role="alert"
       data-cy="participant-form-email-taken"
-    />
-    <origam-alert
-      status="info"
-      rounded="lg"
-      :title="invitationTitle"
-      :text="invitationText"
+    >
+      <origam-chip
+        size="small"
+        color="danger"
+        bg-color="var(--origam-color__feedback--danger---bgSubtle)"
+        :text="refusedLabel"
+      />
+      {{ emailTakenText }}
+    </p>
+    <p
+      class="participant-form__rule"
       data-cy="participant-form-invitation-info"
-    />
+    >
+      <origam-chip
+        size="small"
+        color="info"
+        bg-color="var(--origam-color__feedback--info---bgSubtle)"
+        :text="invitationTitle"
+      />
+      {{ invitationText }}
+    </p>
     <div class="participant-form__cta">
       <origam-btn
         variant="outlined"
@@ -158,12 +170,13 @@
         data-cy="participant-form-submit"
       />
     </div>
+    </div>
   </origam-form>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, useId, watch } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamFileField, OrigamForm, OrigamLabel, OrigamTextField, OrigamTitle } from 'origam/components'
+import { OrigamBtn, OrigamChip, OrigamFileField, OrigamForm, OrigamLabel, OrigamTextField, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { PARTICIPANT_AVATAR_ACCEPT, PARTICIPANT_AVATAR_MAX_BYTES } from '~/consts/admin-participants.const'
 import { EMAIL_MAX_LENGTH, PHONE_PATTERN } from '~/consts/auth.const'
@@ -187,7 +200,7 @@ const lastNameId = useId()
 const firstNameId = useId()
 const nicknameId = useId()
 const avatarId = useId()
-const avatarHintId = useId()
+const emailErrorId = useId()
 const emailId = useId()
 const phoneId = useId()
 const maxFileSize = PARTICIPANT_AVATAR_MAX_BYTES
@@ -233,7 +246,7 @@ const invitationText = computed(() => t('admin.participants.invitation_text', 'U
 const emailTakenText = computed(() => t('admin.participants.error_email_used', 'Cet email est déjà rattaché à un autre compte. Rattachez le profil existant ou corrigez l’email.'))
 const cancelLabel = computed(() => t('admin.participants.form_cancel', 'Annuler'))
 const submitLabel = computed(() => t('admin.participants.form_submit', 'Créer, rattacher et inviter'))
-const emailErrors = computed(() => props.emailTaken ? [emailTakenText.value] : [])
+const refusedLabel = computed(() => t('admin.participants.refused', 'Refusé'))
 
 /*********************************************************
  * Règles
@@ -296,10 +309,36 @@ defineExpose({})
 
 <style scoped lang="scss">
 .participant-form {
-  display: grid;
-  gap: var(--participant-form---gap, var(--origam-space---4));
   padding-top: var(--origam-space---4);
   border-top: var(--origam-border__width---thin) solid var(--origam-color__border---subtle);
+
+  &__body {
+    display: grid;
+    gap: var(--participant-form---gap, var(--origam-space---4));
+  }
+
+  &__error {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--origam-space---2);
+    margin: 0;
+    font-size: var(--origam-font__size---sm);
+    font-weight: var(--origam-font__weight---semibold);
+    color: var(--origam-color__feedback--danger---fgSubtle);
+  }
+
+  &__rule {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--origam-space---2);
+    margin: 0;
+    padding: var(--origam-space---3) var(--origam-space---4);
+    border-radius: var(--origam-radius---lg);
+    background: var(--origam-color__feedback--info---bgSubtle);
+    font-size: var(--origam-font__size---sm);
+  }
 
   &__title {
     font-size: var(--origam-font__size---xl);
@@ -325,12 +364,6 @@ defineExpose({})
     font-weight: var(--origam-font__weight---bold);
     letter-spacing: var(--origam-font__letterSpacing---wide);
     text-transform: uppercase;
-    color: var(--origam-color__text---tertiary);
-  }
-
-  &__hint {
-    margin: 0;
-    font-size: var(--origam-font__size---xs);
     color: var(--origam-color__text---tertiary);
   }
 

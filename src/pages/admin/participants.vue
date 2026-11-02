@@ -281,6 +281,7 @@ defineExpose({})
 <style scoped lang="scss">
 .admin-participants {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-participants---gap, var(--origam-space---6));
 
   &__head {
@@ -335,6 +336,10 @@ defineExpose({})
     display: grid;
     gap: var(--origam-space---4);
     padding: var(--origam-space---6);
+
+    @media (max-width: 760px) {
+      padding: var(--origam-space---5);
+    }
   }
 
   &__card-title {

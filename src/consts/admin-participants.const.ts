@@ -22,10 +22,10 @@ export const PARTICIPANT_AVATAR_MAX_BYTES = AVATAR_MAX_BYTES
 /** Clé de cache de la liste admin des inscrits. */
 export const ADMIN_PARTICIPANTS_CACHE_KEY = 'admin-participants'
 
-export const PARTICIPANT_ACCOUNT_CHIPS: Record<ACCOUNT_STATE, { text: ITranslatableText, color: string }> = {
-  [ACCOUNT_STATE.ACTIVE]: { text: { key: 'admin.participants.account_active', fallback: 'Actif' }, color: 'success' },
-  [ACCOUNT_STATE.INVITED]: { text: { key: 'admin.participants.account_invited', fallback: 'Invité' }, color: 'warning' },
-  [ACCOUNT_STATE.INVITATION_EXPIRED]: { text: { key: 'admin.participants.account_expired', fallback: 'Invitation expirée' }, color: 'error' }
+export const PARTICIPANT_ACCOUNT_CHIPS: Record<ACCOUNT_STATE, { text: ITranslatableText, color: string, bgColor: string }> = {
+  [ACCOUNT_STATE.ACTIVE]: { text: { key: 'admin.participants.account_active', fallback: 'Actif' }, color: 'success', bgColor: 'var(--origam-color__feedback--success---bgSubtle)' },
+  [ACCOUNT_STATE.INVITED]: { text: { key: 'admin.participants.account_invited', fallback: 'Invité' }, color: 'warning', bgColor: 'var(--origam-color__feedback--warning---bgSubtle)' },
+  [ACCOUNT_STATE.INVITATION_EXPIRED]: { text: { key: 'admin.participants.account_expired', fallback: 'Invitation expirée' }, color: 'error', bgColor: 'var(--origam-color__feedback--danger---bgSubtle)' }
 }
 
 /** Texte d'un compétiteur d'archive, sans compte : il ne peut pas être invité depuis cet écran. */

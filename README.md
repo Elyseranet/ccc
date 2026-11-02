@@ -257,6 +257,8 @@ npm run test:api      # tests d'intégration d'API (@nuxt/test-utils/e2e), base 
 npm run test:bundle   # nuxt build, puis vérifie qu'aucun chunk navigateur ne contient de code serveur
 npm run test:a11y     # e2e Playwright (axe), sur nuxt dev et une base de test réelle
 npm run test:visual   # e2e Playwright, comparaison aux maquettes
+npm run test:writes   # e2e Playwright d'écriture (QA-3), sur des éditions créées par les tests ; à lancer après les autres projets ou avec test:e2e
+npm run test:e2e      # tous les projets Playwright : routes, a11y, visual, puis writes
 ```
 
 `test:api` construit l'application puis la lance contre une base de test. Les variables de connexion sont passées par l'environnement, jamais depuis `.env` copié ailleurs :
@@ -300,6 +302,25 @@ Le dump `archives.sql` clôture les 16 éditions, 2026 comprise : sans autre ét
 La règle est la même à chaque exécution : classement des matchs par numéro de séquence décroissant dans chaque poule, valeurs `E2E_IN_PROGRESS_EDITION_CODE`, `E2E_POOL_REWIND_NUMERATOR` et `E2E_POOL_REWIND_DENOMINATOR` dans `tests/e2e/helpers/e2e.const.ts`. La sortie JSON de `prepare-database` indique l'état produit (`inProgressEdition`). Les champs `matches` et `validatedMatches` de cette sortie comptent le dump **avant** la remise en phase de poules ; GET /stats en donne les valeurs après (A16 : 729 matchs joués et 554 avec score dans le dump ; 690 et 515 une fois les 39 matchs à jouer retirés).
 
 `tests/db/in-progress-edition.test.ts` vérifie le déterminisme (deux préparations successives, mêmes ids de matchs programmés), l'absence de création ou de suppression, et la cohérence de ce que l'API calcule pour 2026 (statut, avancement des poules, champion, compteurs d'archive). Les zones visuelles qui lisent 2026 se mesurent sur cet état.
+
+### Tests d'écriture : une édition créée par le test (QA-3)
+
+Un test qui écrit (ajouter ou retirer un inscrit, saisir un score, tirer les poules…) **crée sa propre édition** par l'API réelle d'administration (`POST /editions`, puis les transitions par les routes réelles), jamais sur les archives (2012 à 2026) ni sur 2026 en phase de poules (QA-2). Les compétiteurs dont il a besoin sont créés de même (`POST /competiteurs`) : un test n'écrit jamais sur un profil partagé. Le helper partagé est `tests/e2e/helpers/edition-write.ts`, ses constantes sont dans `tests/e2e/helpers/e2e.const.ts` :
+
+| Fonction | Rôle |
+|---|---|
+| `createEdition(request, libellé)` | édition en `CREATED`, code généré par le serveur |
+| `createCompetitor(request, libellé, surcharges?)` | compétiteur avec compte invité, courriel unique |
+| `attachParticipant(request, édition, compétiteur)` | rattachement par la route réelle ; la première inscription fait passer l'édition à `REGISTRATION` |
+| `createRegistrationEdition(request, libellé)` | édition en inscriptions avec un premier inscrit (point de départ des tirages, F-11, et des scores, F-08) |
+| `selectAdminEdition(context, édition)` | fait de l'édition l'édition de travail des pages `/admin/**` (cookie du sélecteur) |
+| `readCapturedMails()` | courriels « envoyés » par le serveur de test |
+
+**Unicité et isolation.** Le serveur génère le code (`2090`, `2090b`… jusqu'à `z`, CE-1) sous verrou (`pg_advisory_xact_lock`) : deux créations simultanées (`fullyParallel`) ne collisionnent jamais, et aucune ne peut reprendre un code d'archive. Seule l'année peut s'épuiser (26 codes par an, 409 `EDITION_CODE_EXHAUSTED`) : elle part d'un hachage du libellé du test dans les années 2050 à 2099 (bornes de l'API : 2000 à 2100 ; archives : 2012 à 2026), soit 1 300 codes par exécution, la base étant remise à neuf à chaque lancement ; une année épuisée passe à la suivante. Donner un libellé distinct à chaque test.
+
+**Ordre d'exécution.** Les éditions créées restent dans la base jusqu'au lancement suivant, et la plus récente devient l'édition active par défaut de l'admin : les specs d'écriture vivent donc dans `tests/e2e/writes/` et forment le projet Playwright `writes`, qui dépend des projets `routes`, `a11y` et `visual` et passe après eux (`--no-deps` pour le lancer seul). Une spec qui lit seulement va dans `a11y/` ou `visual/`. Les zones visuelles qui dépendent d'une écriture (`*.zones.spec.ts`) se mesurent sur l'édition du test, avec les mêmes masques de valeurs que les autres.
+
+**Courriels.** Le serveur lancé par Playwright utilise le transport `capture` (`NUXT_MAIL_TRANSPORT`, `NUXT_MAIL_CAPTURE_FILE`) : aucun SMTP, chaque courriel est une ligne JSON de `test-results/e2e-mail.jsonl` (remis à zéro à chaque lancement). `invitationSent: true` se produit donc pour de vrai ; `false` (SMTP injoignable) n'a pas d'équivalent e2e et se teste en test de composant, `null` est le rattachement d'un profil existant.
 
 ### Garde anti-code-serveur dans le navigateur (ARCH-1, ARCH-2, ARCH-12)
 

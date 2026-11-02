@@ -37,12 +37,9 @@
         >
           <template #[`item.displayName`]="{ item }">
             <span class="participant-list__cell">
-              <origam-avatar
-                :text="item.initials"
-                :image="item.avatarUrl ?? undefined"
-                size="default"
-                rounded="full"
-                aria-hidden="true"
+              <player-avatar
+                :display-name="item.displayName"
+                :avatar-url="item.avatarUrl"
               />
               <strong>{{ item.displayName }}</strong>
             </span>
@@ -58,7 +55,7 @@
               v-if="item.accountState"
               size="small"
               :color="chipOf(item.accountState).color"
-              :bg-color="chipOf(item.accountState).color"
+              :bg-color="chipOf(item.accountState).bgColor"
               :text="chipOf(item.accountState).label"
               :data-cy="`participant-account-${item.accountState}`"
             />
@@ -109,12 +106,13 @@
 
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
-import { OrigamAvatar, OrigamBtn, OrigamChip, OrigamTitle } from 'origam/components'
+import { OrigamBtn, OrigamChip, OrigamTitle } from 'origam/components'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import AppPagination from '~/components/common/AppPagination.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
+import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_PARTICIPANTS_PAGE_SIZE, PARTICIPANT_ACCOUNT_CHIPS, PARTICIPANT_NO_ACCOUNT_TEXT } from '~/consts/admin-participants.const'
 import { ACCOUNT_STATE } from '~/enums/user.enum'
@@ -177,7 +175,7 @@ const nicknameOf = (nickname: string): string => nickname === ''
   : t('admin.participants.nickname', '« {nickname} »', { nickname })
 const chipOf = (state: ACCOUNT_STATE) => {
   const chip = PARTICIPANT_ACCOUNT_CHIPS[state]
-  return { color: chip.color, label: t(chip.text.key, chip.text.fallback) }
+  return { color: chip.color, bgColor: chip.bgColor, label: t(chip.text.key, chip.text.fallback) }
 }
 const canResend = (state: ACCOUNT_STATE | null): boolean => state === ACCOUNT_STATE.INVITED || state === ACCOUNT_STATE.INVITATION_EXPIRED
 
@@ -188,11 +186,11 @@ const canResend = (state: ACCOUNT_STATE | null): boolean => state === ACCOUNT_ST
  * La clé de colonne est celle du champ de la ligne.
  ********************************************************/
 const headers = computed<IDataTableHeader[]>(() => [
-  { key: 'displayName', title: t('admin.participants.col_player', 'Joueur'), sortable: false },
-  { key: 'nickname', title: t('admin.participants.col_nickname', 'Pseudo'), sortable: false },
-  { key: 'editionsPlayed', title: t('admin.participants.col_editions', 'Éditions'), sortable: false, align: ALIGN.END },
-  { key: 'accountState', title: t('admin.participants.col_account', 'Compte'), sortable: false },
-  { key: 'actions', title: t('admin.participants.col_action', 'Action'), sortable: false, align: ALIGN.END }
+  { key: 'displayName', title: t('admin.participants.col_player', 'Joueur'), sortable: false, nowrap: true },
+  { key: 'nickname', title: t('admin.participants.col_nickname', 'Pseudo'), sortable: false, nowrap: true },
+  { key: 'editionsPlayed', title: t('admin.participants.col_editions', 'Éditions'), sortable: false, nowrap: true, align: ALIGN.END },
+  { key: 'accountState', title: t('admin.participants.col_account', 'Compte'), sortable: false, nowrap: true },
+  { key: 'actions', title: t('admin.participants.col_action', 'Action'), sortable: false, nowrap: true, align: ALIGN.END }
 ])
 
 /*********************************************************
@@ -220,6 +218,7 @@ defineExpose({})
 <style scoped lang="scss">
 .participant-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--participant-list---gap, var(--origam-space---4));
   min-width: 0;
 
