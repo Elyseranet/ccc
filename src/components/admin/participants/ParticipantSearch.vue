@@ -42,11 +42,9 @@
               rounded="full"
             />
           </template>
-          <template
-            v-if="!isCreate(valueOf(slot))"
-            #append
-          >
+          <template #append>
             <origam-chip
+              v-if="!isCreate(valueOf(slot))"
               size="small"
               :text="existingProfileLabel"
             />
@@ -106,7 +104,7 @@ const toItem = (suggestion: IParticipantSuggestion) => ({
   title: suggestion.isCreate
     ? t('admin.participants.create_title', 'Créer un nouveau participant « {query} »', { query: suggestion.title })
     : suggestion.title,
-  subtitle: t(suggestion.subtitle.key, suggestion.subtitle.fallback, suggestion.subtitle.params)
+  props: { subtitle: t(suggestion.subtitle.key, suggestion.subtitle.fallback, suggestion.subtitle.params) }
 })
 const items = computed(() => props.suggestions.map(toItem))
 /** Le slot `item` d'Origam n'est pas typé : la valeur de l'item est lue ici, une seule fois. */
