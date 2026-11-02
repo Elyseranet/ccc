@@ -39,7 +39,7 @@ test.describe('accessibilité des trois écrans et de leurs états', () => {
     await hydrated(page, '/connexion')
     expect(await violations(page)).toEqual([])
     await expect(page.getByLabel('Email')).toBeVisible()
-    await expect(page.getByLabel('Mot de passe')).toBeVisible()
+    await expect(page.getByLabel('Mot de passe', { exact: true })).toBeVisible()
   })
 
   test('/connexion : identifiants refusés, alerte annoncée, 0 violation axe, le mot de passe reste saisi', async ({ page }) => {
