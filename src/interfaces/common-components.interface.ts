@@ -61,3 +61,14 @@ export interface IBubblesOptions {
   canvas: HTMLCanvasElement
   colors: string[]
 }
+
+export interface IAppPaginationProps {
+  page: number
+  total: number
+  pageSize: number
+}
+
+export interface IAppPaginationEmits {
+  (event: 'update:page', value: number): void
+}
+

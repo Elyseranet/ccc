@@ -279,7 +279,7 @@ describe('pages', () => {
     expect(wrapper.get('[data-cy="players-count"]').attributes('role')).toBe('status')
     expect(wrapper.get('[data-cy="players-count"]').text()).toBe('145 joueurs · tri par nom')
     expect(wrapper.findAll('tbody tr')).toHaveLength(20)
-    expect(wrapper.get('[data-cy="players-pager-range"]').text()).toBe('1–20 sur 145')
+    expect(wrapper.get('[data-cy="pagination-range"]').text()).toBe('1–20 sur 145')
     expect(wrapper.find('form[role="search"]').exists()).toBe(true)
   })
 

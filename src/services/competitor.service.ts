@@ -2,6 +2,9 @@ import type { ICompetitorDetail, ICompetitorIdentity, ICompetitorListItem, IComp
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
+import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
+import type { IInvitationResent } from '../interfaces/invitation.interface.js'
+import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
 import { BaseService } from './base.service.js'
 import { QueryFailedError } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
@@ -69,6 +72,18 @@ export class CompetitorService extends BaseService {
 
   headToHead (id: string, opponentId: string): Promise<IHeadToHead> {
     return this.request<IHeadToHead>(`/competiteurs/${encodeURIComponent(id)}/face-a-face`, { query: { adversaire: opponentId } })
+  }
+
+  /** Pose la photo d'un compétiteur (administrateur, B-16) : `multipart/form-data`, un seul champ `file`, sans Content-Type forcé. */
+  uploadAvatar (id: string, file: File): Promise<IAvatarUploadResponse> {
+    const body = new FormData()
+    body.append(AVATAR_UPLOAD_FIELD, file)
+    return this.request<IAvatarUploadResponse>(`/competiteurs/${encodeURIComponent(id)}/avatar`, { method: 'PUT', body })
+  }
+
+  /** Renvoie l'invitation (B-09) : l'ancien lien est invalidé. */
+  resendInvitation (id: string): Promise<IInvitationResent> {
+    return this.request<IInvitationResent>(`/competiteurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })
   }
 }
 
