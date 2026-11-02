@@ -124,7 +124,8 @@ import type { IEditionBracketProps } from '~/interfaces/edition-view.interface'
  * Tableau de la phase finale. Les affiches sont tirées à chaque tour (RG13) : aucun trait de liaison entre les colonnes, et
  * seuls les tours publiés par l'API sont montrés (B-18), jamais un tour vide inventé. Rendu natif : `origam-bracket` dessine un
  * arbre à connecteurs et ne montre ni lien vers la fiche d'un joueur ni le score dans son slot `competitor` (mesuré sur
- * l'édition 2025). Le tableau défile horizontalement dans une région focalisable et nommée ; l'alternative en liste (`<details>`)
+ * l'édition 2025 ; largeur et hauteur de tour en style en ligne, titre centré en dur, slot `connector` vide sans effet : Elyseranet/origam#1282,
+ * fiche `docs/tickets/origam/bracket-largeur-hauteur-titre-et-slot-connector.md`, migration F-03-BRK). Le tableau défile horizontalement dans une région focalisable et nommée ; l'alternative en liste (`<details>`)
  * donne les mêmes affiches en texte. Le vainqueur n'est pas porté par la couleur seule : il est en gras et annoncé.
  ********************************************************/
 const { t } = useT()

@@ -74,17 +74,19 @@
             <span class="edition-summary__eyebrow">{{ finalistLabel }}</span>
             <common-player-link
               :competitor="podium.finalist"
+              :titles="podium.finalistTitles"
               inline
             />
           </li>
           <li
-            v-for="person in podium.semifinalists"
-            :key="person.id"
+            v-for="place in podium.semifinalists"
+            :key="place.person.id"
             class="edition-summary__place"
           >
             <span class="edition-summary__eyebrow">{{ semifinalistLabel }}</span>
             <common-player-link
-              :competitor="person"
+              :competitor="place.person"
+              :titles="place.titles"
               inline
             />
           </li>
@@ -320,6 +322,12 @@ defineExpose({})
     border-radius: var(--origam-radius---lg);
     background: var(--origam-color__surface---sunken);
     font-weight: var(--origam-font__weight---semibold);
+
+    // Comme la maquette : les étoiles passent sous le nom (variables de PlayerLink).
+    --player-link---content-direction: column;
+    --player-link---content-align: flex-start;
+    --player-link---content-gap: var(--origam-space---1);
+    --player-link---stars-margin: 0;
   }
 
   &__facts {

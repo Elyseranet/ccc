@@ -17,7 +17,7 @@ describe('EditionSummary', () => {
     const wrapper = await mountSuspended(EditionSummary, {
       ...withRouterLink,
       props: {
-        podium: { champion: person('c1', 'Lou Bernard'), titlesToDate: 4, finalWinnerScore: 10, finalLoserScore: 7, finalist: person('c2', 'Inès Perrin'), semifinalists: [person('c3', 'Mila Simon')] },
+        podium: { champion: person('c1', 'Lou Bernard'), titlesToDate: 4, finalWinnerScore: 10, finalLoserScore: 7, finalist: person('c2', 'Inès Perrin'), finalistTitles: 1, semifinalists: [{ person: person('c3', 'Mila Simon'), titles: 2 }] },
         facts: [{ id: 'matches', label: { key: 'edition.fact_matches', fallback: 'Matchs' }, value: '120', detail: null, extra: { key: 'edition.summary_matches_archive', fallback: '', params: { matches: 120, unknown: 2 } } }],
         steps: [
           { id: 'creation', index: 1, label: { key: 'edition.step_creation', fallback: 'Création' }, state: EDITION_STEP_STATE.DONE },
@@ -26,6 +26,9 @@ describe('EditionSummary', () => {
       }
     })
     expect(wrapper.get('[data-cy="edition-champion"]').element.tagName).toBe('SPAN')
+    const places = wrapper.findAll('.edition-summary__place')
+    expect(places.map(place => place.find('.player-link__stars').text())).toEqual(['*', '**'])
+    expect(wrapper.find('.edition-summary__champ .player-link__stars').exists()).toBe(false)
     expect(wrapper.get('[data-cy="edition-final-line"]').text()).toBe('Finale gagnée 10–7 contre Inès Perrin')
     expect(wrapper.get('[data-cy="edition-fact-matches"]').text()).toContain('120 matchs, dont 2 au résultat inconnu')
     const steps = wrapper.get('[data-cy="edition-steps"]')
