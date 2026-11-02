@@ -25,3 +25,5 @@
 - [ ] Un client lent reçoit le 408 de façon fiable.
 - [ ] Le test passe 10 fois sur 10 chez le `frontend-lead`, et 10 fois sur 10 sous charge.
 - [ ] Les garanties de L6 restent tenues, ou l'écart est documenté avec sa borne.
+
+- **Lien** : T-SEC-09 est rouvert pour ce défaut (c55bdf4). Les deux tickets se ferment ensemble au merge du correctif. Mesure du chef de projet sur develop cf01fa5 : 2 échecs sur 5 rejeux du fichier seul.

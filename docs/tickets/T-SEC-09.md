@@ -43,3 +43,4 @@ L5 : `describeErrorForLog` (`log-sanitize.util.ts`) ne renvoie que `errorName` e
 - **Cause probable** (à établir) : course entre l'envoi du 408 et `req.destroy()`. Le client du test lit un ECONNRESET quand le serveur détruit le flux juste après la réponse. C'est le même mécanisme que celui corrigé dans T-QA-05 côté client de test.
 - **Impact** : `test:run` est rouge par intermittence sur develop, ce qui bloque les gates de toutes les branches.
 - **À faire, en priorité** : établir la cause (test ou code de production), corriger, puis prouver la stabilité par 10 passages de `test:run` sous charge.
+- **Suivi du correctif** : [T-SEC-15](T-SEC-15.md), ouvert en même temps par le backend-lead, porte l'analyse et le correctif. T-SEC-09 et T-SEC-15 se ferment ensemble, au merge du correctif.
