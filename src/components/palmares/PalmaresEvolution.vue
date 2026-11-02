@@ -42,6 +42,8 @@
         >
           <origam-btn
             variant="text"
+            color="primary"
+            padding-inline="3"
             :text="tableSummary"
             :aria-expanded="isTableOpen"
             :aria-controls="tableId"
