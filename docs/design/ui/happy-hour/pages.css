@@ -325,6 +325,13 @@
 .file-field__ic { width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; opacity: .7; }
 .file-field__input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
 .file-field:has(:focus-visible) { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
+/* Rendu origam-password-field strength-bar + requirement-rules en liste, mesuré sur origam 2.37.4 (champ vide) */
+.pw-meter { display: grid; gap: var(--origam-space---3); padding-block-start: calc(var(--origam-space---4) + var(--origam-space---1) / 2); padding-inline-start: calc(var(--origam-space---1) / 4); }
+.pw-meter__bar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--origam-space---1); }
+.pw-meter__bar > span { height: var(--origam-space---1); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---sunken); }
+.pw-reqs { display: grid; gap: var(--origam-space---1); margin: 0; padding: 0; list-style: none; }
+.pw-req { display: flex; align-items: center; gap: var(--origam-space---1); min-height: var(--origam-space---4); color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); letter-spacing: 0.0333em; line-height: var(--origam-space---4); } /* 0.0333em : interlettrage interne d’Origam sous le champ, sans jeton */
+.pw-req__ic { flex: none; width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
 .hint { font-size: var(--origam-font__size---sm); margin-top: calc(-1 * var(--origam-space---2)); }
 .acc-avatar { display: flex; align-items: end; gap: var(--origam-space---4); }
 .acc-avatar .field { flex: 1; }
