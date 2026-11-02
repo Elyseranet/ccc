@@ -75,6 +75,10 @@ export const matchAlreadyValidated = (): H3Error =>
 export const preconditionRequired = (): H3Error =>
   buildError(428, API_ERROR_CODE.PRECONDITION_REQUIRED, API_ERROR_MESSAGE.PRECONDITION_REQUIRED)
 
+/** 409 : la version est à jour mais les scores envoyés pour la validation diffèrent du score saisi. La version n'est pas en cause : pas de `currentVersion`. */
+export const scoreMismatch = (): H3Error =>
+  buildError(409, API_ERROR_CODE.SCORE_MISMATCH, API_ERROR_MESSAGE.SCORE_MISMATCH)
+
 /** 412 : la version lue est périmée. `currentVersion` permet au client de recharger ; pas l'état complet. */
 export const versionConflict = (currentVersion: number): H3Error =>
   buildError(412, API_ERROR_CODE.VERSION_CONFLICT, API_ERROR_MESSAGE.VERSION_CONFLICT, { currentVersion })

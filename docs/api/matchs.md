@@ -51,7 +51,7 @@ Copie `recorded_score` dans `validated_score`, pose `validated_at` et `validated
 
 - **Rejeu** : un match déjà `VALIDATED` dont les scores validés égalent ceux du corps renvoie `200` avec l'état courant, sans aucun effet de bord (même avec un `If-Match` périmé). Le même appel envoyé trois fois donne un seul effet et trois réponses identiques.
 - Des scores différents sur un match déjà validé : `409 MATCH_ALREADY_VALIDATED`.
-- Des scores différents du score saisi, ou un `If-Match` périmé : `412 VERSION_CONFLICT` (« validé ou modifié par une autre session »), avec la version courante dans `details.currentVersion`.
+- Contrôles dans cet ordre : un `If-Match` périmé (hors rejeu à l'identique d'un match déjà validé) donne `412 VERSION_CONFLICT` (« validé ou modifié par une autre session »), avec la version courante dans `details.currentVersion`, quels que soient les scores ; puis, la version étant à jour, des scores différents du score saisi donnent `409 SCORE_MISMATCH` (« Les scores envoyés ne correspondent pas au score saisi »), sans `currentVersion` : la version n'est pas en cause, le client n'envoie pas ce qu'il a lu.
 - Aucun score saisi : `409 CONFLICT`.
 - Scores incohérents avec le format (RG22 : exactement un côté atteint la cible, 5 en poule et 10 en phase finale ; les autres entre 0 et la cible moins 1) : `422 SCORE_INCONSISTENT`.
 
@@ -113,7 +113,8 @@ Le serveur n'a pas de sémantique propre aux filtres de l'écran (« À traiter 
 | 409 | `MATCH_ALREADY_VALIDATED` | `PUT` sur un match `VALIDATED` (passer par la correction), ou validation avec d'autres scores que ceux déjà validés |
 | 409 | `NEXT_ROUND_ENGAGED` | correction refusée : un tour suivant est engagé (R-3) |
 | 409 | `CONFLICT` | match `RESULT_UNKNOWN`, édition `CLOSED`, tour non ouvert, validation sans score saisi, correction d'un match non `VALIDATED` |
-| 412 | `VERSION_CONFLICT` | `If-Match` périmé, ou scores du corps différents du score saisi ; `details: { currentVersion }` |
+| 409 | `SCORE_MISMATCH` | validation : version à jour mais scores du corps différents du score saisi (pas de `details`) |
+| 412 | `VERSION_CONFLICT` | `If-Match` périmé ; `details: { currentVersion }` |
 | 413 | `PAYLOAD_TOO_LARGE` | corps de plus de 16 Kio |
 | 428 | `PRECONDITION_REQUIRED` | `If-Match` absent (`PUT`, validation et correction) |
 | 422 | `SCORE_INCONSISTENT` | scores incohérents avec le format du match (RG22), à la validation et à la correction |

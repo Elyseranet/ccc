@@ -146,7 +146,8 @@ describe('match scores (B-12)', async () => {
       {}
     ]
     for (const body of bodies) {
-      const response = await send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, body)
+      // `If-Match` est lu avant le service : sans lui, un corps valide pour zod (participant étranger) répondrait 428.
+      const response = await send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, body, { 'If-Match': `"${match.version}"` })
       expect(response.status, JSON.stringify(body)).toBe(400)
     }
     expect((await send('PUT', '/api/v1/matchs/not-a-uuid/score', adminCookie, scoreBody(match, [5, 3]))).status).toBe(400)
@@ -221,15 +222,23 @@ describe('match scores (B-12)', async () => {
     await recordedAs(await putScore(tied, [5, 1]))
   })
 
-  it('refuses a stale If-Match (412 VERSION_CONFLICT) or a score the organiser did not see', async () => {
+  it('refuses a stale If-Match (412 VERSION_CONFLICT) before a score the organiser did not see (409 SCORE_MISMATCH)', async () => {
     const current = await adminMatchBySequence(live.id, 2)
     const stale = await validate(current, [5, 1], { 'If-Match': `"${current.version - 1}"` })
     expect(stale.status).toBe(412)
     expect(await errorOf(stale)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: current.version } })
 
+    // Version périmée ET scores différents : la version d'abord (412).
+    const staleAndDifferent = await validate(current, [5, 3], { 'If-Match': `"${current.version - 1}"` })
+    expect(staleAndDifferent.status).toBe(412)
+    expect(await errorOf(staleAndDifferent)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: current.version } })
+
+    // Version à jour mais scores différents du score saisi : 409 SCORE_MISMATCH, sans currentVersion.
     const unseen = await validate(current, [5, 3])
-    expect(unseen.status).toBe(412)
-    expect(await errorOf(unseen)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: current.version } })
+    expect(unseen.status).toBe(409)
+    const unseenError = await errorOf(unseen)
+    expect(unseenError.code).toBe(API_ERROR_CODE.SCORE_MISMATCH)
+    expect(unseenError.details).toBeUndefined()
 
     expect((await validate(current, [5, 1], { 'If-Match': 'not-a-version' })).status).toBe(400)
     expect((await adminMatchBySequence(live.id, 2)).status).toBe(MATCH_STATUS.RECORDED)

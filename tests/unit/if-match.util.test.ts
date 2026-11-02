@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
-import { toApiError, versionConflict } from '../../src/utils/api-error.util'
+import { scoreMismatch, toApiError, versionConflict } from '../../src/utils/api-error.util'
 import { parseRequiredIfMatchVersion } from '../../src/utils/if-match.util'
 
 describe('parseRequiredIfMatchVersion', () => {
@@ -37,5 +37,13 @@ describe('versionConflict', () => {
       code: API_ERROR_CODE.VERSION_CONFLICT,
       details: { currentVersion: 5 }
     })
+  })
+})
+
+describe('scoreMismatch', () => {
+  it('is a 409 SCORE_MISMATCH without details: the version is not at fault', () => {
+    const error = toApiError(scoreMismatch())
+    expect(error).toMatchObject({ statusCode: 409, code: API_ERROR_CODE.SCORE_MISMATCH })
+    expect(error.details).toBeUndefined()
   })
 })

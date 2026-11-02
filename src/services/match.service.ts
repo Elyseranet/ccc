@@ -26,6 +26,7 @@ import {
   matchNotFound,
   nextRoundEngaged,
   scoreInconsistent,
+  scoreMismatch,
   versionConflict
 } from '../utils/api-error.util.js'
 import { logger } from '../utils/logger.util.js'
@@ -145,7 +146,8 @@ export const recordScore = (dataSource: DataSource, command: IScoreCommand): Pro
 /**
  * « Valider » : copie `recorded_score` vers `validated_score`. Un rejeu (match déjà VALIDATED, mêmes scores)
  * renvoie l'état courant sans effet ; d'autres scores donnent MATCH_ALREADY_VALIDATED. Les scores du corps sont
- * ce que l'organisateur a vu : s'ils diffèrent du score saisi, ou si `If-Match` est périmé, 412 VERSION_CONFLICT.
+ * ce que l'organisateur a vu. Contrôles dans l'ordre : 412 VERSION_CONFLICT si `If-Match` est périmé, puis 409 SCORE_MISMATCH
+ * si les scores diffèrent du score saisi.
  */
 export const validateMatch = (dataSource: DataSource, command: IScoreCommand): Promise<IScoreWriteOutcome> =>
   dataSource.transaction(async (manager) => {
@@ -162,10 +164,12 @@ export const validateMatch = (dataSource: DataSource, command: IScoreCommand): P
     if (match.status !== MATCH_STATUS.RECORDED) {
       throw conflict('No recorded score to validate')
     }
-    if (!hasSameScores(sidesInOrder(match).map((side) => side.recordedScore), scores)) {
-      throw versionConflict(match.version)
-    }
+    // Version d'abord (412), puis concordance des scores (409) : avec une version à jour, des scores différents du score
+    // saisi ne viennent que d'un client qui n'envoie pas ce qu'il a lu.
     assertVersion(match, command.expectedVersion)
+    if (!hasSameScores(sidesInOrder(match).map((side) => side.recordedScore), scores)) {
+      throw scoreMismatch()
+    }
     assertConsistent(match, scores)
     await writeSides(manager, match, (side) => ({ validatedScore: side.recordedScore }), scores)
     await manager.update(MatchEntity, { id: match.id }, {

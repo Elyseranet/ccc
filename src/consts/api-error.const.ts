@@ -41,6 +41,7 @@ export const API_ERROR_MESSAGE = {
   MATCH_ALREADY_VALIDATED: 'Match already validated with different scores',
   PRECONDITION_REQUIRED: 'The If-Match header is required',
   VERSION_CONFLICT: 'The resource was modified by another session',
+  SCORE_MISMATCH: 'Les scores envoyés ne correspondent pas au score saisi',
   NEXT_ROUND_ENGAGED: 'The next round is engaged: the score can no longer be corrected',
   SCORE_INCONSISTENT: 'Scores are inconsistent with the match format',
   MATCH_NOT_FOUND: 'Match not found',
