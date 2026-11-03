@@ -110,7 +110,7 @@ test.describe('admin participants : écritures sur une édition créée par le t
     expect((await adminParticipants(page, edition)).length).toBe(before)
   })
 
-  test('homonymes proches : « Remi » retrouve « Rémi », et un profil déjà inscrit n’est pas proposé', async ({ page, context }) => {
+  test('homonymes proches (parcours.md 4b.4) : « Remi » retrouve « Rémi », un profil déjà inscrit n’est pas proposé, « Créer » reste toujours offert', async ({ page, context }) => {
     const { edition, seed } = await createRegistrationEdition(context.request, 'homonymes')
     const accent = await createCompetitor(context.request, 'homonyme accent', { firstName: 'Rémi', lastName: 'Homonyme Quasi' })
     const plain = await createCompetitor(context.request, 'homonyme plain', { firstName: 'Remi', lastName: 'Homonyme Quasi' })
@@ -123,6 +123,7 @@ test.describe('admin participants : écritures sur une édition créée par le t
     await expect(profiles.filter({ hasText: accent.displayName })).toBeVisible()
     await expect(profiles.filter({ hasText: plain.displayName })).toHaveCount(0)
     await expect(profiles.filter({ hasText: seed.displayName })).toHaveCount(0)
+    await expect(page.getByTestId('participant-search-create')).toBeVisible()
   })
 
   test('photo envoyée en second appel sur un compétiteur créé par le test', async ({ page, context }) => {

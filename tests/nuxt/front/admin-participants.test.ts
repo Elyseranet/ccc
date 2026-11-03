@@ -154,6 +154,8 @@ describe('fonctions pures des inscrits', () => {
     expect(suggestions.map(suggestion => suggestion.value)).toEqual(['a', PARTICIPANT_CREATE_VALUE])
     expect(suggestions[0]!.subtitle.key).toBe('admin.participants.suggestion_one')
     expect(suggestions.at(-1)!.isCreate).toBe(true)
+    expect(buildSuggestions([], new Set(), 'Cam').map(suggestion => suggestion.value)).toEqual([PARTICIPANT_CREATE_VALUE])
+    expect(buildSuggestions(items, new Set(), 'Cam').filter(suggestion => suggestion.isCreate)).toHaveLength(1)
     expect(toParticipantRow(participant('Lisa André', null)).accountState).toBeNull()
   })
 })
