@@ -43,9 +43,9 @@ L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) *
 
 | Variable | Exigence |
 |---|---|
-| `NUXT_PUBLIC_SITE_URL` | URL en `https:`, qui ne désigne ni `localhost`, `127.0.0.1`, `::1`, `0.0.0.0` ni un `*.localhost` ; base des liens d'invitation |
+| `NUXT_PUBLIC_SITE_URL` | URL publique en `https:` : ni `localhost` ni `*.localhost`, ni une adresse locale (`127.0.0.0/8`, `0.0.0.0`, `::`, `::1`, IPv4 mappées comprises), ni une adresse privée ou link-local (`10/8`, `172.16/12`, `192.168/16`, `169.254/16`, `fc00::/7`, `fe80::/10`) ; base des liens d'invitation |
 | `NUXT_MAIL_TRANSPORT` | `smtp` (`capture` est réservé aux tests d'API) |
-| `NUXT_MAIL_HOST` | serveur SMTP réel, nom complet avec un point : ni vide, ni `localhost`, `127.0.0.1`, `::1`, `0.0.0.0`, `*.localhost`, ni un nom de service sans point (`mailpit`) |
+| `NUXT_MAIL_HOST` | serveur SMTP réel, nom complet avec un point ou adresse IP : ni vide, ni local (`localhost`, `*.localhost`, `127.0.0.0/8`, `0.0.0.0`, `::`, `::1`), ni un nom de service sans point (`mailpit`). Les adresses privées et link-local sont **acceptées** pour le SMTP (relais interne de Coolify, décision du 2026-11-02) |
 | `NUXT_MAIL_FROM` | expéditeur réel, par ex. `CCC <no-reply@votre-domaine>` : ni vide, ni la valeur par défaut (`@ccc.local`) |
 | `NUXT_AUTH_SECURE_COOKIE` | ne doit pas être éteint (`false` ou `0`) |
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | 32 caractères au moins (T-SEC-12, L12) |

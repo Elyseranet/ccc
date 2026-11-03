@@ -15,14 +15,25 @@ export const LOCAL_HOSTNAME_SUFFIX = '.localhost'
 /**
  * Plages d'adresses qui désignent la machine locale (T-SEC-06 M1) : tout `127.0.0.0/8`, `0.0.0.0`, `::` et `::1`. Les
  * IPv4 mappées en IPv6 (`::ffff:127.0.0.1`, `::ffff:7f00:1`, toutes leurs écritures) sont rapprochées des plages IPv4 par
- * `net.BlockList`. Les plages privées (10/8, 172.16/12, 192.168/16, fc00::/7) et link-local ne sont PAS refusées : un relais SMTP
- * du réseau interne peut être légitime (décision en attente).
+ * `net.BlockList`.
  */
 export const LOCAL_ADDRESS_RANGES = [
   { network: '127.0.0.0', prefix: 8, family: 'ipv4' },
   { network: '0.0.0.0', prefix: 32, family: 'ipv4' },
   { network: '::1', prefix: 128, family: 'ipv6' },
   { network: '::', prefix: 128, family: 'ipv6' }
+] as const
+/**
+ * Plages privées et link-local (décision utilisateur 2026-11-02) : refusées pour `NUXT_PUBLIC_SITE_URL` SEULEMENT. L'hôte SMTP
+ * les accepte, pour un relais interne de Coolify. IPv4 mappées en IPv6 rapprochées par `net.BlockList`, comme pour les plages locales.
+ */
+export const PRIVATE_ADDRESS_RANGES = [
+  { network: '10.0.0.0', prefix: 8, family: 'ipv4' },
+  { network: '172.16.0.0', prefix: 12, family: 'ipv4' },
+  { network: '192.168.0.0', prefix: 16, family: 'ipv4' },
+  { network: '169.254.0.0', prefix: 16, family: 'ipv4' },
+  { network: 'fc00::', prefix: 7, family: 'ipv6' },
+  { network: 'fe80::', prefix: 10, family: 'ipv6' }
 ] as const
 /** Domaine de l'expéditeur par défaut (comparé EXACTEMENT) : un `from` sur ce domaine n'a jamais été configuré. */
 export const DEFAULT_MAIL_FROM_DOMAIN = 'ccc.local'

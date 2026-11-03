@@ -5,6 +5,7 @@ import {
   LOCAL_ADDRESS_RANGES,
   LOCAL_HOSTNAME,
   LOCAL_HOSTNAME_SUFFIX,
+  PRIVATE_ADDRESS_RANGES,
   STRICT_CONFIG_VARIABLE,
   STRICT_RUNTIME_CONFIG_OFF_VALUES
 } from '../consts/runtime-config.const.js'
@@ -16,6 +17,11 @@ const asText = (value: unknown): string => (typeof value === 'string' ? value.tr
 const localRanges = new BlockList()
 for (const { network, prefix, family } of LOCAL_ADDRESS_RANGES) {
   localRanges.addSubnet(network, prefix, family)
+}
+
+const privateRanges = new BlockList()
+for (const { network, prefix, family } of PRIVATE_ADDRESS_RANGES) {
+  privateRanges.addSubnet(network, prefix, family)
 }
 
 /**
@@ -41,6 +47,12 @@ const isLocalHostname = (hostname: string): boolean => {
   return hostname === LOCAL_HOSTNAME || hostname.endsWith(LOCAL_HOSTNAME_SUFFIX)
 }
 
+/** Adresse privée ou link-local (IPv4 mappées comprises) : refusée pour le site, acceptée pour le SMTP. */
+const isPrivateAddress = (hostname: string): boolean => {
+  const family = isIP(hostname)
+  return family !== 0 && privateRanges.check(hostname, family === 4 ? 'ipv4' : 'ipv6')
+}
+
 /** Mode strict actif ? Faux par défaut ; seules `false`, `0` ou la chaîne vide l'éteignent explicitement. */
 export const isStrictRuntimeConfig = (value: unknown): boolean => {
   if (value === undefined || value === null || value === false) {
@@ -55,7 +67,8 @@ export const isStrictRuntimeConfig = (value: unknown): boolean => {
 const siteUrlViolation = (value: unknown): boolean => {
   try {
     const url = new URL(asText(value))
-    return url.protocol !== 'https:' || isLocalHostname(normalizeHostname(url.host))
+    const hostname = normalizeHostname(url.host)
+    return url.protocol !== 'https:' || isLocalHostname(hostname) || isPrivateAddress(hostname)
   } catch {
     return true
   }
@@ -107,7 +120,7 @@ export const assertStrictRuntimeConfig = (config: IStrictRuntimeConfigInput): vo
   }
   const problems: string[] = []
   if (siteUrlViolation(config.public?.siteUrl)) {
-    problems.push(`${STRICT_CONFIG_VARIABLE.SITE_URL} must be an https URL that does not point to localhost`)
+    problems.push(`${STRICT_CONFIG_VARIABLE.SITE_URL} must be a public https URL (no localhost, private or link-local address)`)
   }
   if (asText(config.mail?.transport) !== 'smtp') {
     problems.push(`${STRICT_CONFIG_VARIABLE.MAIL_TRANSPORT} must be "smtp"`)

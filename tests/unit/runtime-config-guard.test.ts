@@ -55,6 +55,18 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['127.1 shorthand site URL', { siteUrl: 'https://127.1' }, 'NUXT_PUBLIC_SITE_URL'],
     ['decimal 2130706433 site URL', { siteUrl: 'https://2130706433' }, 'NUXT_PUBLIC_SITE_URL'],
     ['LOCALHOST. mixed case site URL', { siteUrl: 'https://LocalHost.' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['10.0.0.1 private site URL (10/8)', { siteUrl: 'https://10.0.0.1' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['10.255.255.254 private site URL', { siteUrl: 'https://10.255.255.254' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['172.16.0.1 private site URL (172.16/12)', { siteUrl: 'https://172.16.0.1' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['172.31.255.254 private site URL', { siteUrl: 'https://172.31.255.254' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['192.168.1.10 private site URL (192.168/16)', { siteUrl: 'https://192.168.1.10' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['169.254.169.254 link-local site URL (169.254/16)', { siteUrl: 'https://169.254.169.254' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[fd00::25] unique-local site URL (fc00::/7)', { siteUrl: 'https://[fd00::25]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[fc00::1] unique-local site URL', { siteUrl: 'https://[fc00::1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[fe80::1] link-local site URL (fe80::/10)', { siteUrl: 'https://[fe80::1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[febf::1] link-local site URL (top of fe80::/10)', { siteUrl: 'https://[febf::1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::ffff:10.0.0.1] mapped private site URL', { siteUrl: 'https://[::ffff:10.0.0.1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::ffff:c0a8:101] mapped 192.168.1.1 site URL', { siteUrl: 'https://[::ffff:c0a8:101]' }, 'NUXT_PUBLIC_SITE_URL'],
     ['default site URL', { siteUrl: DEFAULT_SITE_URL }, 'NUXT_PUBLIC_SITE_URL'],
     ['unparsable site URL', { siteUrl: 'not a url' }, 'NUXT_PUBLIC_SITE_URL'],
     ['empty site URL', { siteUrl: '' }, 'NUXT_PUBLIC_SITE_URL'],
@@ -102,6 +114,18 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['https public IPv4 site URL', { siteUrl: 'https://203.0.113.10' }],
     ['https URL whose name merely contains localhost', { siteUrl: 'https://notlocalhost.example.org' }],
     ['https URL on 128.0.0.1 (outside 127/8)', { siteUrl: 'https://128.0.0.1' }],
+    ['https URL on 172.32.0.1 (just outside 172.16/12)', { siteUrl: 'https://172.32.0.1' }],
+    ['https URL on 11.0.0.1 (just outside 10/8)', { siteUrl: 'https://11.0.0.1' }],
+    ['https URL on 192.169.0.1 (just outside 192.168/16)', { siteUrl: 'https://192.169.0.1' }],
+    ['https URL on [fec0::1] (outside fe80::/10)', { siteUrl: 'https://[fec0::1]' }],
+    ['SMTP relay on 10.0.0.25 (private, accepted for SMTP)', { host: '10.0.0.25' }],
+    ['SMTP relay on 172.20.0.5', { host: '172.20.0.5' }],
+    ['SMTP relay on 192.168.1.25', { host: '192.168.1.25' }],
+    ['SMTP relay on fd00::25 (unique-local, accepted for SMTP)', { host: 'fd00::25' }],
+    ['SMTP relay on [fd00::25]', { host: '[fd00::25]' }],
+    ['SMTP relay on 169.254.1.1 (link-local, accepted for SMTP)', { host: '169.254.1.1' }],
+    ['SMTP relay on fe80::1 (link-local, accepted for SMTP)', { host: 'fe80::1' }],
+    ['SMTP relay on [::ffff:10.0.0.25] (mapped private)', { host: '[::ffff:10.0.0.25]' }],
     ['smtp.example.org', { host: 'smtp.example.org' }],
     ['SMTP host with a port', { host: 'smtp.example.org:587' }],
     ['SMTP host in upper case', { host: 'SMTP.Example.ORG' }],
@@ -109,7 +133,6 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['public IPv6 SMTP host', { host: '[2001:db8::25]' }],
     ['public IPv6 SMTP host without brackets', { host: '2001:db8::25' }],
     ['public IPv4 SMTP host', { host: '203.0.113.25' }],
-    ['private network SMTP relay (out of scope, undecided)', { host: '10.0.0.25' }],
     ['sender on a similar domain', { from: 'CCC <no-reply@notccc.local.example.org>' }],
     ['sender whose display name mentions ccc.local', { from: 'ccc.local <no-reply@example.org>' }],
     ['sender on a ccc.local subdomain name inside another domain', { from: 'no-reply@evilccc.local.test' }]
@@ -129,6 +152,16 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
       auth: { secureCookie: true, deviceCookieSecret: '' }
     }
     expect(() => assertStrictRuntimeConfig(defaults)).toThrow(/NUXT_PUBLIC_SITE_URL.*NUXT_MAIL_HOST.*NUXT_MAIL_FROM.*NUXT_AUTH_DEVICE_COOKIE_SECRET/)
+  })
+
+  it('words the site error as a public https URL, without the value', () => {
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl: 'https://192.168.7.7' })))
+      .toThrow('NUXT_PUBLIC_SITE_URL must be a public https URL (no localhost, private or link-local address)')
+    try {
+      assertStrictRuntimeConfig(configWith({ siteUrl: 'https://192.168.7.7' }))
+    } catch (error) {
+      expect((error as Error).message).not.toContain('192.168.7.7')
+    }
   })
 
   it('never puts a configured value in the message', () => {
