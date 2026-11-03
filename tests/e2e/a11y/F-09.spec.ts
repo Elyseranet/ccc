@@ -62,42 +62,29 @@ test.describe('admin participants : lecture, états et refus sur les vraies donn
     expect(await violationsOf(page)).toEqual([])
   })
 
-  test('recherche : un profil existant est proposé avec « Profil existant », « Créer un nouveau participant » ferme la liste', async ({ page }) => {
-    const edition = await editionOf(page, '2026')
-    const ids = new Set((await registered(page, edition.id)).map(row => row.competitor.id))
-    const profile = await unregisteredProfile(page, ids)
+  test('édition 2026 (au-delà de l’inscription) : lecture seule, aucun bouton Retirer, recherche désactivée, 0 violation axe', async ({ page }) => {
     await openParticipants(page)
-    await page.getByTestId('participant-search').locator('input').fill(profile.displayName)
-    const suggestion = page.getByTestId('participant-search-profile').filter({ hasText: profile.displayName })
-    await expect(suggestion).toBeVisible()
-    await expect(suggestion).toContainText('Profil existant')
-    await expect(page.getByTestId('participant-search-create')).toContainText(`Créer un nouveau participant « ${profile.displayName} »`)
+    await expect(page.getByTestId('participant-read-only')).toContainText('Les inscriptions sont closes')
+    await expect(page.getByTestId('participant-remove')).toHaveCount(0)
+    await expect(page.getByTestId('participant-search').locator('input')).toBeDisabled()
+    await expect(page.getByTestId('participant-summary')).toContainText('inscriptions closes')
+    expect(await violationsOf(page)).toEqual([])
   })
 
-  test('recherche sans résultat : message « Aucun profil ne correspond. » et seule la création est proposée', async ({ page }) => {
-    await openParticipants(page)
-    await page.getByTestId('participant-search').locator('input').fill('zzqxjvw introuvable')
-    await expect(page.getByTestId('participant-search-profile')).toHaveCount(0)
-    await expect(page.getByTestId('participant-search-create')).toBeVisible()
-  })
-
-  test('rattacher un profil à 2026 est refusé (409 REGISTRATION_CLOSED) : message affiché, liste inchangée', async ({ page }) => {
+  test('le serveur refuse l’ajout et le retrait sur 2026 (409 REGISTRATION_CLOSED) et sur une archive (409 EDITION_CLOSED), sans rien modifier', async ({ page }) => {
     const edition = await editionOf(page, '2026')
+    const archive = await editionOf(page, '2025')
     const before = await registered(page, edition.id)
     const profile = await unregisteredProfile(page, new Set(before.map(row => row.competitor.id)))
-    await openParticipants(page)
-    await page.getByTestId('participant-search').locator('input').fill(profile.displayName)
-    await page.getByTestId('participant-search-profile').filter({ hasText: profile.displayName }).click()
-    await expect(page.getByTestId('participant-feedback')).toContainText('Les inscriptions sont closes')
-    expect(await registered(page, edition.id)).toHaveLength(before.length)
-  })
-
-  test('retirer un inscrit de 2026 est refusé (409 REGISTRATION_CLOSED) : message affiché, liste inchangée', async ({ page }) => {
-    const edition = await editionOf(page, '2026')
-    const before = await registered(page, edition.id)
-    await openParticipants(page)
-    await page.getByTestId('participant-remove').first().click()
-    await expect(page.getByTestId('participant-feedback')).toContainText('Les inscriptions sont closes')
+    const add = await page.request.post(`/api/v1/editions/${edition.id}/participants`, { data: { competitorId: profile.id } })
+    expect(add.status()).toBe(409)
+    expect((await add.json()).code).toBe('REGISTRATION_CLOSED')
+    const remove = await page.request.delete(`/api/v1/editions/${edition.id}/participants/${before[0]!.participationId}`)
+    expect(remove.status()).toBe(409)
+    expect((await remove.json()).code).toBe('REGISTRATION_CLOSED')
+    const addArchive = await page.request.post(`/api/v1/editions/${archive.id}/participants`, { data: { competitorId: profile.id } })
+    expect(addArchive.status()).toBe(409)
+    expect((await addArchive.json()).code).toBe('EDITION_CLOSED')
     expect(await registered(page, edition.id)).toHaveLength(before.length)
   })
 
@@ -110,28 +97,6 @@ test.describe('admin participants : lecture, états et refus sur les vraies donn
     await expect(page.getByTestId('participant-search').locator('input')).toBeDisabled()
     await expect(page.getByTestId('participant-summary')).toContainText('lecture seule')
     expect(await violationsOf(page)).toEqual([])
-  })
-
-  test('formulaire de création ouvert : 0 violation axe, champs nommés, email et téléphone annoncés comme privés', async ({ page }) => {
-    await openParticipants(page)
-    await page.getByTestId('participant-search').locator('input').fill('Formulaire Axe')
-    await page.getByTestId('participant-search-create').click()
-    await expect(page.getByTestId('participant-form')).toBeVisible()
-    await expect(page.getByLabel('Email · privé')).toBeVisible()
-    await expect(page.getByLabel('Téléphone · privé')).toBeVisible()
-    await expect(page.getByLabel('Nom', { exact: true })).toHaveValue('Formulaire Axe')
-    expect(await violationsOf(page)).toEqual([])
-  })
-
-  test('formulaire : champs obligatoires et email invalide bloquent l’envoi', async ({ page }) => {
-    await openParticipants(page)
-    await page.getByTestId('participant-search').locator('input').fill('Validation')
-    await page.getByTestId('participant-search-create').click()
-    await page.getByTestId('participant-form-email').locator('input').fill('pas-un-email')
-    await page.getByTestId('participant-form-submit').click()
-    await expect(page.getByTestId('participant-form')).toContainText('Champ obligatoire')
-    await expect(page.getByTestId('participant-form')).toContainText('Adresse email invalide')
-    await expect(page.getByTestId('participant-feedback')).toHaveCount(0)
   })
 
   test('erreur de chargement de la liste (navigation côté client) : alerte et nouvelle tentative', async ({ page }) => {

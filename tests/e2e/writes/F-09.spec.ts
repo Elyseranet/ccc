@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachParticipant, createCompetitor, createRegistrationEdition, readCapturedMails, selectAdminEdition, uniqueEmail } from '../helpers/edition-write'
@@ -144,5 +145,20 @@ test.describe('admin participants : écritures sur une édition créée par le t
     const image = await page.request.get(created!.competitor.avatarUrl!)
     expect(image.status()).toBe(200)
     expect(image.headers()['content-type']).toMatch(/^image\//)
+  })
+
+  test('recherche sans résultat : « Aucun profil ne correspond. », seule la création est proposée ; formulaire ouvert : 0 violation axe, champs privés annoncés', async ({ page, context }) => {
+    const { edition } = await createRegistrationEdition(context.request, 'formulaire')
+    await selectAdminEdition(context, edition)
+    await openParticipants(page)
+
+    await searchField(page).fill('zzqxjvw introuvable')
+    await expect(page.getByTestId('participant-search-profile')).toHaveCount(0)
+    await page.getByTestId('participant-search-create').click()
+    await expect(page.getByTestId('participant-form')).toBeVisible()
+    await expect(page.getByLabel('Email · privé')).toBeVisible()
+    await expect(page.getByLabel('Téléphone · privé')).toBeVisible()
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
+    expect(results.violations.map(violation => violation.id)).toEqual([])
   })
 })

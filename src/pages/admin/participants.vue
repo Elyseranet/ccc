@@ -180,13 +180,13 @@ const summary = computed(() => {
     ? t('admin.participants.summary_one', '1 inscrit')
     : t('admin.participants.summary_other', '{count} inscrits', { count })
   const rule = isReadOnly.value
-    ? t('admin.participants.summary_read_only', 'édition clôturée, lecture seule')
+    ? t('admin.participants.summary_read_only', 'inscriptions closes, lecture seule')
     : t('admin.participants.summary_rule', 'ajout et retrait possibles jusqu’à la validation du tirage')
   return `${base} · ${rule}`
 })
 const addTitle = computed(() => t('admin.participants.add_title', 'Ajouter un participant'))
 const addLead = computed(() => t('admin.participants.add_lead', 'Un seul flux : chercher un profil, le rattacher, ou créer et inviter.'))
-const readOnlyText = computed(() => t('admin.participants.read_only', 'Cette édition est clôturée : les inscrits ne peuvent plus changer.'))
+const readOnlyText = computed(() => t('admin.participants.read_only', 'Les inscriptions sont closes pour cette édition : les inscrits ne peuvent plus changer.'))
 const listError = computed(() => error.value !== undefined && error.value !== null)
 const listErrorText = computed(() => t('admin.participants.list_error', 'La liste des inscrits n’a pas pu être chargée.'))
 const retryLabel = computed(() => t('components.async_state.retry', 'Réessayer'))

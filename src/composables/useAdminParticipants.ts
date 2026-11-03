@@ -4,7 +4,7 @@ import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
 import { ADMIN_PARTICIPANTS_CACHE_KEY } from '~/consts/admin-participants.const'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
-import { EDITION_STATUS } from '~/enums/edition.enum'
+import { PARTICIPANT_EDITABLE_STATUSES } from '~/consts/edition.const'
 import { PARTICIPANT_FEEDBACK_STATUS } from '~/enums/participant-feedback.enum'
 import type { IParticipantFeedback, IParticipantFormValues, IPendingAvatar } from '~/interfaces/admin-participants.interface'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
@@ -18,8 +18,9 @@ import { hasErrorCode, toNewCompetitor, toParticipantError } from '~/utils/admin
  * @description
  * Inscrits de l'édition active de l'admin et actions du ticket F-09 : rattacher un profil existant, créer un participant
  * (deux appels : `POST /editions/{id}/participants` avec `newCompetitor`, puis `PUT /competiteurs/{id}/avatar`), retirer un
- * inscrit, renvoyer une invitation. L'écran se fie à la réponse du serveur : seule une édition clôturée, état connu de
- * l'API, désactive les actions ; un tirage validé (409 `REGISTRATION_CLOSED`) est annoncé par le message du refus.
+ * inscrit, renvoyer une invitation. Les actions sont masquées d'après un état connu de l'API : une édition
+ * au-delà de l'inscription (`PARTICIPANT_EDITABLE_STATUSES`, le jeu que le serveur applique). Un tirage validé pendant l'inscription, ou une
+ * course, reste arbitré par le serveur (409 `REGISTRATION_CLOSED`, `EDITION_CLOSED`), traduit en message.
  * Aucun `await` en tête : les composables de Nuxt (`useAsyncData`…) doivent être appelés avant tout point d'attente. L'édition
  * active par défaut est posée par `useAdminEdition` (le sélecteur de la coque, que la page attend en premier).
  * `invitationSent` est affiché tel quel : `true` (envoyée), `false` (non envoyée, le compte existe), `null` (profil
@@ -34,7 +35,7 @@ export const useAdminParticipants = () => {
 
   const editionId = computed(() => store.editionId)
   const edition = computed(() => (editions.value ?? []).find(item => item.id === editionId.value) ?? null)
-  const isReadOnly = computed(() => edition.value?.status === EDITION_STATUS.CLOSED)
+  const isReadOnly = computed(() => edition.value !== null && !PARTICIPANT_EDITABLE_STATUSES.includes(edition.value.status))
 
   const { data, pending, error, refresh } = useAsyncData(
     ADMIN_PARTICIPANTS_CACHE_KEY,
