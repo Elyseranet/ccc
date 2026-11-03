@@ -686,5 +686,6 @@
   "palmares.titles_one": "1 titre",
   "palmares.titles_other": "{count} titres",
   "palmares.titles_title": "Les titres",
-  "palmares.most_titled_tied": "Les plus titrés"
+  "palmares.most_titled_tied_one": "Les plus titrés · ex aequo, 1 titre chacun",
+  "palmares.most_titled_tied_other": "Les plus titrés · ex aequo, {count} titres chacun"
 }

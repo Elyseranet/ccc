@@ -30,20 +30,38 @@
         {{ first.titles }}
       </text>
     </svg>
-    <div class="palmares-most-titled__text">
+    <div
+      v-if="isTied"
+      class="palmares-most-titled__text palmares-most-titled__text--tied"
+    >
+      <p class="palmares-most-titled__eyebrow">
+        {{ label }}
+      </p>
+      <ul class="palmares-most-titled__ties">
+        <li
+          v-for="holder in holders"
+          :key="holder.id"
+          class="palmares-most-titled__tie"
+          data-cy="palmares-most-titled-holder"
+        >
+          <span
+            class="palmares-most-titled__name palmares-most-titled__name--tie font-display neon--sm"
+            data-cy="palmares-most-titled-name"
+          >{{ holder.name }}</span>
+          <span class="palmares-most-titled__detail">{{ holder.tieDetail }}</span>
+        </li>
+      </ul>
+    </div>
+    <div
+      v-else
+      class="palmares-most-titled__text"
+    >
       <span class="palmares-most-titled__eyebrow">{{ label }}</span>
-      <div
-        v-for="holder in holders"
-        :key="holder.id"
-        class="palmares-most-titled__holder"
-        data-cy="palmares-most-titled-holder"
-      >
-        <span
-          class="palmares-most-titled__name font-display neon--sm"
-          data-cy="palmares-most-titled-name"
-        >{{ holder.name }}</span>
-        <span class="palmares-most-titled__detail">{{ holder.detail }}</span>
-      </div>
+      <span
+        class="palmares-most-titled__name font-display neon--sm"
+        data-cy="palmares-most-titled-name"
+      >{{ first.competitor.displayName }}</span>
+      <span class="palmares-most-titled__detail">{{ holders[0]?.detail }}</span>
     </div>
   </div>
 </template>
@@ -53,6 +71,7 @@ import { computed } from 'vue'
 import { useT } from '~/composables/useT'
 import { BRAND_CAP_POINTS } from '~/consts/brand.const'
 import type { IPalmaresMostTitled, IPalmaresMostTitledProps } from '~/interfaces/palmares.interface'
+import { buildMostTitledLabel } from '~/utils/palmares.util'
 
 /*********************************************************
  * Global
@@ -68,11 +87,11 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const capPoints = BRAND_CAP_POINTS
 const first = computed(() => props.mostTitled[0] ?? null)
-const label = computed(() => props.mostTitled.length > 1
-  ? t('palmares.most_titled_tied', 'Les plus titrés')
-  : t('palmares.most_titled', 'Le plus titré'))
-const holders = computed(() => props.mostTitled.map(entry => ({ id: entry.competitor.id, name: entry.competitor.displayName, detail: detailOf(entry) })))
-const detailOf = (mostTitled: IPalmaresMostTitled): string => {
+const isTied = computed(() => props.mostTitled.length > 1)
+const labelText = computed(() => buildMostTitledLabel(props.mostTitled))
+const label = computed(() => t(labelText.value.key, labelText.value.fallback, labelText.value.params))
+const holders = computed(() => props.mostTitled.map(entry => ({ id: entry.competitor.id, name: entry.competitor.displayName, detail: detailOf(entry, true), tieDetail: detailOf(entry, false) })))
+const detailOf = (mostTitled: IPalmaresMostTitled, withTitles: boolean): string => {
   const titles = mostTitled.titles === 1
     ? t('palmares.titles_one', '1 titre')
     : t('palmares.titles_other', '{count} titres', { count: mostTitled.titles })
@@ -80,7 +99,7 @@ const detailOf = (mostTitled: IPalmaresMostTitled): string => {
     ? t('palmares.participations_one', '1 participation')
     : t('palmares.participations_other', '{count} participations', { count: mostTitled.participations })
   const nickname = mostTitled.nickname ? t('palmares.nickname', '« {nickname} » · ', { nickname: mostTitled.nickname }) : ''
-  return `${nickname}${titles} · ${participations}`
+  return withTitles ? `${nickname}${titles} · ${participations}` : `${nickname}${participations}`
 }
 
 /*********************************************************
@@ -130,16 +149,26 @@ defineExpose({})
     gap: var(--origam-space---1);
   }
 
-  &__holder {
+  &__text--tied {
+    gap: var(--origam-space---3);
+  }
+
+  &__ties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--origam-space---3) var(--origam-space---8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__tie {
     display: grid;
     gap: var(--origam-space---1);
-
-    & + & {
-      margin-top: var(--origam-space---3);
-    }
   }
 
   &__eyebrow {
+    margin: 0;
     font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
     letter-spacing: var(--origam-font__letterSpacing---wider);
@@ -150,6 +179,10 @@ defineExpose({})
   &__name {
     font-size: var(--origam-font__size---3xl);
     line-height: 1;
+  }
+
+  &__name--tie {
+    font-size: var(--origam-font__size---2xl);
   }
 
   &__detail {

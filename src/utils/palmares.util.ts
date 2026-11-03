@@ -3,6 +3,7 @@ import { PALMARES_DEFAULT_TAB, PALMARES_EVOLUTION_TOP, PALMARES_TAB_VALUES } fro
 import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { PALMARES_TAB } from '../enums/palmares.enum.js'
 import type { IEditionSummary } from '../interfaces/edition.interface.js'
+import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import type { IPalmaresEvolution, IPalmaresMostTitled, IPalmaresScope, IPalmaresRankingRow, IPalmaresTitle } from '../interfaces/palmares.interface.js'
 import type { IRankingEvolutionSeries, IRankingRow } from '../interfaces/ranking.interface.js'
 import { editionOption } from './edition-view.util.js'
@@ -100,4 +101,18 @@ export const buildPalmaresScope = (editions: Array<Pick<IEditionSummary, 'code' 
   const last = closed[closed.length - 1]
   const first = closed[Math.max(0, closed.length - window)]
   return last && first ? { lastYear: last.year, windowFirstYear: first.year, windowLastYear: last.year } : null
+}
+
+/**
+ * Titre du bloc « les plus titrés » : seul, « Le plus titré » ; à égalité (F-02-TIE), « Les plus titrés · ex aequo, N titres chacun ».
+ * Le singulier et le pluriel ont chacun leur clé : le projet n'a pas de syntaxe de pluriel i18n.
+ */
+export const buildMostTitledLabel = (mostTitled: IPalmaresMostTitled[]): ITranslatableText => {
+  const titles = mostTitled[0]?.titles ?? 0
+  if (mostTitled.length <= 1) {
+    return { key: 'palmares.most_titled', fallback: 'Le plus titré' }
+  }
+  return titles === 1
+    ? { key: 'palmares.most_titled_tied_one', fallback: 'Les plus titrés · ex aequo, 1 titre chacun' }
+    : { key: 'palmares.most_titled_tied_other', fallback: 'Les plus titrés · ex aequo, {count} titres chacun', params: { count: titles } }
 }

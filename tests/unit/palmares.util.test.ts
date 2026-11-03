@@ -5,6 +5,7 @@ import type { IEditionSummary } from '../../src/interfaces/edition.interface'
 import type { IRankingEvolutionSeries, IRankingRow } from '../../src/interfaces/ranking.interface'
 import {
   buildMostTitled,
+  buildMostTitledLabel,
   buildPalmaresEvolution,
   buildPalmaresScope,
   buildPalmaresTitles,
@@ -99,6 +100,22 @@ describe('les plus titrés (F-02-TIE)', () => {
   it('porte le surnom s’il existe', () => {
     const withNickname: IRankingRow = { ...row(1, 'a', 80, 3), competitor: person('a', 'Lou Bernard', 'La Mousse') }
     expect(buildMostTitled([withNickname])[0]?.nickname).toBe('La Mousse')
+  })
+})
+
+describe('titre du bloc des plus titrés (F-02-TIE)', () => {
+  const holder = (id: string, titles: number) => ({ competitor: person(id, id), nickname: null, titles, participations: 5 })
+
+  it('aucun ou un seul : « Le plus titré »', () => {
+    expect(buildMostTitledLabel([]).key).toBe('palmares.most_titled')
+    expect(buildMostTitledLabel([holder('a', 4)]).key).toBe('palmares.most_titled')
+  })
+
+  it('à égalité : le singulier et le pluriel ont chacun leur clé, sans syntaxe de pluriel', () => {
+    expect(buildMostTitledLabel([holder('a', 1), holder('b', 1)])).toMatchObject({ key: 'palmares.most_titled_tied_one' })
+    const many = buildMostTitledLabel([holder('a', 4), holder('b', 4), holder('c', 4)])
+    expect(many).toMatchObject({ key: 'palmares.most_titled_tied_other', params: { count: 4 } })
+    expect(many.fallback).not.toContain('|')
   })
 })
 

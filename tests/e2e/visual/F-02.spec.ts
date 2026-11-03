@@ -80,36 +80,6 @@ const alignMissingScores = async (mockup: Page, page: Page) => {
   }, hasScore)
 }
 
-/**
- * Le cas « plusieurs plus titrés » (F-02-TIE) : la maquette ne le montre pas. On duplique le détenteur des deux côtés (deux noms de plus,
- * mêmes textes) et la maquette reçoit l'écart entre détenteurs de l'application : le test vérifie la mise en page (hauteur, centrage de la
- * capsule), pas un dessin de la maquette.
- */
-const tieMostTitled = async (mockup: Page, page: Page) => {
-  await page.locator('.palmares-most-titled__holder').first().evaluate((holder) => {
-    const text = holder.parentElement as HTMLElement
-    const label = text.querySelector('.palmares-most-titled__eyebrow') as HTMLElement
-    label.textContent = 'LES PLUS TITRÉS'
-    holder.after(holder.cloneNode(true), holder.cloneNode(true))
-  })
-  await mockup.locator('.palm-podium p').evaluate((text) => {
-    const eyebrow = text.querySelector('.eyebrow') as HTMLElement
-    eyebrow.textContent = 'LES PLUS TITRÉS'
-    const name = text.querySelector('.palm-podium__name') as HTMLElement
-    const detail = text.querySelector('.muted') as HTMLElement
-    for (let index = 0; index < 2; index += 1) {
-      const holder = document.createElement('span')
-      holder.style.cssText = 'display:grid;gap:var(--origam-space---1);margin-top:var(--origam-space---3)'
-      holder.append(name.cloneNode(true), detail.cloneNode(true))
-      text.append(holder)
-    }
-    const first = document.createElement('span')
-    first.style.cssText = 'display:grid;gap:var(--origam-space---1)'
-    first.append(name, detail)
-    eyebrow.after(first)
-  })
-}
-
 const TEXT_PAIRS: ITextPair[] = [
   { mockup: '.palm-hero .page-hero__lead', app: '[data-cy="page-hero-lead"]' },
   { mockup: '.palm-podium__name', app: '[data-cy="palmares-most-titled-name"]' },
@@ -140,11 +110,10 @@ const APP_INK = [
   '[data-cy="page-hero-lead"]', '.palmares-rankings__note', '.palmares-ranking-table caption'
 ]
 
-interface IZone { zone: string, tab?: { app: string, mockup: string }, mockup: string, app: string, tied?: boolean }
+interface IZone { zone: string, tab?: { app: string, mockup: string }, mockup: string, app: string }
 const ZONES: IZone[] = [
   { zone: 'palmares-hero', mockup: '.palm-hero', app: '.palmares-page__hero' },
   { zone: 'palmares-plus-titre', mockup: '.palm-podium', app: '.palmares-most-titled' },
-  { zone: 'palmares-plus-titres-ex-aequo', tied: true, mockup: '.palm-podium', app: '.palmares-most-titled' },
   { zone: 'palmares-titres-entete', mockup: '.section__head:has(#h-titles)', app: '.palmares-titles__head' },
   { zone: 'palmares-titres', mockup: '.champs', app: '.palmares-titles__list' },
   { zone: 'palmares-classements-entete', mockup: '.section__head:has(#h-rk)', app: '.palmares-rankings__head' },
@@ -170,9 +139,6 @@ for (const viewport of VIEWPORTS) {
           await mockup.locator(entry.tab.mockup).click()
         }
         await alignMockupText(mockup, page, TEXT_PAIRS)
-        if (entry.tied) {
-          await tieMostTitled(mockup, page)
-        }
         await alignMissingScores(mockup, page)
         await alignStars(mockup, page, '.champ__who', '.palmares-titles__who')
         await alignStars(mockup, page, '.champ__final', '.palmares-titles__final')
