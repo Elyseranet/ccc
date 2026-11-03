@@ -260,3 +260,6 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## Volumes Docker de test (décision utilisateur 2026-11-02)
 - **Purge unique** des volumes anonymes non attachés (`docker volume prune`, Docker 29 : volumes anonymes seulement) : 762 → 25 volumes, 98,54 GB libérés. Les conteneurs actifs et les volumes nommés ont été conservés.
 - Pour la suite, les conteneurs de test se lancent avec `docker run --rm` et se suppriment avec `docker rm -fv`, ce qui supprime aussi leurs volumes. Règle consignée dans le README par T-SEC-06/12.
+
+## F-09 — Homonymes à la création d'un participant (décision utilisateur 2026-11-03)
+- **Pas d'avertissement.** La liste de suggestions, insensible aux accents, montre les profils proches avec la pastille « Profil existant » et leur nombre d'éditions. L'entrée « Créer » reste toujours proposée, parce que deux vraies personnes peuvent porter le même nom. Cela confirme `parcours.md` 4b.4 (ux, 31cc6e3).
