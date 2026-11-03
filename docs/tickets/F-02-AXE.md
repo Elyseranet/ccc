@@ -2,7 +2,7 @@
 
 - **Statut** : Ouvert (2026-11-03), ticket de remédiation de la dérogation **F-02-AXE**.
 - **Origine** : `origam-chart` pose des points `role="button" tabindex="0"` dans un `<svg role="img">` (`OrigamChartCartesian.vue:87, 205-208`) : axe signale `nested-interactive` (WCAG 4.1.2), sans réglage possible. **Dérogation approuvée par l'utilisateur le 2026-11-02**, **sur l'onglet Évolution seulement** : `tests/e2e/a11y/F-02.spec.ts` désactive cette seule règle pour cet onglet (`disableRules`), nulle part ailleurs. Le tableau équivalent (« Voir en tableau ») porte toutes les valeurs.
-- **Dépend de** : la correction Origam (points non focusables dans une image, ou `role="group"` nommé). Numéro de l'issue : à renseigner par le team-lead dès son ouverture (fiche `docs/tickets/origam/chart-points-focusables-dans-svg-img.md`, `docs/tickets/origam/INDEX.md`).
+- **Dépend de** : la correction Origam (points non focusables dans une image, ou `role="group"` nommé). Issue Origam **#1318** (fiche `docs/tickets/origam/chart-points-focusables-dans-svg-img.md`, `docs/tickets/origam/INDEX.md`).
 
 ## Périmètre
 

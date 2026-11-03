@@ -27,7 +27,7 @@ test.describe('palmarès : accessibilité et comportement (F-02)', () => {
         await expect(page).toHaveURL(new RegExp(`onglet=${tab.query}$`))
       }
       // Origam : les points d'une courbe (`role="button"`, `tabindex="0"`) sont dans un `<svg role="img">` (OrigamChartCartesian.vue:87, 205-208) :
-      // `nested-interactive`, sans réglage possible. Le tableau équivalent porte toutes les valeurs. Fiche docs/tickets/origam/chart-points-focusables-dans-svg-img.md.
+      // `nested-interactive`, sans réglage possible. Le tableau équivalent porte toutes les valeurs. Elyseranet/origam#1318, F-02-AXE (dérogation approuvée par l'utilisateur le 2026-11-02), fiche docs/tickets/origam/chart-points-focusables-dans-svg-img.md.
       const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).disableRules(tab.query === 'evolution' ? [CHART_NESTED_INTERACTIVE] : []).analyze()
       expect(results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)).toEqual([])
     })

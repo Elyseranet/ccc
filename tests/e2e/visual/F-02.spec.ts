@@ -12,7 +12,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * par rang : les deux côtés affichent le même texte, donc les mêmes largeurs, et seuls le gabarit, le filet, le fond, le rayon
  * et les positions sont comparés. La maquette montre 20 lignes par classement, l'application toutes (une centaine) : on masque
  * les lignes en trop côté application avant de comparer. Le tracé du graphique n'est pas comparé : `origam-chart` dessine à 600 x 360 unités
- * (OrigamChartCartesian.vue:683-684), la maquette à 820 x 320 ; écart mesuré et documenté dans docs/tickets/origam/chart-points-focusables-dans-svg-img.md. Les valeurs sont masquées par l'encre transparente, jamais la structure.
+ * (OrigamChartCartesian.vue:683-684), la maquette à 820 x 320 ; écart mesuré (Elyseranet/origam#1317, F-02-CHART), fiche docs/tickets/origam/chart-points-focusables-dans-svg-img.md. Les valeurs sont masquées par l'encre transparente, jamais la structure.
  ********************************************************/
 const MOCK_ROWS = 20
 const VIEWPORTS = [

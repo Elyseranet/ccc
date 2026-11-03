@@ -2,7 +2,7 @@
 
 - **Statut** : Ouvert (2026-11-03), ticket de remédiation de la décision utilisateur **F-02-CHART**.
 - **Origine** : F-02 est mergé avec le graphique d'évolution `origam-chart` **exclu de la mesure** (seuls l'en-tête de la carte et le bouton « Voir en tableau » sont comparés), **sans contournement local**. `origam-chart` dessine à 600 x 360 unités fixes (`OrigamChartCartesian.vue:683-684`, `:789-790`) alors que la maquette dessine à 820 x 320 unités mises à l'échelle de la largeur : zone de la carte mesurée à 23,2 % (1440 px) et 38,9 % (390 px).
-- **Dépend de** : l'évolution Origam « surface de dessin responsive » (le viewBox suit la largeur du conteneur). Numéro de l'issue : à renseigner par le team-lead dès son ouverture (fiche `docs/tickets/origam/chart-points-focusables-dans-svg-img.md`, `docs/tickets/origam/INDEX.md`).
+- **Dépend de** : l'évolution Origam « surface de dessin responsive » (le viewBox suit la largeur du conteneur). Issue Origam **#1317** (fiche `docs/tickets/origam/chart-points-focusables-dans-svg-img.md`, `docs/tickets/origam/INDEX.md`).
 
 ## Périmètre
 

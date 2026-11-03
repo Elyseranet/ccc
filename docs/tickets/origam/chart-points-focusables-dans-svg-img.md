@@ -8,7 +8,7 @@ Deux écarts de mise en page, mesurés dans CCC (F-02, onglet Évolution du Palm
 - le tracé reste à 600 x 360 unités (`preserveAspectRatio="xMidYMid meet"`) quelle que soit la largeur du conteneur : il occupe environ 40 % de la largeur de la carte, centré, alors que la maquette étend le tracé sur toute la largeur (820 x 320 unités, mis à l'échelle). Zone de la carte d'évolution : 32,6 % d'écart de pixels à 1440 px, 30,9 % à 390 px.
 - avec deux éditions la même année (« 2012 · 1re », « 2012 · 2e »), les étiquettes de l'axe horizontal se chevauchent.
 
-## Causes (Origam 2.37.3, `node_modules/origam/dist/src/components/Chart/OrigamChartCartesian.vue`)
+## Causes (Origam 2.37.4, `node_modules/origam/dist/src/components/Chart/OrigamChartCartesian.vue`)
 
 1. `:87-88` : `role="img"` sur le `<svg>` ; `:189-191` (barres), `:205-208` (points) et `:302-304` (bouton de remise à zéro du zoom) : `tabindex="0"` et `role="button"` sur des enfants de ce `<svg>`.
 2. `:683-684` : `SVG_WIDTH = 600`, `SVG_HEIGHT = 360` (constantes), et `:789-790` : la largeur et la hauteur passées au calcul de la mise en page. Aucune prop ni variable ne les change ; `aspectRatio` ne règle que la boîte racine.
@@ -20,9 +20,10 @@ Deux écarts de mise en page, mesurés dans CCC (F-02, onglet Évolution du Palm
 - Mesure visuelle : le tracé est exclu de la comparaison, sans contournement local (F-02-CHART), remédiation `docs/tickets/F-02-CHART.md`.
 - Aucune règle CSS locale ne corrige la mise en page du tracé.
 
-## Numéro de l'issue Origam
+## Issues Origam
 
-À renseigner par le team-lead à l'ouverture de l'issue (surface de dessin responsive : le viewBox suit la largeur ; points non focusables dans une image), puis à reporter dans `docs/tickets/origam/INDEX.md`, `docs/tickets/F-02-CHART.md` et `docs/tickets/F-02-AXE.md`.
+- **#1317** : surface de dessin figée à 600 x 360 (le viewBox ne suit pas la largeur) et étiquettes d'axe qui se chevauchent. Cause 2 et second écart de mise en page ci-dessus. Contournement CCC : tracé exclu de la mesure, F-02-CHART (`docs/tickets/F-02-CHART.md`).
+- **#1318** : points et barres focusables dans un `<svg role="img">` (axe `nested-interactive`). Cause 1 ci-dessus. Contournement CCC : règle désactivée sur l'onglet Évolution, F-02-AXE (`docs/tickets/F-02-AXE.md`).
 
 ## Proposition
 
@@ -38,4 +39,4 @@ Deux écarts de mise en page, mesurés dans CCC (F-02, onglet Évolution du Palm
 
 ## Version
 
-2.37.3
+2.37.4
