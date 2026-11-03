@@ -16,8 +16,13 @@ Deux écarts de mise en page, mesurés dans CCC (F-02, onglet Évolution du Palm
 ## Contournement côté CCC
 
 - Le tableau équivalent (« Voir en tableau ») porte toutes les valeurs, avec légende et en-têtes de colonne.
-- Test d'accessibilité : la règle `nested-interactive` est désactivée pour l'onglet Évolution seulement (`tests/e2e/a11y/F-02.spec.ts`), avec renvoi à cette fiche. Dérogation à faire valider.
+- Test d'accessibilité : la règle `nested-interactive` est désactivée pour l'onglet Évolution seulement (`tests/e2e/a11y/F-02.spec.ts`), avec renvoi à cette fiche. Dérogation approuvée par l'utilisateur le 2026-11-02 (F-02-AXE), remédiation `docs/tickets/F-02-AXE.md`.
+- Mesure visuelle : le tracé est exclu de la comparaison, sans contournement local (F-02-CHART), remédiation `docs/tickets/F-02-CHART.md`.
 - Aucune règle CSS locale ne corrige la mise en page du tracé.
+
+## Numéro de l'issue Origam
+
+À renseigner par le team-lead à l'ouverture de l'issue (surface de dessin responsive : le viewBox suit la largeur ; points non focusables dans une image), puis à reporter dans `docs/tickets/origam/INDEX.md`, `docs/tickets/F-02-CHART.md` et `docs/tickets/F-02-AXE.md`.
 
 ## Proposition
 

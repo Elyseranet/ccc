@@ -33,18 +33,23 @@ export const buildPalmaresTitles = (editions: IEditionSummary[]): IPalmaresTitle
     participantCount: edition.participantCount
   }))
 
-/** Le plus titré : le plus de titres du classement All Time ; à égalité, celui qui est le mieux classé (ordre de l'API). Aucun titre : personne. */
-export const buildMostTitled = (allTime: IRankingRow[]): IPalmaresMostTitled | null => {
-  const best = allTime.reduce<IRankingRow | null>((current, row) => (current === null || row.titles > current.titles ? row : current), null)
-  if (!best || best.titles === 0) {
-    return null
+/**
+ * Les plus titrés (F-02-TIE) : TOUS les joueurs à égalité sur le plus grand nombre de titres du classement All Time, dans l'ordre de
+ * l'API (rang All Time), sans départage inventé. Personne si personne n'a de titre.
+ */
+export const buildMostTitled = (allTime: IRankingRow[]): IPalmaresMostTitled[] => {
+  const best = allTime.reduce((max, row) => Math.max(max, row.titles), 0)
+  if (best === 0) {
+    return []
   }
-  return {
-    competitor: { id: best.competitor.id, displayName: best.competitor.displayName },
-    nickname: best.competitor.nickname,
-    titles: best.titles,
-    participations: best.participations
-  }
+  return allTime
+    .filter(row => row.titles === best)
+    .map(row => ({
+      competitor: { id: row.competitor.id, displayName: row.competitor.displayName },
+      nickname: row.competitor.nickname,
+      titles: row.titles,
+      participations: row.participations
+    }))
 }
 
 /** Lignes d'un classement, avec les points de l'autre classement du même joueur (0 s'il n'y figure pas). */

@@ -685,5 +685,6 @@
   "palmares.titles_note": "RG6 · une étoile par titre au classement",
   "palmares.titles_one": "1 titre",
   "palmares.titles_other": "{count} titres",
-  "palmares.titles_title": "Les titres"
+  "palmares.titles_title": "Les titres",
+  "palmares.most_titled_tied": "Les plus titrés"
 }

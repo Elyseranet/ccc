@@ -122,10 +122,11 @@ test.describe('palmarès : accessibilité et comportement (F-02)', () => {
     expect(await table.locator('thead th[scope="col"]').count()).toBeGreaterThan(2)
   })
 
-  test('le plus titré : le plus de titres du classement All Time', async ({ page, request }) => {
+  test('les plus titrés : tous les joueurs à égalité sur le plus de titres du classement All Time, dans l’ordre de l’API', async ({ page, request }) => {
     const allTime = await (await request.get('/api/v1/classements/all-time')).json() as IRankingRow[]
-    const most = allTime.reduce((best, entry) => (entry.titles > best.titles ? entry : best), allTime[0] as IRankingRow)
+    const best = Math.max(...allTime.map(entry => entry.titles))
+    const holders = allTime.filter(entry => entry.titles === best).map(entry => entry.competitor.displayName)
     await open(page)
-    await expect(page.getByTestId('palmares-most-titled-name')).toHaveText(most.competitor.displayName)
+    await expect(page.getByTestId('palmares-most-titled-name')).toHaveText(holders)
   })
 })

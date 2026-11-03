@@ -20,7 +20,7 @@ export interface IPalmaresTitle {
   participantCount: number | null
 }
 
-/** Le plus titré (hero) : titres de l'archive, participations de son classement All Time. */
+/** Un des plus titrés (hero) : titres de l'archive, participations de son classement All Time. */
 export interface IPalmaresMostTitled {
   competitor: TEditionPerson
   nickname: string | null
@@ -79,7 +79,8 @@ export interface IPalmaresEvolutionProps {
 }
 
 export interface IPalmaresMostTitledProps {
-  mostTitled: IPalmaresMostTitled | null
+  /** Tous les joueurs à égalité sur le plus de titres (ordre de l'API) ; vide si personne n'a de titre. */
+  mostTitled: IPalmaresMostTitled[]
 }
 
 export interface IPalmaresRankingTableProps {

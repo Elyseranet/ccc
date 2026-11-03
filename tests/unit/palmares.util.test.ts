@@ -78,20 +78,27 @@ describe('chronologie des titres', () => {
   })
 })
 
-describe('le plus titré', () => {
-  it('le plus de titres, à égalité le mieux classé (ordre de l’API)', () => {
-    const best = buildMostTitled([row(1, 'a', 80, 2), row(2, 'b', 70, 4), row(3, 'c', 60, 4)])
-    expect(best).toMatchObject({ competitor: { id: 'b' }, titles: 4, participations: 5 })
+describe('les plus titrés (F-02-TIE)', () => {
+  it('un seul détenteur du plus grand nombre de titres', () => {
+    const best = buildMostTitled([row(1, 'a', 80, 2), row(2, 'b', 70, 4), row(3, 'c', 60, 3)])
+    expect(best).toHaveLength(1)
+    expect(best[0]).toMatchObject({ competitor: { id: 'b' }, titles: 4, participations: 5 })
   })
 
-  it('personne sans titre : pas de « plus titré »', () => {
-    expect(buildMostTitled([row(1, 'a', 80, 0)])).toBeNull()
-    expect(buildMostTitled([])).toBeNull()
+  it('à égalité, tous les joueurs, dans l’ordre de l’API, sans départage inventé', () => {
+    const best = buildMostTitled([row(1, 'a', 80, 2), row(2, 'c', 70, 4), row(3, 'b', 60, 4), row(4, 'd', 50, 4)])
+    expect(best.map(entry => entry.competitor.id)).toEqual(['c', 'b', 'd'])
+    expect(new Set(best.map(entry => entry.titles))).toEqual(new Set([4]))
+  })
+
+  it('personne sans titre : aucun plus titré', () => {
+    expect(buildMostTitled([row(1, 'a', 80, 0), row(2, 'b', 70, 0)])).toEqual([])
+    expect(buildMostTitled([])).toEqual([])
   })
 
   it('porte le surnom s’il existe', () => {
     const withNickname: IRankingRow = { ...row(1, 'a', 80, 3), competitor: person('a', 'Lou Bernard', 'La Mousse') }
-    expect(buildMostTitled([withNickname])?.nickname).toBe('La Mousse')
+    expect(buildMostTitled([withNickname])[0]?.nickname).toBe('La Mousse')
   })
 })
 

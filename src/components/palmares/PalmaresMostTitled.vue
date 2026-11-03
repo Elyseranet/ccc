@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="mostTitled"
+    v-if="first"
     class="palmares-most-titled"
     role="group"
     :aria-label="label"
@@ -27,16 +27,23 @@
         y="58"
         text-anchor="middle"
       >
-        {{ mostTitled.titles }}
+        {{ first.titles }}
       </text>
     </svg>
     <div class="palmares-most-titled__text">
       <span class="palmares-most-titled__eyebrow">{{ label }}</span>
-      <span
-        class="palmares-most-titled__name font-display neon--sm"
-        data-cy="palmares-most-titled-name"
-      >{{ mostTitled.competitor.displayName }}</span>
-      <span class="palmares-most-titled__detail">{{ detail }}</span>
+      <div
+        v-for="holder in holders"
+        :key="holder.id"
+        class="palmares-most-titled__holder"
+        data-cy="palmares-most-titled-holder"
+      >
+        <span
+          class="palmares-most-titled__name font-display neon--sm"
+          data-cy="palmares-most-titled-name"
+        >{{ holder.name }}</span>
+        <span class="palmares-most-titled__detail">{{ holder.detail }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -45,26 +52,27 @@
 import { computed } from 'vue'
 import { useT } from '~/composables/useT'
 import { BRAND_CAP_POINTS } from '~/consts/brand.const'
-import type { IPalmaresMostTitledProps } from '~/interfaces/palmares.interface'
+import type { IPalmaresMostTitled, IPalmaresMostTitledProps } from '~/interfaces/palmares.interface'
 
 /*********************************************************
  * Global
  *
  * @description
- * Le plus titré, dans l'en-tête : le plus de titres de l'archive (classement All Time), sa capsule porte le nombre de
- * titres. Absent tant que personne n'a de titre. Le surnom n'est affiché que s'il existe.
+ * Le ou les plus titrés, dans l'en-tête : le plus de titres de l'archive (classement All Time), la capsule porte le nombre de
+ * titres. À égalité (F-02-TIE), tous les joueurs sont montrés, dans l'ordre de l'API, sans départage inventé. Absent tant que
+ * personne n'a de titre. Le surnom n'est affiché que s'il existe.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IPalmaresMostTitledProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const capPoints = BRAND_CAP_POINTS
-const label = computed(() => t('palmares.most_titled', 'Le plus titré'))
-const detail = computed(() => {
-  const mostTitled = props.mostTitled
-  if (!mostTitled) {
-    return ''
-  }
+const first = computed(() => props.mostTitled[0] ?? null)
+const label = computed(() => props.mostTitled.length > 1
+  ? t('palmares.most_titled_tied', 'Les plus titrés')
+  : t('palmares.most_titled', 'Le plus titré'))
+const holders = computed(() => props.mostTitled.map(entry => ({ id: entry.competitor.id, name: entry.competitor.displayName, detail: detailOf(entry) })))
+const detailOf = (mostTitled: IPalmaresMostTitled): string => {
   const titles = mostTitled.titles === 1
     ? t('palmares.titles_one', '1 titre')
     : t('palmares.titles_other', '{count} titres', { count: mostTitled.titles })
@@ -73,7 +81,7 @@ const detail = computed(() => {
     : t('palmares.participations_other', '{count} participations', { count: mostTitled.participations })
   const nickname = mostTitled.nickname ? t('palmares.nickname', '« {nickname} » · ', { nickname: mostTitled.nickname }) : ''
   return `${nickname}${titles} · ${participations}`
-})
+}
 
 /*********************************************************
  * Expose
@@ -120,6 +128,15 @@ defineExpose({})
   &__text {
     display: grid;
     gap: var(--origam-space---1);
+  }
+
+  &__holder {
+    display: grid;
+    gap: var(--origam-space---1);
+
+    & + & {
+      margin-top: var(--origam-space---3);
+    }
   }
 
   &__eyebrow {
