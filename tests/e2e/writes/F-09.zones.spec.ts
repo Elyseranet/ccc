@@ -15,9 +15,8 @@ import type { IClip, ITextPair } from '../visual.util'
  * maquette le pose dans le flux de la carte, Origam l'ouvre en surcouche (`origam-menu`), donc la mise en page de la
  * carte ne dépend pas de lui ; ses lignes sont couvertes par les e2e fonctionnels.
  * Le champ photo de la maquette est un `<input type="file">` natif (bouton du navigateur, hauteur 50 px) : sa hauteur est ramenée à 48 px et sa valeur masquée des
- * deux côtés ; le filet, le rayon et le fond restent comparés. La table des inscrits de la maquette (696 px) déborde de sa carte (650 px) à 1440 px : sa colonne Action est hors cadre et ses
- * colonnes gardent leur largeur naturelle, alors que l'application répartit les cinq colonnes dans la carte. À 1440 px, la zone
- * `pa-liste` ne compare donc que les 300 px de gauche (titre, en-tête et colonne Joueur) ; à 390 px, la table est comparée entière.
+ * deux côtés ; le filet, le rayon et le fond restent comparés. La barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
+ * La table des inscrits est comparée sur toute sa largeur (maquette corrigée, 32fe65b).
  ********************************************************/
 const VIEWPORTS = [
   { name: '1440', width: 1440, height: 900 },
@@ -46,20 +45,19 @@ const APP_INK = [
   '.admin-participants__eyebrow', '[data-cy="participant-summary"]'
 ]
 
-const ZONES: Array<{ name: string, mockup: string, app: string, endMockup?: string, endApp?: string, leftOnlyAt1440?: number }> = [
+const ZONES: Array<{ name: string, mockup: string, app: string, endMockup?: string, endApp?: string }> = [
   { name: 'pa-entete', mockup: '.adm-head', app: '.admin-participants__head' },
-  { name: 'pa-liste', mockup: '.pa-list', app: '[data-cy="participant-list"]', endMockup: '.pa-list tbody tr:first-child', endApp: '[data-cy="participant-table"] tbody tr:first-child', leftOnlyAt1440: 300 },
+  { name: 'pa-liste', mockup: '.pa-list', app: '[data-cy="participant-list"]', endMockup: '.pa-list tbody tr:first-child', endApp: '[data-cy="participant-table"] tbody tr:first-child' },
   { name: 'pa-ajout-formulaire', mockup: '.pa-form', app: '[data-cy="participant-form"]' }
 ]
 
-const clipOf = async (page: Page, zone: string, end?: string, maxWidth?: number): Promise<IClip> => {
+const clipOf = async (page: Page, zone: string, end?: string): Promise<IClip> => {
   const start = await box(page, zone)
-  const width = maxWidth === undefined ? start.width : Math.min(start.width, maxWidth)
   if (!end) {
-    return { ...start, width }
+    return start
   }
   const bottom = await box(page, end)
-  return { x: start.x, y: start.y, width, height: bottom.y + bottom.height - start.y }
+  return { x: start.x, y: start.y, width: start.width, height: bottom.y + bottom.height - start.y }
 }
 
 for (const viewport of VIEWPORTS) {
@@ -88,7 +86,7 @@ for (const viewport of VIEWPORTS) {
           (document.querySelector('#n-em') as HTMLInputElement).value = email
         }, seed.email)
         await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
-        await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .pa-add > * { min-width: 0; } .pa-form { grid-template-columns: minmax(0, 1fr); } .adm-bottom { display: none !important; } @media (max-width: 760px) { .pa-form__grid { grid-template-columns: minmax(0, 1fr) !important; } }' })
+        await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .adm-bottom { display: none !important; }' })
         await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
         await mockup.evaluate(() => {
           const rule = document.querySelector('.pa-form .rule')
@@ -97,17 +95,14 @@ for (const viewport of VIEWPORTS) {
           }
         })
         await mockup.evaluate(() => document.querySelector('.pa-list tbody tr:first-child .chip')?.classList.replace('chip--ok', 'chip--warn'))
-        await mockup.addStyleTag({ content: '.pa-list th:last-child, .pa-list td:last-child { display: none !important; }' })
-        await page.addStyleTag({ content: '[data-cy="participant-table"] th:last-child, [data-cy="participant-table"] td:last-child { display: none !important; }' })
         await alignMockupText(mockup, page, TEXT_PAIRS)
         await hideInk(mockup, MOCKUP_INK)
         await hideInk(page, APP_INK)
 
         await page.evaluate(() => window.scrollTo(0, 0))
         await mockup.evaluate(() => window.scrollTo(0, 0))
-        const maxWidth = viewport.name === '1440' ? zone.leftOnlyAt1440 : undefined
-        const mockClip = await clipOf(mockup, zone.mockup, zone.endMockup, maxWidth)
-        const appClip = await clipOf(page, zone.app, zone.endApp, maxWidth)
+        const mockClip = await clipOf(mockup, zone.mockup, zone.endMockup)
+        const appClip = await clipOf(page, zone.app, zone.endApp)
         const masks = zone.name === 'pa-ajout-formulaire'
           ? { mockup: [], app: [], values: { mockup: ['.pa-form .input--file'], app: ['[data-cy="participant-form-avatar"] .origam-field'] } }
           : undefined

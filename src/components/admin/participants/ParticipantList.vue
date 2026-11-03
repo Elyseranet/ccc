@@ -191,7 +191,7 @@ const headers = computed<IDataTableHeader[]>(() => [
   { key: 'nickname', title: t('admin.participants.col_nickname', 'Pseudo'), sortable: false, nowrap: true },
   { key: 'editionsPlayed', title: t('admin.participants.col_editions', 'Éditions'), sortable: false, nowrap: true, align: ALIGN.END },
   { key: 'accountState', title: t('admin.participants.col_account', 'Compte'), sortable: false, nowrap: true },
-  { key: 'actions', title: t('admin.participants.col_action', 'Action'), sortable: false, nowrap: true, align: ALIGN.END }
+  { key: 'actions', title: t('admin.participants.col_action', 'Action'), sortable: false, align: ALIGN.END }
 ])
 
 /*********************************************************
@@ -252,6 +252,7 @@ defineExpose({})
 
   &__actions {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
     gap: var(--origam-space---1);

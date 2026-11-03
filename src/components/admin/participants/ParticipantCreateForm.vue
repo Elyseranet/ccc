@@ -161,6 +161,7 @@
       />
       <origam-btn
         type="submit"
+        class="participant-form__submit"
         variant="flat"
         bg-color="primary"
         elevation="lg"
@@ -379,8 +380,15 @@ defineExpose({})
       grid-template-columns: 1fr;
     }
 
+  }
+
+  @media (max-width: 1000px) {
     &__cta {
-      grid-template-columns: 1fr 1.6fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__submit {
+      order: -1;
     }
   }
 }
