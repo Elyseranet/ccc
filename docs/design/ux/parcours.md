@@ -86,7 +86,7 @@ Spec : classements ACP / All Time / évolution (RG4, RG8), titres (RG6), cuillè
 1. Participants → champ à autocomplétion sur les 145 profils historiques → propositions à chaque saisie.
 2. Profil existant : rattaché à l'édition, aucun compte recréé. Nouveau : avatar, nom, prénom, pseudo, email, téléphone ; le compte est créé et un email d'invitation part.
 3. Retrait d'un inscrit possible seulement avant tirage ; ajout après validation du tirage refusé (API 409).
-4. Homonymes et email déjà pris : Je ne sais pas (SF P1 Échecs) ; l'écran prévoit un message, le contenu est à écrire.
+4. Email déjà pris : refus, message à écrire (SF P1 Échecs). **Homonymes ou graphies proches** (`Rémi` / `Remi`) : la spec ne dit pas ce que fait le système (SF P1 Échecs). Traitement retenu pour F-09 : la liste de suggestions, insensible aux accents, est le traitement ; chaque suggestion montre nom, nombre d'éditions et la pastille « Profil existant », et l'entrée « Créer » reste toujours proposée (deux vraies personnes peuvent porter le même nom). Aucun avertissement spécifique aux homonymes. Un avertissement à la création d'un nom proche d'un profil existant serait un choix produit (critère de proximité, bloquant ou non) : non décidé.
 
 ### 5. Admin : saisir un tirage
 1. Tableau de bord → étape « Tirages » → Stepper.
