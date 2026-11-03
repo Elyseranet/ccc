@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { createRegistrationEdition, selectAdminEdition } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
@@ -9,6 +9,9 @@ import type { IClip, ITextPair } from '../visual.util'
  * F-09 : zones visuelles de l'écran Participants (admin-participants.html)
  *
  * @description
+ * Pourquoi `writes/` et non `visual/` : ces zones ont besoin d'une édition en inscriptions, créée par le helper partagé (QA-3,
+ * `createRegistrationEdition`), puis d'une écriture refusée (email déjà pris). Une édition créée devient l'édition active par défaut
+ * de l'admin : le projet `writes` passe après `routes`, `a11y` et `visual`, qui lisent la base telle que le seed l'a laissée.
  * Les zones dépendent d'une écriture réussie ou refusée (email déjà pris, premier inscrit) : elles se mesurent sur une
  * édition créée par le test (QA-3), jamais sur 2026. Les VALEURS de données sont recopiées dans la maquette (textes,
  * valeurs des champs) ; filet, fond, rayon et gabarit restent comparés. Le menu des suggestions n'est pas comparé : la
@@ -112,3 +115,29 @@ for (const viewport of VIEWPORTS) {
     }
   })
 }
+
+test.describe('F-09 participants @390 : défilement de la table', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  test('la table défile dans son conteneur, le document ne déborde pas', async ({ page, context }) => {
+    await signIn(context, 'admin')
+    const { edition } = await createRegistrationEdition(context.request, 'zones defilement 390')
+    await selectAdminEdition(context, edition)
+    await page.goto('/admin/participants')
+    await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+    await page.getByTestId('participant-table').waitFor()
+    const overflow = await page.evaluate(() => {
+      const root = document.documentElement
+      let scroller: Element | null = document.querySelector('[data-cy="participant-table"] table')?.parentElement ?? null
+      while (scroller && scroller !== document.body && scroller.scrollWidth <= scroller.clientWidth) {
+        scroller = scroller.parentElement
+      }
+      return {
+        documentOverflow: root.scrollWidth - root.clientWidth,
+        scrollerOverflow: scroller && scroller !== document.body ? scroller.scrollWidth - scroller.clientWidth : 0
+      }
+    })
+    expect(overflow.documentOverflow).toBe(0)
+    expect(overflow.scrollerOverflow).toBeGreaterThan(0)
+  })
+})
