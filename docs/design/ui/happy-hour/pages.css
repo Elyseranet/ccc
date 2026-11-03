@@ -74,6 +74,11 @@
 .palm-podium__cap { width: 5.5rem; flex: none; rotate: -12deg; }
 .palm-podium__cap .cap-txt { font-size: 34px; }
 .palm-podium__name { font-size: var(--origam-font__size---3xl); line-height: 1; }
+.palm-podium[hidden] { display: none; }
+.palm-podium > div { display: grid; gap: var(--origam-space---3); }
+.palm-podium__ties { display: flex; flex-wrap: wrap; gap: var(--origam-space---3) var(--origam-space---8); margin: 0; padding: 0; list-style: none; }
+.palm-podium__ties li { display: grid; gap: var(--origam-space---1); }
+.palm-podium__name--tie { font-size: var(--origam-font__size---2xl); }
 .section--tight { padding-top: var(--origam-space---8); }
 .champs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--origam-space---3); }
 .champ { display: grid; gap: var(--origam-space---1); align-content: start; padding: var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---raised); transition: transform var(--origam-motion__duration---medium) var(--origam-motion__easing---standard), border-color var(--origam-motion__duration---medium) var(--origam-motion__easing---standard); }
