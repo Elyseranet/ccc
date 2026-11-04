@@ -296,3 +296,8 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## Pages livrées et guide de l'environnement de dev (décisions utilisateur 2026-11-04)
 - Les pages des tickets mergés et fermés (accueil F-01, joueurs et fiche joueur F-04, face-à-face F-05) sont **livrées maintenant** (`delivered: true`, ticket T-REL-02), après vérification page par page. Elles deviennent visibles en dev, et le seront aussi en production.
 - Le **guide de l'environnement de dev (T-OPS-04) est publié tout de suite**, avec ce qui est testable aujourd'hui, et une section « après le merge de F-10 » pour la connexion, l'invitation et Mailpit.
+
+## F-13 — Champ « Année » de l'édition (décision utilisateur 2026-11-04)
+- **`origam-text-field` avec le clavier numérique** (`inputmode="numeric"`) et nos règles (4 chiffres, entre 2000 et 2100). Le serveur reste l'autorité. On n'utilise pas `origam-number-field` : boutons +/− hors palette, texte décalé de 33 px sans boutons, et correction silencieuse d'une valeur hors bornes (« 27 » devient 2000), qui ferait partir au serveur une année valide mais fausse et empêcherait l'erreur « 4 chiffres ».
+- Les défauts du champ numérique sont décrits dans la fiche Origam `docs/tickets/origam/number-field-hide-controls-retrait-et-bornage.md` (ui), à numéroter.
+- Le rendu du champ texte est à mesurer par l'ui contre la maquette, après la fenêtre de B-11.
