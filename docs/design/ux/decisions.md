@@ -286,3 +286,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-13 — Bandeau « Édition clôturée » (décision utilisateur 2026-11-04)
 - Le bandeau qui signale une édition clôturée devient une **`origam-alert` info compacte**, titrée « Édition clôturée », qui précise que les résultats et les points sont gelés. Bleu plutôt que vert : c'est un état à connaître, pas un succès. Même forme que l'information « Code » de la même page. À ajouter dans `mapping.md`.
+
+## Environnement de dev et contrôle de santé (décisions utilisateur 2026-11-04)
+- **Environnement de dev sur Coolify**, sur un domaine de dev, avec l'image de production et une base PostgreSQL Coolify. L'utilisateur saisit les réglages dans Coolify, d'après le guide de T-OPS-04.
+- **Mail en dev : Mailpit déployé sur Coolify**, sous un nom de domaine complet. Les invitations sont capturées, aucun vrai mail ne part.
+- **Code déployé : `develop` tel quel**, redéployé à chaque merge.
+- **Contrôle de santé** : `/api/v1/health` renverra aussi la version déployée (SHA) et l'état des migrations (T-OPS-03). Aucun secret dans la réponse.
