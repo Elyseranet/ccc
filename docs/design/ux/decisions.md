@@ -283,3 +283,6 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-13 — Maquette `admin-editions.html` alignée sur Origam (décision utilisateur 2026-11-04)
 - Les messages d'erreur (400/409), aujourd'hui dessinés en pastille, titre en gras et paragraphe, passent au **rendu `origam-alert`**, comme `compte.html` et `admin-participants.html`. L'ui corrige la maquette, et F-13 suit quand il est développé. On garde un seul style de message dans l'admin.
+
+## F-13 — Bandeau « Édition clôturée » (décision utilisateur 2026-11-04)
+- Le bandeau qui signale une édition clôturée devient une **`origam-alert` info compacte**, titrée « Édition clôturée », qui précise que les résultats et les points sont gelés. Bleu plutôt que vert : c'est un état à connaître, pas un succès. Même forme que l'information « Code » de la même page. À ajouter dans `mapping.md`.
