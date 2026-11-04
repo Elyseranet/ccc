@@ -127,11 +127,12 @@ describe('DrawService : écritures', () => {
 })
 
 describe('usePoolDraw : du paramétrage à la validation', () => {
-  it('sans brouillon : étape des paramètres, nombre de poules proposé (6 joueurs au plus par poule)', async () => {
+  it('sans brouillon : étape des paramètres, aucun nombre de poules proposé hors de la table « Config poules » (5 inscrits)', async () => {
     const draw = await mountDraw()
     expect(draw.step.value).toBe(POOL_DRAW_STEP.PARAMETERS)
     expect(draw.total.value).toBe(5)
-    expect(draw.poolCount.value).toBe(1)
+    expect(draw.poolCount.value).toBe(0)
+    expect(draw.parametersIssue.value).not.toBeNull()
     expect(draw.isReadOnly.value).toBe(false)
   })
 

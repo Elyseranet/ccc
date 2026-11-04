@@ -52,7 +52,7 @@ describe('DrawAssignment : saisie', () => {
     expect(wrapper.find('[data-cy="draw-select-1-3"]').exists()).toBe(true)
     expect(wrapper.find('[data-cy="draw-select-1-2"]').exists()).toBe(false)
     expect(wrapper.get('[data-cy="draw-progress-text"]').text()).toBe('3 / 5 joueurs placés')
-    expect(wrapper.get('[data-cy="draw-change-1-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-cy="draw-change-1-2"]').exists()).toBe(true)
   })
 
   it('un seul choix actif : la première place libre de la poule en cours (RG11), les autres places libres sont passives', async () => {
