@@ -78,18 +78,65 @@ export const alignMockupText = async (mockup: Page, page: Page, pairs: ITextPair
 
 const NO_MASKS: IDataMasks = { mockup: [], app: [] }
 
+const STABLE_FRAMES = 5
+const STABLE_TIMEOUT_MS = 5000
+
+/**
+ * T-QA-06 : une capture prise pendant un déplacement de mise en page (hydratation, retour à la ligne tardif, police) donne
+ * une zone de taille fausse (joueur-stats @390 : 358x347 au lieu de 358x262, non reproduit). On attend donc, avant toute
+ * mesure : la fin de l'hydratation Nuxt (absente sur une maquette statique : rien à attendre), puis une mise en page
+ * stable, c'est-à-dire la même taille de document sur `STABLE_FRAMES` images consécutives.
+ */
+const waitForStableLayout = async (page: Page) => {
+  await page.waitForFunction(() => {
+    const nuxt = (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp
+    return nuxt === undefined || nuxt().isHydrating === false
+  }, undefined, { timeout: STABLE_TIMEOUT_MS }).catch(() => undefined)
+  await page.evaluate(({ frames, timeout }) => new Promise<void>((done) => {
+    const started = performance.now()
+    let last = ''
+    let same = 0
+    const tick = () => {
+      const root = document.documentElement
+      const now = `${root.scrollWidth}x${root.scrollHeight}`
+      same = now === last ? same + 1 : 0
+      last = now
+      if (same >= frames || performance.now() - started > timeout) {
+        done()
+        return
+      }
+      requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }), { frames: STABLE_FRAMES, timeout: STABLE_TIMEOUT_MS })
+}
+
 export const settle = async (page: Page) => {
   await page.evaluate(() => document.fonts.ready)
   await page.waitForLoadState('networkidle')
+  await waitForStableLayout(page)
   await page.addStyleTag({ content: '*, *::before, *::after { caret-color: transparent !important; } canvas.bubbles { display: none !important; } .sheet-scrim, .sheet { display: none !important; }' })
+  await waitForStableLayout(page)
 }
 
+const BOX_MAX_ATTEMPTS = 20
+
+/** Boîte de la zone, relue jusqu'à ce que deux mesures espacées de deux images soient identiques (T-QA-06). */
 export const box = async (page: Page, selector: string): Promise<IClip> => {
-  const found = await page.locator(selector).first().boundingBox()
-  if (!found) {
+  const locator = page.locator(selector).first()
+  let previous = await locator.boundingBox()
+  for (let attempt = 0; attempt < BOX_MAX_ATTEMPTS; attempt += 1) {
+    await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))))
+    const current = await locator.boundingBox()
+    if (current && previous && current.x === previous.x && current.y === previous.y && current.width === previous.width && current.height === previous.height) {
+      return current
+    }
+    previous = current
+  }
+  if (!previous) {
     throw new Error(`Élément introuvable : ${selector}`)
   }
-  return found
+  return previous
 }
 
 const addValueMasks = async (target: Page, selectors: string[]) => {
