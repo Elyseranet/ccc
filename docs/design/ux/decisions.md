@@ -271,3 +271,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-02 — États ex aequo et « aucun titre » du bloc « Le plus titré » (décision utilisateur 2026-11-03)
 - Les archives réelles n'ont qu'un seul détenteur. Les états **ex aequo** et **aucun titre** sont couverts par des **tests de composant** (rendu, libellé au singulier ou au pluriel, bloc absent), comme les états de F-01. Seul l'état réel à un détenteur est mesuré au pixel. Aucune réponse d'API réécrite, aucune variante de seed (ARCH-8 respectée).
+
+## Titre des alertes Origam (décision utilisateur 2026-11-04, F-09)
+- Sans réglage, Origam affiche le titre d'une `origam-alert` en 31 px avec un grand espacement des lettres. Pour F-09, le titre est ramené à la taille du texte courant **par les props de l'alerte seule** (quatre props de titre, comme le prévoit `mapping.md`). Aucun défaut de thème pour l'instant : un défaut dans `components['origam-alert']` déplacerait l'état d'erreur `AsyncState` des pages déjà livrées (F-01, F-03, F-04, F-05) sans mesure.
+- Un **ticket d'harmonisation** à part mesure les états d'erreur, puis décide d'un réglage commun dans le thème (règle PROPS-FIRST).
