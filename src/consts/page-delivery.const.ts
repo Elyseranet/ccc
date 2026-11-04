@@ -13,18 +13,17 @@ import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
  * ticket F-xx ne change que SA ligne, et passe `delivered` à `true` quand l'écran est branché sur l'API réelle.
  *
  * `endpoints` ne liste que les endpoints propres à la page (composables et services compris). Ceux du layout
- * (`LAYOUT_ENDPOINTS` : `ME`, et `EDITIONS` pour l'admin) s'y ajoutent. La liste est une première affectation,
- * à confirmer par le ticket de chaque écran avant de le livrer.
+ * (`LAYOUT_ENDPOINTS` : `ME`, et `EDITIONS` pour l'admin) s'y ajoutent. Elle est confirmée sur les appels réels de la page
+ * (composables et services) quand l'écran est livré (T-REL-02 pour l'accueil, les joueurs, la fiche joueur et le face-à-face).
  ********************************************************/
 export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.HOME]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [
       API_ENDPOINT.STATS,
       API_ENDPOINT.EDITIONS,
       API_ENDPOINT.EDITION,
-      API_ENDPOINT.EDITION_ROUNDS,
       API_ENDPOINT.EDITION_MATCHES,
       API_ENDPOINT.RANKING_ACP
     ]
@@ -35,7 +34,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.RANKING_ALL_TIME, API_ENDPOINT.RANKING_EVOLUTION]
   },
   [ROUTES.EDITIONS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [API_ENDPOINT.EDITIONS]
   },
@@ -45,22 +44,22 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.EDITION]
   },
   [ROUTES.PLAYERS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.COMPETITORS, API_ENDPOINT.STATS]
   },
   [ROUTES.PLAYER]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [API_ENDPOINT.COMPETITOR, API_ENDPOINT.HEAD_TO_HEAD]
   },
   [ROUTES.HEAD_TO_HEAD]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.COMPETITOR, API_ENDPOINT.HEAD_TO_HEAD]
   },
   [ROUTES.RULES]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: []
   },

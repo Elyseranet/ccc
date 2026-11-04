@@ -82,6 +82,8 @@ export interface IHomeOverviewSources {
 export interface IHomeHeroProps {
   archive: IHomeArchive
   target: IHomeLink | null
+  /** Cible du lien vers le palmarès ; absente tant que la page n'est pas livrée (le lien est alors masqué). */
+  hallOfFameTo?: string
 }
 
 export interface IHomeCurrentEditionProps {
@@ -90,4 +92,6 @@ export interface IHomeCurrentEditionProps {
 
 export interface IHomeBentoProps {
   overview: IHomeOverview
+  /** Cible des liens vers le palmarès ; absente tant que la page n'est pas livrée (les liens sont alors masqués). */
+  hallOfFameTo?: string
 }

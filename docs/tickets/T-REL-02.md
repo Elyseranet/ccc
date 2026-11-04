@@ -16,3 +16,35 @@
 - [ ] `test:release` vert, et preuve dans le conteneur : chaque page livrée répond 200, les pages non livrées répondent 404.
 - [ ] Playwright complet vert ; il compte comme run mesuré de T-QA-06 si la charge est relevée.
 - [ ] gitleaks propre ; `/security-review` sans high ni medium (une page livrée devient publique).
+
+## Réalisation (dev-f06, 2026-11-04)
+
+Endpoints vérifiés sur les appels réels de chaque page (composables et services), aucun n'a de `pendingTicket` dans `API_ROUTES` :
+
+| Page | Appels réels | Ligne `PAGE_DELIVERY` |
+|---|---|---|
+| `/` (`ROUTES.HOME`) | `useHomeOverview` : `GET /stats`, `GET /editions`, `GET /editions/{id}`, `GET /editions/{id}/matchs`, `GET /classements/acp` | `EDITION_ROUNDS` retiré (jamais appelé) ; livrée |
+| `/joueurs` (`PLAYERS`) | `usePlayerSearch` : `GET /competiteurs`, `GET /editions` ; `useArchiveStats` : `GET /stats` | inchangée ; livrée |
+| `/joueurs/:id` (`PLAYER`) | `useCompetitor` : `GET /competiteurs/{id}` ; `useCompetitorOpponents` : `GET /competiteurs/{id}/face-a-face` | inchangée ; livrée |
+| `/joueurs/face-a-face` (`HEAD_TO_HEAD`) | `useCompetitors` (recherche), `useCompetitor` (A et B), `useHeadToHead` : `GET /competiteurs/{id}/face-a-face?adversaire=` | inchangée ; livrée |
+
+`EDITION_ROUNDS` n'est plus appelé par aucune page : il entre dans `ENDPOINTS_WITHOUT_PAGE` (ARCH-11 bis), avec la même raison que `EDITION_POOLS` et `EDITION_DRAWS` (données redondantes avec `GET /editions/{code}`).
+
+Autres pages dont la ligne était restée fausse :
+- `ROUTES.EDITIONS` (`/editions`, renvoi 302 vers l'édition en cours, A5) : F-03 fermé, `GET /editions` appelé, livrée.
+- `ROUTES.RULES` (`/regles`) : F-06 fermé, aucun endpoint, livrée.
+- `ROUTES.HALL_OF_FAME` : **non livrée**, F-02 n'est pas fermé (en cours, branche `feature/F-02-v2`).
+- `ROUTES.LOGIN`, `INVITATION`, `PROFILE` (F-10) et `ADMIN_PARTICIPANTS` (F-09) : non touchées (consigne). `ROUTES.ADMIN`, `ADMIN_DRAWS` et `ADMIN_MATCHES` : non livrées, F-07, F-11 et F-08 ne sont pas fermés.
+
+`tests/e2e-release/page-delivery.spec.ts` : `DELIVERED_PAGES` étendu aux six pages publiques et à `/editions/2025` ; chaque page livrée doit répondre 200 avec un `<h1>` (`/editions` : 302 vers `/editions/<code>`), les redirections dont la cible est livrée répondent 200, les autres restent en 404 ; le test des liens vérifie l'accueil (`/palmares`, `/connexion`, `/admin` absents).
+
+### Preuve dans le conteneur (dev-f06, image construite sur 98d4931, base `ccc_f06_test` chargée par le seed)
+
+- `docker build` : exit 0 ; migrations appliquées au démarrage (`migrations_up_to_date`), `/api/v1/health` 200.
+- Sans session : `/` 200, `/editions` 302 vers `/editions/2026`, `/editions/2025` 200, `/joueurs` 200, `/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca` 200, `/joueurs/face-a-face` 200, `/regles` 200 (titres `Championnat de Caps`, `Joueurs`, `Règles`).
+- `/admin/plus` : sans session 302 vers `/connexion` ; avec la session admin 200.
+- Non livrées : `/palmares`, `/connexion`, `/profil`, `/invitation/jeton-de-test`, `/admin`, `/admin/matchs`, `/admin/participants`, `/admin/tirages` : 404 ; `/hall-of-fame` et `/admin/scores` : 301 puis 404.
+- e2e-release contre le conteneur (`E2E_BASE_URL`, `E2E_ADMIN_SESSION`) : 30 passed ; un test de F-03 périmé (« l'index des éditions, non livré, reste en 404 ») échouait, il est retiré (couvert par le test du 302).
+- **Constat et décision (decisions.md ab1a6b4)** : l'accueil livré contenait trois liens vers `/palmares` (CTA du hero, tuile du champion, « voir le classement »), page non livrée : ils sont masqués tant que la page n'est pas livrée (`useHomeLinks` → `isPageAccessible`, même règle que la navigation ; visibles en dev et en test) et reviennent à la livraison de F-02. Aucune autre page livrée ne pointe vers une page non livrée.
+- **Preuve dans le conteneur (image reconstruite sur le SHA final)** : mêmes codes qu'ci-dessus (pages livrées 200, `/editions` 302, non livrées 404), et l'accueil ne contient plus aucun `href="/palmares"`, `/connexion` ni `/admin`. e2e-release contre le conteneur : 39 passed (hors le test de la session admin, jeton non disponible ici ; prouvé sur 98d4931).
+- **Mesure visuelle de l'accueil sans les liens** (`tests/e2e-release/home-sans-palmares.visual.spec.ts`, conteneur contre `index.html?sans-palmares`, 1440 / 390 px) : hero 0,489 / 0,784 % (le reste est le décor animé du verre et des capsules), tuile du champion 0,000 / 0,000 %, tuile du classement 0,000 / 0,000 % (338 px, 44 px de moins, aucun espace réservé), tuile des matchs 0,000 / 0,000 %, tuile du face-à-face 0,045 / 0,069 %.
