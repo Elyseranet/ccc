@@ -31,3 +31,21 @@ La garde PROD-1 refuse un `NUXT_MAIL_HOST` sans point (nom de service nu, L2 de 
   - le montage par l'utilisateur, puis sa confirmation que `/api/v1/health` répond 200 et que `getent hosts mailpit.ccc.internal` résout ;
   - au merge de T-REL-02, compléter la liste « testable » avec `/editions` et `/regles`, que T-REL-02 livre aussi.
 - Points non vérifiés, signalés dans le guide : le réglage réseau commun Coolify, le nom de variable `MP_UI_AUTH` et la version de l'image Mailpit.
+
+## Montage du 2026-11-04 (chef de projet, via le navigateur de l'utilisateur, Coolify `coolify.elysera.net`, projet CCC, environnement dev)
+- **Constat avant intervention** : application `ccc` sur la branche `develop` (source « Public GitHub »), mais **dernier déploiement le 2026-10-21, commit `5cc4f6f`**, manuel. Aucun redéploiement automatique : une source « Public GitHub » ne reçoit pas de webhook. Base vide (`/api/v1/stats` à 0), pages publiques en 404. Pas de Mailpit. Variables présentes : `NUXT_DATABASE_*` (5) et `NUXT_AUTH_DEVICE_COOKIE_SECRET`.
+- **Mailpit** : service Coolify « Mailpit » (modèle), compose modifié avant le premier démarrage :
+  - port SMTP `1025` **non publié** sur l'hôte (le modèle publiait `1025:1025`) ;
+  - alias réseau `mailpit.ccc.internal` sur le réseau externe `coolify` ;
+  - interface protégée par `MP_UI_AUTH=${SERVICE_USER_MAILPIT}:${SERVICE_PASSWORD_MAILPIT}`, des identifiants générés par Coolify, jamais saisis ni recopiés ;
+  - image `axllent/mailpit` sans version figée (point à figer, voir « Reste »).
+- **Variables ajoutées à l'application** : `NUXT_PUBLIC_SITE_URL=https://ccc.dev.elysera.net`, `NUXT_MAIL_HOST=mailpit.ccc.internal`, `NUXT_MAIL_PORT=1025`, `NUXT_MAIL_SECURE=false`, `NUXT_MAIL_FROM=CCC <no-reply@ccc.dev.elysera.net>` (littéral), `NUXT_TRUST_PROXY_HOPS=1` (aucun CDN : `ccc.dev.elysera.net` résout directement sur 178.105.208.132, comme `coolify.elysera.net`).
+- **Redéploiement** de `develop` @ `0c74425` : image construite, sonde de santé `healthy` à la première tentative, mise à jour sans coupure, ancien conteneur retiré.
+- **Dans le conteneur** : `getent hosts mailpit.ccc.internal` résout (`fde0:8c1:58a::f`, exit 0) ; `ccc-ops db:seed:archives` donne `{"editions":16,"competitors":146,"matches":729,"validatedMatches":554}`, exit 0.
+- **Vérification externe** (curl, 20:53) : `/api/v1/health` 200 ; `/`, `/editions/2026`, `/editions/2025`, `/joueurs`, `/joueurs/face-a-face`, `/regles` 200 ; `/editions` 302 vers `/editions/2026` ; `/palmares`, `/connexion`, `/admin` 404 ; `/admin/plus` 302 vers `/connexion` ; `/api/v1/stats` : 16 / 146 / 729 / 554 ; aucun lien `/palmares` sur l'accueil. Certificat Let's Encrypt valide jusqu'au 2027-01-19.
+- **Reste** :
+  - **pas de redéploiement automatique** : chaque merge sur develop demande un « Redeploy » dans Coolify, tant qu'aucune source GitHub App ni webhook n'est branché ;
+  - l'interface web de Mailpit n'est servie qu'en **http** sur une adresse `sslip.io` générée : les identifiants et les liens d'invitation y circulent en clair. Il faut un domaine https (par exemple `mail.ccc.dev.elysera.net`, DNS à créer) avant de l'utiliser ;
+  - figer la version de l'image Mailpit ;
+  - premier administrateur (`ccc-ops user:create-admin`) : laissé à l'utilisateur, c'est son identité ; utile seulement après F-10 (connexion et invitation) ;
+  - la route de santé n'affiche pas encore la version déployée (T-OPS-03).
