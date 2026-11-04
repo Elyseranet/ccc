@@ -19,3 +19,8 @@
 - **Run de revue du frontend-lead**, le 2026-11-02 de 08:36:43 à 08:48:42, SHA `97318e3` (helper identique), charge 19,0 / 10,2 / 5,9 au départ : Playwright 239 passés, 0 échec.
 - **Cause : non établie.** L'échec d'origine (358×347, 28,19 %) n'a jamais été reproduit. Hypothèse retenue : mesure ou capture pendant un décalage de mise en page après l'hydratation.
 - **Décision utilisateur (2026-11-04)** : refaire **5 runs complets avec la charge relevée**, puis fermer en écrivant explicitement « cause non établie, échec non reproductible ». Le critère de cause est levé par cette décision. Les runs Playwright complets des gates sur un SHA qui contient `9817d77` comptent s'ils relèvent la charge.
+
+## Runs mesurés (décision utilisateur du 2026-11-04)
+| # | Date et heure | SHA | Résultat | `joueur-stats` @390 | Charge (1 min) |
+|---|---|---|---|---|---|
+| 1 | 2026-11-04, 09:48:26 à 09:56:26 (8,1 min) | `98d4931` (T-REL-02, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % (@1440 : 1248×186, 0,000 %) | 15,17 au départ, 15,17 au plus, 6,35 à la fin (17 relevés toutes les 30 s). En parallèle : vérifications T-REL-02 de dev-f06 (test:run, test:release, Docker) et rendus de l'ui |
