@@ -7,8 +7,8 @@ import type { IMatchSide } from './match.interface.js'
 
 /**
  * Cible « match » d'une entrée d'activité. `sides` : les deux côtés dans l'ordre des positions (aucune
- * convention « vainqueur en premier »). `score` = le score validé pour MATCH_VALIDATED, le score corrigé pour
- * MATCH_CORRECTED.
+ * convention « vainqueur en premier »). `score` = le score validé (le score corrigé pour un match corrigé,
+ * qui reste en MATCH_VALIDATED).
  */
 export interface IAdminActivityMatchTarget {
   type: ADMIN_ACTIVITY_TARGET.MATCH

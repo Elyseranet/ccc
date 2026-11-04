@@ -49,11 +49,11 @@ Chaque source est bornée à `limit` avant la fusion : les `limit` entrées les 
 
 **Limites connues de la dérivation**
 
-- `MATCH_CORRECTED` n'est **pas émis** : `correctMatch` écrase `validated_at` et `validated_by_user_id`, une correction ne se distingue donc pas d'une validation. Le calcul du `kind` d'un match est isolé dans `matchActivityKind` (arbitrage en attente).
+- Il n'existe pas de type « correction » : `correctMatch` réécrit `validated_at` et `validated_by_user_id`, un match corrigé apparaît donc en `MATCH_VALIDATED`, à la date de la correction et avec son auteur (décision utilisateur). Le calcul du `kind` d'un match est isolé dans `matchActivityKind`.
 - Un brouillon remplacé disparaît (il est supprimé), et avec lui son entrée `DRAW_CREATED`.
-- Une correction déplace l'entrée du match à la date de la correction (l'entrée de validation d'origine n'existe plus).
+- Une seule entrée par match : une correction la déplace à sa date, l'entrée de validation d'origine n'existe plus.
 - Les matchs d'archive n'ont pas de `validated_at` : ils n'apparaissent pas.
 
 ## Données exposées
 
-L'acteur se réduit à `{ id, displayName }` (mapper partagé `toAdminActor`). Aucun email ni téléphone des compétiteurs n'est sérialisé. **Réserve ouverte** : pour un compte sans compétiteur (cas normal d'un administrateur créé par `create-admin.util.ts`), `toAdminActor` renvoie l'email en `displayName` ; la décision est en attente. `actor` vaut `null` si l'utilisateur est absent (compte supprimé, `ON DELETE SET NULL`). Aucune chaîne n'est construite par le serveur : le front traduit à partir des champs structurés de `target`.
+L'acteur se réduit à `{ id, displayName }` (mapper partagé `toAdminActor`). Aucun email ni téléphone des compétiteurs n'est sérialisé. Pour un compte sans compétiteur (cas normal d'un administrateur créé par `create-admin.util.ts`), `toAdminActor` renvoie l'email en `displayName` : décision utilisateur, la route n'est lisible que par les administrateurs. `actor` vaut `null` si l'utilisateur est absent (compte supprimé, `ON DELETE SET NULL`). Aucune chaîne n'est construite par le serveur : le front traduit à partir des champs structurés de `target`.

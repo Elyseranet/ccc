@@ -13,9 +13,9 @@ import { toPublicMatch } from './match-public.mapper.util.js'
 const toActivityActor = (user: UserEntity | null): IAdminActor | null => toAdminActor(user)
 
 /**
- * Type d'activité d'un match dont `validated_at` est renseigné. Seul point de décision : `correctMatch` écrase
- * `validated_at`, donc une correction n'est pas distinguable d'une validation (arbitrage en attente, MATCH_CORRECTED
- * non émis).
+ * Type d'activité d'un match dont `validated_at` est renseigné : toujours MATCH_VALIDATED. `correctMatch` réécrit
+ * `validated_at` et `validated_by_user_id` : un match corrigé apparaît donc en MATCH_VALIDATED, à la date de la
+ * correction et avec son auteur (décision utilisateur, B-15).
  */
 export const matchActivityKind = (_match: MatchEntity): ADMIN_ACTIVITY_KIND => ADMIN_ACTIVITY_KIND.MATCH_VALIDATED
 

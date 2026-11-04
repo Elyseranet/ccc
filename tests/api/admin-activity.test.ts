@@ -29,6 +29,7 @@ const UNKNOWN_UUID = '00000000-0000-4000-8000-000000000000'
 let dataSource: DataSource
 let adminCookie: string
 let participantCookie: string
+let bareAdminCookie: string
 let year = 2030
 let competitorSerial = 0
 
@@ -129,6 +130,7 @@ describe('admin activity feed (B-15)', async () => {
   dataSource = await resetTestDatabase()
   // Un administrateur avec compétiteur : son nom affiché est le seul champ d'identité attendu dans le flux.
   const admin = await seedUser(dataSource, { email: 'boss-b15@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN, withCompetitor: true })
+  const bareAdmin = await seedUser(dataSource, { email: 'bare-b15@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
   await seedUser(dataSource, { email: 'player-b15@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT, withCompetitor: true })
 
   await setup({
@@ -141,6 +143,7 @@ describe('admin activity feed (B-15)', async () => {
   beforeAll(async () => {
     adminCookie = cookieHeaderOf(await login('boss-b15@ccc.test', PASSWORD))
     participantCookie = cookieHeaderOf(await login('player-b15@ccc.test', PASSWORD))
+    bareAdminCookie = cookieHeaderOf(await login('bare-b15@ccc.test', PASSWORD))
   })
 
   afterAll(async () => {
@@ -224,6 +227,46 @@ describe('admin activity feed (B-15)', async () => {
       // Le nom affiché de l'administrateur de test embarque son adresse (fixture) : on vérifie les champs, pas le caractère.
       expect(serialized).not.toContain('+33')
       expect(serialized).not.toMatch(/"(email|phone|firstName|lastName|passwordHash)"/)
+    })
+
+    it('lists a corrected match as one MATCH_VALIDATED entry, dated at the correction, with the author of the correction', async () => {
+      const ready = await readyDraft()
+      expect((await asAdmin('POST', `/api/v1/tirages/${ready.draft.id}/validation`)).status).toBe(200)
+      const listMatches = async () => await (await asAdmin('GET', `/api/v1/admin/editions/${ready.edition.id}/matchs`)).json() as IAdminMatch[]
+      const match = (await listMatches())[0]!
+      const body = (values: number[]) => ({
+        scores: match.sides.map((side, index) => ({ participationId: side.participationId, score: values[index]! }))
+      })
+      expect((await asAdmin('PUT', `/api/v1/matchs/${match.id}/score`, body([match.targetScore, 0]))).status).toBe(200)
+      expect((await asAdmin('POST', `/api/v1/matchs/${match.id}/validation`, body([match.targetScore, 0]))).status).toBe(200)
+      const validated = (await activityOf(ready.edition.id)).filter((item) => item.target.id === match.id)
+      expect(validated).toHaveLength(1)
+
+      const current = (await listMatches()).find((candidate) => candidate.id === match.id)!
+      const corrected = await fetch(`/api/v1/matchs/${match.id}/correction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Cookie: bareAdminCookie, 'If-Match': `"${current.version}"` },
+        body: JSON.stringify(body([match.targetScore, 1]))
+      })
+      expect(corrected.status).toBe(200)
+
+      const feed = (await activityOf(ready.edition.id)).filter((item) => item.target.id === match.id)
+      expect(feed).toHaveLength(1)
+      expect(feed[0]).toMatchObject({ kind: ADMIN_ACTIVITY_KIND.MATCH_VALIDATED, actor: { id: bareAdmin.id, displayName: bareAdmin.email } })
+      expect(Date.parse(feed[0]!.at)).toBeGreaterThan(Date.parse(validated[0]!.at))
+      const target = feed[0]!.target as { sides: Array<{ score: number | null }> }
+      expect(target.sides.map((side) => side.score)).toEqual([match.targetScore, 1])
+    })
+
+    it('names an administrator without competitor by their email (visible to administrators only)', async () => {
+      const players = await sixPlayers()
+      const opened = await send('POST', `/api/v1/editions/${players.edition.id}/tirages/poules`, {
+        poolCount: 2, seedCount: 2, seeds: [players.ids.a, players.ids.b]
+      }, bareAdminCookie)
+      expect(opened.status).toBe(201)
+      const feed = await activityOf(players.edition.id)
+      expect(feed).toHaveLength(1)
+      expect(feed[0]!.actor).toEqual({ id: bareAdmin.id, displayName: bareAdmin.email })
     })
 
     it('accepts the edition code as well as its UUID', async () => {
