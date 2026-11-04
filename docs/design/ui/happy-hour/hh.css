@@ -186,6 +186,7 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 /* ═══ Champs et alertes au rendu Origam (partagés : compte, admin) ═══ */
 /* Rendu origam-file-field (thème CCC : outlined, rounded full, 48 px), mesuré sur origam 2.37.4 */
 .file-field { position: relative; display: flex; align-items: center; min-height: var(--origam-space---12); padding-inline: calc(var(--origam-space---3) - 1px) var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---sunken); color: var(--origam-color__text---primary); }
+.file-field { border-radius: var(--origam-space---5) var(--origam-space---6) var(--origam-space---6) var(--origam-space---5) / var(--origam-space---6); } /* contour Origam en morceaux : premier morceau de 20 px, coin gauche elliptique */
 .file-field__ic { width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; opacity: .7; }
 .file-field__input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
 .file-field:has(:focus-visible) { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
@@ -197,7 +198,10 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .alert--info { background: var(--origam-color__feedback--info---bg); color: var(--origam-color__feedback--info---fg); }
 .alert--block { display: grid; grid-template-columns: var(--origam-space---4) minmax(0, 1fr); align-items: start; column-gap: var(--origam-space---4); padding: var(--origam-space---4); }
 .alert--block .alert__ic { margin-top: calc(var(--origam-space---2) + var(--origam-space---1) / 4); }
-.alert--block.alert--compact { padding: var(--origam-space---2); } /* densité compacte : à mesurer contre le rendu Origam */
+.alert--block.alert--compact { padding: var(--origam-space---2); column-gap: var(--origam-space---2); } /* densité compacte : icône et texte à 8 px, mesuré sur 2.37.4 */
+.alert:not(.alert--block) { align-items: start; } /* sur plusieurs lignes, l’icône reste en haut comme chez Origam */
+.alert:not(.alert--block) .alert__ic { margin-top: calc((var(--origam-font__lineHeight---normal) * 1em - var(--origam-space---4)) / 2); }
+.field-msg.field-msg--number { margin-top: var(--origam-space---1); } /* origam-number-field : message à 8 px sous le champ (6 px pour origam-text-field) */
 .alert__title, .alert__body { display: block; }
 .alert__title { font-weight: var(--origam-font__weight---bold); }
 /* Message d’erreur sous un champ (origam-messages), mesuré sur origam 2.37.4 : 12 px et interlettrage 0.0333em, valeurs internes d’Origam sans jeton */
