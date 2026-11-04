@@ -204,4 +204,5 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .alert__title, .alert__body { display: block; }
 .alert__title { font-weight: var(--origam-font__weight---bold); }
 /* Message d’erreur sous un champ (origam-messages), mesuré sur origam 2.37.4 : 12 px et interlettrage 0.0333em, valeurs internes d’Origam sans jeton */
-.field-msg { display: block; margin-top: calc(var(--origam-space---1) / 2); color: var(--origam-color__feedback--danger---fgSubtle); font-size: 0.75rem; line-height: 1; letter-spacing: 0.03552em; word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
+.field-msg { display: flex; align-items: flex-end; min-height: var(--origam-space---4); margin-top: calc(var(--origam-space---1) / 2); color: var(--origam-color__feedback--danger---fgSubtle); font-size: 0.75rem; line-height: 1; letter-spacing: 0.03552em; word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
+.field-msg__text { display: block; min-height: calc(var(--origam-space---3) + var(--origam-space---1) / 2); } /* Origam : zone de détails de 16 px au moins, message de 14 px au moins, calés en bas : une ligne tombe à 8 px du champ, plusieurs à 6 px */
