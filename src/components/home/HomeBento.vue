@@ -58,7 +58,7 @@
         rounded="xl"
         border
         elevation="md"
-        :hover="Boolean(hallOfFameTo)"
+        :hover="isChampionTileLinked"
         class="home-bento__tile home-bento__tile--champion"
         data-cy="home-tile-champion"
       >
@@ -242,6 +242,7 @@ import type { IHomeBentoProps } from '~/interfaces/home.interface'
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IHomeBentoProps>(), { hallOfFameTo: undefined })
+const isChampionTileLinked = computed(() => props.hallOfFameTo !== undefined)
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const arrow = HOME_ARROW_GLYPH
