@@ -149,6 +149,7 @@
 .slot { display: grid; grid-template-columns: var(--origam-space---8) minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---2); min-height: var(--origam-space---11); padding-inline: var(--origam-space---3); border-radius: var(--origam-radius---md); background: var(--origam-color__surface---sunken); font-size: var(--origam-font__size---sm); }
 .slot--seed { background: var(--origam-color__action--secondary---bgSubtle); }
 .slot--empty { padding: var(--origam-space---1) var(--origam-space---1) var(--origam-space---1) var(--origam-space---3); grid-template-columns: var(--origam-space---8) minmax(0, 1fr); background: none; border: 1px dashed var(--origam-color__border---strong); }
+.slot--free { min-height: var(--origam-space---11); } /* place libre = capacité de la poule, sans contrôle (RG11, 7182f05) */
 .slot__k { color: var(--origam-color__text---tertiary); font-weight: var(--origam-font__weight---bold); }
 .tir-side { display: grid; gap: var(--origam-space---4); }
 .tir-params { display: grid; grid-template-columns: 1fr 1fr; gap: var(--origam-space---2); margin-block: var(--origam-space---3); }
