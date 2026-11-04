@@ -9,68 +9,70 @@
     class="draw-recap"
     data-cy="draw-recap"
   >
-    <header class="draw-recap__head">
-      <h2
-        :id="titleId"
-        class="draw-recap__title"
+    <div class="draw-recap__content">
+      <header class="draw-recap__head">
+        <h2
+          :id="titleId"
+          class="draw-recap__title"
+        >
+          {{ title }}
+        </h2>
+        <span
+          class="draw-recap__count"
+          data-cy="draw-recap-summary"
+        >{{ summary }}</span>
+      </header>
+      <div class="draw-recap__pools">
+        <section
+          v-for="pool in poolViews"
+          :key="pool.number"
+          class="draw-recap__pool"
+          :aria-label="pool.title"
+          :data-cy="`draw-recap-pool-${pool.number}`"
+        >
+          <h3 class="draw-recap__pool-title">
+            {{ pool.title }}
+          </h3>
+          <ol class="draw-recap__members">
+            <li
+              v-for="member in pool.members"
+              :key="member.id"
+            >
+              <span class="draw-recap__place">{{ member.place }}</span>
+              <span>{{ member.name }}</span>
+              <origam-chip
+                v-if="member.isSeed"
+                color="secondary"
+                size="small"
+                pill
+                :text="seedLabel"
+              />
+            </li>
+          </ol>
+        </section>
+      </div>
+      <div
+        v-if="!readOnly"
+        class="draw-recap__actions"
       >
-        {{ title }}
-      </h2>
-      <span
-        class="draw-recap__count"
-        data-cy="draw-recap-summary"
-      >{{ summary }}</span>
-    </header>
-    <div class="draw-recap__pools">
-      <section
-        v-for="pool in poolViews"
-        :key="pool.number"
-        class="draw-recap__pool"
-        :aria-label="pool.title"
-        :data-cy="`draw-recap-pool-${pool.number}`"
-      >
-        <h3 class="draw-recap__pool-title">
-          {{ pool.title }}
-        </h3>
-        <ol class="draw-recap__members">
-          <li
-            v-for="member in pool.members"
-            :key="member.id"
-          >
-            <span class="draw-recap__place">{{ member.place }}</span>
-            <span>{{ member.name }}</span>
-            <origam-chip
-              v-if="member.isSeed"
-              color="secondary"
-              size="small"
-              pill
-              :text="seedLabel"
-            />
-          </li>
-        </ol>
-      </section>
-    </div>
-    <div
-      v-if="!readOnly"
-      class="draw-recap__actions"
-    >
-      <origam-btn
-        variant="outlined"
-        size="large"
-        :text="backLabel"
-        data-cy="draw-recap-back"
-        @click="emits('back')"
-      />
-      <origam-btn
-        variant="flat"
-        bg-color="primary"
-        elevation="lg"
-        size="large"
-        :disabled="!canValidate"
-        :text="nextLabel"
-        data-cy="draw-recap-next"
-        @click="emits('next')"
-      />
+        <origam-btn
+          variant="outlined"
+          size="large"
+          :text="backLabel"
+          data-cy="draw-recap-back"
+          @click="emits('back')"
+        />
+        <origam-btn
+          variant="flat"
+          bg-color="primary"
+          elevation="lg"
+          size="large"
+          :disabled="!canValidate"
+          :text="nextLabel"
+          data-cy="draw-recap-next"
+          @click="emits('next')"
+        />
+      </div>
     </div>
   </origam-card>
 </template>
@@ -119,8 +121,10 @@ defineExpose({})
 
 <style scoped lang="scss">
 .draw-recap {
-  display: grid;
-  gap: var(--origam-space---4);
+  &__content {
+    display: grid;
+    gap: var(--origam-space---4);
+  }
 
   &__head {
     display: flex;
@@ -144,7 +148,7 @@ defineExpose({})
 
   &__pools {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
     gap: var(--origam-space---3);
   }
 
@@ -171,8 +175,9 @@ defineExpose({})
 
     li {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: var(--origam-space---2);
+      gap: var(--origam-space---1) var(--origam-space---2);
     }
   }
 

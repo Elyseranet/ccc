@@ -1058,5 +1058,6 @@
   "admin.draws.validation_open": "Validate the draw…",
   "admin.draws.validation_text": "Available once all {total} players are placed. Validation freezes the pools and generates the matches:",
   "admin.draws.validation_title": "5 · Validation",
-  "admin.draws.validation_warning": "it cannot be undone."
+  "admin.draws.validation_warning": "it cannot be undone.",
+  "admin.draws.title": "Pool draw"
 }

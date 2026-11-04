@@ -4,6 +4,7 @@
     persistent
     :max-width="560"
     scrim
+    padding="6"
     :title="title"
     role="alertdialog"
     :aria-describedby="descriptionId"

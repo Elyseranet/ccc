@@ -9,86 +9,88 @@
     class="draw-seeds"
     data-cy="draw-seeds"
   >
-    <h2
-      :id="titleId"
-      class="draw-seeds__title"
-    >
-      {{ title }}
-    </h2>
-    <p class="draw-seeds__lead">
-      {{ lead }}
-    </p>
-    <ol class="draw-seeds__list">
-      <li
-        v-for="seed in seeds"
-        :key="seed.participationId"
-        class="draw-seeds__item"
-        :class="{ 'draw-seeds__item--out': !isSelected(seed.participationId) }"
-        data-cy="draw-seed-row"
+    <div class="draw-seeds__content">
+      <h2
+        :id="titleId"
+        class="draw-seeds__title"
       >
-        <span class="draw-seeds__rank font-display">{{ seed.rank }}</span>
-        <span class="draw-seeds__name">{{ seed.competitor.displayName }}</span>
-        <span class="draw-seeds__acp">{{ formatAcp(seed.acp) }}</span>
-      </li>
-    </ol>
-    <section
-      v-for="group in tieGroups"
-      :key="group.index"
-      class="draw-seeds__tie"
-      :aria-labelledby="`${titleId}-tie-${group.index}`"
-      data-cy="draw-seed-tie"
-    >
-      <h3
-        :id="`${titleId}-tie-${group.index}`"
-        class="draw-seeds__tie-title"
-      >
-        {{ tieTitle(group) }}
-      </h3>
-      <p class="draw-seeds__tie-lead">
-        {{ tieLead }}
+        {{ title }}
+      </h2>
+      <p class="draw-seeds__lead">
+        {{ lead }}
       </p>
-      <ul class="draw-seeds__candidates">
+      <ol class="draw-seeds__list">
         <li
-          v-for="candidate in group.candidates"
-          :key="candidate.participationId"
+          v-for="seed in seeds"
+          :key="seed.participationId"
+          class="draw-seeds__item"
+          :class="{ 'draw-seeds__item--out': !isSelected(seed.participationId) }"
+          data-cy="draw-seed-row"
         >
-          <origam-checkbox
-            :model-value="isChosen(group.index, candidate.participationId)"
-            :label="candidate.competitor.displayName"
-            hide-details
-            :data-cy="`draw-seed-choice-${candidate.participationId}`"
-            @update:model-value="emits('toggle', group.index, candidate.participationId)"
-          />
+          <span class="draw-seeds__rank font-display">{{ seed.rank }}</span>
+          <span class="draw-seeds__name">{{ seed.competitor.displayName }}</span>
+          <span class="draw-seeds__acp">{{ formatAcp(seed.acp) }}</span>
         </li>
-      </ul>
-    </section>
-    <origam-alert
-      v-if="issue"
-      status="warning"
-      rounded="lg"
-      :text="issueText"
-      data-cy="draw-seeds-issue"
-    />
-    <div class="draw-seeds__actions">
-      <origam-btn
-        variant="outlined"
-        size="large"
-        :disabled="busy"
-        :text="backLabel"
-        data-cy="draw-seeds-back"
-        @click="emits('back')"
+      </ol>
+      <section
+        v-for="group in tieGroups"
+        :key="group.index"
+        class="draw-seeds__tie"
+        :aria-labelledby="`${titleId}-tie-${group.index}`"
+        data-cy="draw-seed-tie"
+      >
+        <h3
+          :id="`${titleId}-tie-${group.index}`"
+          class="draw-seeds__tie-title"
+        >
+          {{ tieTitle(group) }}
+        </h3>
+        <p class="draw-seeds__tie-lead">
+          {{ tieLead }}
+        </p>
+        <ul class="draw-seeds__candidates">
+          <li
+            v-for="candidate in group.candidates"
+            :key="candidate.participationId"
+          >
+            <origam-checkbox
+              :model-value="isChosen(group.index, candidate.participationId)"
+              :label="candidate.competitor.displayName"
+              hide-details
+              :data-cy="`draw-seed-choice-${candidate.participationId}`"
+              @update:model-value="emits('toggle', group.index, candidate.participationId)"
+            />
+          </li>
+        </ul>
+      </section>
+      <origam-alert
+        v-if="issue"
+        status="warning"
+        rounded="lg"
+        :text="issueText"
+        data-cy="draw-seeds-issue"
       />
-      <origam-btn
-        variant="flat"
-        bg-color="primary"
-        elevation="lg"
-        size="large"
-        :disabled="!canConfirm"
-        :loading="busy"
-        :text="confirmLabel"
-        data-cy="draw-seeds-confirm"
-        @click="emits('confirm')"
-      />
+      <div class="draw-seeds__actions">
+        <origam-btn
+          variant="outlined"
+          size="large"
+          :disabled="busy"
+          :text="backLabel"
+          data-cy="draw-seeds-back"
+          @click="emits('back')"
+        />
+        <origam-btn
+          variant="flat"
+          bg-color="primary"
+          elevation="lg"
+          size="large"
+          :disabled="!canConfirm"
+          :loading="busy"
+          :text="confirmLabel"
+          data-cy="draw-seeds-confirm"
+          @click="emits('confirm')"
+        />
+      </div>
     </div>
   </origam-card>
 </template>
@@ -138,8 +140,10 @@ defineExpose({})
 
 <style scoped lang="scss">
 .draw-seeds {
-  display: grid;
-  gap: var(--origam-space---4);
+  &__content {
+    display: grid;
+    gap: var(--origam-space---4);
+  }
 
   &__title {
     margin: 0;

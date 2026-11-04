@@ -9,77 +9,79 @@
     class="draw-parameters"
     data-cy="draw-parameters"
   >
-    <h2
-      :id="titleId"
-      class="draw-parameters__title"
-    >
-      {{ title }}
-    </h2>
-    <p class="draw-parameters__lead">
-      {{ lead }}
-    </p>
-    <div class="draw-parameters__fields">
-      <div class="draw-parameters__field">
-        <origam-label
-          :for="fieldId"
-          :text="poolsLabel"
-        />
-        <origam-number-field
-          :id="fieldId"
-          :model-value="poolCount"
-          :min="1"
-          :max="20"
-          :step="1"
-          :disabled="readOnly || busy"
-          single-line
-          hide-details
-          data-cy="draw-pool-count"
-          @update:model-value="handlePoolCount"
+    <div class="draw-parameters__content">
+      <h2
+        :id="titleId"
+        class="draw-parameters__title"
+      >
+        {{ title }}
+      </h2>
+      <p class="draw-parameters__lead">
+        {{ lead }}
+      </p>
+      <div class="draw-parameters__fields">
+        <div class="draw-parameters__field">
+          <origam-label
+            :for="fieldId"
+            :text="poolsLabel"
+          />
+          <origam-number-field
+            :id="fieldId"
+            :model-value="poolCount"
+            :min="1"
+            :max="20"
+            :step="1"
+            :disabled="readOnly || busy"
+            single-line
+            hide-details
+            data-cy="draw-pool-count"
+            @update:model-value="handlePoolCount"
+          />
+        </div>
+        <dl class="draw-parameters__facts">
+          <div>
+            <dt>{{ seedsLabel }}</dt>
+            <dd
+              class="font-display"
+              data-cy="draw-seed-count"
+            >
+              {{ poolCount }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ playersLabel }}</dt>
+            <dd
+              class="font-display"
+              data-cy="draw-player-count"
+            >
+              {{ total }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <p class="draw-parameters__rule">
+        {{ rule }}
+      </p>
+      <origam-alert
+        v-if="issue"
+        status="warning"
+        rounded="lg"
+        :text="issueText"
+        data-cy="draw-parameters-issue"
+      />
+      <div class="draw-parameters__actions">
+        <origam-btn
+          variant="flat"
+          bg-color="primary"
+          elevation="lg"
+          size="large"
+          :disabled="Boolean(issue) || readOnly"
+          :loading="busy"
+          :text="nextLabel"
+          data-cy="draw-parameters-next"
+          @click="emits('next')"
         />
       </div>
-      <dl class="draw-parameters__facts">
-        <div>
-          <dt>{{ seedsLabel }}</dt>
-          <dd
-            class="font-display"
-            data-cy="draw-seed-count"
-          >
-            {{ poolCount }}
-          </dd>
-        </div>
-        <div>
-          <dt>{{ playersLabel }}</dt>
-          <dd
-            class="font-display"
-            data-cy="draw-player-count"
-          >
-            {{ total }}
-          </dd>
-        </div>
-      </dl>
-    </div>
-    <p class="draw-parameters__rule">
-      {{ rule }}
-    </p>
-    <origam-alert
-      v-if="issue"
-      status="warning"
-      rounded="lg"
-      :text="issueText"
-      data-cy="draw-parameters-issue"
-    />
-    <div class="draw-parameters__actions">
-      <origam-btn
-        variant="flat"
-        bg-color="primary"
-        elevation="lg"
-        size="large"
-        :disabled="Boolean(issue) || readOnly"
-        :loading="busy"
-        :text="nextLabel"
-        data-cy="draw-parameters-next"
-        @click="emits('next')"
-      />
     </div>
   </origam-card>
 </template>
@@ -126,8 +128,10 @@ defineExpose({})
 
 <style scoped lang="scss">
 .draw-parameters {
-  display: grid;
-  gap: var(--origam-space---4);
+  &__content {
+    display: grid;
+    gap: var(--origam-space---4);
+  }
 
   &__title {
     margin: 0;

@@ -56,74 +56,76 @@
           class="draw-assignment__pool"
           :data-cy="`draw-pool-${pool.number}`"
         >
-          <header class="draw-assignment__pool-head">
-            <h3 class="draw-assignment__pool-title">
-              {{ pool.title }}
-            </h3>
-            <origam-chip
-              :color="pool.full ? 'success' : undefined"
-              size="small"
-              pill
-              :text="pool.fill"
-            />
-          </header>
-          <ol class="draw-assignment__slots">
-            <li
-              v-for="slot in pool.slots"
-              :key="slot.place"
-              class="draw-assignment__slot"
-              :class="{ 'draw-assignment__slot--seed': slot.isSeed, 'draw-assignment__slot--empty': slot.empty }"
-              :data-cy="`draw-slot-${pool.number}-${slot.place}`"
-            >
-              <span class="draw-assignment__place">{{ slot.place }}</span>
-              <template v-if="slot.empty">
-                <origam-select
-                  :model-value="null"
-                  :items="selectItems"
-                  :label="slot.label"
-                  autocomplete
-                  rounded="full"
-                  density="compact"
-                  hide-details
-                  :disabled="readOnly"
-                  :data-cy="`draw-select-${pool.number}-${slot.place}`"
-                  @update:model-value="handleAssign(pool.number, $event)"
-                />
-              </template>
-              <template v-else-if="editing === slot.key">
-                <origam-select
-                  :model-value="null"
-                  :items="selectItems"
-                  :label="slot.label"
-                  autocomplete
-                  rounded="full"
-                  density="compact"
-                  hide-details
-                  :data-cy="`draw-select-${pool.number}-${slot.place}`"
-                  @update:model-value="handleChange(pool.number, slot.place, $event)"
-                />
-              </template>
-              <template v-else>
-                <b class="draw-assignment__name">{{ slot.name }}</b>
-                <origam-chip
-                  v-if="slot.isSeed"
-                  color="secondary"
-                  size="small"
-                  pill
-                  :text="seedLabel"
-                />
-                <origam-btn
-                  v-else-if="!readOnly"
-                  variant="text"
-                  size="small"
-                  :text="changeLabel"
-                  :aria-label="slot.changeLabel"
-                  :data-cy="`draw-change-${pool.number}-${slot.place}`"
-                  @click="editing = slot.key"
-                />
-              </template>
-            </li>
-          </ol>
+          <div class="draw-assignment__pool-content">
+            <header class="draw-assignment__pool-head">
+              <h3 class="draw-assignment__pool-title">
+                {{ pool.title }}
+              </h3>
+              <origam-chip
+                :color="pool.full ? 'success' : undefined"
+                size="small"
+                pill
+                :text="pool.fill"
+              />
+            </header>
+            <ol class="draw-assignment__slots">
+              <li
+                v-for="slot in pool.slots"
+                :key="slot.place"
+                class="draw-assignment__slot"
+                :class="{ 'draw-assignment__slot--seed': slot.isSeed, 'draw-assignment__slot--empty': slot.empty }"
+                :data-cy="`draw-slot-${pool.number}-${slot.place}`"
+              >
+                <span class="draw-assignment__place">{{ slot.place }}</span>
+                <template v-if="slot.empty">
+                  <origam-select
+                    :model-value="null"
+                    :items="selectItems"
+                    :label="slot.label"
+                    autocomplete
+                    rounded="full"
+                    density="compact"
+                    hide-details
+                    :disabled="readOnly"
+                    :data-cy="`draw-select-${pool.number}-${slot.place}`"
+                    @update:model-value="handleAssign(pool.number, $event)"
+                  />
+                </template>
+                <template v-else-if="editing === slot.key">
+                  <origam-select
+                    :model-value="null"
+                    :items="selectItems"
+                    :label="slot.label"
+                    autocomplete
+                    rounded="full"
+                    density="compact"
+                    hide-details
+                    :data-cy="`draw-select-${pool.number}-${slot.place}`"
+                    @update:model-value="handleChange(pool.number, slot.place, $event)"
+                  />
+                </template>
+                <template v-else>
+                  <b class="draw-assignment__name">{{ slot.name }}</b>
+                  <origam-chip
+                    v-if="slot.isSeed"
+                    color="secondary"
+                    size="small"
+                    pill
+                    :text="seedLabel"
+                  />
+                  <origam-btn
+                    v-else-if="!readOnly"
+                    variant="text"
+                    size="small"
+                    :text="changeLabel"
+                    :aria-label="slot.changeLabel"
+                    :data-cy="`draw-change-${pool.number}-${slot.place}`"
+                    @click="editing = slot.key"
+                  />
+                </template>
+              </li>
+            </ol>
+          </div>
         </origam-card>
       </div>
     </section>
@@ -346,7 +348,7 @@ defineExpose({})
     gap: var(--origam-space---3);
   }
 
-  &__pool {
+  &__pool-content {
     display: grid;
     gap: var(--origam-space---3);
   }

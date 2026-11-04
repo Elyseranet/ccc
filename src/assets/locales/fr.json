@@ -1058,5 +1058,6 @@
   "admin.draws.validation_open": "Valider le tirage…",
   "admin.draws.validation_text": "Disponible quand les {total} joueurs sont placés. La validation fige les poules et génère les matchs :",
   "admin.draws.validation_title": "5 · Validation",
-  "admin.draws.validation_warning": "elle n’est pas annulable."
+  "admin.draws.validation_warning": "elle n’est pas annulable.",
+  "admin.draws.title": "Tirage des poules"
 }
