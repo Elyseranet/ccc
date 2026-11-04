@@ -109,7 +109,9 @@
 /* ── Participants ─────────────────────────────────────────────────────── */
 .pa-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--origam-space---5); align-items: start; }
 .pa-add { display: grid; gap: var(--origam-space---4); }
-.combo__list { display: grid; gap: var(--origam-space---1); margin-top: var(--origam-space---2); padding: var(--origam-space---2); border: 1px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---overlay); box-shadow: var(--origam-shadow---md); }
+.combo { position: relative; }
+.combo__list[hidden] { display: none; }
+.combo__list { position: absolute; z-index: 20; top: 100%; left: 0; right: 0; display: grid; gap: var(--origam-space---1); margin-top: var(--origam-space---2); padding: var(--origam-space---2); border: 1px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---overlay); box-shadow: var(--origam-shadow---md); }
 .sug { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---3); min-height: var(--origam-space---12); padding: var(--origam-space---2) var(--origam-space---3); border-radius: var(--origam-radius---md); cursor: pointer; }
 .sug span:nth-child(2) { display: grid; }
 .sug small { font-size: var(--origam-font__size---sm); }
@@ -117,9 +119,11 @@
 .sug--new { border-top: 1px dashed var(--origam-color__border---default); border-radius: 0 0 var(--origam-radius---md) var(--origam-radius---md); }
 .avatar--new { background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); box-shadow: none; }
 .pa-form { display: grid; gap: var(--origam-space---4); padding-top: var(--origam-space---4); border-top: 1px solid var(--origam-color__border---subtle); }
-.pa-form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---3); }
+.pa-form__grid { align-items: start; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---3); }
 .pa-form .input { width: 100%; }
 .input.is-error { border-color: var(--origam-color__feedback--danger---border); }
+/* Champ en erreur : le contour d’Origam est fait de trois morceaux ; le premier (21 px de large) donne un coin gauche elliptique, visible avec la bordure danger */
+.pa-form .input.is-error { border-radius: calc(var(--origam-space---5) + 1px) var(--origam-space---6) var(--origam-space---6) calc(var(--origam-space---5) + 1px) / var(--origam-space---6); }
 .input--file { padding-block: var(--origam-space---3); }
 .input--sm { min-height: var(--origam-space---11); width: 100%; }
 .acc-error { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); color: var(--origam-color__feedback--danger---fgSubtle); font-weight: var(--origam-font__weight---semibold); font-size: var(--origam-font__size---sm); }

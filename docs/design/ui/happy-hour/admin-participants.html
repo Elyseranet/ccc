@@ -33,9 +33,10 @@
     <h2 id="h-add" class="h-card">Ajouter un participant</h2>
     <p class="muted">Un seul flux : chercher dans les 145 profils, rattacher, ou créer et inviter.</p>
     <!-- origam-select autocomplete (search, items) · origam-list des suggestions · origam-btn « Créer » -->
+    <!-- Menu de suggestions = superposition sous le champ (origam-select) ; fermé par défaut (page mesurée), ouvert avec admin-participants.html?menu-ouvert (vérifié en e2e, hors mesure) -->
     <div class="combo">
-      <p class="field"><label for="pa-q">Nom, prénom ou pseudo</label><input id="pa-q" class="input" type="search" value="Cam" role="combobox" aria-expanded="true" aria-controls="pa-list" aria-autocomplete="list" autocomplete="off"></p>
-      <ul id="pa-list" class="combo__list" role="listbox" aria-label="Profils correspondants">
+      <p class="field"><label for="pa-q">Nom, prénom ou pseudo</label><input id="pa-q" class="input" type="search" value="Cam" role="combobox" aria-expanded="false" aria-controls="pa-list" aria-autocomplete="list" autocomplete="off"></p>
+      <ul id="pa-list" class="combo__list" role="listbox" aria-label="Profils correspondants" hidden>
         <li role="option" aria-selected="true" class="sug is-active"><span class="avatar">CD</span><span><b>Camille Durand</b><small class="muted">1 édition · dernière 2013</small></span><span class="chip">Profil existant</span></li>
         <li role="option" aria-selected="false" class="sug sug--new"><span class="avatar avatar--new" aria-hidden="true">+</span><span><b>Créer un nouveau participant « Cam »</b><small class="muted">Aucun de ces profils ? Créez-le et envoyez l’invitation</small></span></li>
       </ul>
@@ -47,12 +48,12 @@
         <p class="field"><label for="n-ln">Nom</label><input id="n-ln" class="input" value="Roussel"></p>
         <p class="field"><label for="n-fn">Prénom</label><input id="n-fn" class="input" value="Camille"></p>
         <p class="field"><label for="n-ps">Pseudo</label><input id="n-ps" class="input" value="Décapsuleur"></p>
-        <p class="field"><label for="n-av">Avatar</label><input id="n-av" class="input input--file" type="file" accept="image/*"></p>
-        <p class="field"><label for="n-em">Email · privé</label><input id="n-em" class="input is-error" type="email" value="camille@exemple.fr" aria-invalid="true" aria-describedby="n-em-err"></p>
+        <p class="field"><label for="n-av">Avatar</label><span class="file-field"><svg class="file-field__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"/></svg><input id="n-av" class="file-field__input" type="file" accept="image/*"></span></p>
+        <p class="field"><label for="n-em">Email · privé</label><input id="n-em" class="input is-error" type="email" value="camille@exemple.fr" aria-invalid="true" aria-describedby="n-em-err"><span id="n-em-err" class="field-msg">Cet email est déjà rattaché à un autre compte. Rattachez le profil existant ou corrigez l’email.</span></p>
         <p class="field"><label for="n-tel">Téléphone · privé</label><input id="n-tel" class="input" type="tel"></p>
       </div>
-      <p id="n-em-err" class="acc-error" role="alert"><span class="chip chip--danger">Refusé</span>Cet email est déjà rattaché à un autre compte. Rattachez le profil existant ou corrigez l’email.</p>
-      <p class="rule"><span class="chip chip--info">Invitation</span>Un compte est créé et un email d’invitation part aussitôt. Le lien est valable 7 jours ; un renvoi annule l’ancien (A14).</p>
+      <!-- origam-alert status="info" title="Invitation" rounded="lg" font-size="md" font-weight="bold" letter-spacing="normal" line-height="normal" (A14) -->
+      <p class="alert alert--info alert--block" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Invitation</span><span class="alert__body">Un compte est créé et un email d’invitation part aussitôt. Le lien est valable 7 jours ; un renvoi annule l’ancien.</span></span></p>
       <div class="pa-form__cta"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="submit">Créer, rattacher et inviter</button></div>
     </form>
   </section>
@@ -64,6 +65,10 @@
   </section>
 </div>
 <div class="snack" role="status"><span class="chip chip--ok">Invitation envoyée</span>Profil rattaché à l’édition 2026</div></main>
+<script>
+  // Maquette : état « menu ouvert » choisi par l’adresse. Aucune animation pilotée en JS.
+  if (new URLSearchParams(location.search).has('menu-ouvert')) { document.getElementById('pa-list').hidden = false; document.getElementById('pa-q').setAttribute('aria-expanded', 'true') }
+</script>
 </div>
 <nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
 </body>
