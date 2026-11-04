@@ -115,6 +115,89 @@ Ordre conseillé : déployer (les migrations s'appliquent au démarrage), `db:se
 
 Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n'est nécessaire ni présent.
 
+## Environnement de dev sur Coolify (T-OPS-04)
+
+Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 : Coolify, domaine de dev, Mailpit sur Coolify, branche `develop` telle quelle). L'équipe n'a pas accès à Coolify : chaque étape est à faire dans l'interface Coolify. Les valeurs entre chevrons (`<…>`) sont à fournir ; aucune valeur de ce guide n'est un secret réel.
+
+### 1. Ressources à créer dans un même projet Coolify
+
+1. **PostgreSQL 16** : ressource « Database » de Coolify. Noter l'hôte interne, le port, l'utilisateur, le mot de passe et la base qu'elle affiche.
+2. **Mailpit** : ressource « Docker Compose », avec ce contenu (version d'image à figer au montage, par exemple la dernière publiée) :
+
+   ```yaml
+   services:
+     mailpit:
+       image: axllent/mailpit:<version-figée>
+       environment:
+         MP_UI_AUTH: "<utilisateur>:<mot-de-passe-ui>"
+       networks:
+         default:
+           aliases:
+             - mailpit.ccc.internal
+   ```
+
+   - L'**alias à point** `mailpit.ccc.internal` est indispensable : dès le merge de T-SEC-06, la garde PROD-1 refuse un hôte SMTP sans point (nom de service nu). Le SMTP (port 1025) n'est jamais publié ; seule l'interface web (port 8025) reçoit un domaine Coolify, par exemple `mail.<domaine-dev>`.
+   - **L'interface web montre les liens d'invitation, qui sont des secrets** : la protéger par un mot de passe (`MP_UI_AUTH` ; nom de variable à vérifier dans la documentation de Mailpit pour la version figée).
+   - L'application doit **partager un réseau Docker** avec Mailpit pour résoudre l'alias (option Coolify de connexion au réseau commun du projet). Le réglage exact de Coolify n'est pas connu de l'équipe : il se vérifie à l'étape 4.
+3. **Application** : source « Dépôt Git » `https://github.com/Elyseranet/ccc`, branche **`develop`**, build par **`Dockerfile`**, port **3000**, domaine `https://<domaine-dev>`, **redéploiement automatique** à chaque push sur `develop`.
+
+### 2. Variables de l'application
+
+| Variable | Valeur pour l'instance de dev |
+|---|---|
+| `NUXT_DATABASE_HOST`, `NUXT_DATABASE_PORT`, `NUXT_DATABASE_USERNAME`, `NUXT_DATABASE_PASSWORD`, `NUXT_DATABASE_DATABASE` | les valeurs de la ressource PostgreSQL |
+| `NUXT_PUBLIC_SITE_URL` | `https://<domaine-dev>` : base des liens d'invitation ; https, jamais localhost (garde PROD-1), et jamais une IP privée dès le merge de T-SEC-06 |
+| `NUXT_MAIL_TRANSPORT` | `smtp` |
+| `NUXT_MAIL_HOST` | `mailpit.ccc.internal` (l'alias à point) |
+| `NUXT_MAIL_PORT` | `1025` |
+| `NUXT_MAIL_SECURE` | `false` (Mailpit, réseau interne) |
+| `NUXT_MAIL_FROM` | `CCC <no-reply@<domaine-dev>>` : un vrai domaine, jamais `ccc.local` (refusé) |
+| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | 32 caractères au moins, générés une fois (`openssl rand -hex 32`), propres à cette instance |
+| `NUXT_TRUST_PROXY_HOPS` | `1` par défaut : le proxy de Coolify seul. Ajouter 1 par CDN ou proxy placé devant Coolify. |
+| `NUXT_AUTH_ALLOWED_ORIGINS` | vide ; à poser à `https://<domaine-dev>` seulement si une écriture légitime répond 403 `FORBIDDEN_ORIGIN` |
+
+Ne pas poser `NUXT_STRICT_RUNTIME_CONFIG` ni `NUXT_AUTH_SECURE_COOKIE` : l'image force le mode strict, et les cookies sécurisés sont le défaut.
+
+### 3. Sonde de santé
+
+Dans Coolify, healthcheck HTTP sur le chemin `/api/v1/health`, port 3000 (ou laisser le `HEALTHCHECK` de l'image). Réponse attendue : **200**. Un 503 signifie que la base n'est pas joignable.
+
+### 4. Premier déploiement et vérifications
+
+1. Déployer. Au démarrage, les migrations s'appliquent avant le serveur ; si la configuration est refusée, le journal du conteneur nomme la variable fautive (jamais sa valeur).
+2. Vérifier `https://<domaine-dev>/api/v1/health` : 200.
+3. Dans le terminal du conteneur de l'application, vérifier que l'alias de Mailpit est résolu :
+
+   ```sh
+   getent hosts mailpit.ccc.internal
+   ```
+
+   Une ligne `<adresse> mailpit.ccc.internal` doit s'afficher. **Si rien ne s'affiche**, l'application ne joint pas Mailpit : prévenir l'équipe, qui posera la suite à l'utilisateur. Dépannage temporaire seulement : mettre dans `NUXT_MAIL_HOST` l'adresse IP privée du conteneur Mailpit (acceptée par la garde pour le SMTP). Elle change à chaque redéploiement de Mailpit, d'où la fragilité.
+4. Charger les archives 2012-2026 (une seule fois, base vide) :
+
+   ```sh
+   ccc-ops db:seed:archives
+   ```
+
+   Résultat attendu : `"editions":16,"competitors":146,"matches":729,"validatedMatches":554`.
+5. Créer le premier administrateur : `ccc-ops user:create-admin`, saisir l'email demandé. La commande affiche **une seule fois** le lien de première connexion (valable 7 jours, usage unique) : c'est un secret, à ne copier ni dans un ticket ni dans une conversation. Le lien du premier admin ne passe pas par Mailpit ; les invitations des joueurs, elles, y arrivent.
+
+### 5. Ce qui est testable
+
+Une page non livrée répond **404** en production (garde OPS-3). Il n'y a pas de mode « toutes pages visibles » (décision utilisateur du 2026-11-04).
+
+**Testable aujourd'hui** (`develop` à la date de ce guide) :
+- les pages d'édition, `/editions/<code>`, par exemple `/editions/2026` ;
+- l'API publique : `/api/v1/health`, `/api/v1/editions`, `/api/v1/competiteurs`, `/api/v1/classements/acp`, `/api/v1/classements/all-time`, `/api/v1/classements/evolution`.
+
+**Disponible après le merge de T-REL-02** (livraison des pages des tickets fermés, décision utilisateur du 2026-11-04) : l'accueil, la liste des joueurs, la fiche joueur et le face-à-face. Ces pages répondent encore 404 tant que T-REL-02 n'est pas dans `develop`.
+
+**Après le merge de F-10** (connexion et invitation) :
+- se connecter par `/connexion` ;
+- ouvrir le lien du premier administrateur, affiché par `ccc-ops user:create-admin`, sur `/invitation/<jeton>`, et choisir le mot de passe ;
+- lire dans Mailpit (`https://mail.<domaine-dev>`, protégé par mot de passe) les invitations des joueurs, puis les ouvrir de la même façon. Une invitation de joueur part quand un administrateur crée un compétiteur avec un email. Par l'interface, cela suppose aussi que l'écran d'administration des participants soit livré, ce qui ne dépend pas de F-10.
+Avant ce merge, ces liens ouvrent un 404. L'instance redéploie `develop` à chaque merge : ces parcours s'ouvrent d'eux-mêmes à la livraison, sans rien changer dans Coolify.
+
 ## Développement
 
 ```sh
