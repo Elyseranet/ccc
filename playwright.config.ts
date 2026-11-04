@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test'
-import { E2E_SECURE_COOKIE } from './tests/e2e/helpers/e2e.const'
+import { E2E_RATE_LIMIT_MAX_REQUESTS, E2E_SECURE_COOKIE } from './tests/e2e/helpers/e2e.const'
 
 const PORT = Number(process.env.E2E_PORT ?? 3100)
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
@@ -18,8 +18,9 @@ export default defineConfig({
   },
   webServer: {
     // HTTP local : cookies sans Secure ni préfixe __Host- (L3), le nom du cookie e2e en est dérivé (E2E_SESSION_COOKIE).
-    // Un serveur déjà lancé (reuseExistingServer) doit l'avoir été avec la même valeur.
-    command: `E2E=true NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE} npx nuxt dev --port ${PORT}`,
+    // Un serveur déjà lancé (reuseExistingServer) doit l'avoir été avec les mêmes valeurs.
+    // Les e2e partagent une seule IP : les budgets par IP des routes à jeton d'invitation et d'avatar (30 par 15 min, 10 par 10 min) sont relevés (F-10).
+    command: `E2E=true NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE} NUXT_RATE_LIMIT_INVITATION_TOKEN_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} NUXT_RATE_LIMIT_AVATAR_UPLOAD_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} npx nuxt dev --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: true,
     timeout: 120000

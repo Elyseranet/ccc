@@ -39,3 +39,33 @@ export const E2E_IN_PROGRESS_EDITION_CODE = '2026'
 export const E2E_POOL_REWIND_NUMERATOR = 1
 
 export const E2E_POOL_REWIND_DENOMINATOR = 3
+
+/**
+ * Comptes de test rattachés à des compétiteurs réels des archives (ARCH-9), retrouvés par leur nom d'affichage :
+ * `member` (lecture : profil, captures), `edit` (écritures : téléphone, avatar, mot de passe), `login` (connexion réelle), `logout` et `logoutHeader` (déconnexion depuis le profil et depuis l'en-tête, qui révoquent leur session),
+ * `invited*` (invitations valide, d'activation, expirée, consommée). Aucun de ces compétiteurs n'est dans la paire du face-à-face.
+ */
+export const E2E_ACCOUNT_COMPETITORS = {
+  member: 'Alan Denoyelle',
+  edit: 'Alan Gabriel',
+  login: 'Alex Madec',
+  logout: 'Antoine Savary',
+  logoutHeader: 'Antoine Pagès',
+  expired: 'Arthur Remion',
+  invited: 'Alice Rosette',
+  invitedFlow: 'Amandine Content',
+  invitedExpired: 'Andréa Busetto',
+  invitedConsumed: 'Antoine Gallais'
+} as const
+
+/** Téléphone posé sur les compétiteurs des comptes de test : donnée de test, jamais une donnée publique. */
+export const E2E_PHONE = '+33 6 00 00 00 00'
+
+/**
+ * Identité posée sur le compétiteur du compte `member`, pour que le profil affiche un pseudo comme la maquette (les archives n'en
+ * portent pas). Donnée de la base de test uniquement ; le nom d'affichage, lui, ne change pas.
+ */
+export const E2E_MEMBER_IDENTITY = { firstName: 'Alan', lastName: 'Denoyelle', nickname: 'Rebond' } as const
+
+/** Budget par IP des routes à jeton d'invitation et d'envoi d'avatar pendant les e2e (une seule IP pour toute la suite). */
+export const E2E_RATE_LIMIT_MAX_REQUESTS = 1000

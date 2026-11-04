@@ -233,11 +233,14 @@ export const CCC_HH_DARK: IOrigamTheme = {
         ghost: { bg: 'rgba(255, 244, 220, 0)', bgHover: 'rgba(255, 244, 220, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#fff4dc', fgDisabled: '#6d5f92' }
       },
       border: { default: 'rgba(201, 184, 232, 0.18)', subtle: 'rgba(201, 184, 232, 0.09)', strong: 'rgba(201, 184, 232, 0.38)', focus: '#3ee8ff' },
+      // `bgHover` et `bgActive` = `bg` : `origam-alert` est « survolée » (`hover` vrai par défaut) et « active » (sa visibilité sert d'état actif) sans aucune
+      // interaction ; le fond au repos est donc celui de ces jetons, qui retombaient sur un `color-mix` (#cc5667 pour `danger`) ou sur un noir à 30 %
+      // avec un texte basculé en blanc. Défaut Origam : docs/tickets/origam/alert-etat-survol-au-repos.md (Elyseranet/origam#1307).
       feedback: {
-        success: { bg: '#4ff0a8', bgSubtle: 'rgba(79, 240, 168, 0.14)', fg: '#160b2e', fgSubtle: '#4ff0a8', border: '#4ff0a8' },
-        warning: { bg: '#ffb21a', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgSubtle: '#ffb21a', border: '#ffb21a' },
-        danger: { bg: '#ff6b81', bgSubtle: 'rgba(255, 107, 129, 0.14)', fg: '#160b2e', fgSubtle: '#ff6b81', border: '#ff6b81' },
-        info: { bg: '#7fd4ff', bgSubtle: 'rgba(127, 212, 255, 0.14)', fg: '#160b2e', fgSubtle: '#7fd4ff', border: '#7fd4ff' }
+        success: { bg: '#4ff0a8', bgHover: '#4ff0a8', bgActive: '#4ff0a8', bgSubtle: 'rgba(79, 240, 168, 0.14)', fg: '#160b2e', fgSubtle: '#4ff0a8', border: '#4ff0a8' },
+        warning: { bg: '#ffb21a', bgHover: '#ffb21a', bgActive: '#ffb21a', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgSubtle: '#ffb21a', border: '#ffb21a' },
+        danger: { bg: '#ff6b81', bgHover: '#ff6b81', bgActive: '#ff6b81', bgSubtle: 'rgba(255, 107, 129, 0.14)', fg: '#160b2e', fgSubtle: '#ff6b81', border: '#ff6b81' },
+        info: { bg: '#7fd4ff', bgHover: '#7fd4ff', bgActive: '#7fd4ff', bgSubtle: 'rgba(127, 212, 255, 0.14)', fg: '#160b2e', fgSubtle: '#7fd4ff', border: '#7fd4ff' }
       },
       // Couleurs d'univers (décor : capsules, pinte, glaçon). Pas de rôle sémantique dans le DS.
       bar: { foam: '#fff4dc', amber: '#ffb21a', neon: '#ff3d9a', ice: '#3ee8ff', night: '#160b2e', glow: '#3a1f66' }

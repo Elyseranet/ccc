@@ -47,16 +47,31 @@
                 </li>
               </ul>
             </nav>
-            <origam-btn
+            <div
               v-if="accountLink"
-              :to="accountLink.to"
-              variant="outlined"
-              size="small"
-              rounded="full"
-              class="public-header__account"
-              data-cy="account-link"
-              :text="accountLink.text"
-            />
+              class="public-header__account-group"
+            >
+              <origam-btn
+                :to="accountLink.to"
+                variant="outlined"
+                size="small"
+                rounded="full"
+                class="public-header__account"
+                data-cy="account-link"
+                :text="accountLink.text"
+              />
+              <origam-btn
+                variant="text"
+                rounded="full"
+                font-weight="semibold"
+                class="public-header__link public-header__link--rest"
+                :loading="logoutPending"
+                :disabled="logoutPending"
+                data-cy="logout-link"
+                :text="logoutLabel"
+                @click="handleLogout"
+              />
+            </div>
             <span
               v-else
               class="public-header__end"
@@ -65,6 +80,27 @@
           </template>
         </origam-toolbar>
       </div>
+    </div>
+    <div
+      class="page-wrap public-notice"
+      role="status"
+      data-cy="public-notice"
+    >
+      <p
+        v-if="loggedOut"
+        class="public-notice__text"
+        data-cy="logged-out-notice"
+      >
+        {{ loggedOutText }}
+      </p>
+      <p
+        v-if="logoutFailed"
+        class="public-notice__text public-notice__text--error"
+        role="alert"
+        data-cy="logout-failed-notice"
+      >
+        {{ logoutFailedText }}
+      </p>
     </div>
     <origam-main
       id="contenu"
@@ -104,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { OrigamBtn, OrigamMain, OrigamToolbar } from 'origam/components'
 import BrandMark from '~/components/common/BrandMark.vue'
 import SkipLink from '~/components/common/SkipLink.vue'
@@ -114,6 +150,8 @@ import { INTENT, VARIANT } from 'origam/enums'
 import { ROUTES } from '~/consts/routes.const'
 import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
 import { useAuthStore } from '~/composables/useAuthStore'
+import { useLogout } from '~/composables/useLogout'
+import { LOGGED_OUT_STATE_KEY } from '~/consts/auth-session.const'
 
 /*********************************************************
  * Global
@@ -129,6 +167,9 @@ import { useAuthStore } from '~/composables/useAuthStore'
 const { t } = useT()
 const auth = useAuthStore()
 const { isActive, ariaCurrent } = useNavigationState()
+const route = useRoute()
+const loggedOut = useState<boolean>(LOGGED_OUT_STATE_KEY, () => false)
+const { logout, pending: logoutPending, failed: logoutFailed } = useLogout()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{ default(): unknown }>()
@@ -169,8 +210,20 @@ const navigation = computed(() => PUBLIC_NAVIGATION.map((item) => {
  *
  * @description
  * Pas d'avatar ni de « Connexion » en en-tête (A3, E-d) : seul un utilisateur connecté voit un lien,
- * « Espace organisateur » pour un administrateur, « Mon profil » pour un participant.
+ * « Espace organisateur » pour un administrateur, « Mon profil » pour un participant. « Se déconnecter » les accompagne, avec le rendu des autres liens
+ * (variante `text`, sans `to`). La région `role="status"` au-dessus du contenu annonce la déconnexion à l'arrivée sur l'accueil.
  ********************************************************/
+const logoutLabel = computed(() => t('layout.header.logout', 'Se déconnecter'))
+const loggedOutText = computed(() => t('layout.header.logged_out', 'Vous êtes déconnecté·e'))
+const logoutFailedText = computed(() => t('layout.header.logout_failed', 'La déconnexion a échoué. Vous êtes peut-être toujours connecté·e : réessayez.'))
+const handleLogout = () => {
+  logout()
+}
+watch(() => route.path, (path) => {
+  if (path !== ROUTES.HOME) {
+    loggedOut.value = false
+  }
+})
 const accountLink = computed(() => {
   if (auth.isAdmin) {
     return { to: ROUTES.ADMIN, text: t('layout.header.organizer_space', 'Espace organisateur') }
@@ -269,6 +322,23 @@ defineExpose({})
   &__account {
     flex: none;
   }
+}
+
+.public-notice {
+  &__text {
+    margin: var(--public-notice---margin, var(--origam-space---4) 0 0);
+    color: var(--origam-color__text---secondary);
+
+    &--error {
+      color: var(--origam-color__feedback--danger---fgSubtle);
+    }
+  }
+}
+
+.public-header__account-group {
+  display: flex;
+  align-items: center;
+  gap: var(--public-header__account-group---gap, var(--origam-space---2));
 }
 
 .public-main {

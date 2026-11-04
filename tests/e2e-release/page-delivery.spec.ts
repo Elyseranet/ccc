@@ -16,9 +16,11 @@ import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
 const EDITION_PAGE = '/editions/2025'
 const EDITIONS_INDEX = '/editions'
 const PLAYER_PAGE = '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca'
-/** Pages livrées, sauf l'admin : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5). */
-const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES]
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ...DELIVERED_PUBLIC_PAGES]
+const INVITATION_PAGE = '/invitation/jeton-de-test'
+/** Pages livrées, sauf l'admin et le profil : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5 ; un jeton d'invitation inconnu donne l'état « lien inconnu »). */
+const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE]
+/** `/profil` est livré mais réservé à un compte : sans session il redirige vers `/connexion` (testé plus bas). */
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
 
 const hidden = (pages: string[]): string[] => pages.filter(page => !DELIVERED_PAGES.includes(page))
@@ -31,9 +33,9 @@ test.describe('pages non livrées', () => {
     })
   }
 
-  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` compris (T-REL-02, ab1a6b4)', async ({ request }) => {
+  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` tant qu’il n’est pas livré (T-REL-02, ab1a6b4)', async ({ request }) => {
     const html = await (await request.get('/', { maxRedirects: 0 })).text()
-    for (const href of ['/palmares', '/connexion', '/admin']) {
+    for (const href of hidden([ROUTES.HALL_OF_FAME, ROUTES.LOGIN, ROUTES.ADMIN])) {
       expect(html).not.toContain(`href="${href}"`)
     }
     for (const dataCy of ['home-cta-secondary', 'home-rank-more']) {
@@ -109,5 +111,25 @@ test.describe(`page livrée ${ROUTES.EDITION} (F-03)`, () => {
     const html = await response.text()
     expect(html).toContain('data-cy="edition-tab-matches"')
     expect(html).toContain('<h1')
+  })
+})
+
+test.describe(`pages livrées ${ROUTES.LOGIN}, ${ROUTES.INVITATION} et ${ROUTES.PROFILE} (F-10)`, () => {
+  test('/connexion : publique, répond 200 avec son formulaire', async ({ request }) => {
+    const response = await request.get(ROUTES.LOGIN, { maxRedirects: 0 })
+    expect(response.status()).toBe(200)
+    expect(await response.text()).toContain('data-cy="login-form"')
+  })
+
+  test('/invitation/{jeton} : un jeton inconnu répond 200 avec l’état « lien inconnu », jamais 404 de livraison', async ({ request }) => {
+    const response = await request.get(INVITATION_PAGE, { maxRedirects: 0 })
+    expect(response.status()).toBe(200)
+    expect(await response.text()).toContain('data-cy="account-state"')
+  })
+
+  test('/profil : sans session, redirige vers /connexion (pas 404)', async ({ request }) => {
+    const response = await request.get(ROUTES.PROFILE, { maxRedirects: 0 })
+    expect(response.status()).toBe(302)
+    expect(response.headers().location).toBe(ROUTES.LOGIN)
   })
 })

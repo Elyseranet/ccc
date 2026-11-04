@@ -1,35 +1,32 @@
 import { defineStore } from 'pinia'
 import { USER_ROLE } from '~/enums/user.enum'
-import type { ISessionIdentity } from '~/interfaces/session.interface'
+import type { IMe } from '~/interfaces/me.interface'
+import { toInitials } from '~/utils/session.util'
 
 /*********************************************************
  * Auth store
  *
  * @description
- * Session côté client : le rôle (`USER_ROLE`, enum partagé) et les initiales affichées dans la coque admin.
- * Il est alimenté par `GET /moi` via le composable `useMe` (ticket B-08 / F-10).
+ * Le compte connecté, tel que `GET /moi` le renvoie (`IMe`, B-08) : c'est la seule source de l'état connecté, le cookie de
+ * session étant httpOnly. `me` est `null` sans session. Le rôle et les initiales de la coque admin en sont dérivés.
  * L'accès admin est contrôlé par le middleware `admin`.
  ********************************************************/
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    role: null as USER_ROLE | null,
-    initials: null as string | null
+    me: null as IMe | null
   }),
   getters: {
-    isAuthenticated: (state): boolean => state.role !== null,
-    isAdmin: (state): boolean => state.role === USER_ROLE.ADMIN
+    role: (state): USER_ROLE | null => state.me?.role ?? null,
+    initials: (state): string | null => state.me ? toInitials(state.me) : null,
+    isAuthenticated: (state): boolean => state.me !== null,
+    isAdmin: (state): boolean => state.me?.role === USER_ROLE.ADMIN
   },
   actions: {
-    setRole (role: USER_ROLE | null) {
-      this.role = role
-    },
-    setSession (session: ISessionIdentity) {
-      this.role = session.role
-      this.initials = session.initials
+    setMe (me: IMe | null) {
+      this.me = me
     },
     clear () {
-      this.role = null
-      this.initials = null
+      this.me = null
     }
   }
 })
