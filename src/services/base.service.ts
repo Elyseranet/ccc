@@ -10,6 +10,7 @@ import { toApiRequestError } from '../utils/api-request-error.util.js'
  * Unique client HTTP de l'application : `$fetch` (pas d'axios). URL de base `/api/v1`,
  * `timeout` explicite, rejet typé `ApiRequestError` sur statut non-2xx, aucun retry
  * (la validation de score est idempotente côté serveur, pas côté client).
+ * `options.headers` transmet tels quels les en-têtes propres à un appel (`If-Match` des écritures versionnées, SEC-Q).
  * Aucun en-tête `Content-Type` n'est posé à la main : `$fetch` envoie `application/json` pour un objet, et le navigateur ajoute
  * lui-même le `boundary` d'un `FormData` (téléversement d'avatar, B-16).
  * Toujours l'API réelle (ARCH-8) : aucune fixture. Les composables passent `useRequestFetch()` en `fetcher`, pour que le
@@ -36,6 +37,7 @@ export abstract class BaseService {
         retry: 0,
         method: options.method ?? 'GET',
         query: options.query,
+        headers: options.headers,
         body: options.body
       })
       return response as T

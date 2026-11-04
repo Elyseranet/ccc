@@ -7,6 +7,8 @@ import type { TApiFetcher } from '../types/api-fetcher.type.js'
 export interface IApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   query?: Record<string, string | number | boolean | undefined>
+  /** En-têtes propres à l'appel (ex. `If-Match`). Jamais `Content-Type` : `$fetch` le pose selon le corps. */
+  headers?: Record<string, string>
   body?: Record<string, unknown> | FormData
 }
 
