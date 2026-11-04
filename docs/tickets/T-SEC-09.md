@@ -1,7 +1,7 @@
 # T-SEC-09 — Logs de migration et lecture du corps après un 408
 
 - **Origine** : revue de sécurité de la vague 3a, findings LOW L5 et L6, le 2026-10-22.
-- **Statut** : **Rouvert** (2026-11-02) : test L6 instable sur develop, voir « Réouverture ». Mergé @ `5779571`.
+- **Statut** : **Fermé** (2026-11-04). Mergé @ `5779571`, rouvert le 2026-11-02 pour le test L6 instable, refermé par T-SEC-15 @ `4ef010c` ; voir « Refermeture ».
 
 ## L5 — Message brut de PostgreSQL dans les logs de migration
 
@@ -44,3 +44,7 @@ L5 : `describeErrorForLog` (`log-sanitize.util.ts`) ne renvoie que `errorName` e
 - **Impact** : `test:run` est rouge par intermittence sur develop, ce qui bloque les gates de toutes les branches.
 - **À faire, en priorité** : établir la cause (test ou code de production), corriger, puis prouver la stabilité par 10 passages de `test:run` sous charge.
 - **Suivi du correctif** : [T-SEC-15](T-SEC-15.md), ouvert en même temps par le backend-lead, porte l'analyse et le correctif. T-SEC-09 et T-SEC-15 se ferment ensemble, au merge du correctif.
+
+## Refermeture — 2026-11-04 (chef de projet)
+- Le test L6 `request-body-destroy` instable (ECONNRESET) est corrigé par **T-SEC-15**, mergé @ `4ef010c` : vidange bornée après le 408 au lieu de la mise en pause. Preuves dans T-SEC-15 (« Fermeture ») : 50/50 en fichier seul, 10/10 sous charge, `test:run` 624, `test:api` 254/254 seul, Playwright 239/239.
+- L'exigence L6 (« plus aucun octet lu ») est assouplie et bornée : au plus `maxBytes` octets lus puis jetés, pendant au plus 1 500 ms, sans aucun traitement.

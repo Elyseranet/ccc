@@ -123,7 +123,7 @@ Constats LOW de la revue de sécurité de la vague 3a (2026-10-22), hors vague 3
 
 Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier unique front et back, ARCH-2), proposé par le `frontend-lead` : [T-HTTP-01](T-HTTP-01.md), **À faire**, après le merge de F-00h et de la vague 3a.
 
-Délai de lecture : RST possible au lieu du 408, test `request-body-destroy` instable (develop rouge environ 3 fois sur 4 chez le front) : [T-SEC-15](T-SEC-15.md), **À faire, priorité haute**.
+Délai de lecture : RST possible au lieu du 408, test `request-body-destroy` instable (develop rouge environ 3 fois sur 4 chez le front) : [T-SEC-15](T-SEC-15.md), **Fermé** — mergé @ `4ef010c` (2026-11-04).
 
 Revue de sécurité de B-11 (2026-11-01), LOW L4, hors B-11 : [T-SEC-13](T-SEC-13.md), limite de débit des routes de tirage et coût de la proposition de têtes de série, **À faire**.
 
@@ -383,4 +383,5 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-QA-05](T-QA-05.md) : **Fermé** — mergé @ `09b73de` (10 passages test:run verts sous charge).
 - [T-SEC-09](T-SEC-09.md) : **Fermé** — mergé @ `5779571`.
 - [T-SEC-09](T-SEC-09.md) : **rouvert** (2026-11-02) — test L6 `request-body-destroy` instable sur develop (ECONNRESET, 2/5), bloque les gates.
+- [T-SEC-09](T-SEC-09.md) : **refermé** (2026-11-04) — par T-SEC-15 @ `4ef010c`.
 - [T-SEC-16](T-SEC-16.md) : ouvert — auto-héberger les polices (plus de Google Fonts), suite de la revue F-10.

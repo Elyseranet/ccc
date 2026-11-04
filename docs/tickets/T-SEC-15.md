@@ -1,6 +1,6 @@
 # T-SEC-15 — Délai de lecture (T-SEC-09 L6) : le client peut recevoir un RST au lieu du 408
 
-- **Statut** : À faire, **priorité haute** : `test:run` de `develop` est rouge environ 3 fois sur 4 sur la machine du `frontend-lead`. Ouvert le 2026-11-02 par `backend-lead`.
+- **Statut** : **Fermé** (2026-11-04), mergé dans `develop` @ `4ef010c` ; voir « Fermeture ».
 - **Origine** : T-SEC-09, mergé dans `develop` @ 5779571.
 
 ## Constat
@@ -37,3 +37,15 @@
 **Correctif.** `readRequestBody` ne met plus la requête en pause après le délai : la lecture continue, les octets sont jetés sans être conservés ni traités, au plus `maxBytes` octets ET au plus `REQUEST_BODY_DRAIN_GRACE_MS` (1,5 s, `src/consts/request.const.ts`) ; au premier des deux seuils, ou à la fermeture de la réponse, la requête est détruite. Sans borne de durée, un client lent aurait pu continuer d'écrire après le 408 (slowloris que N3 voulait couper). Le tampon de réception est vide à la fermeture : FIN ordinaire. Mesure : 16 essais, 408 complet 16 sur 16, aucune erreur avant la réponse, reset après la réponse 2 fois sur 16 (contre 13).
 
 **Écart avec L6** (« plus aucun octet lu ») : au plus `maxBytes` octets lus puis jetés, pendant au plus `REQUEST_BODY_DRAIN_GRACE_MS`, sans aucun traitement. **Test** : le client ne rejette plus sur une erreur de socket ; il exige un 408 complet avant toute erreur, un deuxième cas borne la lecture en octets, un troisième en durée (réponse jamais écrite, client qui écrit 1 octet toutes les 100 ms : requête détruite dans le délai de grâce plus une marge). Limite : sur loopback le test ne distingue pas l'ancienne implémentation de la nouvelle ; la preuve de l'amélioration est la mesure ci-dessus.
+
+## Fermeture — 2026-11-04 (chef de projet)
+- `feature/T-SEC-15` @ `69d63f0` (bd378cd puis 69d63f0), mergé dans `develop` @ `4ef010c`.
+- **Cause mesurée** : le test L6 était fautif, et un RST réel existait côté serveur : fermer la socket avec des octets non lus dans son tampon envoie un RST au lieu d'un FIN, et le client peut perdre le 408.
+- **Correctif** : après le 408, la lecture continue, les octets sont jetés sans être stockés ni traités. La requête est détruite au premier des deux seuils : `maxBytes` octets, ou `REQUEST_BODY_DRAIN_GRACE_MS` = 1 500 ms (`src/consts/request.const.ts`).
+- **Contrôles** :
+  - dev-b09 : fichier seul 50/50 ; 10 `test:run` sous charge, tous verts (624 tests) ;
+  - frontend-lead : 10/10 à faible charge et 10/10 sous charge (charge 18 à 22) ; `test:run` 624 ; typecheck vert ; **Playwright 239/239** ; gitleaks propre ; axios absent ;
+  - backend-lead : passes `test:api` des 3 et 4 novembre rouges par délais de démarrage du serveur de test. **Témoin** sur les 2 mêmes fichiers : develop sans correctif 21/21 en 48,14 s, T-SEC-15 21/21 en 51,61 s : le correctif est hors de cause, la machine était chargée (indexation Spotlight après la purge Docker, non prouvé). **Passe seule, fenêtre confirmée : 26 fichiers, 254/254, 543,55 s** (2026-11-04, 09:13:03 à 09:22:07) ;
+  - chef de projet, après le merge : typecheck vert ; `test:run` 69 fichiers passés, 1 ignoré ; 624 tests passés, 1 ignoré.
+- **Sécurité** : relu par le chef de projet. Les octets lus après le délai ne sont ni stockés ni traités. La connexion est tenue au plus `timeoutMs` (10 s) + 1,5 s, et la minuterie est annulée à la fermeture. Aucun high ni medium.
+- **Reste ailleurs** : rien. T-SEC-09 est refermé avec ce merge.
