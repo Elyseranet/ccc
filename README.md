@@ -59,7 +59,7 @@ Une seule instance de l'application est déployée pour l'instant. Les migration
 
 ### Version déployée (T-OPS-03)
 
-L'image reçoit le SHA du commit **au build** : `docker build --build-arg APP_VERSION=$(git rev-parse HEAD) .`. Le `Dockerfile` le pose dans `NUXT_APP_VERSION` (étage runner), lu par `runtimeConfig.appVersion`. Sans argument, la sonde répond `version: null`.
+L'image reçoit le SHA du commit **au build** : `docker build --build-arg APP_VERSION=$(git rev-parse HEAD) .`. Le `Dockerfile` le pose dans `NUXT_APP_VERSION` (étage runner), lu par `runtimeConfig.appVersion`. Sans argument, la sonde répond `version: null`. La sonde lit `process.env.NUXT_APP_VERSION` directement, car Nitro convertit les valeurs `NUXT_*` de `runtimeConfig` en nombres quand elles y ressemblent (un SHA court `3555796` ou `1234e56` n'y serait plus une chaîne).
 
 Sur Coolify, la documentation indique que `SOURCE_COMMIT` (« Deployed Git commit ») est une variable prédéfinie, **exclue des builds Docker par défaut**, et qu'elle devient disponible au build en réglant **Advanced > Build > Source commit availability** sur « Available during build ». Le `Dockerfile` déclare donc `ARG SOURCE_COMMIT`. La documentation ne dit pas explicitement que Coolify le transmet comme `--build-arg` : **Je ne sais pas** ; à vérifier au premier déploiement (`GET /api/v1/health` doit renvoyer le SHA). Si `version` reste `null`, déclarer `APP_VERSION` à la main dans les variables de build de Coolify, sans valeur par défaut dans le dépôt.
 
