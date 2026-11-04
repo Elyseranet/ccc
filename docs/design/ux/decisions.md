@@ -301,3 +301,6 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **`origam-text-field` avec le clavier numérique** (`inputmode="numeric"`) et nos règles (4 chiffres, entre 2000 et 2100). Le serveur reste l'autorité. On n'utilise pas `origam-number-field` : boutons +/− hors palette, texte décalé de 33 px sans boutons, et correction silencieuse d'une valeur hors bornes (« 27 » devient 2000), qui ferait partir au serveur une année valide mais fausse et empêcherait l'erreur « 4 chiffres ».
 - Les défauts du champ numérique sont décrits dans la fiche Origam `docs/tickets/origam/number-field-hide-controls-retrait-et-bornage.md` (ui), à numéroter.
 - Le rendu du champ texte est à mesurer par l'ui contre la maquette, après la fenêtre de B-11.
+
+## T-REL-02 — Liens vers une page non livrée (décision utilisateur 2026-11-04)
+- L'accueil livré contient trois liens vers le palmarès (`home-cta-secondary`, `home-tile-champion`, `home-rank-more`), et le palmarès (F-02) n'est pas encore livré. Ces liens sont **masqués tant que la page cible n'est pas livrée**, avec la même règle que la navigation (lecture de `PAGE_DELIVERY`), sans second mécanisme. Ils réapparaissent d'eux-mêmes à la livraison de F-02. La mise en page de l'accueil sans ces liens est mesurée.
