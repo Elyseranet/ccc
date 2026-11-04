@@ -20,6 +20,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * La maquette reproduit le rendu d'Origam 2.37.4 (e27446e) : champ photo `origam-file-field`, refus de l'email sous le champ, information `origam-alert` ; seule la barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
  * Le snackbar est masqué (décision 68a4899) et vérifié par e2e (`writes/F-09.spec.ts`) ; le menu des suggestions est une surcouche Origam sous le champ, la zone mesure la page menu fermé, le menu ouvert est vérifié par e2e.
  * L'inscrit de l'application est un compte invité : sa ligne porte Renvoyer et Retirer, alors que la ligne de la maquette n'a que Retirer. Le bouton Renvoyer (dépend de l'état du compte) est masqué dans la mesure ; il est vérifié par les tests de composant.
+ * Le formulaire est mesuré en trois zones pour isoler l'alerte : titre et champs, alerte « Invitation » (son fond au repos dépend du contournement #1307, qui arrive avec F-10), boutons.
  * La table des inscrits est comparée sur toute sa largeur (maquette corrigée, 32fe65b).
  ********************************************************/
 const VIEWPORTS = [
@@ -52,7 +53,9 @@ const APP_INK = [
 const ZONES: Array<{ name: string, mockup: string, app: string, endMockup?: string, endApp?: string }> = [
   { name: 'pa-entete', mockup: '.adm-head', app: '.admin-participants__head' },
   { name: 'pa-liste', mockup: '.pa-list', app: '[data-cy="participant-list"]', endMockup: '.pa-list tbody tr:first-child', endApp: '[data-cy="participant-table"] tbody tr:first-child' },
-  { name: 'pa-ajout-formulaire', mockup: '.pa-form', app: '[data-cy="participant-form"]' }
+  { name: 'pa-ajout-formulaire', mockup: '.pa-form', app: '[data-cy="participant-form"]', endMockup: '.pa-form__grid', endApp: '.participant-form__grid' },
+  { name: 'pa-ajout-alerte', mockup: '.pa-form .alert', app: '[data-cy="participant-form-invitation-info"]' },
+  { name: 'pa-ajout-boutons', mockup: '.pa-form__cta', app: '.participant-form__cta' }
 ]
 
 const clipOf = async (page: Page, zone: string, end?: string): Promise<IClip> => {
