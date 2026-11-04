@@ -3,7 +3,7 @@ import type { IHealth } from '../../../interfaces/health.interface'
 import { LOG_EVENT } from '../../../consts/log-event.const'
 import { MIGRATIONS_ASSET_STORAGE } from '../../../consts/health.const'
 import { RATE_LIMIT_ROUTE_KEY } from '../../../consts/rate-limit.const'
-import { loadMigrationsHealth, parseMigrationTimestamps, resolveAppVersion } from '../../../utils/health.util'
+import { resolveAppVersion, resolveMigrationsHealth } from '../../../utils/health.util'
 import { enforceRateLimit } from '../../../utils/rate-limit.util'
 import { logger } from '../../../utils/logger.util'
 import { HEALTH_DEADLINE_MS } from '../../../consts/database-config.const'
@@ -27,8 +27,9 @@ export default defineEventHandler(async (event): Promise<IHealth> => {
       await connected.query('SELECT 1')
       return connected
     })(), HEALTH_DEADLINE_MS)
-    const shipped = parseMigrationTimestamps(await useStorage(MIGRATIONS_ASSET_STORAGE).getKeys())
-    return { status: HEALTH_STATUS.OK, version, migrations: await loadMigrationsHealth(dataSource, shipped) }
+    // Hors du `catch` de la base : un stockage de migrations cassé donne `migrations: null` en 200, jamais un 503.
+    const migrations = await resolveMigrationsHealth(dataSource, () => useStorage(MIGRATIONS_ASSET_STORAGE).getKeys(), event.context.requestId)
+    return { status: HEALTH_STATUS.OK, version, migrations }
   } catch (error) {
     const cause = ((error as { cause?: unknown }).cause ?? error) as { name?: string, code?: string }
     logger.error(LOG_EVENT.HEALTH_CHECK_FAILED, {

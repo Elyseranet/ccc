@@ -20,3 +20,11 @@
 - [ ] Tests unitaires et d'API : 200 avec version et migrations, 503 sans base, aucun champ sensible.
 - [ ] Preuve Docker : l'image construite avec un SHA le renvoie sur `/api/v1/health`.
 - [ ] `test:run`, `test:api`, typecheck, gitleaks verts ; `/security-review` sans high ni medium.
+
+## Revue de sécurité (ab2cbea) : suites
+
+- **L2, corrigé** : la lecture de la liste des migrations embarquées (`useStorage(...).getKeys()`) a son propre `try` (`resolveMigrationsHealth`). Si elle échoue, la sonde répond **200** avec `migrations: null` et un log structuré `health_migrations_unknown` (nom et code de l'erreur, jamais son message). Le 503 reste réservé à la base injoignable. Tests unitaires : stockage qui lève une erreur donne `null` sans toucher à la base ; une erreur de la base remonte.
+- **L3 (LOW, non bloquant, non traité)** : deux requêtes par appel (`SELECT 1`, puis la lecture de la petite table `migrations`), sans entrée utilisateur. Coût négligeable à une sonde toutes les 30 s, et le limiteur passe en premier (`enforceRateLimit` est la première instruction de `health.get.ts`). Option : retirer le `SELECT 1`, puisque la lecture des migrations interroge déjà la base.
+- **I4 (INFO, accepté)** : la version (SHA) et `pendingCount` deviennent publics, ce qui permet une empreinte. Accepté par conception : aucun nom de migration, aucune liste, aucun hôte ni utilisateur. Option : les réserver aux appels locaux.
+- **I5 (INFO)** : `nitro.serverAssets` embarque le contenu des migrations dans `.output/server`, sans les servir en HTTP. Vérifié par le team-lead : seulement des noms de colonnes (`password_hash`, `token_hash`), aucun secret.
+- **M1** : le délai de connexion et de requête de la base est hors de ce ticket, suivi par T-SEC-17.

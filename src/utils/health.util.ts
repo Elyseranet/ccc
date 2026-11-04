@@ -5,7 +5,9 @@ import {
   MIGRATIONS_TABLE_QUERY,
   PG_UNDEFINED_TABLE
 } from '../consts/health.const.js'
+import { LOG_EVENT } from '../consts/log-event.const.js'
 import type { IHealthMigrations } from '../interfaces/health.interface.js'
+import { logger } from './logger.util.js'
 
 /**
  * La version déployée. Nitro convertit les valeurs de `NUXT_*` avec `destr` : `3555796` devient le nombre 3555796 et
@@ -56,4 +58,25 @@ export const loadMigrationsHealth = async (dataSource: DataSource, shipped: read
     executed = []
   }
   return toHealthMigrations(countPendingMigrations(shipped, executed))
+}
+
+/**
+ * État des migrations pour la sonde. La lecture de la liste embarquée (`listShippedFiles`, le stockage serverAssets de
+ * Nitro) a son PROPRE `try` : si elle échoue, la base va peut-être très bien, donc `null` (inconnu) et un log structuré
+ * sans détail, jamais un 503 qui ferait redémarrer un conteneur sain. Une erreur de la base, elle, remonte : c'est le 503.
+ */
+export const resolveMigrationsHealth = async (
+  dataSource: DataSource,
+  listShippedFiles: () => Promise<readonly string[]>,
+  requestId?: string
+): Promise<IHealthMigrations | null> => {
+  let shipped: number[]
+  try {
+    shipped = parseMigrationTimestamps(await listShippedFiles())
+  } catch (error) {
+    const cause = error as { name?: string, code?: string } | null
+    logger.warn(LOG_EVENT.HEALTH_MIGRATIONS_UNKNOWN, { requestId, errorName: cause?.name, errorCode: cause?.code })
+    return null
+  }
+  return loadMigrationsHealth(dataSource, shipped)
 }

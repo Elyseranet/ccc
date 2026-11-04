@@ -5,6 +5,7 @@ import {
   countPendingMigrations,
   loadMigrationsHealth,
   normalizeAppVersion,
+  resolveMigrationsHealth,
   resolveAppVersion,
   parseMigrationTimestamps,
   toHealthMigrations
@@ -99,6 +100,40 @@ describe('loadMigrationsHealth', () => {
     const dataSource = dataSourceWith(async () => [])
     expect(await loadMigrationsHealth(dataSource, [])).toBeNull()
     expect(dataSource.query).not.toHaveBeenCalled()
+  })
+})
+
+describe('resolveMigrationsHealth (the shipped list has its own failure path)', () => {
+  const dataSourceWith = (query: () => Promise<unknown>): DataSource => ({ query: vi.fn(query) }) as unknown as DataSource
+
+  it('answers null, not an error, when the shipped migrations storage fails, and never touches the database', async () => {
+    const dataSource = dataSourceWith(async () => [])
+    const brokenStorage = async (): Promise<string[]> => { throw new Error('storage mount missing: /srv/secret/path') }
+    expect(await resolveMigrationsHealth(dataSource, brokenStorage, 'req-1')).toBeNull()
+    expect(dataSource.query).not.toHaveBeenCalled()
+  })
+
+  it('does not leak the storage error message in the log line', async () => {
+    const lines: string[] = []
+    const spy = vi.spyOn(process.stdout, 'write').mockImplementation((chunk: string | Uint8Array) => { lines.push(String(chunk)); return true })
+    try {
+      await resolveMigrationsHealth(dataSourceWith(async () => []), async () => { throw new Error('storage mount missing: /srv/secret/path') })
+    } finally {
+      spy.mockRestore()
+    }
+    expect(lines.join('')).toContain('health_migrations_unknown')
+    expect(lines.join('')).not.toContain('/srv/secret/path')
+  })
+
+  it('still lets a database error through, so the route answers 503', async () => {
+    const dataSource = dataSourceWith(async () => { throw Object.assign(new Error('connection lost'), { code: '08006' }) })
+    await expect(resolveMigrationsHealth(dataSource, async () => ['1793180000000-AddDrawAssignmentPoolNumber.ts'])).rejects.toThrow('connection lost')
+  })
+
+  it('returns the migrations state when both the storage and the database answer', async () => {
+    const dataSource = dataSourceWith(async () => [{ timestamp: '1793180000000' }])
+    expect(await resolveMigrationsHealth(dataSource, async () => ['1793180000000-AddDrawAssignmentPoolNumber.ts', '1793180000001-Next.ts']))
+      .toEqual({ upToDate: false, pendingCount: 1 })
   })
 })
 
