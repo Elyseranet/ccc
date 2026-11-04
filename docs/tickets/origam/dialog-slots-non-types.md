@@ -1,6 +1,8 @@
 # ds(dialog) : erreur de typage sur les slots de `origam-dialog` (F-11) : cause à établir
 
-> **Cause non vérifiée : à établir par une mesure vue-tsc (F-11). Ne pas déposer chez Origam en l'état.**
+> **DRAFT, cause not verified, not filed**
+>
+> Cause à établir par une mesure vue-tsc (F-11). Hors `INDEX.md` tant qu'elle ne l'est pas.
 
 ## Constat à confirmer
 
