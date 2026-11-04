@@ -1,6 +1,6 @@
 # ds(number-field) : avec `hideControls`, un retrait vide de 27 px reste à gauche du texte ; au montage, la valeur est bornée sans interaction
 
-> Numéro de ticket Origam à attribuer à l'ouverture. Deux constats sur le même composant : le premier est un défaut de rendu, le second un défaut de comportement (bornage au montage) doublé d'une demande d'évolution (bornage à la sortie du champ non désactivable).
+> Ticket Origam **#1327**. Deux constats sur le même composant : le premier est un défaut de rendu, le second un défaut de comportement (bornage au montage) doublé d'une demande d'évolution (bornage à la sortie du champ non désactivable).
 
 ## Constat 1 : retrait vide avec `hideControls`
 
@@ -40,10 +40,7 @@ Le champ numérique sans contrôles n'est donc pas aligné sur les autres champs
 
 ## Contournement CCC
 
-Pas encore décidé (F-13, champ « Année »). Les pistes sont transmises au chef de projet :
-
-- `hideControls` en acceptant le retrait de 33 px ;
-- ou `origam-text-field` avec `inputmode="numeric"` et les règles de longueur et de bornes de l'application, rendu identique aux autres champs et sans bornage.
+Décision utilisateur 87eea8e (F-13, champ « Année ») : `origam-number-field` **n'est pas utilisé**. Le champ est un `origam-text-field` avec `inputmode="numeric"` et `maxlength="4"`, et les règles de l'application (4 chiffres, 2000 à 2100, le schéma serveur de B-10 faisant foi). Pas de bornage silencieux : « 27 » reste « 27 » et affiche son message. Rendu identique aux autres champs (texte à 21 px du bord). À revoir quand Origam est corrigé, si un champ numérique avec contrôles devient utile.
 
 ## Version
 

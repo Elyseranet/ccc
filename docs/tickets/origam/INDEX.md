@@ -33,3 +33,4 @@
 | #1284 | évolution : `chip-group`, pas de retour à la ligne, prop `column` sans effet | `:deep` limité à `.origam-slide-group__container` dans EditionMatches (F-03b) |
 | #1304 | évolution : alignement du contenu de `btn` (`justify-content`, `text-align` avec `wrap`) en dur, sans token | `:deep(.origam-btn__content)` dans `PlayerLink.vue` (F-01) |
 | #1307 | `alert` : au repos, l'alerte prend les états survol et actif, fond assombri | thème : `feedback.*.bgHover` et `bgActive` égaux à `bg` (F-10) |
+| #1327 | `number-field` : retrait vide de 27 px avec `hideControls` ; valeur bornée au montage et à la sortie, sans pouvoir le désactiver | champ « Année » en `origam-text-field` `inputmode="numeric"`, number-field non utilisé (F-13, 87eea8e) |
