@@ -184,6 +184,12 @@ describe('corps du brouillon (PUT /tirages/{id}/affectations)', () => {
     ])
   })
 
+  it('changer un joueur garde son rang d’arrivée : les autres drawnOrder ne sont pas renumérotés', () => {
+    const entered = placePlayer(placePlayer(placePlayer(buildEmptyPools(['p1', 'p2'], 5), 1, 'p3'), 2, 'p4'), 1, 'p5')
+    const changed = replacePlayer(entered, 1, 2, 'p6')
+    expect(buildAssignments(changed).map(entry => [entry.participationId, entry.drawnOrder])).toEqual([['p1', 1], ['p2', 2], ['p6', 3], ['p4', 4], ['p5', 5]])
+  })
+
   it('une saisie partielle donne un brouillon partiel : seules les têtes de série', () => {
     expect(buildAssignments(buildEmptyPools(['p1', 'p2'], 5))).toHaveLength(2)
   })
