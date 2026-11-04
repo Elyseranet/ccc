@@ -92,7 +92,7 @@ for (const viewport of VIEWPORTS) {
         await mockup.evaluate((email) => {
           (document.querySelector('#n-em') as HTMLInputElement).value = email
         }, seed.email)
-        await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
+        await mockup.addStyleTag({ content: '.combo__list, .snack, .adm-bottom { display: none !important; }' })
         await page.addStyleTag({ content: '.admin-bottom, [data-cy="participant-feedback"], [data-cy="participant-resend"] { display: none !important; }' })
         await mockup.evaluate(() => {
           document.querySelector('.pa-list tbody tr:first-child .chip')?.classList.replace('chip--ok', 'chip--warn')

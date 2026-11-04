@@ -3,6 +3,12 @@ import { ACCOUNT_STATE } from '../enums/user.enum.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import { AVATAR_MAX_BYTES } from './avatar.const.js'
 
+/** Largeur de chaque colonne de la table des inscrits, en pourcentage : celles de la maquette à 1440 px (648 px : 170, 94, 89, 156 et 139 px), pour que la mise en page ne dépende pas des noms affichés. */
+export const PARTICIPANT_COLUMN_WIDTHS = { displayName: '26%', nickname: '14.5%', editionsPlayed: '13.5%', accountState: '24%', actions: '22%' } as const
+
+/** Largeur minimale de chaque colonne : celle de la maquette à 390 px, où la table défile dans son conteneur (170, 94, 89, 156 et 117 px, soit 626 px). */
+export const PARTICIPANT_COLUMN_MIN_WIDTHS = { displayName: '170px', nickname: '94px', editionsPlayed: '89px', accountState: '156px', actions: '117px' } as const
+
 /** Inscrits par page de la table (maquette : « 1–8 sur 44 »). */
 export const ADMIN_PARTICIPANTS_PAGE_SIZE = 8
 
