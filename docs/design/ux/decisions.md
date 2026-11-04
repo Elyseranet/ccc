@@ -313,3 +313,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Le nombre de poules proposé vient de la table « Config poules » du classeur (RG16, `archives.sql`, `legacy_workbook_rows`, lignes 9 à 83), qui couvre 20 à 70 joueurs par pas de 5. Exemples : 45 joueurs donnent 7 poules, 65 en donnent 10. Ce n'est pas une formule.
 - **Hors de la table** (effectif qui n'est pas un multiple de 5, inférieur à 20 ou supérieur à 70) : **aucune valeur proposée**, l'admin saisit le nombre de poules (RG9). Aucune règle n'est inventée.
 - Placement dans une poule : le joueur tiré prend la première place libre de la poule en cours de saisie (RG11, ux 7182f05). L'ordre de tirage en salle est porté par `drawnOrder`. « Changer » remplace un joueur sans changer son ordre, et il n'y a pas de retrait (le contrat B-11 ne dit pas si des trous dans `drawnOrder` sont permis).
+
+## Instance de dev Coolify — exploitation (décisions utilisateur 2026-11-04, T-OPS-04)
+- **Redéploiement** : le chef de projet redéploie l'application dev (« Redeploy » dans Coolify, via le navigateur de l'utilisateur) **après chaque merge sur `develop`**, puis vérifie la sonde de santé et les pages livrées. La source reste « Public GitHub ».
+- **Interface web de Mailpit** : servie sur un **domaine https dédié** (`mail.ccc.dev.elysera.net` ou un joker `*.dev.elysera.net` vers 178.105.208.132), avec un certificat Let's Encrypt. L'adresse http `sslip.io` générée n'est pas utilisée. L'enregistrement DNS est à créer côté utilisateur.
