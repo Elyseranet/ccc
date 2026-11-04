@@ -24,7 +24,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-08](B-08.md) | Auth : login, logout, sessions, rôles, `/moi`, migration M2 | 2 | B-01, B-02 | — | **Fermé** — mergé dans `develop` @ `124c85a` (intégration `a72d6aa`) |
 | [B-09](B-09.md) | Invitations, première connexion, `POST /competiteurs` | 3 | B-08 | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-09` @ `531ea89`, PROD-1 compris) ; réappliqué avec T-SEC-04 par dev-b09 sur `feature/wave3a-identity` (depuis `82d914e`) |
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-10` @ `d2563c3`, email branché) ; à réappliquer par dev-b10 sur `feature/wave3a-identity`, après B-09 |
-| [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | À faire |
+| [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | **Fermé** — mergé dans `develop` @ `8c30c09` (2026-11-04) |
 | [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : réappliqué par dev-b12 (`feature/B-12-r` @ `a97dd60`, légers verts) ; test:db, test:api et doc d'API `docs/api/matchs.md` en cours |
 | [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | À faire |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
