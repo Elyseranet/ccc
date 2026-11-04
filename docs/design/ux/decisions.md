@@ -292,3 +292,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Mail en dev : Mailpit déployé sur Coolify**, sous un nom de domaine complet. Les invitations sont capturées, aucun vrai mail ne part.
 - **Code déployé : `develop` tel quel**, redéployé à chaque merge.
 - **Contrôle de santé** : `/api/v1/health` renverra aussi la version déployée (SHA) et l'état des migrations (T-OPS-03). Aucun secret dans la réponse.
+
+## Pages livrées et guide de l'environnement de dev (décisions utilisateur 2026-11-04)
+- Les pages des tickets mergés et fermés (accueil F-01, joueurs et fiche joueur F-04, face-à-face F-05) sont **livrées maintenant** (`delivered: true`, ticket T-REL-02), après vérification page par page. Elles deviennent visibles en dev, et le seront aussi en production.
+- Le **guide de l'environnement de dev (T-OPS-04) est publié tout de suite**, avec ce qui est testable aujourd'hui, et une section « après le merge de F-10 » pour la connexion, l'invitation et Mailpit.
