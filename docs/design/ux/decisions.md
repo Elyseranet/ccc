@@ -317,3 +317,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## Instance de dev Coolify — exploitation (décisions utilisateur 2026-11-04, T-OPS-04)
 - **Redéploiement** : le chef de projet redéploie l'application dev (« Redeploy » dans Coolify, via le navigateur de l'utilisateur) **après chaque merge sur `develop`**, puis vérifie la sonde de santé et les pages livrées. La source reste « Public GitHub ».
 - **Interface web de Mailpit** : servie sur un **domaine https dédié** (`mail.ccc.dev.elysera.net` ou un joker `*.dev.elysera.net` vers 178.105.208.132), avec un certificat Let's Encrypt. L'adresse http `sslip.io` générée n'est pas utilisée. L'enregistrement DNS est à créer côté utilisateur.
+
+## Administration sur l'instance de dev (décision utilisateur 2026-11-04)
+- **Livrer dans l'ordre, au plus vite, avec des développeurs en plus.** L'ordre : F-10 (connexion, profil), puis redéploiement et compte admin ; ensuite F-09, puis F-11 ; enfin F-07 (tableau de bord `/admin`, cible du lien « Administration »), F-08 (scores) et F-13 (éditions), lancés en parallèle avec trois développeurs front de plus, plus B-15 côté back (flux d'activité, nécessaire à F-07). La limite PAR-1 (trois développeurs front) est levée pour ces tickets.
+- Pas de réglage « toutes pages visibles » : une page n'apparaît sur la dev qu'une fois livrée et vérifiée.
