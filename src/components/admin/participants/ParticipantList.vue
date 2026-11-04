@@ -116,6 +116,7 @@ import AsyncState from '~/components/common/AsyncState.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_PARTICIPANTS_PAGE_SIZE, PARTICIPANT_ACCOUNT_CHIPS, PARTICIPANT_NO_ACCOUNT_TEXT } from '~/consts/admin-participants.const'
+import { PARTICIPANT_COLUMN } from '~/enums/participant-column.enum'
 import { ACCOUNT_STATE } from '~/enums/user.enum'
 import type { IParticipantListEmits, IParticipantListProps, IParticipantRow } from '~/interfaces/admin-participants.interface'
 import { toParticipantRow } from '~/utils/admin-participants.util'
@@ -187,11 +188,11 @@ const canResend = (state: ACCOUNT_STATE | null): boolean => state === ACCOUNT_ST
  * La clé de colonne est celle du champ de la ligne.
  ********************************************************/
 const headers = computed<IDataTableHeader[]>(() => [
-  { key: 'displayName', title: t('admin.participants.col_player', 'Joueur'), sortable: false, nowrap: true },
-  { key: 'nickname', title: t('admin.participants.col_nickname', 'Pseudo'), sortable: false, nowrap: true },
-  { key: 'editionsPlayed', title: t('admin.participants.col_editions', 'Éditions'), sortable: false, nowrap: true, align: ALIGN.END },
-  { key: 'accountState', title: t('admin.participants.col_account', 'Compte'), sortable: false, nowrap: true },
-  { key: 'actions', title: t('admin.participants.col_action', 'Action'), sortable: false, align: ALIGN.END }
+  { key: PARTICIPANT_COLUMN.DISPLAY_NAME, title: t('admin.participants.col_player', 'Joueur'), sortable: false, nowrap: true },
+  { key: PARTICIPANT_COLUMN.NICKNAME, title: t('admin.participants.col_nickname', 'Pseudo'), sortable: false, nowrap: true },
+  { key: PARTICIPANT_COLUMN.EDITIONS_PLAYED, title: t('admin.participants.col_editions', 'Éditions'), sortable: false, nowrap: true, align: ALIGN.END },
+  { key: PARTICIPANT_COLUMN.ACCOUNT_STATE, title: t('admin.participants.col_account', 'Compte'), sortable: false, nowrap: true },
+  { key: PARTICIPANT_COLUMN.ACTIONS, title: t('admin.participants.col_action', 'Action'), sortable: false, align: ALIGN.END }
 ])
 
 /*********************************************************
