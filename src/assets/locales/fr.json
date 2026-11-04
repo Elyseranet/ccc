@@ -431,7 +431,7 @@
   "rules.game_heading": "Deux joueurs. Une cible. Un point à la fois.",
   "rules.game_lead": "Les joueurs lancent leur capsule chacun leur tour. Une touche est suivie de la réplique adverse ; le point est marqué si l’adversaire ne touche pas à son tour.",
   "rules.note_lead": "Le bûcheron ne compte pas :",
-  "rules.note_text": "toucher la bière sans faire tomber la capsule posée dessus ne rapporte pas de point.",
+  "rules.note_text": "toucher la bière et faire tomber la capsule posée dessus ne rapporte pas de point.",
   "rules.page_eyebrow": "Règlement officiel",
   "rules.page_lead": "Un jeu d’adresse : faire tomber la capsule posée sur la bière adverse. Le déroulé d’un point, les huit règles d’or, le fonctionnement du tournoi et les variantes.",
   "rules.page_title": "Les règles du Caps",

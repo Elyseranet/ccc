@@ -125,7 +125,7 @@ const heading = computed(() => t('rules.game_heading', 'Deux joueurs. Une cible.
 const lead = computed(() => t('rules.game_lead', 'Les joueurs lancent leur capsule chacun leur tour. Une touche est suivie de la réplique adverse ; le point est marqué si l’adversaire ne touche pas à son tour.'))
 const stepsLabel = computed(() => t('rules.steps_label', 'Le déroulé d’un point'))
 const noteLead = computed(() => t('rules.note_lead', 'Le bûcheron ne compte pas :'))
-const noteText = computed(() => t('rules.note_text', 'toucher la bière sans faire tomber la capsule posée dessus ne rapporte pas de point.'))
+const noteText = computed(() => t('rules.note_text', 'toucher la bière et faire tomber la capsule posée dessus ne rapporte pas de point.'))
 const goldenTitle = computed(() => t('golden_rules.title', 'Les huit règles d’or'))
 const facts = computed(() => RULES_FACTS.map(fact => ({ id: fact.id, label: t(fact.label.key, fact.label.fallback), value: fact.value })))
 const goldenVariant = GOLDEN_RULES_VARIANT.CARDS
