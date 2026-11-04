@@ -105,7 +105,8 @@ test.describe('admin participants : écritures sur une édition créée par le t
     await page.getByTestId('participant-form-email').locator('input').fill(seed.email)
     await page.getByTestId('participant-form-submit').click()
 
-    await expect(page.getByTestId('participant-form-email-taken')).toContainText('déjà rattaché à un autre compte')
+    await expect(page.getByTestId('participant-form').getByText('déjà rattaché à un autre compte')).toBeVisible()
+    await expect(page.getByTestId('participant-form-email').locator('input')).toHaveAttribute('aria-invalid', 'true')
     await expect(page.getByTestId('participant-form')).toBeVisible()
     expect((await adminParticipants(page, edition)).length).toBe(before)
   })

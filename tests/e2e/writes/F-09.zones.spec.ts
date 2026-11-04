@@ -17,8 +17,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * valeurs des champs) ; filet, fond, rayon et gabarit restent comparés. Le menu des suggestions n'est pas comparé : la
  * maquette le pose dans le flux de la carte, Origam l'ouvre en surcouche (`origam-menu`), donc la mise en page de la
  * carte ne dépend pas de lui ; ses lignes sont couvertes par les e2e fonctionnels.
- * Le champ photo de la maquette est un `<input type="file">` natif (bouton du navigateur, hauteur 50 px) : sa hauteur est ramenée à 48 px et sa valeur masquée des
- * deux côtés ; le filet, le rayon et le fond restent comparés. La barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
+ * La maquette reproduit le rendu d'Origam 2.37.4 (e27446e) : champ photo `origam-file-field`, refus de l'email sous le champ, information `origam-alert` ; seule la barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
  * Le snackbar est masqué (décision 68a4899) et vérifié par e2e (`writes/F-09.spec.ts`) ; le menu des suggestions est une surcouche Origam sous le champ, la zone mesure la page menu fermé, le menu ouvert est vérifié par e2e.
  * La table des inscrits est comparée sur toute sa largeur (maquette corrigée, 32fe65b).
  ********************************************************/
@@ -83,21 +82,14 @@ for (const viewport of VIEWPORTS) {
         await page.getByTestId('participant-form-nickname').locator('input').fill('Décapsuleur')
         await page.getByTestId('participant-form-email').locator('input').fill(seed.email)
         await page.getByTestId('participant-form-submit').click()
-        await page.getByTestId('participant-form-email-taken').waitFor()
+        await page.getByText('déjà rattaché à un autre compte').waitFor()
         await page.getByTestId('participant-feedback').waitFor({ state: 'detached' }).catch(() => undefined)
 
         await mockup.evaluate((email) => {
           (document.querySelector('#n-em') as HTMLInputElement).value = email
         }, seed.email)
         await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
-        await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .adm-bottom { display: none !important; }' })
         await page.addStyleTag({ content: '.admin-bottom, [data-cy="participant-feedback"] { display: none !important; }' })
-        await mockup.evaluate(() => {
-          const rule = document.querySelector('.pa-form .rule')
-          if (rule) {
-            rule.lastChild!.textContent = rule.lastChild!.textContent!.replace(' (A14)', '')
-          }
-        })
         await mockup.evaluate(() => document.querySelector('.pa-list tbody tr:first-child .chip')?.classList.replace('chip--ok', 'chip--warn'))
         await alignMockupText(mockup, page, TEXT_PAIRS)
         await hideInk(mockup, MOCKUP_INK)
@@ -107,10 +99,7 @@ for (const viewport of VIEWPORTS) {
         await mockup.evaluate(() => window.scrollTo(0, 0))
         const mockClip = await clipOf(mockup, zone.mockup, zone.endMockup)
         const appClip = await clipOf(page, zone.app, zone.endApp)
-        const masks = zone.name === 'pa-ajout-formulaire'
-          ? { mockup: [], app: [], values: { mockup: ['.pa-form .input--file'], app: ['[data-cy="participant-form-avatar"] .origam-field'] } }
-          : undefined
-        await compare(page, mockup, zone.name, viewport.name, mockClip, appClip, masks)
+        await compare(page, mockup, zone.name, viewport.name, mockClip, appClip)
         await mockContext.close()
       })
     }

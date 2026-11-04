@@ -329,12 +329,11 @@ describe('composants des inscrits', () => {
     expect(wrapper.emitted('submit')![0]![0]).toMatchObject({ lastName: ' Roussel ', firstName: 'Camille', email: 'camille@exemple.fr', avatar: null })
   })
 
-  it('email déjà pris : message dans un rôle « alert » lié au champ, formulaire conservé', async () => {
+  it('email déjà pris : message sous le champ (error-messages), champ invalide, formulaire conservé', async () => {
     const wrapper = await mountSuspended(ParticipantCreateForm, { props: { initialLastName: 'Cam', pending: false, emailTaken: true } })
-    const alert = wrapper.get('[data-cy="participant-form-email-taken"]')
-    expect(alert.attributes('role')).toBe('alert')
-    expect(alert.text()).toContain('déjà rattaché à un autre compte')
-    expect(wrapper.get('[data-cy="participant-form-email"] input').attributes('aria-describedby')).toBe(alert.attributes('id'))
+    expect(wrapper.get('[data-cy="participant-form-email"]').text()).toContain('déjà rattaché à un autre compte')
+    expect(wrapper.get('[data-cy="participant-form-email"] input').attributes('aria-invalid')).toBe('true')
+    expect(wrapper.get('[data-cy="participant-form-invitation-info"]').text()).toContain('Invitation')
     expect((wrapper.get('[data-cy="participant-form-last-name"] input').element as HTMLInputElement).value).toBe('Cam')
   })
 })
