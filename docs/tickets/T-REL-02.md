@@ -37,3 +37,12 @@ Autres pages dont la ligne était restée fausse :
 - `ROUTES.LOGIN`, `INVITATION`, `PROFILE` (F-10) et `ADMIN_PARTICIPANTS` (F-09) : non touchées (consigne). `ROUTES.ADMIN`, `ADMIN_DRAWS` et `ADMIN_MATCHES` : non livrées, F-07, F-11 et F-08 ne sont pas fermés.
 
 `tests/e2e-release/page-delivery.spec.ts` : `DELIVERED_PAGES` étendu aux six pages publiques et à `/editions/2025` ; chaque page livrée doit répondre 200 avec un `<h1>` (`/editions` : 302 vers `/editions/<code>`), les redirections dont la cible est livrée répondent 200, les autres restent en 404 ; le test des liens vérifie l'accueil (`/palmares`, `/connexion`, `/admin` absents).
+
+### Preuve dans le conteneur (dev-f06, image construite sur 98d4931, base `ccc_f06_test` chargée par le seed)
+
+- `docker build` : exit 0 ; migrations appliquées au démarrage (`migrations_up_to_date`), `/api/v1/health` 200.
+- Sans session : `/` 200, `/editions` 302 vers `/editions/2026`, `/editions/2025` 200, `/joueurs` 200, `/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca` 200, `/joueurs/face-a-face` 200, `/regles` 200 (titres `Championnat de Caps`, `Joueurs`, `Règles`).
+- `/admin/plus` : sans session 302 vers `/connexion` ; avec la session admin 200.
+- Non livrées : `/palmares`, `/connexion`, `/profil`, `/invitation/jeton-de-test`, `/admin`, `/admin/matchs`, `/admin/participants`, `/admin/tirages` : 404 ; `/hall-of-fame` et `/admin/scores` : 301 puis 404.
+- e2e-release contre le conteneur (`E2E_BASE_URL`, `E2E_ADMIN_SESSION`) : 30 passed ; un test de F-03 périmé (« l'index des éditions, non livré, reste en 404 ») échouait, il est retiré (couvert par le test du 302).
+- **Constat** : l'accueil livré contient trois liens vers `/palmares` (CTA du hero `home-cta-secondary`, tuile du champion `home-tile-champion`, « voir le classement » `home-rank-more`), page non livrée tant que F-02 n'est pas fermé : en production, ces liens mènent à un 404. Le test des liens de l'accueil ne vérifie donc pas `/palmares` (commentaire dans le spec) ; à traiter (livrer F-02, ou masquer ces liens tant que la page n'est pas livrée).
