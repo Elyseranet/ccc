@@ -8,3 +8,7 @@
   2. stabiliser la capture (attendre la fin du réseau ou de l'hydratation, ou une hauteur stable de la zone) dans le helper commun, pas dans ce seul spec ;
   3. prouver la stabilité : 5 runs complets verts sous charge.
 - **Fermeture** : avec le SHA, les 5 runs et la cause établie.
+
+## Point du 2026-11-04 (chef de projet) — mergé, ticket laissé ouvert
+- `feature/T-QA-06` @ `ec4fbd0` squashé dans `develop` @ `9817d77` (`tests/e2e/visual.util.ts` seul). Le helper commun attend l'hydratation et une mise en page stable avant de mesurer et de capturer. Validé par le frontend-lead.
+- **Reste pour fermer** : verser ici les 5 runs complets sous charge (date, SHA, compteurs, charge) et la cause établie. Je ne les ai pas encore : le ticket reste ouvert jusqu'à leur réception.
