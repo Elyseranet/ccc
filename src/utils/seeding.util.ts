@@ -7,7 +7,7 @@ import { FINAL_STAGE } from '../enums/participation.enum.js'
  * RG10 : compare deux candidats. Ordre : ACP, titres, finales, demies, quarts, huitièmes,
  * barrages (tous décroissants), puis nombre de participations CROISSANT. 0 = égalité parfaite.
  */
-function compareSeedCandidates(a: ISeedCandidate, b: ISeedCandidate): number {
+export function compareSeedCandidates(a: ISeedCandidate, b: ISeedCandidate): number {
   return (
     b.acp - a.acp ||
     b.titles - a.titles ||
@@ -67,4 +67,32 @@ export function countStagesReached(participations: readonly IStagedParticipation
     playoffs: count(FINAL_STAGE.PLAYOFF),
     participations: participations.length,
   }
+}
+
+/**
+ * RG9, RG10 : la sélection de têtes de série est valable si aucun candidat écarté n'est strictement meilleur qu'un
+ * candidat retenu. Avec une égalité parfaite à la frontière (RG10 ne la tranche pas), l'administrateur choisit
+ * librement parmi les ex æquo ; hors égalité, la sélection est exactement le haut du classement.
+ */
+export function isValidSeedSelection(ranked: readonly ISeedCandidate[], selected: ReadonlySet<string>): boolean {
+  const chosen = ranked.filter((candidate) => selected.has(candidate.playerId))
+  if (chosen.length !== selected.size) {
+    return false
+  }
+  const left = ranked.filter((candidate) => !selected.has(candidate.playerId))
+  return chosen.every((inside) => left.every((outside) => compareSeedCandidates(inside, outside) <= 0))
+}
+
+/** Égalités parfaites qui chevauchent la frontière des `count` têtes de série : seules celles-ci obligent à choisir. */
+export function boundaryTies(ranking: ISeedRanking, count: number): string[][] {
+  const position = new Map(ranking.ranked.map((candidate, index) => [candidate.playerId, index]))
+  return ranking.unresolvedTies.filter((group) => {
+    const inside = group.filter((id) => (position.get(id) ?? Infinity) < count).length
+    return inside > 0 && inside < group.length
+  })
+}
+
+/** Rang « compétition » (1 + nombre de candidats strictement meilleurs) : les ex æquo partagent le même rang. */
+export function competitionRank(ranked: readonly ISeedCandidate[], candidate: ISeedCandidate): number {
+  return ranked.filter((other) => compareSeedCandidates(other, candidate) < 0).length + 1
 }

@@ -395,8 +395,8 @@ export const loadEditionContentStamp = async (
 const isUniqueViolation = (error: unknown): boolean =>
   error instanceof QueryFailedError && (error.driverError as { code?: string } | undefined)?.code === PG_UNIQUE_VIOLATION
 
-const editionClosed = () => conflictWithCode(API_ERROR_CODE.EDITION_CLOSED, API_ERROR_MESSAGE.EDITION_CLOSED)
-const registrationClosed = () => conflictWithCode(API_ERROR_CODE.REGISTRATION_CLOSED, API_ERROR_MESSAGE.REGISTRATION_CLOSED)
+export const editionClosed = () => conflictWithCode(API_ERROR_CODE.EDITION_CLOSED, API_ERROR_MESSAGE.EDITION_CLOSED)
+export const registrationClosed = () => conflictWithCode(API_ERROR_CODE.REGISTRATION_CLOSED, API_ERROR_MESSAGE.REGISTRATION_CLOSED)
 const alreadyRegistered = () =>
   conflictWithCode(API_ERROR_CODE.PARTICIPANT_ALREADY_REGISTERED, API_ERROR_MESSAGE.PARTICIPANT_ALREADY_REGISTERED)
 
@@ -443,7 +443,7 @@ export const createEdition = (dataSource: DataSource, input: ICreateEditionReque
     throw isComputedFieldCollision(error) ? conflictWithCode(API_ERROR_CODE.EDITION_CONFLICT, API_ERROR_MESSAGE.EDITION_CONFLICT) : error
   })
 
-const findEditionLocked = async (manager: EntityManager, idOrCode: string): Promise<EditionEntity> => {
+export const findEditionLocked = async (manager: EntityManager, idOrCode: string): Promise<EditionEntity> => {
   const edition = await manager.getRepository(EditionEntity).findOne({
     where: isEditionUuid(idOrCode) ? { id: idOrCode } : { code: idOrCode },
     lock: { mode: 'pessimistic_write' }

@@ -1,11 +1,7 @@
 import type { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
-import type { IAdminActor, IAdminMatch } from '../interfaces/admin-match.interface.js'
+import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
+import { toAdminActor } from './admin-actor.mapper.util.js'
 import { toPublicMatch } from './match-public.mapper.util.js'
-
-const toActor = (match: MatchEntity): IAdminActor | null => {
-  const user = match.validatedBy
-  return user ? { id: user.id, displayName: user.competitor?.displayName ?? user.email } : null
-}
 
 /**
  * DTO admin (C6) : statut réel (RECORDED visible), score saisi et commentaire (A13). Ne jamais le renvoyer hors
@@ -22,6 +18,6 @@ export const toAdminMatch = (match: MatchEntity): IAdminMatch => {
     version: match.version,
     recordedAt: match.recordedAt?.toISOString() ?? null,
     validatedAt: match.validatedAt?.toISOString() ?? null,
-    validatedBy: toActor(match)
+    validatedBy: toAdminActor(match.validatedBy)
   }
 }
