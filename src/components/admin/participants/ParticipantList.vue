@@ -27,74 +27,81 @@
       :empty-title="emptyTitle"
     >
       <template #default>
-        <app-data-table
-          class="participant-list__table"
-          hide-default-footer
-          :caption="caption"
-          :headers="headers"
-          :items="pageRows"
-          :items-per-page="pageSize"
-          data-cy="participant-table"
+        <section
+          class="participant-list__scroll"
+          :aria-label="caption"
+          tabindex="0"
+          data-cy="participant-scroll"
         >
-          <template #[`item.displayName`]="{ item }">
-            <span class="participant-list__cell">
-              <player-avatar
-                :display-name="item.displayName"
-                :avatar-url="item.avatarUrl"
-              />
-              <strong>{{ item.displayName }}</strong>
-            </span>
-          </template>
-          <template #[`item.nickname`]="{ item }">
-            <span class="participant-list__muted">{{ nicknameOf(item.nickname) }}</span>
-          </template>
-          <template #[`item.editionsPlayed`]="{ item }">
-            <span class="participant-list__num">{{ item.editionsPlayed }}</span>
-          </template>
-          <template #[`item.accountState`]="{ item }">
-            <origam-chip
-              v-if="item.accountState"
-              size="small"
-              :color="chipOf(item.accountState).color"
-              :bg-color="chipOf(item.accountState).bgColor"
-              :text="chipOf(item.accountState).label"
-              :data-cy="`participant-account-${item.accountState}`"
-            />
-            <span
-              v-else
-              class="participant-list__muted"
-              data-cy="participant-account-none"
-            >{{ noAccountLabel }}</span>
-          </template>
-          <template #[`item.actions`]="{ item }">
-            <span class="participant-list__actions">
-              <origam-btn
-                v-if="canResend(item.accountState)"
-                class="participant-list__action"
-                variant="text"
-                color="primary"
+          <app-data-table
+            class="participant-list__table"
+            hide-default-footer
+            :caption="caption"
+            :headers="headers"
+            :items="pageRows"
+            :items-per-page="pageSize"
+            data-cy="participant-table"
+          >
+            <template #[`item.displayName`]="{ item }">
+              <span class="participant-list__cell">
+                <player-avatar
+                  :display-name="item.displayName"
+                  :avatar-url="item.avatarUrl"
+                />
+                <strong>{{ item.displayName }}</strong>
+              </span>
+            </template>
+            <template #[`item.nickname`]="{ item }">
+              <span class="participant-list__muted">{{ nicknameOf(item.nickname) }}</span>
+            </template>
+            <template #[`item.editionsPlayed`]="{ item }">
+              <span class="participant-list__num">{{ item.editionsPlayed }}</span>
+            </template>
+            <template #[`item.accountState`]="{ item }">
+              <origam-chip
+                v-if="item.accountState"
                 size="small"
-                :disabled="isBusy"
-                :text="resendLabel"
-                :aria-label="resendAria(item.displayName)"
-                data-cy="participant-resend"
-                @click="handleResend(item.competitorId)"
+                :color="chipOf(item.accountState).color"
+                :bg-color="chipOf(item.accountState).bgColor"
+                :text="chipOf(item.accountState).label"
+                :data-cy="`participant-account-${item.accountState}`"
               />
-              <origam-btn
-                v-if="editable"
-                class="participant-list__action"
-                variant="text"
-                size="small"
-                :loading="busyParticipationId === item.participationId"
-                :disabled="isBusy"
-                :text="removeLabel"
-                :aria-label="removeAria(item.displayName)"
-                data-cy="participant-remove"
-                @click="handleRemove(item.participationId)"
-              />
-            </span>
-          </template>
-        </app-data-table>
+              <span
+                v-else
+                class="participant-list__muted"
+                data-cy="participant-account-none"
+              >{{ noAccountLabel }}</span>
+            </template>
+            <template #[`item.actions`]="{ item }">
+              <span class="participant-list__actions">
+                <origam-btn
+                  v-if="canResend(item.accountState)"
+                  class="participant-list__action"
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  :disabled="isBusy"
+                  :text="resendLabel"
+                  :aria-label="resendAria(item.displayName)"
+                  data-cy="participant-resend"
+                  @click="handleResend(item.competitorId)"
+                />
+                <origam-btn
+                  v-if="editable"
+                  class="participant-list__action"
+                  variant="text"
+                  size="small"
+                  :loading="busyParticipationId === item.participationId"
+                  :disabled="isBusy"
+                  :text="removeLabel"
+                  :aria-label="removeAria(item.displayName)"
+                  data-cy="participant-remove"
+                  @click="handleRemove(item.participationId)"
+                />
+              </span>
+            </template>
+          </app-data-table>
+        </section>
         <app-pagination
           :page="page"
           :total="participants.length"
@@ -237,6 +244,14 @@ defineExpose({})
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
     line-height: var(--origam-font__lineHeight---tight);
+  }
+
+  &__scroll {
+    overflow-x: auto;
+
+    :deep(.origam-table__wrapper) {
+      overflow: visible;
+    }
   }
 
   &__cell {
