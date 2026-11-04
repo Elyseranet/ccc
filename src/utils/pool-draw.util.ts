@@ -182,6 +182,10 @@ export const buildPoolsFromDraft = (draft: IAdminDraw, total: number): IPoolDraw
 export const poolSlots = (pool: IPoolDrawPool): IPoolDrawSlot[] =>
   Array.from({ length: Math.max(pool.size, pool.members.length) }, (_, index) => ({ place: index + 1, member: pool.members[index] ?? null }))
 
+/** Poule en cours de saisie (RG11 : poule après poule) : la première qui n'est pas pleine, `null` quand toutes le sont. */
+export const currentPoolNumber = (pools: IPoolDrawPool[]): number | null =>
+  pools.find(pool => pool.members.length < pool.size)?.number ?? null
+
 export const nextOrder = (pools: IPoolDrawPool[]): number =>
   pools.reduce((max, pool) => Math.max(max, ...pool.members.map(member => member.order)), 0) + 1
 

@@ -62,6 +62,14 @@
                 {{ pool.title }}
               </h3>
               <origam-chip
+                v-if="pool.current"
+                color="primary"
+                size="small"
+                pill
+                :text="currentLabel"
+                :data-cy="`draw-pool-current-${pool.number}`"
+              />
+              <origam-chip
                 :color="pool.full ? 'success' : undefined"
                 size="small"
                 pill
@@ -77,7 +85,7 @@
                 :data-cy="`draw-slot-${pool.number}-${slot.place}`"
               >
                 <span class="draw-assignment__place">{{ slot.place }}</span>
-                <template v-if="slot.empty">
+                <template v-if="slot.active">
                   <origam-select
                     :model-value="null"
                     :items="selectItems"
@@ -91,11 +99,16 @@
                     @update:model-value="handleAssign(pool.number, $event)"
                   />
                 </template>
+                <span
+                  v-else-if="slot.empty"
+                  class="draw-assignment__free"
+                  :data-cy="`draw-free-${pool.number}-${slot.place}`"
+                >{{ freeLabel }}</span>
                 <template v-else-if="editing === slot.key">
                   <origam-select
                     :model-value="null"
                     :items="selectItems"
-                    :label="slot.label"
+                    :label="slot.changeLabel"
                     autocomplete
                     rounded="full"
                     density="compact"
@@ -225,7 +238,7 @@ import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamS
 import { useT } from '~/composables/useT'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
 import type { IDrawAssignmentProps } from '~/interfaces/pool-draw.interface'
-import { poolSlots } from '~/utils/pool-draw.util'
+import { currentPoolNumber, poolSlots } from '~/utils/pool-draw.util'
 
 /*********************************************************
  * Global
@@ -254,6 +267,8 @@ const unsavedText = computed(() => t('admin.draws.unsaved', 'La dernière affect
 const retryLabel = computed(() => t('admin.draws.retry_save', 'Réessayer'))
 const seedLabel = computed(() => t('admin.draws.seed_chip', 'Tête de série'))
 const changeLabel = computed(() => t('admin.draws.change', 'Changer'))
+const currentLabel = computed(() => t('admin.draws.pool_current', 'En cours'))
+const freeLabel = computed(() => t('admin.draws.slot_free', 'Libre'))
 const restTitle = computed(() => t('admin.draws.rest_title', 'À placer'))
 const restEmpty = computed(() => t('admin.draws.rest_empty', 'Tous les joueurs sont placés.'))
 const seedsTitle = computed(() => t('admin.draws.seeds_side_title', 'Têtes de série'))
@@ -261,8 +276,10 @@ const seedsLead = computed(() => t('admin.draws.seeds_side_lead', 'Les {count} m
 const nextLabel = computed(() => t('admin.draws.entry_next', 'Voir le récapitulatif'))
 const names = computed(() => new Map(props.players.map(player => [player.participationId, player.competitor.displayName])))
 const selectItems = computed(() => props.unplaced.map(player => ({ title: player.competitor.displayName, value: player.participationId })))
+const currentPool = computed(() => currentPoolNumber(props.pools))
 const poolViews = computed(() => props.pools.map(pool => ({
   number: pool.number,
+  current: pool.number === currentPool.value,
   title: t('admin.draws.pool_title', 'Poule {number}', { number: pool.number }),
   fill: t('admin.draws.pool_fill', '{placed}/{size}', { placed: pool.members.length, size: pool.size }),
   full: pool.members.length >= pool.size,
@@ -270,10 +287,12 @@ const poolViews = computed(() => props.pools.map(pool => ({
     place: slot.place,
     key: `${pool.number}-${slot.place}`,
     empty: slot.member === null,
+    // Un seul choix actif : la première place libre de la poule en cours (RG11), les autres places libres restent passives.
+    active: slot.member === null && pool.number === currentPool.value && slot.place === pool.members.length + 1,
     isSeed: slot.member?.isSeed ?? false,
     name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '',
-    label: t('admin.draws.slot_label', 'Poule {pool}, place {place}', { pool: pool.number, place: slot.place }),
-    changeLabel: t('admin.draws.change_label', 'Changer la place {place} de la poule {pool}', { pool: pool.number, place: slot.place })
+    label: t('admin.draws.slot_label', 'Poule {pool} : joueur tiré', { pool: pool.number }),
+    changeLabel: t('admin.draws.change_label', 'Changer le joueur {name}', { name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '' })
   }))
 })))
 const handleAssign = (poolNumber: number, value: string | null) => {
@@ -377,6 +396,7 @@ defineExpose({})
     }
 
     &--empty {
+      color: var(--origam-color__text---tertiary);
       grid-template-columns: var(--origam-space---8) minmax(0, 1fr);
       padding: var(--origam-space---1) var(--origam-space---1) var(--origam-space---1) var(--origam-space---3);
       background: none;

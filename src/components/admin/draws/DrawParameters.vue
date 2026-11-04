@@ -30,7 +30,8 @@
             :model-value="text"
             inputmode="numeric"
             :maxlength="2"
-            :error-messages="errorMessages"
+            :rules="rules"
+            validate-on="input lazy"
             :disabled="readOnly || busy"
             single-line
             data-cy="draw-pool-count"
@@ -83,6 +84,7 @@ import { computed, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamLabel, OrigamTextField } from 'origam/components'
 import { useT } from '~/composables/useT'
 import type { IDrawParametersProps } from '~/interfaces/pool-draw.interface'
+import { parameterIssue } from '~/utils/pool-draw.util'
 
 /*********************************************************
  * Global
@@ -103,7 +105,6 @@ const poolsLabel = computed(() => t('admin.draws.parameters_pools', 'Poules'))
 const seedsLabel = computed(() => t('admin.draws.parameters_seeds', 'Têtes de série'))
 const playersLabel = computed(() => t('admin.draws.parameters_players', 'Inscrits'))
 const rule = computed(() => t('admin.draws.parameters_rule', 'Les poules sont les plus égales possible, à un joueur près (RG16) ; les joueurs des plus petites poules boivent une bière avant les matchs (RG17).'))
-const issueText = computed(() => (props.issue ? t(props.issue.key, props.issue.fallback, props.issue.params) : ''))
 const nextLabel = computed(() => t('admin.draws.parameters_next', 'Calculer les têtes de série'))
 /*
  * Le champ garde le texte tapé : un nombre hors bornes (« 25 ») reste affiché avec son message au lieu d'être ramené en silence à une
@@ -111,7 +112,13 @@ const nextLabel = computed(() => t('admin.draws.parameters_next', 'Calculer les 
  */
 const text = ref(props.poolCount > 0 ? String(props.poolCount) : '')
 const typedPoolCount = (value: string): number => (value.trim() === '' ? 0 : Number(value))
-const errorMessages = computed(() => (props.issue ? [issueText.value] : []))
+// L'erreur n'apparaît qu'après une interaction (saisie ou sortie du champ) : `validate-on="input lazy"` n'évalue pas à l'ouverture.
+// « Suivant » reste désactivé tant que `issue` est posée (RG9).
+const rules = [(value: string | null): true | string => {
+  const typed = typedPoolCount(value ?? '')
+  const found = parameterIssue(typed, typed, props.total)
+  return found ? t(found.key, found.fallback, found.params) : true
+}]
 const handleInput = (value: string | null) => {
   text.value = value ?? ''
   emits('update:poolCount', typedPoolCount(text.value))

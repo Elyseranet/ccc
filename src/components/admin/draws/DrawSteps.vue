@@ -1,35 +1,22 @@
 <template>
-  <div
+  <origam-stepper
+    :items="items"
+    :model-value="activeIndex"
+    :orientation="mobile ? 'vertical' : 'horizontal'"
+    :clickable="false"
+    show-connectors
+    :aria-label="label"
     class="draw-steps"
     data-cy="draw-steps"
-  >
-    <origam-stepper
-      :items="items"
-      :model-value="activeIndex"
-      orientation="horizontal"
-      :clickable="false"
-      show-connectors
-      :aria-label="label"
-      class="draw-steps__wide"
-      data-cy="draw-steps-horizontal"
-    />
-    <origam-stepper
-      :items="items"
-      :model-value="activeIndex"
-      orientation="vertical"
-      :clickable="false"
-      show-connectors
-      :aria-label="label"
-      class="draw-steps__narrow"
-      data-cy="draw-steps-vertical"
-    />
-  </div>
+  />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamStepper } from 'origam/components'
+import { useDisplay } from 'origam/composables'
 import { useT } from '~/composables/useT'
+import { POOL_DRAW_STEPPER_MOBILE_BREAKPOINT } from '~/consts/pool-draw.const'
 import { POOL_DRAW_STEP_STATE } from '~/enums/pool-draw.enum'
 import type { IDrawStepsProps } from '~/interfaces/pool-draw.interface'
 
@@ -38,11 +25,12 @@ import type { IDrawStepsProps } from '~/interfaces/pool-draw.interface'
  *
  * @description
  * Les cinq étapes du tirage (paramètres, têtes de série, saisie, récapitulatif, validation) : `origam-stepper` non cliquable,
- * horizontal sur grand écran et vertical sur mobile (mapping.md). `orientation` est une prop et non un style : un second stepper
- * vertical est rendu et la requête média n'affiche que celui qui convient (l'autre, en `display: none`, sort de l'arbre d'accessibilité).
+ * horizontal sur grand écran, vertical sous le seuil `md` d'Origam (`useDisplay`, réutilisé : aucun point de rupture maison, un seul
+ * stepper dans le DOM dont seule la prop `orientation` change).
  * L'étape courante est portée par `modelValue`, l'état de chaque étape (faite, active, à venir) par son `status`.
  ********************************************************/
 const { t } = useT()
+const { mobile } = useDisplay({ mobileBreakpoint: POOL_DRAW_STEPPER_MOBILE_BREAKPOINT })
 const props = withDefaults(defineProps<IDrawStepsProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
@@ -62,19 +50,5 @@ defineExpose({})
 <style scoped lang="scss">
 .draw-steps {
   margin-bottom: var(--origam-space---6);
-
-  &__narrow {
-    display: none;
-  }
-}
-
-@media (max-width: 760px) {
-  .draw-steps__wide {
-    display: none;
-  }
-
-  .draw-steps__narrow {
-    display: flex;
-  }
 }
 </style>

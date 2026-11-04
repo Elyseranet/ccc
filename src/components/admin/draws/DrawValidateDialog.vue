@@ -11,7 +11,7 @@
     data-cy="draw-validate-dialog"
     @update:model-value="handleOpen"
   >
-    <template #[textSlot]>
+    <template #text>
       <p
         :id="descriptionId"
         class="draw-validate-dialog__text"
@@ -19,7 +19,7 @@
         {{ text }} <strong>{{ warning }}</strong>
       </p>
     </template>
-    <template #[footerSlot]>
+    <template #footer>
       <div class="draw-validate-dialog__actions">
         <origam-btn
           ref="cancelRef"
@@ -63,9 +63,6 @@ const props = withDefaults(defineProps<IDrawValidateDialogProps>(), {})
 const emits = defineEmits<{ (event: 'cancel'): void, (event: 'confirm'): void }>()
 defineSlots<{}>()
 const descriptionId = useId()
-// Origam ne type pas les slots de `origam-dialog` (`defineSlots()` vide, IDialogSlots non relié) : noms de slot dynamiques, vérifiés à l'exécution.
-const textSlot = 'text'
-const footerSlot = 'footer'
 const cancelRef = ref<{ $el?: HTMLElement } | null>(null)
 const title = computed(() => t('admin.draws.validate_title', 'Valider le tirage des poules ?'))
 const text = computed(() => t('admin.draws.validate_text', '{total} joueurs, {pools} poules. Les affectations seront figées et les {matches} matchs de poule générés.', { total: props.total, pools: props.poolCount, matches: props.matchCount }))

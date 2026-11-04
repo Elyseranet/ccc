@@ -25,7 +25,7 @@ const assignmentProps = (pools: IPoolDrawPool[], saveState = POOL_DRAW_SAVE_STAT
 describe('DrawSteps', () => {
   it('cinq étapes, l’étape de saisie est la troisième et les deux premières sont faites', async () => {
     const wrapper = await mountSuspended(DrawSteps, { props: { steps: buildSteps(POOL_DRAW_STEP.ENTRY) } })
-    const items = wrapper.get('[data-cy="draw-steps-horizontal"]').findAll('[data-cy^="stepper-item-"]')
+    const items = wrapper.findAll('[data-cy^="stepper-item-"]')
     expect(items).toHaveLength(5)
     expect(items[0]!.classes().join(' ')).toContain('done')
     expect(items[2]!.classes().join(' ')).toContain('active')
@@ -53,6 +53,16 @@ describe('DrawAssignment : saisie', () => {
     expect(wrapper.find('[data-cy="draw-select-1-2"]').exists()).toBe(false)
     expect(wrapper.get('[data-cy="draw-progress-text"]').text()).toBe('3 / 5 joueurs placés')
     expect(wrapper.get('[data-cy="draw-change-1-2"]').exists()).toBe(true)
+  })
+
+  it('un seul choix actif : la première place libre de la poule en cours (RG11), les autres places libres sont passives', async () => {
+    const wrapper = await mountSuspended(DrawAssignment, { props: assignmentProps(pools) })
+    expect(wrapper.findAll('[data-cy^="draw-select-"]')).toHaveLength(1)
+    expect(wrapper.find('[data-cy="draw-select-1-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-cy="draw-pool-current-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-cy="draw-pool-current-2"]').exists()).toBe(false)
+    expect(wrapper.get('[data-cy="draw-free-1-3"]').text()).toBe('Libre')
+    expect(wrapper.get('[data-cy="draw-free-2-2"]').text()).toBe('Libre')
   })
 
   it('un joueur placé disparaît de la liste « À placer »', async () => {
