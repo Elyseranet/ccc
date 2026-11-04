@@ -217,6 +217,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-15](F-15.md) | Texte des champs (valeur, placeholder) environ 1 px plus bas que la maquette | maquettes à champs (joueurs, face-à-face) | F-00m | **Fermé** (2026-10-28) : mergé @ `7ee8aad` (branche 8188eae) ; Origam #1280 | à créer |
 | [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | **Fermé** (2026-10-28) : mergé @ `e61fe43` | à créer |
 | [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | **Fermé** (2026-11-02) : mergé @ `819bc3f` | worktree de dev-f06 |
+| [F-17](F-17.md) | Titre des `origam-alert` à la taille du texte et en gras partout (défaut de thème, AsyncState compris) | `admin-participants.html` (e27446e) | F-09 | À faire (75e978e) : mesurer les états d'erreur, puis arbitrage utilisateur ; change le rendu livré de l'état d'erreur (F-01, F-03, F-04, F-05) | à créer |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
