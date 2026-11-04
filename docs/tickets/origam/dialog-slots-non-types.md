@@ -1,23 +1,20 @@
-# ds(dialog) : les slots de `origam-dialog` ne sont pas typés (`defineSlots()` vide) — défaut de typage
+# ds(dialog) : erreur de typage sur les slots de `origam-dialog` (F-11) : cause à établir
 
-## Constat
+> **Cause non vérifiée : à établir par une mesure vue-tsc (F-11). Ne pas déposer chez Origam en l'état.**
 
-`OrigamDialog` déclare ses slots avec un `defineSlots()` vide : pour `vue-tsc`, le composant n'a aucun slot (`Property 'text' does not exist on type '{}'`), alors que le gabarit les lit (`slots.text`, `slots.footer`, `slots['header-title']`…, `OrigamDialog.vue:84-137`) et que l'interface `IDialogSlots` existe (`interfaces/Dialog/dialog.interface.d.ts:70`) sans être reliée au composant. Un écran qui pose un texte et des actions dans un dialogue (`#text`, `#footer`) ne passe pas le typecheck.
+## Constat à confirmer
 
-Constaté dans CCC (F-11, confirmation de validation du tirage des poules), Origam 2.37.4.
+Lors de F-11 (confirmation de validation du tirage, `src/components/admin/draws/DrawValidateDialog.vue`), un typecheck a signalé une erreur sur `#text` / `#footer` de `origam-dialog` (Origam 2.37.4). Le message exact n'a pas été conservé.
 
-## Contournement côté CCC
+## Hypothèses (non mesurées)
 
-Noms de slot dynamiques (`#[textSlot]`, `#[footerSlot]`) dans `src/components/admin/draws/DrawValidateDialog.vue`, avec un commentaire. Les slots existent bien à l'exécution.
+- Les 219 composants du dist ont un `defineSlots()` vide (famille #1133, `vue-tsc-composants-sans-dts.md`) : mais `<template #close>` sur `origam-alert` (AsyncState.vue) passe le typecheck, donc ce n'est pas suffisant pour expliquer l'erreur.
+- Une autre cause propre à `OrigamDialog`.
 
-## Proposition
+## À faire
 
-`defineSlots<IDialogSlots>()` dans `OrigamDialog.vue` (et `IDialogConfirmationSlots` dans `OrigamDialogConfirmation.vue`).
+1. Relancer vue-tsc sur les slots simples `#text` / `#footer`, relever le message exact et le slot.
+2. Tester les mêmes slots sur un autre composant.
+3. Remplir cette fiche avec la cause réelle, ou demander au team-lead de la retirer.
 
-## Critère d'acceptation
-
-1. `<origam-dialog><template #text>…</template><template #footer>…</template></origam-dialog>` passe `vue-tsc` sans erreur.
-
-## Version
-
-2.37.4
+Hors `INDEX.md` tant que la cause n'est pas établie.

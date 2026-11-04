@@ -62,18 +62,11 @@
                 {{ pool.title }}
               </h3>
               <origam-chip
-                v-if="pool.current"
-                color="primary"
-                size="small"
-                pill
-                :text="currentLabel"
-                :data-cy="`draw-pool-current-${pool.number}`"
-              />
-              <origam-chip
-                :color="pool.full ? 'success' : undefined"
+                :color="pool.full ? 'success' : (pool.current ? 'primary' : undefined)"
                 size="small"
                 pill
                 :text="pool.fill"
+                :data-cy="pool.current ? `draw-pool-current-${pool.number}` : undefined"
               />
             </header>
             <ol class="draw-assignment__slots">
@@ -237,7 +230,7 @@ import { computed, ref, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamSelect } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
-import type { IDrawAssignmentProps } from '~/interfaces/pool-draw.interface'
+import type { IDrawAssignmentProps, IPoolDrawPool } from '~/interfaces/pool-draw.interface'
 import { currentPoolNumber, poolSlots } from '~/utils/pool-draw.util'
 
 /*********************************************************
@@ -267,7 +260,6 @@ const unsavedText = computed(() => t('admin.draws.unsaved', 'La dernière affect
 const retryLabel = computed(() => t('admin.draws.retry_save', 'Réessayer'))
 const seedLabel = computed(() => t('admin.draws.seed_chip', 'Tête de série'))
 const changeLabel = computed(() => t('admin.draws.change', 'Changer'))
-const currentLabel = computed(() => t('admin.draws.pool_current', 'En cours'))
 const freeLabel = computed(() => t('admin.draws.slot_free', 'Libre'))
 const restTitle = computed(() => t('admin.draws.rest_title', 'À placer'))
 const restEmpty = computed(() => t('admin.draws.rest_empty', 'Tous les joueurs sont placés.'))
@@ -277,11 +269,20 @@ const nextLabel = computed(() => t('admin.draws.entry_next', 'Voir le récapitul
 const names = computed(() => new Map(props.players.map(player => [player.participationId, player.competitor.displayName])))
 const selectItems = computed(() => props.unplaced.map(player => ({ title: player.competitor.displayName, value: player.participationId })))
 const currentPool = computed(() => currentPoolNumber(props.pools))
+const poolFill = (pool: IPoolDrawPool): string => {
+  const params = { placed: pool.members.length, size: pool.size }
+  if (pool.members.length >= pool.size) {
+    return t('admin.draws.pool_fill', '{placed}/{size}', params)
+  }
+  return pool.number === currentPool.value
+    ? t('admin.draws.pool_current', 'En cours · {placed}/{size}', params)
+    : t('admin.draws.pool_next', 'À suivre · {placed}/{size}', params)
+}
 const poolViews = computed(() => props.pools.map(pool => ({
   number: pool.number,
   current: pool.number === currentPool.value,
   title: t('admin.draws.pool_title', 'Poule {number}', { number: pool.number }),
-  fill: t('admin.draws.pool_fill', '{placed}/{size}', { placed: pool.members.length, size: pool.size }),
+  fill: poolFill(pool),
   full: pool.members.length >= pool.size,
   slots: poolSlots(pool).map(slot => ({
     place: slot.place,
@@ -292,7 +293,7 @@ const poolViews = computed(() => props.pools.map(pool => ({
     isSeed: slot.member?.isSeed ?? false,
     name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '',
     label: t('admin.draws.slot_label', 'Poule {pool} : joueur tiré', { pool: pool.number }),
-    changeLabel: t('admin.draws.change_label', 'Changer le joueur {name}', { name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '' })
+    changeLabel: t('admin.draws.change_label', 'Changer {name}, poule {pool}', { name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '', pool: pool.number })
   }))
 })))
 const handleAssign = (poolNumber: number, value: string | null) => {
