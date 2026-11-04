@@ -127,6 +127,8 @@ Tests d'API sensibles à la charge, ralentissement par compte SEC-A2 (`auth.test
 
 Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1) : [T-SEC-17](T-SEC-17.md), **À faire**.
 
+Montée de nuxt 4.6.1 vers 4.6.3 : trois avis moderate dans le runtime embarqué en production (remesure de T-SEC-01 du 2026-11-04) : [T-SEC-18](T-SEC-18.md), **À faire**, après la vague T-SEC-08/10 et T-OPS-03.
+
 Délai de lecture : RST possible au lieu du 408, test `request-body-destroy` instable (develop rouge environ 3 fois sur 4 chez le front) : [T-SEC-15](T-SEC-15.md), **Fermé** — mergé @ `4ef010c` (2026-11-04).
 
 Revue de sécurité de B-11 (2026-11-01), LOW L4, hors B-11 : [T-SEC-13](T-SEC-13.md), limite de débit des routes de tirage et coût de la proposition de têtes de série, **À faire**.
