@@ -304,3 +304,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## T-REL-02 — Liens vers une page non livrée (décision utilisateur 2026-11-04)
 - L'accueil livré contient trois liens vers le palmarès (`home-cta-secondary`, `home-tile-champion`, `home-rank-more`), et le palmarès (F-02) n'est pas encore livré. Ces liens sont **masqués tant que la page cible n'est pas livrée**, avec la même règle que la navigation (lecture de `PAGE_DELIVERY`), sans second mécanisme. Ils réapparaissent d'eux-mêmes à la livraison de F-02. La mise en page de l'accueil sans ces liens est mesurée.
+
+## F-09 — Dérogation axe sur le menu ouvert d'`origam-select` (décision utilisateur 2026-11-04)
+- Menu des suggestions ouvert : axe signale `aria-required-attr` et `aria-required-children`, deux défauts d'Origam 2.37.4. Il y a deux `role="combobox"` imbriqués (`OrigamTextField.vue:32` et `:94`), et un `role="menu"` posé sur un contenu `listbox` (`OrigamMenu.vue:14`).
+- **Dérogation approuvée**, limitée à ces deux règles et à ces deux éléments, dans `tests/e2e/writes/F-09.spec.ts`. Issue Origam **#1331**. Ticket de remédiation à ouvrir au merge de F-09, pour réactiver les règles quand Origam corrige. Le menu reste utilisable au clavier, ce que vérifie l'e2e.
