@@ -31,12 +31,15 @@ test.describe('pages non livrées', () => {
     })
   }
 
-  test('aucun lien vers une page non livrée dans l’accueil', async ({ request }) => {
+  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` compris (T-REL-02, ab1a6b4)', async ({ request }) => {
     const html = await (await request.get('/', { maxRedirects: 0 })).text()
-    // `/palmares` est exclu : l'accueil le lie (CTA du hero, tuile du champion, « voir le classement ») alors que F-02 n'est pas livré ; constaté dans le conteneur (T-REL-02), à lever avec F-02.
-    for (const href of ['/connexion', '/admin']) {
+    for (const href of ['/palmares', '/connexion', '/admin']) {
       expect(html).not.toContain(`href="${href}"`)
     }
+    for (const dataCy of ['home-cta-secondary', 'home-rank-more']) {
+      expect(html).not.toContain(`data-cy="${dataCy}"`)
+    }
+    expect(html).toContain('data-cy="home-tile-champion"')
   })
 
   test('un cookie de session présenté ne rend pas visible une page non livrée', async ({ request }) => {

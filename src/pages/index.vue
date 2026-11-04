@@ -6,6 +6,7 @@
     <home-hero
       :archive="archive"
       :target="target"
+      :hall-of-fame-to="hallOfFameTo"
     />
     <golden-rules />
     <div class="page-wrap">
@@ -21,6 +22,7 @@
           <home-bento
             v-if="overview"
             :overview="overview"
+            :hall-of-fame-to="hallOfFameTo"
           />
         </template>
       </async-state>
@@ -34,6 +36,7 @@ import AsyncState from '~/components/common/AsyncState.vue'
 import GoldenRules from '~/components/common/GoldenRules.vue'
 import HomeBento from '~/components/home/HomeBento.vue'
 import HomeHero from '~/components/home/HomeHero.vue'
+import { useHomeLinks } from '~/composables/useHomeLinks'
 import { useHomeOverview } from '~/composables/useHomeOverview'
 import { useT } from '~/composables/useT'
 import { HOME_EMPTY_ARCHIVE } from '~/consts/home.const'
@@ -60,6 +63,7 @@ useHead({ title: computed(() => t('pages.home.title', 'Championnat de Caps')) })
  * Sans données (chargement, erreur), le hero reste affiché avec des compteurs à zéro : la pastille du nombre d'éditions est alors masquée.
  ********************************************************/
 const { data: overview, pending, apiError, refresh } = useHomeOverview()
+const { hallOfFameTo } = useHomeLinks()
 const archive = computed(() => overview.value?.archive ?? HOME_EMPTY_ARCHIVE)
 const target = computed(() => overview.value?.target ?? null)
 const isEmpty = computed(() => overview.value !== null && overview.value !== undefined && !overview.value.hasEditions)

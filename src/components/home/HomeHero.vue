@@ -54,9 +54,10 @@
             </template>
           </origam-btn>
           <origam-btn
+            v-if="hallOfFameTo"
             variant="outlined"
             size="large"
-            :to="ROUTES.HALL_OF_FAME"
+            :to="hallOfFameTo"
             class="home-hero__button"
             data-cy="home-cta-secondary"
             :text="secondaryText"
@@ -87,7 +88,7 @@ import type { IHomeHeroProps } from '~/interfaces/home.interface'
  * Le décor (canvas de bulles) est coupé sous `prefers-reduced-motion: reduce` par le composant commun.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IHomeHeroProps>(), {})
+const props = withDefaults(defineProps<IHomeHeroProps>(), { hallOfFameTo: undefined })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const arrow = HOME_ARROW_GLYPH

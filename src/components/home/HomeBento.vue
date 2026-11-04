@@ -54,11 +54,11 @@
         </template>
       </origam-card>
       <origam-card
-        :to="ROUTES.HALL_OF_FAME"
+        :to="hallOfFameTo"
         rounded="xl"
         border
         elevation="md"
-        hover
+        :hover="Boolean(hallOfFameTo)"
         class="home-bento__tile home-bento__tile--champion"
         data-cy="home-tile-champion"
       >
@@ -178,7 +178,8 @@
               {{ rankNone }}
             </p>
             <origam-btn
-              :to="ROUTES.HALL_OF_FAME"
+              v-if="hallOfFameTo"
+              :to="hallOfFameTo"
               variant="text"
               color="primary"
               padding-inline="3"
@@ -240,7 +241,7 @@ import type { IHomeBentoProps } from '~/interfaces/home.interface'
  * Les compteurs d'archive viennent UNIQUEMENT de `IArchiveStats` (`GET /stats`) : jamais une somme des `matchCount` d'éditions.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IHomeBentoProps>(), {})
+const props = withDefaults(defineProps<IHomeBentoProps>(), { hallOfFameTo: undefined })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const arrow = HOME_ARROW_GLYPH
