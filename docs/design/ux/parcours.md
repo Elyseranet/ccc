@@ -39,11 +39,11 @@ Tableau de bord                 /admin
 Édition en cours
 ├── Participants                /admin/participants     autocomplétion, rattacher ou créer (wireframe `admin-participants.html`)
 ├── Tirages                     /admin/tirages          Stepper : paramètres · têtes de série · saisie · récapitulatif · validation (poules) ; tirage de tour pour le bracket
-├── Poules et matchs            /admin/poules           liste filtrable, saisie et validation de score (A1, tranché)
+├── Poules et matchs            /admin/matchs           liste filtrable, saisie et validation de score (A1, tranché)
 └── Bracket                     /admin/bracket
 Référentiel
-├── Compétiteurs                /admin/competitors      profils uniques, contacts privés
-└── Éditions                    /admin/editions         création, statut, archives
+├── Compétiteurs                /admin/competiteurs     annuaire + panneau d'identité à côté (/admin/competiteurs/<id>), contacts privés
+└── Éditions                    /admin/editions         liste ; /admin/editions/nouvelle ; /admin/editions/<code> (modifier, lecture seule si clôturée)
 ```
 
 Principes : la barre dit **où** (édition) et la navigation dit **quoi** ; le tableau de bord répond à « que dois-je faire maintenant ? » ; une édition archivée est en lecture seule ; mobile = barre d'onglets basse (arbitrage A7).
