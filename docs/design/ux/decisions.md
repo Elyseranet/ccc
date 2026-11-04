@@ -308,3 +308,8 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## F-09 — Dérogation axe sur le menu ouvert d'`origam-select` (décision utilisateur 2026-11-04)
 - Menu des suggestions ouvert : axe signale `aria-required-attr` et `aria-required-children`, deux défauts d'Origam 2.37.4. Il y a deux `role="combobox"` imbriqués (`OrigamTextField.vue:32` et `:94`), et un `role="menu"` posé sur un contenu `listbox` (`OrigamMenu.vue:14`).
 - **Dérogation approuvée**, limitée à ces deux règles et à ces deux éléments, dans `tests/e2e/writes/F-09.spec.ts`. Issue Origam **#1331**. Ticket de remédiation à ouvrir au merge de F-09, pour réactiver les règles quand Origam corrige. Le menu reste utilisable au clavier, ce que vérifie l'e2e.
+
+## F-11 — Nombre de poules par défaut (décision utilisateur 2026-11-04)
+- Le nombre de poules proposé vient de la table « Config poules » du classeur (RG16, `archives.sql`, `legacy_workbook_rows`, lignes 9 à 83), qui couvre 20 à 70 joueurs par pas de 5. Exemples : 45 joueurs donnent 7 poules, 65 en donnent 10. Ce n'est pas une formule.
+- **Hors de la table** (effectif qui n'est pas un multiple de 5, inférieur à 20 ou supérieur à 70) : **aucune valeur proposée**, l'admin saisit le nombre de poules (RG9). Aucune règle n'est inventée.
+- Placement dans une poule : le joueur tiré prend la première place libre de la poule en cours de saisie (RG11, ux 7182f05). L'ordre de tirage en salle est porté par `drawnOrder`. « Changer » remplace un joueur sans changer son ordre, et il n'y a pas de retrait (le contrat B-11 ne dit pas si des trous dans `drawnOrder` sont permis).
