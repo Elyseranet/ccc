@@ -197,6 +197,7 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .alert--info { background: var(--origam-color__feedback--info---bg); color: var(--origam-color__feedback--info---fg); }
 .alert--block { display: grid; grid-template-columns: var(--origam-space---4) minmax(0, 1fr); align-items: start; column-gap: var(--origam-space---4); padding: var(--origam-space---4); }
 .alert--block .alert__ic { margin-top: calc(var(--origam-space---2) + var(--origam-space---1) / 4); }
+.alert--block.alert--compact { padding: var(--origam-space---2); } /* densité compacte : à mesurer contre le rendu Origam */
 .alert__title, .alert__body { display: block; }
 .alert__title { font-weight: var(--origam-font__weight---bold); }
 /* Message d’erreur sous un champ (origam-messages), mesuré sur origam 2.37.4 : 12 px et interlettrage 0.0333em, valeurs internes d’Origam sans jeton */
