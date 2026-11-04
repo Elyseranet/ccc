@@ -123,6 +123,8 @@ Constats LOW de la revue de sécurité de la vague 3a (2026-10-22), hors vague 3
 
 Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier unique front et back, ARCH-2), proposé par le `frontend-lead` : [T-HTTP-01](T-HTTP-01.md), **À faire**, après le merge de F-00h et de la vague 3a.
 
+Tests d'API sensibles à la charge, ralentissement par compte SEC-A2 (`auth.test.ts`, 145 s et 553 s sous charge) : [T-QA-07](T-QA-07.md), **À faire**.
+
 Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1) : [T-SEC-17](T-SEC-17.md), **À faire**.
 
 Délai de lecture : RST possible au lieu du 408, test `request-body-destroy` instable (develop rouge environ 3 fois sur 4 chez le front) : [T-SEC-15](T-SEC-15.md), **Fermé** — mergé @ `4ef010c` (2026-11-04).
