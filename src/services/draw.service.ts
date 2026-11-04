@@ -49,7 +49,8 @@ import { toQualificationMember } from './qualification.service.js'
  * @description
  * Tirages, brouillons compris (C7). Service unique du domaine (ARCH-2) : la classe navigateur (`$fetch`, via BaseService)
  * et les fonctions serveur du tirage des poules (TypeORM, B-11) ; le code navigateur ne référence jamais ces dernières,
- * le build client les élague (`tests/build/client-bundle.test.ts`). L'écriture côté navigateur est ajoutée par F-11.
+ * le build client les élague (`tests/build/client-bundle.test.ts`). Les écritures du tirage côté navigateur sont celles de F-11 (le corps JSON part
+ * avec le `Content-Type` posé par `$fetch`, jamais forcé ici ; 16 Ko au plus, B-11).
  ********************************************************/
 export class DrawService extends BaseService {
   constructor (options: IBaseServiceOptions = {}) {
@@ -58,6 +59,26 @@ export class DrawService extends BaseService {
 
   adminList (editionId: string): Promise<IAdminDraw[]> {
     return this.request<IAdminDraw[]>(`/admin/editions/${encodeURIComponent(editionId)}/tirages`)
+  }
+
+  /** Propose les `poolCount` têtes de série (RG9) et signale les égalités non tranchées (RG10). */
+  seedProposal (editionId: string, poolCount: number): Promise<ISeedProposal> {
+    return this.request<ISeedProposal>(`/editions/${encodeURIComponent(editionId)}/tetes-de-serie`, { query: { poules: poolCount } })
+  }
+
+  /** Ouvre le brouillon du tirage des poules ; un brouillon existant est remplacé (on recommence le tirage). */
+  createPoolDraft (editionId: string, body: ICreatePoolDrawRequest): Promise<IAdminDraw> {
+    return this.request<IAdminDraw>(`/editions/${encodeURIComponent(editionId)}/tirages/poules`, { method: 'POST', body: { ...body } })
+  }
+
+  /** Enregistre le brouillon : la liste est remplacée à chaque appel (idempotent), elle peut être partielle. */
+  saveAssignments (drawId: string, body: IUpdateDrawAssignmentsRequest): Promise<IAdminDraw> {
+    return this.request<IAdminDraw>(`/tirages/${encodeURIComponent(drawId)}/affectations`, { method: 'PUT', body: { ...body } })
+  }
+
+  /** Fige le tirage : poules créées, round-robin généré, édition en `POOLS_DRAWN`. Pas de corps ; idempotent. */
+  validate (drawId: string): Promise<IAdminDraw> {
+    return this.request<IAdminDraw>(`/tirages/${encodeURIComponent(drawId)}/validation`, { method: 'POST' })
   }
 }
 
