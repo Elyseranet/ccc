@@ -16,3 +16,24 @@
 - [ ] `test:release` vert, et preuve dans le conteneur : chaque page livrée répond 200, les pages non livrées répondent 404.
 - [ ] Playwright complet vert ; il compte comme run mesuré de T-QA-06 si la charge est relevée.
 - [ ] gitleaks propre ; `/security-review` sans high ni medium (une page livrée devient publique).
+
+## Réalisation (dev-f06, 2026-11-04)
+
+Endpoints vérifiés sur les appels réels de chaque page (composables et services), aucun n'a de `pendingTicket` dans `API_ROUTES` :
+
+| Page | Appels réels | Ligne `PAGE_DELIVERY` |
+|---|---|---|
+| `/` (`ROUTES.HOME`) | `useHomeOverview` : `GET /stats`, `GET /editions`, `GET /editions/{id}`, `GET /editions/{id}/matchs`, `GET /classements/acp` | `EDITION_ROUNDS` retiré (jamais appelé) ; livrée |
+| `/joueurs` (`PLAYERS`) | `usePlayerSearch` : `GET /competiteurs`, `GET /editions` ; `useArchiveStats` : `GET /stats` | inchangée ; livrée |
+| `/joueurs/:id` (`PLAYER`) | `useCompetitor` : `GET /competiteurs/{id}` ; `useCompetitorOpponents` : `GET /competiteurs/{id}/face-a-face` | inchangée ; livrée |
+| `/joueurs/face-a-face` (`HEAD_TO_HEAD`) | `useCompetitors` (recherche), `useCompetitor` (A et B), `useHeadToHead` : `GET /competiteurs/{id}/face-a-face?adversaire=` | inchangée ; livrée |
+
+`EDITION_ROUNDS` n'est plus appelé par aucune page : il entre dans `ENDPOINTS_WITHOUT_PAGE` (ARCH-11 bis), avec la même raison que `EDITION_POOLS` et `EDITION_DRAWS` (données redondantes avec `GET /editions/{code}`).
+
+Autres pages dont la ligne était restée fausse :
+- `ROUTES.EDITIONS` (`/editions`, renvoi 302 vers l'édition en cours, A5) : F-03 fermé, `GET /editions` appelé, livrée.
+- `ROUTES.RULES` (`/regles`) : F-06 fermé, aucun endpoint, livrée.
+- `ROUTES.HALL_OF_FAME` : **non livrée**, F-02 n'est pas fermé (en cours, branche `feature/F-02-v2`).
+- `ROUTES.LOGIN`, `INVITATION`, `PROFILE` (F-10) et `ADMIN_PARTICIPANTS` (F-09) : non touchées (consigne). `ROUTES.ADMIN`, `ADMIN_DRAWS` et `ADMIN_MATCHES` : non livrées, F-07, F-11 et F-08 ne sont pas fermés.
+
+`tests/e2e-release/page-delivery.spec.ts` : `DELIVERED_PAGES` étendu aux six pages publiques et à `/editions/2025` ; chaque page livrée doit répondre 200 avec un `<h1>` (`/editions` : 302 vers `/editions/<code>`), les redirections dont la cible est livrée répondent 200, les autres restent en 404 ; le test des liens vérifie l'accueil (`/palmares`, `/connexion`, `/admin` absents).

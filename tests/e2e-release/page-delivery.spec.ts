@@ -14,7 +14,11 @@ import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
  * Quand un ticket F-xx livre sa page, il **ajoute** sa route à `DELIVERED_PAGES` ci-dessous : elle n'est alors plus attendue en 404.
  ********************************************************/
 const EDITION_PAGE = '/editions/2025'
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, EDITION_PAGE]
+const EDITIONS_INDEX = '/editions'
+const PLAYER_PAGE = '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca'
+/** Pages livrées, sauf l'admin : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5). */
+const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES]
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ...DELIVERED_PUBLIC_PAGES]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
 
 const hidden = (pages: string[]): string[] => pages.filter(page => !DELIVERED_PAGES.includes(page))
@@ -27,9 +31,9 @@ test.describe('pages non livrées', () => {
     })
   }
 
-  test('aucun lien vers une page non livrée dans la réponse 404', async ({ request }) => {
+  test('aucun lien vers une page non livrée dans l’accueil', async ({ request }) => {
     const html = await (await request.get('/', { maxRedirects: 0 })).text()
-    for (const href of ['/editions', '/joueurs', '/palmares', '/regles', '/connexion', '/admin']) {
+    for (const href of ['/palmares', '/connexion', '/admin']) {
       expect(html).not.toContain(`href="${href}"`)
     }
   })
@@ -42,10 +46,33 @@ test.describe('pages non livrées', () => {
     expect(response.status()).toBe(404)
   })
 
-  for (const { from } of REDIRECTS) {
+  for (const { from } of REDIRECTS.filter(redirect => !DELIVERED_PAGES.includes(redirect.to.split('#')[0] as string))) {
     test(`${from} : la chaîne de redirection se termine en 404`, async ({ request }) => {
       const response = await request.get(from)
       expect(response.status()).toBe(404)
+    })
+  }
+})
+
+test.describe('pages livrées publiques (T-REL-02)', () => {
+  for (const page of DELIVERED_PUBLIC_PAGES.filter(entry => entry !== EDITIONS_INDEX)) {
+    test(`${page} répond 200 sans session, avec un titre de page`, async ({ request }) => {
+      const response = await request.get(page, { maxRedirects: 0 })
+      expect(response.status()).toBe(200)
+      expect(await response.text()).toContain('<h1')
+    })
+  }
+
+  test(`${EDITIONS_INDEX} renvoie vers l’édition en cours (302 côté serveur)`, async ({ request }) => {
+    const response = await request.get(EDITIONS_INDEX, { maxRedirects: 0 })
+    expect(response.status()).toBe(302)
+    expect(response.headers().location).toMatch(/^\/editions\/.+/)
+  })
+
+  for (const { from, to } of REDIRECTS.filter(redirect => DELIVERED_PAGES.includes(redirect.to.split('#')[0] as string))) {
+    test(`${from} mène à ${to} (200)`, async ({ request }) => {
+      const response = await request.get(from)
+      expect(response.status()).toBe(200)
     })
   }
 })
