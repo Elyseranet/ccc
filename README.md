@@ -57,6 +57,14 @@ Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comm
 
 Une seule instance de l'application est déployée pour l'instant. Les migrations s'exécutent au démarrage de chaque conteneur : avec plusieurs réplicas démarrant en même temps, elles tourneraient en parallèle, sans verrou entre instances. Avant de passer à plusieurs réplicas, il faudra donc exécuter les migrations dans une étape unique (par exemple une commande de pré-déploiement `ccc-ops migrate`) ou ajouter un verrou.
 
+### Version déployée (T-OPS-03)
+
+L'image reçoit le SHA du commit **au build** : `docker build --build-arg APP_VERSION=$(git rev-parse HEAD) .`. Le `Dockerfile` le pose dans `NUXT_APP_VERSION` (étage runner), lu par `runtimeConfig.appVersion`. Sans argument, la sonde répond `version: null`.
+
+Sur Coolify, la documentation indique que `SOURCE_COMMIT` (« Deployed Git commit ») est une variable prédéfinie, **exclue des builds Docker par défaut**, et qu'elle devient disponible au build en réglant **Advanced > Build > Source commit availability** sur « Available during build ». Le `Dockerfile` déclare donc `ARG SOURCE_COMMIT`. La documentation ne dit pas explicitement que Coolify le transmet comme `--build-arg` : **Je ne sais pas** ; à vérifier au premier déploiement (`GET /api/v1/health` doit renvoyer le SHA). Si `version` reste `null`, déclarer `APP_VERSION` à la main dans les variables de build de Coolify, sans valeur par défaut dans le dépôt.
+
+Coolify exclut `SOURCE_COMMIT` du build par défaut « pour que les commits dont les couches n'ont pas changé réutilisent le cache » (sa documentation) : l'activer est le compromis de la version affichée. Dans le `Dockerfile`, les `ARG` ne sont déclarés que dans l'étage runner, après toutes les couches coûteuses.
+
 ### Prérequis de release : garde par page livrée
 
 Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint dont la route serveur n'existe pas encore. Il n'y a pas de variable pour désactiver la garde.
@@ -81,6 +89,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Obligatoire dans le compose ; l'application refuse de démarrer en production sans lui (SEC-A4). Disponible après intégration de B-08. |
 | `NUXT_AUTH_SECURE_COOKIE` | non (vrai) | Cookies `Secure` + préfixe `__Host-` (T-SEC-04, L3). **Ne jamais positionner `false` sur un déploiement Coolify en HTTPS** (laisser la variable absente) ; `false` ne sert qu'au développement local en HTTP. |
 | `NUXT_AUTH_PASSWORD_HASH_CONCURRENCY` | non (2) | Calculs scrypt simultanés, de 1 à 64 ; au-delà, 503 `SERVICE_BUSY` avec `Retry-After` (T-SEC-04, L2). |
+| `NUXT_APP_VERSION` | non (vide) | Version déployée, SHA du commit (T-OPS-03). **Posée par l'image** depuis l'argument de build `APP_VERSION` (ou `SOURCE_COMMIT`), ne pas la renseigner à la main. Vide : `/api/v1/health` répond `version: null`. N'accepte que `[A-Za-z0-9._-]`, 64 caractères au plus. |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
 | `NUXT_TRUST_PROXY_HOPS` | **oui derrière Coolify** (défaut 0) | Nombre de reverse proxys de confiance devant le conteneur, de 0 à 5. À poser au nombre de proxys réellement traversés (le proxy de Coolify seul : 1 ; un CDN devant en ajoute un). La chaîne exacte du déploiement n'est pas encore connue : à vérifier au premier déploiement. |
@@ -101,7 +110,7 @@ La CLI (migrations, seed, scripts) ne borne que la connexion : elle n'a ni `stat
 ### Domaine et sonde de santé
 
 - Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
-- La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
+- La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon, avec le même format `{ status, version, migrations }` (T-OPS-03). `version` est le SHA du commit déployé, ou `null` s'il n'a pas été injecté au build (jamais une valeur inventée). `migrations` vaut `{ upToDate, pendingCount }` : les migrations livrées avec le build qui manquent encore dans la table de suivi TypeORM ; `null` en 503. Aucun hôte, utilisateur, nom de migration ni message du pilote n'y figure. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
 - La route est soumise au limiteur de débit par IP. Derrière le proxy de Coolify, poser `NUXT_TRUST_PROXY_HOPS` au nombre de proxys traversés (voir la table des variables) : sans lui, tous les clients partagent l'IP du proxy. Le SSL PostgreSQL (`NUXT_DATABASE_SSL` pressentie) reste à faire (T-SEC-02). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
 
 ### Première mise en route

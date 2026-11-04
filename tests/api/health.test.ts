@@ -3,21 +3,31 @@ import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { HEALTH_STATUS } from '../../src/enums/health-status.enum'
+import { resetTestDatabase } from './helpers/auth-fixtures'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 
 describe('GET /api/v1/health (database reachable)', async () => {
+  const env = requireTestDatabaseEnv()
+  // La sonde compare la table de suivi aux migrations livrées : la base doit être migrée avant le démarrage.
+  const dataSource = await resetTestDatabase()
+  await dataSource.destroy()
+
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
     setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
-    env: requireTestDatabaseEnv()
+    env
   })
 
-  it('answers 200 with only a status', async () => {
+  it('answers 200 with the status, a null version (none injected) and the migrations up to date', async () => {
     const response = await fetch('/api/v1/health')
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ status: HEALTH_STATUS.OK })
+    expect(await response.json()).toEqual({
+      status: HEALTH_STATUS.OK,
+      version: null,
+      migrations: { upToDate: true, pendingCount: 0 }
+    })
   })
 
   it('sets an X-Request-Id header', async () => {
@@ -46,6 +56,7 @@ describe('GET /api/v1/health (database reachable)', async () => {
 
   it('exposes no infrastructure detail on the health payload', async () => {
     const body = await $fetch<Record<string, unknown>>('/api/v1/health')
-    expect(Object.keys(body)).toEqual(['status'])
+    expect(Object.keys(body)).toEqual(['status', 'version', 'migrations'])
+    expect(Object.keys(body.migrations as object)).toEqual(['upToDate', 'pendingCount'])
   })
 })

@@ -23,7 +23,7 @@ describe('GET /api/v1/health (database cut)', async () => {
     const text = await response.text()
 
     expect(response.status).toBe(503)
-    expect(JSON.parse(text)).toEqual({ status: HEALTH_STATUS.UNAVAILABLE })
+    expect(JSON.parse(text)).toEqual({ status: HEALTH_STATUS.UNAVAILABLE, version: null, migrations: null })
     expect(text).not.toMatch(/ECONNREFUSED|127\.0\.0\.1|password|postgres/i)
     expect(text).not.toContain(env.NUXT_DATABASE_HOST)
     expect(text).not.toContain(env.NUXT_DATABASE_PASSWORD)

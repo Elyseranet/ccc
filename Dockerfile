@@ -72,7 +72,14 @@ RUN touch /app/.ccc-production-image
 # PROD-1 : garde-fou de configuration, actif par défaut dans cette image. Le serveur et `user:create-admin` refusent de
 # démarrer si NUXT_PUBLIC_SITE_URL n'est pas en https ou vise une machine locale, si le SMTP (NUXT_MAIL_*) est absent,
 # local ou resté par défaut, si les cookies perdent `Secure` ou si NUXT_AUTH_DEVICE_COOKIE_SECRET manque. Pas de mode recette.
+# T-OPS-03 : version déployée (SHA du commit), injectée au build et lue par /api/v1/health via runtimeConfig
+# (NUXT_APP_VERSION). Aucune valeur par défaut : sans argument, la sonde répond `version: null`.
+# `APP_VERSION` est explicite ; `SOURCE_COMMIT` est le nom que Coolify donne au commit déployé (README, « Déploiement Coolify »).
+ARG APP_VERSION=""
+ARG SOURCE_COMMIT=""
+
 ENV NODE_ENV=production \
+    NUXT_APP_VERSION=${APP_VERSION:-${SOURCE_COMMIT}} \
     NUXT_STRICT_RUNTIME_CONFIG=true \
     HOST=0.0.0.0 \
     PORT=3000
