@@ -98,6 +98,7 @@
           hide-details="auto"
           autocomplete="off"
           :error="emailTaken"
+          :aria-invalid="emailTaken ? 'true' : undefined"
           :error-messages="emailErrors"
           :rules="emailRules"
           data-cy="participant-form-email"
