@@ -19,6 +19,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * carte ne dépend pas de lui ; ses lignes sont couvertes par les e2e fonctionnels.
  * Le champ photo de la maquette est un `<input type="file">` natif (bouton du navigateur, hauteur 50 px) : sa hauteur est ramenée à 48 px et sa valeur masquée des
  * deux côtés ; le filet, le rayon et le fond restent comparés. La barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
+ * Le snackbar est masqué (décision 68a4899) et vérifié par e2e (`writes/F-09.spec.ts`) ; le menu des suggestions est une surcouche Origam sous le champ, la zone mesure la page menu fermé, le menu ouvert est vérifié par e2e.
  * La table des inscrits est comparée sur toute sa largeur (maquette corrigée, 32fe65b).
  ********************************************************/
 const VIEWPORTS = [
@@ -90,7 +91,7 @@ for (const viewport of VIEWPORTS) {
         }, seed.email)
         await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
         await mockup.addStyleTag({ content: '.pa-form .input--file { box-sizing: border-box; height: var(--origam-space---12); padding-block: 0; } .adm-bottom { display: none !important; }' })
-        await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
+        await page.addStyleTag({ content: '.admin-bottom, [data-cy="participant-feedback"] { display: none !important; }' })
         await mockup.evaluate(() => {
           const rule = document.querySelector('.pa-form .rule')
           if (rule) {
