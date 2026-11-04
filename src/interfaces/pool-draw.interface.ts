@@ -85,7 +85,6 @@ export interface IPoolDrawContext {
 
 export interface IDrawStepsProps {
   steps: IPoolDrawStepView[]
-  orientation?: 'horizontal' | 'vertical'
 }
 
 export interface IDrawParametersProps {

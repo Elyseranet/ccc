@@ -25,7 +25,7 @@ const assignmentProps = (pools: IPoolDrawPool[], saveState = POOL_DRAW_SAVE_STAT
 describe('DrawSteps', () => {
   it('cinq étapes, l’étape de saisie est la troisième et les deux premières sont faites', async () => {
     const wrapper = await mountSuspended(DrawSteps, { props: { steps: buildSteps(POOL_DRAW_STEP.ENTRY) } })
-    const items = wrapper.findAll('[data-cy^="stepper-item-"]')
+    const items = wrapper.get('[data-cy="draw-steps-horizontal"]').findAll('[data-cy^="stepper-item-"]')
     expect(items).toHaveLength(5)
     expect(items[0]!.classes().join(' ')).toContain('done')
     expect(items[2]!.classes().join(' ')).toContain('active')

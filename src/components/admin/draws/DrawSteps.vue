@@ -1,14 +1,29 @@
 <template>
-  <origam-stepper
-    :items="items"
-    :model-value="activeIndex"
-    :orientation="orientation"
-    :clickable="false"
-    show-connectors
-    :aria-label="label"
+  <div
     class="draw-steps"
     data-cy="draw-steps"
-  />
+  >
+    <origam-stepper
+      :items="items"
+      :model-value="activeIndex"
+      orientation="horizontal"
+      :clickable="false"
+      show-connectors
+      :aria-label="label"
+      class="draw-steps__wide"
+      data-cy="draw-steps-horizontal"
+    />
+    <origam-stepper
+      :items="items"
+      :model-value="activeIndex"
+      orientation="vertical"
+      :clickable="false"
+      show-connectors
+      :aria-label="label"
+      class="draw-steps__narrow"
+      data-cy="draw-steps-vertical"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -23,11 +38,12 @@ import type { IDrawStepsProps } from '~/interfaces/pool-draw.interface'
  *
  * @description
  * Les cinq étapes du tirage (paramètres, têtes de série, saisie, récapitulatif, validation) : `origam-stepper` non cliquable,
- * horizontal sur grand écran et vertical sur mobile (mapping.md). L'étape courante est portée par `modelValue`, l'état de chaque
- * étape (faite, active, à venir) par son `status`.
+ * horizontal sur grand écran et vertical sur mobile (mapping.md). `orientation` est une prop et non un style : un second stepper
+ * vertical est rendu et la requête média n'affiche que celui qui convient (l'autre, en `display: none`, sort de l'arbre d'accessibilité).
+ * L'étape courante est portée par `modelValue`, l'état de chaque étape (faite, active, à venir) par son `status`.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IDrawStepsProps>(), { orientation: 'horizontal' })
+const props = withDefaults(defineProps<IDrawStepsProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const label = computed(() => t('admin.draws.steps_label', 'Étapes du tirage'))
@@ -46,5 +62,19 @@ defineExpose({})
 <style scoped lang="scss">
 .draw-steps {
   margin-bottom: var(--origam-space---6);
+
+  &__narrow {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .draw-steps__wide {
+    display: none;
+  }
+
+  .draw-steps__narrow {
+    display: flex;
+  }
 }
 </style>
