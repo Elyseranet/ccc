@@ -1,6 +1,6 @@
 # ds : les composants qui exposent `forwardRefs(...)` n'acceptent aucun slot au typecheck (`origam-dialog`, `-form`, `-menu`, `-tooltip`, `-snackbar`, `-text-field`)
 
-> **DRAFT, mesure faite, pas encore déposée chez Origam** (à relire par le front-lead avant dépôt).
+> **Déposée : Origam #1332** (liée à #1133). La section « Contournement » n'a pas été reprise dans l'issue.
 
 ## Mesure (Origam 2.37.4, vue-tsc du consommateur, CCC F-11)
 

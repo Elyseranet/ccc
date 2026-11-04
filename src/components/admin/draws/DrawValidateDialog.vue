@@ -65,7 +65,7 @@ defineSlots<{}>()
 const descriptionId = useId()
 // Contournement de typage : `<template #text>` et `<template #footer>` sur `origam-dialog` donnent, en 2.37.4,
 // « TS2339: Property 'text' does not exist on type '{}' » (DrawValidateDialog.vue 14,16) et « Property 'footer' ... » (22,16),
-// alors que les slots existent à l'exécution. Cause non établie : fiche DRAFT docs/tickets/origam/dialog-slots-non-types.md.
+// alors que les slots existent à l'exécution. Origam #1332 (composants à `forwardRefs`), fiche docs/tickets/origam/dialog-slots-non-types.md.
 const textSlot = 'text'
 const footerSlot = 'footer'
 const cancelRef = ref<{ $el?: HTMLElement } | null>(null)
