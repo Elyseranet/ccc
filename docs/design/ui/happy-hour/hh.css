@@ -201,7 +201,6 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .alert--block.alert--compact { padding: var(--origam-space---2); column-gap: var(--origam-space---2); } /* densité compacte : icône et texte à 8 px, mesuré sur 2.37.4 */
 .alert:not(.alert--block) { align-items: start; } /* sur plusieurs lignes, l’icône reste en haut comme chez Origam */
 .alert:not(.alert--block) .alert__ic { margin-top: calc((var(--origam-font__lineHeight---normal) * 1em - var(--origam-space---4)) / 2); }
-.field-msg.field-msg--number { margin-top: var(--origam-space---1); } /* origam-number-field : message à 8 px sous le champ (6 px pour origam-text-field) */
 .alert__title, .alert__body { display: block; }
 .alert__title { font-weight: var(--origam-font__weight---bold); }
 /* Message d’erreur sous un champ (origam-messages), mesuré sur origam 2.37.4 : 12 px et interlettrage 0.0333em, valeurs internes d’Origam sans jeton */
