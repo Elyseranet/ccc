@@ -24,3 +24,4 @@
 | # | Date et heure | SHA | Résultat | `joueur-stats` @390 | Charge (1 min) |
 |---|---|---|---|---|---|
 | 1 | 2026-11-04, 09:48:26 à 09:56:26 (8,1 min) | `98d4931` (T-REL-02, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % (@1440 : 1248×186, 0,000 %) | 15,17 au départ, 15,17 au plus, 6,35 à la fin (17 relevés toutes les 30 s). En parallèle : vérifications T-REL-02 de dev-f06 (test:run, test:release, Docker) et rendus de l'ui |
+| 2 | 2026-11-04, 09:58:44 à 10:06:14 (7,7 min) | `650e4ca` (B-11, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % | 3,35 au départ, 4,45 au plus, 2,39 à la fin (16 relevés). 130/130 zones identiques au run 1 (ratio et taille) |
