@@ -15,6 +15,10 @@ import { signIn } from '../helpers/session'
  * par les tests de composant). Les parcours qui ne modifient rien (liste, recherche, 409 sur 2026) sont dans
  * `a11y/F-09.spec.ts`.
  ********************************************************/
+/** Défauts d'Origam 2.37.4 sur le menu ouvert de `origam-select` (docs/tickets/origam/select-menu-ouvert-roles-aria.md) : seuls ces deux éléments, seules ces deux règles. */
+const KNOWN_OPEN_MENU_VIOLATIONS = ['aria-required-attr', 'aria-required-children']
+const KNOWN_OPEN_MENU_TARGETS = ['role="combobox"', 'role="menu"']
+
 const PNG_1X1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64')
 
 const openParticipants = async (page: Page) => {
@@ -164,7 +168,7 @@ test.describe('admin participants : écritures sur une édition créée par le t
     expect(results.violations.map(violation => violation.id)).toEqual([])
   })
 
-  test('menu des suggestions ouvert (décision 68a4899) : surcouche sous le champ, options nommées, « Créer » toujours présent, 0 violation axe', async ({ page, context }) => {
+  test('menu des suggestions ouvert (décision 68a4899) : surcouche sous le champ, options nommées, « Créer » toujours présent, 0 violation axe hors défauts Origam connus', async ({ page, context }) => {
     const { edition } = await createRegistrationEdition(context.request, 'menu')
     const profile = await createCompetitor(context.request, 'menu profil', { lastName: 'Menu Unique' })
     await selectAdminEdition(context, edition)
@@ -183,7 +187,8 @@ test.describe('admin participants : écritures sur une édition créée par le t
     const menu = await page.getByRole('listbox').boundingBox()
     expect(menu!.y).toBeGreaterThanOrEqual(field!.y + field!.height - 1)
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
-    expect(results.violations.map(violation => violation.id)).toEqual([])
+    const unexpected = results.violations.filter(violation => !(KNOWN_OPEN_MENU_VIOLATIONS.includes(violation.id) && violation.nodes.every(node => KNOWN_OPEN_MENU_TARGETS.some(target => node.html.includes(target)))))
+    expect(unexpected.map(violation => violation.id)).toEqual([])
     await page.keyboard.press('Escape')
     await expect(page.getByRole('listbox')).toHaveCount(0)
   })
