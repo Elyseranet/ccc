@@ -113,9 +113,9 @@ export const attachParticipant = async (request: APIRequestContext, edition: IWr
 }
 
 /** Une édition en inscriptions, avec un premier inscrit créé pour le test. */
-export const createRegistrationEdition = async (request: APIRequestContext, label: string): Promise<{ edition: IWriteEdition, seed: IWriteCompetitor, seedParticipation: IWriteParticipant }> => {
+export const createRegistrationEdition = async (request: APIRequestContext, label: string, seedName?: Partial<Pick<IWriteCompetitor, 'firstName' | 'lastName'>>): Promise<{ edition: IWriteEdition, seed: IWriteCompetitor, seedParticipation: IWriteParticipant }> => {
   const edition = await createEdition(request, label)
-  const seed = await createCompetitor(request, `${label} inscrit`)
+  const seed = await createCompetitor(request, `${label} inscrit`, seedName)
   const seedParticipation = await attachParticipant(request, edition, seed)
   return { edition: { ...edition, status: 'REGISTRATION' }, seed, seedParticipation }
 }

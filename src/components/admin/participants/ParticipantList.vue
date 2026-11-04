@@ -70,6 +70,7 @@
             <span class="participant-list__actions">
               <origam-btn
                 v-if="canResend(item.accountState)"
+                class="participant-list__action"
                 variant="text"
                 color="primary"
                 size="small"
@@ -81,6 +82,7 @@
               />
               <origam-btn
                 v-if="editable"
+                class="participant-list__action"
                 variant="text"
                 size="small"
                 :loading="busyParticipationId === item.participationId"
@@ -241,6 +243,12 @@ defineExpose({})
     display: inline-flex;
     align-items: center;
     gap: var(--origam-space---3);
+  }
+
+  &__action {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__muted {

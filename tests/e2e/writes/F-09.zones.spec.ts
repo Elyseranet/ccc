@@ -19,6 +19,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * carte ne dépend pas de lui ; ses lignes sont couvertes par les e2e fonctionnels.
  * La maquette reproduit le rendu d'Origam 2.37.4 (e27446e) : champ photo `origam-file-field`, refus de l'email sous le champ, information `origam-alert` ; seule la barre basse fixe (390 px) est masquée des deux côtés : elle recouvre le bas de la capture pleine page.
  * Le snackbar est masqué (décision 68a4899) et vérifié par e2e (`writes/F-09.spec.ts`) ; le menu des suggestions est une surcouche Origam sous le champ, la zone mesure la page menu fermé, le menu ouvert est vérifié par e2e.
+ * L'inscrit de l'application est un compte invité : sa ligne porte Renvoyer et Retirer, alors que la ligne de la maquette n'a que Retirer. Le bouton Renvoyer (dépend de l'état du compte) est masqué dans la mesure ; il est vérifié par les tests de composant.
  * La table des inscrits est comparée sur toute sa largeur (maquette corrigée, 32fe65b).
  ********************************************************/
 const VIEWPORTS = [
@@ -70,7 +71,7 @@ for (const viewport of VIEWPORTS) {
     for (const zone of ZONES) {
       test(zone.name, async ({ page, browser, context }) => {
         await signIn(context, 'admin')
-        const { edition, seed } = await createRegistrationEdition(context.request, `zones ${zone.name} ${viewport.name}`)
+        const { edition, seed } = await createRegistrationEdition(context.request, `zones ${zone.name} ${viewport.name}`, { firstName: 'Lisa', lastName: 'André' })
         await selectAdminEdition(context, edition)
         const { mockup, mockContext } = await open(page, browser, viewport, 'admin-participants.html', '/admin/participants')
         await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
@@ -89,8 +90,10 @@ for (const viewport of VIEWPORTS) {
           (document.querySelector('#n-em') as HTMLInputElement).value = email
         }, seed.email)
         await mockup.addStyleTag({ content: '.combo__list, .snack { display: none !important; }' })
-        await page.addStyleTag({ content: '.admin-bottom, [data-cy="participant-feedback"] { display: none !important; }' })
-        await mockup.evaluate(() => document.querySelector('.pa-list tbody tr:first-child .chip')?.classList.replace('chip--ok', 'chip--warn'))
+        await page.addStyleTag({ content: '.admin-bottom, [data-cy="participant-feedback"], [data-cy="participant-resend"] { display: none !important; }' })
+        await mockup.evaluate(() => {
+          document.querySelector('.pa-list tbody tr:first-child .chip')?.classList.replace('chip--ok', 'chip--warn')
+        })
         await alignMockupText(mockup, page, TEXT_PAIRS)
         await hideInk(mockup, MOCKUP_INK)
         await hideInk(page, APP_INK)
