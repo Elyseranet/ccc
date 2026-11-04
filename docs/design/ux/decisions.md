@@ -263,3 +263,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 ## F-09 — Homonymes à la création d'un participant (décision utilisateur 2026-11-03)
 - **Pas d'avertissement.** La liste de suggestions, insensible aux accents, montre les profils proches avec la pastille « Profil existant » et leur nombre d'éditions. L'entrée « Créer » reste toujours proposée, parce que deux vraies personnes peuvent porter le même nom. Cela confirme `parcours.md` 4b.4 (ux, 31cc6e3).
+
+## F-09 — Maquette des participants (décisions utilisateur 2026-11-03)
+- **Messages : la maquette s'aligne sur Origam**, comme `compte.html` (F-10). L'invitation est une `origam-alert` info, le refus de l'email s'affiche sous le champ (`errorMessages`), et la photo est un `origam-file-field`. F-09 remplace ses deux pastilles. On garde un seul style de message dans le produit.
+- **Menu des suggestions de recherche** : la maquette le dessine **superposé** sous le champ, comme Origam. La page menu fermé est mesurée au pixel ; le menu ouvert (options, entrée « Créer », accessibilité) est vérifié en e2e, hors de la mesure au pixel.
+- **Snackbar de confirmation** : **hors mesure au pixel** (masquée), vérifiée en e2e (texte, `role="status"`, disparition).
+
+## F-02 — États ex aequo et « aucun titre » du bloc « Le plus titré » (décision utilisateur 2026-11-03)
+- Les archives réelles n'ont qu'un seul détenteur. Les états **ex aequo** et **aucun titre** sont couverts par des **tests de composant** (rendu, libellé au singulier ou au pluriel, bloc absent), comme les états de F-01. Seul l'état réel à un détenteur est mesuré au pixel. Aucune réponse d'API réécrite, aucune variante de seed (ARCH-8 respectée).
