@@ -33,9 +33,9 @@ test.describe('pages non livrées', () => {
     })
   }
 
-  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` compris (T-REL-02, ab1a6b4)', async ({ request }) => {
+  test('aucun lien vers une page non livrée dans l’accueil, `/palmares` tant qu’il n’est pas livré (T-REL-02, ab1a6b4)', async ({ request }) => {
     const html = await (await request.get('/', { maxRedirects: 0 })).text()
-    for (const href of ['/palmares', '/connexion', '/admin']) {
+    for (const href of hidden([ROUTES.HALL_OF_FAME, ROUTES.LOGIN, ROUTES.ADMIN])) {
       expect(html).not.toContain(`href="${href}"`)
     }
     for (const dataCy of ['home-cta-secondary', 'home-rank-more']) {
