@@ -275,3 +275,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## Titre des alertes Origam (décision utilisateur 2026-11-04, F-09)
 - Sans réglage, Origam affiche le titre d'une `origam-alert` en 31 px avec un grand espacement des lettres. Pour F-09, le titre est ramené à la taille du texte courant **par les props de l'alerte seule** (quatre props de titre, comme le prévoit `mapping.md`). Aucun défaut de thème pour l'instant : un défaut dans `components['origam-alert']` déplacerait l'état d'erreur `AsyncState` des pages déjà livrées (F-01, F-03, F-04, F-05) sans mesure.
 - Un **ticket d'harmonisation** à part mesure les états d'erreur, puis décide d'un réglage commun dans le thème (règle PROPS-FIRST).
+
+## F-17 — Titre des alertes dans le thème (décision utilisateur 2026-11-04)
+- Fait nouveau (ui) : aucune maquette ne dessine l'état d'erreur `AsyncState`, et partout où une maquette dessine un titre d'alerte, il est à la taille du texte et en gras. Les 31 px actuels des pages livrées sont un rendu non voulu.
+- **Décision : réglage commun dans le thème** (PROPS-FIRST), `components['origam-alert']` titre à `md`, gras, interlettrage et interligne normaux. Les props d'instance de F-09 seront retirées par F-17. Le titre du message d'erreur des pages livrées (F-01, F-03, F-04, F-05) passe de 31 à 16 px, avec captures avant et après relues. F-17 passe après le merge de F-09.
+- Cette décision complète celle du même jour (« Titre des alertes Origam ») : F-09 garde ses props d'instance jusqu'à F-17.
+
+## F-13 — Maquette `admin-editions.html` alignée sur Origam (décision utilisateur 2026-11-04)
+- Les messages d'erreur (400/409), aujourd'hui dessinés en pastille, titre en gras et paragraphe, passent au **rendu `origam-alert`**, comme `compte.html` et `admin-participants.html`. L'ui corrige la maquette, et F-13 suit quand il est développé. On garde un seul style de message dans l'admin.
