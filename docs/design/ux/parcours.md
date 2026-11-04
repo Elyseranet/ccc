@@ -91,7 +91,7 @@ Spec : classements ACP / All Time / évolution (RG4, RG8), titres (RG6), cuillè
 ### 5. Admin : saisir un tirage
 1. Tableau de bord → étape « Tirages » → Stepper.
 2. Étape 1 : l'administrateur paramètre le nombre de poules (têtes de série = nombre de poules, RG9) ; les têtes de série sont calculées (classement ACP) et à contrôler ; départage RG10 → *confiance*.
-3. Étape 2 : têtes de série placées une par poule, puis saisie poule après poule (RG11) pendant le tirage physique ; les joueurs déjà placés disparaissent des listes ; brouillon enregistré à chaque affectation → *flux*.
+3. Étape 2 : têtes de série placées une par poule, puis saisie poule après poule (RG11) pendant le tirage physique ; le joueur choisi prend le premier emplacement libre de la poule en cours (aucune « place » n'est définie dans la spec ; le contrat conserve la poule et l'ordre de sortie `drawnOrder`) ; les joueurs déjà placés disparaissent des listes ; brouillon enregistré à chaque affectation → *flux*.
 4. Étape 3 : récapitulatif ; étape 4 : dialogue de validation ; la validation est définitive, sans annulation (SF P2 Échecs) → *prudence*.
 Poules inégales possibles (RG16) : rappel de la règle de jeu « bière » (RG17), non applicative. Désistement après tirage : Je ne sais pas (SF Questions ouvertes).
 
