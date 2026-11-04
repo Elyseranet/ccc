@@ -23,3 +23,11 @@ La garde PROD-1 refuse un `NUXT_MAIL_HOST` sans point (nom de service nu, L2 de 
 - [ ] Guide relu par le chef de projet, chaque commande vérifiée sur `develop`.
 - [ ] Aucun secret dans le dépôt (gitleaks).
 - [ ] L'utilisateur confirme que `/api/v1/health` répond 200 sur le domaine de dev.
+
+## Point du 2026-11-04 (chef de projet) — guide mergé, ticket laissé ouvert
+- Guide `README.md`, section « Environnement de dev sur Coolify (T-OPS-04) », branche `docs/T-OPS-04` @ `a9a6938`, mergé dans `develop` @ `e1551f1`. Relu par le chef de projet ; gitleaks propre (backend-lead).
+- **Reste pour fermer** :
+  - le domaine de dev et le nombre de proxys, à fournir par l'utilisateur ;
+  - le montage par l'utilisateur, puis sa confirmation que `/api/v1/health` répond 200 et que `getent hosts mailpit.ccc.internal` résout ;
+  - au merge de T-REL-02, compléter la liste « testable » avec `/editions` et `/regles`, que T-REL-02 livre aussi.
+- Points non vérifiés, signalés dans le guide : le réglage réseau commun Coolify, le nom de variable `MP_UI_AUTH` et la version de l'image Mailpit.
