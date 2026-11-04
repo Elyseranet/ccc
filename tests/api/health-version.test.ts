@@ -8,7 +8,8 @@ import { resetTestDatabase } from './helpers/auth-fixtures'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 
-const SHA = 'a3f9c2d41b7e4c6f8a0d5e1b2c3d4e5f60718293'
+// Un SHA court valable que Nitro lit comme le nombre 1.234e+59 : la sonde doit le rendre tel quel.
+const SHA = '1234e56'
 
 describe('GET /api/v1/health (version and migrations, T-OPS-03)', async () => {
   const env = requireTestDatabaseEnv()

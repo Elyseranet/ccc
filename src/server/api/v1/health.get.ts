@@ -3,7 +3,7 @@ import type { IHealth } from '../../../interfaces/health.interface'
 import { LOG_EVENT } from '../../../consts/log-event.const'
 import { MIGRATIONS_ASSET_STORAGE } from '../../../consts/health.const'
 import { RATE_LIMIT_ROUTE_KEY } from '../../../consts/rate-limit.const'
-import { loadMigrationsHealth, normalizeAppVersion, parseMigrationTimestamps } from '../../../utils/health.util'
+import { loadMigrationsHealth, parseMigrationTimestamps, resolveAppVersion } from '../../../utils/health.util'
 import { enforceRateLimit } from '../../../utils/rate-limit.util'
 import { logger } from '../../../utils/logger.util'
 import { HEALTH_DEADLINE_MS } from '../../../consts/database-config.const'
@@ -17,7 +17,7 @@ import { withDeadline } from '../../../utils/deadline.util'
  */
 export default defineEventHandler(async (event): Promise<IHealth> => {
   enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.HEALTH)
-  const version = normalizeAppVersion(useRuntimeConfig().appVersion)
+  const version = resolveAppVersion(process.env.NUXT_APP_VERSION, useRuntimeConfig().appVersion)
 
   try {
     // T-SEC-17 : connexion et requête ont leurs délais (3 s), mais leur somme dépasserait le délai de 5 s du HEALTHCHECK :

@@ -7,6 +7,14 @@ import {
 } from '../consts/health.const.js'
 import type { IHealthMigrations } from '../interfaces/health.interface.js'
 
+/**
+ * La version déployée. Nitro convertit les valeurs de `NUXT_*` avec `destr` : `3555796` devient le nombre 3555796 et
+ * `1234e56` le nombre 1.234e+59, deux SHA courts valables que `runtimeConfig` ne rend plus comme des chaînes. On lit donc la
+ * variable d'environnement brute en premier ; `runtimeConfig` ne sert que de repli et une valeur non textuelle y est refusée.
+ */
+export const resolveAppVersion = (rawEnvironmentValue: unknown, runtimeConfigValue: unknown): string | null =>
+  normalizeAppVersion(rawEnvironmentValue) ?? normalizeAppVersion(runtimeConfigValue)
+
 /** La version vient de l'environnement : on ne la renvoie que si elle a la forme d'un SHA, d'un tag ou d'un numéro. */
 export const normalizeAppVersion = (raw: unknown): string | null => {
   const value = typeof raw === 'string' ? raw.trim() : ''

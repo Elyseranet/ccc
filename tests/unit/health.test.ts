@@ -5,6 +5,7 @@ import {
   countPendingMigrations,
   loadMigrationsHealth,
   normalizeAppVersion,
+  resolveAppVersion,
   parseMigrationTimestamps,
   toHealthMigrations
 } from '../../src/utils/health.util'
@@ -25,6 +26,21 @@ describe('normalizeAppVersion', () => {
       expect(normalizeAppVersion(value)).toBeNull()
     }
   )
+})
+
+describe('resolveAppVersion', () => {
+  it('reads the raw environment string first, so a numeric-looking short SHA survives Nitro\'s value parsing', () => {
+    // runtimeConfig rend 3555796 comme nombre et 1234e56 comme 1.234e+59 : seule la variable brute est fidèle.
+    expect(resolveAppVersion('3555796', 3555796)).toBe('3555796')
+    expect(resolveAppVersion('1234e56', 1.234e+59)).toBe('1234e56')
+  })
+
+  it('falls back on runtimeConfig when the environment variable is absent, and refuses a non-text value there', () => {
+    expect(resolveAppVersion(undefined, SHA)).toBe(SHA)
+    expect(resolveAppVersion(undefined, 3555796)).toBeNull()
+    expect(resolveAppVersion(undefined, '')).toBeNull()
+    expect(resolveAppVersion(undefined, undefined)).toBeNull()
+  })
 })
 
 describe('migrations state', () => {
