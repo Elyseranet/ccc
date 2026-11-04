@@ -15,7 +15,7 @@ import { signIn } from '../helpers/session'
  * par les tests de composant). Les parcours qui ne modifient rien (liste, recherche, 409 sur 2026) sont dans
  * `a11y/F-09.spec.ts`.
  ********************************************************/
-/** Défauts d'Origam 2.37.4 sur le menu ouvert de `origam-select` (docs/tickets/origam/select-menu-ouvert-roles-aria.md) : seuls ces deux éléments, seules ces deux règles. */
+/** Défauts d'Origam 2.37.4 sur le menu ouvert de `origam-select` (Origam #1331, docs/tickets/origam/select-menu-ouvert-roles-aria.md) : seuls ces deux éléments, seules ces deux règles. */
 const KNOWN_OPEN_MENU_VIOLATIONS = ['aria-required-attr', 'aria-required-children']
 const KNOWN_OPEN_MENU_TARGETS = ['role="combobox"', 'role="menu"']
 

@@ -1,5 +1,7 @@
 # ds(select) : menu ouvert, deux `role="combobox"` imbriqués (champ et saisie) et un `role="menu"` qui contient un `role="listbox"`
 
+Ticket Origam : #1331.
+
 ## Constat
 
 Mesuré par axe-core (WCAG 2.2 AA) sur `/admin/participants` (F-09), `origam-select` `autocomplete`, menu **ouvert** (la saisie a ouvert la liste des suggestions). Menu fermé : 0 violation. Menu ouvert : deux violations, et elles seules.
