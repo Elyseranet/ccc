@@ -6,8 +6,26 @@ import type { ITranslatableText } from '../interfaces/common-components.interfac
 export const POOL_DRAW_MIN_POOLS = 1
 export const POOL_DRAW_MAX_POOLS = 20
 
-/** Taille de poule visée pour proposer un nombre de poules : « poules de 6 et de 5 » (maquette `admin-tirages.html`, RG16). */
-export const POOL_DRAW_TARGET_POOL_SIZE = 6
+/**
+ * Nombre de poules proposé au départ, par nombre d'inscrits (RG16). Source : classeur de l'ancien système, feuille « Config poules »,
+ * lignes 9 à 83 (`legacy_workbook_rows` dans `src/assets/seeds/archives.sql`), recopiée ici : la table du seed n'est jamais lue à
+ * l'exécution. Ce n'est pas une formule (40 inscrits : 8 poules, 45 : 7). Configuration d'origine entre parenthèses.
+ * Hors de cette table (pas un multiple de 5, moins de 20 ou plus de 70 inscrits) : aucune proposition, l'administrateur saisit le
+ * nombre (RG9) ; aucune interpolation n'est inventée.
+ */
+export const POOL_DRAW_DEFAULT_POOL_COUNT: Readonly<Record<number, number>> = {
+  20: 4, // 4 × 5
+  25: 5, // 5 × 5
+  30: 6, // 6 × 5
+  35: 7, // 7 × 5
+  40: 8, // 8 × 5
+  45: 7, // 4 × 6 + 3 × 7
+  50: 8, // 6 × 6 + 2 × 7
+  55: 9, // 8 × 6 + 1 × 7
+  60: 10, // 10 × 6
+  65: 10, // 5 × 6 + 5 × 7
+  70: 10 // 10 × 7
+}
 
 /** Durée d'affichage du retour « Brouillon enregistré » (mapping.md : `timeout: 2500`). */
 export const POOL_DRAW_SNACKBAR_TIMEOUT_MS = 2500

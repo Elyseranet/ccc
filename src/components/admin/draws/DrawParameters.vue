@@ -25,17 +25,16 @@
             :for="fieldId"
             :text="poolsLabel"
           />
-          <origam-number-field
+          <origam-text-field
             :id="fieldId"
-            :model-value="poolCount"
-            :min="1"
-            :max="20"
-            :step="1"
+            :model-value="text"
+            inputmode="numeric"
+            :maxlength="2"
+            :error-messages="errorMessages"
             :disabled="readOnly || busy"
             single-line
-            hide-details
             data-cy="draw-pool-count"
-            @update:model-value="handlePoolCount"
+            @update:model-value="handleInput"
           />
         </div>
         <dl class="draw-parameters__facts">
@@ -62,13 +61,6 @@
       <p class="draw-parameters__rule">
         {{ rule }}
       </p>
-      <origam-alert
-        v-if="issue"
-        status="warning"
-        rounded="lg"
-        :text="issueText"
-        data-cy="draw-parameters-issue"
-      />
       <div class="draw-parameters__actions">
         <origam-btn
           variant="flat"
@@ -87,8 +79,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useId } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamCard, OrigamLabel, OrigamNumberField } from 'origam/components'
+import { computed, ref, useId, watch } from 'vue'
+import { OrigamBtn, OrigamCard, OrigamLabel, OrigamTextField } from 'origam/components'
 import { useT } from '~/composables/useT'
 import type { IDrawParametersProps } from '~/interfaces/pool-draw.interface'
 
@@ -113,9 +105,23 @@ const playersLabel = computed(() => t('admin.draws.parameters_players', 'Inscrit
 const rule = computed(() => t('admin.draws.parameters_rule', 'Les poules sont les plus égales possible, à un joueur près (RG16) ; les joueurs des plus petites poules boivent une bière avant les matchs (RG17).'))
 const issueText = computed(() => (props.issue ? t(props.issue.key, props.issue.fallback, props.issue.params) : ''))
 const nextLabel = computed(() => t('admin.draws.parameters_next', 'Calculer les têtes de série'))
-const handlePoolCount = (value: number | null) => {
-  emits('update:poolCount', value ?? 0)
+/*
+ * Le champ garde le texte tapé : un nombre hors bornes (« 25 ») reste affiché avec son message au lieu d'être ramené en silence à une
+ * valeur valide (Origam #1327, décision 87eea8e). Un texte vide ou non entier est transmis tel quel (0, NaN) et `issue` le refuse.
+ */
+const text = ref(props.poolCount > 0 ? String(props.poolCount) : '')
+const typedPoolCount = (value: string): number => (value.trim() === '' ? 0 : Number(value))
+const errorMessages = computed(() => (props.issue ? [issueText.value] : []))
+const handleInput = (value: string | null) => {
+  text.value = value ?? ''
+  emits('update:poolCount', typedPoolCount(text.value))
 }
+// Une valeur venue de l'extérieur (brouillon rechargé) remplace le texte, jamais celle que l'on vient de taper.
+watch(() => props.poolCount, (value) => {
+  if (typedPoolCount(text.value) !== value) {
+    text.value = value > 0 ? String(value) : ''
+  }
+})
 
 /*********************************************************
  * Expose

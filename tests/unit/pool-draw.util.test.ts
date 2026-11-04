@@ -69,12 +69,17 @@ describe('paramètres : RG9, on ne passe pas l’étape sans autant de têtes de
     expect(parameterIssue(6, 6, 5)).toMatchObject({ key: 'admin.draws.issue_too_many_pools' })
   })
 
-  it('propose des poules de 6 au plus, dans les bornes', () => {
-    expect(suggestPoolCount(45)).toBe(8)
-    expect(suggestPoolCount(12)).toBe(2)
-    expect(suggestPoolCount(3)).toBe(1)
-    expect(suggestPoolCount(0)).toBe(0)
-    expect(suggestPoolCount(500)).toBe(20)
+  it('propose le nombre de poules de la table « Config poules » (RG16), sans formule', () => {
+    const table: Array<[number, number]> = [[20, 4], [25, 5], [30, 6], [35, 7], [40, 8], [45, 7], [50, 8], [55, 9], [60, 10], [65, 10], [70, 10]]
+    for (const [count, pools] of table) {
+      expect(suggestPoolCount(count)).toBe(pools)
+    }
+  })
+
+  it('ne propose rien hors de la table', () => {
+    for (const count of [0, 3, 19, 21, 44, 46, 75, 500]) {
+      expect(suggestPoolCount(count)).toBe(0)
+    }
   })
 })
 

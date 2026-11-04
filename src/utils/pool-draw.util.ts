@@ -5,7 +5,7 @@ import {
   POOL_DRAW_MAX_POOLS,
   POOL_DRAW_MIN_POOLS,
   POOL_DRAW_STEPS,
-  POOL_DRAW_TARGET_POOL_SIZE
+  POOL_DRAW_DEFAULT_POOL_COUNT
 } from '../consts/pool-draw.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { POOL_DRAW_STEP, POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
@@ -52,13 +52,11 @@ export const poolSizes = (total: number, poolCount: number): number[] => {
   return Array.from({ length: poolCount }, (_, index) => (index < larger ? base + 1 : base))
 }
 
-/** Nombre de poules proposé au départ : des poules de 6 joueurs au plus (maquette, RG16), modifiable par l'administrateur. */
-export const suggestPoolCount = (participantCount: number): number => {
-  if (participantCount < 1) {
-    return 0
-  }
-  return Math.min(POOL_DRAW_MAX_POOLS, Math.min(participantCount, Math.max(POOL_DRAW_MIN_POOLS, Math.ceil(participantCount / POOL_DRAW_TARGET_POOL_SIZE))))
-}
+/**
+ * Nombre de poules proposé au départ : celui de la table « Config poules » du classeur (RG16). 0 quand le nombre d'inscrits n'y
+ * figure pas : pas de proposition, l'administrateur saisit le nombre.
+ */
+export const suggestPoolCount = (participantCount: number): number => POOL_DRAW_DEFAULT_POOL_COUNT[participantCount] ?? 0
 
 /**
  * Ce qui empêche de quitter l'étape « Paramètres » (RG9) : autant de têtes de série que de poules, et un nombre de poules compris
