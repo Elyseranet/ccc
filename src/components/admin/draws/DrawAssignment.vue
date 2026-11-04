@@ -62,7 +62,8 @@
                 {{ pool.title }}
               </h3>
               <origam-chip
-                :color="pool.full ? 'success' : (pool.current ? 'primary' : undefined)"
+                :color="pool.chip.color"
+                :bg-color="pool.chip.bgColor"
                 size="small"
                 pill
                 :text="pool.fill"
@@ -229,6 +230,9 @@
 import { computed, ref, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamSelect } from 'origam/components'
 import { useT } from '~/composables/useT'
+import { EDITION_CHIP_PROPS } from '~/consts/edition-view.const'
+import { POOL_DRAW_CHIP_CURRENT } from '~/consts/pool-draw.const'
+import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
 import type { IDrawAssignmentProps, IPoolDrawPool } from '~/interfaces/pool-draw.interface'
 import { currentPoolNumber, poolSlots } from '~/utils/pool-draw.util'
@@ -278,9 +282,17 @@ const poolFill = (pool: IPoolDrawPool): string => {
     ? t('admin.draws.pool_current', 'En cours · {placed}/{size}', params)
     : t('admin.draws.pool_next', 'À suivre · {placed}/{size}', params)
 }
+// Recette des chips (mapping.md) : pleine = en cours, teintée success = poule pleine, neutre = à suivre (défaut du thème).
+const poolChip = (pool: IPoolDrawPool): { color?: string, bgColor?: string } => {
+  if (pool.members.length >= pool.size) {
+    return EDITION_CHIP_PROPS[EDITION_CHIP_FAMILY.TINTED_SUCCESS]
+  }
+  return pool.number === currentPool.value ? POOL_DRAW_CHIP_CURRENT : EDITION_CHIP_PROPS[EDITION_CHIP_FAMILY.NEUTRAL]
+}
 const poolViews = computed(() => props.pools.map(pool => ({
   number: pool.number,
   current: pool.number === currentPool.value,
+  chip: poolChip(pool),
   title: t('admin.draws.pool_title', 'Poule {number}', { number: pool.number }),
   fill: poolFill(pool),
   full: pool.members.length >= pool.size,
