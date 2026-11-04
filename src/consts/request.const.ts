@@ -39,3 +39,11 @@ export const TRUSTED_PROXY_SUBNETS: ReadonlyArray<{ readonly network: string, re
   { network: '::1', prefix: 128, family: 'ipv6' },
   { network: 'fc00::', prefix: 7, family: 'ipv6' }
 ]
+
+/**
+ * T-SEC-15 : durée maximale pendant laquelle les octets reçus après un 408 sont lus puis jetés (en plus du plafond de
+ * `maxBytes`). Elle laisse à la pile TCP le temps d'émettre la réponse et de vider le tampon de réception avant la fermeture
+ * (sinon RST), sans permettre à un client volontairement lent de tenir la connexion : au premier des deux seuils, la requête
+ * est détruite. 1,5 s couvre largement l'envoi d'une réponse de moins de 200 octets, même sur un lien lent.
+ */
+export const REQUEST_BODY_DRAIN_GRACE_MS = 1500
