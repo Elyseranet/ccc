@@ -30,7 +30,9 @@
       <p class="page-hero__lead" data-state="404">Cette page n’existe pas ou n’est plus disponible.</p>
       <p class="page-hero__lead" data-state="generique" hidden>La page n’a pas pu s’afficher. Réessayez dans quelques instants.</p>
       <!-- origam-btn variant="flat" bg-color="primary" elevation="lg" :hover="{ elevation: 'xl' }" size="large" to="/" -->
-      <p class="err-hero__cta"><a class="btn btn--primary" href="index.html">Retour à l’accueil <span aria-hidden="true">→</span></a></p>
+      <p class="err-hero__cta" data-state="404"><a class="btn btn--primary" href="index.html">Retour à l’accueil <span aria-hidden="true">→</span></a></p>
+      <!-- Erreur générique (ux) : « Réessayer » = bouton (recharge / clearError) en action principale, « Retour à l’accueil » en secondaire (origam-btn outlined) -->
+      <p class="err-hero__cta" data-state="generique" hidden><button class="btn btn--primary" type="button">Réessayer</button><a class="btn btn--outlined" href="index.html">Retour à l’accueil</a></p>
     </div>
     <span data-state="404"><svg class="err-cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/><text class="cap-txt" x="50" y="59" text-anchor="middle">404</text></svg></span><span data-state="generique" hidden><svg class="err-cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/><text class="cap-txt" x="50" y="59" text-anchor="middle">500</text></svg></span>
   </div>
@@ -51,7 +53,7 @@
   // Maquette : état « erreur générique » choisi par l’adresse (erreur.html?generique). Aucune animation pilotée en JS.
   if (new URLSearchParams(location.search).has('generique')) {
     document.querySelectorAll('[data-state]').forEach((e) => { e.hidden = e.dataset.state !== 'generique' })
-    document.title = 'Erreur · CCC'
+    document.title = 'Une erreur est survenue · CCC'
   }
 </script>
 </body>
