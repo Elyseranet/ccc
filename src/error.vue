@@ -86,6 +86,10 @@ import type { IErrorPageProps } from '~/interfaces/error-page.interface'
  * Nuxt la rend à la place de `app.vue`, d'où son propre `origam-app`. Structure de `erreur.html` (ui) : `PageHero`
  * (code en eyebrow, titre, chapô), bouton d'accueil de la même recette que le CTA de l'accueil, et une capsule
  * décorative qui porte le code.
+ *
+ * @description
+ * Taille des boutons (48 px, padding 24 px) : même mécanisme et mêmes valeurs que `HomeHero.vue` (`__button`,
+ * `--origam-btn---height-lg` et `--origam-btn---padding-lg`). Deuxième usage ; un troisième le fera factoriser.
  ********************************************************/
 const props = withDefaults(defineProps<IErrorPageProps>(), {})
 const emits = defineEmits<{}>()
@@ -164,8 +168,8 @@ defineExpose({})
   }
 
   &__button {
-    --origam-btn---height-lg: var(--error-page__button---height, var(--origam-space---12));
-    --origam-btn---padding-lg: var(--error-page__button---padding, var(--origam-space---6));
+    --origam-btn---height-lg: var(--origam-space---12);
+    --origam-btn---padding-lg: var(--origam-space---6);
   }
 
   &__arrow {
