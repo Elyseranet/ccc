@@ -1133,5 +1133,13 @@
   "admin.competitors.error_unknown_text": "Saving failed: try again.",
   "admin.more.competitors": "Competitors",
   "admin.more.competitors_description": "Fix an identity, manage the photo",
-  "layout.admin.nav_competitors": "Competitors"
+  "layout.admin.nav_competitors": "Competitors",
+  "admin.competitors.photo_legend": "Photo",
+  "admin.competitors.photo_upload": "Upload a photo",
+  "admin.competitors.photo_placeholder": "Choose an image",
+  "admin.competitors.photo_hint": "JPEG, PNG or WebP, 2 MB maximum. Metadata (EXIF, GPS position) is removed on upload.",
+  "admin.competitors.photo_remove": "Delete the photo",
+  "admin.competitors.photo_initials_hint": "Without a photo, the avatar shows the initials. “Delete the photo” goes back to the initials.",
+  "admin.competitors.photo_alt": "Photo of {name}",
+  "admin.competitors.photo_alt_initials": "No photo: initials {initials}"
 }

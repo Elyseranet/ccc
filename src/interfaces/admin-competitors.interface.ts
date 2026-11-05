@@ -1,4 +1,5 @@
 import type { ALIGN } from 'origam/enums'
+import type { ACCOUNT_ERROR } from '../enums/account.enum.js'
 import type { IAdminFailure } from './admin-failure.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { ICompetitorDetail, ICompetitorListItem } from './competitor.interface.js'
@@ -50,6 +51,22 @@ export interface ICompetitorIdentityFormProps {
 
 export interface ICompetitorIdentityFormEmits {
   (event: 'submit', values: ICompetitorFormValues): void
+}
+
+export interface ICompetitorPhotoProps {
+  displayName: string
+  /** Photo courante (`avatarUrl` de l'API), ou `null` : les initiales s'affichent alors. */
+  avatarUrl?: string | null
+  /** Cause d'échec à afficher (refus local ou erreur 413, 415, 422 du serveur). */
+  error?: ACCOUNT_ERROR | null
+  /** Un envoi ou un retrait est en cours. */
+  pending?: boolean
+}
+
+export interface ICompetitorPhotoEmits {
+  (event: 'select', file: File): void
+  (event: 'invalid', reason: ACCOUNT_ERROR): void
+  (event: 'remove'): void
 }
 
 export interface IReferenceHeadProps {

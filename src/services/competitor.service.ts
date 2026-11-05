@@ -81,6 +81,11 @@ export class CompetitorService extends BaseService {
     return this.request<IAvatarUploadResponse>(`/competiteurs/${encodeURIComponent(id)}/avatar`, { method: 'PUT', body })
   }
 
+  /** Retire la photo d'un compétiteur (administrateur, B-16) : 204, les initiales reviennent ; 404 sans photo. La version de l'identité ne bouge pas. */
+  async deleteAvatar (id: string): Promise<void> {
+    await this.request<void>(`/competiteurs/${encodeURIComponent(id)}/avatar`, { method: 'DELETE' })
+  }
+
   /** Renvoie l'invitation (B-09) : l'ancien lien est invalidé. */
   resendInvitation (id: string): Promise<IInvitationResent> {
     return this.request<IInvitationResent>(`/competiteurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })

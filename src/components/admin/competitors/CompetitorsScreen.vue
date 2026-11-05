@@ -48,7 +48,19 @@
             :failure="failure"
             :saved="saved"
             @submit="handleSubmit"
-          />
+          >
+            <template #photo>
+              <competitor-photo
+                :display-name="competitor.displayName"
+                :avatar-url="competitor.avatarUrl"
+                :error="photoError"
+                :pending="photoPending"
+                @select="handleSelect"
+                @invalid="handleInvalid"
+                @remove="handleRemove"
+              />
+            </template>
+          </competitor-identity-form>
         </async-state>
       </div>
     </div>
@@ -57,6 +69,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import CompetitorPhoto from '~/components/admin/competitors/CompetitorPhoto.vue'
 import CompetitorIdentityForm from '~/components/admin/competitors/CompetitorIdentityForm.vue'
 import CompetitorsTable from '~/components/admin/competitors/CompetitorsTable.vue'
 import CompetitorsToolbar from '~/components/admin/competitors/CompetitorsToolbar.vue'
@@ -64,8 +77,10 @@ import ReferenceHead from '~/components/admin/ReferenceHead.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import { useAdminCompetitors } from '~/composables/useAdminCompetitors'
 import { useCompetitorIdentity } from '~/composables/useCompetitorIdentity'
+import { useCompetitorPhoto } from '~/composables/useCompetitorPhoto'
 import { useT } from '~/composables/useT'
 import { ADMIN_COMPETITORS_PAGE_SIZE } from '~/consts/admin-competitors.const'
+import type { ACCOUNT_ERROR } from '~/enums/account.enum'
 import type { ICompetitorFormValues, ICompetitorsScreenProps } from '~/interfaces/admin-competitors.interface'
 import { toCompetitorFormValues } from '~/utils/admin-competitors.util'
 
@@ -104,12 +119,30 @@ const {
  * La fiche porte la version de l'identité ; le composable l'envoie en `If-Match`. Les valeurs du formulaire suivent la fiche.
  ********************************************************/
 const competitorId = computed(() => props.competitorId)
-const { competitor, loading, loadFailure, save, saving, saved, failure, refresh } = useCompetitorIdentity(competitorId)
+const { competitor, loading, loadFailure, save, saving, saved, failure, reload, refresh } = useCompetitorIdentity(competitorId)
 const values = computed<ICompetitorFormValues>(() => competitor.value
   ? toCompetitorFormValues(competitor.value)
   : { displayName: '', firstName: '', lastName: '', nickname: '' })
 const handleSubmit = (submitted: ICompetitorFormValues) => {
   save(submitted)
+}
+
+/*********************************************************
+ * Photo
+ *
+ * @description
+ * Second appel, indépendant de l'identité (B-16) : la photo ne fait pas avancer la version. Après un envoi ou un retrait, la fiche
+ * et l'annuaire sont rechargés (l'URL de l'image change).
+ ********************************************************/
+const { upload, remove, reject, error: photoError, pending: photoPending } = useCompetitorPhoto(competitorId, reload)
+const handleSelect = (file: File) => {
+  upload(file)
+}
+const handleInvalid = (reason: ACCOUNT_ERROR) => {
+  reject(reason)
+}
+const handleRemove = () => {
+  remove()
 }
 
 /*********************************************************

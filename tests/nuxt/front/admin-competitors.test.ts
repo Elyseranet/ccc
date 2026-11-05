@@ -12,6 +12,8 @@ import type { ICompetitorDetail, ICompetitorListItem } from '../../../src/interf
 import { CompetitorService } from '../../../src/services/competitor.service'
 import { buildMe } from '../../helpers/me'
 import CompetitorIdentityForm from '~/components/admin/competitors/CompetitorIdentityForm.vue'
+import CompetitorPhoto from '~/components/admin/competitors/CompetitorPhoto.vue'
+import { ACCOUNT_ERROR } from '../../../src/enums/account.enum'
 import CompetitorsIndexPage from '~/pages/admin/competiteurs/index.vue'
 import CompetitorPage from '~/pages/admin/competiteurs/[id].vue'
 
@@ -284,5 +286,91 @@ describe('page de correction', () => {
     await flushPromises()
     expect(wrapper.find('[data-cy="competitor-form"]').exists()).toBe(false)
     expect(wrapper.find('[data-cy="async-state-error"]').exists()).toBe(true)
+  })
+})
+
+describe('photo du compétiteur (second appel, B-16)', () => {
+  const mountPhoto = (props: Record<string, unknown> = {}) => mountSuspended(CompetitorPhoto, { props: { displayName: 'Lou Bernard', ...props } })
+
+  it('sans photo : initiales nommées, « Supprimer la photo » désactivé', async () => {
+    const wrapper = await mountPhoto()
+    expect(wrapper.get('[data-cy="competitor-photo-avatar"]').attributes('aria-label')).toBe('Aucune photo : initiales LB')
+    expect(wrapper.get('[data-cy="competitor-photo-avatar"]').text()).toBe('LB')
+    expect(wrapper.get('[data-cy="competitor-photo-remove"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('JPEG, PNG ou WebP, 2 Mo maximum')
+  })
+
+  it('avec photo : le retrait est possible et relayé', async () => {
+    const wrapper = await mountPhoto({ avatarUrl: '/api/v1/competiteurs/x/avatar?v=abc' })
+    expect(wrapper.get('[data-cy="competitor-photo-avatar"]').attributes('aria-label')).toBe('Photo de Lou Bernard')
+    await wrapper.get('[data-cy="competitor-photo-remove"]').trigger('click')
+    expect(wrapper.emitted('remove')).toHaveLength(1)
+  })
+
+  it('les erreurs 413, 415 et 422 s’affichent en alerte compacte annoncée', async () => {
+    for (const [error, text] of [
+      [ACCOUNT_ERROR.AVATAR_TOO_LARGE, 'L’image dépasse 2 Mo.'],
+      [ACCOUNT_ERROR.AVATAR_UNSUPPORTED_TYPE, 'Format d’image non pris en charge'],
+      [ACCOUNT_ERROR.AVATAR_UNREADABLE, 'Cette image est illisible.']
+    ] as const) {
+      const wrapper = await mountPhoto({ error })
+      const alert = wrapper.get('[data-cy="competitor-photo-error"]')
+      expect(alert.text()).toContain(text)
+      expect(alert.attributes('role')).toBe('alert')
+    }
+  })
+
+  it('pendant un envoi, le bloc est désactivé', async () => {
+    const wrapper = await mountPhoto({ pending: true, avatarUrl: '/x?v=1' })
+    expect(wrapper.get('fieldset').attributes('disabled')).toBeDefined()
+  })
+
+  it('envoi : PUT multipart sur la route du compétiteur, sans toucher à l’identité ni à sa version', async () => {
+    const backend = registerBackend()
+    const contentTypes = vi.fn()
+    registerEndpoint(`/api/v1/competiteurs/${LOU}/avatar`, defineEventHandler((event) => {
+      contentTypes(event.method, getHeader(event, 'content-type'))
+      return { avatarUrl: `/api/v1/competiteurs/${LOU}/avatar?v=abc` }
+    }))
+    const wrapper = await mountPage()
+    await flushPromises()
+    wrapper.findComponent(CompetitorPhoto).vm.$emit('select', new File(['x'], 'photo.png', { type: 'image/png' }))
+    await vi.waitFor(() => expect(contentTypes).toHaveBeenCalled())
+    expect(contentTypes.mock.calls[0]![0]).toBe('PUT')
+    expect(contentTypes.mock.calls[0]![1]).toMatch(/^multipart\/form-data; boundary=/)
+    await flushPromises()
+    expect(backend.patched).not.toHaveBeenCalled()
+    await wrapper.get('[data-cy="competitor-form-nickname"] input').setValue('Mousse')
+    await wrapper.get('[data-cy="competitor-form"]').trigger('submit')
+    await settle(wrapper)
+    expect(backend.patched).toHaveBeenCalledWith('"3"', expect.any(Object))
+  })
+
+  it('retrait : DELETE sur la route du compétiteur', async () => {
+    registerBackend()
+    registerEndpoint(`/api/v1/competiteurs/${LOU}`, defineEventHandler(() => detail({ avatarUrl: '/api/v1/competiteurs/x/avatar?v=1' })))
+    const verbs = vi.fn()
+    registerEndpoint(`/api/v1/competiteurs/${LOU}/avatar`, defineEventHandler((event) => {
+      verbs(event.method)
+      setResponseStatus(event, 204)
+      return null
+    }))
+    const wrapper = await mountPage()
+    await flushPromises()
+    wrapper.findComponent(CompetitorPhoto).vm.$emit('remove')
+    await vi.waitFor(() => expect(verbs).toHaveBeenCalledWith('DELETE'))
+  })
+
+  it('un fichier trop lourd reçu du serveur (413) s’affiche sous le champ', async () => {
+    registerBackend()
+    registerEndpoint(`/api/v1/competiteurs/${LOU}/avatar`, defineEventHandler((event) => {
+      setResponseStatus(event, 413)
+      return apiError(413, API_ERROR_CODE.AVATAR_TOO_LARGE)
+    }))
+    const wrapper = await mountPage()
+    await flushPromises()
+    wrapper.findComponent(CompetitorPhoto).vm.$emit('select', new File(['x'], 'photo.png', { type: 'image/png' }))
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="competitor-photo-error"]').exists()).toBe(true))
+    expect(wrapper.get('[data-cy="competitor-photo-error"]').text()).toContain('2 Mo')
   })
 })
