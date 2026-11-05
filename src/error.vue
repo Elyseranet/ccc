@@ -59,6 +59,7 @@
             <cap-badge
               class="error-page__cap"
               :text="code"
+              :text-y="capTextY"
             />
           </div>
         </section>
@@ -72,6 +73,7 @@ import { OrigamApp, OrigamBtn } from 'origam/components'
 import CapBadge from '~/components/common/CapBadge.vue'
 import PageHero from '~/components/common/PageHero.vue'
 import { useErrorPage } from '~/composables/useErrorPage'
+import { ERROR_PAGE_CAP_TEXT_Y } from '~/consts/error-page.const'
 import { HOME_ARROW_GLYPH, HOME_CTA_HOVER } from '~/consts/home.const'
 import { ROUTES } from '~/consts/routes.const'
 import type { IErrorPageProps } from '~/interfaces/error-page.interface'
@@ -92,6 +94,7 @@ const { heroTitle, heroSubtitle, eyebrow, hasCode, code, isGeneric, backLabel, r
 const ctaHover = HOME_CTA_HOVER
 const arrow = HOME_ARROW_GLYPH
 const homeRoute = ROUTES.HOME
+const capTextY = ERROR_PAGE_CAP_TEXT_Y
 useHead({ title: documentTitle })
 
 /*********************************************************

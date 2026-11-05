@@ -27,6 +27,7 @@ export interface IPageHeroProps {
 
 export interface ICapBadgeProps {
   text: string
+  textY?: number
 }
 
 export interface IPlayerLinkProps {

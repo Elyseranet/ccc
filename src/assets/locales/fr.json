@@ -851,8 +851,6 @@
   "error_page.generic_text": "La page n’a pas pu s’afficher. Réessayez dans quelques instants.",
   "error_page.back_home": "Retour à l’accueil",
   "error_page.retry": "Réessayer",
-  "error_page.not_found_document_title": "Page introuvable · CCC",
-  "error_page.generic_document_title": "Une erreur est survenue · CCC",
   "account.profile.confirm_password": "Confirmer le nouveau mot de passe",
   "account.profile.incomplete": "Profil incomplet : il manque {fields}.",
   "account.profile.missing_nickname": "pseudo (renseigné par l’organisation)",

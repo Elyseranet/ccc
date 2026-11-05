@@ -18,7 +18,7 @@
     <text
       class="cap-badge__text"
       x="50"
-      y="59"
+      :y="textY"
       text-anchor="middle"
     >
       {{ text }}
@@ -36,9 +36,12 @@ import type { ICapBadgeProps } from '~/interfaces/common-components.interface'
  * @description
  * Capsule décorative portant un court texte (le code d'une erreur, par exemple). Elle est `aria-hidden` : l'information
  * est déjà dans le texte de la page. Les capsules à chiffre de l'édition et de l'accueil dessinent chacune la leur ;
- * elles pourraient s'appuyer sur celle-ci.
+ * elles pourraient s'appuyer sur celle-ci : même polygone, même rond intérieur, texte à y = 58 par défaut (valeur de ces
+ * capsules), taille, graisse et couleurs réglées par les variables `--cap-badge__*`.
  ********************************************************/
-const props = withDefaults(defineProps<ICapBadgeProps>(), {})
+const props = withDefaults(defineProps<ICapBadgeProps>(), {
+  textY: 58
+})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const capPoints = BRAND_CAP_POINTS
@@ -68,6 +71,7 @@ defineExpose({})
     fill: var(--cap-badge__text---fill, var(--origam-color__bar---foam));
     font-family: var(--origam-font__family---display);
     font-size: var(--cap-badge__text---font-size, 26px);
+    font-weight: var(--cap-badge__text---font-weight, 400);
   }
 }
 </style>

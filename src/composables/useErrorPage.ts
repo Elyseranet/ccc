@@ -18,7 +18,9 @@ import { isKnownStatusCode, resolveErrorPageKind } from '~/utils/error-page.util
  *   recharge la route) et « Retour à l'accueil » en contour.
  * Le code affiché en eyebrow est le vrai `statusCode`, jamais écrit en dur ; sans code connu, pas d'eyebrow. Le message
  * technique de l'erreur n'est jamais affiché. À l'arrivée, le focus va sur le titre `h1` (un lecteur d'écran annonce
- * la page). La page porte `noindex` : une page d'erreur ne doit pas être indexée.
+ * la page). La page porte `noindex` : une page d'erreur ne doit pas être indexée. Le titre du document est celui du
+ * h1, sans nom de site : le suffixe sera ajouté en un seul endroit par `useSeo` (T-SEO-01), à brancher à son merge
+ * à la place de `useSeoMeta` (`useSeo({ noindex: true })`).
  ********************************************************/
 export const useErrorPage = (error: Ref<IErrorPageError> | (() => IErrorPageError)) => {
   const { t } = useT()
@@ -38,9 +40,7 @@ export const useErrorPage = (error: Ref<IErrorPageError> | (() => IErrorPageErro
   const eyebrow = computed(() => hasCode.value ? t('error_page.eyebrow', 'Erreur {code}', { code: code.value }) : '')
   const backLabel = computed(() => t('error_page.back_home', 'Retour à l’accueil'))
   const retryLabel = computed(() => t('error_page.retry', 'Réessayer'))
-  const documentTitle = computed(() => isNotFound.value
-    ? t('error_page.not_found_document_title', 'Page introuvable · CCC')
-    : t('error_page.generic_document_title', 'Une erreur est survenue · CCC'))
+  const documentTitle = computed(() => t(heroTitle.value.key, heroTitle.value.fallback))
 
   /** En 404 le retour à l'accueil est l'action principale ; sinon « Réessayer » l'est et l'accueil passe en contour. */
   const homeButton = computed(() => isNotFound.value
