@@ -364,3 +364,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Pas d'acceptation des CGU à la première connexion** : les CGU et la politique de confidentialité sont accessibles par des liens (pied de page et écran d'invitation), sans case à cocher.
 - **Page d'erreur CCC dans F-19** : un `error.vue` avec le layout public (message, lien vers l'accueil, pied de page avec les mentions légales).
 - **Aucune mention de médiateur de la consommation** : le site est gratuit et ne vend rien. À revoir si CCC devient payant.
+
+## 2026-11-05 — F-13 : compteur d'inscrits en direct dans la liste admin des éditions
+
+- **Décision utilisateur** : la liste admin des éditions affiche le nombre d'inscrits en direct pour une édition en cours, comme la maquette (« Participants 45 »). Le back l'ajoute au DTO de la liste **admin**, dans un petit ticket qui amende le contrat. Le `participantCount` public reste figé à la clôture.
