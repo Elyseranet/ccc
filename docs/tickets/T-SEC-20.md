@@ -28,5 +28,5 @@
 - [ ] Test unitaire : le plugin appelle la purge au démarrage, puis à chaque intervalle (timers simulés), et s'arrête au `close`.
 - [ ] Test d'API ou de base : une session expirée depuis plus de 24 h est supprimée sans qu'aucun login n'ait lieu. Une session expirée depuis moins de 24 h est conservée.
 - [ ] Une erreur de base pendant la purge ne fait pas tomber le serveur. Elle est loguée sans message brut.
-- [ ] README (variables) et `docs/api/auth.md` à jour, avec la durée garantie.
+- [ ] README à jour avec la durée garantie : section sessions, et tableau des variables si un drapeau est ajouté. Il n'existe pas de `docs/api/auth.md`.
 - [ ] typecheck, test:run, test:db, test:api (dans une fenêtre), gitleaks verts.
