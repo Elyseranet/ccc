@@ -38,7 +38,9 @@
         />
         <origam-btn
           variant="flat"
-          color="primary"
+          bg-color="primary"
+          elevation="lg"
+          :hover="ctaHover"
           :disabled="!canValidate"
           :loading="isBusy"
           :text="validateLabel"
@@ -53,9 +55,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamDialog } from 'origam/components'
+import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
-import { DIALOG_SLOT, SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
+import { DIALOG_SLOT, SCORE_CTA_HOVER, SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
 import type { IScoreValidationConfirmEmits, IScoreValidationConfirmProps } from '~/interfaces/score-entry.interface'
 
 /*********************************************************
@@ -65,14 +68,16 @@ import type { IScoreValidationConfirmEmits, IScoreValidationConfirmProps } from 
  * Confirmation de la validation d'un score déjà saisi (bouton « Valider » d'une carte). Valider rend le score opposable et
  * recalcule le classement : on le dit avant. Le focus initial est sur « Annuler », l'action la moins destructive.
  * Échap, focus piégé et retour du focus au déclencheur viennent d'`origam-dialog`. Emplacements `text` et `footer` en dynamique :
- * `defineSlots()` d'`origam-dialog` n'est pas typé, vue-tsc refuserait un emplacement nommé.
+ * `defineSlots()` d'`origam-dialog` perd son typage (Origam #1332), vue-tsc refuserait un emplacement nommé.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IScoreValidationConfirmProps>(), {})
 const emits = defineEmits<IScoreValidationConfirmEmits>()
 defineSlots<{}>()
 const maxWidth = SCORE_CONFIRM_MAX_WIDTH
+useFocusReturn(() => props.open)
 const dialogSlot = DIALOG_SLOT
+const ctaHover = SCORE_CTA_HOVER
 const cancelRef = ref<{ $el?: HTMLElement } | null>(null)
 
 /*********************************************************

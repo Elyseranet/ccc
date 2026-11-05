@@ -42,7 +42,9 @@
           <origam-btn
             v-if="card.actionLabel"
             :variant="card.actionVariant"
-            :color="card.actionColor"
+            :bg-color="card.actionBgColor"
+            :elevation="card.actionElevation"
+            :hover="card.actionHover"
             block
             class="match-queue__action"
             :text="card.actionLabel"
@@ -110,7 +112,9 @@ const views = computed(() => props.cards.map((card) => {
     actionLabel: action ? t(action.label.key, action.label.fallback) : null,
     actionAriaLabel: action ? t(action.aria.key, action.aria.fallback, players) : undefined,
     actionVariant: action?.variant,
-    actionColor: action?.color,
+    actionBgColor: action?.bgColor,
+    actionElevation: action?.elevation,
+    actionHover: action?.hover,
     actionDataCy: action ? `admin-match-${action.dataCy}-${card.id}` : undefined
   }
 }))

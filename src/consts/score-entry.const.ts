@@ -83,3 +83,6 @@ export const SCORE_SNACKBAR_TIMEOUT_MS = 5000
 
 /** Emplacements d'`origam-dialog` utilisés (écrits en dynamique : `defineSlots()` d'Origam n'est pas typé). */
 export const DIALOG_SLOT = { text: 'text', footer: 'footer' } as const
+
+/** Survol du bouton d'action principal (recette `mapping.md` : ombre `xl`). */
+export const SCORE_CTA_HOVER = { elevation: 'xl' } as const

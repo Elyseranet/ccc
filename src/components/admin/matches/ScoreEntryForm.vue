@@ -15,22 +15,33 @@
           class="score-entry-form__vs font-display"
           aria-hidden="true"
         >–</span>
-        <origam-text-field
-          :model-value="values[index]"
-          :label="name"
-          :error-messages="fieldMessages[index]"
-          :autofocus="focusOnMount && index === 0"
-          :disabled="busy"
-          inputmode="numeric"
-          :maxlength="maxLength"
-          autocomplete="off"
-          rounded="lg"
-          class="score-entry-form__field font-display"
-          :class="{ 'score-entry-form__field--second': index > 0 }"
-          :data-cy="`admin-score-input-${index}`"
-          :aria-describedby="ruleId"
-          @update:model-value="handleInput(index, $event)"
-        />
+        <div
+          class="score-entry-form__player"
+          :class="{ 'score-entry-form__player--second': index > 0 }"
+        >
+          <origam-label
+            :for="fieldIds[index]"
+            class="score-entry-form__name"
+            :text="name"
+          />
+          <origam-text-field
+            :id="fieldIds[index]"
+            :model-value="values[index]"
+            :label="name"
+            single-line
+            :error-messages="fieldMessages[index]"
+            :autofocus="focusOnMount && index === 0"
+            :disabled="busy"
+            inputmode="numeric"
+            :maxlength="maxLength"
+            autocomplete="off"
+            rounded="lg"
+            class="score-entry-form__field"
+            :data-cy="`admin-score-input-${index}`"
+            :aria-describedby="ruleId"
+            @update:model-value="handleInput(index, $event)"
+          />
+        </div>
       </template>
     </div>
     <origam-alert
@@ -47,6 +58,8 @@
       status="info"
       density="compact"
       rounded="lg"
+      font-size="sm"
+      class="score-entry-form__rule"
       :title="ruleTitle"
       :text="ruleText"
       data-cy="admin-score-rule"
@@ -78,7 +91,9 @@
       <origam-btn
         type="submit"
         variant="flat"
-        color="primary"
+        bg-color="primary"
+        elevation="lg"
+        :hover="ctaHover"
         :disabled="!canValidate"
         :loading="validating"
         :text="validateLabel"
@@ -90,9 +105,9 @@
 
 <script setup lang="ts">
 import { computed, useId } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamForm, OrigamTextField } from 'origam/components'
+import { OrigamAlert, OrigamBtn, OrigamForm, OrigamLabel, OrigamTextField } from 'origam/components'
 import { useT } from '~/composables/useT'
-import { SCORE_INPUT_MAX_LENGTH } from '~/consts/score-entry.const'
+import { SCORE_CTA_HOVER, SCORE_INPUT_MAX_LENGTH } from '~/consts/score-entry.const'
 import { SCORE_ENTRY_PHASE } from '~/enums/score-entry.enum'
 import type { IScoreEntryFormEmits, IScoreEntryFormProps } from '~/interfaces/score-entry.interface'
 
@@ -113,7 +128,10 @@ const props = withDefaults(defineProps<IScoreEntryFormProps>(), {
 const emits = defineEmits<IScoreEntryFormEmits>()
 defineSlots<{}>()
 const ruleId = useId()
+const fieldBaseId = useId()
+const fieldIds = computed(() => props.names.map((_name, index) => `${fieldBaseId}-${index}`))
 const maxLength = SCORE_INPUT_MAX_LENGTH
+const ctaHover = SCORE_CTA_HOVER
 
 /*********************************************************
  * Actions
@@ -148,8 +166,10 @@ defineExpose({})
 
 <style scoped lang="scss">
 .score-entry-form {
-  display: grid;
-  gap: var(--score-entry-form---gap, var(--origam-space---5));
+  :deep(.origam-form__content) {
+    display: grid;
+    gap: var(--score-entry-form---gap, var(--origam-space---5));
+  }
 
   &__duel {
     display: grid;
@@ -158,19 +178,40 @@ defineExpose({})
     gap: var(--score-entry-form__duel---gap, var(--origam-space---3));
   }
 
+  &__player {
+    display: grid;
+    gap: var(--score-entry-form__player---gap, var(--origam-space---2));
+
+    &--second {
+      text-align: end;
+    }
+  }
+
+  &__name {
+    font-weight: var(--origam-font__weight---bold);
+  }
+
   &__vs {
-    padding-top: var(--origam-space---5);
+    padding-top: var(--origam-space---8);
     color: var(--origam-color__text---tertiary);
     font-size: var(--origam-font__size---3xl);
   }
 
   &__field {
+    --origam-input__control---height: var(--score-entry-form__field---height, 5rem);
+
     :deep(input) {
+      font-family: var(--score-entry-form__field---font-family, var(--origam-font__family---display, inherit));
       color: var(--origam-color__bar---amber);
       font-size: var(--origam-font__size---4xl);
       font-variant-numeric: tabular-nums;
       text-align: center;
     }
+  }
+
+  &__rule {
+    --origam-alert--info---bg: var(--score-entry-form__rule---bg, var(--origam-color__feedback--info---bgSubtle));
+    --origam-alert--info---fg: var(--score-entry-form__rule---fg, var(--origam-color__feedback--info---fgSubtle));
   }
 
   &__meta {
@@ -191,6 +232,10 @@ defineExpose({})
 :root {
   --score-entry-form---gap: var(--origam-space---5);
   --score-entry-form__duel---gap: var(--origam-space---3);
+  --score-entry-form__field---height: 5rem;
+  --score-entry-form__player---gap: var(--origam-space---2);
+  --score-entry-form__rule---bg: var(--origam-color__feedback--info---bgSubtle);
+  --score-entry-form__rule---fg: var(--origam-color__feedback--info---fgSubtle);
   --score-entry-form__actions---gap: var(--origam-space---3);
 }
 </style>

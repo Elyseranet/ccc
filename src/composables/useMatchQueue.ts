@@ -1,8 +1,9 @@
 import { computed } from 'vue'
 import { useAdminEdition } from '~/composables/useAdminEdition'
+import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
-import { ADMIN_MATCH_DEFAULT_FILTER, ADMIN_MATCH_FILTER_QUERY_PARAM, ADMIN_MATCH_FILTERS, ADMIN_MATCH_POOL_QUERY_PARAM } from '~/consts/admin-match-filters.const'
+import { ADMIN_MATCH_DEFAULT_FILTER, ADMIN_MATCH_FILTER_QUERY_PARAM, ADMIN_MATCH_FILTERS, ADMIN_MATCH_POOL_QUERY_PARAM, ADMIN_MATCHES_ASYNC_KEY } from '~/consts/admin-match-filters.const'
 import { EDITION_STATUS } from '~/enums/edition.enum'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
 import type { IAdminMatch } from '~/interfaces/admin-match.interface'
@@ -18,6 +19,10 @@ import { fromAsyncDataError, toAsyncDataError } from '~/utils/async-data-error.u
  * File admin des scores de l'édition active (`GET /admin/editions/{id}/matchs`, C6). La liste complète est chargée une fois :
  * les compteurs des quatre filtres en découlent sans autre appel, et le filtre (`?f=`) et la poule (`?poule=`) sont portés
  * par l'URL (changer de filtre ne recharge rien). Une édition archivée est en lecture seule : aucune action sur les cartes.
+ * Clé de cache fixe : l'édition active (cookie) n'est connue qu'après le chargement des éditions, une clé calculée à partir d'elle
+ * serait `null` au rendu serveur et autre chose à l'hydratation (liste vide affichée). Le changement d'édition relance la requête (`watch`).
+ * Contexte Nuxt : `useRequestFetch`, `useAsyncData` et `useRoute` ne marchent qu'avant le premier `await` d'un composable. Toutes les
+ * requêtes démarrent donc d'abord, puis une seule attente les rassemble (même recette que `useEditionView`).
  * Après une écriture, `replaceMatch` remplace la ligne par la réponse du serveur (sa nouvelle version comprise) sans relire la liste.
  ********************************************************/
 export const useMatchQueue = async () => {
@@ -25,13 +30,15 @@ export const useMatchQueue = async () => {
   const router = useRouter()
   const { t } = useT()
   const service = new MatchService({ fetcher: useRequestFetch() })
-  const { store } = await useAdminEdition()
-  const { data: editions } = await useEditions()
+  const store = useAdminEditionStore()
+  const adminEdition = useAdminEdition()
+  const editionsRequest = useEditions()
   const editionId = computed(() => store.editionId)
 
-  const request = await useAsyncData(
-    () => `admin-matches:${editionId.value}`,
+  const request = useAsyncData(
+    ADMIN_MATCHES_ASYNC_KEY,
     async (): Promise<IAdminMatch[]> => {
+      await adminEdition
       if (!editionId.value) {
         return []
       }
@@ -43,6 +50,8 @@ export const useMatchQueue = async () => {
     },
     { watch: [editionId], default: () => [] }
   )
+  await Promise.all([adminEdition, editionsRequest, request])
+  const { data: editions } = editionsRequest
 
   const replaceQuery = (name: string, value: string | null) => {
     const { [name]: _previous, ...rest } = route.query

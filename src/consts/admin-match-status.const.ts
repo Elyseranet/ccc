@@ -24,14 +24,18 @@ export const MATCH_ACTION_VIEW: Record<MATCH_ACTION, {
   label: ITranslatableText
   aria: ITranslatableText
   variant: 'flat' | 'outlined'
-  color?: string
+  bgColor?: string
+  elevation?: string
+  hover?: { elevation: string }
   dataCy: string
 }> = {
   [MATCH_ACTION.VALIDATE]: {
     label: { key: 'admin.matches.action_validate', fallback: 'Valider' },
     aria: { key: 'admin.matches.action_validate_aria', fallback: 'Valider {first} contre {second}' },
     variant: 'flat',
-    color: 'primary',
+    bgColor: 'primary',
+    elevation: 'lg',
+    hover: { elevation: 'xl' },
     dataCy: 'validate'
   },
   [MATCH_ACTION.ENTER]: {

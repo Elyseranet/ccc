@@ -27,3 +27,6 @@ export const ADMIN_MATCH_FILTERS: ReadonlyArray<{ value: ADMIN_MATCH_FILTER, key
 
 /** Valeur de texte de « Toutes les poules » dans le sélecteur (Origam ne distingue pas `null` d'une absence de sélection). */
 export const ADMIN_MATCH_ALL_POOLS_VALUE = 'all'
+
+/** Clé `useAsyncData` de la file admin (fixe : le changement d'édition relance la requête par `watch`). */
+export const ADMIN_MATCHES_ASYNC_KEY = 'admin-matches'

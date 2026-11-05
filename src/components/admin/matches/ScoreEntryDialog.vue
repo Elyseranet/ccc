@@ -39,6 +39,7 @@ import { computed } from 'vue'
 import { OrigamDialog } from 'origam/components'
 import ScoreEntryForm from '~/components/admin/matches/ScoreEntryForm.vue'
 import { useBelowWidth } from '~/composables/useBelowWidth'
+import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
 import { DIALOG_SLOT, SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
@@ -54,7 +55,8 @@ import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interface
  * focus piégé, Échap, le retour du focus au déclencheur et le voile, ce que `origam-sheet` ne fournit pas (c'est une boîte
  * positionnée, sans overlay ni piège de focus) ; en mobile le dialogue est simplement ancré en bas.
  * Les emplacements `text` et `footer` d'`origam-dialog` s'écrivent en dynamique (`#[…]`) : le composant déclare `defineSlots()` sans type,
- * donc vue-tsc refuse tout emplacement nommé (défaut Origam à suivre, voir docs/tickets/origam/INDEX.md).
+ * donc vue-tsc refuse tout emplacement nommé (Origam #1332 : les composants à `forwardRefs` perdent le typage de leurs emplacements).
+ * Le focus revient au déclencheur à la fermeture (`useFocusReturn`) : mesuré, `origam-dialog` le laisse sur `<body>`.
  * La saisie ne ferme le dialogue que sur un succès. Un échec (412, réseau) le laisse ouvert avec son message.
  ********************************************************/
 const { t } = useT()
@@ -63,6 +65,7 @@ const emits = defineEmits<IScoreEntryDialogEmits>()
 defineSlots<{}>()
 const dialogSlot = DIALOG_SLOT
 const isSheet = useBelowWidth(SCORE_SHEET_BREAKPOINT_PX)
+useFocusReturn(() => props.open)
 const location = computed(() => isSheet.value ? 'bottom' : undefined)
 const maxWidth = computed(() => isSheet.value ? '100%' : 560)
 
@@ -149,11 +152,22 @@ defineExpose({})
 
 <style scoped lang="scss">
 .score-entry-dialog {
+  :deep(.origam-card__content) {
+    padding: var(--score-entry-dialog---padding, var(--origam-space---6));
+  }
+
   &--sheet {
     :deep(.origam-overlay__content) {
       inset: auto 0 0;
       width: 100%;
+      margin: 0;
     }
   }
+}
+</style>
+
+<style>
+:root {
+  --score-entry-dialog---padding: var(--origam-space---6);
 }
 </style>
