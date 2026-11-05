@@ -57,6 +57,7 @@ import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interface
  * positionnée, sans overlay ni piège de focus) ; en mobile le dialogue est simplement ancré en bas.
  * Les emplacements `text` et `footer` d'`origam-dialog` s'écrivent en dynamique (`#[…]`) : le composant déclare `defineSlots()` sans type,
  * donc vue-tsc refuse tout emplacement nommé (Origam #1332 : les composants à `forwardRefs` perdent le typage de leurs emplacements).
+ * L'eyebrow (tour et numéro) s'affiche au-dessus du titre sans changer l'ordre du DOM : le titre reste lu en premier (`column-reverse`).
  * Le focus revient au déclencheur à la fermeture (`useFocusReturn`) : mesuré, `origam-dialog` le laisse sur `<body>`.
  * La saisie ne ferme le dialogue que sur un succès. Un échec (412, réseau) le laisse ouvert avec son message.
  ********************************************************/
@@ -154,8 +155,35 @@ defineExpose({})
 
 <style scoped lang="scss">
 .score-entry-dialog {
+  :deep(.origam-card) {
+    padding: 0;
+  }
+
+  :deep(.origam-card-header) {
+    padding: var(--score-entry-dialog---padding, var(--origam-space---6)) var(--score-entry-dialog---padding, var(--origam-space---6)) 0;
+  }
+
   :deep(.origam-card__content) {
-    padding: var(--score-entry-dialog---padding, var(--origam-space---6));
+    padding: var(--score-entry-dialog__content---padding-top, var(--origam-space---5)) var(--score-entry-dialog---padding, var(--origam-space---6)) var(--score-entry-dialog---padding, var(--origam-space---6));
+  }
+
+  :deep(.origam-card-header__content) {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  :deep(.origam-card-header__subtitle) {
+    color: var(--origam-color__text---tertiary);
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wider);
+    text-transform: uppercase;
+  }
+
+  :deep(.origam-card-header__title) {
+    font-size: var(--origam-font__size---xl);
+    font-weight: var(--origam-font__weight---bold);
+    line-height: var(--origam-font__lineHeight---tight);
   }
 
   &--sheet {
@@ -171,5 +199,6 @@ defineExpose({})
 <style>
 :root {
   --score-entry-dialog---padding: var(--origam-space---6);
+  --score-entry-dialog__content---padding-top: var(--origam-space---5);
 }
 </style>

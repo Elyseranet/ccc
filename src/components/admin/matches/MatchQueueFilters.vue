@@ -38,6 +38,7 @@
       <div class="match-queue-filters__field">
         <origam-label
           :for="roundId"
+          class="match-queue-filters__field-label"
           :text="roundLabel"
         />
         <origam-select
@@ -60,6 +61,7 @@
       >
         <origam-label
           :for="poolId"
+          class="match-queue-filters__field-label"
           :text="poolLabel"
         />
         <origam-select
@@ -210,9 +212,19 @@ defineExpose({})
 
   &__field {
     display: grid;
-    gap: var(--match-queue-filters__field---gap, var(--origam-space---2));
-    flex: 0 1 var(--match-queue-filters__select---width, 16rem);
+    gap: var(--match-queue-filters__field---gap, var(--origam-space---1));
+    flex: 1 1 var(--match-queue-filters__field---basis, 12rem);
+    max-width: var(--match-queue-filters__field---max-width, 16rem);
     min-width: 0;
+  }
+
+  &__field-label {
+    color: var(--origam-color__text---tertiary);
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    line-height: var(--origam-font__lineHeight---normal);
+    text-transform: uppercase;
   }
 
   &__select {
@@ -223,6 +235,7 @@ defineExpose({})
     display: inline-flex;
     align-items: center;
     gap: var(--origam-space---2);
+    line-height: var(--origam-font__lineHeight---normal);
   }
 
   &__count {
@@ -246,7 +259,8 @@ defineExpose({})
   --match-queue-filters---gap: var(--origam-space---4);
   --match-queue-filters---margin-bottom: var(--origam-space---5);
   --match-queue-filters__selects---gap: var(--origam-space---3);
-  --match-queue-filters__select---width: 16rem;
-  --match-queue-filters__field---gap: var(--origam-space---2);
+  --match-queue-filters__field---basis: 12rem;
+  --match-queue-filters__field---max-width: 16rem;
+  --match-queue-filters__field---gap: var(--origam-space---1);
 }
 </style>

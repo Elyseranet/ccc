@@ -209,9 +209,12 @@ defineExpose({})
     }
   }
 
-  &__rule {
-    --origam-alert--info---bg: var(--score-entry-form__rule---bg, var(--origam-color__feedback--info---bgSubtle));
-    --origam-alert--info---fg: var(--score-entry-form__rule---fg, var(--origam-color__feedback--info---fgSubtle));
+  &__rule.origam-alert {
+    --origam-color__feedback--info---bgHover: var(--score-entry-form__rule---bg, var(--origam-color__feedback--info---bgSubtle));
+    --origam-color__feedback--info---bgActive: var(--score-entry-form__rule---bg, var(--origam-color__feedback--info---bgSubtle));
+
+    background-color: var(--score-entry-form__rule---bg, var(--origam-color__feedback--info---bgSubtle));
+    color: var(--score-entry-form__rule---fg, var(--origam-color__text---primary));
   }
 
   &__meta {
@@ -235,7 +238,7 @@ defineExpose({})
   --score-entry-form__field---height: 5rem;
   --score-entry-form__player---gap: var(--origam-space---2);
   --score-entry-form__rule---bg: var(--origam-color__feedback--info---bgSubtle);
-  --score-entry-form__rule---fg: var(--origam-color__feedback--info---fgSubtle);
+  --score-entry-form__rule---fg: var(--origam-color__text---primary);
   --score-entry-form__actions---gap: var(--origam-space---3);
 }
 </style>
