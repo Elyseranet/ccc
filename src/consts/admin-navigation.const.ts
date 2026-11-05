@@ -1,4 +1,6 @@
 import IconDashboard from '~/components/icons/IconDashboard.vue'
+import IconCompetitors from '~/components/icons/IconCompetitors.vue'
+import IconEditions from '~/components/icons/IconEditions.vue'
 import IconDraws from '~/components/icons/IconDraws.vue'
 import IconMatches from '~/components/icons/IconMatches.vue'
 import IconMore from '~/components/icons/IconMore.vue'
@@ -16,6 +18,14 @@ export const ADMIN_NAVIGATION: INavigationGroup[] = filterDeliveredGroups([
       { key: 'layout.admin.nav_participants', label: 'Participants', to: ROUTES.ADMIN_PARTICIPANTS, icon: IconParticipants },
       { key: 'layout.admin.nav_draws', label: 'Tirages', to: ROUTES.ADMIN_DRAWS, icon: IconDraws },
       { key: 'layout.admin.nav_matches', label: 'Poules et matchs', to: ROUTES.ADMIN_MATCHES, icon: IconMatches }
+    ]
+  },
+  {
+    key: 'layout.admin.group_reference',
+    label: 'Référentiel',
+    items: [
+      { key: 'layout.admin.nav_editions', label: 'Éditions', to: ROUTES.ADMIN_EDITIONS, icon: IconEditions },
+      { key: 'layout.admin.nav_competitors', label: 'Compétiteurs', to: ROUTES.ADMIN_COMPETITORS, icon: IconCompetitors }
     ]
   }
 ])

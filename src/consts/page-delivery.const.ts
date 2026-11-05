@@ -155,6 +155,31 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     layout: LAYOUT.ADMIN,
     endpoints: []
   },
+  [ROUTES.ADMIN_EDITIONS]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: [API_ENDPOINT.EDITIONS]
+  },
+  [ROUTES.ADMIN_EDITION_NEW]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: [API_ENDPOINT.EDITION_CREATE]
+  },
+  [ROUTES.ADMIN_EDITION]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: [API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_UPDATE]
+  },
+  [ROUTES.ADMIN_COMPETITORS]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.COMPETITOR]
+  },
+  [ROUTES.ADMIN_COMPETITOR]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.COMPETITOR, API_ENDPOINT.COMPETITOR_UPDATE]
+  },
   [ROUTES.ADMIN_MORE]: {
     delivered: true,
     layout: LAYOUT.ADMIN,

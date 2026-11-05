@@ -5,6 +5,7 @@ import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-c
 import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
 import type { IInvitationResent } from '../interfaces/invitation.interface.js'
 import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
+import { toIfMatchHeaders } from '../utils/if-match-header.util.js'
 import { BaseService } from './base.service.js'
 import type { DataSource, EntityManager } from 'typeorm'
 import { PUBLIC_ROUND_STATUSES } from '../consts/match-score.const.js'
@@ -83,6 +84,11 @@ export class CompetitorService extends BaseService {
   /** Renvoie l'invitation (B-09) : l'ancien lien est invalidé. */
   resendInvitation (id: string): Promise<IInvitationResent> {
     return this.request<IInvitationResent>(`/competiteurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })
+  }
+
+  /** Corrige l'identité (administrateur, B-10) : `version` est celle lue par `detail`, envoyée en `If-Match` (obligatoire, 428 sans elle, 412 si périmée). */
+  updateIdentity (id: string, body: IUpdateCompetitorRequest, version: number): Promise<ICompetitorIdentity> {
+    return this.request<ICompetitorIdentity>(`/competiteurs/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...body }, headers: toIfMatchHeaders(version) })
   }
 }
 

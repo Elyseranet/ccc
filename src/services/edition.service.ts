@@ -97,6 +97,16 @@ export class EditionService extends BaseService {
   async removeParticipant (id: string, participationId: string): Promise<void> {
     await this.request<void>(`/editions/${encodeURIComponent(id)}/participants/${encodeURIComponent(participationId)}`, { method: 'DELETE' })
   }
+
+  /** Crée une édition (administrateur, B-10) : le code est généré par le serveur (CE-1), jamais envoyé. */
+  create (body: ICreateEditionRequest): Promise<IEditionSummary> {
+    return this.request<IEditionSummary>('/editions', { method: 'POST', body: { ...body } })
+  }
+
+  /** Modifie nom, date, lieu et description (R-9 : ni code, ni année, ni statut). `id` accepte l'UUID ou le code. */
+  update (id: string, body: IUpdateEditionRequest): Promise<IEditionSummary> {
+    return this.request<IEditionSummary>(`/editions/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...body } })
+  }
 }
 
 /** Accepte l'UUID ou le code (`2012a`). 404 si inconnue. */

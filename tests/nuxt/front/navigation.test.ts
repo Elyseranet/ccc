@@ -16,12 +16,10 @@ describe('navigation publique (A5, E-d)', () => {
 describe('navigation admin (A7, FA-05, FA-09)', () => {
   const items = ADMIN_NAVIGATION.flatMap(group => group.items)
 
-  it('masque Bracket, Compétiteurs et Éditions tant qu’aucun ticket ne les porte', () => {
+  it('masque Bracket tant qu’aucun ticket ne le porte, et porte Éditions et Compétiteurs (F-13) dans le Référentiel', () => {
     const paths = items.map(item => item.to)
-    expect(paths).toEqual(['/admin', '/admin/participants', '/admin/tirages', '/admin/matchs'])
-    for (const hidden of ['/admin/bracket', '/admin/competitors', '/admin/editions']) {
-      expect(paths).not.toContain(hidden)
-    }
+    expect(paths).toEqual(['/admin', '/admin/participants', '/admin/tirages', '/admin/matchs', '/admin/editions', '/admin/competiteurs'])
+    expect(paths).not.toContain('/admin/bracket')
   })
 
   it('la barre basse a 4 entrées : Tableau, Matchs, Tirages, Plus', () => {
