@@ -1,6 +1,6 @@
 # T-QA-06 — Capture visuelle instable : joueur-stats @390 (F-04)
 
-- **Statut** : Ouvert (2026-11-01, chef de projet, signalé par le frontend-lead au gate de F-01).
+- **Statut** : **Fermé** le 2026-11-05 par le chef de projet. Cause non établie, échec non reproductible : 5 passes mesurées vertes sur 5 (décision utilisateur 6434362). Le correctif de stabilisation `9817d77` est sur develop. Ouvert le 2026-11-01, signalé par le frontend-lead au gate de F-01.
 - **Constat** : `tests/e2e/visual/F-04.spec.ts:129`, zone `joueur-stats` @390, à **28,19 %** dans un run Playwright complet (15,2 min, charge ~11). La zone a été capturée à 358×347 au lieu de 358×262 : la mise en page n'était pas stabilisée. Rejouée seule sur le même SHA : 22 verts, 0,000 % @390 et @1440.
 - **Cause probable** (à confirmer) : capture avant la fin de l'hydratation ou du chargement réseau.
 - **À faire** :
@@ -27,3 +27,10 @@
 | 2 | 2026-11-04, 09:58:44 à 10:06:14 (7,7 min) | `650e4ca` (B-11, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % | 3,35 au départ, 4,45 au plus, 2,39 à la fin (16 relevés). 130/130 zones identiques au run 1 (ratio et taille) |
 | 3 | 2026-11-04, 15:16:32 à 15:24:32 (8,1 min) | `2b3b93d` (T-REL-02, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % | 8,93 au départ, 8,93 au plus, 5,85 à la fin (17 relevés). En parallèle : Playwright F-09 de dev-f04 |
 | 4 | 2026-11-04, 20:26:33 à 20:36:03 (9,5 min) | `aeb855b` (F-10, contient `9817d77`) | 281 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % | 7,97 au départ, 10,67 au plus, 5,06 à la fin (20 relevés) |
+| 5 | 2026-11-05, 09:23:48 à 09:32:49 (9,0 min) | `39c94c1` (T-SEC-08-r3, contient `9817d77`) | 239 passés, 0 échec, 0 instable, 0 ignoré | 358×262, 0,000 % | 7,85 au départ, 21,88 au plus, 8,49 à la fin (19 relevés ; vitest d'i18n-dashboard en parallèle) |
+
+
+## Fermeture (2026-11-05)
+
+- **Mesures** : 5 passes complètes sur 5 vertes, `joueur-stats @390` capturée à 358×262 et 0,000 % à chaque fois. La charge machine maximale allait de 4,45 à 21,88 selon les passes. Les données de chaque passe sont dans le tableau ci-dessus ; la passe 5 a été relevée par le frontend-lead.
+- **Conclusion** : la cause n'est pas établie et l'échec du 2026-11-01 ne s'est pas reproduit, même à une charge double. Le ticket est fermé selon la décision utilisateur 6434362. Si la zone redevient instable, ouvrir un nouveau ticket qui renvoie à celui-ci.
