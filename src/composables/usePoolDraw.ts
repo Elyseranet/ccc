@@ -4,7 +4,8 @@ import { useEditions } from '~/composables/useEditions'
 import { PARTICIPANT_EDITABLE_STATUSES } from '~/consts/edition.const'
 import { POOL_DRAW_DRAFTS_CACHE_KEY, POOL_DRAW_PROPOSAL_CACHE_KEY, POOL_DRAW_RESTART_CODES } from '~/consts/pool-draw.const'
 import { DRAW_KIND, DRAW_STATUS } from '~/enums/draw.enum'
-import { POOL_DRAW_FEEDBACK_STATUS, POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP } from '~/enums/pool-draw.enum'
+import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
+import { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP } from '~/enums/pool-draw.enum'
 import type { IAdminDraw, ISeedProposal } from '~/interfaces/draw.interface'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import type { IPoolDrawFeedback, IPoolDrawLastSaved, IPoolDrawPool } from '~/interfaces/pool-draw.interface'
@@ -86,7 +87,7 @@ export const usePoolDraw = async () => {
   const busy = ref(false)
   const needsRestart = ref(false)
 
-  const notify = (status: POOL_DRAW_FEEDBACK_STATUS, message: ITranslatableText) => {
+  const notify = (status: FEEDBACK_STATUS, message: ITranslatableText) => {
     feedback.value = { status, message }
   }
   const dismissFeedback = () => {
@@ -94,7 +95,7 @@ export const usePoolDraw = async () => {
   }
   const fail = (cause: unknown) => {
     needsRestart.value = hasPoolDrawErrorCode(cause, POOL_DRAW_RESTART_CODES)
-    notify(POOL_DRAW_FEEDBACK_STATUS.ERROR, toPoolDrawError(cause))
+    notify(FEEDBACK_STATUS.ERROR, toPoolDrawError(cause))
   }
 
   /** Reprend l'état du serveur : un brouillon rouvre la saisie, un tirage validé donne la lecture seule. */
@@ -274,7 +275,7 @@ export const usePoolDraw = async () => {
     busy.value = true
     try {
       draft.value = await drawService.validate(current.id)
-      notify(POOL_DRAW_FEEDBACK_STATUS.SUCCESS, { key: 'admin.draws.feedback_validated', fallback: 'Tirage validé : les poules et leurs matchs sont créés.' })
+      notify(FEEDBACK_STATUS.SUCCESS, { key: 'admin.draws.feedback_validated', fallback: 'Tirage validé : les poules et leurs matchs sont créés.' })
       await Promise.all([draftsRequest.refresh(), refreshNuxtData('editions')])
       hydrate()
       return true

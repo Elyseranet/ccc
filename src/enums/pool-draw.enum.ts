@@ -13,12 +13,6 @@ export enum POOL_DRAW_STEP_STATE {
   PENDING = 'pending'
 }
 
-export enum POOL_DRAW_FEEDBACK_STATUS {
-  SUCCESS = 'success',
-  WARNING = 'warning',
-  ERROR = 'error'
-}
-
 /** État de l'enregistrement du brouillon : la dernière affectation est-elle sur le serveur ? */
 export enum POOL_DRAW_SAVE_STATE {
   IDLE = 'idle',

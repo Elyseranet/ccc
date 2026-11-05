@@ -1,11 +1,11 @@
 import type { ACCOUNT_STATE } from '../enums/user.enum.js'
-import type { PARTICIPANT_FEEDBACK_STATUS } from '../enums/participant-feedback.enum.js'
+import type { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { IAdminParticipant } from './edition.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 
 /** Retour d'une action sur les inscrits : un texte traduisible, jamais une chaîne finale. */
 export interface IParticipantFeedback {
-  status: PARTICIPANT_FEEDBACK_STATUS
+  status: FEEDBACK_STATUS
   message: ITranslatableText
 }
 

@@ -6,7 +6,7 @@ import { defineComponent } from 'vue'
 import { ADMIN_PARTICIPANTS_PAGE_SIZE, PARTICIPANT_CREATE_VALUE } from '../../../src/consts/admin-participants.const'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { EDITION_STATUS } from '../../../src/enums/edition.enum'
-import { PARTICIPANT_FEEDBACK_STATUS } from '../../../src/enums/participant-feedback.enum'
+import { FEEDBACK_STATUS } from '../../../src/enums/feedback.enum'
 import { ACCOUNT_STATE } from '../../../src/enums/user.enum'
 import type { IParticipantFormValues } from '../../../src/interfaces/admin-participants.interface'
 import type { IAdminParticipant } from '../../../src/interfaces/edition.interface'
@@ -178,7 +178,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     const api = await mountComposable()
     expect(await api.attach(COMPETITOR_ID)).toBe(true)
     expect(body).toHaveBeenCalledWith({ competitorId: COMPETITOR_ID })
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.participants.feedback_attached' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.participants.feedback_attached' } })
   })
 
   it('créer un participant : invitationSent true, « Invitation envoyée », la photo part dans un second appel', async () => {
@@ -193,7 +193,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     }) })
     const api = await mountComposable()
     expect(await api.create({ ...FORM, avatar: new File(['x'], 'photo.png', { type: 'image/png' }) })).toBe(true)
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.participants.feedback_invitation_sent' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.participants.feedback_invitation_sent' } })
     expect(avatar).toHaveBeenCalledTimes(1)
     expect(api.pendingAvatar.value).toBeNull()
   })
@@ -205,7 +205,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     }) })
     const api = await mountComposable()
     await api.create(FORM)
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.WARNING, message: { key: 'admin.participants.feedback_invitation_failed' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.WARNING, message: { key: 'admin.participants.feedback_invitation_failed' } })
   })
 
   it('email déjà pris : 409 EMAIL_ALREADY_USED marque le champ, sans retour d’erreur générique', async () => {
@@ -226,7 +226,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     }) })
     const api = await mountComposable()
     expect(await api.attach(COMPETITOR_ID)).toBe(false)
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.ERROR, message: { key: 'admin.participants.error_registration_closed' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.ERROR, message: { key: 'admin.participants.error_registration_closed' } })
   })
 
   it('un refus REGISTRATION_CLOSED recharge l’édition : l’écran apprend son état et masque les actions', async () => {
@@ -274,7 +274,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     const api = await mountComposable()
     await api.create({ ...FORM, avatar: new File(['x'], 'photo.png', { type: 'image/png' }) })
     expect(api.pendingAvatar.value).toMatchObject({ displayName: 'Camille Roussel' })
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.ERROR, message: { key: 'admin.participants.feedback_avatar_failed' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.ERROR, message: { key: 'admin.participants.feedback_avatar_failed' } })
 
     registerEndpoint(`/api/v1/competiteurs/${COMPETITOR_ID}-Camille Roussel/avatar`, { method: 'PUT', handler: defineEventHandler(() => ({ avatarUrl: '/x?v=2' })) })
     expect(await api.retryAvatar()).toBe(true)
@@ -289,7 +289,7 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     expect(api.feedback.value?.message.key).toBe('admin.participants.feedback_resent')
     registerEndpoint(`/api/v1/competiteurs/${COMPETITOR_ID}/invitation`, { method: 'POST', handler: defineEventHandler(() => ({ invitationSent: false, invitationExpiresAt: '2030-01-01T00:00:00.000Z' })) })
     await api.resend(COMPETITOR_ID)
-    expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.WARNING, message: { key: 'admin.participants.feedback_resend_failed' } })
+    expect(api.feedback.value).toMatchObject({ status: FEEDBACK_STATUS.WARNING, message: { key: 'admin.participants.feedback_resend_failed' } })
   })
 })
 

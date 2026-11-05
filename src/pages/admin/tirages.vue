@@ -65,7 +65,7 @@
         data-cy="draw-too-few"
       />
       <origam-alert
-        v-if="feedback && feedback.status === POOL_DRAW_FEEDBACK_STATUS.ERROR"
+        v-if="feedback && feedback.status === FEEDBACK_STATUS.ERROR"
         status="error"
         rounded="lg"
         :text="feedbackText"
@@ -192,7 +192,8 @@ import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { EDITION_STATUS_LABELS } from '~/consts/edition-status.const'
 import { POOL_DRAW_SNACKBAR_TIMEOUT_MS } from '~/consts/pool-draw.const'
-import { POOL_DRAW_FEEDBACK_STATUS, POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP } from '~/enums/pool-draw.enum'
+import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
+import { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP } from '~/enums/pool-draw.enum'
 import { poolMatchCount, toSeedRows } from '~/utils/pool-draw.util'
 
 /*********************************************************
@@ -259,7 +260,7 @@ const savedText = computed(() => {
     : t('admin.draws.draft_saved_retry', 'Brouillon enregistré · {placed}/{total}', { placed: saved.placed, total: saved.total })
 })
 const feedbackText = computed(() => (feedback.value ? t(feedback.value.message.key, feedback.value.message.fallback, feedback.value.message.params) : ''))
-const successOpen = computed(() => feedback.value !== null && feedback.value.status === POOL_DRAW_FEEDBACK_STATUS.SUCCESS)
+const successOpen = computed(() => feedback.value !== null && feedback.value.status === FEEDBACK_STATUS.SUCCESS)
 const handleSavedOpen = (open: boolean) => {
   savedOpen.value = open
 }

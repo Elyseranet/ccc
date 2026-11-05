@@ -1,4 +1,5 @@
-import type { POOL_DRAW_FEEDBACK_STATUS, POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP, POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
+import type { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
+import type { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP, POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { IAdminDraw, ISeedProposal } from './draw.interface.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
@@ -59,7 +60,7 @@ export interface IPoolDrawStepView {
 }
 
 export interface IPoolDrawFeedback {
-  status: POOL_DRAW_FEEDBACK_STATUS
+  status: FEEDBACK_STATUS
   message: ITranslatableText
 }
 
