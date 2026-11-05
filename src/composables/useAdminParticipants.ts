@@ -64,11 +64,15 @@ export const useAdminParticipants = () => {
   const dismissFeedback = () => {
     feedback.value = null
   }
-  const fail = (cause: unknown) => {
-    notify(PARTICIPANT_FEEDBACK_STATUS.ERROR, toParticipantError(cause))
-  }
   const reload = async () => {
     await Promise.all([refresh(), refreshNuxtData('editions')])
+  }
+  /** Un refus « inscriptions closes » ou « édition close » apprend à l'écran l'état de l'édition : on la recharge, les actions se masquent. */
+  const fail = async (cause: unknown) => {
+    notify(PARTICIPANT_FEEDBACK_STATUS.ERROR, toParticipantError(cause))
+    if (hasErrorCode(cause, API_ERROR_CODE.REGISTRATION_CLOSED) || hasErrorCode(cause, API_ERROR_CODE.EDITION_CLOSED)) {
+      await reload()
+    }
   }
 
   const attach = async (competitorId: string): Promise<boolean> => {
@@ -86,7 +90,7 @@ export const useAdminParticipants = () => {
       await reload()
       return true
     } catch (cause) {
-      fail(cause)
+      await fail(cause)
       return false
     } finally {
       busy.value = false
@@ -132,7 +136,7 @@ export const useAdminParticipants = () => {
         emailTaken.value = true
         dismissFeedback()
       } else {
-        fail(cause)
+        await fail(cause)
       }
       return false
     } finally {
@@ -169,7 +173,7 @@ export const useAdminParticipants = () => {
       await reload()
       return true
     } catch (cause) {
-      fail(cause)
+      await fail(cause)
       return false
     } finally {
       busy.value = false
@@ -190,7 +194,7 @@ export const useAdminParticipants = () => {
       await reload()
       return true
     } catch (cause) {
-      fail(cause)
+      await fail(cause)
       return false
     } finally {
       busy.value = false

@@ -52,6 +52,11 @@ export interface IWriteParticipant {
   invitationSent: boolean | null
 }
 
+export interface IWriteDraw {
+  id: string
+  poolCount: number
+}
+
 export interface ICapturedMail {
   to: string
   subject: string
@@ -118,6 +123,46 @@ export const createRegistrationEdition = async (request: APIRequestContext, labe
   const seed = await createCompetitor(request, `${label} inscrit`, seedName)
   const seedParticipation = await attachParticipant(request, edition, seed)
   return { edition: { ...edition, status: 'REGISTRATION' }, seed, seedParticipation }
+}
+
+/** Inscrit `count` compétiteurs neufs (créés pour le test) à l'édition : de quoi former des poules. */
+export const attachNewParticipants = async (request: APIRequestContext, edition: IWriteEdition, count: number, label: string): Promise<IWriteCompetitor[]> => {
+  const competitors: IWriteCompetitor[] = []
+  for (let index = 0; index < count; index += 1) {
+    const competitor = await createCompetitor(request, `${label} ${index + 1}`)
+    await attachParticipant(request, edition, competitor)
+    competitors.push(competitor)
+  }
+  return competitors
+}
+
+const STATUS_OK = 200
+
+const expectOk = async (response: Awaited<ReturnType<APIRequestContext['get']>>, what: string, expected: number[]) => {
+  if (!expected.includes(response.status())) {
+    throw new Error(`${what} : ${response.status()} ${await response.text()}`)
+  }
+  return response.json() as Promise<unknown>
+}
+
+/**
+ * Crée et VALIDE le tirage des poules de l'édition par les routes réelles de B-11 : têtes de série proposées par le serveur, brouillon, affectation de
+ * chaque inscrit (têtes de série en tête, les autres répartis en rond), puis validation. L'édition passe en `POOLS_DRAWN` : le tirage est figé.
+ * Il faut au moins `poolCount` inscrits.
+ */
+export const createValidatedPoolDraw = async (request: APIRequestContext, edition: IWriteEdition, poolCount = 2): Promise<IWriteDraw> => {
+  const proposal = await expectOk(await request.get(`/api/v1/editions/${edition.id}/tetes-de-serie`, { params: { poules: poolCount } }), 'GET tetes-de-serie', [STATUS_OK]) as { seeds: Array<{ participationId: string }> }
+  const seeds = proposal.seeds.map(seed => seed.participationId)
+  const draft = await expectOk(await request.post(`/api/v1/editions/${edition.id}/tirages/poules`, { data: { poolCount, seedCount: poolCount, seeds } }), 'POST tirages/poules', [STATUS_CREATED]) as { id: string }
+  const participants = await expectOk(await request.get(`/api/v1/admin/editions/${edition.id}/participants`), 'GET participants admin', [STATUS_OK]) as Array<{ participationId: string }>
+  const others = participants.map(participant => participant.participationId).filter(id => !seeds.includes(id))
+  const assignments = [
+    ...seeds.map((participationId, index) => ({ participationId, poolNumber: index + 1, drawnOrder: index + 1 })),
+    ...others.map((participationId, index) => ({ participationId, poolNumber: (index % poolCount) + 1, drawnOrder: seeds.length + index + 1 }))
+  ]
+  await expectOk(await request.put(`/api/v1/tirages/${draft.id}/affectations`, { data: { assignments } }), 'PUT affectations', [STATUS_OK])
+  await expectOk(await request.post(`/api/v1/tirages/${draft.id}/validation`), 'POST validation', [STATUS_OK])
+  return { id: draft.id, poolCount }
 }
 
 /** Fait de cette édition l'édition de travail des pages admin (cookie du sélecteur d'édition). */

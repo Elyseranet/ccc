@@ -227,6 +227,24 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
     expect(api.feedback.value).toMatchObject({ status: PARTICIPANT_FEEDBACK_STATUS.ERROR, message: { key: 'admin.participants.error_registration_closed' } })
   })
 
+  it('un refus REGISTRATION_CLOSED recharge l’édition : l’écran apprend son état et masque les actions', async () => {
+    let statusCalls = 0
+    registerEndpoint('/api/v1/editions', defineEventHandler(() => {
+      statusCalls += 1
+      return [{ id: EDITION_ID, code: '2027', year: 2027, name: null, status: statusCalls > 1 ? EDITION_STATUS.POOLS_DRAWN : EDITION_STATUS.REGISTRATION }]
+    }))
+    registerEndpoint(`/api/v1/editions/${EDITION_ID}/participants`, { method: 'POST', handler: defineEventHandler((event) => {
+      setResponseStatus(event, 409)
+      return apiError(409, API_ERROR_CODE.REGISTRATION_CLOSED)
+    }) })
+    const api = await mountComposable()
+    expect(api.isReadOnly.value).toBe(false)
+    await api.attach(COMPETITOR_ID)
+    await flushPromises()
+    expect(api.isReadOnly.value).toBe(true)
+    expect(api.feedback.value?.message.key).toBe('admin.participants.error_registration_closed')
+  })
+
   it('retrait avant tirage : 204, message « retiré » ; après tirage : 409 REGISTRATION_CLOSED', async () => {
     registerEndpoint(`/api/v1/editions/${EDITION_ID}/participants/${PARTICIPATION_ID}`, { method: 'DELETE', handler: defineEventHandler((event) => {
       setResponseStatus(event, 204)
