@@ -389,8 +389,8 @@
 .legal__body code { padding: 0 var(--origam-space---1); border-radius: var(--origam-radius---sm); background: var(--origam-color__surface---sunken); font-family: var(--origam-font__family---mono); font-size: var(--origam-font__size---sm); }
 .legal__dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--origam-space---2) var(--origam-space---5); }
 .legal__dl dt { color: var(--origam-color__text---secondary); font-weight: var(--origam-font__weight---bold); }
-.legal__table .table td, .legal__table .table th { white-space: normal; vertical-align: top; }
-.legal__table caption { font-size: var(--origam-font__size---md); }
+.legal__table .table td, .legal__table .table th { white-space: normal; }
+.legal__table caption { font-weight: var(--origam-font__weight---regular); } /* origam-table : légende en graisse normale, non thémable (Origam #1283) */
 .legal__aside-note { color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); }
 .legal-links { display: grid; gap: var(--origam-space---3); }
 .legal-links ul { display: flex; flex-wrap: wrap; gap: var(--origam-space---2); }
