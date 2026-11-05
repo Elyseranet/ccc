@@ -388,3 +388,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 4. **Confirmation de la clôture** : l'organisateur saisit le code de l'édition.
 5. **Saisie du tirage physique des tours** : affiche par affiche (les deux joueurs d'une affiche saisis ensemble).
 6. **B-13, puissance de 2** : aucun refus à la qualification. Les contrôles se font au tirage : chaque affiche a deux côtés, tout le vivier est tiré, un vivier impair est refusé. L'organisateur reste responsable de la cohérence du tableau.
+
+## 2026-11-05 — B-13 / F-25 : tours hors puissance de 2
+
+- **Décision utilisateur** : quand le nombre de qualifiés n'est pas une puissance de 2, l'admin choisit le tour qu'il tire. Le serveur vérifie seulement que chaque affiche a deux joueurs et que personne n'est oublié, avec une garde sur les huitièmes. On enregistre ce qui s'est passé en salle ; aucune règle de barrage calculée n'est inventée.
