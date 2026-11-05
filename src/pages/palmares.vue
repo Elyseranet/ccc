@@ -74,6 +74,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
+const title = computed(() => t('pages.hall_of_fame.title', 'Palmarès'))
 useSeo({ page: SEO_PAGE.HALL_OF_FAME })
 
 /*********************************************************

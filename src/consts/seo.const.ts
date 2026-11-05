@@ -52,7 +52,7 @@ export const SEO_MESSAGES: Record<SEO_PAGE, ISeoPageMessages> = {
     description: { key: 'seo.players.description', label: 'L’annuaire des joueurs du Championnat de Caps : recherchez un joueur par nom ou pseudo et consultez sa fiche.' }
   },
   [SEO_PAGE.PLAYER]: {
-    title: { key: 'seo.player.title', label: '{name} · Fiche joueur du Championnat de Caps' },
+    title: { key: 'seo.player.title', label: '{name} · Fiche joueur · CCC' },
     description: { key: 'seo.player.description', label: 'Fiche de {name} au Championnat de Caps : parcours, victoires et défaites, adversaires fréquents.' }
   },
   [SEO_PAGE.HEAD_TO_HEAD]: {

@@ -72,7 +72,6 @@
   "edition.hero_title": "Edition {code}",
   "edition.index_empty_text": "No edition is recorded yet.",
   "edition.index_empty_title": "No edition",
-  "edition.page_title": "Edition {code}",
   "edition.participants_empty_text": "This edition’s participants are not known yet.",
   "edition.participants_empty_title": "No participants",
   "edition.participants_pool": "Pool {rank}",
@@ -247,10 +246,8 @@
   "pages.home.title": "Caps Championship",
   "pages.hall_of_fame.title": "Hall of fame",
   "pages.editions.title": "Editions",
-  "pages.players.title": "Players",
   "pages.player.title": "Player profile",
   "pages.head_to_head.title": "Head to head",
-  "pages.rules.title": "Rules",
   "pages.login.title": "Log in",
   "pages.invitation.title": "Invitation",
   "pages.profile.title": "My profile",
@@ -703,5 +700,5 @@
   "seo.players.description": "The Caps Championship players directory: search a player by name or nickname and open their page.",
   "seo.head_to_head.title": "Head to head between two players · Caps Championship",
   "seo.edition.description": "Caps Championship edition {code}: participants, pools, final stage, matches and results.",
-  "seo.player.title": "{name} · Caps Championship player page"
+  "seo.player.title": "{name} · Player page · CCC"
 }

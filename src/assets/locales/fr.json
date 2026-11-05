@@ -72,7 +72,6 @@
   "edition.hero_title": "Édition {code}",
   "edition.index_empty_text": "Aucune édition n’est encore enregistrée.",
   "edition.index_empty_title": "Aucune édition",
-  "edition.page_title": "Édition {code}",
   "edition.participants_empty_text": "Les participants de cette édition ne sont pas encore connus.",
   "edition.participants_empty_title": "Aucun participant",
   "edition.participants_pool": "Poule {rank}",
@@ -247,10 +246,8 @@
   "pages.home.title": "Championnat de Caps",
   "pages.hall_of_fame.title": "Palmarès",
   "pages.editions.title": "Éditions",
-  "pages.players.title": "Joueurs",
   "pages.player.title": "Fiche joueur",
   "pages.head_to_head.title": "Face-à-face",
-  "pages.rules.title": "Règles",
   "pages.login.title": "Connexion",
   "pages.invitation.title": "Invitation",
   "pages.profile.title": "Mon profil",
@@ -703,5 +700,5 @@
   "seo.players.description": "L’annuaire des joueurs du Championnat de Caps : recherchez un joueur par nom ou pseudo et consultez sa fiche.",
   "seo.head_to_head.title": "Face-à-face entre deux joueurs · Championnat de Caps",
   "seo.edition.description": "Édition {code} du Championnat de Caps : participants, poules, phase finale, matchs et résultats.",
-  "seo.player.title": "{name} · Fiche joueur du Championnat de Caps"
+  "seo.player.title": "{name} · Fiche joueur · CCC"
 }
