@@ -9,7 +9,8 @@ Contrat des routes sous `/api/v1`, publié avant le code pour F-24 et F-25. Les 
 | Route | Corps | Réponse | Rôle |
 |---|---|---|---|
 | `GET /admin/editions/{id}/qualification` | query facultative `?topPerPool=&bestNextCount=` | `200` `IQualificationStatus` | État de la qualification sans rien écrire : classements, matchs bloquants, égalités à départager, départages créés, qualifiés calculés |
-| `POST /editions/{id}/qualification` | `IQualificationParameters` | `200` `IQualificationResult` | Arrête la liste des qualifiés (RG18) et passe l'édition à `QUALIFIED` |
+| `GET /admin/editions/{id}/tirages/tour` | aucun | `200` `IRoundDrawPreview` | Prochain tirage de tour sans rien écrire : `roundKind` qui serait tiré, `candidates` (vivier), `blockedBy` (`QUALIFICATION_NOT_DONE`, `ROUND_NOT_COMPLETED` ou null). Même fonction que `POST …/tirages/tour` |
+| `POST /editions/{id}/qualification` | `IQualificationParameters` | `200` `IQualificationResult` | Fige la liste des qualifiés (RG18) et passe l'édition à `QUALIFIED` |
 | `POST /editions/{id}/departages` | `ICreateTiebreakRequest` | `201` `IAdminMatch` | Crée un match `TIEBREAK` pour exactement un groupe de `ties` (A10, A11, R-1, R-2, R-6, R-7) |
 | `POST /editions/{id}/tirages/tour` | `ICreateRoundDrawRequest` | `201` `IAdminDraw` | Ouvre le brouillon du tirage du tour suivant (RG13) ; barrages si la qualification a `withPlayoff` |
 | `PUT /tirages/{id}/affectations` | `IUpdateRoundDrawRequest` (tirage de tour) | `200` `IAdminDraw` | Enregistre les affiches tirées physiquement (route existante de B-11, étendue aux tirages de tour) |
@@ -27,3 +28,15 @@ Contrat des routes sous `/api/v1`, publié avant le code pour F-24 et F-25. Les 
 | `ROUND_NOT_COMPLETED` | le dernier tour de phase finale n'est pas entièrement validé (RG13) |
 
 Les codes `DRAW_ALREADY_VALIDATED`, `DRAW_INCOMPLETE`, `DRAW_INCONSISTENT`, `EDITION_CLOSED` de B-11 s'appliquent aussi aux tirages de tour.
+
+## Paramètres de la qualification et simulation
+
+- `topPerPool` (n) et `bestNextCount` (m) sont des **entiers** : `topPerPool` vaut au moins 1 et au plus la taille de la plus grande poule ; `bestNextCount` vaut au moins 0 et au plus le nombre de poules. Hors bornes, ou non entier : **400** `VALIDATION_FAILED`. C'est vrai pour le corps de `POST …/qualification` et pour la simulation `GET …/qualification?topPerPool=&bestNextCount=`. Le schéma `zod` (`src/server/schemas/qualification.schema.ts`) contrôle le type et les bornes absolues ; les bornes liées à l'édition (taille de la plus grande poule, nombre de poules) sont contrôlées par le service avec le même code d'erreur.
+- **`withPlayoff` ne change pas la liste des qualifiés** (RG18 : les n premiers de chaque poule plus les m meilleurs (n+1)èmes). Il ne change que le type du premier tour de phase finale : `PLAYOFF` (barrages, A9) au lieu du tour déduit de la taille du vivier. Ce tour se lit dans `IRoundDrawPreview.roundKind`.
+
+## Départages et liste des matchs admin
+
+Un match de départage est un match `TIEBREAK` du tour `POOLS`. Il apparaît dans `GET /admin/editions/{id}/matchs` (`purpose: TIEBREAK`, cible 5 à deux côtés, 3 à N côtés) : le listage ne filtre pas sur `purpose`. Son `pool_id` :
+- **`scope: POOL`** (égalité au sein d'une poule) : la poule de l'égalité ;
+- **`scope: BOUNDARY`** (égalité entre poules pour une place de meilleur (n+1)ème) : **null**. Il n'apparaît donc pas dans le filtre `?poule=`, mais figure dans le listage sans ce filtre et avec `?tour=POOLS`.
+La saisie et la validation passent par `PUT /matchs/{id}/score` et `POST /matchs/{id}/validation`, avec `If-Match` (T-SEC-08).

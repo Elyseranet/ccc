@@ -2,6 +2,8 @@ import type { TIEBREAK_FORMAT } from '../enums/domain.enum.js'
 import type { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { QUALIFICATION_ROUTE, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { TSidePosition } from '../types/draw.type.js'
+import type { TRoundDrawBlock } from '../types/qualification.type.js'
 import type { IAdminMatch } from './admin-match.interface.js'
 import type { ICompetitorPublic } from './competitor.interface.js'
 import type { IPool } from './pool.interface.js'
@@ -16,6 +18,12 @@ export interface IQualificationParameters {
   withPlayoff: boolean
 }
 
+/** Un joueur d'une liste de la qualification ou du tirage : sa participation et son identité publique. */
+export interface IQualificationMember {
+  participationId: string
+  competitor: ICompetitorPublic
+}
+
 /** Égalité non tranchée, à départager par un match TIEBREAK (A10, A11, R-1, R-2, R-6, R-7). */
 export interface ITiebreakGroup {
   scope: TIEBREAK_SCOPE
@@ -27,8 +35,7 @@ export interface ITiebreakGroup {
   format: TIEBREAK_FORMAT
   /** Places à pourvoir parmi ces joueurs (frontière entre poules) ; 0 pour une égalité de poule. */
   slots: number
-  participationIds: string[]
-  competitors: ICompetitorPublic[]
+  members: IQualificationMember[]
 }
 
 /**
@@ -36,8 +43,8 @@ export interface ITiebreakGroup {
  * seuls matchs VALIDATED (E-f). `parameters` : la configuration enregistrée, sinon celle de la requête (`?topPerPool=&bestNextCount=`).
  */
 export interface IQualificationStatus {
-  /** true une fois la liste arrêtée (`edition.status` au moins QUALIFIED). */
-  arrested: boolean
+  /** true une fois la liste des qualifiés figée par `POST …/qualification` (`edition.status` au moins QUALIFIED). */
+  listFinalized: boolean
   parameters: IQualificationParameters | null
   pools: IPool[]
   /** Matchs de poule (REGULAR ou TIEBREAK) ni VALIDATED ni RESULT_UNKNOWN : ils bloquent l'arrêt de la liste. */
@@ -50,9 +57,7 @@ export interface IQualificationStatus {
   qualified: IQualifiedParticipant[] | null
 }
 
-export interface IQualifiedParticipant {
-  participationId: string
-  competitor: ICompetitorPublic
+export interface IQualifiedParticipant extends IQualificationMember {
   poolId: string
   /** Place dans la poule. */
   poolRank: number
@@ -67,6 +72,17 @@ export interface IQualificationResult {
   eliminatedCount: number
   /** true pour un rejeu à l'identique : aucun effet (idempotence). */
   replayed: boolean
+}
+
+/**
+ * Prochain tirage de tour (`GET /admin/editions/{id}/tirages/tour`), sans rien écrire : même déduction que
+ * `POST /editions/{id}/tirages/tour` (une seule fonction côté serveur). `candidates` : le vivier à tirer (participations
+ * QUALIFIED). `roundKind` : le tour qui serait tiré (null si aucun). `blockedBy` : ce qui empêche le tirage, sinon null.
+ */
+export interface IRoundDrawPreview {
+  roundKind: ROUND_KIND | null
+  candidates: IQualificationMember[]
+  blockedBy: TRoundDrawBlock | null
 }
 
 /** Corps de `POST /editions/{id}/departages` : exactement l'un des groupes de `IQualificationStatus.ties`. */
@@ -87,7 +103,7 @@ export interface ICreateRoundDrawRequest {
 export interface IRoundDrawAssignmentInput {
   participationId: string
   pairingIndex: number
-  sidePosition: 1 | 2
+  sidePosition: TSidePosition
   /** Ordre global du tirage, 1..N. */
   drawnOrder: number
 }
