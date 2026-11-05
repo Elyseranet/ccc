@@ -8,7 +8,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import type { IPool } from '../interfaces/pool.interface.js'
-import type { IMatchValidationResult } from '../interfaces/score.interface.js'
+import type { IMatchValidationResult, IScoreSubmission } from '../interfaces/score.interface.js'
 import { MATCH_PUBLIC_RELATIONS } from '../consts/edition.const.js'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { ADMIN_MATCH_RELATIONS, OPEN_ROUND_STATUSES, QUALIFICATION_STOPPED_EDITION_STATUSES } from '../consts/match-score.const.js'
@@ -30,6 +30,7 @@ import {
   versionConflict
 } from '../utils/api-error.util.js'
 import { logger } from '../utils/logger.util.js'
+import { toIfMatchHeaders } from '../utils/if-match-header.util.js'
 import { toAdminMatch } from '../utils/match-admin.mapper.util.js'
 import { toPublicMatch } from '../utils/match-public.mapper.util.js'
 import { alignScores, hasSameScores, sidesInOrder } from '../utils/match-score.util.js'
@@ -42,7 +43,7 @@ import { loadParticipations } from './edition.service.js'
  * @description
  * File admin des scores (C6). Service unique du domaine (ARCH-2) : la classe navigateur (`$fetch`, via BaseService)
  * et les fonctions serveur d'écriture des scores (TypeORM, B-12) ; le code navigateur ne référence jamais ces dernières,
- * le build client les élague (`tests/build/client-bundle.test.ts`). L'écriture côté navigateur est ajoutée par F-08.
+ * le build client les élague (`tests/build/client-bundle.test.ts`). Les écritures navigateur (`record`, `validate`) portent `If-Match` (F-08, SEC-Q).
  ********************************************************/
 export class MatchService extends BaseService {
   constructor (options: IBaseServiceOptions = {}) {
@@ -51,6 +52,24 @@ export class MatchService extends BaseService {
 
   adminList (editionId: string, query: IAdminMatchesQuery = {}): Promise<IAdminMatch[]> {
     return this.request<IAdminMatch[]>(`/admin/editions/${encodeURIComponent(editionId)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } })
+  }
+
+  /** « Enregistrer » : `PUT /matchs/{id}/score`, version lue obligatoire (`If-Match`). Rend le match à jour, version comprise. */
+  record (matchId: string, submission: IScoreSubmission, version: number): Promise<IAdminMatch> {
+    return this.request<IAdminMatch>(`/matchs/${encodeURIComponent(matchId)}/score`, {
+      method: 'PUT',
+      body: { scores: submission.scores },
+      headers: toIfMatchHeaders(version)
+    })
+  }
+
+  /** « Valider » : `POST /matchs/{id}/validation`. La réponse porte l'état recalculé (match, poule, tour) : aucune relecture. */
+  validate (matchId: string, submission: IScoreSubmission, version: number): Promise<IMatchValidationResult> {
+    return this.request<IMatchValidationResult>(`/matchs/${encodeURIComponent(matchId)}/validation`, {
+      method: 'POST',
+      body: { scores: submission.scores },
+      headers: toIfMatchHeaders(version)
+    })
   }
 }
 

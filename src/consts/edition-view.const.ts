@@ -93,6 +93,7 @@ export const EDITION_CHIP_PROPS: Record<EDITION_CHIP_FAMILY, { color?: string, b
   [EDITION_CHIP_FAMILY.NEUTRAL]: {},
   [EDITION_CHIP_FAMILY.TINTED_SUCCESS]: { color: 'success', bgColor: 'var(--origam-color__feedback--success---bgSubtle)' },
   [EDITION_CHIP_FAMILY.TINTED_INFO]: { color: 'info', bgColor: 'var(--origam-color__feedback--info---bgSubtle)' },
+  [EDITION_CHIP_FAMILY.TINTED_WARNING]: { color: 'warning', bgColor: 'var(--origam-color__feedback--warning---bgSubtle)' },
   [EDITION_CHIP_FAMILY.FULL_SECONDARY]: { color: 'secondary', bgColor: 'secondary' }
 }
 

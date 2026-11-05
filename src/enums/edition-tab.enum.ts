@@ -17,6 +17,7 @@ export enum EDITION_CHIP_FAMILY {
   NEUTRAL = 'neutral',
   TINTED_SUCCESS = 'tinted-success',
   TINTED_INFO = 'tinted-info',
+  TINTED_WARNING = 'tinted-warning',
   FULL_SECONDARY = 'full-secondary'
 }
 

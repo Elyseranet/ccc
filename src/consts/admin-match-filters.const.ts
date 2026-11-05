@@ -24,3 +24,6 @@ export const ADMIN_MATCH_FILTERS: ReadonlyArray<{ value: ADMIN_MATCH_FILTER, key
   { value: ADMIN_MATCH_FILTER.UNSCORED, key: 'admin.matches.filter_unscored', label: 'Sans score' },
   { value: ADMIN_MATCH_FILTER.VALIDATED, key: 'admin.matches.filter_validated', label: 'Validés' }
 ]
+
+/** Valeur de texte de « Toutes les poules » dans le sélecteur (Origam ne distingue pas `null` d'une absence de sélection). */
+export const ADMIN_MATCH_ALL_POOLS_VALUE = 'all'
