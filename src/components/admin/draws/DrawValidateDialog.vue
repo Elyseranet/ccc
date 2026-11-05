@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamDialog } from 'origam/components'
 import { useT } from '~/composables/useT'
 import type { IDrawValidateDialogProps } from '~/interfaces/pool-draw.interface'
@@ -79,6 +79,20 @@ const handleOpen = (value: boolean) => {
     emits('cancel')
   }
 }
+// Dialogue `persistent` (ni clic extérieur ni Échap par défaut) : une action irréversible se referme pourtant au clavier (Échap annule).
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && !props.busy) {
+    emits('cancel')
+  }
+}
+watch(() => props.open, (open) => {
+  if (open) {
+    window.addEventListener('keydown', handleKeydown)
+  } else {
+    window.removeEventListener('keydown', handleKeydown)
+  }
+})
+onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 watch(() => props.open, async (open) => {
   if (open) {
     await nextTick()

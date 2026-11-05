@@ -98,9 +98,11 @@ test.describe('admin tirages : parcours complet sur une édition créée par le 
     }
     await expect(page.getByTestId('draw-rest')).toContainText('Tous les joueurs sont placés')
 
-    const draft = (await draftsOf(page, edition)).find(entry => entry.kind === 'POOLS')
+    // L'avancement est optimiste : chaque affectation part ensuite en file vers le serveur (une requête par affectation).
+    const draftOf = async () => (await draftsOf(page, edition)).find(entry => entry.kind === 'POOLS')
+    await expect.poll(async () => (await draftOf())?.assignments.length).toBe(PLAYER_COUNT)
+    const draft = await draftOf()
     expect(draft?.status).toBe('DRAFT')
-    expect(draft?.assignments).toHaveLength(PLAYER_COUNT)
     const orders = draft!.assignments.map(assignment => assignment.drawnOrder).sort((a, b) => a - b)
     expect(orders).toEqual(Array.from({ length: PLAYER_COUNT }, (_, index) => index + 1))
 
@@ -125,9 +127,8 @@ test.describe('admin tirages : parcours complet sur une édition créée par le 
 
     const validated = (await draftsOf(page, edition)).find(entry => entry.kind === 'POOLS')
     expect(validated?.status).toBe('VALIDATED')
-    const matches = await (await page.request.get(`/api/v1/editions/${edition.code}/matchs`)).json() as { items?: unknown[] } | unknown[]
-    const count = Array.isArray(matches) ? matches.length : (matches.items?.length ?? 0)
-    expect(count).toBe(EXPECTED_POOLS * ((POOL_SIZE * (POOL_SIZE - 1)) / 2))
+    const { total } = await (await page.request.get(`/api/v1/editions/${edition.code}/matchs`)).json() as { total: number }
+    expect(total).toBe(EXPECTED_POOLS * ((POOL_SIZE * (POOL_SIZE - 1)) / 2))
   })
 
   test('annuler la confirmation ne valide rien ; Échap ferme le dialogue', async ({ page, context }) => {
