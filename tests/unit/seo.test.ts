@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { SEO_DESCRIPTION_MAX_LENGTH, SEO_MESSAGES, SEO_PRIVATE_ROUTE_PATTERNS, SEO_TITLE_MAX_LENGTH } from '../../src/consts/seo.const'
+import { SEO_DESCRIPTION_MAX_LENGTH, SEO_MESSAGES, SEO_PRIVATE_ROUTE_PATTERNS, SEO_TITLE_MAX_LENGTH, SEO_TITLE_SEPARATOR } from '../../src/consts/seo.const'
 import { SEO_PAGE } from '../../src/enums/seo.enum'
-import { buildAbsoluteImageUrl, buildCanonicalUrl } from '../../src/utils/seo.util'
+import { buildAbsoluteImageUrl, buildCanonicalUrl, renderBounded } from '../../src/utils/seo.util'
 
 const read = (file: string): Record<string, string> => JSON.parse(readFileSync(file, 'utf8'))
 const fr = read('src/assets/locales/fr.json')
@@ -11,6 +11,8 @@ const en = read('src/assets/locales/en.json')
 
 /** Paramètres réalistes : le code d'une édition, le nom le plus long qu'on puisse raisonnablement afficher. */
 const SAMPLE_PARAMS = { code: '2012b', name: 'Prénom Nom-Composé-Long' }
+/** Suffixe ajouté une seule fois par `useSeo` : séparateur et nom du site. */
+const SITE_SUFFIX = `${SEO_TITLE_SEPARATOR}${fr['layout.brand_name']}`
 const fill = (text: string): string => Object.entries(SAMPLE_PARAMS).reduce((message, [name, value]) => message.replaceAll(`{${name}}`, value), text)
 
 describe('URL canonique et image de partage', () => {
@@ -29,6 +31,31 @@ describe('URL canonique et image de partage', () => {
     expect(buildAbsoluteImageUrl('https://ccc.example.test', '  ')).toBe('')
     expect(buildAbsoluteImageUrl('https://ccc.example.test/', '/partage.png')).toBe('https://ccc.example.test/partage.png')
     expect(buildAbsoluteImageUrl('https://ccc.example.test', 'https://cdn.example.test/partage.png')).toBe('https://cdn.example.test/partage.png')
+  })
+})
+
+describe('renderBounded : un paramètre trop long est tronqué avec une ellipse', () => {
+  const render = (params: Record<string, string | number>): string => `${params.name} : fiche`
+
+  it('un texte qui tient reste intact', () => {
+    expect(renderBounded(render, { name: 'Sam' }, 40)).toBe('Sam : fiche')
+  })
+
+  it('un nom trop long perd la fin, garde le texte fixe et tient dans le plafond', () => {
+    const text = renderBounded(render, { name: 'Maximilien-Alexandre de la Tour d’Auvergne' }, 30)
+    expect(text.length).toBeLessThanOrEqual(30)
+    expect(text.endsWith('… : fiche')).toBe(true)
+    expect(text.startsWith('Maximilien')).toBe(true)
+  })
+
+  it('sans paramètre texte à tronquer, c’est le rendu entier qui est borné', () => {
+    const text = renderBounded(() => 'x'.repeat(100), {}, 20)
+    expect(text).toHaveLength(20)
+    expect(text.endsWith('…')).toBe(true)
+  })
+
+  it('les paramètres numériques ne sont jamais tronqués', () => {
+    expect(renderBounded(params => `Édition ${params.code} du championnat`, { code: 2025 }, 40)).toBe('Édition 2025 du championnat')
   })
 })
 
@@ -55,6 +82,12 @@ describe('textes de référencement : une clé par page, uniques, bornés', () =
     }
   })
 
+  it('aucun titre ne porte le nom du site : il est ajouté une seule fois par useSeo', () => {
+    for (const page of pages) {
+      expect(fr[`seo.${page}.title`], page).not.toContain(fr['layout.brand_name']!)
+    }
+  })
+
   it.each([['fr', fr], ['en', en]])('chaque titre et chaque description sont uniques (%s)', (_, locale) => {
     const titles = pages.map(page => locale[`seo.${page}.title`])
     const descriptions = pages.map(page => locale[`seo.${page}.description`])
@@ -64,7 +97,7 @@ describe('textes de référencement : une clé par page, uniques, bornés', () =
 
   it.each([['fr', fr], ['en', en]])('un titre tient en %i caractères et une description en %i (%s)'.replace('%i', String(SEO_TITLE_MAX_LENGTH)).replace('%i', String(SEO_DESCRIPTION_MAX_LENGTH)), (_, locale) => {
     for (const page of pages) {
-      expect(fill(locale[`seo.${page}.title`]!).length, `${page} title`).toBeLessThanOrEqual(SEO_TITLE_MAX_LENGTH)
+      expect(`${fill(locale[`seo.${page}.title`]!)}${SITE_SUFFIX}`.length, `${page} title`).toBeLessThanOrEqual(SEO_TITLE_MAX_LENGTH)
       expect(fill(locale[`seo.${page}.description`]!).length, `${page} description`).toBeLessThanOrEqual(SEO_DESCRIPTION_MAX_LENGTH)
     }
   })

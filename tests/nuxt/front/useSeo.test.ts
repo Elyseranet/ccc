@@ -64,7 +64,27 @@ describe('useSeo : page publique', () => {
     expect(documentTitle()).toBe('Édition 2025 du Championnat de Caps · CCC')
     expect(meta('meta[name="description"]')).toContain('Édition 2025')
     await mountSeo({ page: SEO_PAGE.PLAYER, path: '/joueurs/abc', params: () => ({ name: 'Nicolas Deseine' }) })
-    expect(documentTitle()).toBe('Nicolas Deseine · Fiche joueur · CCC')
+    expect(documentTitle()).toBe('Nicolas Deseine : fiche joueur · CCC')
+  })
+
+  it('un nom très long est tronqué avec une ellipse : le titre complet reste sous 60 caractères et garde le suffixe du site', async () => {
+    const name = 'Maximilien-Alexandre de la Tour d’Auvergne-Lauraguais-Montmorency'
+    await mountSeo({ page: SEO_PAGE.PLAYER, path: '/joueurs/abc', params: { name } })
+    const title = documentTitle()
+    expect(title.length).toBeLessThanOrEqual(60)
+    expect(title.endsWith(' : fiche joueur · CCC')).toBe(true)
+    expect(title).toContain('…')
+    expect(title.startsWith('Maximilien-Alexandre')).toBe(true)
+    expect(meta('meta[property="og:title"]')).toBe(title)
+    expect(meta('meta[name="description"]')!.length).toBeLessThanOrEqual(160)
+  })
+
+  it('le nom du site est ajouté une seule fois, à toutes les pages, accueil compris', async () => {
+    for (const page of Object.values(SEO_PAGE)) {
+      await mountSeo({ page, path: '/x', params: { code: '2025', name: 'Nicolas Deseine' } })
+      expect(documentTitle().match(/ · CCC/g), page).toHaveLength(1)
+      expect(documentTitle().endsWith(' · CCC'), page).toBe(true)
+    }
   })
 
   it('la racine a pour canonique l’origine seule', async () => {

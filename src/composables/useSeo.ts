@@ -5,20 +5,24 @@ import {
   SEO_LOCALES,
   SEO_MESSAGES,
   SEO_OG_TYPE,
+  SEO_DESCRIPTION_MAX_LENGTH,
   SEO_ROBOTS_NOINDEX,
+  SEO_TITLE_MAX_LENGTH,
+  SEO_TITLE_SEPARATOR,
   SEO_TWITTER_CARD,
   SEO_TWITTER_CARD_WITH_IMAGE
 } from '~/consts/seo.const'
 import type { ISeoOptions } from '~/interfaces/seo.interface'
 import { isSiteIndexable } from '~/utils/site-indexable.util'
-import { buildAbsoluteImageUrl, buildCanonicalUrl } from '~/utils/seo.util'
+import { buildAbsoluteImageUrl, buildCanonicalUrl, renderBounded } from '~/utils/seo.util'
 
 /*********************************************************
  * useSeo
  *
  * @description
  * Métadonnées de référencement d'une page (T-SEO-01). Une page publique donne son `page` : titre et description viennent de
- * `seo.<page>.title|description` (textes fixes avec paramètres, jamais assemblés à partir des données de la page), la canonique et `og:url`
+ * `seo.<page>.title|description` (textes fixes avec paramètres, jamais assemblés à partir des données de la page). Le nom du site est ajouté une seule fois au titre, ici ; un
+ * paramètre trop long (le nom d'un joueur) est tronqué avec une ellipse pour que le titre complet tienne dans 60 caractères et la description dans 160, la canonique et `og:url`
  * de `runtimeConfig.public.siteUrl` (jamais de l'en-tête Host) et du chemin sans query, `og:locale` de la langue chargée par `useT`. L'image de
  * partage (`runtimeConfig.public.siteOgImage`) n'est posée que si elle est renseignée. Une page privée (admin, connexion, profil, invitation)
  * passe `noindex` : elle ne pose que `robots`, et garde son propre titre. `robots: noindex, nofollow` est aussi posé dans le HTML de toutes les
@@ -38,8 +42,9 @@ export const useSeo = (options: ISeoOptions) => {
   const messages = SEO_MESSAGES[options.page]
   const params = computed(() => toValue(options.params) ?? {})
   const siteName = computed(() => t('layout.brand_name', 'CCC'))
-  const title = computed(() => t(messages.title.key, messages.title.label, params.value))
-  const description = computed(() => t(messages.description.key, messages.description.label, params.value))
+  const suffix = computed(() => `${SEO_TITLE_SEPARATOR}${siteName.value}`)
+  const title = computed(() => `${renderBounded(bounded => t(messages.title.key, messages.title.label, bounded), params.value, SEO_TITLE_MAX_LENGTH - suffix.value.length)}${suffix.value}`)
+  const description = computed(() => renderBounded(bounded => t(messages.description.key, messages.description.label, bounded), params.value, SEO_DESCRIPTION_MAX_LENGTH))
   const siteUrl = String(config.public.siteUrl)
   const url = computed(() => buildCanonicalUrl(siteUrl, toValue(options.path) ?? route.path))
   const image = buildAbsoluteImageUrl(siteUrl, String(config.public.siteOgImage ?? ''))
