@@ -1,4 +1,5 @@
 import type { IAddParticipantResult, IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
+import type { IAdminActivityItem } from '../interfaces/admin-activity.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IArchiveStats } from '../interfaces/stats.interface.js'
@@ -71,6 +72,11 @@ export class EditionService extends BaseService {
 
   detail (id: string): Promise<IEditionDetail> {
     return this.request<IEditionDetail>(`/editions/${encodeURIComponent(id)}`)
+  }
+
+  /** Flux d'activité du tableau de bord (B-15) : validations de match et de tirage, du plus récent au plus ancien. */
+  adminActivity (id: string, limit?: number): Promise<IAdminActivityItem[]> {
+    return this.request<IAdminActivityItem[]>(`/admin/editions/${encodeURIComponent(id)}/activite`, { query: { limit } })
   }
 
   matches (id: string, query: IEditionMatchesQuery = {}): Promise<IPaginated<IMatch>> {
