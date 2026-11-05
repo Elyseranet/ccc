@@ -6,6 +6,14 @@ Toutes ces routes exigent le rôle `ADMIN` : **401** sans session, **403** pour 
 
 Chaque écriture journalise un événement structuré avec `userId` et `editionId` (ou `competitorId`), sans donnée personnelle : `edition_created`, `edition_updated`, `competitor_updated`, `participant_added`, `participant_removed`.
 
+## `GET /api/v1/admin/editions` (B-20)
+
+Toutes les éditions, de la plus récente à la plus ancienne (`chronologicalRank` décroissant), sans pagination, comme la liste publique. Réponse `IAdminEditionSummary[]` = `IEditionSummary` + `registeredCount`.
+
+- `registeredCount` est le nombre d'inscrits **en direct** : les participations de l'édition à l'instant de la lecture, quel que soit son statut. Un retrait (`DELETE …/participants/{participationId}`) le fait baisser, un ajout le fait monter, et il vaut `0` pour une édition sans inscrit. Le compte vient d'une seule requête `COUNT(*) … GROUP BY edition_id` : le nombre de requêtes ne dépend pas du nombre d'éditions.
+- `participantCount` reste le N **figé à la clôture** (RG2, A6), `null` tant que l'édition n'est pas close. La liste publique `GET /api/v1/editions` ne change pas et n'expose pas `registeredCount`.
+- Accès ADMIN : **401** sans session, **403** pour un participant, rôle vérifié avant toute lecture. `Cache-Control: no-store`. Aucune limite de débit propre, comme `GET …/participants`.
+
 ## `POST /api/v1/editions`
 
 Corps : `{ year, name, heldOn?, description?, location? }` (`heldOn` au format `YYYY-MM-DD`, date calendaire réelle ; `year` entre 2000 et 2100). Réponse **201** : `IEditionSummary`, statut `CREATED`, origine `APP`.
