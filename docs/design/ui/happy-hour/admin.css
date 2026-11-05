@@ -278,3 +278,14 @@
 .q-rank .table th, .q-rank .table td { white-space: normal; } /* origam-table : retour à la ligne dans les cellules, pas de défilement horizontal (décision front-lead) */
 .adm-dep { flex: 0 0 auto; }
 .mc[hidden] { display: none; }
+/* origam-dialog configuré (option a, front-lead) : carte 560 px, marge 8, rayon xl, ombre xl ; en-tête marge 16, titre xl gras ; texte md, marge 0 24 24 (marge latérale non thémable : décalée de 8 px sur le titre) ; pied = slot, marge 0 16 16, boutons d’Origam 44 px */
+.odlg { width: min(35rem, 100%); margin-top: var(--origam-space---4); padding: var(--origam-space---2); border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---xl); }
+.odlg__h { display: flex; align-items: center; justify-content: space-between; gap: var(--origam-space---3); min-height: var(--origam-space---14); padding-inline: var(--origam-space---4); }
+.odlg__t { font-size: var(--origam-font__size---xl); font-weight: var(--origam-font__weight---bold); line-height: var(--origam-font__lineHeight---tight); }
+.odlg__x { flex: none; width: var(--origam-space---11); min-height: var(--origam-space---11); padding-inline: 0; background: none; box-shadow: none; color: var(--origam-color__text---primary); }
+.odlg__x svg { width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
+.odlg__txt { display: grid; gap: var(--origam-space---3); padding: 0 var(--origam-space---6) var(--origam-space---6); font-size: var(--origam-font__size---md); line-height: var(--origam-font__lineHeight---normal); }
+.odlg__f { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--origam-space---3); padding: 0 var(--origam-space---4) var(--origam-space---4); }
+.odlg__f .btn { min-height: var(--origam-space---11); padding-inline: var(--origam-space---5); }
+.odlg__f .btn--outlined { border: 2px solid var(--origam-color__border---strong); box-shadow: none; color: white; } /* origam-btn outlined : bordure réelle de 2 px (pas une ombre intérieure), texte blanc imposé par v-contrast */
+.odlg__f .btn--danger { box-shadow: var(--origam-shadow---lg); } /* recette CTA : elevation lg */
