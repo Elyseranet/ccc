@@ -1,25 +1,28 @@
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAdminEdition } from '~/composables/useAdminEdition'
 import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
-import { ADMIN_MATCH_DEFAULT_FILTER, ADMIN_MATCH_FILTER_QUERY_PARAM, ADMIN_MATCH_FILTERS, ADMIN_MATCH_POOL_QUERY_PARAM, ADMIN_MATCHES_ASYNC_KEY } from '~/consts/admin-match-filters.const'
+import { ADMIN_MATCH_ALL_ROUNDS_VALUE, ADMIN_MATCH_DEFAULT_FILTER, ADMIN_MATCH_FILTER_QUERY_PARAM, ADMIN_MATCH_FILTERS, ADMIN_MATCH_POOL_QUERY_PARAM, ADMIN_MATCH_ROUND_QUERY_PARAM, ADMIN_MATCHES_ASYNC_KEY } from '~/consts/admin-match-filters.const'
 import { EDITION_STATUS } from '~/enums/edition.enum'
-import { ROUND_KIND } from '~/enums/round.enum'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
+import { ROUND_KIND } from '~/enums/round.enum'
+import type { TAdminMatchRound } from '~/types/admin-match-round.type'
 import type { IAdminMatch } from '~/interfaces/admin-match.interface'
 import type { IMatchFilterView } from '~/interfaces/admin-match-queue.interface'
 import { MatchService } from '~/services/match.service'
-import { countByFilter, matchesFilter, parseAdminMatchFilter, parseAdminMatchPool, poolsOf, sortForQueue, toMatchCard } from '~/utils/admin-match.util'
+import { countByFilter, currentRoundOf, matchesFilter, parseAdminMatchFilter, parseAdminMatchPool, parseAdminMatchRound, poolsOf, roundsOf, sortForQueue, toMatchCard } from '~/utils/admin-match.util'
 import { fromAsyncDataError, toAsyncDataError } from '~/utils/async-data-error.util'
 
 /*********************************************************
  * useMatchQueue
  *
  * @description
- * File admin des scores de l'édition active (`GET /admin/editions/{id}/matchs?tour=POOLS`, C6) : les matchs de poule seulement
- * (décision front-lead, spec fonctionnelle : « matchs de poules » et « matchs du bracket » sont deux étapes distinctes ; la saisie du bracket
- * est un autre ticket). La liste complète est chargée une fois :
+ * File admin des scores de l'édition active (`GET /admin/editions/{id}/matchs`, C6), tous tours confondus (décision utilisateur
+ * 1b7483d5 : aucun écran admin ne saisit les scores de la phase finale). Le tour (`?tour=`, par défaut le tour en cours) et, pour les
+ * poules, la poule (`?poule=`) filtrent côté navigateur ; les compteurs suivent le tour et la poule actifs.
+ * Le tour par défaut est calculé à chaque chargement de la liste, pas à chaque écriture : valider le dernier match d'un tour ne fait pas
+ * sauter la vue sur le tour suivant. La liste complète est chargée une fois :
  * les compteurs des quatre filtres en découlent sans autre appel, et le filtre (`?f=`) et la poule (`?poule=`) sont portés
  * par l'URL (changer de filtre ne recharge rien). Une édition archivée est en lecture seule : aucune action sur les cartes.
  * Clé de cache fixe : l'édition active (cookie) n'est connue qu'après le chargement des éditions, une clé calculée à partir d'elle
@@ -46,7 +49,7 @@ export const useMatchQueue = async () => {
         return []
       }
       try {
-        return await service.adminList(editionId.value, { tour: ROUND_KIND.POOLS })
+        return await service.adminList(editionId.value)
       } catch (cause) {
         throw toAsyncDataError(cause)
       }
@@ -66,16 +69,38 @@ export const useMatchQueue = async () => {
     set: value => { replaceQuery(ADMIN_MATCH_FILTER_QUERY_PARAM, value === ADMIN_MATCH_DEFAULT_FILTER ? null : value) }
   })
 
+  const matches = computed(() => request.data.value ?? [])
+  const rounds = computed(() => roundsOf(matches.value))
+  const defaultRound = ref(currentRoundOf(matches.value))
+  watch(request.status, (status) => {
+    if (status === 'success') {
+      defaultRound.value = currentRoundOf(matches.value)
+    }
+  })
+  const round = computed<TAdminMatchRound>({
+    get: () => {
+      const asked = parseAdminMatchRound(route.query[ADMIN_MATCH_ROUND_QUERY_PARAM])
+      return asked !== null && (asked === ADMIN_MATCH_ALL_ROUNDS_VALUE || rounds.value.includes(asked))
+        ? asked
+        : defaultRound.value ?? ADMIN_MATCH_ALL_ROUNDS_VALUE
+    },
+    set: value => {
+      const { [ADMIN_MATCH_POOL_QUERY_PARAM]: _pool, [ADMIN_MATCH_ROUND_QUERY_PARAM]: _previous, ...rest } = route.query
+      router.replace({ query: { ...rest, [ADMIN_MATCH_ROUND_QUERY_PARAM]: value } })
+    }
+  })
+  const hasPoolFilter = computed(() => round.value === ROUND_KIND.POOLS)
+
   const pool = computed<number | null>({
-    get: () => parseAdminMatchPool(route.query[ADMIN_MATCH_POOL_QUERY_PARAM]),
+    get: () => hasPoolFilter.value ? parseAdminMatchPool(route.query[ADMIN_MATCH_POOL_QUERY_PARAM]) : null,
     set: value => { replaceQuery(ADMIN_MATCH_POOL_QUERY_PARAM, value === null ? null : String(value)) }
   })
 
   const edition = computed(() => (editions.value ?? []).find(entry => entry.id === editionId.value) ?? null)
   const isReadonly = computed(() => edition.value?.status === EDITION_STATUS.CLOSED)
-  const matches = computed(() => request.data.value ?? [])
-  const pools = computed(() => poolsOf(matches.value))
-  const inPool = computed(() => matches.value.filter(match => pool.value === null || match.poolRank === pool.value))
+  const inRound = computed(() => matches.value.filter(match => round.value === ADMIN_MATCH_ALL_ROUNDS_VALUE || match.roundKind === round.value))
+  const pools = computed(() => poolsOf(inRound.value))
+  const inPool = computed(() => inRound.value.filter(match => pool.value === null || match.poolRank === pool.value))
   const counts = computed(() => countByFilter(inPool.value))
   const filterViews = computed<IMatchFilterView[]>(() => ADMIN_MATCH_FILTERS.map(entry => ({
     value: entry.value,
@@ -98,5 +123,5 @@ export const useMatchQueue = async () => {
     await request.refresh()
   }
 
-  return { filter, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending: request.pending, findMatch, replaceMatch, reload }
+  return { filter, round, rounds, hasPoolFilter, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending: request.pending, findMatch, replaceMatch, reload }
 }

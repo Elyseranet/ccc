@@ -34,27 +34,61 @@
         </template>
       </origam-chip>
     </origam-chip-group>
-    <origam-select
-      :model-value="poolValue"
-      :items="poolItems"
-      :label="poolLabel"
-      rounded="full"
-      hide-details
-      :menu-icon="CaretDown"
-      class="match-queue-filters__pool"
-      data-cy="admin-matches-pool"
-      @update:model-value="handlePool"
-    />
+    <div class="match-queue-filters__selects">
+      <div class="match-queue-filters__field">
+        <origam-label
+          :for="roundId"
+          :text="roundLabel"
+        />
+        <origam-select
+          :id="roundId"
+          :model-value="round"
+          :items="roundItems"
+          :label="roundLabel"
+          single-line
+          rounded="full"
+          hide-details
+          :menu-icon="CaretDown"
+          class="match-queue-filters__select"
+          data-cy="admin-matches-round"
+          @update:model-value="handleRound"
+        />
+      </div>
+      <div
+        v-if="hasPoolFilter"
+        class="match-queue-filters__field"
+      >
+        <origam-label
+          :for="poolId"
+          :text="poolLabel"
+        />
+        <origam-select
+          :id="poolId"
+          :model-value="poolValue"
+          :items="poolItems"
+          :label="poolLabel"
+          single-line
+          rounded="full"
+          hide-details
+          :menu-icon="CaretDown"
+          class="match-queue-filters__select"
+          data-cy="admin-matches-pool"
+          @update:model-value="handlePool"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { OrigamChip, OrigamChipGroup, OrigamSelect } from 'origam/components'
+import { computed, useId } from 'vue'
+import { OrigamChip, OrigamChipGroup, OrigamLabel, OrigamSelect } from 'origam/components'
 import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
-import { ADMIN_MATCH_ALL_POOLS_VALUE } from '~/consts/admin-match-filters.const'
+import { ADMIN_MATCH_ALL_POOLS_VALUE, ADMIN_MATCH_ALL_ROUNDS_VALUE } from '~/consts/admin-match-filters.const'
+import { ROUND_LABELS } from '~/consts/round-labels.const'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
+import type { TAdminMatchRound } from '~/types/admin-match-round.type'
 import type { IMatchQueueFiltersEmits, IMatchQueueFiltersProps } from '~/interfaces/admin-match-queue.interface'
 
 /*********************************************************
@@ -69,6 +103,8 @@ const { t } = useT()
 const props = withDefaults(defineProps<IMatchQueueFiltersProps>(), {})
 const emits = defineEmits<IMatchQueueFiltersEmits>()
 defineSlots<{}>()
+const roundId = useId()
+const poolId = useId()
 
 /*********************************************************
  * Filtres
@@ -76,7 +112,15 @@ defineSlots<{}>()
  * @description
  * Le chip actif prend la couleur secondaire ; le compteur porte aussi le sens (jamais la couleur seule).
  ********************************************************/
-const filtersLabel = computed(() => t('admin.matches.filters_label', 'Filtrer les matchs'))
+const filtersLabel = computed(() => {
+  const round = props.round === ADMIN_MATCH_ALL_ROUNDS_VALUE
+    ? t('admin.matches.round_all', 'Tous les tours')
+    : t(ROUND_LABELS[props.round].key, ROUND_LABELS[props.round].label)
+  const scope = props.hasPoolFilter && props.pool !== null
+    ? t('admin.matches.scope_pool', '{round}, poule {rank}', { round, rank: props.pool })
+    : round
+  return t('admin.matches.filters_label', 'Filtrer les matchs · compteurs pour : {scope}', { scope })
+})
 const views = computed(() => props.filters.map(entry => {
   const selected = entry.value === props.filter
   return {
@@ -89,6 +133,22 @@ const views = computed(() => props.filters.map(entry => {
 }))
 const handleFilter = (value: ADMIN_MATCH_FILTER) => {
   emits('update:filter', value)
+}
+
+/*********************************************************
+ * Tour
+ *
+ * @description
+ * « Tous les tours », puis les seuls tours qui existent dans l'édition, dans l'ordre de `ROUND_KIND`, avec les libellés de
+ * `ROUND_LABELS` (pas de seconde table). Le tour par défaut (le tour en cours) est choisi par le parent.
+ ********************************************************/
+const roundLabel = computed(() => t('admin.matches.round_label', 'Tour'))
+const roundItems = computed(() => [
+  { title: t('admin.matches.round_all', 'Tous les tours'), value: ADMIN_MATCH_ALL_ROUNDS_VALUE },
+  ...props.rounds.map(kind => ({ title: t(ROUND_LABELS[kind].key, ROUND_LABELS[kind].label), value: kind }))
+])
+const handleRound = (value: TAdminMatchRound) => {
+  emits('update:round', value)
 }
 
 /*********************************************************
@@ -142,8 +202,21 @@ defineExpose({})
     gap: var(--origam-space---2);
   }
 
-  &__pool {
-    max-width: var(--match-queue-filters__pool---max-width, 16rem);
+  &__selects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--match-queue-filters__selects---gap, var(--origam-space---3));
+  }
+
+  &__field {
+    display: grid;
+    gap: var(--match-queue-filters__field---gap, var(--origam-space---2));
+    flex: 0 1 var(--match-queue-filters__select---width, 16rem);
+    min-width: 0;
+  }
+
+  &__select {
+    min-width: 0;
   }
 
   &__label {
@@ -172,6 +245,8 @@ defineExpose({})
 :root {
   --match-queue-filters---gap: var(--origam-space---4);
   --match-queue-filters---margin-bottom: var(--origam-space---5);
-  --match-queue-filters__pool---max-width: 16rem;
+  --match-queue-filters__selects---gap: var(--origam-space---3);
+  --match-queue-filters__select---width: 16rem;
+  --match-queue-filters__field---gap: var(--origam-space---2);
 }
 </style>

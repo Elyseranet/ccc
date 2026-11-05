@@ -40,9 +40,13 @@
         <match-queue-filters
           :filters="filterViews"
           :filter="filter"
+          :rounds="rounds"
+          :round="round"
+          :has-pool-filter="hasPoolFilter"
           :pools="pools"
           :pool="pool"
           @update:filter="handleFilter"
+          @update:round="handleRound"
           @update:pool="handlePool"
         />
         <match-queue
@@ -102,6 +106,7 @@ import { EDITION_STATUS } from '~/enums/edition.enum'
 import { SCORE_ENTRY_SUCCESS } from '~/enums/score-entry.enum'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
 import type { IAdminMatch } from '~/interfaces/admin-match.interface'
+import type { TAdminMatchRound } from '~/types/admin-match-round.type'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 
 /*********************************************************
@@ -121,7 +126,7 @@ const title = computed(() => t('pages.admin_matches.title', 'Poules et matchs'))
 useHead({ title })
 useSeo({ noindex: true })
 const queue = await useMatchQueue()
-const { filter, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending } = queue
+const { filter, round, rounds, hasPoolFilter, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending } = queue
 const hasCards = computed(() => cards.value.length > 0)
 const editionCode = computed(() => edition.value?.code ?? '')
 const eyebrow = computed(() => edition.value ? t('admin.matches.eyebrow', 'Édition {year}', { year: edition.value.year }) : '')
@@ -147,10 +152,13 @@ const viewEmptyDescription = computed(() => t('admin.matches.view_empty_text', '
  * Filtres
  *
  * @description
- * Le filtre et la poule sont portés par l'URL (`?f=`, `?poule=`).
+ * Le filtre, le tour et la poule sont portés par l'URL (`?f=`, `?tour=`, `?poule=`).
  ********************************************************/
 const handleFilter = (value: ADMIN_MATCH_FILTER) => {
   filter.value = value
+}
+const handleRound = (value: TAdminMatchRound) => {
+  round.value = value
 }
 const handlePool = (value: number | null) => {
   pool.value = value

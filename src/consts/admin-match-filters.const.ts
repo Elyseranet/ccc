@@ -30,3 +30,9 @@ export const ADMIN_MATCH_ALL_POOLS_VALUE = 'all'
 
 /** Clé `useAsyncData` de la file admin (fixe : le changement d'édition relance la requête par `watch`). */
 export const ADMIN_MATCHES_ASYNC_KEY = 'admin-matches'
+
+/** Paramètre d'URL du tour (`/admin/matchs?tour=QUARTER`). Absent : le tour en cours de l'édition. */
+export const ADMIN_MATCH_ROUND_QUERY_PARAM = 'tour'
+
+/** Valeur de « Tous les tours » dans l'URL et dans le sélecteur. */
+export const ADMIN_MATCH_ALL_ROUNDS_VALUE = 'all'

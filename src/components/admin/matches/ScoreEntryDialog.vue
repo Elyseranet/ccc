@@ -43,6 +43,7 @@ import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
 import { DIALOG_SLOT, SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
+import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { MATCH_STATUS } from '~/enums/match.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interfaces/score-entry.interface'
@@ -113,8 +114,9 @@ const eyebrow = computed(() => {
   if (!match) {
     return ''
   }
+  const label = ROUND_LABELS[match.roundKind].match
   const round = match.poolRank === null
-    ? t('admin.matches.dialog_final', 'Phase finale')
+    ? t(label.key, label.label)
     : t('admin.matches.pool_n', 'Poule {rank}', { rank: match.poolRank })
   return t('admin.matches.dialog_eyebrow', '{round} · match {number}', { round, number: `${props.editionCode}-${match.sequence}` })
 })

@@ -1,6 +1,8 @@
 import type { ADMIN_MATCH_FILTER } from '../enums/admin-match-filter.enum.js'
 import type { EDITION_CHIP_FAMILY } from '../enums/edition-tab.enum.js'
 import type { MATCH_ACTION } from '../enums/match-action.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { TAdminMatchRound } from '../types/admin-match-round.type.js'
 import type { IAdminMatch } from './admin-match.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 
@@ -32,7 +34,11 @@ export interface IMatchFilterView {
 export interface IMatchQueueFiltersProps {
   filters: IMatchFilterView[]
   filter: ADMIN_MATCH_FILTER
-  /** Rangs de poule présents dans l'édition. */
+  /** Tours présents dans l'édition, dans l'ordre de `ROUND_KIND`. */
+  rounds: ROUND_KIND[]
+  round: TAdminMatchRound
+  /** Rangs de poule du tour affiché ; le sélecteur de poule n'existe que pour le tour « Poules ». */
+  hasPoolFilter: boolean
   pools: number[]
   /** `null` : toutes les poules. */
   pool: number | null
@@ -40,6 +46,7 @@ export interface IMatchQueueFiltersProps {
 
 export interface IMatchQueueFiltersEmits {
   (event: 'update:filter', value: ADMIN_MATCH_FILTER): void
+  (event: 'update:round', value: TAdminMatchRound): void
   (event: 'update:pool', value: number | null): void
 }
 

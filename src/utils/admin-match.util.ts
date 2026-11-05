@@ -1,10 +1,13 @@
 import {
+  ADMIN_MATCH_ALL_ROUNDS_VALUE,
   ADMIN_MATCH_DEFAULT_FILTER,
   ADMIN_MATCH_FILTER_STATUSES,
   ADMIN_MATCH_FILTERS
 } from '../consts/admin-match-filters.const.js'
 import { ADMIN_MATCH_QUEUE_ORDER, ADMIN_MATCH_STATUS_VIEW } from '../consts/admin-match-status.const.js'
 import { ROUND_LABELS } from '../consts/round-labels.const.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
+import type { TAdminMatchRound } from '../types/admin-match-round.type.js'
 import { ADMIN_MATCH_FILTER } from '../enums/admin-match-filter.enum.js'
 import { MATCH_ACTION } from '../enums/match-action.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
@@ -30,6 +33,29 @@ export const parseAdminMatchFilter = (raw: unknown): ADMIN_MATCH_FILTER => {
 export const parseAdminMatchPool = (raw: unknown): number | null => {
   const value = first(raw)
   return value !== undefined && /^[1-9]\d{0,2}$/.test(value) ? Number(value) : null
+}
+
+/** `?tour=` : un tour (`ROUND_KIND`), `all`, ou `null` (absent ou inconnu : le tour en cours s'applique). */
+export const parseAdminMatchRound = (raw: unknown): TAdminMatchRound | null => {
+  const value = first(raw)
+  if (value === ADMIN_MATCH_ALL_ROUNDS_VALUE) {
+    return ADMIN_MATCH_ALL_ROUNDS_VALUE
+  }
+  return Object.values(ROUND_KIND).find(kind => kind === value) ?? null
+}
+
+/** Tours présents dans l'édition, dans l'ordre de `ROUND_KIND`. */
+export const roundsOf = (matches: readonly IAdminMatch[]): ROUND_KIND[] =>
+  Object.values(ROUND_KIND).filter(kind => matches.some(match => match.roundKind === kind))
+
+/**
+ * Tour en cours : le premier tour (ordre de `ROUND_KIND`) qui a encore un match à saisir ou à valider ; si tout est validé, le
+ * dernier tour de l'édition ; `null` sans match. `IAdminMatch` ne porte pas le statut du tour, on le déduit des matchs.
+ */
+export const currentRoundOf = (matches: readonly IAdminMatch[]): ROUND_KIND | null => {
+  const rounds = roundsOf(matches)
+  const open = rounds.find(kind => matches.some(match => match.roundKind === kind && ADMIN_MATCH_FILTER_STATUSES[ADMIN_MATCH_DEFAULT_FILTER].includes(match.status)))
+  return open ?? rounds[rounds.length - 1] ?? null
 }
 
 export const matchesFilter = (match: IAdminMatch, filter: ADMIN_MATCH_FILTER): boolean =>

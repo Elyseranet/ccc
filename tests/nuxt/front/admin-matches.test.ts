@@ -8,6 +8,7 @@ import { ROUTES } from '../../../src/consts/routes.const'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { MATCH_STATUS } from '../../../src/enums/match.enum'
+import { ROUND_KIND } from '../../../src/enums/round.enum'
 import type { IAdminMatch } from '../../../src/interfaces/admin-match.interface'
 import type { IEditionSummary } from '../../../src/interfaces/edition.interface'
 import AdminMatchesPage from '../../../src/pages/admin/matchs.vue'
@@ -84,10 +85,23 @@ describe('page « Poules et matchs » (F-08)', () => {
     expect(wrapper.get('[data-cy="admin-match-m3"]').text()).toContain('Sans score')
   })
 
-  it('la file ne demande que les matchs de poule (tour=POOLS)', async () => {
+  it('la file charge tous les tours (aucun ?tour= envoyé à l’API)', async () => {
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-matches-queue"]').exists()).toBe(true))
-    expect(listQueries).toHaveBeenCalledWith(expect.objectContaining({ tour: 'POOLS' }))
+    expect(listQueries).toHaveBeenCalled()
+    expect(listQueries.mock.calls[0]![0]).not.toHaveProperty('tour')
+  })
+
+  it('le tour par défaut est le tour en cours, le sélecteur de poule n’existe que pour « Poules »', async () => {
+    matches = [
+      buildAdminMatch({ id: 'p1', sequence: 1, status: MATCH_STATUS.VALIDATED, roundKind: ROUND_KIND.POOLS, poolRank: 1 }),
+      buildAdminMatch({ id: 'q1', sequence: 2, status: MATCH_STATUS.SCHEDULED, roundKind: ROUND_KIND.QUARTER, poolRank: null, targetScore: 10 })
+    ]
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-match-q1"]').exists()).toBe(true))
+    expect(wrapper.find('[data-cy="admin-matches-pool"]').exists()).toBe(false)
+    expect(wrapper.find('[data-cy="admin-matches-round"]').exists()).toBe(true)
+    expect(wrapper.find('[data-cy="admin-match-p1"]').exists()).toBe(false)
   })
 
   it('les boutons portent le nom des deux joueurs et un libellé visible contenu dans leur nom', async () => {

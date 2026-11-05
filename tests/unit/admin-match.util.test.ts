@@ -4,13 +4,17 @@ import { ADMIN_MATCH_FILTER } from '../../src/enums/admin-match-filter.enum'
 import { EDITION_CHIP_FAMILY } from '../../src/enums/edition-tab.enum'
 import { MATCH_ACTION } from '../../src/enums/match-action.enum'
 import { MATCH_STATUS } from '../../src/enums/match.enum'
+import { ROUND_KIND } from '../../src/enums/round.enum'
 import {
   countByFilter,
+  currentRoundOf,
   initialScoreInputs,
   matchesFilter,
   parseAdminMatchFilter,
   parseAdminMatchPool,
+  parseAdminMatchRound,
   poolsOf,
+  roundsOf,
   sortForQueue,
   toMatchCard
 } from '../../src/utils/admin-match.util'
@@ -83,5 +87,33 @@ describe('file admin des matchs (F-08)', () => {
   it('le formulaire repart du score déjà saisi, vide sinon', () => {
     expect(initialScoreInputs(queue[2]!)).toEqual(['5', '1'])
     expect(initialScoreInputs(queue[1]!)).toEqual(['', ''])
+  })
+
+  it('le tour de l’URL est un ROUND_KIND ou « all », sinon null (le tour en cours s’applique)', () => {
+    expect(parseAdminMatchRound('QUARTER')).toBe(ROUND_KIND.QUARTER)
+    expect(parseAdminMatchRound('all')).toBe('all')
+    expect(parseAdminMatchRound('ROUND_OF_32')).toBeNull()
+    expect(parseAdminMatchRound(undefined)).toBeNull()
+  })
+
+  it('seuls les tours présents sont proposés, dans l’ordre de ROUND_KIND', () => {
+    const rounds = [
+      buildAdminMatch({ id: 'f', roundKind: ROUND_KIND.FINAL }),
+      buildAdminMatch({ id: 'q', roundKind: ROUND_KIND.QUARTER }),
+      buildAdminMatch({ id: 'p', roundKind: ROUND_KIND.POOLS })
+    ]
+    expect(roundsOf(rounds)).toEqual([ROUND_KIND.POOLS, ROUND_KIND.QUARTER, ROUND_KIND.FINAL])
+  })
+
+  it('le tour en cours est le premier tour avec un match à traiter, sinon le dernier, sinon null', () => {
+    const open = [
+      buildAdminMatch({ id: 'a', roundKind: ROUND_KIND.POOLS, status: MATCH_STATUS.VALIDATED }),
+      buildAdminMatch({ id: 'b', roundKind: ROUND_KIND.QUARTER, status: MATCH_STATUS.SCHEDULED }),
+      buildAdminMatch({ id: 'c', roundKind: ROUND_KIND.FINAL, status: MATCH_STATUS.SCHEDULED })
+    ]
+    expect(currentRoundOf(open)).toBe(ROUND_KIND.QUARTER)
+    const done = open.map(match => ({ ...match, status: MATCH_STATUS.VALIDATED }))
+    expect(currentRoundOf(done)).toBe(ROUND_KIND.FINAL)
+    expect(currentRoundOf([])).toBeNull()
   })
 })
