@@ -81,7 +81,8 @@ export const sameMembers = (a: readonly string[], b: readonly string[]): boolean
  * dupliquée. Bloqué par QUALIFICATION_NOT_DONE tant que la liste n'est pas figée, par ROUND_NOT_COMPLETED tant que le dernier
  * tour de phase finale n'est pas entièrement validé. Le type du tour : PLAYOFF (barrages, A9) pour le premier tour d'une
  * qualification `withPlayoff`, sinon déduit de la taille du vivier (2, 4, 8, 16) ; null si rien n'est tirable.
- * Q2 (en attente) : aucune exigence de puissance de 2 à la qualification, seule la taille du vivier compte ici.
+ * Décision utilisateur c9790abd : aucun refus « puissance de 2 » à la qualification, les contrôles se font au tirage. Une taille
+ * hors 2, 4, 8, 16 sans barrages donne `roundKind: null` : point d'entrée unique, la décision sur ces tailles (12, 20…) est en attente.
  */
 export const planRoundDraw = (input: IRoundDrawPlanInput): IRoundDrawPlan => {
   const finalized = input.qualification !== null

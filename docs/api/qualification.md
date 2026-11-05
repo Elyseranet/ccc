@@ -40,3 +40,14 @@ Un match de départage est un match `TIEBREAK` du tour `POOLS`. Il apparaît dan
 - **`scope: POOL`** (égalité au sein d'une poule) : la poule de l'égalité ;
 - **`scope: BOUNDARY`** (égalité entre poules pour une place de meilleur (n+1)ème) : **null**. Il n'apparaît donc pas dans le filtre `?poule=`, mais figure dans le listage sans ce filtre et avec `?tour=POOLS`.
 La saisie et la validation passent par `PUT /matchs/{id}/score` et `POST /matchs/{id}/validation`, avec `If-Match` (T-SEC-08).
+
+## Décisions utilisateur (c9790abd)
+
+- **Pas de refus « puissance de 2 » à la qualification** : on ne bloque pas une configuration documentée (RG18, par exemple « 4 premiers + 8 meilleurs cinquièmes » à 70 joueurs). Les contrôles se font au tirage : chaque affiche a deux côtés, tout le vivier est tiré (hors barrages), un vivier impair est refusé. Le type du tour se déduit de la taille du vivier (2, 4, 8, 16) ; une autre taille sans barrages donne `roundKind: null` dans l'aperçu (décision en attente).
+- **Aucun retour arrière** : aucune route ne rouvre une liste arrêtée ni un tirage de tour validé. Les rejeux à l'identique sont idempotents (200, sans effet).
+- **Tirage saisi affiche par affiche** : `PUT /tirages/{id}/affectations` remplace tout le brouillon ; une saisie partielle est permise en brouillon, la complétude n'est exigée qu'à la validation.
+- **Départages saisis dans F-08** : ils figurent dans `GET /admin/editions/{id}/matchs` (tour `POOLS`, `purpose: TIEBREAK`).
+
+## Départage entre poules : paramètres
+
+`ICreateTiebreakRequest.parameters` (`{ topPerPool, bestNextCount }`) est facultatif : il n'est utile que pour un départage `BOUNDARY` tant que la liste n'est pas figée, car les égalités entre poules dépendent de n et m. Sans lui, seules les égalités de poule peuvent être départagées. Pour une égalité de poule, il est inutile.

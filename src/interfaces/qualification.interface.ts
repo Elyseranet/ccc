@@ -85,9 +85,14 @@ export interface IRoundDrawPreview {
   blockedBy: TRoundDrawBlock | null
 }
 
-/** Corps de `POST /editions/{id}/departages` : exactement l'un des groupes de `IQualificationStatus.ties`. */
+/**
+ * Corps de `POST /editions/{id}/departages` : exactement l'un des groupes de `IQualificationStatus.ties`.
+ * `parameters` (n et m) n'est utile que pour un départage ENTRE POULES (`BOUNDARY`) tant que la liste n'est pas figée :
+ * sans eux, le serveur ne sait pas quelles égalités entre poules comptent. Pour une égalité de poule il est inutile.
+ */
 export interface ICreateTiebreakRequest {
   participationIds: string[]
+  parameters?: Pick<IQualificationParameters, 'topPerPool' | 'bestNextCount'>
 }
 
 /**

@@ -1,3 +1,4 @@
+import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { FINAL_STAGE } from '../enums/participation.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 
@@ -33,3 +34,9 @@ export const QUALIFICATION_BEST_NEXT_MAX = 20
 
 /** Un départage compte au plus ce nombre de joueurs (une poule en compte jusqu'à 8). */
 export const TIEBREAK_PLAYERS_MAX = 16
+
+/** Les états de l'édition où les poules existent mais où la liste des qualifiés n'est pas encore figée. */
+export const POOLS_STAGE_STATUSES: readonly EDITION_STATUS[] = [EDITION_STATUS.POOLS_DRAWN, EDITION_STATUS.POOLS_PLAYING]
+
+/** Avant le tirage des poules : rien à qualifier. */
+export const PRE_POOLS_STATUSES: readonly EDITION_STATUS[] = [EDITION_STATUS.CREATED, EDITION_STATUS.REGISTRATION]

@@ -2,7 +2,11 @@ import type { TIEBREAK_FORMAT } from '../enums/domain.enum.js'
 import type { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { QUALIFICATION_ROUTE, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
+import type { ParticipationEntity } from '../server/db/typeorm/entities/participation.entity.js'
+import type { PoolEntity } from '../server/db/typeorm/entities/pool.entity.js'
 import type { IPoolStanding } from './pool.interface.js'
+import type { IMatchRecord } from './stats.interface.js'
 import type { IQualificationParameters, IRoundDrawAssignmentInput } from './qualification.interface.js'
 import type { TRoundDrawBlock } from '../types/qualification.type.js'
 
@@ -64,4 +68,15 @@ export interface IRoundDrawCheckInput {
   poolWinnerIds: readonly string[]
   /** true à la validation : tout le vivier est tiré (hors barrages), chaque affiche a deux côtés. */
   complete: boolean
+}
+
+/** Poules, inscrits en poule et matchs du tour de poules d'une édition, avec les enregistrements pour le classement. */
+export interface IPoolContext {
+  pools: PoolEntity[]
+  participations: ParticipationEntity[]
+  /** Matchs du tour de poules, REGULAR et TIEBREAK, avec leurs côtés. */
+  matches: MatchEntity[]
+  poolInputs: IQualificationPoolInput[]
+  /** Matchs VALIDATED ou RESULT_UNKNOWN uniquement (clé = participation). */
+  records: IMatchRecord[]
 }
