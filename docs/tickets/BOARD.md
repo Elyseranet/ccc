@@ -225,6 +225,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | **Fermé** (2026-11-02) : mergé @ `819bc3f` | worktree de dev-f06 |
 | [F-17](F-17.md) | Titre des `origam-alert` à la taille du texte et en gras partout (défaut de thème, AsyncState compris) | `admin-participants.html` (e27446e) | F-09 | À faire, décision prise (24cd3d3) : défaut de thème ; après le merge de F-09 ; titre de l'état d'erreur 31 → 16 px (F-01, F-03, F-04, F-05) | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
+| [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | À faire |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
@@ -362,6 +363,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-03](T-OPS-03.md) : **À faire** (2026-11-04) — santé : version déployée et état des migrations (backend-lead).
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
+- [T-SEO-01](T-SEO-01.md) : **À faire** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap.
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
 ### Architecture (chef de projet, 2026-10-22)
