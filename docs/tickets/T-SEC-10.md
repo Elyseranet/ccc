@@ -1,7 +1,7 @@
 # T-SEC-10 — Écritures admin : concurrence et cohérence des données
 
 - **Origine** : seconde revue de sécurité de la vague 3a (`f4dd3e1`), findings LOW L1, L2, L3 et L5, le 2026-10-22.
-- **Statut** : À faire. Hors vague 3a. L1 contient une **question ouverte** à poser à l'utilisateur.
+- **Statut** : **Partiellement traité.** L1 est réglé par T-SEC-08-r3, mergé @ `4e87bfc` le 2026-11-05. Restent L2, L3 (avec B-14) et L5. Le ticket reste ouvert.
 - **Lié à** : [T-SEC-08](T-SEC-08.md) (`If-Match` sur les scores), même question de fond pour L1.
 
 ## L1 — `updateCompetitorIdentity` sans transaction ni conflit
@@ -42,3 +42,13 @@
 - [ ] L5 : tests unitaires des schémas et test d'API du `PATCH`.
 
 - **Q1 tranchée par l'utilisateur (2026-10-28)** : voir `decisions.md`, « SEC-Q ».
+
+
+## Avancement (2026-11-05)
+
+- **L1 réglé** au merge `4e87bfc` :
+  - `PATCH /competiteurs/{id}` exige `If-Match` (428 si l'en-tête manque, 412 `VERSION_CONFLICT` si la version est périmée) ;
+  - la ligne est verrouillée en `pessimistic_write` dans une transaction ;
+  - la colonne `competitors.version` est ajoutée.
+  Preuves : voir la fermeture de T-SEC-08.
+- **Restent ouverts** : L2, L3 (à traiter avec B-14) et L5.

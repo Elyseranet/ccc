@@ -351,3 +351,10 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : l'étape 2 du centre de contrôle affiche seulement « N participants inscrits ». La mention « 0 invitation en attente » sort de la maquette `admin.html` ; l'API n'expose pas ce nombre et n'aura pas à le faire pour F-07.
 - Le suivi des invitations reste sur l'écran de gestion des comptes.
 - La référence interne « (A17) » du bloc activité sort aussi de la maquette (décision du chef de projet : aucune référence interne affichée).
+
+## 2026-11-05 — Décisions utilisateur : robots.txt, dérogation 490938f, purge des sessions, Spec API de T-SEC-08
+
+- **`public/robots.txt` supprimé** dans le commit de T-SEO-01 qui le remplace par la route dynamique (`Disallow: /` hors production). Accord donné pour cette suppression précise.
+- **Dérogation Playwright pour `490938f`** (T-SEO-01, variable `NUXT_PUBLIC_SITE_INDEXABLE` et helper `isSiteIndexable`, sans aucun appelant) : merge après typecheck et test:run verts, sans Playwright. La dérogation est notée dans le message de merge, et le prochain Playwright complet couvre ce code.
+- **Purge planifiée des sessions expirées** : un ticket back, pour que la politique de confidentialité annonce une durée maximale définie (et non « au plus tôt 24 h »).
+- **Spec API amendée** avec le contrat de T-SEC-08 (If-Match ; 428, 412, 400, 409 ; `version` du compétiteur).

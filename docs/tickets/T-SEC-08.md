@@ -1,7 +1,7 @@
 # T-SEC-08 — Scores : `If-Match` facultatif sur l'enregistrement et la validation
 
 - **Origine** : revue de sécurité de la vague 3a, finding LOW L4, le 2026-10-22.
-- **Statut** : À faire. Hors vague 3a. Contient une **question ouverte** à poser à l'utilisateur.
+- **Statut** : **Fermé** le 2026-11-05 par le chef de projet. Mergé dans develop @ `4e87bfc` (branche `feature/T-SEC-08-r3` @ `39c94c1`).
 - **Fichiers** : `src/server/api/v1/matchs/[id]/score.put.ts` et `validation.post.ts` (`ifMatchRequired: false`), `src/utils/match-score-route.util.ts`, `src/services/match.service.ts`.
 
 ## Constat
@@ -57,3 +57,16 @@ Décision utilisateur SEC-Q (T-SEC-08 Q1, T-SEC-10 Q1) : contrôle de version **
 - une saisie puis une validation enchaînées avec la version renvoyée ;
 - un PUT puis un DELETE d'avatar laissent `version` inchangée, mais changent l'ETag de l'édition ;
 - la migration fait aller, retour et aller, puis `migration:generate` répond « No changes », et `db:seed:archives` s'applique toujours.
+
+
+## Fermeture (2026-11-05, merge `4e87bfc`)
+
+- **Passe lourde** (dev-b12, 2026-11-04 de 21:17 à 21:30, fenêtre confirmée, base PostgreSQL neuve, aucun test exclu) :
+  - migrations : run (9), revert de `AddCompetitorVersion`, run, puis generate « No changes in database schema were found » ;
+  - test:db 120/120 ; test:api 314/314 (SEC-A2 en 3703 ms ; la charge machine n'a pas été relevée).
+- **Front-lead** (2026-11-05) : typecheck vert ; test:run 652 passés ; Playwright routes + a11y + visuel 239/239, sans échec, instable ni ignoré, de 09:23:48 à 09:32:49.
+- **Sécurité** :
+  - gitleaks propre (dev-b12) ;
+  - revue de sécurité du diff `develop...39c94c1` : aucun défaut high ni medium, un défaut low, `version` exposé sur la route publique `GET /competiteurs/{id}`, ouvert en [T-SEC-19](T-SEC-19.md) ;
+  - `npm audit --omit=dev` : 3 modérées connues, suivies dans T-SEC-18, aucune high ni critical.
+- **Contrat** : la Spec API est amendée selon la décision de l'utilisateur du 2026-11-05.
