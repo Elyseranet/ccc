@@ -364,6 +364,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
 - [T-SEO-01](T-SEO-01.md) : **À faire** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap.
+- [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
 ### Architecture (chef de projet, 2026-10-22)
