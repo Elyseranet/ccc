@@ -1,6 +1,6 @@
 # ds(password-field) : une règle de longueur s'ajoute toujours à la validation, même champ vide et sans `requirements`
 
-> Numéro de ticket Origam à attribuer à l'ouverture. Fiche unique : elle fusionne `password-field-longueur-minimale-toujours-imposee.md` (dev-f05, F-10), qui est retirée.
+> Ticket Origam **#1334**. Fiche unique : elle fusionne `password-field-longueur-minimale-toujours-imposee.md` (dev-f05, F-10), qui est retirée.
 
 ## Constat
 
@@ -15,7 +15,7 @@ const infos = computed(() => {
 
 - La règle s'applique même avec `requirements: false` (valeur par défaut), et même quand `requirementRules` remplace la liste affichée.
 - Un champ vide échoue. Un champ de mot de passe **facultatif** (changement de mot de passe optionnel sur un profil) bloque donc l'envoi du formulaire.
-- Le message est en anglais et ne passe pas par la locale : « This field must contain: 8 characters ».
+- Le message passe par la locale d’Origam (`t("origam.validation.must_contains", { value: info.message })`, ligne 636), mais il n’est pas surchargeable par champ. Il s’affiche en anglais dans CCC, qui ne traduit pas cette clé : « This field must contain: 8 characters ». De plus, la partie « 8 characters » vient de `REQUIREMENT_MIN_LENGTH` (`message: `${length} characters``, `consts/PasswordField/password-field.const.js`), une chaîne anglaise en dur, hors locale.
 - La longueur minimale sert à la fois d'exigence **affichée** et de règle de **validation**, sans moyen de séparer les deux.
 - Sur un champ de **connexion**, un ancien mot de passe de moins de 8 caractères ne peut pas être envoyé : le navigateur le refuse avant tout appel au serveur.
 
@@ -39,13 +39,13 @@ La valeur 0 n'est donc pas traitée comme absente : la règle construite (`(.{0,
 
 ## Proposition
 
-Ne construire la règle de longueur que si `requirements` ou `strengthBar` est actif, ou si `min-length` est explicitement fourni. Laisser la valeur vide valide quand le champ n'est pas `required`, comme le font les autres champs. Faire passer le message par la locale, et le rendre surchargeable.
+Ne construire la règle de longueur que si `requirements` ou `strengthBar` est actif, ou si `min-length` est explicitement fourni. Laisser la valeur vide valide quand le champ n'est pas `required`, comme le font les autres champs. Rendre le message surchargeable par champ, et faire passer sa partie variable (« N characters ») par la locale.
 
 ## Attendu
 
 - Les exigences n'entrent dans la validation que si `requirements` (ou `requirementRules`) est actif.
 - Un champ vide est laissé aux règles de l'appelant (`rules`, `required`).
-- Le message passe par la locale.
+- Le message est surchargeable par champ, et sa partie variable (« 8 characters ») passe aussi par la locale.
 
 ## Critères d'acceptation
 
