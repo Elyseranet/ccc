@@ -333,3 +333,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Polices auto-hébergées** (T-SEC-16) : plus aucun appel à Google Fonts. Licence à vérifier (OFL attendue).
 - **Cookies : information, sans bandeau.** Les trois cookies (`ccc_session`, `ccc_device`, `ccc_admin_edition`) sont exemptés de consentement selon la CNIL (authentification, sécurité, personnalisation). Une section « Cookies » de la politique de confidentialité les liste. Un bandeau ne deviendra obligatoire que si l'on ajoute une mesure d'audience non exemptée, un contenu tiers ou de la publicité.
 - Pages prévues : `/mentions-legales`, `/confidentialite` (avec la section cookies), `/cgu` (recommandées) et `/accessibilite` (à décider). Le pied de page porte ces liens, le ©, et « Site réalisé par Elysera avec Origam », en lien simple `rel="noopener"`.
+
+## F-13, F-07, accessibilité, mineurs (décisions utilisateur 2026-11-05)
+- **F-13 : pages séparées** aux adresses françaises `/admin/editions`, `/admin/editions/nouvelle`, `/admin/editions/[code]`, `/admin/competiteurs/[[id]]` (ux, parcours 9e10f1f). La barre d'onglets de `admin-editions.html` devient une navigation entre pages (retouche ui), et le contenu des panneaux ne change pas. Un code d'édition est toujours généré par le serveur (année, ou année et lettre), donc il n'entre pas en conflit avec `nouvelle` (back-lead).
+- **F-07 : « N participants inscrits »**, le nombre réel, sans « le jour J », sous l'étape « Participants » (retouche d'une ligne de `admin.html`).
+- **Déclaration d'accessibilité : publiée, honnête**, sur `/accessibilite` : ce qui est fait (axe automatisé, clavier, mouvement réduit), ce qui ne l'est pas (aucun audit RGAA complet, donc pas de « conforme »), les défauts connus venant d'Origam, et un contact.
+- **Mineurs : non.** Le championnat et les comptes sont réservés aux majeurs. La politique de confidentialité et les CGU le disent.
