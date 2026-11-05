@@ -40,7 +40,7 @@ Tableau de bord                 /admin
 ├── Participants                /admin/participants     autocomplétion, rattacher ou créer (wireframe `admin-participants.html`)
 ├── Tirages                     /admin/tirages          Stepper : paramètres · têtes de série · saisie · récapitulatif · validation (poules) ; tirage de tour pour le bracket
 ├── Poules et matchs            /admin/matchs           liste filtrable, saisie et validation de score (A1, tranché)
-└── Phase finale                /admin/phase-finale     UNE entrée, trois pages liées par un stepper : qualification (F-24), tirage de tour (F-25), clôture (F-26). Routes à confirmer par le front.
+└── Phase finale                /admin/phase-finale     UNE entrée, trois pages liées par un stepper (décision front-lead) : `/admin/phase-finale` redirige vers l'étape courante (la première dont les conditions ne sont pas remplies, sinon la clôture) ; `/admin/phase-finale/qualification` (F-24), `/admin/phase-finale/tirage` (F-25, tirage de tour ; le tirage des poules reste `/admin/tirages`), `/admin/phase-finale/cloture` (F-26).
 Référentiel
 ├── Compétiteurs                /admin/competiteurs     annuaire + panneau d'identité à côté (/admin/competiteurs/<id>), contacts privés
 └── Éditions                    /admin/editions         liste ; /admin/editions/nouvelle ; /admin/editions/<code> (modifier, lecture seule si clôturée)
