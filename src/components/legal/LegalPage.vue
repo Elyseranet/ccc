@@ -136,6 +136,8 @@
                 mode="kv"
                 :items="block.definitions"
                 :border="false"
+                margin="0"
+                bg-color="transparent"
                 class="legal-page__definitions"
                 data-cy="legal-definitions"
               >
@@ -167,6 +169,7 @@
           tag="nav"
           rounded="xl"
           border
+          elevation="md"
           padding="6"
           aria-labelledby="legal-related-title"
           data-cy="legal-related"
@@ -175,7 +178,7 @@
             <origam-title
               id="legal-related-title"
               tag="h2"
-              font-size="lg"
+              font-size="xl"
               font-weight="bold"
               :text="relatedTitle"
             />
@@ -214,6 +217,13 @@ import type { ILegalPageProps } from '~/interfaces/legal.interface'
  * Page de lecture longue des pages légales : fil d'Ariane, titre, date de mise à jour, sections, carte « Voir aussi »,
  * et sommaire d'ancres natives (`nav` + `details`/`summary`, sans JS ni ARIA : c'est de la navigation, pas un accordéon).
  * Le contenu vient d'une constante (`LEGAL_*_CONTENT`), traduit par `useLegalPage`.
+ *
+ * @description
+ * Éditeur (`origam-data-list` mode `kv`) : tout ce qui a une variable passe par elle (affichage grille, gras et couleur
+ * de la clé, tailles). Il reste deux `:deep()` sur la grille (lignes en `display: contents`, pour aligner les clés entre
+ * elles) et sur la valeur (en bloc, sinon le texte et le marqueur deviennent deux éléments flex), plus un en mobile pour
+ * l'espacement entre deux paires. Ces propriétés n'ont pas de variable dans Origam : défaut suivi dans
+ * Elyseranet/origam#1267 (précédent : `HeadToHeadSummary.vue`, F-05).
  ********************************************************/
 const props = withDefaults(defineProps<ILegalPageProps>(), {})
 const emits = defineEmits<{}>()
@@ -262,6 +272,16 @@ defineExpose({})
     border-radius: var(--origam-radius---lg);
     font-weight: var(--origam-font__weight---bold);
     cursor: pointer;
+
+    &::after {
+      content: '▾';
+      margin-inline-start: auto;
+      color: var(--origam-color__text---secondary);
+    }
+  }
+
+  &__toc[open] > &__toc-summary::after {
+    content: '▴';
   }
 
   &__toc-list {
@@ -337,6 +357,25 @@ defineExpose({})
     }
   }
 
+  &__definitions {
+    --origam-data-list__kv---display: grid;
+    --origam-data-list__kv---key-font-size: var(--origam-font__size---md);
+    --origam-data-list__kv---key-font-weight: var(--origam-font__weight---bold);
+    --origam-data-list__kv---key-color: var(--origam-color__text---secondary);
+    --origam-data-list__kv---value-font-size: var(--origam-font__size---md);
+
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--origam-space---2) var(--origam-space---5);
+  }
+
+  &__definitions :deep(.origam-data-list__kv-row) {
+    display: contents;
+  }
+
+  &__definitions :deep(.origam-data-list__kv-value) {
+    display: block;
+  }
+
   &__table :deep(th),
   &__table :deep(td) {
     white-space: normal;
@@ -367,6 +406,15 @@ defineExpose({})
 
     &__aside {
       position: static;
+    }
+
+    &__definitions {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--origam-space---1);
+    }
+
+    &__definitions :deep(.origam-data-list__kv-row + .origam-data-list__kv-row .origam-data-list__kv-key) {
+      margin-top: var(--origam-space---2);
     }
   }
 }

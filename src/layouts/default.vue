@@ -444,6 +444,8 @@ defineExpose({})
   &__link {
     --origam-btn---padding-lg: var(--origam-space---3);
     --origam-btn---min-width: 0;
+    --origam-btn---overlay-opacity-active: 0;
+    --origam-btn---overlay-opacity-active-hover: 0;
 
     color: var(--origam-color__text---secondary);
     text-decoration: underline;
