@@ -37,6 +37,7 @@
         :key="group.index"
         class="draw-seeds__tie"
         :aria-labelledby="`${titleId}-tie-${group.index}`"
+        :data-needed="group.needed"
         data-cy="draw-seed-tie"
       >
         <h3
