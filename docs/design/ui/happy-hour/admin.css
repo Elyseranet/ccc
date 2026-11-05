@@ -29,7 +29,7 @@
 
 /* origam-stepper vertical */
 .steps { display: grid; gap: 0; counter-reset: s; }
-.st { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---4); padding-block: var(--origam-space---3); }
+.st { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--origam-space---4); padding-block: var(--origam-space---3); }
 .st:not(:last-child)::after { content: ''; position: absolute; left: calc(var(--origam-space---5) - 1px); top: calc(50% + var(--origam-space---5)); bottom: calc(-50% + var(--origam-space---5)); width: 2px; background: var(--origam-color__border---default); }
 .st--done:not(:last-child)::after { background: var(--origam-color__feedback--success---border); }
 .st__i { display: grid; place-items: center; width: var(--origam-space---10); aspect-ratio: 1; border-radius: var(--origam-radius---full); border: 2px solid var(--origam-color__border---strong); color: var(--origam-color__text---secondary); font-weight: var(--origam-font__weight---bold); }
