@@ -379,3 +379,12 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 - **B-20 est mergé après F-13** (décision utilisateur). Pas d'exception temporaire à ARCH-11 bis : la liste « endpoints sans page » reste réservée aux endpoints durablement sans page. F-13 déclare `ADMIN_EDITIONS` avec `pendingTicket: 'B-20'`, puis B-20 est rebasé et retire le `pendingTicket`.
 - **Écrans admin de la phase finale : tickets front à ouvrir** (décision utilisateur) : validation des qualifiés, barrages et départages, tirage du tableau final, et clôture de l'édition. Ils s'appuient sur B-13 et B-14. ux et ui les dessinent d'abord. La saisie des scores de phase finale reste dans F-08, avec son filtre par tour (décision 1b7483d5).
+
+## 2026-11-05 — Phase finale admin (F-24, F-25, F-26) et B-13 : six décisions utilisateur
+
+1. **Navigation** : une seule entrée « Phase finale », qui ouvre trois pages liées par un stepper (qualification, tirage du tour, clôture). Le menu reste court ; les écrans suivent les étapes 5 à 9 du centre de contrôle.
+2. **Score d'un départage** : saisi dans « Poules et matchs » (F-08), avec un filtre « Départages ». Il n'y a qu'un seul lieu de saisie des scores.
+3. **Réversibilité** : aucun retour arrière. L'arrêt de la liste des qualifiés, un tirage de tour validé et la clôture sont définitifs, et chaque dialogue de confirmation le dit.
+4. **Confirmation de la clôture** : l'organisateur saisit le code de l'édition.
+5. **Saisie du tirage physique des tours** : affiche par affiche (les deux joueurs d'une affiche saisis ensemble).
+6. **B-13, puissance de 2** : aucun refus à la qualification. Les contrôles se font au tirage : chaque affiche a deux côtés, tout le vivier est tiré, un vivier impair est refusé. L'organisateur reste responsable de la cohérence du tableau.
