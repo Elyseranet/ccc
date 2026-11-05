@@ -374,3 +374,8 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : la file de `/admin/matchs` montre les matchs de poule **et** de phase finale, avec un **filtre par tour**. Ce filtre est à ajouter à la maquette `admin-matchs.html` par ui.
 - **Raison** : aucun écran admin du tableau final n'existe (F-03-BRK ne concerne que la page publique). Avec une file limitée aux poules, aucun score de phase finale ne pourrait être saisi depuis l'admin.
 - Cette décision remplace le choix provisoire « poules seulement » pris dans la branche F-08 (c77c0f9).
+
+## 2026-11-05 — B-20 attend F-13 ; écrans admin de la phase finale à ouvrir
+
+- **B-20 est mergé après F-13** (décision utilisateur). Pas d'exception temporaire à ARCH-11 bis : la liste « endpoints sans page » reste réservée aux endpoints durablement sans page. F-13 déclare `ADMIN_EDITIONS` avec `pendingTicket: 'B-20'`, puis B-20 est rebasé et retire le `pendingTicket`.
+- **Écrans admin de la phase finale : tickets front à ouvrir** (décision utilisateur) : validation des qualifiés, barrages et départages, tirage du tableau final, et clôture de l'édition. Ils s'appuient sur B-13 et B-14. ux et ui les dessinent d'abord. La saisie des scores de phase finale reste dans F-08, avec son filtre par tour (décision 1b7483d5).
