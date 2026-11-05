@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · CCC · Admin clôture (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a> <a href="admin-qualification.html">admin: qualification</a> <a href="admin-tirage-tour.html">admin: tirage de tour</a> <a href="admin-cloture.html">admin: clôture</a></p>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><strong>CCC · Organisation</strong><span class="spacer"></span>
+  <label for="ctx" class="sr">Édition active</label><select id="ctx"><option>Édition 2026 · poules</option><option>2025 (archive, lecture seule)</option></select>
+  <a class="btn" href="accueil.html">Voir le site public</a><button>Compte</button></header>
+<div class="note">Le sélecteur d'édition est global : toutes les pages admin travaillent sur une édition choisie ici (aujourd'hui aucune page admin n'a de contexte d'édition). Archive = lecture seule.</div>
+<div class="shell"><aside><nav aria-label="Administration"><ul>
+ <li><a href="admin-dashboard.html" >Tableau de bord</a></li></ul>
+ <h2>Édition en cours</h2><ul>
+ <li><a href="admin-participants.html">Participants</a></li>
+ <li><a href="admin-tirage.html" >Tirages</a></li>
+ <li><a href="admin-score.html">Poules et matchs</a></li>
+ <li><a href="#">Bracket</a></li></ul>
+ <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div id="contenu">
+<main>
+ <h1>Clôture · Édition 2026</h1>
+ <p>Dernière étape du centre de contrôle : clôturer l'édition une fois la finale validée.</p>
+ <section class="box" aria-labelledby="h-pre"><h2 id="h-pre">Avant de clôturer</h2>
+  <ul style="list-style:none;padding:0"><li>Finale validée <span class="badge badge--ok">oui</span></li><li>Tous les matchs de l'édition validés <span class="badge badge--ok">oui</span></li><li>Vainqueur : Joueur A · Finaliste : Joueur B</li><li>Participants : N</li></ul>
+  <div class="note">Précondition (B-14) : 409 si la finale n'est pas validée. Si elle n'est pas remplie, la liste dit laquelle est en échec et le bouton « Clôturer » est inactif avec la raison en texte.</div></section>
+
+ <section class="box" style="margin-top:1rem" aria-labelledby="h-eff"><h2 id="h-eff">Ce que la clôture fait</h2>
+  <ul>
+   <li>Les points de chaque participation sont <b>figés</b> : points = barème × N / 50, où N est le nombre de participants (RG1, RG2). Exemple de la spec : 36 participants, le champion obtient 18 × 36 / 50 = 12,96 points.</li>
+   <li>L'édition passe en <b>lecture seule partout</b> : participants, tirages, scores, qualification. Toute écriture est refusée (409).</li>
+   <li>Les classements ACP et All Time intègrent l'édition.</li>
+   <li>Un changement de barème ultérieur ne réécrit pas le palmarès.</li></ul>
+  <table><caption>Aperçu des points figés par résultat</caption><thead><tr><th scope="col">Résultat</th><th scope="col">Base</th><th scope="col">Points pour N participants</th></tr></thead>
+   <tbody><tr><td>Champion·ne</td><td>18</td><td>18 × N / 50</td></tr><tr><td>Finaliste</td><td>13</td><td>13 × N / 50</td></tr><tr><td>Demi-finaliste</td><td>9</td><td>9 × N / 50</td></tr><tr><td>Quart de finaliste</td><td>6</td><td>6 × N / 50</td></tr><tr><td>Huitième de finaliste</td><td>3</td><td>3 × N / 50</td></tr><tr><td>Barragiste</td><td>1</td><td>1 × N / 50</td></tr><tr><td>Éliminé·e en poule</td><td>0</td><td>0</td></tr></tbody></table>
+  <div class="note">Valeurs de base = RG1 (pour 50 participants). L'aperçu chiffré (avec N réel) est calculé par le serveur ou le front à partir de ces règles ; un tour non disputé rapporte « / » (RG3). Je ne sais pas si l'aperçu doit être calculé côté écran avant la clôture ou seulement affiché après : le wireframe suppose l'aperçu avec la formule, sans promettre de chiffres.</div></section>
+
+ <section class="box" style="margin-top:1rem" aria-labelledby="h-cf"><h2 id="h-cf">Confirmer la clôture</h2>
+  <button class="primary" aria-haspopup="dialog">Clôturer l'édition…</button>
+  <div class="box" role="dialog" aria-labelledby="dc" style="max-width:560px;margin-top:.6rem"><h3 id="dc">Clôturer l'édition 2026 ?</h3>
+   <p>Les points seront figés et l'édition passera en lecture seule. <b>Aucune route ne permet de rouvrir une édition clôturée.</b></p>
+   <div><label for="cc">Pour confirmer, saisissez le code de l'édition : <b>2026</b></label><input id="cc" autocomplete="off"></div>
+   <div class="row"><button>Annuler</button><button class="primary" disabled>Clôturer définitivement</button></div></div>
+  <div class="note">« Confirmation explicite » (ticket F-26) : le bouton définitif reste inactif tant que le code de l'édition n'est pas saisi (action unique par an, irréversible dans l'API : B-14 ne définit aucune réouverture ; la spec dit seulement « Après la finale, l'édition est clôturée »). Réouverture : Je ne sais pas si l'utilisateur la veut un jour ; question à poser via team-lead. Focus initial sur le champ ; Échap annule ; bouton inactif pendant l'envoi ; clôturer une édition déjà clôturée renvoie 200 sans recalcul (idempotent), l'écran ne montre alors pas d'erreur.</div>
+  <div class="note note--ds">origam-dialog + champ de confirmation (origam-confirm-wrapper : rôle à vérifier avant usage, sinon origam-text-field + comparaison côté écran).</div></section>
+
+ <h2>États</h2>
+ <p class="state-title">FINALE NON VALIDÉE (409)</p><div class="box box--dashed" role="status"><p>La clôture n'est possible qu'après validation de la finale. <a href="admin-score.html">Aller aux scores</a></p><button disabled>Clôturer l'édition…</button></div>
+ <p class="state-title">CLÔTURÉE (lecture seule partout)</p><div class="box box--dashed"><p>Édition clôturée le 00/00 à 00:00 par l'administrateur. Points figés. <a href="palmares.html">Voir le palmarès</a></p></div>
+ <p class="state-title">SUCCÈS</p><div class="box" role="status"><p>Édition 2026 clôturée. Les classements ont été mis à jour.</p></div>
+ <p class="state-title">VERSION PÉRIMÉE (412) / ERREUR RÉSEAU</p><div class="box" role="alert"><p>La clôture n'a pas pu être confirmée. Vérifiez l'état de l'édition avant de réessayer : elle est peut-être déjà clôturée.</p><button>Vérifier l'état</button></div>
+ <p class="state-title">ENVOI EN COURS</p><div class="box" aria-busy="true"><button disabled>Clôture en cours…</button></div>
+ <p class="state-title">IMPACT SUR LES AUTRES ÉCRANS ADMIN</p><div class="box box--dashed"><p>Participants, tirages, qualification, scores : bandeau « Édition clôturée · lecture seule », actions masquées ou désactivées avec ce motif. Tableau de bord : étape 9 « Clôture » cochée.</p></div>
+</main></div></div></body></html>
