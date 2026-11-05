@@ -175,3 +175,55 @@ export const readCapturedMails = (): ICapturedMail[] => readFileSync(E2E_MAIL_CA
   .split('\n')
   .filter(line => line.trim() !== '')
   .map(line => JSON.parse(line) as ICapturedMail)
+
+/*********************************************************
+ * Tirage des poules par l'API réelle (F-08, scores)
+ *
+ * @description
+ * Un test de score a besoin de matchs. `createDrawnEdition` crée l'édition, ses inscrits (compétiteurs créés pour le test),
+ * puis enchaîne les routes réelles de B-11 : têtes de série proposées, brouillon, affectations, validation. Les inscrits sont
+ * répartis en `poolCount` poules par ordre de tirage (la tête de série d'une poule en premier : RG11). L'édition passe à
+ * `POOLS_DRAWN`, le tour de poules est `DRAWN` (la saisie des scores est ouverte).
+ ********************************************************/
+export interface IDrawnEdition {
+  edition: IWriteEdition
+  participants: IWriteParticipant[]
+  competitors: IWriteCompetitor[]
+}
+
+interface ISeedProposalResponse { seeds: Array<{ participationId: string }> }
+interface IDrawResponse { id: string }
+
+const STATUS_OK = 200
+
+const expectStatus = async (response: Awaited<ReturnType<APIRequestContext['get']>>, label: string, expected: number): Promise<unknown> => {
+  if (response.status() !== expected) {
+    throw new Error(`${label} : ${response.status()} ${await response.text()}`)
+  }
+  return response.json()
+}
+
+/** Une édition dont le tirage des poules est validé : `participantCount` inscrits répartis en `poolCount` poules. */
+export const createDrawnEdition = async (request: APIRequestContext, label: string, participantCount = 4, poolCount = 1): Promise<IDrawnEdition> => {
+  const edition = await createEdition(request, label)
+  const competitors: IWriteCompetitor[] = []
+  const participants: IWriteParticipant[] = []
+  for (let index = 0; index < participantCount; index += 1) {
+    const competitor = await createCompetitor(request, `${label} ${index + 1}`)
+    competitors.push(competitor)
+    participants.push(await attachParticipant(request, edition, competitor))
+  }
+  const proposal = await expectStatus(await request.get(`/api/v1/editions/${edition.id}/tetes-de-serie?poules=${poolCount}`), 'GET tetes-de-serie', STATUS_OK) as ISeedProposalResponse
+  const seeds = proposal.seeds.map(seed => seed.participationId)
+  const draw = await expectStatus(await request.post(`/api/v1/editions/${edition.id}/tirages/poules`, { data: { poolCount, seedCount: poolCount, seeds } }), 'POST tirages/poules', STATUS_CREATED) as IDrawResponse
+  const seedSet = new Set(seeds)
+  const ordered = [...seeds, ...participants.map(participant => participant.participationId).filter(id => !seedSet.has(id))]
+  const assignments = ordered.map((participationId, index) => ({
+    participationId,
+    poolNumber: index < poolCount ? index + 1 : (index % poolCount) + 1,
+    drawnOrder: index + 1
+  }))
+  await expectStatus(await request.put(`/api/v1/tirages/${draw.id}/affectations`, { data: { assignments } }), 'PUT affectations', STATUS_OK)
+  await expectStatus(await request.post(`/api/v1/tirages/${draw.id}/validation`), 'POST validation', STATUS_OK)
+  return { edition: { ...edition, status: 'POOLS_DRAWN' }, participants, competitors }
+}
