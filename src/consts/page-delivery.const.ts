@@ -158,7 +158,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.ADMIN_EDITIONS]: {
     delivered: false,
     layout: LAYOUT.ADMIN,
-    endpoints: [API_ENDPOINT.EDITIONS]
+    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.ADMIN_EDITIONS]
   },
   [ROUTES.ADMIN_EDITION_NEW]: {
     delivered: false,

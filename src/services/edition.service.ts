@@ -1,4 +1,4 @@
-import type { IAddParticipantResult, IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
+import type { IAddParticipantResult, IAdminEditionSummary, IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
 import type { IAdminActivityItem } from '../interfaces/admin-activity.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
@@ -96,6 +96,11 @@ export class EditionService extends BaseService {
   /** Retire un inscrit tant que le tirage n'est pas validé (Q1) : 204, sans corps. */
   async removeParticipant (id: string, participationId: string): Promise<void> {
     await this.request<void>(`/editions/${encodeURIComponent(id)}/participants/${encodeURIComponent(participationId)}`, { method: 'DELETE' })
+  }
+
+  /** Liste vue par l'administrateur (B-20) : chaque édition avec son nombre d'inscrits en direct. */
+  adminList (): Promise<IAdminEditionSummary[]> {
+    return this.request<IAdminEditionSummary[]>('/admin/editions')
   }
 
   /** Crée une édition (administrateur, B-10) : le code est généré par le serveur (CE-1), jamais envoyé. */

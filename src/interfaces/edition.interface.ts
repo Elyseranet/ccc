@@ -62,6 +62,15 @@ export interface IEditionSummary {
   semiFinalists: IEditionPodiumEntry[]
 }
 
+/**
+ * Édition vue par l'administrateur (liste F-13). `registeredCount` : nombre d'inscrits EN DIRECT (participations de l'édition
+ * à l'instant de la lecture, quel que soit son statut ; un retrait le fait baisser ; 0 sans inscrit). `participantCount`
+ * reste le N figé à la clôture (RG2, A6). Ne jamais renvoyer ce DTO sur une route publique.
+ */
+export interface IAdminEditionSummary extends IEditionSummary {
+  registeredCount: number
+}
+
 export interface IEditionParticipant {
   participationId: string
   competitor: ICompetitorPublic
