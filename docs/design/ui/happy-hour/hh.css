@@ -151,6 +151,14 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .hh-footer a { display: inline-flex; align-items: center; min-height: var(--origam-space---11); padding-inline: var(--origam-space---3); border-radius: var(--origam-radius---full); color: var(--origam-color__text---secondary); font-weight: var(--origam-font__weight---semibold); }
 .hh-footer a:hover { color: var(--origam-color__text---primary); }
 .hh-footer__note { margin-top: var(--origam-space---6); font-size: var(--origam-font__size---xs); color: var(--origam-color__text---tertiary); max-width: 60rem; }
+/* Pied de page F-19 : rangée légale (liens, ©, crédit) sous la rangée de navigation */
+.hh-footer__legal { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---4) var(--origam-space---8); margin-top: var(--origam-space---6); padding-top: var(--origam-space---6); border-top: 1px solid var(--origam-color__border---subtle); }
+.hh-footer__legal ul { margin-inline-start: calc(-1 * var(--origam-space---3)); } /* texte des liens aligné sur le © */
+.hh-footer__meta { display: grid; gap: var(--origam-space---1); color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); }
+.hh-footer .hh-footer__credit { display: inline; min-height: 0; padding: 0; border-radius: 0; color: var(--origam-color__text---primary); text-decoration: underline; text-underline-offset: 3px; }
+.hh-footer a[aria-current="page"] { color: var(--origam-color__text---primary); text-decoration-thickness: 3px; } /* liens soulignés comme le pied de page livré ; page courante : trait plus épais + texte primaire, pas la couleur seule */
+/* Marqueur [À FOURNIR : …] des pages légales : visible, en monospace, pour ne jamais passer en production par oubli */
+.todo { padding: 0 var(--origam-space---1); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---sm); background: var(--origam-color__feedback--warning---bgSubtle); color: var(--origam-color__feedback--warning---fgSubtle); font-family: var(--origam-font__family---mono); font-size: var(--origam-font__size---sm); overflow-wrap: anywhere; }
 
 /* ── Ticker (règles d'or) ─────────────────────────────────────────────── */
 .ticker { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); }
