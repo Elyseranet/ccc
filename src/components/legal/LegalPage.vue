@@ -85,6 +85,7 @@
                 tag="h3"
                 font-size="lg"
                 font-weight="bold"
+                line-height="normal"
                 letter-spacing="normal"
                 :text="block.text"
               />
@@ -169,6 +170,7 @@
         </section>
         <origam-card
           tag="nav"
+          class="legal-page__card"
           rounded="xl"
           border
           elevation="md"
@@ -344,6 +346,10 @@ defineExpose({})
       line-height: var(--origam-font__lineHeight---normal);
     }
 
+    h3 {
+      margin: var(--legal-page__subheading---margin-top, var(--origam-space---2)) 0 0;
+    }
+
     ul {
       display: grid;
       gap: var(--origam-space---1);
@@ -398,6 +404,12 @@ defineExpose({})
     margin: var(--origam-space---3) 0 0;
     padding: 0;
     list-style: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .legal-page__card {
+    padding: var(--origam-space---5);
   }
 }
 
