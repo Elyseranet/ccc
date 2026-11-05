@@ -23,6 +23,7 @@ const come = person(COME, 'Côme', 'Garnier')
 
 const detail = (competitor: ICompetitorPublic, stats: Partial<ICompetitorDetail['stats']>): ICompetitorDetail => ({
   ...competitor,
+  version: 1,
   participations: [],
   stats: { played: 0, wins: 0, losses: 0, unknownResults: 0, pointsFor: 0, pointsAgainst: 0, titles: 0, ...stats }
 })

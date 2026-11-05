@@ -11,7 +11,7 @@ import { useDataSource } from '../../../../../utils/database.util.js'
  */
 export default defineEventHandler(async (event): Promise<IMatchValidationResult> => {
   const startedAt = Date.now()
-  const command = await readScoreCommand(event, { ifMatchRequired: false })
+  const command = await readScoreCommand(event)
   const dataSource = await useDataSource()
   const outcome = await validateMatch(dataSource, command)
   const result = await loadValidationResult(dataSource, command.matchId)

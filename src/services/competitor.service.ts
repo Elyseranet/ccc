@@ -1,4 +1,4 @@
-import type { ICompetitorDetail, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest, ICompetitorWithTitles } from '../interfaces/competitor.interface.js'
+import type { ICompetitorDetail, ICompetitorIdentity, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest, ICompetitorWithTitles } from '../interfaces/competitor.interface.js'
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
@@ -17,7 +17,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_PURPOSE } from '../enums/match.enum.js'
 import { toMatchRecord } from '../utils/match-record.mapper.util.js'
-import { competitorNotFound, emailAlreadyUsed } from '../utils/api-error.util.js'
+import { competitorNotFound, emailAlreadyUsed, versionConflict } from '../utils/api-error.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { countTitles } from '../utils/ranking.util.js'
 import { computeHeadToHead, computePlayerBalance, computeWinLoss, countedOutcomes, countUnknownResults, resolveMatchOutcome } from '../utils/record.util.js'
@@ -239,6 +239,8 @@ const findPublicCompetitor = async (db: DataSource, id: string): Promise<ICompet
 export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail> => {
   const db = await useDataSource()
   const competitor = await findPublicCompetitor(db, id)
+  // Version de l'identité, à renvoyer dans `If-Match` de `PATCH /competiteurs/{id}`.
+  const { version } = await db.getRepository(CompetitorEntity).findOneOrFail({ where: { id }, select: { id: true, version: true } })
 
   const participationRows = await db.getRepository(ParticipationEntity).createQueryBuilder('pt')
     .innerJoin('pt.edition', 'e')
@@ -287,7 +289,7 @@ export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail
     titles: titlesByCompetitor(participationRows.map((row) => ({ competitorId: id, finalStage: row.finalStage, editionStatus: row.edition.status }))).get(id) ?? 0
   }
 
-  return { ...competitor, participations, stats }
+  return { ...competitor, version, participations, stats }
 }
 
 const toSummary = (
@@ -433,21 +435,36 @@ export const createCompetitorWithAccount = async (
   }
 }
 
-/** Corrige l'identité d'un compétiteur (liste blanche du schéma). 404 `COMPETITOR_NOT_FOUND` s'il n'existe pas. */
-export const updateCompetitorIdentity = async (
+/**
+ * Corrige l'identité d'un compétiteur (liste blanche du schéma), en une transaction sous `FOR UPDATE` (T-SEC-10 L1).
+ * 404 `COMPETITOR_NOT_FOUND` s'il n'existe pas ; 412 `VERSION_CONFLICT` (avec la version courante) si `expectedVersion` est
+ * périmée. La réponse porte la nouvelle version.
+ */
+export const updateCompetitorIdentity = (
   dataSource: DataSource,
   competitorId: string,
-  patch: IUpdateCompetitorRequest
-): Promise<ICompetitorPublic> => {
-  const repository = dataSource.getRepository(CompetitorEntity)
-  const competitor = await repository.findOneBy({ id: competitorId })
-  if (!competitor) {
-    throw competitorNotFound()
-  }
-  const changes: Partial<CompetitorEntity> = {}
-  if (patch.displayName !== undefined) changes.displayName = patch.displayName
-  if (patch.firstName !== undefined) changes.firstName = patch.firstName
-  if (patch.lastName !== undefined) changes.lastName = patch.lastName
-  if (patch.nickname !== undefined) changes.nickname = patch.nickname
-  return toCompetitorPublic(await repository.save(Object.assign(competitor, changes)))
-}
+  patch: IUpdateCompetitorRequest,
+  expectedVersion: number
+): Promise<ICompetitorIdentity> =>
+  dataSource.transaction(async (manager) => {
+    const locked = await manager.findOne(CompetitorEntity, {
+      where: { id: competitorId },
+      select: { id: true, version: true },
+      lock: { mode: 'pessimistic_write' }
+    })
+    if (!locked) {
+      throw competitorNotFound()
+    }
+    if (locked.version !== expectedVersion) {
+      throw versionConflict(locked.version)
+    }
+    const changes: Partial<CompetitorEntity> = {}
+    if (patch.displayName !== undefined) changes.displayName = patch.displayName
+    if (patch.firstName !== undefined) changes.firstName = patch.firstName
+    if (patch.lastName !== undefined) changes.lastName = patch.lastName
+    if (patch.nickname !== undefined) changes.nickname = patch.nickname
+    // TypeORM ajoute l'incrément de `@VersionColumn` : c'est la nouvelle version de l'identité.
+    await manager.update(CompetitorEntity, { id: competitorId }, changes)
+    const updated = await manager.findOneByOrFail(CompetitorEntity, { id: competitorId })
+    return { ...toCompetitorPublic(updated), version: updated.version }
+  })

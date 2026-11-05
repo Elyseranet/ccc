@@ -9,6 +9,7 @@ import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { USER_ROLE } from '../../src/enums/user.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../src/enums/edition.enum'
 import type { IEditionParticipant } from '../../src/interfaces/edition.interface'
+import { CompetitorEntity } from '../../src/server/db/typeorm/entities/competitor.entity'
 import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
 import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
 import { buildMultipart, fileUpload, makeGif, makeJpegWithGps, makePng, makeWebp } from '../helpers/avatar-fixtures'
@@ -316,7 +317,7 @@ describe('avatar upload (B-16)', async () => {
     })
   })
   describe('edition ETag after an avatar change (wave 3a review, M1)', () => {
-    it('changes the participants ETag after a PUT and after a DELETE, so no 304 serves a stale avatarUrl', async () => {
+    it('changes the participants ETag after a PUT and after a DELETE, so no 304 serves a stale avatarUrl, but never the identity version (T-SEC-08)', async () => {
       const carol = await seedUser(dataSource, { email: 'carol@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT, withCompetitor: true })
       const edition = await dataSource.getRepository(EditionEntity).save({
         code: '2041', year: 2041, chronologicalRank: 2041, origin: EDITION_ORIGIN.APP, status: EDITION_STATUS.CLOSED, name: 'Édition 2041'
@@ -326,6 +327,9 @@ describe('avatar upload (B-16)', async () => {
       const avatarOf = async (response: Response): Promise<string | null> =>
         ((await response.json()) as IEditionParticipant[]).find((item) => item.competitor.id === carol.competitorId)!.competitor.avatarUrl
 
+      const identityVersion = async (): Promise<number> =>
+        (await dataSource.getRepository(CompetitorEntity).findOneByOrFail({ id: carol.competitorId! })).version
+      const versionBefore = await identityVersion()
       const before = await fetch(path)
       expect(before.status).toBe(200)
       const etagBefore = before.headers.get('etag')!
@@ -338,12 +342,14 @@ describe('avatar upload (B-16)', async () => {
       const etagAfterUpload = afterUpload.headers.get('etag')!
       expect(etagAfterUpload).not.toBe(etagBefore)
       expect(await avatarOf(afterUpload)).toMatch(AVATAR_URL_PATTERN)
+      expect(await identityVersion()).toBe(versionBefore)
 
       expect((await del(`/api/v1/competiteurs/${carol.competitorId}/avatar`, cookie)).status).toBe(204)
       const afterDelete = await fetch(path, { headers: { 'If-None-Match': etagAfterUpload } })
       expect(afterDelete.status).toBe(200)
       expect(afterDelete.headers.get('etag')).not.toBe(etagAfterUpload)
       expect(await avatarOf(afterDelete)).toBeNull()
+      expect(await identityVersion()).toBe(versionBefore)
     })
   })
 })

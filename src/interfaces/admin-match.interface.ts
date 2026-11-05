@@ -11,7 +11,7 @@ export interface IAdminMatchSide extends IMatchSide {
 
 /**
  * Match vu par l'administrateur (C6). Ne jamais renvoyer ce DTO sur une route publique.
- * `version` sert au verrouillage optimiste (`If-Match`, MATCH_VERSION_CONFLICT).
+ * `version` sert au verrouillage optimiste (`If-Match`, VERSION_CONFLICT).
  */
 export interface IAdminMatch extends IMatch {
   sides: IAdminMatchSide[]

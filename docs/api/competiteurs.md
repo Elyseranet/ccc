@@ -66,7 +66,7 @@ GET /api/v1/competiteurs?q=dese&sort=wins
 
 Chaque participation porte (G2) : `poolNumber` (numéro de la poule de l'édition, 1-based, `null` si le joueur n'a pas de poule), `poolRank` (sa **place** dans la poule, inchangé), et `wins`, `losses`, `unknownResults` de l'édition. Ces trois compteurs viennent de `computeWinLoss` sur les matchs `REGULAR` de l'édition (R-5) ; leur somme sur toutes les éditions égale `stats.wins` et `stats.losses`.
 
-Réponse : `ICompetitorDetail` (identité publique, `participations` triées par ordre chronologique avec stade final et points figés, `stats`). `id` mal formé : 400. Inconnu : 404 `COMPETITOR_NOT_FOUND`. Un compétiteur sans match avec score renvoie des statistiques à 0.
+Réponse : `ICompetitorDetail` (identité publique, `version`, `participations` triées par ordre chronologique avec stade final et points figés, `stats`). `id` mal formé : 400. Inconnu : 404 `COMPETITOR_NOT_FOUND`. Un compétiteur sans match avec score renvoie des statistiques à 0.
 
 ```json
 {
@@ -81,6 +81,35 @@ Réponse : `ICompetitorDetail` (identité publique, `participations` triées par
   ],
   "stats": { "played": 4, "wins": 3, "losses": 1, "unknownResults": 1, "pointsFor": 19, "pointsAgainst": 11, "titles": 1 }
 }
+```
+
+`version` est la version de l'**identité** (nom affiché, prénom, nom, pseudo), à renvoyer dans `If-Match` de `PATCH /competiteurs/{id}`. L'avatar et le téléphone ne la font pas avancer.
+
+## `PATCH /competiteurs/{id}` (administrateur)
+
+Corrige l'identité (liste blanche : `displayName`, `firstName`, `lastName`, `nickname` ; ni avatar ni téléphone, `400` sinon). **`If-Match` obligatoire** (décision SEC-Q, T-SEC-10 L1) : la `version` lue dans `GET /competiteurs/{id}`, de préférence entre guillemets (`If-Match: "3"`).
+
+| Statut | Code | Cas |
+|---|---|---|
+| 200 | | `ICompetitorIdentity` : l'identité corrigée (`ICompetitorPublic`) et sa **nouvelle `version`** |
+| 400 | `VALIDATION_FAILED` / `BAD_REQUEST` | corps invalide ; `If-Match` mal formé |
+| 401, 403 | | pas de session ; session non administrateur |
+| 404 | `COMPETITOR_NOT_FOUND` | compétiteur inconnu |
+| 412 | `VERSION_CONFLICT` | version périmée ; `details: { currentVersion }` |
+| 428 | `PRECONDITION_REQUIRED` | `If-Match` absent |
+
+La correction est une transaction avec verrou de ligne : deux corrections simultanées se sérialisent, la seconde reçoit `412`. Rechargez le compétiteur après un `412`.
+
+```
+PATCH /api/v1/competiteurs/5b0e.../
+If-Match: "1"
+Content-Type: application/json
+
+{ "nickname": "Rebond" }
+```
+
+```json
+{ "id": "5b0e...", "displayName": "Nicolas Deseine", "firstName": "Nicolas", "lastName": "Deseine", "nickname": "Rebond", "avatarUrl": null, "version": 2 }
 ```
 
 ## `GET /competiteurs/{id}/face-a-face`

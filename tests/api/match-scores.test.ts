@@ -76,12 +76,19 @@ describe('match scores (B-12)', async () => {
   const adminMatchBySequence = async (editionId: string, sequence: number): Promise<IAdminMatch> =>
     (await adminList(editionId)).find((match) => match.sequence === sequence)!
   const errorOf = async (response: Response): Promise<IApiError> => await response.json() as IApiError
-  const putScore = (match: IAdminMatch, values: number[], headers: Record<string, string> = {}) =>
-    send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, scoreBody(match, values), headers)
-  const validate = (match: IAdminMatch, values: number[], headers: Record<string, string> = {}) =>
-    send('POST', `/api/v1/matchs/${match.id}/validation`, adminCookie, scoreBody(match, values), headers)
-  const correct = (match: IAdminMatch, values: number[], headers: Record<string, string> = {}) =>
-    send('POST', `/api/v1/matchs/${match.id}/correction`, adminCookie, scoreBody(match, values), headers)
+  // `headers` : omis -> `If-Match` de la version de `match` ; `null` -> aucun `If-Match` ; un objet -> ces en-têtes seuls.
+  const versionHeaders = (match: IAdminMatch, headers?: Record<string, string> | null): Record<string, string> =>
+    headers === null ? {} : headers ?? { 'If-Match': `"${match.version}"` }
+  const putScore = (match: IAdminMatch, values: number[], headers?: Record<string, string> | null) =>
+    send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, scoreBody(match, values), versionHeaders(match, headers))
+  const validate = (match: IAdminMatch, values: number[], headers?: Record<string, string> | null) =>
+    send('POST', `/api/v1/matchs/${match.id}/validation`, adminCookie, scoreBody(match, values), versionHeaders(match, headers))
+  const correct = (match: IAdminMatch, values: number[], headers?: Record<string, string> | null) =>
+    send('POST', `/api/v1/matchs/${match.id}/correction`, adminCookie, scoreBody(match, values), versionHeaders(match, headers))
+  const recordedAs = async (response: Response): Promise<IAdminMatch> => {
+    expect(response.status).toBe(200)
+    return await response.json() as IAdminMatch
+  }
   const publicMatches = async (): Promise<IMatch[]> => {
     const response = await fetch(`/api/v1/editions/${live.id}/matchs`)
     expect(response.status).toBe(200)
@@ -139,11 +146,12 @@ describe('match scores (B-12)', async () => {
       {}
     ]
     for (const body of bodies) {
-      const response = await send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, body)
+      // `If-Match` est lu avant le service : sans lui, un corps valide pour zod (participant étranger) répondrait 428.
+      const response = await send('PUT', `/api/v1/matchs/${match.id}/score`, adminCookie, body, { 'If-Match': `"${match.version}"` })
       expect(response.status, JSON.stringify(body)).toBe(400)
     }
     expect((await send('PUT', '/api/v1/matchs/not-a-uuid/score', adminCookie, scoreBody(match, [5, 3]))).status).toBe(400)
-    const unknown = await send('PUT', '/api/v1/matchs/00000000-0000-4000-8000-000000000000/score', adminCookie, scoreBody(match, [5, 3]))
+    const unknown = await send('PUT', '/api/v1/matchs/00000000-0000-4000-8000-000000000000/score', adminCookie, scoreBody(match, [5, 3]), { 'If-Match': '"1"' })
     expect(unknown.status).toBe(404)
   })
 
@@ -205,27 +213,70 @@ describe('match scores (B-12)', async () => {
     expect(notReached.status).toBe(422)
     expect((await errorOf(notReached)).code).toBe(API_ERROR_CODE.SCORE_INCONSISTENT)
 
-    expect((await putScore(recorded, [5, 5])).status).toBe(200)
-    const tie = await validate(recorded, [5, 5])
+    const tied = await recordedAs(await putScore(recorded, [5, 5]))
+    const tie = await validate(tied, [5, 5])
     expect(tie.status).toBe(422)
     expect((await errorOf(tie)).code).toBe(API_ERROR_CODE.SCORE_INCONSISTENT)
     expect((await adminMatchBySequence(live.id, 2)).status).toBe(MATCH_STATUS.RECORDED)
 
-    expect((await putScore(recorded, [5, 1])).status).toBe(200)
+    await recordedAs(await putScore(tied, [5, 1]))
   })
 
-  it('refuses a stale If-Match or a score the organiser did not see (409 MATCH_VERSION_CONFLICT)', async () => {
+  it('refuses a stale If-Match (412 VERSION_CONFLICT) before a score the organiser did not see (409 SCORE_MISMATCH)', async () => {
     const current = await adminMatchBySequence(live.id, 2)
     const stale = await validate(current, [5, 1], { 'If-Match': `"${current.version - 1}"` })
-    expect(stale.status).toBe(409)
-    expect((await errorOf(stale)).code).toBe(API_ERROR_CODE.MATCH_VERSION_CONFLICT)
+    expect(stale.status).toBe(412)
+    expect(await errorOf(stale)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: current.version } })
 
+    // Version périmée ET scores différents : la version d'abord (412).
+    const staleAndDifferent = await validate(current, [5, 3], { 'If-Match': `"${current.version - 1}"` })
+    expect(staleAndDifferent.status).toBe(412)
+    expect(await errorOf(staleAndDifferent)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: current.version } })
+
+    // Version à jour mais scores différents du score saisi : 409 SCORE_MISMATCH, sans currentVersion.
     const unseen = await validate(current, [5, 3])
     expect(unseen.status).toBe(409)
-    expect((await errorOf(unseen)).code).toBe(API_ERROR_CODE.MATCH_VERSION_CONFLICT)
+    const unseenError = await errorOf(unseen)
+    expect(unseenError.code).toBe(API_ERROR_CODE.SCORE_MISMATCH)
+    expect(unseenError.details).toBeUndefined()
 
     expect((await validate(current, [5, 1], { 'If-Match': 'not-a-version' })).status).toBe(400)
     expect((await adminMatchBySequence(live.id, 2)).status).toBe(MATCH_STATUS.RECORDED)
+  })
+
+  it('requires If-Match on the three match write routes: 428 PRECONDITION_REQUIRED, and 412 with the exact current version', async () => {
+    const match = await adminMatchBySequence(live.id, 2)
+    const attempts = [
+      (headers?: Record<string, string> | null) => putScore(match, [4, 2], headers),
+      (headers?: Record<string, string> | null) => validate(match, [5, 1], headers),
+      (headers?: Record<string, string> | null) => correct(match, [5, 1], headers)
+    ]
+    for (const attempt of attempts) {
+      const missing = await attempt(null)
+      expect(missing.status).toBe(428)
+      expect((await errorOf(missing)).code).toBe(API_ERROR_CODE.PRECONDITION_REQUIRED)
+    }
+    // Une version périmée : PUT (scores différents) et correction ; la validation est couverte plus haut.
+    const stalePut = await attempts[0]!({ 'If-Match': `"${match.version + 3}"` })
+    expect(stalePut.status).toBe(412)
+    expect(await errorOf(stalePut)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: match.version } })
+    expect((await adminMatchBySequence(live.id, 2)).version).toBe(match.version)
+  })
+
+  it('chains a record then a validation with the version returned by the write', async () => {
+    const chained = await seedKnockoutEdition(dataSource, { code: '2029', year: 2029, chronologicalRank: 6, withFinalDraw: false })
+    const match = await adminMatchBySequence(chained.edition.id, 3)
+    const recorded = await recordedAs(await putScore(match, [10, 8]))
+    expect(recorded.version).toBeGreaterThan(match.version)
+    // Réutiliser l'ancienne version échoue ; la version renvoyée par la saisie suffit.
+    expect((await validate(match, [10, 8])).status).toBe(412)
+    const validated = await validate(recorded, [10, 8])
+    expect(validated.status).toBe(200)
+    const result = await validated.json() as IMatchValidationResult
+    expect(result.match.version).toBeGreaterThan(recorded.version)
+    const corrected = await correct({ ...recorded, version: result.match.version }, [10, 6])
+    expect(corrected.status).toBe(200)
+    expect((await corrected.json() as IMatchValidationResult).match.version).toBeGreaterThan(result.match.version)
   })
 
   it('refuses to validate a match with no recorded score (409)', async () => {
@@ -286,9 +337,9 @@ describe('match scores (B-12)', async () => {
   })
 
   it('validates a final 10-9 and derives the winner into the next-round pool', async () => {
-    const final = await adminMatchBySequence(knockout.edition.id, 3)
-    expect(final.targetScore).toBe(10)
-    expect((await putScore(final, [10, 9])).status).toBe(200)
+    const scheduledFinal = await adminMatchBySequence(knockout.edition.id, 3)
+    expect(scheduledFinal.targetScore).toBe(10)
+    const final = await recordedAs(await putScore(scheduledFinal, [10, 9]))
     const response = await validate(final, [10, 9])
     expect(response.status).toBe(200)
     const result = await response.json() as IMatchValidationResult
@@ -298,8 +349,8 @@ describe('match scores (B-12)', async () => {
     expect(result.advancingParticipationIds).toEqual([final.sides[0]!.participationId])
 
     const tiedFinal = await adminMatchBySequence(engagedKnockout.edition.id, 3)
-    expect((await putScore(tiedFinal, [10, 10])).status).toBe(200)
-    expect((await validate(tiedFinal, [10, 10])).status).toBe(422)
+    const tiedRecorded = await recordedAs(await putScore(tiedFinal, [10, 10]))
+    expect((await validate(tiedRecorded, [10, 10])).status).toBe(422)
   })
 
   it('refuses writes on a closed edition and on a round that is not open (409)', async () => {
@@ -320,12 +371,13 @@ describe('match scores (B-12)', async () => {
   describe('correction (A15)', () => {
     it('requires If-Match, a validated match and a consistent score', async () => {
       const match = await adminMatchBySequence(live.id, 1)
-      const noHeader = await correct(match, [3, 5])
-      expect(noHeader.status).toBe(400)
+      const noHeader = await correct(match, [3, 5], null)
+      expect(noHeader.status).toBe(428)
+      expect((await errorOf(noHeader)).code).toBe(API_ERROR_CODE.PRECONDITION_REQUIRED)
 
       const stale = await correct(match, [3, 5], { 'If-Match': `"${match.version + 5}"` })
-      expect(stale.status).toBe(409)
-      expect((await errorOf(stale)).code).toBe(API_ERROR_CODE.MATCH_VERSION_CONFLICT)
+      expect(stale.status).toBe(412)
+      expect(await errorOf(stale)).toMatchObject({ code: API_ERROR_CODE.VERSION_CONFLICT, details: { currentVersion: match.version } })
 
       const inconsistent = await correct(match, [5, 5], { 'If-Match': `"${match.version}"` })
       expect(inconsistent.status).toBe(422)

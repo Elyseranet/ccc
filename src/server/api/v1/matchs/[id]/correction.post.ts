@@ -5,7 +5,7 @@ import { useDataSource } from '../../../../../utils/database.util.js'
 
 /** A15 : corrige un score validé (`If-Match` obligatoire), journalisé ; 409 si un tour suivant est engagé. Administrateur. */
 export default defineEventHandler(async (event): Promise<IMatchValidationResult> => {
-  const command = await readScoreCommand(event, { ifMatchRequired: true })
+  const command = await readScoreCommand(event)
   const dataSource = await useDataSource()
   await correctMatch(dataSource, command)
   return loadValidationResult(dataSource, command.matchId)

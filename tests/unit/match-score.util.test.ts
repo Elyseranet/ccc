@@ -5,7 +5,7 @@ import { ROUND_KIND } from '../../src/enums/round.enum'
 import type { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
 import { toApiError } from '../../src/utils/api-error.util'
 import { toAdminMatch } from '../../src/utils/match-admin.mapper.util'
-import { alignScores, hasSameScores, parseAdminMatchListQuery, parseIfMatchVersion } from '../../src/utils/match-score.util'
+import { alignScores, hasSameScores, parseAdminMatchListQuery } from '../../src/utils/match-score.util'
 
 const side = (position: number, participationId: string, recordedScore: number | null, validatedScore: number | null) => ({
   id: `side-${position}`,
@@ -39,21 +39,6 @@ const buildMatch = (overrides: Partial<MatchEntity> = {}): MatchEntity => ({
   sides: [side(2, 'b', 3, null), side(1, 'a', 5, null)],
   ...overrides
 } as unknown as MatchEntity)
-
-describe('parseIfMatchVersion', () => {
-  it('reads a bare, quoted or weak version', () => {
-    expect(parseIfMatchVersion('3')).toBe(3)
-    expect(parseIfMatchVersion('"3"')).toBe(3)
-    expect(parseIfMatchVersion('W/"12"')).toBe(12)
-  })
-
-  it('is undefined without header and 400 when malformed', () => {
-    expect(parseIfMatchVersion(undefined)).toBeUndefined()
-    for (const bad of ['', 'abc', '-1', '1.5', '*']) {
-      expect(() => parseIfMatchVersion(bad), bad).toThrowError()
-    }
-  })
-})
 
 describe('alignScores', () => {
   const match = buildMatch()

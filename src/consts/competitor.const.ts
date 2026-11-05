@@ -28,6 +28,12 @@ export const LIKE_SPECIAL_CHARACTERS = /[\\%_]/g
 export const COMBINING_MARKS = /\p{M}/gu
 
 /** Colonnes publiques uniquement : le téléphone n'est même pas lu depuis la base. */
+/**
+ * Valeur de `version` pour un `update` qui ne change pas l'identité : fixer la colonne explicitement empêche TypeORM d'ajouter
+ * son incrément automatique de `@VersionColumn` (avatar, téléphone). La date `updated_at` avance, la version non.
+ */
+export const COMPETITOR_KEEP_VERSION = (): string => '"version"'
+
 export const COMPETITOR_PUBLIC_COLUMNS = ['c.id', 'c.displayName', 'c.firstName', 'c.lastName', 'c.nickname', 'c.avatarVersion']
 
 /** Statuts de match qui entrent dans les bilans : avec score, ou résultat inconnu (R-5). */

@@ -51,11 +51,12 @@ const seedPoolMatch = async (): Promise<IScored> => {
   return { matchId: match.id, participationIds: [participations[0]!.id, participations[1]!.id] }
 }
 
-const command = (seed: IScored, scores: [number, number], extra: { expectedVersion?: number } = {}) => ({
+/** Commande d'écriture : sans version explicite, `If-Match` vaut la version courante du match (contrôle obligatoire, SEC-Q). */
+const command = async (seed: IScored, scores: [number, number], expectedVersion?: number) => ({
   matchId: seed.matchId,
   userId: adminId,
   scores: seed.participationIds.map((participationId, index) => ({ participationId, score: scores[index]! })),
-  ...extra
+  expectedVersion: expectedVersion ?? (await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })).version
 })
 
 beforeAll(async () => {
@@ -74,13 +75,11 @@ afterAll(cleanup)
 describe('match score service (B-12)', () => {
   it('validates exactly once when two validations race for the same match (row lock)', async () => {
     const seed = await seedPoolMatch()
-    await recordScore(dataSource, command(seed, [5, 2]))
+    await recordScore(dataSource, await command(seed, [5, 2]))
     const before = await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })
 
-    const outcomes = await Promise.all([
-      validateMatch(dataSource, command(seed, [5, 2])),
-      validateMatch(dataSource, command(seed, [5, 2]))
-    ])
+    const racing = await command(seed, [5, 2])
+    const outcomes = await Promise.all([validateMatch(dataSource, racing), validateMatch(dataSource, racing)])
 
     expect(outcomes.map((outcome) => outcome.replayed).sort()).toEqual([false, true])
     const after = await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })
@@ -90,23 +89,23 @@ describe('match score service (B-12)', () => {
 
   it('does not touch a validated match on replay, and refuses other scores', async () => {
     const seed = await seedPoolMatch()
-    await recordScore(dataSource, command(seed, [5, 1]))
-    await validateMatch(dataSource, command(seed, [5, 1]))
+    await recordScore(dataSource, await command(seed, [5, 1]))
+    await validateMatch(dataSource, await command(seed, [5, 1]))
     const validated = await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })
 
-    const replay = await validateMatch(dataSource, command(seed, [5, 1], { expectedVersion: 0 }))
+    const replay = await validateMatch(dataSource, await command(seed, [5, 1], 0))
     expect(replay.replayed).toBe(true)
     expect((await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })).version).toBe(validated.version)
 
-    await expect(validateMatch(dataSource, command(seed, [5, 4]))).rejects.toSatisfy(
+    await expect(validateMatch(dataSource, await command(seed, [5, 4]))).rejects.toSatisfy(
       (error: unknown) => toApiError(error).code === API_ERROR_CODE.MATCH_ALREADY_VALIDATED
     )
   })
 
   it('journals match_corrected with the previous and the new score, the author and the match', async () => {
     const seed = await seedPoolMatch()
-    await recordScore(dataSource, command(seed, [5, 1]))
-    await validateMatch(dataSource, command(seed, [5, 1]))
+    await recordScore(dataSource, await command(seed, [5, 1]))
+    await validateMatch(dataSource, await command(seed, [5, 1]))
     const validated = await dataSource.getRepository(MatchEntity).findOneByOrFail({ id: seed.matchId })
 
     const lines: string[] = []
@@ -114,7 +113,7 @@ describe('match score service (B-12)', () => {
       lines.push(String(chunk))
       return true
     }) as typeof process.stdout.write)
-    await correctMatch(dataSource, command(seed, [2, 5], { expectedVersion: validated.version }))
+    await correctMatch(dataSource, await command(seed, [2, 5], validated.version))
     vi.restoreAllMocks()
 
     const entry = lines.map((line) => { try { return JSON.parse(line) as Record<string, unknown> } catch { return null } })
