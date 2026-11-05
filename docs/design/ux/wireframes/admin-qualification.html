@@ -12,12 +12,15 @@
  <li><a href="admin-participants.html">Participants</a></li>
  <li><a href="admin-tirage.html" >Tirages</a></li>
  <li><a href="admin-score.html">Poules et matchs</a></li>
- <li><a href="#">Bracket</a></li></ul>
+ <li><a href="admin-qualification.html" aria-current=page>Phase finale</a></li></ul>
  <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
- <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (A1). « Phase finale » = une seule entrée, trois pages liées par un stepper (qualification, tirage de tour, clôture).</div></aside>
  <div id="contenu">
 <main>
- <h1>Qualification · Édition 2026</h1>
+ <nav aria-label="Phase finale" class="box" style="margin-bottom:1rem"><ol class="row" style="list-style:none;margin:0;padding:0">
+ <li aria-current="step"><a href="admin-qualification.html" aria-current="step">1 Qualification</a></li><li><a href="admin-tirage-tour.html">2 Tirage de tour</a></li><li><a href="admin-cloture.html">3 Clôture</a></li></ol>
+ <div class="note note--ds">origam-stepper cliquable (liens), un par page ; l'étape courante porte aria-current="step". Une étape dont les conditions ne sont pas remplies reste atteignable : l'écran explique ce qui manque (409), il ne se cache pas.</div></nav>
+  <h1>Qualification · Édition 2026</h1>
  <p>Étape 5 du centre de contrôle : arrêter la liste des qualifiés à l'issue des poules, après avoir réglé les égalités.</p>
  <ol aria-label="Étapes de cette page" class="row" style="list-style:none;padding:0"><li class="badge badge--ok">1 Poules validées</li><li class="badge" aria-current="step"><b>2 Égalités</b></li><li class="badge badge--wait">3 Paramètres</li><li class="badge badge--wait">4 Arrêter la liste</li></ol>
  <div class="note">Les 4 blocs sont des sections d'une même page (une route, pas un assistant) : l'ordre est celui de l'API (409 si un match de poule n'est pas validé ; 409 si une égalité exige un départage non joué). Chaque bloc dit s'il est atteignable et pourquoi sinon.</div>
@@ -52,8 +55,7 @@
    <div><label for="qm">Meilleurs (n+1)èmes</label><input id="qm" type="number" min="0" inputmode="numeric" value="2"></div>
    <div><label for="qb">Avec barrages</label><input id="qb" type="checkbox"></div></form>
   <p role="status"><b>Aperçu : N qualifiés</b> (n × nombre de poules + m)</p>
-  <p role="alert" class="badge badge--wait">Le nombre de qualifiés n'est pas une puissance de 2 : le tour suivant ne pourra pas être tiré.</p>
-  <div class="note">Paramètres exactement ceux de l'API : { topPerPool: n, bestNextCount: m, withPlayoff: boolean } (RG18). Exemple de la spec (RG18) : à 70 joueurs, « 3 premiers + 2 meilleurs quatrièmes avec barrages » ou « 4 premiers + 8 meilleurs cinquièmes ». L'avertissement « puissance de 2 » est un contrôle PROPOSÉ par le ticket B-13, « à valider en revue » : non bloquant côté écran tant que non confirmé. CORRECTION (back-lead, contrat B-13) : withPlayoff ne change pas la liste des qualifiés, seulement le type du premier tour ; l'aperçu « N qualifiés » est donc identique avec ou sans barrages, et l'écran ajoute « Premier tour à tirer : Barrages » quand la case est cochée.</div>
+  <div class="note">Paramètres exactement ceux de l'API : { topPerPool: n, bestNextCount: m, withPlayoff: boolean } (RG18). Exemple de la spec (RG18) : à 70 joueurs, « 3 premiers + 2 meilleurs quatrièmes avec barrages » ou « 4 premiers + 8 meilleurs cinquièmes ». Aucun contrôle « puissance de 2 » à la qualification (décision utilisateur, c9790abd) : le nombre de qualifiés n'est pas refusé pour cette raison. Comment les tours s'enchaînent quand le nombre n'est pas une puissance de 2 : Je ne sais pas (la spec ne décrit que 8 → 4 → 2 → 1 et 16 → 8 → …). CORRECTION (back-lead, contrat B-13) : withPlayoff ne change pas la liste des qualifiés, seulement le type du premier tour ; l'aperçu « N qualifiés » est donc identique avec ou sans barrages, et l'écran ajoute « Premier tour à tirer : Barrages » quand la case est cochée.</div>
   <div class="note note--ds">origam-form, origam-text-field (inputmode numérique, pas origam-number-field : cf. decisions.md F-13), origam-switch pour les barrages.</div></section>
 
  <section class="box" style="margin-top:1rem" aria-labelledby="h-arr"><h2 id="h-arr">4. Arrêter la liste des qualifiés</h2>
@@ -62,9 +64,9 @@
   <button class="primary" aria-haspopup="dialog" disabled>Arrêter la liste…</button>
   <p class="badge badge--wait">Indisponible : 2 égalités restantes et 3 matchs de poule à valider.</p>
   <div class="box" role="dialog" aria-labelledby="dq" style="max-width:520px;margin-top:.6rem"><h3 id="dq">Arrêter la liste des qualifiés ?</h3>
-   <p>N joueurs seront qualifiés pour la phase finale. L'édition passe à l'état « Qualifiés validés ». <b>La correction d'un score de poule ne sera plus possible</b> (décision B-12, R-3).</p>
+   <p>N joueurs seront qualifiés pour la phase finale. L'édition passe à l'état « Qualifiés validés ». <b>La correction d'un score de poule ne sera plus possible</b> (décision B-12, R-3). <b>Cette action est définitive : il n'est pas possible de revenir en arrière.</b></p>
    <div class="row"><button>Annuler</button><button class="primary">Arrêter la liste</button></div></div>
-  <div class="note">Conséquence réelle (B-13) : l'édition passe à QUALIFIED dans la même transaction ; après cela, POST /matchs/{id}/correction sur un match de poule renvoie 409 NEXT_ROUND_ENGAGED. Le dialogue le dit. Réversibilité de l'arrêt de la liste : Je ne sais pas (aucune route d'annulation dans B-13) ; le dialogue ne promet donc pas de retour arrière. Focus initial du dialogue sur « Annuler ». Bouton inactif pendant l'envoi (idempotence).</div>
+  <div class="note">Conséquence réelle (B-13) : l'édition passe à QUALIFIED dans la même transaction ; après cela, POST /matchs/{id}/correction sur un match de poule renvoie 409 NEXT_ROUND_ENGAGED. Le dialogue le dit. Aucun retour arrière (décision utilisateur, c9790abd) : le dialogue le dit en toutes lettres. Focus initial du dialogue sur « Annuler ». Bouton inactif pendant l'envoi (idempotence).</div>
   <div class="note note--ds">origam-dialog, origam-stepper (lecture seule) pour l'avancement, origam-snackbar « Liste des qualifiés arrêtée ».</div></section>
 
  <h2>États</h2>

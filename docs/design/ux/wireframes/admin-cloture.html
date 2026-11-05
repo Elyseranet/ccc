@@ -12,12 +12,15 @@
  <li><a href="admin-participants.html">Participants</a></li>
  <li><a href="admin-tirage.html" >Tirages</a></li>
  <li><a href="admin-score.html">Poules et matchs</a></li>
- <li><a href="#">Bracket</a></li></ul>
+ <li><a href="admin-qualification.html" aria-current=page>Phase finale</a></li></ul>
  <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
- <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (A1). « Phase finale » = une seule entrée, trois pages liées par un stepper (qualification, tirage de tour, clôture).</div></aside>
  <div id="contenu">
 <main>
- <h1>Clôture · Édition 2026</h1>
+ <nav aria-label="Phase finale" class="box" style="margin-bottom:1rem"><ol class="row" style="list-style:none;margin:0;padding:0">
+ <li><a href="admin-qualification.html">1 Qualification</a></li><li><a href="admin-tirage-tour.html">2 Tirage de tour</a></li><li aria-current="step"><a href="admin-cloture.html" aria-current="step">3 Clôture</a></li></ol>
+ <div class="note note--ds">origam-stepper cliquable (liens), un par page ; l'étape courante porte aria-current="step". Une étape dont les conditions ne sont pas remplies reste atteignable : l'écran explique ce qui manque (409), il ne se cache pas.</div></nav>
+  <h1>Clôture · Édition 2026</h1>
  <p>Dernière étape du centre de contrôle : clôturer l'édition une fois la finale validée.</p>
  <section class="box" aria-labelledby="h-pre"><h2 id="h-pre">Avant de clôturer</h2>
   <ul style="list-style:none;padding:0"><li>Finale validée <span class="badge badge--ok">oui</span></li><li>Tous les matchs de l'édition validés <span class="badge badge--ok">oui</span></li><li>Vainqueur : Joueur A · Finaliste : Joueur B</li><li>Participants : N</li></ul>
@@ -36,10 +39,10 @@
  <section class="box" style="margin-top:1rem" aria-labelledby="h-cf"><h2 id="h-cf">Confirmer la clôture</h2>
   <button class="primary" aria-haspopup="dialog">Clôturer l'édition…</button>
   <div class="box" role="dialog" aria-labelledby="dc" style="max-width:560px;margin-top:.6rem"><h3 id="dc">Clôturer l'édition 2026 ?</h3>
-   <p>Les points seront figés et l'édition passera en lecture seule. <b>Aucune route ne permet de rouvrir une édition clôturée.</b></p>
+   <p>Les points seront figés et l'édition passera en lecture seule. <b>Cette action est définitive : il n'est pas possible de revenir en arrière, l'édition ne pourra pas être rouverte.</b></p>
    <div><label for="cc">Pour confirmer, saisissez le code de l'édition : <b>2026</b></label><input id="cc" autocomplete="off"></div>
    <div class="row"><button>Annuler</button><button class="primary" disabled>Clôturer définitivement</button></div></div>
-  <div class="note">« Confirmation explicite » (ticket F-26) : le bouton définitif reste inactif tant que le code de l'édition n'est pas saisi (action unique par an, irréversible dans l'API : B-14 ne définit aucune réouverture ; la spec dit seulement « Après la finale, l'édition est clôturée »). Réouverture : Je ne sais pas si l'utilisateur la veut un jour ; question à poser via team-lead. Focus initial sur le champ ; Échap annule ; bouton inactif pendant l'envoi ; clôturer une édition déjà clôturée renvoie 200 sans recalcul (idempotent), l'écran ne montre alors pas d'erreur.</div>
+  <div class="note">« Confirmation explicite » (ticket F-26) : le bouton définitif reste inactif tant que le code de l'édition n'est pas saisi (action unique par an, irréversible dans l'API : B-14 ne définit aucune réouverture ; la spec dit seulement « Après la finale, l'édition est clôturée »). Aucun retour arrière (décision utilisateur, c9790abd). Focus initial sur le champ ; Échap annule ; bouton inactif pendant l'envoi ; clôturer une édition déjà clôturée renvoie 200 sans recalcul (idempotent), l'écran ne montre alors pas d'erreur.</div>
   <div class="note note--ds">origam-dialog + champ de confirmation (origam-confirm-wrapper : rôle à vérifier avant usage, sinon origam-text-field + comparaison côté écran).</div></section>
 
  <h2>États</h2>

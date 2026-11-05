@@ -12,12 +12,15 @@
  <li><a href="admin-participants.html">Participants</a></li>
  <li><a href="admin-tirage.html" >Tirages</a></li>
  <li><a href="admin-score.html">Poules et matchs</a></li>
- <li><a href="#">Bracket</a></li></ul>
+ <li><a href="admin-qualification.html" aria-current=page>Phase finale</a></li></ul>
  <h2>Référentiel</h2><ul><li><a href="#">Compétiteurs</a></li><li><a href="#">Éditions</a></li></ul></nav>
- <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (arbitrage A1).</div></aside>
+ <div class="note note--ds">Bureau : origam-drawer permanent / origam-layout. Mobile : origam-bottom-nav (4 entrées max) + « Plus » ; la barre latérale réduite à des points sans libellé (layouts/admin.vue:80) est supprimée. « Scores » est fusionné dans « Poules et matchs » (A1). « Phase finale » = une seule entrée, trois pages liées par un stepper (qualification, tirage de tour, clôture).</div></aside>
  <div id="contenu">
 <main>
- <h1>Tirage du tour · Édition 2026</h1>
+ <nav aria-label="Phase finale" class="box" style="margin-bottom:1rem"><ol class="row" style="list-style:none;margin:0;padding:0">
+ <li><a href="admin-qualification.html">1 Qualification</a></li><li aria-current="step"><a href="admin-tirage-tour.html" aria-current="step">2 Tirage de tour</a></li><li><a href="admin-cloture.html">3 Clôture</a></li></ol>
+ <div class="note note--ds">origam-stepper cliquable (liens), un par page ; l'étape courante porte aria-current="step". Une étape dont les conditions ne sont pas remplies reste atteignable : l'écran explique ce qui manque (409), il ne se cache pas.</div></nav>
+  <h1>Tirage du tour · Édition 2026</h1>
  <p>Étape 6 du centre de contrôle (et suivantes) : enregistrer le tirage physique de chaque tour de la phase finale. Un tour n'existe pas avant son tirage (décision B-18) ; la saisie des scores se fait dans <a href="admin-score.html">Poules et matchs</a> avec le filtre par tour (F-08).</p>
  <ol aria-label="Tours de la phase finale" class="row" style="list-style:none;padding:0">
   <li class="badge badge--ok">Barrages ✓</li><li class="badge" aria-current="step"><b>Huitièmes · à tirer</b></li><li class="badge">Quarts</li><li class="badge">Demis</li><li class="badge">Finale</li></ol>
@@ -28,29 +31,31 @@
   <p role="status"><b>16 joueurs</b> dans le vivier, 8 affiches à tirer.</p>
   <table><caption class="sr">Composition du vivier</caption><thead><tr><th scope="col">Origine</th><th scope="col">Joueurs</th></tr></thead>
    <tbody><tr><td>Premiers de poule (direct)</td><td>8</td></tr><tr><td>Vainqueurs des barrages</td><td>8</td></tr></tbody></table>
-  <div class="note">RG14 : avec barrages, les premiers de poule vont directement en huitièmes et sont mélangés aux vainqueurs des barrages pour le tirage des huitièmes. Sans barrages : le vivier = les qualifiés. La composition des barrages (qui affronte qui, combien de barragistes) n'est pas décrite : Je ne sais pas (B-13) ; elle est fournie par le tirage physique, donc saisie comme n'importe quel tour. Le total du vivier doit être pair, et une puissance de 2 pour le tour suivant (contrôle proposé, B-13).</div></section>
+  <div class="note">RG14 : avec barrages, les premiers de poule vont directement en huitièmes et sont mélangés aux vainqueurs des barrages pour le tirage des huitièmes. Sans barrages : le vivier = les qualifiés. La composition des barrages (qui affronte qui, combien de barragistes) n'est pas décrite : Je ne sais pas (B-13) ; elle est fournie par le tirage physique, donc saisie comme n'importe quel tour. Le total du vivier doit être pair pour former des paires. Aucun refus « puissance de 2 » (décision c9790abd).</div></section>
 
- <section class="box" style="margin-top:1rem" aria-labelledby="h-sai"><h2 id="h-sai">Saisir le tirage</h2>
-  <p>Affiches saisies : <b>3 / 8</b> · Joueurs restants : <b>10</b></p>
-  <ol style="list-style:none;padding:0" class="grid grid--2">
-   <li><fieldset><legend>Affiche 1</legend><div class="row"><label for="a1a" class="sr">Joueur</label><select id="a1a"><option>Joueur A</option></select><span class="vs">contre</span><label for="a1b" class="sr">Adversaire</label><select id="a1b"><option>Joueur B</option></select></div></fieldset></li>
-   <li><fieldset><legend>Affiche 4</legend><div class="row"><select aria-label="Affiche 4, joueur"><option>— choisir —</option></select><span class="vs">contre</span><select aria-label="Affiche 4, adversaire"><option>— choisir —</option></select></div></fieldset></li></ol>
-  <div class="note">Un joueur déjà placé disparaît des autres listes. L'ordre des affiches suit l'ordre du tirage dans la salle (comme le tirage des poules, F-11 : l'ordre de saisie est l'ordre de sortie). Je ne sais pas si la main innocente tire des joueurs un à un (affiche = deux tirages successifs) ou des affiches entières : le wireframe saisit des affiches de deux selects, ce qui donne la même donnée enregistrée ; à confirmer avec l'organisateur. Brouillon enregistré à chaque affiche. Un seul vainqueur par affiche, côtés symétriques (invariant 3). Cible du tour : 10 points (affichée, non éditable).</div>
-  <div class="note note--ds">origam-select (recherche), origam-list pour les joueurs restants, origam-snackbar « Brouillon enregistré ».</div></section>
+ <section class="box" style="margin-top:1rem" aria-labelledby="h-sai"><h2 id="h-sai">Saisir le tirage, affiche par affiche</h2>
+  <p role="status">Affiche <b>4 / 8</b> · Joueurs restants : <b>10</b></p>
+  <form class="box" aria-labelledby="h-af"><h3 id="h-af">Affiche 4</h3>
+   <div class="row"><div><label for="a4a">Joueur 1</label><select id="a4a"><option>— choisir —</option></select></div><span class="vs">contre</span><div><label for="a4b">Joueur 2</label><select id="a4b"><option>— choisir —</option></select></div></div>
+   <button class="primary">Enregistrer l'affiche 4</button></form>
+  <h3>Affiches enregistrées</h3>
+  <ol><li>Joueur A contre Joueur B <button>Modifier l'affiche 1</button></li><li>Joueur C contre Joueur D <button>Modifier l'affiche 2</button></li><li>Joueur E contre Joueur F <button>Modifier l'affiche 3</button></li></ol>
+  <div class="note">DÉCISION UTILISATEUR (c9790abd) : le tirage se saisit une affiche à la fois, dans l'ordre où elle est sortie. Un seul formulaire actif, deux sélecteurs ; « Enregistrer » ajoute l'affiche à la liste, puis le formulaire passe à l'affiche suivante (focus sur le premier sélecteur, annonce role="status" « Affiche 4 enregistrée »). Un joueur déjà placé disparaît des listes. Les affiches enregistrées restent modifiables tant que le tirage n'est pas validé (brouillon) ; le contrat de modification d'une affiche du brouillon n'est pas décrit : Je ne sais pas, à confirmer avec le back. L'ordre de saisie est l'ordre de sortie. Cible du tour : 10 points (affichée, non éditable). Pour les barrages : même écran, libellé « Barrages ».</div>
+  <div class="note note--ds">origam-form, origam-select (recherche), origam-list des affiches, origam-snackbar.</div></section>
 
  <section class="box" style="margin-top:1rem" aria-labelledby="h-rec"><h2 id="h-rec">Récapitulatif et validation</h2>
   <table><caption class="sr">Affiches du tour</caption><thead><tr><th scope="col">#</th><th scope="col">Joueur 1</th><th scope="col">Joueur 2</th></tr></thead><tbody><tr><td>1</td><td>Joueur A</td><td>Joueur B</td></tr></tbody></table>
   <button class="primary" aria-haspopup="dialog" disabled>Valider le tirage des huitièmes…</button>
   <p class="badge badge--wait">Indisponible : 5 affiches restent à saisir.</p>
   <div class="box" role="dialog" aria-labelledby="dt" style="max-width:520px;margin-top:.6rem"><h3 id="dt">Valider le tirage des huitièmes ?</h3>
-   <p>8 matchs seront créés, à 10 points. <b>Cette action est définitive</b> (comme le tirage des poules).</p>
+   <p>8 matchs seront créés, à 10 points. <b>Cette action est définitive : il n'est pas possible de revenir en arrière.</b></p>
    <div class="row"><button>Annuler</button><button class="primary">Valider définitivement</button></div></div>
-  <div class="note">POST /tirages/{id}/validation crée les matchs du tour avec cible 10 (B-13) ; idempotent : une double validation ne crée aucun match en plus. Annulation d'un tirage de tour validé : la spec dit seulement que la validation du tirage des poules est définitive (SF P2) ; pour les tours, Je ne sais pas, le dialogue suppose la même règle (à confirmer par team-lead). Après validation : lien « Saisir les scores des huitièmes » vers F-08 filtré sur ce tour.</div></section>
+  <div class="note">POST /tirages/{id}/validation crée les matchs du tour avec cible 10 (B-13) ; idempotent : une double validation ne crée aucun match en plus. Aucun retour arrière pour un tirage de tour validé (décision utilisateur, c9790abd), comme pour le tirage des poules (SF P2). Après validation : lien « Saisir les scores des huitièmes » vers F-08 filtré sur ce tour.</div></section>
 
  <h2>États</h2>
  <p class="state-title">TOUR PRÉCÉDENT INCOMPLET (409)</p><div class="box box--dashed" role="status"><p>Le tirage des quarts n'est possible qu'après validation de tous les matchs des huitièmes (2 restants). <a href="admin-score.html">Aller aux scores</a></p></div>
  <p class="state-title">LISTE DES QUALIFIÉS NON ARRÊTÉE</p><div class="box box--dashed"><p>Arrêtez d'abord la liste des qualifiés. <a href="admin-qualification.html">Aller à la qualification</a></p></div>
- <p class="state-title">VIVIER IMPAIR OU NON PUISSANCE DE 2</p><div class="box" role="alert"><p>Le vivier compte 15 joueurs : le tour ne peut pas être tiré. Vérifiez la qualification.</p></div>
+ <p class="state-title">VIVIER IMPAIR</p><div class="box" role="alert"><p>Le vivier compte 15 joueurs : les affiches ne peuvent pas être formées par paires. Vérifiez la qualification.</p></div>
  <p class="state-title">TOUR TIRÉ (lecture seule)</p><div class="box box--dashed"><p>Tirage des huitièmes validé par l'administrateur le 00/00 à 00:00. 8 matchs créés. <a href="admin-score.html">Saisir les scores</a></p></div>
  <p class="state-title">FINALE VALIDÉE</p><div class="box box--dashed"><p>Tous les tours sont validés. <a href="admin-cloture.html">Clôturer l'édition</a></p></div>
  <p class="state-title">VERSION PÉRIMÉE (412) / ERREUR</p><div class="box" role="alert"><p>Le tirage n'a pas pu être enregistré. Votre saisie est conservée. Rechargez l'état de l'édition puis réessayez.</p><button>Recharger</button></div>

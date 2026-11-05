@@ -40,7 +40,7 @@ Tableau de bord                 /admin
 ├── Participants                /admin/participants     autocomplétion, rattacher ou créer (wireframe `admin-participants.html`)
 ├── Tirages                     /admin/tirages          Stepper : paramètres · têtes de série · saisie · récapitulatif · validation (poules) ; tirage de tour pour le bracket
 ├── Poules et matchs            /admin/matchs           liste filtrable, saisie et validation de score (A1, tranché)
-└── Bracket                     /admin/bracket
+└── Phase finale                /admin/phase-finale     UNE entrée, trois pages liées par un stepper : qualification (F-24), tirage de tour (F-25), clôture (F-26). Routes à confirmer par le front.
 Référentiel
 ├── Compétiteurs                /admin/competiteurs     annuaire + panneau d'identité à côté (/admin/competiteurs/<id>), contacts privés
 └── Éditions                    /admin/editions         liste ; /admin/editions/nouvelle ; /admin/editions/<code> (modifier, lecture seule si clôturée)
@@ -81,9 +81,9 @@ Points critiques : sélecteur d'édition lisible sur mobile ; bracket défilable
 ### 7. Admin : de la fin des poules à la clôture (spec « Centre de contrôle », étapes 5 à 9 ; F-24, F-25, F-26)
 Wireframes : `admin-qualification.html`, `admin-tirage-tour.html`, `admin-cloture.html`.
 1. **Qualification (étape 5)** : poules entièrement validées (sinon 409) → égalités restantes → création des départages (1v1 à 5 à deux joueurs ; match à N côtés premier à 3 à trois ou plus, mini-poule d'abord en poule, perdants ex aequo, places multiples rejouées : A11, R-1, R-2, R-6, R-7) → paramètres n premiers + m meilleurs (n+1)èmes + barrages (RG18) → « Arrêter la liste » avec dialogue : l'édition passe à « Qualifiés validés » et la correction d'un score de poule est bloquée (B-12, R-3).
-2. **Tirage de tour (étape 6 et suivantes)** : vivier = qualifiés (avec barrages : premiers de poule directs + vainqueurs de barrages aux huitièmes, RG14) → saisie des affiches du tirage physique → récapitulatif → validation définitive : les matchs du tour sont créés à 10 points. Un tour n'existe pas avant son tirage (B-18) ; le tirage d'un tour exige tous les matchs du précédent validés (409). Scores : F-08, filtre par tour.
+2. **Tirage de tour (étape 6 et suivantes)** : vivier = qualifiés (avec barrages : premiers de poule directs + vainqueurs de barrages aux huitièmes, RG14) → saisie du tirage physique affiche par affiche → récapitulatif → validation définitive : les matchs du tour sont créés à 10 points. Un tour n'existe pas avant son tirage (B-18) ; le tirage d'un tour exige tous les matchs du précédent validés (409). Scores : F-08, filtre par tour.
 3. **Clôture (étape 9)** : finale validée (sinon 409) → récapitulatif des conséquences (points figés = base × N / 50, lecture seule partout, classements mis à jour) → confirmation explicite en saisissant le code de l'édition → clôture idempotente.
-Je ne sais pas / à poser : navigation et routes de ces écrans ; où se saisit le score d'un départage ; manière dont la main innocente tire (un joueur à la fois ou une affiche) ; réversibilité de l'arrêt de la liste, d'un tirage de tour validé et de la clôture ; composition des barrages (B-13).
+Décisions utilisateur du 2026-11-05 (c9790abd) : une seule entrée « Phase finale » avec trois pages liées par un stepper ; les scores de départage se saisissent dans F-08 avec un interrupteur « Départages seulement » (indépendant du Tour et de la Poule) ; aucun retour arrière (liste des qualifiés, tirage de tour, clôture), dit en toutes lettres dans les dialogues ; clôture confirmée en saisissant le code de l'édition ; tirage de tour saisi affiche par affiche ; pas de refus « puissance de 2 » à la qualification. Je ne sais pas : composition des barrages (B-13), enchaînement des tours si le nombre de qualifiés n'est pas une puissance de 2, contrat de modification d'une affiche du brouillon.
 
 ### 4. Palmarès (public)
 1. Palmarès → chronologie des champions → clic sur une édition → *exploration*.
