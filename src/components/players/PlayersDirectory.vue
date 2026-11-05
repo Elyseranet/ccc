@@ -59,35 +59,26 @@
       class="players-directory__note"
       data-cy="players-career-note"
     >{{ careerNote }}</p>
-    <div
-      v-if="total > 0"
-      class="players-directory__pager"
+    <app-pagination
+      :page="page"
+      :total="total"
+      :page-size="pageSize"
       data-cy="players-pagination"
-    >
-      <span
-        class="players-directory__range"
-        data-cy="players-pager-range"
-      >{{ rangeText }}</span>
-      <origam-pagination
-        :model-value="page"
-        :length="pageCount"
-        :total-visible="PLAYERS_PAGINATION_VISIBLE"
-        :aria-label="paginationLabel"
-        @update:model-value="handlePage"
-      />
-    </div>
+      @update:page="handlePage"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppDataTable from '~/components/common/AppDataTable.vue'
+import AppPagination from '~/components/common/AppPagination.vue'
 import type { ICompetitorListItem } from '~/interfaces/competitor.interface'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { usePlayerFormat } from '~/composables/usePlayerFormat'
 import { useT } from '~/composables/useT'
-import { PLAYERS_COLUMN_VALUES, PLAYERS_COLUMNS, PLAYERS_KEEP_SERVER_ORDER, PLAYERS_PAGINATION_VISIBLE, PLAYERS_SORT_DEFAULT_ORDER } from '~/consts/players.const'
+import { PLAYERS_COLUMN_VALUES, PLAYERS_COLUMNS, PLAYERS_KEEP_SERVER_ORDER, PLAYERS_SORT_DEFAULT_ORDER } from '~/consts/players.const'
 import { COMPETITOR_SORT, SORT_ORDER } from '~/enums/competitor-sort.enum'
 import type { IPlayersDirectoryEmits, IPlayersDirectoryProps } from '~/interfaces/players.interface'
 
@@ -155,12 +146,6 @@ const unknownText = (count: number): string => count === 1
 const pageCount = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
 const caption = computed(() => t('players.table.caption', 'Liste des compétiteurs, page {page} sur {pages}', { page: props.page, pages: pageCount.value }))
 const careerNote = computed(() => t('players.career_note', 'Les statistiques sont celles de toute la carrière, quelle que soit l’édition choisie.'))
-const paginationLabel = computed(() => t('players.pagination.label', 'Pagination'))
-const rangeText = computed(() => t('players.pagination.range', '{from}–{to} sur {total}', {
-  from: (props.page - 1) * props.pageSize + 1,
-  to: Math.min(props.page * props.pageSize, props.total),
-  total: props.total
-}))
 const handlePage = (value: number) => {
   emits('update:page', value)
 }
@@ -201,21 +186,6 @@ defineExpose({})
     display: block;
     font-size: var(--origam-font__size---xs);
     color: var(--origam-color__text---tertiary);
-  }
-
-  &__pager {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--origam-space---3);
-    margin-top: var(--origam-space---5);
-    font-size: var(--origam-font__size---sm);
-    color: var(--origam-color__text---secondary);
-  }
-
-  &__range {
-    font-variant-numeric: tabular-nums;
   }
 
   &__note {

@@ -34,4 +34,5 @@
 | #1304 | évolution : alignement du contenu de `btn` (`justify-content`, `text-align` avec `wrap`) en dur, sans token | `:deep(.origam-btn__content)` dans `PlayerLink.vue` (F-01) |
 | #1307 | `alert` : au repos, l'alerte prend les états survol et actif, fond assombri | thème : `feedback.*.bgHover` et `bgActive` égaux à `bg` (F-10) |
 | #1327 | `number-field` : retrait vide de 27 px avec `hideControls` ; valeur bornée au montage et à la sortie, sans pouvoir le désactiver | champ « Année » en `origam-text-field` `inputmode="numeric"`, number-field non utilisé (F-13, 87eea8e) |
+| #1331 | `select` : deux `role="combobox"` imbriqués (champ et saisie) et `role="menu"` sur un overlay qui contient un `listbox` (menu ouvert) | les 2 règles axe tolérées sur le menu ouvert seulement, restreintes aux 2 éléments (F-09) |
 | #1334 | `password-field` : règle de longueur toujours ajoutée à la validation, même champ vide et sans `requirements` ; message non surchargeable par champ | `minLength: 0` + `requirementRules` + `rules` (F-10) |

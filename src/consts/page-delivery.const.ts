@@ -94,7 +94,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_PARTICIPANTS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [
       API_ENDPOINT.EDITION,
@@ -102,7 +102,9 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
       API_ENDPOINT.COMPETITORS,
       API_ENDPOINT.EDITION_PARTICIPANT_ADD,
       API_ENDPOINT.EDITION_PARTICIPANT_REMOVE,
-      API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD
+      API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD,
+      API_ENDPOINT.ADMIN_PARTICIPANTS,
+      API_ENDPOINT.COMPETITOR_INVITATION_RESEND
     ]
   },
   [ROUTES.ADMIN_DRAWS]: {

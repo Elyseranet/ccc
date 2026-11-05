@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { E2E_SESSIONS_FILE } from './helpers/e2e.const'
+import { E2E_MAIL_CAPTURE_FILE, E2E_SESSIONS_FILE } from './helpers/e2e.const'
 
 /*********************************************************
  * Préparation des e2e (ARCH-9) : base de test réelle
@@ -13,6 +13,7 @@ import { E2E_SESSIONS_FILE } from './helpers/e2e.const'
  ********************************************************/
 export default function globalSetup (): void {
   mkdirSync(dirname(E2E_SESSIONS_FILE), { recursive: true })
+  writeFileSync(E2E_MAIL_CAPTURE_FILE, '')
   const result = spawnSync('npx', ['vite-node', 'tests/e2e/helpers/prepare-database.ts'], { stdio: 'inherit', env: process.env })
   if (result.status !== 0) {
     throw new Error('Préparation de la base e2e en échec (voir la sortie ci-dessus)')

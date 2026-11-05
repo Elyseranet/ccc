@@ -68,7 +68,7 @@ test.describe('joueurs : accessibilité et recherche', () => {
     const pagination = page.getByTestId('players-pagination')
     await pagination.getByRole('button', { name: /page 2$/i }).click()
     await expect(page).toHaveURL(/page=2/)
-    await expect(page.getByTestId('players-pager-range')).toHaveText('21–40 sur 146')
+    await expect(page.getByTestId('pagination-range')).toHaveText('21–40 sur 146')
     await expect(pagination.getByRole('button', { name: /page 2$/i })).toHaveAttribute('aria-current', 'page')
     await page.goto('/joueurs')
     await page.waitForLoadState('networkidle')
@@ -85,7 +85,7 @@ test.describe('joueurs : accessibilité et recherche', () => {
     await expect(third).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/page=3/)
-    await expect(page.getByTestId('players-pager-range')).toHaveText('41–60 sur 146')
+    await expect(page.getByTestId('pagination-range')).toHaveText('41–60 sur 146')
     await expect(pagination.getByRole('button', { name: /page 3$/i })).toHaveAttribute('aria-current', 'page')
   })
 

@@ -42,6 +42,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .player-avatar {
+  flex: none;
   color: var(--player-avatar---color, var(--origam-color__text---primary));
   box-shadow: inset 0 0 0 2px var(--player-avatar---ring, var(--origam-color__border---default));
 }

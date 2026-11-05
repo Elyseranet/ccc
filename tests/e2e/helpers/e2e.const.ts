@@ -69,3 +69,24 @@ export const E2E_MEMBER_IDENTITY = { firstName: 'Alan', lastName: 'Denoyelle', n
 
 /** Budget par IP des routes à jeton d'invitation et d'envoi d'avatar pendant les e2e (une seule IP pour toute la suite). */
 export const E2E_RATE_LIMIT_MAX_REQUESTS = 1000
+
+/*********************************************************
+ * Éditions créées par les tests d'écriture (QA-3)
+ *
+ * @description
+ * Un test d'écriture crée sa propre édition par l'API réelle (`POST /editions`), sans toucher aux archives ni à 2026. Le
+ * serveur génère le code (`2090`, `2090b`… jusqu'à `z`, CE-1) sous verrou : deux créations simultanées ne collisionnent
+ * jamais. Reste à ne pas épuiser les 26 codes d'une année : l'année vient d'un hachage du libellé du test, dans
+ * `E2E_WRITE_YEAR_FIRST` à `E2E_WRITE_YEAR_FIRST + E2E_WRITE_YEAR_SPAN - 1` (2050 à 2099, entre les bornes 2000 et
+ * 2100 de l'API et au-delà des archives 2012 à 2026), soit 1 300 codes par exécution, la base étant remise à neuf à
+ * chaque lancement. Une année épuisée (409 `EDITION_CODE_EXHAUSTED`) passe à la suivante.
+ ********************************************************/
+export const E2E_WRITE_YEAR_FIRST = 2050
+export const E2E_WRITE_YEAR_SPAN = 50
+export const E2E_WRITE_EMAIL_DOMAIN = 'ccc-e2e.example'
+
+/** Cookie du sélecteur d'édition de l'admin (`ADMIN_EDITION_COOKIE`) : il désigne l'édition de travail des pages `/admin/**`. */
+export const E2E_ADMIN_EDITION_COOKIE = 'ccc_admin_edition'
+
+/** Courriels « envoyés » par le serveur de test : transport `capture` (une ligne JSON par message), remis à zéro à chaque lancement. */
+export const E2E_MAIL_CAPTURE_FILE = resolve('test-results', 'e2e-mail.jsonl')

@@ -1,8 +1,9 @@
-import type { IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
+import type { IAddParticipantResult, IAdminParticipant, ICreateEditionRequest, IEditionChampion, IEditionPodiumEntry, IEditionDetail, IEditionParticipant, IEditionSummary, IUpdateEditionRequest, IEditionFinal } from '../interfaces/edition.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IArchiveStats } from '../interfaces/stats.interface.js'
 import type { IEditionMatchesQuery, IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import type { TAddParticipantRequest } from '../types/edition.type.js'
 import { BaseService } from './base.service.js'
 import { In, QueryFailedError } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
@@ -74,6 +75,21 @@ export class EditionService extends BaseService {
 
   matches (id: string, query: IEditionMatchesQuery = {}): Promise<IPaginated<IMatch>> {
     return this.request<IPaginated<IMatch>>(`/editions/${encodeURIComponent(id)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } })
+  }
+
+  /** Inscrits vus par l'administrateur (B-10) : ni email ni téléphone, état du compte compris. */
+  adminParticipants (id: string): Promise<IAdminParticipant[]> {
+    return this.request<IAdminParticipant[]>(`/admin/editions/${encodeURIComponent(id)}/participants`)
+  }
+
+  /** Ajoute un inscrit : `{ competitorId }` rattache un profil, `{ newCompetitor }` en crée un et l'invite (C8). */
+  addParticipant (id: string, body: TAddParticipantRequest): Promise<IAddParticipantResult> {
+    return this.request<IAddParticipantResult>(`/editions/${encodeURIComponent(id)}/participants`, { method: 'POST', body: { ...body } })
+  }
+
+  /** Retire un inscrit tant que le tirage n'est pas validé (Q1) : 204, sans corps. */
+  async removeParticipant (id: string, participationId: string): Promise<void> {
+    await this.request<void>(`/editions/${encodeURIComponent(id)}/participants/${encodeURIComponent(participationId)}`, { method: 'DELETE' })
   }
 }
 

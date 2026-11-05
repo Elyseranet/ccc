@@ -20,8 +20,9 @@ const INVITATION_PAGE = '/invitation/jeton-de-test'
 /** Pages livrées, sauf l'admin et le profil : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5 ; un jeton d'invitation inconnu donne l'état « lien inconnu »). */
 const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE]
 /** `/profil` est livré mais réservé à un compte : sans session il redirige vers `/connexion` (testé plus bas). */
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
+const ADMIN_PARTICIPANTS_DATA_CY = 'admin-participants'
 
 const hidden = (pages: string[]): string[] => pages.filter(page => !DELIVERED_PAGES.includes(page))
 
@@ -101,6 +102,22 @@ test.describe(`page livrée ${ROUTES.ADMIN_MORE} (T-LIVE-01)`, () => {
     const response = await request.get(ROUTES.ADMIN_MORE, { maxRedirects: 0, headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${token}` } })
     expect(response.status()).toBe(200)
     expect(await response.text()).toContain(`data-cy="${ADMIN_MORE_NAV_DATA_CY}"`)
+  })
+})
+
+test.describe(`page livrée ${ROUTES.ADMIN_PARTICIPANTS} (F-09)`, () => {
+  test('sans session, redirige vers /connexion (pas 404)', async ({ request }) => {
+    const response = await request.get(ROUTES.ADMIN_PARTICIPANTS, { maxRedirects: 0 })
+    expect(response.status()).toBe(302)
+    expect(response.headers().location).toBe(ROUTES.LOGIN)
+  })
+
+  test('avec la session administrateur de la base amorcée, répond 200', async ({ request }) => {
+    const token = process.env.E2E_ADMIN_SESSION ?? (existsSync(E2E_SESSIONS_FILE) ? (JSON.parse(readFileSync(E2E_SESSIONS_FILE, 'utf8')) as Record<string, string>).admin : undefined)
+    expect(token, 'aucune session administrateur : définir E2E_ADMIN_SESSION avec le jeton de la base amorcée par global-setup (tests/e2e/helpers/prepare-database.ts) ou lancer Playwright une fois pour écrire le fichier de sessions').toBeTruthy()
+    const response = await request.get(ROUTES.ADMIN_PARTICIPANTS, { maxRedirects: 0, headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${token}` } })
+    expect(response.status()).toBe(200)
+    expect(await response.text()).toContain(`data-cy="${ADMIN_PARTICIPANTS_DATA_CY}"`)
   })
 })
 

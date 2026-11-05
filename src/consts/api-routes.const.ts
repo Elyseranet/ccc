@@ -44,5 +44,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.MATCH_VALIDATION]: { file: 'matchs/[id]/validation.post.ts' },
   [API_ENDPOINT.ME_AVATAR_UPLOAD]: { file: 'moi/avatar.put.ts' },
   [API_ENDPOINT.ME_AVATAR_DELETE]: { file: 'moi/avatar.delete.ts' },
-  [API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD]: { file: 'competiteurs/[id]/avatar.put.ts' }
+  [API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD]: { file: 'competiteurs/[id]/avatar.put.ts' },
+  [API_ENDPOINT.ADMIN_PARTICIPANTS]: { file: 'admin/editions/[id]/participants.get.ts' },
+  [API_ENDPOINT.COMPETITOR_INVITATION_RESEND]: { file: 'competiteurs/[id]/invitation.post.ts' }
 }

@@ -97,7 +97,7 @@ const prepareDirectory = async (page: Page, mockup: Page) => {
     ['.pl-cell .avatar', '.players-directory__cell .player-avatar'],
     ['.pl-cell > span:last-child a', '.players-directory__cell .player-link__name'],
     ['.table tbody td.num', '.players-directory__num'],
-    ['.pager > .num', '[data-cy="players-pager-range"]']
+    ['.pager > .num', '[data-cy="pagination-range"]']
   ])
 }
 

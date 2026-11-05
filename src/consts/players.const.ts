@@ -63,7 +63,6 @@ export const PLAYER_ONGOING_LEVEL = 0
 
 export const PLAYER_OPPONENTS_LIMIT = 4
 
-export const PLAYERS_PAGINATION_VISIBLE = 8
 
 export const PLAYERS_HEAD_TO_HEAD_QUERY_KEYS = {
   A: 'a',
