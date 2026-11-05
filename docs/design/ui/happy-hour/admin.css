@@ -66,6 +66,7 @@
 .mcs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---3); }
 .mc { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: 't t chip' 'a s b' 'act act act'; align-items: center; gap: var(--origam-space---3); padding: var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---sm); }
 .mc__t { grid-area: t; } .mc .chip { grid-area: chip; justify-self: end; }
+.mc__chips { grid-area: chip; display: flex; flex-wrap: wrap; justify-content: end; gap: var(--origam-space---1); } .mc__chips .chip { grid-area: auto; }
 .mc__a { grid-area: a; font-weight: var(--origam-font__weight---bold); }
 .mc__b { grid-area: b; font-weight: var(--origam-font__weight---bold); text-align: right; }
 .mc__s { grid-area: s; font-size: var(--origam-font__size---2xl); color: var(--origam-color__bar---amber); }
@@ -74,18 +75,19 @@
 
 /* origam-dialog / tiroir bas — état ouvert pour la maquette */
 .sheet-scrim { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--origam-color__surface---sunken) 72%, transparent); backdrop-filter: blur(4px); }
-.sheet { position: fixed; z-index: 41; top: 50%; left: calc(50% + 8.5rem); translate: -50% -50%; width: min(34rem, 100% - 2 * var(--origam-space---4)); padding: var(--origam-space---6); border: 1px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---overlay); box-shadow: var(--origam-shadow---xl); animation: sheet-in var(--origam-motion__duration---medium) var(--origam-motion__easing---decelerate) both; }
+.sheet { position: fixed; z-index: 41; top: 50%; left: calc(50% + 8.5rem); translate: -50% -50%; width: min(35rem, 100% - 2 * var(--origam-space---4)); padding: var(--origam-space---6); border: 1px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---overlay); box-shadow: var(--origam-shadow---xl); animation: sheet-in var(--origam-motion__duration---medium) var(--origam-motion__easing---decelerate) both; }
 @keyframes sheet-in { from { opacity: 0; translate: -50% -44%; } }
 .sheet__grip { display: none; }
 .sheet__h { display: flex; align-items: start; justify-content: space-between; gap: var(--origam-space---3); }
-.sheet__x { width: var(--origam-space---11); padding-inline: 0; }
+.sheet__x { width: var(--origam-space---11); min-height: var(--origam-space---11); padding-inline: 0; background: none; box-shadow: none; color: var(--origam-color__text---primary); } /* origam-dialog : bouton de fermeture icône seule (mdi-close 16 px), sans bordure */
+.sheet__x svg { width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
 .sheet__form { display: grid; gap: var(--origam-space---5); margin-top: var(--origam-space---5); }
 .duel { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: var(--origam-space---3); }
 .duel__p { display: grid; gap: var(--origam-space---2); }
 .duel__p:last-child { text-align: right; }
 .duel__p label { font-weight: var(--origam-font__weight---bold); }
 .duel__vs { padding-bottom: var(--origam-space---4); font-size: var(--origam-font__size---3xl); color: var(--origam-color__text---tertiary); }
-.score-in { width: 100%; min-height: 5rem; border: 2px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); color: var(--origam-color__bar---amber); font-size: var(--origam-font__size---4xl); text-align: center; }
+.score-in { width: 100%; padding: 5px calc(var(--origam-space---5) - 1px); border: 2px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); color: var(--origam-color__action--primary---fgSubtle); font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---normal); text-align: start; } /* origam-text-field single-line rounded lg, color primary, .font-display, vars --origam-field---font-size 4xl et bordure 2 px border.strong (mesuré 2.37.4) */
 .score-in:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
 .rule { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); padding: var(--origam-space---3) var(--origam-space---4); border-radius: var(--origam-radius---lg); background: var(--origam-color__feedback--info---bgSubtle); font-size: var(--origam-font__size---sm); }
 .sheet__meta { font-size: var(--origam-font__size---sm); }
