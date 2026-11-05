@@ -53,5 +53,18 @@
 </section></main>
 </div>
 <nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+<script>
+  // Maquette : état « saisie d’un match de phase finale » choisi par l’adresse (admin-matchs.html?tour=QUARTER). Aucune animation pilotée en JS.
+  if (new URLSearchParams(location.search).get('tour') === 'QUARTER') {
+    document.getElementById('rf').value = 'Quarts'
+    document.querySelector('label[for="pf"]').closest('.field').hidden = true
+    document.querySelector('.sheet__h .eyebrow').textContent = 'Quart de finale · match 2026-112'
+    const set = (id, name, v) => { const i = document.getElementById(id); i.max = '10'; i.value = v; document.querySelector('label[for="' + id + '"]').textContent = name }
+    set('sa', 'Lou Bernard', '10'); set('sb', 'Nina Perrin', '7')
+    document.querySelector('#sheet-rule .chip').textContent = 'Cible 10'
+    document.querySelector('#sheet-rule').lastChild.textContent = 'En phase finale, le vainqueur marque exactement 10 (RG22). Saisir n’est pas valider : le tableau ne bouge qu’à la validation.'
+    document.querySelector('.sheet__cta [type="submit"]').textContent = 'Valider 10–7'
+  }
+</script>
 </body>
 </html>
