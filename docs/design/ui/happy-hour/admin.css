@@ -61,7 +61,8 @@
 .fchip .num { padding: 0 var(--origam-space---2); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---overlay); font-size: var(--origam-font__size---xs); }
 .fchip[aria-pressed="true"] { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); border-color: transparent; }
 .fchip[aria-pressed="true"] .num { background: var(--origam-color__surface---default); color: var(--origam-color__text---primary); }
-.adm-pool { max-width: 16rem; margin-bottom: var(--origam-space---5); }
+.adm-sel-row { display: flex; flex-wrap: wrap; gap: var(--origam-space---3); margin-bottom: var(--origam-space---5); }
+.adm-pool { flex: 1 1 12rem; max-width: 16rem; }
 .mcs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---3); }
 .mc { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: 't t chip' 'a s b' 'act act act'; align-items: center; gap: var(--origam-space---3); padding: var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---xl); background: var(--origam-color__surface---raised); box-shadow: var(--origam-shadow---sm); }
 .mc__t { grid-area: t; } .mc .chip { grid-area: chip; justify-self: end; }
