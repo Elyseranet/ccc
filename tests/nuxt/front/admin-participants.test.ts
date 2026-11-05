@@ -51,8 +51,9 @@ const FORM: IParticipantFormValues = { lastName: ' Roussel ', firstName: 'Camill
 
 const apiError = (statusCode: number, code: API_ERROR_CODE) => ({ statusCode, code, message: code })
 
+let editionStatus: EDITION_STATUS = EDITION_STATUS.REGISTRATION
 const registerEditions = () => registerEndpoint('/api/v1/editions', defineEventHandler(() => [
-  { id: EDITION_ID, code: '2027', year: 2027, name: null, status: EDITION_STATUS.REGISTRATION }
+  { id: EDITION_ID, code: '2027', year: 2027, name: null, status: editionStatus }
 ]))
 const registerList = (rows: IAdminParticipant[] = [participant('Lisa André', ACCOUNT_STATE.ACTIVE)]) =>
   registerEndpoint(`/api/v1/admin/editions/${EDITION_ID}/participants`, defineEventHandler(() => rows))
@@ -162,6 +163,7 @@ describe('fonctions pures des inscrits', () => {
 
 describe('useAdminParticipants : parcours d’écriture contre des routes simulées', () => {
   beforeEach(() => {
+    editionStatus = EDITION_STATUS.REGISTRATION
     registerEditions()
     registerList()
   })
@@ -228,17 +230,13 @@ describe('useAdminParticipants : parcours d’écriture contre des routes simul�
   })
 
   it('un refus REGISTRATION_CLOSED recharge l’édition : l’écran apprend son état et masque les actions', async () => {
-    let statusCalls = 0
-    registerEndpoint('/api/v1/editions', defineEventHandler(() => {
-      statusCalls += 1
-      return [{ id: EDITION_ID, code: '2027', year: 2027, name: null, status: statusCalls > 1 ? EDITION_STATUS.POOLS_DRAWN : EDITION_STATUS.REGISTRATION }]
-    }))
     registerEndpoint(`/api/v1/editions/${EDITION_ID}/participants`, { method: 'POST', handler: defineEventHandler((event) => {
       setResponseStatus(event, 409)
       return apiError(409, API_ERROR_CODE.REGISTRATION_CLOSED)
     }) })
     const api = await mountComposable()
     expect(api.isReadOnly.value).toBe(false)
+    editionStatus = EDITION_STATUS.POOLS_DRAWN
     await api.attach(COMPETITOR_ID)
     await flushPromises()
     expect(api.isReadOnly.value).toBe(true)
