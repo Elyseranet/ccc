@@ -21,7 +21,9 @@ import { computed } from 'vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPageHero from '~/components/common/PageHero.vue'
 import { useEditions } from '~/composables/useEditions'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { ROUTES } from '~/consts/routes.const'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import { fromAsyncDataError } from '~/utils/async-data-error.util'
@@ -39,7 +41,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-useHead({ title: computed(() => t('pages.editions.title', 'Éditions')) })
+useSeo({ page: SEO_PAGE.EDITIONS })
 
 /*********************************************************
  * Redirection

@@ -132,6 +132,7 @@ import ParticipantSearch from '~/components/admin/participants/ParticipantSearch
 import { useAdminEdition } from '~/composables/useAdminEdition'
 import { useAdminParticipants } from '~/composables/useAdminParticipants'
 import { useParticipantSearch } from '~/composables/useParticipantSearch'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { PARTICIPANT_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-participants.const'
 import { EDITION_STATUS_LABELS } from '~/consts/edition-status.const'
@@ -153,6 +154,7 @@ defineSlots<{}>()
 const addTitleId = useId()
 const title = computed(() => t('pages.admin_participants.title', 'Participants'))
 useHead({ title })
+useSeo({ noindex: true })
 
 await useAdminEdition()
 const {

@@ -65,7 +65,9 @@ import PlayerJourney from '~/components/players/PlayerJourney.vue'
 import PlayerOpponents from '~/components/players/PlayerOpponents.vue'
 import PlayerStats from '~/components/players/PlayerStats.vue'
 import { usePlayerProfile } from '~/composables/usePlayerProfile'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { PLAYERS_BREADCRUMB_DIVIDER } from '~/consts/players.const'
 import { ROUTES } from '~/consts/routes.const'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
@@ -114,7 +116,7 @@ if (import.meta.server) {
  * @description
  * Titre du document : le nom du joueur, ou « Fiche joueur » tant qu'il n'est pas connu.
  ********************************************************/
-useHead({ title: computed(() => competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur')) })
+useSeo({ page: SEO_PAGE.PLAYER, params: () => ({ name: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur') }) })
 const breadcrumbLabel = computed(() => t('components.page_hero.breadcrumb_label', 'Fil d’Ariane'))
 const breadcrumbDivider = PLAYERS_BREADCRUMB_DIVIDER
 const breadcrumbItems = computed(() => [

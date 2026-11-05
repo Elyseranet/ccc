@@ -38,7 +38,9 @@ import HomeBento from '~/components/home/HomeBento.vue'
 import HomeHero from '~/components/home/HomeHero.vue'
 import { useHomeLinks } from '~/composables/useHomeLinks'
 import { useHomeOverview } from '~/composables/useHomeOverview'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { HOME_EMPTY_ARCHIVE } from '~/consts/home.const'
 
 /*********************************************************
@@ -54,7 +56,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-useHead({ title: computed(() => t('pages.home.title', 'Championnat de Caps')) })
+useSeo({ page: SEO_PAGE.HOME })
 
 /*********************************************************
  * Données

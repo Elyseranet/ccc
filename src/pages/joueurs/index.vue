@@ -58,7 +58,9 @@ import PlayersDirectory from '~/components/players/PlayersDirectory.vue'
 import PlayersSearch from '~/components/players/PlayersSearch.vue'
 import { useArchiveStats } from '~/composables/useEditions'
 import { usePlayerSearch } from '~/composables/usePlayerSearch'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 
 /*********************************************************
@@ -73,7 +75,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-useHead({ title: computed(() => t('pages.players.title', 'Joueurs')) })
+useSeo({ page: SEO_PAGE.PLAYERS })
 
 /*********************************************************
  * Données

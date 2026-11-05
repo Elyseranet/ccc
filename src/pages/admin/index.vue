@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamTitle } from 'origam/components'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 
 /*********************************************************
@@ -27,6 +28,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const title = computed(() => t('pages.admin_dashboard.title', 'Tableau de bord'))
 useHead({ title })
+useSeo({ noindex: true })
 
 /*********************************************************
  * Expose

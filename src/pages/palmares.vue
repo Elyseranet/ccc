@@ -56,7 +56,9 @@ import PalmaresMostTitled from '~/components/palmares/PalmaresMostTitled.vue'
 import PalmaresRankings from '~/components/palmares/PalmaresRankings.vue'
 import PalmaresTitles from '~/components/palmares/PalmaresTitles.vue'
 import { usePalmares } from '~/composables/usePalmares'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 
 /*********************************************************
@@ -72,7 +74,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-useHead({ title: computed(() => t('pages.hall_of_fame.title', 'Palmarès')) })
+useSeo({ page: SEO_PAGE.HALL_OF_FAME })
 
 /*********************************************************
  * Données

@@ -74,6 +74,7 @@ import { OrigamAlert, OrigamBtn, OrigamLabel, OrigamList, OrigamTitle } from 'or
 import AdminEditionSelect from '~/components/admin/AdminEditionSelect.vue'
 import IconChevronRight from '~/components/icons/IconChevronRight.vue'
 import { useLogout } from '~/composables/useLogout'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { ADMIN_MORE_ITEMS } from '~/consts/admin-more.const'
 import { isPageAccessible } from '~/utils/page-delivery.util'
@@ -95,6 +96,7 @@ const editionFieldId = useId()
 const editionTitleId = useId()
 const title = computed(() => t('pages.admin_more.title', 'Plus'))
 useHead({ title })
+useSeo({ noindex: true })
 
 /*********************************************************
  * Libellés

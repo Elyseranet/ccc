@@ -43,6 +43,7 @@ import AccountState from '~/components/account/AccountState.vue'
 import ProfileForm from '~/components/account/ProfileForm.vue'
 import { useLogout } from '~/composables/useLogout'
 import { useProfile } from '~/composables/useProfile'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { ACCOUNT_STATE_TONE } from '~/enums/account.enum'
 import type { ACCOUNT_ERROR } from '~/enums/account.enum'
@@ -62,6 +63,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const title = computed(() => t('pages.profile.title', 'Mon profil'))
 useHead({ title })
+useSeo({ noindex: true })
 const successTone = ACCOUNT_STATE_TONE.SUCCESS
 const savedTitle = computed(() => t('account.profile.saved_title', 'Profil enregistré'))
 const savedText = computed(() => t('account.profile.saved_text', 'Votre fiche publique n’affiche jamais votre email ni votre téléphone.'))

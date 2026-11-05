@@ -1,6 +1,7 @@
 import { CCC_HH_THEMES } from './src/themes/ccc.theme'
 import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_INDEXABLE, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
+import { SEO_PRIVATE_ROUTE_PATTERNS, SEO_ROBOTS_NOINDEX } from './src/consts/seo.const'
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
@@ -61,7 +62,9 @@ export default defineNuxtConfig({
     // Politique de référent (F-10, revue de sécurité M1) : ailleurs, seule l'origine part vers un site tiers ; sur le lien d'invitation, dont le
     // jeton est dans le chemin, jamais rien (la page charge des polices de Google), et la réponse ne se met pas en cache.
     '/**': { headers: { 'referrer-policy': 'strict-origin-when-cross-origin' } },
-    '/invitation/**': { headers: { 'referrer-policy': 'no-referrer', 'cache-control': 'no-store' } }
+    // Pages privées (T-SEO-01) : jamais indexées, aucun lien suivi, quelle que soit la variable d'indexation du site. L'en-tête double la meta `robots` de `useSeo`.
+    ...Object.fromEntries(SEO_PRIVATE_ROUTE_PATTERNS.map(pattern => [pattern, { headers: { 'x-robots-tag': SEO_ROBOTS_NOINDEX } }])),
+    '/invitation/**': { headers: { 'x-robots-tag': SEO_ROBOTS_NOINDEX, 'referrer-policy': 'no-referrer', 'cache-control': 'no-store' } }
   },
   runtimeConfig: {
     // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
@@ -125,6 +128,8 @@ export default defineNuxtConfig({
     public: {
       // URL publique du site (NUXT_PUBLIC_SITE_URL) : base des liens d'invitation, jamais déduite de l'en-tête Host.
       siteUrl: DEFAULT_SITE_URL,
+      // Image de partage Open Graph et Twitter (NUXT_PUBLIC_SITE_OG_IMAGE : chemin ou URL absolue). Vide tant que l'image 1200 x 630 n'est pas dessinée (T-SEO-01).
+      siteOgImage: '',
       // Indexation par les moteurs (NUXT_PUBLIC_SITE_INDEXABLE, T-SEO-01) : faux par défaut, seule la production la pose à `true`.
       siteIndexable: DEFAULT_SITE_INDEXABLE
     },

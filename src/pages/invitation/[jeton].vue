@@ -25,6 +25,7 @@ import AccountLayout from '~/components/account/AccountLayout.vue'
 import InvitationForm from '~/components/account/InvitationForm.vue'
 import InvitationState from '~/components/account/InvitationState.vue'
 import { useInvitation } from '~/composables/useInvitation'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { INVITATION_STATE } from '~/enums/account.enum'
 import { getInitials } from '~/utils/player.util'
@@ -44,6 +45,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const title = computed(() => t('pages.invitation.title', 'Invitation'))
 useHead({ title })
+useSeo({ noindex: true })
 
 /*********************************************************
  * Invitation

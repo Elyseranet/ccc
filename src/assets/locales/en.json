@@ -687,5 +687,21 @@
   "palmares.titles_other": "{count} titles",
   "palmares.titles_title": "The titles",
   "palmares.most_titled_tied_one": "Most titles · tied, 1 title each",
-  "palmares.most_titled_tied_other": "Most titles · tied, {count} titles each"
+  "palmares.most_titled_tied_other": "Most titles · tied, {count} titles each",
+  "seo.players.title": "Caps Championship players · CCC",
+  "seo.edition.title": "Caps Championship edition {code} · CCC",
+  "seo.head_to_head.description": "Compare two Caps Championship players: their meetings, the score of their matchups and their overall records.",
+  "seo.rules.title": "Caps Championship rules · CCC",
+  "seo.editions.title": "Caps Championship editions · CCC",
+  "seo.hall_of_fame.description": "The Caps Championship hall of fame: ACP and All Time rankings, points evolution and titles timeline.",
+  "seo.editions.description": "All the Caps Championship editions: pools, final stage, matches and rankings of each edition.",
+  "seo.player.description": "{name} at the Caps Championship: journey, wins and losses, frequent opponents.",
+  "seo.home.description": "The Caps Championship: the current edition, the latest validated scores, the champion and the ACP ranking.",
+  "seo.rules.description": "The Caps Championship rules: the game, the tournament and the variants.",
+  "seo.home.title": "Caps Championship · Editions, players, rankings",
+  "seo.hall_of_fame.title": "Caps Championship hall of fame · CCC",
+  "seo.players.description": "The Caps Championship players directory: search a player by name or nickname and open their page.",
+  "seo.head_to_head.title": "Head to head between two players · Caps Championship",
+  "seo.edition.description": "Caps Championship edition {code}: participants, pools, final stage, matches and results.",
+  "seo.player.title": "{name} · Caps Championship player page"
 }

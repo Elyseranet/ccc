@@ -55,7 +55,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamTab, OrigamTabPanel, OrigamTabPanels, OrigamTabs } from 'origam/components'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { useRulesTab } from '~/composables/useRulesTab'
 import { RULES_TAB } from '~/enums/rules-tab.enum'
 
@@ -70,7 +72,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-useHead({ title: computed(() => t('pages.rules.title', 'Règles')) })
+useSeo({ page: SEO_PAGE.RULES })
 
 /*********************************************************
  * Textes

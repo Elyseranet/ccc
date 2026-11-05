@@ -109,7 +109,9 @@ import EditionSelector from '~/components/edition/EditionSelector.vue'
 import EditionSummary from '~/components/edition/EditionSummary.vue'
 import { useEditionTabs } from '~/composables/useEditionTabs'
 import { useEditionView } from '~/composables/useEditionView'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { EDITION_TABS } from '~/consts/edition-view.const'
 import { ROUTES } from '~/consts/routes.const'
 import { EDITION_TAB } from '~/enums/edition-tab.enum'
@@ -129,7 +131,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const route = useRoute()
 const code = computed(() => String(route.params.id))
-useHead({ title: computed(() => t('edition.page_title', 'Édition {code}', { code: code.value })) })
+useSeo({ page: SEO_PAGE.EDITION, params: () => ({ code: code.value }) })
 
 /*********************************************************
  * Données

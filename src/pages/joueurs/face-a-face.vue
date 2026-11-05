@@ -58,7 +58,9 @@ import HeadToHeadHistory from '~/components/head-to-head/HeadToHeadHistory.vue'
 import HeadToHeadPicker from '~/components/head-to-head/HeadToHeadPicker.vue'
 import HeadToHeadSummary from '~/components/head-to-head/HeadToHeadSummary.vue'
 import { useHeadToHeadComparison } from '~/composables/useHeadToHeadComparison'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
+import { SEO_PAGE } from '~/enums/seo.enum'
 import { ROUTES } from '~/consts/routes.const'
 import type { IBreadcrumbEntry, ITranslatableText } from '~/interfaces/common-components.interface'
 
@@ -74,8 +76,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-const title = computed(() => t('pages.head_to_head.title', 'Face-à-face'))
-useHead({ title })
+useSeo({ page: SEO_PAGE.HEAD_TO_HEAD })
 
 /*********************************************************
  * Logique de l'écran

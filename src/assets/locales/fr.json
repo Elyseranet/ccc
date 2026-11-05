@@ -687,5 +687,21 @@
   "palmares.titles_other": "{count} titres",
   "palmares.titles_title": "Les titres",
   "palmares.most_titled_tied_one": "Les plus titrés · ex aequo, 1 titre chacun",
-  "palmares.most_titled_tied_other": "Les plus titrés · ex aequo, {count} titres chacun"
+  "palmares.most_titled_tied_other": "Les plus titrés · ex aequo, {count} titres chacun",
+  "seo.players.title": "Joueurs du Championnat de Caps · CCC",
+  "seo.edition.title": "Édition {code} du Championnat de Caps · CCC",
+  "seo.head_to_head.description": "Comparez deux joueurs du Championnat de Caps : leurs rencontres, le score de leurs confrontations et leurs bilans globaux.",
+  "seo.rules.title": "Règles du Championnat de Caps · CCC",
+  "seo.editions.title": "Éditions du Championnat de Caps · CCC",
+  "seo.hall_of_fame.description": "Le palmarès du Championnat de Caps : classements ACP et All Time, évolution des points et chronologie des titres.",
+  "seo.editions.description": "Toutes les éditions du Championnat de Caps : poules, phase finale, matchs et classements de chaque édition.",
+  "seo.player.description": "Fiche de {name} au Championnat de Caps : parcours, victoires et défaites, adversaires fréquents.",
+  "seo.home.description": "Le Championnat de Caps : l’édition en cours, les derniers scores validés, le champion et le classement ACP.",
+  "seo.rules.description": "Les règles du Championnat de Caps : le jeu, le tournoi et les variantes.",
+  "seo.home.title": "Championnat de Caps · Éditions, joueurs, classements",
+  "seo.hall_of_fame.title": "Palmarès du Championnat de Caps · CCC",
+  "seo.players.description": "L’annuaire des joueurs du Championnat de Caps : recherchez un joueur par nom ou pseudo et consultez sa fiche.",
+  "seo.head_to_head.title": "Face-à-face entre deux joueurs · Championnat de Caps",
+  "seo.edition.description": "Édition {code} du Championnat de Caps : participants, poules, phase finale, matchs et résultats.",
+  "seo.player.title": "{name} · Fiche joueur du Championnat de Caps"
 }

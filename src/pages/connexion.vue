@@ -28,6 +28,7 @@ import { computed } from 'vue'
 import AccountLayout from '~/components/account/AccountLayout.vue'
 import LoginForm from '~/components/account/LoginForm.vue'
 import { useLogin } from '~/composables/useLogin'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import type { ILoginRequest } from '~/interfaces/auth.interface'
 
@@ -44,6 +45,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const title = computed(() => t('pages.login.title', 'Connexion'))
 useHead({ title })
+useSeo({ noindex: true })
 const asideBig = computed(() => t('account.login.aside_big', 'Santé !'))
 const asideText = computed(() => t('account.login.aside_text', 'Après connexion : un participant arrive sur son profil, l’organisation sur son espace.'))
 
