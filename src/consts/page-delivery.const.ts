@@ -94,7 +94,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_PARTICIPANTS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [
       API_ENDPOINT.EDITION,
