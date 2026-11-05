@@ -5,6 +5,7 @@ import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_DEFAULT_FILTER, ADMIN_MATCH_FILTER_QUERY_PARAM, ADMIN_MATCH_FILTERS, ADMIN_MATCH_POOL_QUERY_PARAM, ADMIN_MATCHES_ASYNC_KEY } from '~/consts/admin-match-filters.const'
 import { EDITION_STATUS } from '~/enums/edition.enum'
+import { ROUND_KIND } from '~/enums/round.enum'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
 import type { IAdminMatch } from '~/interfaces/admin-match.interface'
 import type { IMatchFilterView } from '~/interfaces/admin-match-queue.interface'
@@ -16,7 +17,9 @@ import { fromAsyncDataError, toAsyncDataError } from '~/utils/async-data-error.u
  * useMatchQueue
  *
  * @description
- * File admin des scores de l'édition active (`GET /admin/editions/{id}/matchs`, C6). La liste complète est chargée une fois :
+ * File admin des scores de l'édition active (`GET /admin/editions/{id}/matchs?tour=POOLS`, C6) : les matchs de poule seulement
+ * (décision front-lead, spec fonctionnelle : « matchs de poules » et « matchs du bracket » sont deux étapes distinctes ; la saisie du bracket
+ * est un autre ticket). La liste complète est chargée une fois :
  * les compteurs des quatre filtres en découlent sans autre appel, et le filtre (`?f=`) et la poule (`?poule=`) sont portés
  * par l'URL (changer de filtre ne recharge rien). Une édition archivée est en lecture seule : aucune action sur les cartes.
  * Clé de cache fixe : l'édition active (cookie) n'est connue qu'après le chargement des éditions, une clé calculée à partir d'elle
@@ -43,7 +46,7 @@ export const useMatchQueue = async () => {
         return []
       }
       try {
-        return await service.adminList(editionId.value)
+        return await service.adminList(editionId.value, { tour: ROUND_KIND.POOLS })
       } catch (cause) {
         throw toAsyncDataError(cause)
       }

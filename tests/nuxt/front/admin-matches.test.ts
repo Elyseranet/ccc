@@ -1,6 +1,6 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import { defineEventHandler, getHeader, readBody, setResponseStatus } from 'h3'
+import { defineEventHandler, getHeader, getQuery, readBody, setResponseStatus } from 'h3'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RouterLink } from 'vue-router'
 import { useAdminEditionStore } from '../../../src/composables/useAdminEditionStore'
@@ -21,10 +21,12 @@ const edition = (status: EDITION_STATUS): IEditionSummary => ({
 let editions: IEditionSummary[] = [edition(EDITION_STATUS.POOLS_PLAYING)]
 let matches: IAdminMatch[] = []
 let listFailing = false
+const listQueries = vi.fn()
 const validations = vi.fn()
 
 registerEndpoint('/api/v1/editions', defineEventHandler(() => editions))
 registerEndpoint('/api/v1/admin/editions/e1/matchs', defineEventHandler((event) => {
+  listQueries(getQuery(event))
   if (listFailing) {
     setResponseStatus(event, 500)
     return { statusCode: 500, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'x' }
@@ -80,6 +82,12 @@ describe('page « Poules et matchs » (F-08)', () => {
     expect(wrapper.find('[data-cy="admin-match-m1"]').exists()).toBe(false)
     expect(wrapper.get('[data-cy="admin-match-m2"]').text()).toContain('Saisi · à valider')
     expect(wrapper.get('[data-cy="admin-match-m3"]').text()).toContain('Sans score')
+  })
+
+  it('la file ne demande que les matchs de poule (tour=POOLS)', async () => {
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-matches-queue"]').exists()).toBe(true))
+    expect(listQueries).toHaveBeenCalledWith(expect.objectContaining({ tour: 'POOLS' }))
   })
 
   it('les boutons portent le nom des deux joueurs et un libellé visible contenu dans leur nom', async () => {
