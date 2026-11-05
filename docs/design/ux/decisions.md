@@ -358,3 +358,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Dérogation Playwright pour `490938f`** (T-SEO-01, variable `NUXT_PUBLIC_SITE_INDEXABLE` et helper `isSiteIndexable`, sans aucun appelant) : merge après typecheck et test:run verts, sans Playwright. La dérogation est notée dans le message de merge, et le prochain Playwright complet couvre ce code.
 - **Purge planifiée des sessions expirées** : un ticket back, pour que la politique de confidentialité annonce une durée maximale définie (et non « au plus tôt 24 h »).
 - **Spec API amendée** avec le contrat de T-SEC-08 (If-Match ; 428, 412, 400, 409 ; `version` du compétiteur).
+
+## 2026-11-05 — F-19 : CGU, page d'erreur, médiateur (décisions utilisateur)
+
+- **Pas d'acceptation des CGU à la première connexion** : les CGU et la politique de confidentialité sont accessibles par des liens (pied de page et écran d'invitation), sans case à cocher.
+- **Page d'erreur CCC dans F-19** : un `error.vue` avec le layout public (message, lien vers l'accueil, pied de page avec les mentions légales).
+- **Aucune mention de médiateur de la consommation** : le site est gratuit et ne vend rien. À revoir si CCC devient payant.
