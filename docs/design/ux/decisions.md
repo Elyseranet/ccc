@@ -345,3 +345,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : les animations en boucle de l'accueil (pinte, fond animé) reçoivent un **bouton « Mettre en pause les animations »**, accessible au clavier, dont l'état est mémorisé pour le visiteur. Elles ne sont pas raccourcies.
 - **Raison** : WCAG 2.2.2 et RGAA 13.8 exigent un moyen d'arrêter une animation de plus de 5 secondes, et `prefers-reduced-motion` n'en est pas un. L'effet vitrine est conservé.
 - `prefers-reduced-motion: reduce` continue de tout désactiver.
+
+## 2026-11-05 — F-07 : pas de compteur d'invitations en attente
+
+- **Décision utilisateur** : l'étape 2 du centre de contrôle affiche seulement « N participants inscrits ». La mention « 0 invitation en attente » sort de la maquette `admin.html` ; l'API n'expose pas ce nombre et n'aura pas à le faire pour F-07.
+- Le suivi des invitations reste sur l'écran de gestion des comptes.
+- La référence interne « (A17) » du bloc activité sort aussi de la maquette (décision du chef de projet : aucune référence interne affichée).
