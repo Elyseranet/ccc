@@ -149,6 +149,7 @@ Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 :
 | `NUXT_PUBLIC_SITE_URL` | `https://<domaine-dev>` : base des liens d'invitation ; https, jamais localhost (garde PROD-1), et jamais une IP privée dès le merge de T-SEC-06 |
 | `NUXT_MAIL_TRANSPORT` | `smtp` |
 | `NUXT_MAIL_HOST` | `mailpit.ccc.internal` (l'alias à point) |
+| `NUXT_PUBLIC_SITE_INDEXABLE` | ne pas la définir, ou `false` : la dev n'est jamais indexée (T-SEO-01) |
 | `NUXT_MAIL_PORT` | `1025` |
 | `NUXT_MAIL_SECURE` | `false` (Mailpit, réseau interne) |
 | `NUXT_MAIL_FROM` | `CCC <no-reply@<domaine-dev>>` : un vrai domaine, jamais `ccc.local` (refusé) |
@@ -320,6 +321,7 @@ Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (A
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `30` | Réglages propres à la recherche publique `GET /api/v1/competiteurs?q=` (clé `competitors-search`) ; surchargent les valeurs par défaut ci-dessus. |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | `60000`, `300` | Budget unique, partagé par toutes les routes publiques en lecture (clé `public-read`) : liste des compétiteurs (hors `?q=`), fiche, face-à-face, éditions et sous-ressources, stats, classements. `/health` et la recherche `?q=` gardent leur clé. |
 | `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000` | URL publique du site : base des liens d'invitation (jamais l'en-tête `Host`). À renseigner en production. |
+| `NUXT_PUBLIC_SITE_INDEXABLE` | `false` | Indexation par les moteurs de recherche (T-SEO-01). Seul `true` l'ouvre ; toute autre valeur la laisse fermée. **Laisser à `false` sur l'instance de dev**, ne mettre `true` qu'en production. |
 | `NUXT_MAIL_HOST`, `_PORT`, `_SECURE`, `_USER`, `_PASSWORD`, `_FROM` | `localhost`, `1025`, `false`, vide, vide, `CCC <no-reply@ccc.local>` | Envoi des invitations par SMTP (nodemailer) : Mailpit en local, fournisseur SMTP en production. |
 | `NUXT_RATE_LIMIT_INVITATION_TOKEN_WINDOW_MS`, `_MAX_REQUESTS` | `900000`, `30` | Budget par IP des routes publiques `GET`/`POST /auth/invitation/{jeton}` (clé `invitation-token`). |
 | `NUXT_RATE_LIMIT_AVATAR_UPLOAD_WINDOW_MS`, `_MAX_REQUESTS` | `600000`, `10` | Envois d'avatar (`PUT /moi/avatar`, `PUT /competiteurs/{id}/avatar`, clé `avatar-upload`, par IP). Le limiteur passe avant la lecture du corps : un envoi refusé en 429 (avec `Retry-After`) n'est ni lu ni décodé par sharp. |
