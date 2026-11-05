@@ -272,3 +272,9 @@
 .ostep__t { font-weight: var(--origam-font__weight---medium); line-height: var(--origam-font__lineHeight---normal); }
 .ostep__conn { flex: 1 1 0; height: 1px; margin: calc(var(--origam-space---4) - 0.5px) var(--origam-space---1) 0; border-radius: var(--origam-radius---full); background: var(--origam-color__border---subtle); }
 .ostep__conn--done { background: var(--origam-color__feedback--success---fgSubtle); }
+.ostep--phase { margin-bottom: var(--origam-space---4); }
+.ostep--phase a.ostep__item { color: inherit; text-decoration: none; border-radius: var(--origam-radius---lg); }
+.ostep--phase a.ostep__item:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
+.q-rank .table th, .q-rank .table td { white-space: normal; } /* origam-table : retour à la ligne dans les cellules, pas de défilement horizontal (décision front-lead) */
+.adm-dep { flex: 0 0 auto; }
+.mc[hidden] { display: none; }
