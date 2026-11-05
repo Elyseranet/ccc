@@ -12,7 +12,7 @@
     data-cy="admin-score-dialog"
     @update:model-value="handleOpen"
   >
-    <template #text>
+    <template #[dialogSlot.text]>
       <score-entry-form
         :names="names"
         :values="entry.values.value"
@@ -41,7 +41,7 @@ import ScoreEntryForm from '~/components/admin/matches/ScoreEntryForm.vue'
 import { useBelowWidth } from '~/composables/useBelowWidth'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
-import { SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
+import { DIALOG_SLOT, SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
 import { MATCH_STATUS } from '~/enums/match.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interfaces/score-entry.interface'
@@ -53,12 +53,15 @@ import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interface
  * Saisie d'un score en dialogue modal (bureau) ou en tiroir bas (mobile, sous 1000 px). Un seul composant : `origam-dialog` donne le
  * focus piégé, Échap, le retour du focus au déclencheur et le voile, ce que `origam-sheet` ne fournit pas (c'est une boîte
  * positionnée, sans overlay ni piège de focus) ; en mobile le dialogue est simplement ancré en bas.
+ * Les emplacements `text` et `footer` d'`origam-dialog` s'écrivent en dynamique (`#[…]`) : le composant déclare `defineSlots()` sans type,
+ * donc vue-tsc refuse tout emplacement nommé (défaut Origam à suivre, voir docs/tickets/origam/INDEX.md).
  * La saisie ne ferme le dialogue que sur un succès. Un échec (412, réseau) le laisse ouvert avec son message.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IScoreEntryDialogProps>(), {})
 const emits = defineEmits<IScoreEntryDialogEmits>()
 defineSlots<{}>()
+const dialogSlot = DIALOG_SLOT
 const isSheet = useBelowWidth(SCORE_SHEET_BREAKPOINT_PX)
 const location = computed(() => isSheet.value ? 'bottom' : undefined)
 const maxWidth = computed(() => isSheet.value ? '100%' : 560)

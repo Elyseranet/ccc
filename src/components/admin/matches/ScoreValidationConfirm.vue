@@ -9,7 +9,7 @@
     data-cy="admin-validate-dialog"
     @update:model-value="handleOpen"
   >
-    <template #text>
+    <template #[dialogSlot.text]>
       <p
         class="score-validation-confirm__text"
         data-cy="admin-validate-text"
@@ -26,7 +26,7 @@
         data-cy="admin-validate-failure"
       />
     </template>
-    <template #footer>
+    <template #[dialogSlot.footer]>
       <div class="score-validation-confirm__actions">
         <origam-btn
           ref="cancelRef"
@@ -55,7 +55,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamDialog } from 'origam/components'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
-import { SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
+import { DIALOG_SLOT, SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
 import type { IScoreValidationConfirmEmits, IScoreValidationConfirmProps } from '~/interfaces/score-entry.interface'
 
 /*********************************************************
@@ -64,13 +64,15 @@ import type { IScoreValidationConfirmEmits, IScoreValidationConfirmProps } from 
  * @description
  * Confirmation de la validation d'un score déjà saisi (bouton « Valider » d'une carte). Valider rend le score opposable et
  * recalcule le classement : on le dit avant. Le focus initial est sur « Annuler », l'action la moins destructive.
- * Échap, focus piégé et retour du focus au déclencheur viennent d'`origam-dialog`.
+ * Échap, focus piégé et retour du focus au déclencheur viennent d'`origam-dialog`. Emplacements `text` et `footer` en dynamique :
+ * `defineSlots()` d'`origam-dialog` n'est pas typé, vue-tsc refuserait un emplacement nommé.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IScoreValidationConfirmProps>(), {})
 const emits = defineEmits<IScoreValidationConfirmEmits>()
 defineSlots<{}>()
 const maxWidth = SCORE_CONFIRM_MAX_WIDTH
+const dialogSlot = DIALOG_SLOT
 const cancelRef = ref<{ $el?: HTMLElement } | null>(null)
 
 /*********************************************************

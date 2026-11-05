@@ -80,3 +80,6 @@ export const SCORE_CONFIRM_MAX_WIDTH = 440
 
 /** Durée d'affichage (ms) du message de confirmation (« classement recalculé »). */
 export const SCORE_SNACKBAR_TIMEOUT_MS = 5000
+
+/** Emplacements d'`origam-dialog` utilisés (écrits en dynamique : `defineSlots()` d'Origam n'est pas typé). */
+export const DIALOG_SLOT = { text: 'text', footer: 'footer' } as const

@@ -122,7 +122,11 @@ const views = computed(() => props.cards.map((card) => {
  * « Saisir » ouvre le formulaire ; « Valider » ouvre la confirmation. Le parent décide, ce composant n'écrit rien.
  ********************************************************/
 const handleAction = (id: string, action: MATCH_ACTION | null) => {
-  emits(action === MATCH_ACTION.VALIDATE ? 'validate' : 'enter', id)
+  if (action === MATCH_ACTION.VALIDATE) {
+    emits('validate', id)
+  } else {
+    emits('enter', id)
+  }
 }
 
 /*********************************************************

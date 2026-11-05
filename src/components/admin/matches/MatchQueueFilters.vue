@@ -40,6 +40,7 @@
       :label="poolLabel"
       rounded="full"
       hide-details
+      :menu-icon="CaretDown"
       class="match-queue-filters__pool"
       data-cy="admin-matches-pool"
       @update:model-value="handlePool"
@@ -50,6 +51,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamChip, OrigamChipGroup, OrigamSelect } from 'origam/components'
+import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_ALL_POOLS_VALUE } from '~/consts/admin-match-filters.const'
 import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
