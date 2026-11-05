@@ -339,3 +339,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **F-07 : « N participants inscrits »**, le nombre réel, sans « le jour J », sous l'étape « Participants » (retouche d'une ligne de `admin.html`).
 - **Déclaration d'accessibilité : publiée, honnête**, sur `/accessibilite` : ce qui est fait (axe automatisé, clavier, mouvement réduit), ce qui ne l'est pas (aucun audit RGAA complet, donc pas de « conforme »), les défauts connus venant d'Origam, et un contact.
 - **Mineurs : non.** Le championnat et les comptes sont réservés aux majeurs. La politique de confidentialité et les CGU le disent.
+
+## 2026-11-05 — Accessibilité de l'accueil : bouton pause des animations (T-A11Y-01, M5)
+
+- **Décision utilisateur** : les animations en boucle de l'accueil (pinte, fond animé) reçoivent un **bouton « Mettre en pause les animations »**, accessible au clavier, dont l'état est mémorisé pour le visiteur. Elles ne sont pas raccourcies.
+- **Raison** : WCAG 2.2.2 et RGAA 13.8 exigent un moyen d'arrêter une animation de plus de 5 secondes, et `prefers-reduced-motion` n'en est pas un. L'effet vitrine est conservé.
+- `prefers-reduced-motion: reduce` continue de tout désactiver.
