@@ -28,7 +28,7 @@
  <li>© &lt;année&gt; Elysera : année courante (ticket F-19).</li>
  <li>Crédit « Site réalisé par Elysera avec Origam » : liens simples rel="noopener", sans target="_blank". URL d’Origam : à fournir.</li>
  <li>Aucun bandeau ni bouton de cookies (décision d18aa80).</li>
- <li>Pages d’erreur (404, 500) et pages d’authentification publiques : le footer y figure si elles utilisent le layout public. Je ne l’ai pas vérifié dans le code.</li>
+ <li>Pages d’authentification publiques (/connexion, /profil, /invitation/[jeton]) : layout public, donc footer présent (vérifié par le front-lead). Pages d’erreur : pas de error.vue, page Nuxt par défaut sans notre layout, donc sans footer ; un error.vue aux couleurs de CCC avec footer serait une décision de périmètre à prendre via team-lead.</li>
  <li>Admin : pas de footer légal (pages non publiques). Les pages légales restent accessibles sans session (ticket F-19 §6).</li>
 </ul>
 <div class="note note--ds">Ne pas utiliser origam-toolbar comme enveloppe sémantique du footer sans avoir vérifié son DOM (audit U18) ; liens = origam-btn avec href en variante plain (cible 44 px) ou liens natifs stylés.</div>
