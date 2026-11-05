@@ -233,6 +233,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-20](F-20.md) | Composant partagé de puces de filtre (doublon EditionMatches / MatchQueueFilters) | — | F-08 | À faire (2026-11-05) | à créer |
 | [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | À faire (2026-11-05) | à créer |
 | [F-22](F-22.md) | `useCompetitor` : clé de cache figée au premier id (fiche joueur, face-à-face, F-13) | — | — | À faire (2026-11-05) ; impact face-à-face à vérifier | à créer |
+| [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
 | [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | À faire |
 
