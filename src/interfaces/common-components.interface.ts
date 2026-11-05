@@ -25,6 +25,10 @@ export interface IPageHeroProps {
   breadcrumb?: IBreadcrumbEntry[]
 }
 
+export interface ICapBadgeProps {
+  text: string
+}
+
 export interface IPlayerLinkProps {
   competitor: Pick<ICompetitorPublic, 'id' | 'displayName'>
   titles?: number

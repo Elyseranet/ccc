@@ -1,5 +1,5 @@
 export interface IErrorPageError {
-  statusCode: number
+  statusCode?: number
   statusMessage?: string
   message?: string
 }

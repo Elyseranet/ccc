@@ -10,7 +10,11 @@ export const PUBLIC_PAGES = [
   '/regles',
   '/connexion',
   '/invitation/jeton-de-test',
-  '/profil'
+  '/profil',
+  '/mentions-legales',
+  '/confidentialite',
+  '/cgu',
+  '/accessibilite'
 ]
 
 export const ADMIN_PAGES = [
