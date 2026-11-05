@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCC · Pied de page (wireframe)</title><link rel="stylesheet" href="wireframe.css"></head><body>
+<p class="wf-bar"><strong>WIREFRAME CCC (basse fidélité)</strong> <a href="accueil.html">accueil</a> <a href="edition.html">édition</a> <a href="joueurs.html">joueurs</a> <a href="joueur.html">fiche joueur</a> <a href="face-a-face.html">face-à-face</a> <a href="palmares.html">palmarès</a> <a href="compte.html">compte</a> <a href="footer.html">pied de page</a> <a href="mentions-legales.html">pages légales</a> <a href="admin-dashboard.html">admin: tableau de bord</a> <a href="admin-participants.html">admin: participants</a> <a href="admin-tirage.html">admin: tirage</a> <a href="admin-score.html">admin: scores</a></p>
+<main style="max-width:1100px;margin:0 auto;padding:1rem">
+<h1>Pied de page (F-19)</h1>
+<p>Présent sur toutes les pages publiques (layout public), jamais sur l’admin. Un seul landmark <code>footer</code>, avec un <code>nav</code> « Informations légales ».</p>
+<p class="state-title">DESKTOP · LES 4 PAGES LIVRÉES (page courante : CGU)</p>
+<div class="frame"><footer class="site-footer" style="margin-top:0"><div class="site-footer__in"><nav aria-label="Informations légales"><ul><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cgu.html" aria-current="page">Conditions d’utilisation</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul></nav>
+  <p>© 2026 Elysera</p>
+  <p>Site réalisé par <a href="https://elysera.net" rel="noopener">Elysera</a> avec <a href="#" rel="noopener">Origam</a> <span class="todo">[À FOURNIR : URL d’Origam]</span></p></div></footer></div>
+<div class="note">Ordre : Mentions légales, Confidentialité, Conditions d’utilisation, Accessibilité (ordre du ticket). Page courante : aria-current="page" et soulignement, jamais la couleur seule.</div>
+<p class="state-title">MOBILE (375 px)</p>
+<div class="frame frame--m"><footer class="site-footer" style="margin-top:0"><div class="site-footer__in"><nav aria-label="Informations légales"><ul><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cgu.html">Conditions d’utilisation</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul></nav>
+  <p>© 2026 Elysera</p>
+  <p>Site réalisé par <a href="https://elysera.net" rel="noopener">Elysera</a> avec <a href="#" rel="noopener">Origam</a> <span class="todo">[À FOURNIR : URL d’Origam]</span></p></div></footer></div>
+<div class="note">Les liens s’enroulent sur plusieurs lignes, chacun d’au moins 44 px de haut ; aucun scroll horizontal à 320 px. © puis crédit sous les liens.</div>
+<p class="state-title">FILTRAGE PAR LIVRAISON · /cgu NON LIVRÉE</p>
+<div class="frame"><footer class="site-footer" style="margin-top:0"><div class="site-footer__in"><nav aria-label="Informations légales"><ul><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul></nav>
+  <p>© 2026 Elysera</p>
+  <p>Site réalisé par <a href="https://elysera.net" rel="noopener">Elysera</a> avec <a href="#" rel="noopener">Origam</a> <span class="todo">[À FOURNIR : URL d’Origam]</span></p></div></footer></div>
+<p class="state-title">AUCUNE PAGE LÉGALE LIVRÉE</p>
+<div class="frame"><footer class="site-footer" style="margin-top:0"><div class="site-footer__in">
+  <p>© 2026 Elysera</p>
+  <p>Site réalisé par <a href="https://elysera.net" rel="noopener">Elysera</a> avec <a href="#" rel="noopener">Origam</a> <span class="todo">[À FOURNIR : URL d’Origam]</span></p></div></footer></div>
+<div class="note">Même règle que la navigation et que T-REL-02 : un lien vers une page dont PAGE_DELIVERY[route].delivered est faux n’est pas rendu (ni grisé, ni désactivé). Si aucune des quatre n’est livrée, le nav n’est pas rendu (pas de landmark vide) ; le © et le crédit restent, car ils ne dépendent d’aucune page. Pas de second mécanisme de filtrage.</div>
+<h2>Règles</h2>
+<ul>
+ <li>© &lt;année&gt; Elysera : année courante (ticket F-19).</li>
+ <li>Crédit « Site réalisé par Elysera avec Origam » : liens simples rel="noopener", sans target="_blank". URL d’Origam : à fournir.</li>
+ <li>Aucun bandeau ni bouton de cookies (décision d18aa80).</li>
+ <li>Pages d’erreur (404, 500) et pages d’authentification publiques : le footer y figure si elles utilisent le layout public. Je ne l’ai pas vérifié dans le code.</li>
+ <li>Admin : pas de footer légal (pages non publiques). Les pages légales restent accessibles sans session (ticket F-19 §6).</li>
+</ul>
+<div class="note note--ds">Ne pas utiliser origam-toolbar comme enveloppe sémantique du footer sans avoir vérifié son DOM (audit U18) ; liens = origam-btn avec href en variante plain (cible 44 px) ou liens natifs stylés.</div>
+</main></body></html>
