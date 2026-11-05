@@ -1,5 +1,6 @@
 import { test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { alignToPixel } from '../helpers/home-visual'
 import { box, compare, open } from '../visual.util'
 
 /*********************************************************
@@ -61,6 +62,8 @@ for (const viewport of VIEWPORTS) {
         }
         await mockup.evaluate(() => window.scrollTo(0, 0))
         await page.evaluate(() => window.scrollTo(0, 0))
+        await alignToPixel(mockup, mock)
+        await alignToPixel(page, app)
         const mockBox = await box(mockup, mock)
         const appBox = await box(page, app)
         await compare(page, mockup, `${spec.name}-${name}`, viewport.name, mockBox, appBox)

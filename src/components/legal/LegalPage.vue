@@ -66,6 +66,7 @@
             font-size="2xl"
             font-weight="bold"
             line-height="tight"
+            letter-spacing="normal"
             :text="section.title"
           />
           <div
@@ -84,6 +85,7 @@
                 tag="h3"
                 font-size="lg"
                 font-weight="bold"
+                letter-spacing="normal"
                 :text="block.text"
               />
               <ul v-else-if="block.isList">
@@ -178,8 +180,10 @@
             <origam-title
               id="legal-related-title"
               tag="h2"
-              font-size="xl"
+              font-size="2xl"
               font-weight="bold"
+              line-height="tight"
+              letter-spacing="normal"
               :text="relatedTitle"
             />
             <ul class="legal-page__related">
