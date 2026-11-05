@@ -113,4 +113,16 @@ describe('RG18, RG20, A10 : sélection des qualifiés', () => {
     // la même égalité plus bas dans le classement n est pas concernée
     expect(selectQualifiers([tied], 3, 1).requiresTiebreak).toEqual([])
   })
+
+  it('sans meilleur (n+1)ème à pourvoir (m = 0), une égalité qui commence au rang n+1 ne bloque pas, celle qui chevauche la frontière si', () => {
+    const below: IPoolStanding = {
+      ...pool(['a1', 3, 4, 5], ['a2', 1, 4, 0], ['a3', 1, 4, 0]),
+      requiresTiebreak: [{ playerIds: ['a2', 'a3'], startRank: 2, format: TIEBREAK_FORMAT.ONE_VS_ONE }],
+    }
+    expect(selectQualifiers([below], 1, 0).requiresTiebreak).toEqual([])
+    expect(selectQualifiers([below], 1, 0).topQualifiers).toEqual(['a1'])
+    expect(selectQualifiers([below], 1, 1).requiresTiebreak).toEqual(below.requiresTiebreak)
+    // a2 et a3 se disputent le rang 2 : avec n = 2, une seule des deux est qualifiée, quel que soit m.
+    expect(selectQualifiers([below], 2, 0).requiresTiebreak).toEqual(below.requiresTiebreak)
+  })
 })

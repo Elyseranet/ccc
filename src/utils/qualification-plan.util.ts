@@ -1,0 +1,143 @@
+import { KNOCKOUT_ROUND_ORDER, ROUND_KIND_BY_POOL_SIZE } from '../consts/qualification.const.js'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import { EDITION_STATUS } from '../enums/edition.enum.js'
+import { QUALIFICATION_ROUTE, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
+import type { ITiebreakRequirement } from '../interfaces/pool.interface.js'
+import type {
+  IQualificationComputation,
+  IQualificationPoolInput,
+  IQualificationTie,
+  IQualifiedEntry,
+  IRoundDrawCheckInput,
+  IRoundDrawPlan,
+  IRoundDrawPlanInput
+} from '../interfaces/qualification-plan.interface.js'
+import type { IQualificationParameters } from '../interfaces/qualification.interface.js'
+import type { IMatchRecord } from '../interfaces/stats.interface.js'
+import { selectQualifiers } from './qualification.util.js'
+import { computePoolStanding } from './standing.util.js'
+
+const toTie = (requirement: ITiebreakRequirement, pools: readonly IQualificationPoolInput[], slots: number): IQualificationTie => {
+  const owner = pools.find((pool) => requirement.playerIds.every((id) => pool.memberIds.includes(id)))
+  return {
+    scope: owner ? TIEBREAK_SCOPE.POOL : TIEBREAK_SCOPE.BOUNDARY,
+    poolId: owner?.poolId ?? null,
+    startRank: requirement.startRank,
+    format: requirement.format,
+    slots: owner ? 0 : slots,
+    playerIds: requirement.playerIds
+  }
+}
+
+/**
+ * RG18 à RG20, A10, A11, R-6, R-7 : classements des poules, égalités à départager et qualifiés. `records` contient les
+ * matchs de poule (REGULAR et TIEBREAK, clé = participation) ; un départage entre poules y figure aussi. Fonction pure,
+ * sans accès à la base : l'état de la qualification et la création d'un départage s'y appuient tous deux.
+ */
+export const computeQualification = (
+  pools: readonly IQualificationPoolInput[],
+  records: readonly IMatchRecord[],
+  parameters: Pick<IQualificationParameters, 'topPerPool' | 'bestNextCount'> | null
+): IQualificationComputation => {
+  const standings = pools.map((pool) => computePoolStanding(pool.memberIds, records))
+  const poolTies = standings.flatMap((standing, index) =>
+    standing.requiresTiebreak.map((requirement) => toTie(requirement, [pools[index]!], 0)))
+  if (!parameters) {
+    return { standings, blockingTies: [], poolTies, qualified: null }
+  }
+
+  const selection = selectQualifiers(standings, parameters.topPerPool, parameters.bestNextCount, records)
+  const blockingTies = selection.requiresTiebreak.map((requirement) => toTie(requirement, pools, selection.tiebreakSlots))
+  if (blockingTies.length > 0) {
+    return { standings, blockingTies, poolTies, qualified: [] }
+  }
+
+  const placeOf = new Map<string, { poolId: string, poolRank: number }>()
+  standings.forEach((standing, index) => {
+    for (const entry of standing.entries) {
+      placeOf.set(entry.playerId, { poolId: pools[index]!.poolId, poolRank: entry.rank })
+    }
+  })
+  const entry = (playerId: string, route: QUALIFICATION_ROUTE): IQualifiedEntry =>
+    ({ playerId, route, ...placeOf.get(playerId)! })
+  return {
+    standings,
+    blockingTies: [],
+    poolTies,
+    qualified: [
+      ...selection.topQualifiers.map((id) => entry(id, QUALIFICATION_ROUTE.TOP_OF_POOL)),
+      ...selection.bestNextQualifiers.map((id) => entry(id, QUALIFICATION_ROUTE.BEST_NEXT))
+    ]
+  }
+}
+
+/** Deux groupes de joueurs identiques, quel que soit l'ordre. */
+export const sameMembers = (a: readonly string[], b: readonly string[]): boolean =>
+  a.length === b.length && a.every((id) => b.includes(id))
+
+/**
+ * RG13, RG14 : le prochain tirage de tour. Une seule fonction pour l'aperçu (GET) et la création (POST), donc aucune règle
+ * dupliquée. Bloqué par QUALIFICATION_NOT_DONE tant que la liste n'est pas figée, par ROUND_NOT_COMPLETED tant que le dernier
+ * tour de phase finale n'est pas entièrement validé. Le type du tour : PLAYOFF (barrages, A9) pour le premier tour d'une
+ * qualification `withPlayoff`, sinon déduit de la taille du vivier (2, 4, 8, 16) ; null si rien n'est tirable.
+ * Q2 (en attente) : aucune exigence de puissance de 2 à la qualification, seule la taille du vivier compte ici.
+ */
+export const planRoundDraw = (input: IRoundDrawPlanInput): IRoundDrawPlan => {
+  const finalized = input.qualification !== null
+    && ![EDITION_STATUS.CREATED, EDITION_STATUS.REGISTRATION, EDITION_STATUS.POOLS_DRAWN, EDITION_STATUS.POOLS_PLAYING].includes(input.editionStatus)
+  if (!finalized) {
+    return { roundKind: null, blockedBy: API_ERROR_CODE.QUALIFICATION_NOT_DONE }
+  }
+  if (input.editionStatus === EDITION_STATUS.CLOSED || input.knockoutRounds.some((round) => round.kind === ROUND_KIND.FINAL)) {
+    return { roundKind: null, blockedBy: null }
+  }
+  if (input.knockoutRounds.some((round) => !round.completed)) {
+    return { roundKind: null, blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED }
+  }
+  if (input.knockoutRounds.length === 0 && input.qualification!.withPlayoff) {
+    return { roundKind: ROUND_KIND.PLAYOFF, blockedBy: null }
+  }
+  const kind = ROUND_KIND_BY_POOL_SIZE[input.candidateCount] ?? null
+  const lastIndex = Math.max(-1, ...input.knockoutRounds.map((round) => KNOCKOUT_ROUND_ORDER.indexOf(round.kind)))
+  return { roundKind: kind !== null && KNOCKOUT_ROUND_ORDER.indexOf(kind) > lastIndex ? kind : null, blockedBy: null }
+}
+
+/**
+ * Cohérence des affiches tirées physiquement (A1). Renvoie la raison du premier défaut, ou null. Brouillon (`complete` false) :
+ * une affiche peut être partielle. Validation (`complete` true) : au moins une affiche, toutes à deux côtés, affiches numérotées
+ * de 1 à k, et tout le vivier tiré sauf pour les barrages, où seuls les barragistes sont tirés.
+ */
+export const checkRoundDrawAssignments = (input: IRoundDrawCheckInput): string | null => {
+  const { assignments, candidateIds, roundKind, poolWinnerIds, complete } = input
+  const candidates = new Set(candidateIds)
+  if (!assignments.every((assignment) => candidates.has(assignment.participationId))) {
+    return 'A drawn player is not in the pool of qualified players'
+  }
+  if (new Set(assignments.map((assignment) => assignment.participationId)).size !== assignments.length) {
+    return 'A player is drawn more than once'
+  }
+  if (new Set(assignments.map((assignment) => assignment.drawnOrder)).size !== assignments.length) {
+    return 'The draw order has duplicates'
+  }
+  const sides = assignments.map((assignment) => `${assignment.pairingIndex}:${assignment.sidePosition}`)
+  if (new Set(sides).size !== sides.length) {
+    return 'A pairing side is used twice'
+  }
+  if (roundKind === ROUND_KIND.PLAYOFF && assignments.some((assignment) => poolWinnerIds.includes(assignment.participationId))) {
+    return 'A pool winner does not play the playoff round'
+  }
+  if (!complete) {
+    return null
+  }
+  const pairings = new Set(assignments.map((assignment) => assignment.pairingIndex))
+  const pairingCount = pairings.size
+  const contiguous = [...pairings].every((index) => index >= 1 && index <= pairingCount)
+  if (pairingCount === 0 || !contiguous || assignments.length !== pairingCount * 2) {
+    return 'Every pairing must have two players, numbered from 1'
+  }
+  if (roundKind !== ROUND_KIND.PLAYOFF && assignments.length !== candidates.size) {
+    return 'Every qualified player must be drawn'
+  }
+  return null
+}

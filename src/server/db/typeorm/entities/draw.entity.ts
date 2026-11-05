@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, type Relation } from 'typeorm'
 import { DRAW_KIND, DRAW_STATUS } from '../../../../enums/draw.enum.js'
+import { ROUND_KIND } from '../../../../enums/round.enum.js'
 import type { IDrawParameters } from '../../../../interfaces/draw.interface.js'
 import { EditionEntity } from './edition.entity.js'
 import { RoundEntity } from './round.entity.js'
@@ -28,6 +29,13 @@ export class DrawEntity extends UuidPrimaryEntity {
 
   @Column({ type: 'uuid', nullable: true })
   roundId!: string | null
+
+  /**
+   * Type du tour visé par un tirage de TOUR (B-13), posé dès le brouillon : le tour n'existe qu'à la validation (B-18), donc
+   * `round_id` reste null jusque-là. Null pour un tirage de poules. La garde R-3 de B-12 s'appuie dessus.
+   */
+  @Column({ type: 'enum', enum: ROUND_KIND, enumName: 'round_kind', nullable: true })
+  roundKind!: ROUND_KIND | null
 
   @Column({ type: 'enum', enum: DRAW_STATUS, enumName: 'draw_status', default: DRAW_STATUS.DRAFT })
   status!: DRAW_STATUS
