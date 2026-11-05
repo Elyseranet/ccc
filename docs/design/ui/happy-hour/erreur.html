@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page introuvable · CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="">
+<div class="ambient" aria-hidden="true"></div>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-toolbar tag="header" flat · nav = origam-btn (to) · pas d'avatar ni de « Connexion » en en-tête (décision A3/E-d) -->
+<header class="hh-header"><div class="wrap hh-header__bar">
+  <a class="hh-brand font-display" href="index.html" aria-label="CCC, accueil"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <nav class="hh-nav" aria-label="Navigation principale"><ul><li><a href="edition.html">Éditions</a></li><li><a href="joueurs.html">Joueurs</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="regles.html">Règles</a></li></ul></nav>
+  <span class="hh-header__end" aria-hidden="true"></span>
+</div></header>
+<main id="contenu">
+<!-- Page d’erreur CCC (error.vue, décision 9639ca1) : layout public + pied de page. PageHero (eyebrow, titre, chapô) + un lien vers l’accueil. Deux états : 404 (défaut) et erreur générique (erreur.html?generique). -->
+<section class="page-hero err-hero" aria-labelledby="h-err">
+  <div class="wrap err-hero__in">
+    <div class="err-hero__text">
+      <p class="eyebrow" data-state="404">Erreur 404</p><p class="eyebrow" data-state="generique" hidden>Erreur 500</p>
+      <h1 id="h-err" class="page-hero__title font-display neon"><span data-state="404">Page introuvable</span><span data-state="generique" hidden>Une erreur est survenue</span></h1>
+      <p class="page-hero__lead" data-state="404">Cette page n’existe pas ou n’est plus disponible.</p>
+      <p class="page-hero__lead" data-state="generique" hidden>La page n’a pas pu s’afficher. Réessayez dans quelques instants.</p>
+      <!-- origam-btn variant="flat" bg-color="primary" elevation="lg" :hover="{ elevation: 'xl' }" size="large" to="/" -->
+      <p class="err-hero__cta"><a class="btn btn--primary" href="index.html">Retour à l’accueil <span aria-hidden="true">→</span></a></p>
+    </div>
+    <span data-state="404"><svg class="err-cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/><text class="cap-txt" x="50" y="59" text-anchor="middle">404</text></svg></span><span data-state="generique" hidden><svg class="err-cap" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap cap--amber" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/><text class="cap-txt" x="50" y="59" text-anchor="middle">500</text></svg></span>
+  </div>
+</section>
+</main>
+<!-- Pied de page F-19 : liens filtrés par livraison (PAGE_DELIVERY) comme la navigation ; nav vide = non rendu ; © et crédit toujours présents -->
+<footer class="hh-footer"><div class="wrap">
+  <div class="hh-footer__grid">
+    <p class="hh-footer__brand font-display neon--sm">CCC</p>
+    <nav aria-label="Pied de page"><ul><li><a href="regles.html">Règles</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="compte.html">Connexion</a></li></ul></nav>
+  </div>
+  <div class="hh-footer__legal">
+    <nav aria-label="Informations légales"><ul><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cgu.html">Conditions d’utilisation</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul></nav>
+    <div class="hh-footer__meta"><p>© 2026 Elysera</p><p>Site réalisé par <a class="hh-footer__credit" href="https://elysera.net" rel="noopener">Elysera</a> avec <a class="hh-footer__credit" href="#" rel="noopener">Origam</a> <span class="todo">[À FOURNIR : URL d’Origam]</span></p></div>
+  </div>
+</div></footer>
+<script>
+  // Maquette : état « erreur générique » choisi par l’adresse (erreur.html?generique). Aucune animation pilotée en JS.
+  if (new URLSearchParams(location.search).has('generique')) {
+    document.querySelectorAll('[data-state]').forEach((e) => { e.hidden = e.dataset.state !== 'generique' })
+    document.title = 'Erreur · CCC'
+  }
+</script>
+</body>
+</html>

@@ -402,3 +402,15 @@
   .legal__dl { grid-template-columns: minmax(0, 1fr); gap: var(--origam-space---1); }
   .legal__dl dd + dt { margin-top: var(--origam-space---2); }
 }
+
+/* ═══ PAGE D’ERREUR (F-19, error.vue) ═══════════════════════════════════ */
+.err-hero { min-height: 50vh; display: flex; align-items: center; }
+.err-hero__in { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---10); }
+.err-hero__cta { margin-top: var(--origam-space---8); }
+.err-cap { display: block; width: clamp(8rem, 18vw, 14rem); rotate: -12deg; }
+.err-cap .cap-txt { font-size: 26px; }
+@media (max-width: 760px) {
+  .err-hero__in { grid-template-columns: minmax(0, 1fr); gap: var(--origam-space---6); }
+  .err-hero__in > span { order: -1; }
+  .err-cap { width: 7rem; }
+}
