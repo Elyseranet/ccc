@@ -368,3 +368,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## 2026-11-05 — F-13 : compteur d'inscrits en direct dans la liste admin des éditions
 
 - **Décision utilisateur** : la liste admin des éditions affiche le nombre d'inscrits en direct pour une édition en cours, comme la maquette (« Participants 45 »). Le back l'ajoute au DTO de la liste **admin**, dans un petit ticket qui amende le contrat. Le `participantCount` public reste figé à la clôture.
+
+## 2026-11-05 — F-08 : la file des scores couvre tous les tours, avec un filtre par tour
+
+- **Décision utilisateur** : la file de `/admin/matchs` montre les matchs de poule **et** de phase finale, avec un **filtre par tour**. Ce filtre est à ajouter à la maquette `admin-matchs.html` par ui.
+- **Raison** : aucun écran admin du tableau final n'existe (F-03-BRK ne concerne que la page publique). Avec une file limitée aux poules, aucun score de phase finale ne pourrait être saisi depuis l'admin.
+- Cette décision remplace le choix provisoire « poules seulement » pris dans la branche F-08 (c77c0f9).
