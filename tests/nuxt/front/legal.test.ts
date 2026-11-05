@@ -1,14 +1,20 @@
+import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
+import { RouterLink } from 'vue-router'
+import InvitationForm from '~/components/account/InvitationForm.vue'
+import { LAYOUT } from '../../../src/enums/layout.enum'
+import type { IPageDelivery } from '../../../src/interfaces/page-delivery.interface'
 import { LEGAL_ACCESSIBILITY_CONTENT } from '../../../src/consts/legal-accessibility.const'
 import { LEGAL_NOTICE_CONTENT } from '../../../src/consts/legal-notice.const'
 import { LEGAL_PRIVACY_CONTENT } from '../../../src/consts/legal-privacy.const'
 import { LEGAL_TERMS_CONTENT } from '../../../src/consts/legal-terms.const'
 import { PAGE_DELIVERY } from '../../../src/consts/page-delivery.const'
-import { LEGAL_NAVIGATION } from '../../../src/consts/public-navigation.const'
+import { INVITATION_LEGAL_ITEMS, LEGAL_NAVIGATION } from '../../../src/consts/public-navigation.const'
 import { ROUTES } from '../../../src/consts/routes.const'
 import type { ILegalPageContent } from '../../../src/interfaces/legal.interface'
 import { filterDeliveredItems } from '../../../src/utils/page-delivery.util'
 
+const withRouterLink = { global: { components: { RouterLink } } }
 const PAGES: ILegalPageContent[] = [LEGAL_NOTICE_CONTENT, LEGAL_PRIVACY_CONTENT, LEGAL_TERMS_CONTENT, LEGAL_ACCESSIBILITY_CONTENT]
 const LEGAL_ROUTES = [ROUTES.LEGAL_NOTICE, ROUTES.PRIVACY, ROUTES.TERMS, ROUTES.ACCESSIBILITY]
 
@@ -53,5 +59,28 @@ describe('pages légales (F-19)', () => {
   it('la déclaration d’accessibilité n’affirme jamais être conforme', () => {
     const statement = LEGAL_ACCESSIBILITY_CONTENT.sections[0]!.blocks[0]!.text!.fallback
     expect(statement).toContain('pas déclaré')
+  })
+})
+
+describe('liens légaux de l’invitation (décision 9639ca1)', () => {
+  const deliveredTable = (delivered: boolean): Record<string, IPageDelivery> => ({
+    [ROUTES.TERMS]: { delivered, layout: LAYOUT.DEFAULT, endpoints: [] },
+    [ROUTES.PRIVACY]: { delivered, layout: LAYOUT.DEFAULT, endpoints: [] }
+  })
+
+  it('les deux liens sont les CGU et la politique de confidentialité', () => {
+    expect(INVITATION_LEGAL_ITEMS.map(item => item.to)).toEqual([ROUTES.TERMS, ROUTES.PRIVACY])
+  })
+
+  it('pages non livrées : aucun lien ; pages livrées : les deux liens', () => {
+    expect(filterDeliveredItems(INVITATION_LEGAL_ITEMS, false, deliveredTable(false))).toEqual([])
+    expect(filterDeliveredItems(INVITATION_LEGAL_ITEMS, false, deliveredTable(true))).toHaveLength(2)
+  })
+
+  it('le formulaire d’invitation affiche les liens (pages accessibles en test), sans case à cocher', async () => {
+    const wrapper = await mountSuspended(InvitationForm, { ...withRouterLink, props: { initials: 'SD' } })
+    const links = wrapper.get('[data-cy="invitation-legal"]')
+    expect(links.findAll('a').map(link => link.attributes('href'))).toEqual([ROUTES.TERMS, ROUTES.PRIVACY])
+    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(false)
   })
 })
