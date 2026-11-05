@@ -82,7 +82,7 @@ export const LEGAL_TERMS_CONTENT: ILegalPageContent = {
       id: 'droit',
       title: { key: 'legal.terms.law_title', fallback: 'Droit applicable et litiges' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.terms.law_text', fallback: 'Droit français. Médiateur de la consommation : [À FOURNIR : à décider avec un juriste : applicable ou non]' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.terms.law_text', fallback: 'Droit français.' } }
       ]
     },
     {
