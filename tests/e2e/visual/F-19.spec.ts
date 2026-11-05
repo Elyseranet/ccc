@@ -114,8 +114,7 @@ for (const viewport of VIEWPORTS) {
       for (const zone of ERROR_ZONES) {
         test(zone.name, async ({ page, browser }) => {
           const { mockup, mockContext } = await open(page, browser, viewport, state.file, state.route)
-          // `.err-hero__cta { display: flex }` l'emporte sur `[hidden]` : la rangée de boutons de l'état inactif reste visible dans la maquette.
-          await mockup.addStyleTag({ content: '.hh-footer__note { display: none !important; } [hidden] { display: none !important; }' })
+          await mockup.addStyleTag({ content: '.hh-footer__note { display: none !important; }' })
           if (state.statusCode) {
             await showGenericError(page, state.statusCode)
           }

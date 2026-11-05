@@ -197,7 +197,6 @@
                   :to="link.to"
                   variant="outlined"
                   rounded="full"
-                  font-weight="semibold"
                   :data-cy="`legal-related-${link.to}`"
                   :text="link.text"
                 />
