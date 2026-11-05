@@ -13,13 +13,13 @@ export const DEFAULT_SITE_INDEXABLE = false
 export const LOCAL_HOSTNAME = 'localhost'
 export const LOCAL_HOSTNAME_SUFFIX = '.localhost'
 /**
- * Plages d'adresses qui désignent la machine locale (T-SEC-06 M1) : tout `127.0.0.0/8`, `0.0.0.0`, `::` et `::1`. Les
+ * Plages d'adresses qui désignent la machine locale (T-SEC-06 M1, L2) : tout `127.0.0.0/8`, tout `0.0.0.0/8` (« ce réseau »), `::` et `::1`. Les
  * IPv4 mappées en IPv6 (`::ffff:127.0.0.1`, `::ffff:7f00:1`, toutes leurs écritures) sont rapprochées des plages IPv4 par
  * `net.BlockList`.
  */
 export const LOCAL_ADDRESS_RANGES = [
   { network: '127.0.0.0', prefix: 8, family: 'ipv4' },
-  { network: '0.0.0.0', prefix: 32, family: 'ipv4' },
+  { network: '0.0.0.0', prefix: 8, family: 'ipv4' },
   { network: '::1', prefix: 128, family: 'ipv6' },
   { network: '::', prefix: 128, family: 'ipv6' }
 ] as const
@@ -35,6 +35,23 @@ export const PRIVATE_ADDRESS_RANGES = [
   { network: 'fc00::', prefix: 7, family: 'ipv6' },
   { network: 'fe80::', prefix: 10, family: 'ipv6' }
 ] as const
+/**
+ * IPv6 qui embarquent une IPv4 (T-SEC-06, revue L2). `net.BlockList` ne rapproche que les adresses MAPPÉES (`::ffff:a.b.c.d`) des
+ * plages IPv4 : pour ces trois formes, la garde extrait l'IPv4 embarquée (à `ipv4Offset` octets du début) et la passe dans les mêmes
+ * listes IPv4 (locales, puis privées pour le site). Seules les adresses dont l'IPv4 embarquée est locale (ou privée) sont refusées :
+ * une adresse publique de ces formes reste acceptée. `prefix` : octets que l'adresse doit avoir en tête.
+ */
+export const EMBEDDED_IPV4_FORMS = [
+  { name: 'NAT64 (64:ff9b::/96)', prefix: [0x00, 0x64, 0xff, 0x9b, 0, 0, 0, 0, 0, 0, 0, 0], ipv4Offset: 12 },
+  { name: '6to4 (2002::/16)', prefix: [0x20, 0x02], ipv4Offset: 2 },
+  { name: 'IPv4-compatible (::/96, déprécié)', prefix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ipv4Offset: 12 }
+] as const
+/** Nombre d'octets d'une adresse IPv6. */
+export const IPV6_BYTE_LENGTH = 16
+/** Étiquette de nom d'hôte (lettres, chiffres, tirets ; ni tiret en tête ni en queue) et nom à au moins deux étiquettes. */
+export const MAIL_FROM_DOMAIN_PATTERN = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/
+/** `Nom <adresse>` : un nom sans chevrons, puis une adresse entre chevrons, rien après. */
+export const MAIL_FROM_NAMED_ADDRESS_PATTERN = /^([^<>]*[^<>\s])\s*<([^<>\s]+)>$/
 /** Domaine de l'expéditeur par défaut (comparé EXACTEMENT) : un `from` sur ce domaine n'a jamais été configuré. */
 export const DEFAULT_MAIL_FROM_DOMAIN = 'ccc.local'
 

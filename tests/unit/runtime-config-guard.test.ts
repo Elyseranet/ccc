@@ -1,4 +1,6 @@
+import { BlockList } from 'node:net'
 import { describe, expect, it } from 'vitest'
+import { LOCAL_ADDRESS_RANGES } from '../../src/consts/runtime-config.const'
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_URL } from '../../src/consts/runtime-config.const'
 import { assertStrictRuntimeConfig, isStrictRuntimeConfig } from '../../src/utils/runtime-config-guard.util'
 
@@ -55,6 +57,15 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['127.1 shorthand site URL', { siteUrl: 'https://127.1' }, 'NUXT_PUBLIC_SITE_URL'],
     ['decimal 2130706433 site URL', { siteUrl: 'https://2130706433' }, 'NUXT_PUBLIC_SITE_URL'],
     ['LOCALHOST. mixed case site URL', { siteUrl: 'https://LocalHost.' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['0.1.2.3 site URL (0.0.0.0/8)', { siteUrl: 'https://0.1.2.3' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['0.255.255.255 site URL (top of 0.0.0.0/8)', { siteUrl: 'https://0.255.255.255' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[64:ff9b::7f00:1] NAT64 local site URL', { siteUrl: 'https://[64:ff9b::7f00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[64:ff9b::a00:1] NAT64 private site URL', { siteUrl: 'https://[64:ff9b::a00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[2002:7f00:1::] 6to4 local site URL', { siteUrl: 'https://[2002:7f00:1::]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[2002:c0a8:101::] 6to4 private site URL', { siteUrl: 'https://[2002:c0a8:101::]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::7f00:1] IPv4-compatible local site URL', { siteUrl: 'https://[::7f00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::a00:1] IPv4-compatible private site URL', { siteUrl: 'https://[::a00:1]' }, 'NUXT_PUBLIC_SITE_URL'],
+    ['[::ffff:0.1.2.3] mapped 0/8 site URL', { siteUrl: 'https://[::ffff:0.1.2.3]' }, 'NUXT_PUBLIC_SITE_URL'],
     ['10.0.0.1 private site URL (10/8)', { siteUrl: 'https://10.0.0.1' }, 'NUXT_PUBLIC_SITE_URL'],
     ['10.255.255.254 private site URL', { siteUrl: 'https://10.255.255.254' }, 'NUXT_PUBLIC_SITE_URL'],
     ['172.16.0.1 private site URL (172.16/12)', { siteUrl: 'https://172.16.0.1' }, 'NUXT_PUBLIC_SITE_URL'],
@@ -84,6 +95,11 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['::ffff:7f00:1 SMTP host (no brackets)', { host: '::ffff:7f00:1' }, 'NUXT_MAIL_HOST'],
     ['[::] SMTP host', { host: '[::]' }, 'NUXT_MAIL_HOST'],
     ['127.0.0.2 SMTP host', { host: '127.0.0.2' }, 'NUXT_MAIL_HOST'],
+    ['0.1.2.3 SMTP host (0.0.0.0/8)', { host: '0.1.2.3' }, 'NUXT_MAIL_HOST'],
+    ['[64:ff9b::7f00:1] NAT64 local SMTP host', { host: '[64:ff9b::7f00:1]' }, 'NUXT_MAIL_HOST'],
+    ['64:ff9b::7f00:1 NAT64 local SMTP host (no brackets)', { host: '64:ff9b::7f00:1' }, 'NUXT_MAIL_HOST'],
+    ['[2002:7f00:1::] 6to4 local SMTP host', { host: '[2002:7f00:1::]' }, 'NUXT_MAIL_HOST'],
+    ['[::7f00:1] IPv4-compatible local SMTP host', { host: '[::7f00:1]' }, 'NUXT_MAIL_HOST'],
     ['LOCALHOST SMTP host with a port', { host: 'LocalHost:1025' }, 'NUXT_MAIL_HOST'],
     ['dotless service name with a trailing dot', { host: 'mailpit.' }, 'NUXT_MAIL_HOST'],
     ['unparsable SMTP host', { host: 'bad host' }, 'NUXT_MAIL_HOST'],
@@ -95,6 +111,17 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['default sender', { from: DEFAULT_MAIL_FROM }, 'NUXT_MAIL_FROM'],
     ['default sender address alone', { from: 'no-reply@ccc.local' }, 'NUXT_MAIL_FROM'],
     ['default sender domain, other local part', { from: 'CCC <admin@ccc.local>' }, 'NUXT_MAIL_FROM'],
+    ['default sender followed by a comment', { from: 'no-reply@ccc.local (x)' }, 'NUXT_MAIL_FROM'],
+    ['default sender followed by a semicolon', { from: 'no-reply@ccc.local;' }, 'NUXT_MAIL_FROM'],
+    ['named sender followed by text', { from: 'CCC <no-reply@ccc.local> x' }, 'NUXT_MAIL_FROM'],
+    ['named sender with text before the name', { from: 'x CCC <no-reply@ccc.local>' }, 'NUXT_MAIL_FROM'],
+    ['two addresses', { from: 'a@ccc.example.org, no-reply@ccc.local' }, 'NUXT_MAIL_FROM'],
+    ['address without a dotted domain', { from: 'a@b' }, 'NUXT_MAIL_FROM'],
+    ['a name without an address', { from: 'CCC' }, 'NUXT_MAIL_FROM'],
+    ['an address between angle brackets without a name', { from: '<no-reply@ccc.example.org>' }, 'NUXT_MAIL_FROM'],
+    ['empty angle brackets', { from: 'CCC <>' }, 'NUXT_MAIL_FROM'],
+    ['a domain with an invalid character', { from: 'no-reply@ccc_example.org' }, 'NUXT_MAIL_FROM'],
+    ['a domain label starting with a dash', { from: 'no-reply@-ccc.example.org' }, 'NUXT_MAIL_FROM'],
     ['default sender domain, upper case', { from: 'CCC <No-Reply@CCC.LOCAL>' }, 'NUXT_MAIL_FROM'],
     ['default sender domain, trailing dot', { from: 'no-reply@ccc.local.' }, 'NUXT_MAIL_FROM'],
     ['cookies without Secure (boolean)', { secureCookie: false }, 'NUXT_AUTH_SECURE_COOKIE'],
@@ -118,6 +145,19 @@ describe('assertStrictRuntimeConfig (PROD-1, T-SEC-06, T-SEC-12)', () => {
     ['https URL on 11.0.0.1 (just outside 10/8)', { siteUrl: 'https://11.0.0.1' }],
     ['https URL on 192.169.0.1 (just outside 192.168/16)', { siteUrl: 'https://192.169.0.1' }],
     ['https URL on [fec0::1] (outside fe80::/10)', { siteUrl: 'https://[fec0::1]' }],
+    ['sender as a plain address', { from: 'no-reply@ccc.example.org' }],
+    ['sender with a quoted display name', { from: '"CCC, le tournoi" <no-reply@ccc.example.org>' }],
+    ['https URL on 1.0.0.1 (just outside 0.0.0.0/8)', { siteUrl: 'https://1.0.0.1' }],
+    ['SMTP host on 1.0.0.25 (just outside 0.0.0.0/8)', { host: '1.0.0.25' }],
+    ['https public NAT64 site URL [64:ff9b::808:808] (8.8.8.8)', { siteUrl: 'https://[64:ff9b::808:808]' }],
+    ['https public 6to4 site URL [2002:808:808::] (8.8.8.8)', { siteUrl: 'https://[2002:808:808::]' }],
+    ['https public IPv4-compatible site URL [::808:808]', { siteUrl: 'https://[::808:808]' }],
+    ['public NAT64 SMTP host', { host: '[64:ff9b::808:808]' }],
+    ['public 6to4 SMTP host', { host: '[2002:808:808::]' }],
+    ['public IPv4-compatible SMTP host', { host: '[::808:808]' }],
+    ['private NAT64 SMTP host [64:ff9b::a00:1] (accepted for SMTP)', { host: '[64:ff9b::a00:1]' }],
+    ['private 6to4 SMTP host [2002:c0a8:101::] (accepted for SMTP)', { host: '[2002:c0a8:101::]' }],
+    ['private IPv4-compatible SMTP host [::a00:1] (accepted for SMTP)', { host: '[::a00:1]' }],
     ['SMTP relay on 10.0.0.25 (private, accepted for SMTP)', { host: '10.0.0.25' }],
     ['SMTP relay on 172.20.0.5', { host: '172.20.0.5' }],
     ['SMTP relay on 192.168.1.25', { host: '192.168.1.25' }],
@@ -215,5 +255,29 @@ describe('production image marker (T-SEC-06, Q1)', () => {
   it.each([false, 'false', 'FALSE', '0', '', ' ', undefined, null])('marker present, flag off (%j): refuses to start, naming the variable only', (strict) => {
     const call = () => assertStrictRuntimeConfig(configWith({ strict, productionImage: true }))
     expect(call).toThrow('NUXT_STRICT_RUNTIME_CONFIG cannot be turned off in the production image')
+  })
+})
+
+describe('what net.BlockList does by itself on IPv6 forms that embed an IPv4 (T-SEC-06 review L2)', () => {
+  const blockList = new BlockList()
+  for (const { network, prefix, family } of LOCAL_ADDRESS_RANGES) {
+    blockList.addSubnet(network, prefix, family)
+  }
+
+  it('matches mapped IPv4 in every spelling', () => {
+    expect(blockList.check('::ffff:7f00:1', 'ipv6')).toBe(true)
+    expect(blockList.check('0:0:0:0:0:ffff:7f00:1', 'ipv6')).toBe(true)
+    expect(blockList.check('::ffff:0.1.2.3', 'ipv6')).toBe(true)
+  })
+
+  it('does NOT match NAT64, 6to4 or IPv4-compatible forms: the guard extracts their IPv4 itself', () => {
+    expect(blockList.check('64:ff9b::7f00:1', 'ipv6')).toBe(false)
+    expect(blockList.check('2002:7f00:1::', 'ipv6')).toBe(false)
+    expect(blockList.check('::7f00:1', 'ipv6')).toBe(false)
+  })
+
+  it('covers 0.0.0.0/8 and not 0.0.0.0/32 only', () => {
+    expect(blockList.check('0.1.2.3', 'ipv4')).toBe(true)
+    expect(blockList.check('1.0.0.1', 'ipv4')).toBe(false)
   })
 })

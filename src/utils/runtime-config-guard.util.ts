@@ -1,10 +1,15 @@
 import { BlockList, isIP } from 'node:net'
+import { ACCOUNT_EMAIL_PATTERN } from '../consts/email.const.js'
 import { DEVICE_SECRET_MIN_LENGTH } from '../consts/auth.const.js'
 import {
   DEFAULT_MAIL_FROM_DOMAIN,
+  EMBEDDED_IPV4_FORMS,
+  IPV6_BYTE_LENGTH,
   LOCAL_ADDRESS_RANGES,
   LOCAL_HOSTNAME,
   LOCAL_HOSTNAME_SUFFIX,
+  MAIL_FROM_DOMAIN_PATTERN,
+  MAIL_FROM_NAMED_ADDRESS_PATTERN,
   PRIVATE_ADDRESS_RANGES,
   STRICT_CONFIG_VARIABLE,
   STRICT_RUNTIME_CONFIG_OFF_VALUES
@@ -38,20 +43,53 @@ const normalizeHostname = (host: string): string => {
   }
 }
 
-/** Machine locale : `localhost` et `*.localhost`, plages de `LOCAL_ADDRESS_RANGES`, IPv4 mappées comprises. */
-const isLocalHostname = (hostname: string): boolean => {
-  const family = isIP(hostname)
-  if (family !== 0) {
-    return localRanges.check(hostname, family === 4 ? 'ipv4' : 'ipv6')
+/** Les 16 octets d'une IPv6 en écriture hexadécimale (celle que renvoie `URL`), `::` développé. `null` si l'écriture est inattendue. */
+const ipv6Bytes = (address: string): number[] | null => {
+  const halves = address.split('::')
+  if (halves.length > 2) {
+    return null
   }
-  return hostname === LOCAL_HOSTNAME || hostname.endsWith(LOCAL_HOSTNAME_SUFFIX)
+  const groups = (part: string): string[] => (part === '' ? [] : part.split(':'))
+  const head = groups(halves[0]!)
+  const tail = halves.length === 2 ? groups(halves[1]!) : []
+  const missing = halves.length === 2 ? IPV6_BYTE_LENGTH / 2 - head.length - tail.length : 0
+  const words = [...head, ...Array<string>(Math.max(missing, 0)).fill('0'), ...tail]
+  if (words.length !== IPV6_BYTE_LENGTH / 2 || words.some((word) => !/^[0-9a-f]{1,4}$/.test(word))) {
+    return null
+  }
+  return words.flatMap((word) => [Number.parseInt(word, 16) >> 8, Number.parseInt(word, 16) & 0xff])
 }
 
-/** Adresse privée ou link-local (IPv4 mappées comprises) : refusée pour le site, acceptée pour le SMTP. */
-const isPrivateAddress = (hostname: string): boolean => {
-  const family = isIP(hostname)
-  return family !== 0 && privateRanges.check(hostname, family === 4 ? 'ipv4' : 'ipv6')
+/**
+ * IPv4 embarquée dans une IPv6 NAT64, 6to4 ou IPv4-compatible (`EMBEDDED_IPV4_FORMS`), `null` pour toute autre adresse. Fonction
+ * unique : les plages locales et privées s'appliquent à cette IPv4 comme à une IPv4 ordinaire. Les adresses mappées
+ * (`::ffff:a.b.c.d`) n'en ont pas besoin, `net.BlockList` les rapproche déjà des plages IPv4.
+ */
+const embeddedIPv4 = (address: string): string | null => {
+  const bytes = ipv6Bytes(address)
+  const form = bytes === null ? undefined : EMBEDDED_IPV4_FORMS.find(({ prefix }) => prefix.every((value, index) => bytes[index] === value))
+  return bytes === null || form === undefined ? null : bytes.slice(form.ipv4Offset, form.ipv4Offset + 4).join('.')
 }
+
+/** Vrai si `hostname` (adresse IP) est dans `ranges`, directement ou par son IPv4 embarquée. */
+const inRanges = (hostname: string, ranges: BlockList): boolean => {
+  const family = isIP(hostname)
+  if (family === 0) {
+    return false
+  }
+  if (ranges.check(hostname, family === 4 ? 'ipv4' : 'ipv6')) {
+    return true
+  }
+  const embedded = family === 6 ? embeddedIPv4(hostname) : null
+  return embedded !== null && ranges.check(embedded, 'ipv4')
+}
+
+/** Machine locale : `localhost` et `*.localhost`, plages de `LOCAL_ADDRESS_RANGES`, IPv4 mappées ou embarquées comprises. */
+const isLocalHostname = (hostname: string): boolean =>
+  inRanges(hostname, localRanges) || (isIP(hostname) === 0 && (hostname === LOCAL_HOSTNAME || hostname.endsWith(LOCAL_HOSTNAME_SUFFIX)))
+
+/** Adresse privée ou link-local (IPv4 mappées ou embarquées comprises) : refusée pour le site, acceptée pour le SMTP. */
+const isPrivateAddress = (hostname: string): boolean => inRanges(hostname, privateRanges)
 
 /** Mode strict actif ? Faux par défaut ; seules `false`, `0` ou la chaîne vide l'éteignent explicitement. */
 export const isStrictRuntimeConfig = (value: unknown): boolean => {
@@ -86,15 +124,24 @@ const smtpHostViolation = (value: unknown): boolean => {
   return isIP(host) === 0 && !host.includes('.')
 }
 
-/** Adresse de l'expéditeur, avec ou sans nom affiché (`CCC <no-reply@ccc.local>`) : domaine exact, sans `>` ni point final. */
-const mailFromDomain = (from: string): string => {
-  const address = /<([^<>]*)>\s*$/.exec(from)?.[1] ?? from
-  return address.slice(address.lastIndexOf('@') + 1).trim().replace(/\.+$/, '').toLowerCase()
+/**
+ * Domaine de l'expéditeur, ou `null` si `from` n'a pas l'une des DEUX formes admises : `adresse` ou `Nom <adresse>`. L'adresse doit
+ * valider entièrement `ACCOUNT_EMAIL_PATTERN` et son domaine être un nom d'hôte (`MAIL_FROM_DOMAIN_PATTERN`) : une adresse suivie
+ * d'un commentaire ou d'un point-virgule, ou `Nom <adresse> suite`, n'a donc pas de domaine reconnu. Un point final est ignoré.
+ */
+const mailFromDomain = (from: string): string | null => {
+  const address = MAIL_FROM_NAMED_ADDRESS_PATTERN.exec(from)?.[2] ?? from
+  if (!ACCOUNT_EMAIL_PATTERN.test(address)) {
+    return null
+  }
+  const domain = address.slice(address.lastIndexOf('@') + 1).replace(/\.$/, '').toLowerCase()
+  return MAIL_FROM_DOMAIN_PATTERN.test(domain) ? domain : null
 }
 
+/** Échec fermé : un `from` vide, d'une forme non admise, ou sur le domaine par défaut, est une violation. */
 const mailFromViolation = (value: unknown): boolean => {
-  const from = asText(value)
-  return from === '' || mailFromDomain(from) === DEFAULT_MAIL_FROM_DOMAIN
+  const domain = mailFromDomain(asText(value))
+  return domain === null || domain === DEFAULT_MAIL_FROM_DOMAIN
 }
 
 /**
