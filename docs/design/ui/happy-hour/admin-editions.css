@@ -14,7 +14,7 @@
 /* Formulaires */
 .ed-form { display: grid; gap: var(--origam-space---5); margin-top: var(--origam-space---6); }
 .ed-form__h { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: var(--origam-space---3); }
-.ed-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---4); }
+.ed-grid { align-items: start; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---4); }
 .ed-grid__full { grid-column: 1 / -1; }
 .ed-grid .input { width: 100%; }
 .input--area { min-height: 7rem; padding-block: var(--origam-space---3); border-radius: var(--origam-radius---lg); resize: vertical; font: inherit; line-height: var(--origam-font__lineHeight---normal); }
