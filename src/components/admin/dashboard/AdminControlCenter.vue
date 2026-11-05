@@ -23,6 +23,7 @@
         orientation="vertical"
         :clickable="false"
         show-connectors
+        :model-value="activeIndex"
         :items="items"
         data-cy="admin-control-center-steps"
       />
@@ -34,6 +35,7 @@
 import { computed } from 'vue'
 import { OrigamCard, OrigamStepper, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'
+import { ADMIN_DASHBOARD_STEP_STATUS } from '~/enums/admin-dashboard.enum'
 import type { IAdminControlCenterEmits, IAdminControlCenterProps, IAdminControlCenterSlots } from '~/interfaces/admin-dashboard.interface'
 
 /*********************************************************
@@ -51,6 +53,18 @@ const emits = defineEmits<IAdminControlCenterEmits>()
 defineSlots<IAdminControlCenterSlots>()
 const titleId = 'admin-control-center-title'
 const title = computed(() => t('admin.dashboard.control_center_title', 'Centre de contrôle'))
+
+/*********************************************************
+ * Étape en cours
+ *
+ * @description
+ * Origam calcule l'état des connecteurs depuis `model-value` (index de l'étape en cours), pas depuis le `status` des items : sans lui,
+ * tous les connecteurs restent « à venir ». Sans étape en cours (édition clôturée), toutes les étapes sont faites : on pointe après la dernière.
+ ********************************************************/
+const activeIndex = computed(() => {
+  const index = props.items.findIndex(item => item.status === ADMIN_DASHBOARD_STEP_STATUS.ACTIVE)
+  return index === -1 ? props.items.length : index
+})
 
 /*********************************************************
  * Expose

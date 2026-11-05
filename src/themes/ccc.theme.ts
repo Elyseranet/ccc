@@ -23,6 +23,10 @@ import type { IOrigamTheme } from 'origam/interfaces'
  * Contournements Origam portés par `src/assets/css/main.css` (le CSS ne prend pas de commentaire) ; chacun se
  * retire quand le défaut suivi est corrigé dans Origam (docs/tickets/origam/INDEX.md) :
  *   - `:where(.origam-tab__label)` (interligne des onglets) : Elyseranet/origam#1252 ;
+ *   - `.origam-stepper .origam-stepper-item__indicator--active…` (une seule variable `--origam-stepper---color` pour les étapes
+ *     faite et en cours : le centre de contrôle veut « fait » en vert et « en cours » en rose) : Elyseranet/origam#1339 ;
+ *   - `.origam-stepper .origam-stepper-item__subtitle…` (sous-titre d'étape en `white-space: nowrap`, il déborde à 390 px) :
+ *     Elyseranet/origam#1340 ;
  *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
@@ -139,6 +143,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
   // Tableaux (F-00g) : ni une prop ni un token sémantique n'expriment ces valeurs ; chaque entrée pointe vers un token existant.
   cssVars: {
     '--origam-btn---text-indent': '0',
+    // Centre de contrôle (F-07, option 1) : « fait » en vert, indicateur et connecteur. La couleur de l'étape en cours est posée par
+    // `main.css` (Elyseranet/origam#1339 : une seule variable pour « fait » et « en cours »).
+    '--origam-stepper---color': 'var(--origam-color__feedback--success---fgSubtle)',
+    '--origam-stepper---connector-color-done': 'var(--origam-color__feedback--success---fgSubtle)',
     // Fond de la table : surface.raised (le défaut du DS est surface.default).
     '--origam-table---background-color': 'var(--origam-color__surface---raised)',
     '--origam-data-table---background-color': 'var(--origam-color__surface---raised)',
