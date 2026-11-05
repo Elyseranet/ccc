@@ -133,7 +133,7 @@ Poules inégales possibles (RG16) : rappel de la règle de jeu « bière » (RG1
 - Navigation : `aria-current="page"` sur l'entrée active ; onglets : soit `origam-tabs` (clavier flèches), soit vrais liens ; jamais un état « actif » codé en dur.
 - Tous les tableaux : `caption` (visible ou masquée), `th scope`, `aria-sort` si triable ; version cartes sur mobile sans perte d'information.
 - Formulaires : un `label` visible par champ (placeholder ≠ label), erreurs liées par `aria-describedby`, `inputmode="numeric"` pour les scores, groupes en `fieldset/legend`.
-- Dialogues (validation de tirage/score) : focus piégé, Échap, retour du focus au déclencheur, focus initial sur l'action la moins destructive.
+- Dialogues (validation de tirage/score) : focus piégé, Échap, retour du focus au déclencheur, focus initial sur l'action la moins destructive. Pas de `persistent` : Échap et le clic à l'extérieur ferment = annulent (la validation n'a lieu que sur le bouton explicite) ; `persistent` bloquerait aussi Échap (Origam 2.37.4) et pénaliserait le clavier. Vaut pour les dialogues de validation de tirage, de score, de liste des qualifiés, de tirage de tour et de clôture.
 - Statut et résultats dynamiques : région `role="status"` (liste filtrée, enregistrement) ; `role="alert"` pour les erreurs.
 - Information jamais portée par la seule couleur : statuts en texte (« Validé », « Saisi, à valider »).
 - Contraste texte ≥ 4,5:1 ; remplacer `--faint` (3,38:1 sur fond) pour du texte ; taille de texte courante ≥ 14 px, rien en dessous de 12 px.
