@@ -135,6 +135,47 @@
           </ul>
         </nav>
       </div>
+      <div class="public-footer__legal page-wrap">
+        <nav
+          v-if="hasLegalNavigation"
+          :aria-label="legalLabel"
+        >
+          <ul class="public-footer__list public-footer__list--legal">
+            <li
+              v-for="item in legalNavigation"
+              :key="item.to"
+            >
+              <origam-btn
+                :to="item.to"
+                variant="text"
+                rounded="full"
+                font-weight="semibold"
+                class="public-footer__link"
+                :aria-current="item.current"
+                :data-cy="`footer-legal-${item.to}`"
+                :text="item.text"
+              />
+            </li>
+          </ul>
+        </nav>
+        <div class="public-footer__meta">
+          <p data-cy="footer-copyright">
+            {{ copyright }}
+          </p>
+          <p data-cy="footer-credit">
+            {{ creditPrefix }}
+            <a
+              class="public-footer__credit"
+              :href="publisherUrl"
+              rel="noopener"
+              data-cy="footer-credit-publisher"
+            >{{ publisherName }}</a>
+            {{ creditMiddle }}
+            {{ designSystemName }}
+            <legal-text :text="designSystemUrlTodo" />
+          </p>
+        </div>
+      </div>
     </footer>
   </div>
 </template>
@@ -148,7 +189,9 @@ import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
 import { INTENT, VARIANT } from 'origam/enums'
 import { ROUTES } from '~/consts/routes.const'
-import { FOOTER_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
+import LegalText from '~/components/legal/LegalText.vue'
+import { LEGAL_DESIGN_SYSTEM_NAME, LEGAL_PUBLISHER_NAME, LEGAL_PUBLISHER_URL } from '~/consts/legal.const'
+import { FOOTER_NAVIGATION, LEGAL_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
 import { useAuthStore } from '~/composables/useAuthStore'
 import { useLogout } from '~/composables/useLogout'
 import { LOGGED_OUT_STATE_KEY } from '~/consts/auth-session.const'
@@ -185,6 +228,29 @@ const brandLabel = computed(() => t('layout.header.brand_label', 'CCC, accueil')
 const navLabel = computed(() => t('layout.header.nav_label', 'Navigation principale'))
 const footerLabel = computed(() => t('layout.footer.nav_label', 'Pied de page'))
 const footerNavigation = computed(() => FOOTER_NAVIGATION.map(item => ({ to: item.to, text: t(item.key, item.label) })))
+
+/*********************************************************
+ * Informations légales
+ *
+ * @description
+ * Second `nav` du pied de page (E-d : le premier garde « Pied de page »). Ses liens suivent la règle de livraison de la
+ * navigation (`filterDeliveredItems`) ; une liste vide n'est pas rendue. Le © et le crédit sont toujours présents.
+ * Le lien d'Origam n'existe pas tant que l'URL n'est pas fournie : le marqueur le dit à la place.
+ ********************************************************/
+const legalLabel = computed(() => t('layout.footer.legal_nav_label', 'Informations légales'))
+const legalNavigation = computed(() => LEGAL_NAVIGATION.map(item => ({
+  to: item.to,
+  text: t(item.key, item.label),
+  current: ariaCurrent(item.to, true)
+})))
+const hasLegalNavigation = computed(() => legalNavigation.value.length > 0)
+const publisherName = LEGAL_PUBLISHER_NAME
+const publisherUrl = LEGAL_PUBLISHER_URL
+const designSystemName = LEGAL_DESIGN_SYSTEM_NAME
+const copyright = computed(() => t('layout.footer.copyright', '© {year} {publisher}', { year: new Date().getFullYear(), publisher: LEGAL_PUBLISHER_NAME }))
+const creditPrefix = computed(() => t('layout.footer.credit_prefix', 'Site réalisé par'))
+const creditMiddle = computed(() => t('layout.footer.credit_middle', 'avec'))
+const designSystemUrlTodo = computed(() => t('layout.footer.origam_url_todo', '[À FOURNIR : URL d’Origam]'))
 
 /*********************************************************
  * Navigation
@@ -381,6 +447,43 @@ defineExpose({})
 
     color: var(--origam-color__text---secondary);
     text-decoration: underline;
+
+    &[aria-current='page'] {
+      color: var(--origam-color__text---primary);
+      text-decoration-thickness: var(--public-footer__link--current---thickness, 3px);
+    }
+  }
+
+  &__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---4) var(--origam-space---8);
+    margin-top: var(--origam-space---6);
+    padding-top: var(--origam-space---6);
+    border-top: var(--origam-border__width---thin) solid var(--origam-color__border---subtle);
+  }
+
+  &__list--legal {
+    margin-inline-start: calc(-1 * var(--origam-space---3));
+  }
+
+  &__meta {
+    display: grid;
+    gap: var(--origam-space---1);
+    color: var(--origam-color__text---secondary);
+    font-size: var(--origam-font__size---sm);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__credit {
+    color: var(--origam-color__text---primary);
+    text-decoration: underline;
+    text-underline-offset: var(--public-footer__credit---underline-offset, 3px);
   }
 }
 
@@ -419,5 +522,7 @@ defineExpose({})
   --public-header---blur: 16px;
   --public-header---radius: var(--origam-radius---full);
   --public-main---reserved-height: 20rem;
+  --public-footer__link--current---thickness: 3px;
+  --public-footer__credit---underline-offset: 3px;
 }
 </style>

@@ -14,3 +14,10 @@ export const FOOTER_NAVIGATION: INavigationItem[] = filterDeliveredItems([
   { key: 'layout.footer.nav_hall_of_fame', label: 'Palmarès', to: ROUTES.HALL_OF_FAME },
   { key: 'layout.footer.nav_login', label: 'Connexion', to: ROUTES.LOGIN }
 ])
+
+export const LEGAL_NAVIGATION: INavigationItem[] = filterDeliveredItems([
+  { key: 'layout.footer.legal_notice', label: 'Mentions légales', to: ROUTES.LEGAL_NOTICE },
+  { key: 'layout.footer.legal_privacy', label: 'Confidentialité', to: ROUTES.PRIVACY },
+  { key: 'layout.footer.legal_terms', label: 'Conditions d’utilisation', to: ROUTES.TERMS },
+  { key: 'layout.footer.legal_accessibility', label: 'Accessibilité', to: ROUTES.ACCESSIBILITY }
+])
