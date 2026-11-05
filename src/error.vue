@@ -3,10 +3,10 @@
     <nuxt-layout name="default">
       <template #default>
         <section
-          class="error-page page-wrap"
+          class="error-page"
           data-cy="error-page"
         >
-          <div class="error-page__in">
+          <div class="error-page__in page-wrap">
             <page-hero
               class="error-page__hero"
               :title="heroTitle"
@@ -137,18 +137,24 @@ defineExpose({})
   display: flex;
   align-items: center;
   min-height: var(--error-page---min-height, 50vh);
+  padding-block: var(--error-page---padding-block, var(--origam-space---12) var(--origam-space---10));
 
   &__in {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--error-page---gap, var(--origam-space---10));
-    width: 100%;
   }
 
   &__hero {
+    --page-hero---padding-block: 0;
+
     width: auto;
     margin-inline: 0;
+  }
+
+  &__hero :deep(h1:focus) {
+    outline: none;
   }
 
   &__eyebrow {
@@ -200,6 +206,7 @@ defineExpose({})
 <style>
 :root {
   --error-page---gap: var(--origam-space---10);
+  --error-page---padding-block: var(--origam-space---12) var(--origam-space---10);
   --error-page__actions---margin-top: var(--origam-space---8);
 }
 </style>

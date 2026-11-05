@@ -83,3 +83,52 @@ for (const viewport of VIEWPORTS) {
     })
   }
 }
+
+/*********************************************************
+ * Page d'erreur (`erreur.html`, décision 9639ca1) : 404 réel, et erreur générique par la route de rendu d'erreur de
+ * Nuxt en développement (`/__nuxt_error`).
+ ********************************************************/
+const ERROR_STATES = [
+  { name: '404', file: 'erreur.html', route: '/page-qui-nexiste-pas', statusCode: undefined },
+  { name: 'generique', file: 'erreur.html?generique', route: '/regles', statusCode: 500 }
+]
+
+/** L'erreur générique est posée dans l'état Nuxt (`payload.error`), comme le ferait `showError` : la page d'erreur remplace alors la page. */
+const showGenericError = async (page: Page, statusCode: number) => {
+  await page.evaluate((code) => {
+    (window as unknown as { useNuxtApp: () => { payload: { error: unknown } } }).useNuxtApp().payload.error = { statusCode: code, statusMessage: 'Erreur', message: 'Cannot read properties of undefined' }
+  }, statusCode)
+  await page.locator('[data-cy="error-page"]').waitFor()
+}
+
+const ERROR_ZONES = [
+  { name: 'hero', mock: '.err-hero', app: '[data-cy="error-page"]' },
+  { name: 'pied', mock: '.hh-footer', app: '.public-footer' }
+]
+
+for (const viewport of VIEWPORTS) {
+  for (const state of ERROR_STATES) {
+    test.describe(`erreur ${state.name} @${viewport.name}`, () => {
+      test.use({ viewport: { width: viewport.width, height: viewport.height } })
+
+      for (const zone of ERROR_ZONES) {
+        test(zone.name, async ({ page, browser }) => {
+          const { mockup, mockContext } = await open(page, browser, viewport, state.file, state.route)
+          // `.err-hero__cta { display: flex }` l'emporte sur `[hidden]` : la rangée de boutons de l'état inactif reste visible dans la maquette.
+          await mockup.addStyleTag({ content: '.hh-footer__note { display: none !important; } [hidden] { display: none !important; }' })
+          if (state.statusCode) {
+            await showGenericError(page, state.statusCode)
+          }
+          await mockup.evaluate(() => window.scrollTo(0, 0))
+          await page.evaluate(() => window.scrollTo(0, 0))
+          await alignToPixel(mockup, zone.mock)
+          await alignToPixel(page, zone.app)
+          const mockBox = await box(mockup, zone.mock)
+          const appBox = await box(page, zone.app)
+          await compare(page, mockup, `erreur-${state.name}-${zone.name}`, viewport.name, mockBox, appBox)
+          await mockContext.close()
+        })
+      }
+    })
+  }
+}
