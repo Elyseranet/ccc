@@ -119,7 +119,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_MATCHES]: {
-    delivered: true,
+    delivered: false,
     layout: LAYOUT.ADMIN,
     endpoints: [
       API_ENDPOINT.ADMIN_MATCHES,
