@@ -33,6 +33,18 @@
    <tbody><tr><td>Premiers de poule (direct)</td><td>8</td></tr><tr><td>Vainqueurs des barrages</td><td>8</td></tr></tbody></table>
   <div class="note">RG14 : avec barrages, les premiers de poule vont directement en huitièmes et sont mélangés aux vainqueurs des barrages pour le tirage des huitièmes. Sans barrages : le vivier = les qualifiés. La composition des barrages (qui affronte qui, combien de barragistes) n'est pas décrite : Je ne sais pas (B-13) ; elle est fournie par le tirage physique, donc saisie comme n'importe quel tour. Le total du vivier doit être pair pour former des paires. Aucun refus « puissance de 2 » (décision c9790abd).</div></section>
 
+ <section class="box" style="margin-top:1rem" aria-labelledby="h-ch"><h2 id="h-ch">Tour à tirer</h2>
+  <p><b>Cas courant</b> (vivier de 2, 4, 8 ou 16 joueurs) : le tour est déduit, sans choix. Ex. : « Tour à tirer : Huitièmes, 16 joueurs. »</p>
+  <p class="state-title">VIVIER HORS 2 / 4 / 8 / 16 : L'ADMINISTRATEUR CHOISIT LE TOUR</p>
+  <form class="box"><fieldset><legend>Quel tour tirez-vous avec ces 12 joueurs ? (6 affiches)</legend>
+   <div><label for="rk1"><input type="radio" name="rk" id="rk1"> Barrages</label></div>
+   <div><label for="rk2"><input type="radio" name="rk" id="rk2" checked> Quarts de finale</label></div>
+   <div><label for="rk3"><input type="radio" name="rk" id="rk3"> Demi-finales</label></div></fieldset>
+   <p class="meta">Seuls les tours autorisés pour ce vivier sont proposés.</p></form>
+  <div class="note">DÉCISION UTILISATEUR (673e5b4b, option c) : quand le vivier n'est pas de 2, 4, 8 ou 16 joueurs, la lecture GET …/tirages/tour renvoie roundKind = null et allowedRoundKinds ; l'écran propose ce choix AVANT la première affiche, parmi allowedRoundKinds uniquement (groupe de boutons radio dans un fieldset/legend, pas un select caché). Libellés : Barrages (PLAYOFF, A9), Huitièmes, Quarts, Demi-finales, Finale. Le vivier est toujours tiré en entier : le choix ne change que le nom du tour et les contrôles, pas le nombre d'affiches (vivier / 2). Une fois la première affiche enregistrée, le choix est verrouillé et affiché en texte (je ne sais pas si le back autorise de le changer ensuite : à confirmer). Les options du radio ci-dessus sont ILLUSTRATIVES : seule la liste renvoyée par le serveur fait foi, et sa règle de calcul est côté back.</div>
+  <div class="note">Contrôles du serveur à connaître (back-lead) : affiches complètes, vivier entièrement tiré, vivier impair refusé, aucun premier de poule en barrages (RG14), HUITIÈMES = exactement 16 joueurs, FINALE = exactement 2, pas de tour antérieur à un tour déjà tiré, barrages seulement avant le premier tour de phase finale. L'écran n'y ajoute aucune règle : il filtre les choix par allowedRoundKinds et affiche les refus du serveur.</div>
+  <div class="note note--ds">origam-radio-group (ou origam-item-group), à vérifier ; fieldset/legend natifs si le composant ne les fournit pas.</div></section>
+
  <section class="box" style="margin-top:1rem" aria-labelledby="h-sai"><h2 id="h-sai">Saisir le tirage, affiche par affiche</h2>
   <p role="status">Affiche <b>4 / 8</b> · Joueurs restants : <b>10</b></p>
   <form class="box" aria-labelledby="h-af"><h3 id="h-af">Affiche 4</h3>
@@ -55,6 +67,15 @@
  <h2>États</h2>
  <p class="state-title">TOUR PRÉCÉDENT INCOMPLET (409)</p><div class="box box--dashed" role="status"><p>Le tirage des quarts n'est possible qu'après validation de tous les matchs des huitièmes (2 restants). <a href="admin-score.html">Aller aux scores</a></p></div>
  <p class="state-title">LISTE DES QUALIFIÉS NON ARRÊTÉE</p><div class="box box--dashed"><p>Arrêtez d'abord la liste des qualifiés. <a href="admin-qualification.html">Aller à la qualification</a></p></div>
+ <p class="state-title">REFUS DU SERVEUR (messages)</p>
+ <ul>
+  <li role="alert">Affiches incomplètes : « Il reste N affiches à saisir. »</li>
+  <li role="alert">Vivier non tiré en entier : « Tous les joueurs du vivier doivent figurer dans une affiche. »</li>
+  <li role="alert">Barrages : « Les premiers de poule n’entrent pas en barrages. »</li>
+  <li role="alert">Huitièmes : « Les huitièmes se tirent à 16 joueurs exactement. »</li>
+  <li role="alert">Finale : « La finale se tire à 2 joueurs exactement. »</li>
+  <li role="alert">Ordre des tours : « Ce tour est antérieur à un tour déjà tiré. » ; « Les barrages ne peuvent être tirés qu’avant le premier tour de phase finale. »</li></ul>
+ <div class="note">Messages affichés dans une alerte en tête de la section concernée, jamais seulement en rouge. Libellés à passer par l'i18n ; les codes d'erreur du serveur ne sont pas affichés tels quels. Le choix de tour en radio ne peut normalement pas produire ces refus (options filtrées) : ils couvrent un état périmé (412) ou une course entre deux sessions.</div>
  <p class="state-title">VIVIER IMPAIR</p><div class="box" role="alert"><p>Le vivier compte 15 joueurs : les affiches ne peuvent pas être formées par paires. Vérifiez la qualification.</p></div>
  <p class="state-title">TOUR TIRÉ (lecture seule)</p><div class="box box--dashed"><p>Tirage des huitièmes validé par l'administrateur le 00/00 à 00:00. 8 matchs créés. <a href="admin-score.html">Saisir les scores</a></p></div>
  <p class="state-title">FINALE VALIDÉE</p><div class="box box--dashed"><p>Tous les tours sont validés. <a href="admin-cloture.html">Clôturer l'édition</a></p></div>
