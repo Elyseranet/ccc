@@ -208,6 +208,8 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 .alert__ic { flex: none; width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
 /* origam-alert status="info" rounded="lg" avec titre (font-size md, font-weight bold, letter-spacing et line-height normal), densité par défaut, mesuré sur origam 2.37.4. Fond = info.bg au repos (#1307) */
 .alert--info { background: var(--origam-color__feedback--info---bg); color: var(--origam-color__feedback--info---fg); }
+.alert--warning { background: var(--origam-color__feedback--warning---bg); color: var(--origam-color__feedback--warning---fg); }
+.alert--success { background: var(--origam-color__feedback--success---bg); color: var(--origam-color__feedback--success---fg); }
 .alert--block { display: grid; grid-template-columns: var(--origam-space---4) minmax(0, 1fr); align-items: start; column-gap: var(--origam-space---4); padding: var(--origam-space---4); }
 .alert--block .alert__ic { margin-top: calc(var(--origam-space---2) + var(--origam-space---1) / 4); }
 .alert--block.alert--compact { padding: var(--origam-space---2); column-gap: var(--origam-space---2); } /* densité compacte : icône et texte à 8 px, mesuré sur 2.37.4 */

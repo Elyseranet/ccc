@@ -206,3 +206,35 @@
 }
 .pa-grid > *, .tir-grid > *, .adm-grid > * { min-width: 0; }
 .snack { white-space: normal; width: max-content; max-width: min(36rem, 100vw - 2 * var(--origam-space---4)); }
+
+/* ═══ PHASE FINALE ADMIN (F-24 qualification, F-25 tirage de tour, F-26 clôture) ═══ */
+.hsteps--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.q-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--origam-space---5); align-items: start; }
+.q-sec { margin-top: var(--origam-space---6); }
+.q-rank .adm-card-h { flex-wrap: wrap; }
+.q-rank__sel { display: flex; align-items: center; gap: var(--origam-space---3); min-width: 0; }
+.q-rank__sel .input { width: 12rem; max-width: 100%; }
+.q-note, .q-why { margin-top: var(--origam-space---3); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---secondary); }
+.q-ties { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---4); }
+.q-tie { display: grid; align-content: start; justify-items: start; gap: var(--origam-space---2); }
+.q-tie__who { font-weight: var(--origam-font__weight---bold); }
+.q-tie__st { display: flex; flex-wrap: wrap; gap: var(--origam-space---2); }
+.q-params { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: var(--origam-space---4); }
+.q-switch { align-content: start; }
+/* origam-switch : case à cocher native, rôle switch, piste + curseur */
+.switch { appearance: none; position: relative; width: var(--origam-space---12); height: var(--origam-space---6); margin-top: var(--origam-space---3); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---sunken); border: 1px solid var(--origam-color__border---strong); cursor: pointer; }
+.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: calc(var(--origam-space---6) - 8px); aspect-ratio: 1; border-radius: var(--origam-radius---full); background: var(--origam-color__text---secondary); transition: translate var(--origam-motion__duration---fast) var(--origam-motion__easing---standard); }
+.switch:checked { background: var(--origam-color__action--secondary---bg); border-color: transparent; }
+.switch:checked::after { translate: var(--origam-space---6) 0; background: var(--origam-color__action--secondary---fg); }
+.switch:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
+.q-preview { margin-top: var(--origam-space---4); }
+.q-act { display: grid; justify-items: start; margin-top: var(--origam-space---4); }
+/* États de la maquette (hors produit) et points ouverts (à confirmer par team-lead) */
+.mock-states { display: grid; gap: var(--origam-space---3); margin-top: var(--origam-space---10); padding-top: var(--origam-space---6); border-top: 1px dashed var(--origam-color__border---strong); }
+.open-pt { display: grid; gap: var(--origam-space---2); margin-top: var(--origam-space---3); padding: var(--origam-space---3); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---lg); }
+.open-pt__tag { font-family: var(--origam-font__family---mono); font-size: var(--origam-font__size---xs); color: var(--origam-color__feedback--warning---fgSubtle); }
+@media (max-width: 1000px) {
+  .q-grid, .q-ties, .q-params { grid-template-columns: minmax(0, 1fr); }
+  .hsteps--4 { display: flex; overflow-x: auto; scrollbar-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .switch::after { transition: none; } }

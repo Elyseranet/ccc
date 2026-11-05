@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qualification · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-layout : origam-drawer permanent (≥ 1000 px) · origam-bottom-nav (< 1000 px, 4 entrées, décision A7) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li></ul></nav>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <!-- origam-toolbar : sélecteur d'édition global (origam-select) -->
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Édition 2026 · étape 5 sur 9</p><h1 class="adm-h1 font-display neon--sm">Qualification</h1></div><p class="muted">Arrêter la liste des qualifiés à l’issue des poules, après avoir réglé les égalités.</p></div>
+<!-- origam-stepper orientation="horizontal" clickable=false (lecture seule) : avancement de cette page, une seule route (pas un assistant) -->
+<ol class="hsteps hsteps--4" aria-label="Étapes de la qualification"><li class="hs hs--done"><span class="hs__i num">✓</span>Poules validées</li><li class="hs hs--active" aria-current="step"><span class="hs__i num">2</span>Égalités</li><li class="hs hs--pending"><span class="hs__i num">3</span>Paramètres</li><li class="hs hs--pending"><span class="hs__i num">4</span>Arrêter la liste</li></ol>
+<div class="q-grid">
+<section class="card q-pre" aria-labelledby="h-pre"><header class="adm-card-h"><h2 id="h-pre" class="h-card">1 · Poules à jour</h2><span class="chip chip--warn">102 / 105</span></header>
+  <div class="progress" role="img" aria-label="102 matchs de poule validés sur 105"><span style="--p:97.1"></span></div>
+  <p class="muted">Tant que tous les matchs de poule ne sont pas validés, les actions de cette page restent inactives (la raison est affichée sous chaque bouton).</p>
+  <!-- origam-btn variant="text" to="/admin/matchs" (filtre : poules, à traiter) --><a class="btn btn--text btn--sm" href="admin-matchs.html">Voir les 3 matchs restants →</a>
+</section>
+<section class="card q-rank" aria-labelledby="h-cl"><header class="adm-card-h"><h2 id="h-cl" class="h-card">Classement des poules</h2><p class="field q-rank__sel"><label for="gp">Poule</label><select id="gp" class="input"><option>Toutes les poules</option><option selected>Poule 1</option><option>Poule 2</option></select></p></header>
+  <!-- origam-table : ordre = victoires, cap’s average, confrontation directe (A10) ; statut provisoire tant que la liste n’est pas arrêtée -->
+  <div class="table-wrap"><table class="table"><caption class="sr-only">Classement de la poule 1</caption><thead><tr><th scope="col">Rang</th><th scope="col">Joueur</th><th scope="col" class="r">Victoires</th><th scope="col" class="r">Cap’s average</th><th scope="col">Statut</th></tr></thead><tbody><tr><td class="num">1</td><td><b>Maya Legrand</b></td><td class="r num">5</td><td class="r num">+2,40</td><td><span class="chip chip--ok">Qualifié (provisoire)</span></td></tr><tr><td class="num">2</td><td><b>Maya Bonnet</b></td><td class="r num">3</td><td class="r num">+0,80</td><td><span class="chip chip--warn">Égalité à départager</span></td></tr><tr><td class="num">2</td><td><b>Maël Faure</b></td><td class="r num">3</td><td class="r num">+0,80</td><td><span class="chip chip--warn">Égalité à départager</span></td></tr><tr><td class="num">4</td><td><b>Céleste Marie</b></td><td class="r num">2</td><td class="r num">−0,60</td><td><span class="chip ">Éliminé</span></td></tr><tr><td class="num">5</td><td><b>Manon Henry</b></td><td class="r num">1</td><td class="r num">−1,20</td><td><span class="chip ">Éliminé</span></td></tr><tr><td class="num">6</td><td><b>Côme Duval</b></td><td class="r num">1</td><td class="r num">−1,40</td><td><span class="chip ">Éliminé</span></td></tr></tbody></table></div>
+  <p class="muted q-note">Ordre : victoires, puis cap’s average, puis confrontation directe. Le statut reste provisoire tant que la liste n’est pas arrêtée.</p>
+</section>
+</div>
+<section class="q-sec" aria-labelledby="h-eg"><header class="adm-card-h"><h2 id="h-eg" class="h-card">2 · Égalités à départager</h2><p class="muted" role="status">2 égalités restantes pour une place qualificative</p></header>
+<ul class="q-ties">
+  <li class="card q-tie"><p class="eyebrow">Poule 1 · 2<sup>e</sup> place · 2 joueurs</p><p class="q-tie__who">Maya Bonnet, Maël Faure</p><p class="muted">Match 1 contre 1, cible 5 points.</p><p class="q-tie__st"><span class="chip">Départage non créé</span></p><button class="btn btn--primary btn--sm" type="button" disabled>Créer le départage</button><p class="q-why">Indisponible : 3 matchs de poule à valider.</p></li>
+  <li class="card q-tie"><p class="eyebrow">Meilleur 3<sup>e</sup> entre poules · 3 joueurs</p><p class="q-tie__who">Lisa Masson, Paul Girard, Eva Michel</p><p class="muted">Mini-poule d’abord (confrontation directe), puis match à 3 côtés, premier à 3 points.</p><p class="q-tie__st"><span class="chip chip--ok">Mini-poule jouée</span><span class="chip chip--warn">Match à 3 côtés à créer</span></p><button class="btn btn--primary btn--sm" type="button" disabled>Créer le départage</button><p class="q-why">Indisponible : 3 matchs de poule à valider.</p>
+  <!-- POINT OUVERT (team-lead) : lieu de saisie du score d’un départage --><div class="open-pt"><p class="open-pt__tag">À confirmer · lieu de saisie du score d’un départage</p><a class="btn btn--text btn--sm" href="admin-matchs.html">Saisir le score dans « Poules et matchs » →</a></div></li>
+</ul></section>
+<section class="card q-sec" aria-labelledby="h-par"><header class="adm-card-h"><h2 id="h-par" class="h-card">3 · Paramètres de qualification</h2></header>
+  <!-- origam-form · origam-text-field inputmode="numeric" (pas origam-number-field, décision 87eea8e) · origam-switch -->
+  <form class="q-params" action="#"><p class="field"><label for="qn">Premiers de chaque poule</label><input id="qn" class="input" type="text" inputmode="numeric" value="2"></p><p class="field"><label for="qm">Meilleurs (n+1)<sup>es</sup></label><input id="qm" class="input" type="text" inputmode="numeric" value="0"></p><p class="field q-switch"><label for="qb">Avec barrages</label><input id="qb" class="switch" type="checkbox" role="switch"></p></form>
+  <p class="q-preview" role="status"><b>Aperçu : 16 qualifiés</b> <span class="muted">(2 × 8 poules + 0)</span></p>
+  <!-- POINT OUVERT (team-lead) : composition des barrages --><div class="open-pt"><p class="open-pt__tag">À confirmer · composition des barrages</p><p class="muted">Avec barrages, la répartition entre qualifiés directs et barragistes n’est pas définie : le total est remplacé par « Les barrages seront tirés à l’étape suivante ».</p></div>
+</section>
+<section class="card q-sec" aria-labelledby="h-arr"><header class="adm-card-h"><h2 id="h-arr" class="h-card">4 · Arrêter la liste des qualifiés</h2></header>
+  <div class="table-wrap"><table class="table"><caption class="sr-only">Aperçu des qualifiés</caption><thead><tr><th scope="col">Poule</th><th scope="col" class="r">Rang</th><th scope="col">Joueur</th><th scope="col">Voie</th></tr></thead><tbody><tr><td>1</td><td class="r num">1</td><td><b>Maya Legrand</b></td><td><span class="chip chip--ok">Direct</span></td></tr><tr><td>1</td><td class="r num">2</td><td><b>Maya Bonnet</b></td><td><span class="chip chip--info">Après départage</span></td></tr><tr><td>2</td><td class="r num">1</td><td><b>Clara Lambert</b></td><td><span class="chip chip--ok">Direct</span></td></tr></tbody></table></div>
+  <div class="q-act"><button class="btn btn--primary" type="button" aria-haspopup="dialog" disabled>Arrêter la liste…</button><p class="q-why">Indisponible : 2 égalités restantes et 3 matchs de poule à valider.</p></div>
+  <!-- origam-dialog (focus initial sur « Annuler », bouton inactif pendant l’envoi) -->
+  <section class="card confirm" role="alertdialog" aria-labelledby="h-dq" aria-describedby="dq-d"><span class="confirm__ic font-display" aria-hidden="true">!</span><div><h3 id="h-dq" class="h-card">Arrêter la liste des qualifiés ?</h3><p id="dq-d" class="muted">16 joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». <b>La correction d’un score de poule ne sera plus possible.</b></p><!-- POINT OUVERT (team-lead) : réversibilité de la liste arrêtée --><div class="open-pt"><p class="open-pt__tag">À confirmer · réversibilité de la liste arrêtée</p><p class="muted">Aucune annulation n’est prévue : le dialogue ne promet pas de retour arrière.</p></div></div><div class="confirm__cta"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="button">Arrêter la liste</button></div></section>
+</section>
+<!-- États de la page (maquette) -->
+<section class="mock-states" aria-labelledby="h-st"><h2 id="h-st" class="eyebrow">États</h2>
+  <div class="card q-tie"><p class="eyebrow">Meilleur 3<sup>e</sup> · 4 joueurs pour 2 places</p><p class="q-tie__st"><span class="chip chip--ok">Départage 1 validé : Lisa Masson qualifiée</span></p><p class="muted">Places restantes : 1. Restent en lice : Paul Girard, Eva Michel, Théo Gauthier.</p><button class="btn btn--primary btn--sm" type="button">Créer le départage suivant</button></div>
+  <!-- origam-alert status="info" density="compact" rounded="lg" --><div class="alert alert--info alert--block alert--compact" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__body">Aucune égalité à départager. Vous pouvez passer aux paramètres.</span></span></div>
+  <!-- origam-alert status="warning" rounded="lg" --><div class="alert alert--warning alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg><span><span class="alert__title">Le tour suivant ne pourra pas être tiré.</span><span class="alert__body">Le nombre de qualifiés (18) n’est pas une puissance de 2. Contrôle non bloquant tant qu’il n’est pas confirmé.</span></span></div>
+  <!-- origam-alert status="info" rounded="lg" --><div class="alert alert--info alert--block" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Liste arrêtée</span><span class="alert__body">Arrêtée le 14/06 à 23:40 : 2 premiers par poule, 0 meilleur 3<sup>e</sup>, sans barrages. Prochaine étape : <a href="admin-tirage-tour.html">tirage du tour</a>.</span></span></div>
+  <!-- origam-alert status="error" rounded="lg" --><div class="alert alert--error alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__title">Les données de l’édition ont changé depuis votre dernière lecture.</span><span class="alert__body">Rechargez pour voir l’état actuel avant d’arrêter la liste. <button class="btn btn--outlined btn--sm" type="button">Recharger</button></span></span></div>
+  <!-- origam-alert status="error" rounded="lg" --><div class="alert alert--error alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__title">La liste ne peut pas être arrêtée.</span><span class="alert__body">Une égalité reste à départager.</span></span></div>
+  <!-- origam-alert status="info" density="compact" rounded="lg" --><div class="alert alert--info alert--block alert--compact" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Édition clôturée</span><span class="alert__body">Ses résultats et ses points sont figés : elle ne se modifie plus.</span></span></div>
+</section>
+</main>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+</body>
+</html>
