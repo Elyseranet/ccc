@@ -230,6 +230,8 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-16](F-16.md) | Face-à-face : afficher G9 (résultats inconnus de la paire) et G10 (« Poule n ») après B-17 | `face-a-face.html` | B-17 (mergé 640842b) | **Fermé** (2026-10-28) : mergé @ `e61fe43` | à créer |
 | [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | **Fermé** (2026-11-02) : mergé @ `819bc3f` | worktree de dev-f06 |
 | [F-17](F-17.md) | Titre des `origam-alert` à la taille du texte et en gras partout (défaut de thème, AsyncState compris) | `admin-participants.html` (e27446e) | F-09 | À faire, décision prise (24cd3d3) : défaut de thème ; après le merge de F-09 ; titre de l'état d'erreur 31 → 16 px (F-01, F-03, F-04, F-05) | à créer |
+| [F-20](F-20.md) | Composant partagé de puces de filtre (doublon EditionMatches / MatchQueueFilters) | — | F-08 | À faire (2026-11-05) | à créer |
+| [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | À faire (2026-11-05) | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
 | [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | À faire |
 
