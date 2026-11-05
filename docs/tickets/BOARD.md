@@ -125,6 +125,10 @@ Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier u
 
 Tests d'API sensibles à la charge, ralentissement par compte SEC-A2 (`auth.test.ts`, 145 s et 553 s sous charge) : [T-QA-07](T-QA-07.md), **À faire**.
 
+Tests `tests/nuxt/front` en délai dépassé (5 s) sous forte charge (`admin-more`, `players`, load 29 à 35) : [T-QA-08](T-QA-08.md), **À faire**.
+
+Liste admin des éditions avec compteur d'inscrits en direct, pour F-13 (décision utilisateur 2026-11-05) : [B-20](B-20.md), **À faire**.
+
 Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1) : [T-SEC-17](T-SEC-17.md), **À faire**.
 
 Purge planifiée des sessions expirées (durée maximale garantie pour la politique de confidentialité, F-19 ; décision utilisateur 2026-11-05) : [T-SEC-20](T-SEC-20.md), **À faire**.
