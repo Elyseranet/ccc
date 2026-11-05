@@ -51,3 +51,13 @@ La saisie et la validation passent par `PUT /matchs/{id}/score` et `POST /matchs
 ## Départage entre poules : paramètres
 
 `ICreateTiebreakRequest.parameters` (`{ topPerPool, bestNextCount }`) est facultatif : il n'est utile que pour un départage `BOUNDARY` tant que la liste n'est pas figée, car les égalités entre poules dépendent de n et m. Sans lui, seules les égalités de poule peuvent être départagées. Pour une égalité de poule, il est inutile.
+
+## Tour choisi par l'administrateur (decisions 673e5b4b)
+
+`IRoundDrawPreview` porte `allowedRoundKinds`, les tours que l'administrateur peut tirer ; `roundKind` n'est renseigné que s'il est **déduit**.
+
+- Vivier de 2, 4, 8 ou 16 joueurs, ou premier tour d'une qualification `withPlayoff` : `roundKind` est déduit (2 la finale, 4 les demies, 8 les quarts, 16 les huitièmes ; PLAYOFF pour les barrages), `allowedRoundKinds` vaut `[roundKind]` et `POST …/tirages/tour` peut omettre le champ. Fourni, il doit valoir la valeur déduite, sinon 409.
+- Autre taille de vivier : `roundKind` vaut `null` dans l'aperçu avec `blockedBy` null, `allowedRoundKinds` liste les tours possibles, et `POST …/tirages/tour` **exige** `roundKind` (400 `VALIDATION_FAILED` avec `details` s'il manque ; 409 `DRAW_INCONSISTENT` s'il n'est pas permis).
+- Ordre : un tour ne peut pas précéder un tour déjà tiré (`KNOCKOUT_ROUND_ORDER`) ; le PLAYOFF n'est possible que tant qu'aucun tour de phase finale n'a été tiré.
+- Contrôles au tirage et à la validation : chaque affiche a deux côtés, tout le vivier du tour est tiré sans doublon, un vivier impair est refusé (sauf barrages, où seuls les barragistes sont tirés, jamais un premier de poule, RG14).
+- Gardes de taille : un tirage `ROUND_OF_16` porte exactement 16 joueurs (demande de l'utilisateur) ; un tirage `FINAL` exactement 2, **contrainte d'intégrité technique et non règle produit** : sans elle, il n'y aurait pas un seul champion (`finalStage: CHAMPION`). Aucune autre contrainte de taille : on n'invente pas de règle de barrage.

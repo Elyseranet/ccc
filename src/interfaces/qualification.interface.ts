@@ -77,10 +77,16 @@ export interface IQualificationResult {
 /**
  * Prochain tirage de tour (`GET /admin/editions/{id}/tirages/tour`), sans rien écrire : même déduction que
  * `POST /editions/{id}/tirages/tour` (une seule fonction côté serveur). `candidates` : le vivier à tirer (participations
- * QUALIFIED). `roundKind` : le tour qui serait tiré (null si aucun). `blockedBy` : ce qui empêche le tirage, sinon null.
+ * QUALIFIED). `blockedBy` : ce qui empêche le tirage, sinon null.
+ *
+ * `roundKind` : le tour qui serait tiré, DÉDUIT (vivier de 2, 4, 8 ou 16 joueurs, ou barrages) ; null quand le choix revient à
+ * l'admin (autre taille de vivier, decisions 673e5b4b) ou quand rien n'est tirable. `allowedRoundKinds` : les tours que
+ * l'admin peut tirer, dans l'ordre de jeu ; `[roundKind]` quand il est déduit, `[]` quand rien n'est tirable. Quand `roundKind`
+ * est null et que `allowedRoundKinds` n'est pas vide, `ICreateRoundDrawRequest.roundKind` est OBLIGATOIRE.
  */
 export interface IRoundDrawPreview {
   roundKind: ROUND_KIND | null
+  allowedRoundKinds: ROUND_KIND[]
   candidates: IQualificationMember[]
   blockedBy: TRoundDrawBlock | null
 }
@@ -96,9 +102,11 @@ export interface ICreateTiebreakRequest {
 }
 
 /**
- * Corps de `POST /editions/{id}/tirages/tour`. `roundKind` est déduit de la taille du vivier quand il est omis
- * (2 FINAL, 4 SEMI, 8 QUARTER, 16 ROUND_OF_16), ou PLAYOFF tant qu'aucun tour de phase finale n'est tiré et que la
- * qualification a `withPlayoff`. S'il est fourni, il doit être celui-là.
+ * Corps de `POST /editions/{id}/tirages/tour`. Vivier de 2, 4, 8 ou 16 joueurs (ou premier tour d'une qualification
+ * `withPlayoff`, donc PLAYOFF) : `roundKind` est déduit, il peut être omis, et s'il est fourni il doit valoir la valeur déduite.
+ * Autre taille : `roundKind` est OBLIGATOIRE (400 `VALIDATION_FAILED` s'il manque) et doit figurer dans
+ * `IRoundDrawPreview.allowedRoundKinds` (decisions 673e5b4b). Gardes : un tirage ROUND_OF_16 porte exactement 16 joueurs, un tirage
+ * FINAL exactement 2 (contrainte d'intégrité : sinon pas un seul champion), sinon 409.
  */
 export interface ICreateRoundDrawRequest {
   roundKind?: ROUND_KIND
