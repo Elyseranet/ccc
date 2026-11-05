@@ -84,7 +84,7 @@ test.describe('admin éditions : écritures sur une édition créée par le test
 
     const snackbar = page.getByTestId('edition-form-saved')
     await expect(snackbar).toContainText('Modifications enregistrées')
-    await expect(snackbar).toHaveAttribute('role', 'status')
+    await expect(snackbar.locator('[role="status"]').first()).toBeVisible()
     await expect(snackbar).toBeHidden({ timeout: 8000 })
     const saved = (await editions(page)).find(row => row.id === edition.id)
     expect(saved?.name).toBe('Nom modifié par le test')
@@ -176,8 +176,8 @@ test.describe('admin compétiteurs : identité (If-Match) et photo sur un profil
     expect((await competitor(page, profile.id)).nickname).toBe('Avec photo')
 
     await page.getByTestId('competitor-photo-remove').click()
+    await expect.poll(async () => (await competitor(page, profile.id)).avatarUrl).toBeNull()
     await expect(page.getByTestId('competitor-photo-remove')).toBeDisabled()
-    expect((await competitor(page, profile.id)).avatarUrl).toBeNull()
   })
 
   test('fichier d’un format refusé (415) : message dans l’alerte de la photo, rien n’est posé', async ({ page, context }) => {
