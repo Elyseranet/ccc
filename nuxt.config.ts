@@ -1,6 +1,6 @@
 import { CCC_HH_THEMES } from './src/themes/ccc.theme'
 import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
-import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
+import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_INDEXABLE, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
 
@@ -124,7 +124,9 @@ export default defineNuxtConfig({
     },
     public: {
       // URL publique du site (NUXT_PUBLIC_SITE_URL) : base des liens d'invitation, jamais déduite de l'en-tête Host.
-      siteUrl: DEFAULT_SITE_URL
+      siteUrl: DEFAULT_SITE_URL,
+      // Indexation par les moteurs (NUXT_PUBLIC_SITE_INDEXABLE, T-SEO-01) : faux par défaut, seule la production la pose à `true`.
+      siteIndexable: DEFAULT_SITE_INDEXABLE
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
     auth: {
