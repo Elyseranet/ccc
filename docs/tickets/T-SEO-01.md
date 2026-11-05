@@ -20,3 +20,11 @@
 - [ ] La dev renvoie `Disallow: /` et `X-Robots-Tag: noindex` (curl).
 - [ ] Les pages privées portent `noindex`. Chaque page publique a un titre et une description uniques.
 - [ ] typecheck, `test:run`, Playwright, release, `/security-review` verts.
+
+## Avancement (2026-11-05)
+
+- **Helper mergé** @ `b69089e` : `NUXT_PUBLIC_SITE_INDEXABLE`, `runtimeConfig.public.siteIndexable` à false par défaut, et `isSiteIndexable` en échec fermé. Vérifications : typecheck vert ; test:run 719 passés, 0 échec ; gitleaks propre. Playwright dérogé par décision de l'utilisateur (rien n'appelle encore ce code).
+- **Reste** :
+  - les routes `robots.txt` et `sitemap.xml`, le `X-Robots-Tag` et la suppression de `public/robots.txt` (accordée), côté back ;
+  - le front de dev-f05 (`useSeo`, noindex des pages privées), à rebaser sur ce merge.
+  Le ticket reste ouvert.
