@@ -2,6 +2,8 @@ export const LOG_EVENT = {
   REQUEST_COMPLETED: 'request_completed',
   UNHANDLED_ERROR: 'unhandled_error',
   DATABASE_INIT_FAILED: 'database_init_failed',
+  DATABASE_TIMEOUT: 'database_timeout',
+  DATABASE_TIMEOUT_CONFIG_INVALID: 'database_timeout_config_invalid',
   HEALTH_CHECK_FAILED: 'health_check_failed',
   COMPETITORS_SEARCH: 'competitors_search',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
