@@ -392,9 +392,9 @@
 .legal__table .table td, .legal__table .table th { white-space: normal; }
 .legal__table caption { font-weight: var(--origam-font__weight---regular); } /* origam-table : légende en graisse normale, non thémable (Origam #1283) */
 .legal__aside-note { color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); }
-.legal-links { display: grid; gap: var(--origam-space---3); }
+.legal-links { display: grid; gap: var(--origam-space---3); border-color: var(--origam-color__border---subtle); } /* origam-card : bordure border.subtle */
 .legal-links ul { display: flex; flex-wrap: wrap; gap: var(--origam-space---2); }
-.legal-links a { display: inline-flex; align-items: center; min-height: var(--origam-space---11); padding-inline: var(--origam-space---4); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---full); color: var(--origam-color__text---primary); font-weight: var(--origam-font__weight---semibold); text-decoration: none; }
+.legal-links a { display: inline-flex; align-items: center; min-height: var(--origam-space---11); padding-inline: var(--origam-space---5); border: 2px solid currentColor; border-radius: var(--origam-radius---full); color: white; font-weight: var(--origam-font__weight---semibold); text-decoration: none; } /* rendu origam-btn outlined mesuré par dev-f19 : bordure 2 px, marge 20 px, texte blanc imposé en ligne par la directive v-contrast d’Origam (pas de jeton) */
 .legal-links a:hover { background: var(--origam-color__action--ghost---bgHover); }
 @media (max-width: 1000px) {
   .legal { grid-template-columns: minmax(0, 1fr); gap: var(--origam-space---6); }
