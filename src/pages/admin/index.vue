@@ -124,7 +124,7 @@ import { recordedQueueLink } from '~/utils/admin-dashboard.util'
  *
  * @description
  * Tableau de bord admin (`/admin`) : centre de contrôle, éléments à traiter et activité récente de l'édition active.
- * Tout passe par `useAdminDashboard` et `useAdminActivity` ; la page n'appelle ni service ni `$fetch`.
+ * Tout passe par `useAdminDashboard` et `useAdminActivity` ; la page n'appelle aucune couche HTTP.
  ********************************************************/
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { t } = useT()
