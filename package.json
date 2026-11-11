@@ -23,6 +23,7 @@
     "user:create-admin": "npm run db:typeorm:build && node .typeorm-dist/src/utils/create-admin-cli.util.js",
     "db:seed:archives": "npm run db:typeorm:build && node .typeorm-dist/src/utils/seed-archives-cli.util.js",
     "typecheck": "node scripts/typecheck.mjs",
+    "docs:tokens": "node scripts/gen-mockup-tokens.mjs",
     "test:front": "node scripts/test-run.mjs --project front",
     "test:release": "RELEASE_BUILD=true node scripts/test-run.mjs --project front tests/nuxt/front/api-routes.release.test.ts",
     "test:release:e2e": "playwright test --config playwright.release.config.ts",

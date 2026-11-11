@@ -289,3 +289,14 @@
 .odlg__f .btn { min-height: var(--origam-space---11); padding-inline: var(--origam-space---5); }
 .odlg__f .btn--outlined { border: 2px solid var(--origam-color__border---strong); box-shadow: none; color: white; } /* origam-btn outlined : bordure réelle de 2 px (pas une ombre intérieure), texte blanc imposé par v-contrast */
 .odlg__f .btn--danger { box-shadow: var(--origam-shadow---lg); } /* recette CTA : elevation lg */
+.r-round { margin-bottom: var(--origam-space---3); }
+/* origam-radio-group (rendu 2.37.4) : boutons radio en ligne, rond 16 px à 12 px du bord dans une cible de 40 px, libellé à 40 px en text.secondary ; fieldset/legend natifs autour */
+.rg { display: grid; gap: var(--origam-space---2); min-width: 0; margin: 0; }
+.rg__l { float: left; width: 100%; padding: 0; margin-bottom: var(--origam-space---2); font-weight: var(--origam-font__weight---bold); } /* légende à l’intérieur de la carte */
+.rg__opts { clear: both; }
+.rg__opts { display: flex; flex-wrap: wrap; }
+.rg__opt { display: inline-flex; align-items: center; min-height: var(--origam-space---14); padding-inline-end: var(--origam-space---4); color: var(--origam-color__text---secondary); cursor: pointer; }
+.rg__opt input { appearance: none; flex: none; width: var(--origam-space---10); height: var(--origam-space---10); margin: 0; background: radial-gradient(circle, transparent 5px, currentColor 5px 7px, transparent 7px); color: var(--origam-color__text---primary); cursor: pointer; }
+.rg__opt input:checked { background: radial-gradient(circle, currentColor 3.5px, transparent 3.5px 5px, currentColor 5px 7px, transparent 7px); color: var(--origam-color__action--secondary---bg); }
+.rg__opt input:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: -4px; border-radius: var(--origam-radius---full); }
+.rg[disabled] .rg__opt { opacity: .5; cursor: default; }

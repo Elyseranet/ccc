@@ -1,13 +1,12 @@
 import type { IOrigamTheme } from 'origam/interfaces'
 
 /*********************************************************
- * CCC — thème « Happy Hour » (direction retenue le 2026-10-20)
+ * CCC — thème « Au bord de la mer » (décision utilisateur 2026-11-08, remplace « Happy Hour »)
  *
  * @description
- * La soirée au bar : nuit violette, néon rose, ambre de la bière, crème de la mousse.
- * Mode SOMBRE uniquement. Un mode clair n'a pas été retenu : sur fond crème, le néon
- * rose et l'ambre perdent leur rôle de lumière et l'univers « soirée » disparaît.
- * Voir notes dans mapping.md.
+ * L'affiche du festival de bières de Cherbourg : bleu pétrole profond du fond, or chaud
+ * des lettres, crème de la mousse. Mode SOMBRE uniquement : même raison que le HH, l'or
+ * et la crème perdraient leur rôle de lumière en mode clair. Voir notes dans mapping.md.
  *
  * @description
  * Découpage conforme à `activeDefaultsFor` (origam.ts) :
@@ -44,16 +43,24 @@ import type { IOrigamTheme } from 'origam/interfaces'
 
 export const CCC_HH_BASE: IOrigamTheme = {
   name: 'ccc',
-  label: 'CCC · Happy Hour',
-  description: 'Nuit violette, néon rose, ambre bière et mousse.',
-  swatch: 'linear-gradient(135deg, #160b2e 45%, #ff3d9a 45% 70%, #ffb21a 70%)',
+  label: 'CCC · Au bord de la mer',
+  description: 'Bleu pétrole, or chaud et crème de la mousse.',
+  swatch: 'linear-gradient(135deg, #112631 45%, #c17825 45% 70%, #f3eedd 70%)',
 
   // ── 1) PROPS D'ABORD ────────────────────────────────────────────
   components: {
     // Contournement Origam #1227 : `components.global.density` (valeur par défaut du DS) retiré ; il déclenchait un avertissement `density` sur chaque composant.
 
-    // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (ambre + ombre néon via elevation).
-    'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold', letterSpacing: 'normal', lineHeight: 'normal' },
+    // Actions : défaut texte neutre ; CTA = `variant="flat" color="primary"` (or + extrusion ambre via elevation).
+    'origam-btn': {
+      variant: 'text',
+      size: 'large',
+      rounded: 'full',
+      elevation: 'none',
+      fontWeight: 'bold',
+      letterSpacing: 'normal',
+      lineHeight: 'normal'
+    },
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
@@ -65,19 +72,53 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-bottom-nav': { elevation: 'lg', grow: true },
 
     // Données
-    'origam-chip': { size: 'small', pill: true, border: false, fontWeight: 'bold', color: 'var(--origam-color__text---secondary)', bgColor: 'var(--origam-color__surface---overlay)' },
+    'origam-chip': {
+      size: 'small',
+      pill: true,
+      border: false,
+      fontWeight: 'bold',
+      color: 'var(--origam-color__text---secondary)',
+      bgColor: 'var(--origam-color__surface---overlay)'
+    },
     'origam-chip-group': { column: false },
     'origam-badge': { rounded: 'full', inline: true },
     'origam-tabs': { variant: 'pills', rounded: 'full', density: 'default', color: 'secondary' },
     'origam-tab': { fontWeight: 'bold' },
-    'origam-table': { border: true, borderColor: 'var(--origam-color__border---default)', rounded: 'lg', density: 'default', hover: true, elevation: 'none' },
-    'origam-data-table': { density: 'default', hover: true, rounded: 'lg', border: true, borderColor: 'var(--origam-color__border---default)' },
+    'origam-table': {
+      border: true,
+      borderColor: 'var(--origam-color__border---default)',
+      rounded: 'lg',
+      density: 'default',
+      hover: true,
+      elevation: 'none'
+    },
+    'origam-data-table': {
+      density: 'default',
+      hover: true,
+      rounded: 'lg',
+      border: true,
+      borderColor: 'var(--origam-color__border---default)'
+    },
     'origam-list': { density: 'comfortable', rounded: 'lg', slim: false },
     'origam-list-item': { rounded: 'lg' },
     'origam-data-list': { density: 'compact', rounded: 'lg', border: true },
-    'origam-bracket': { variant: 'single-elimination', color: 'primary', density: 'compact', showScores: true, showSeed: false, showRoundTitles: true, elevation: 'md' },
+    'origam-bracket': {
+      variant: 'single-elimination',
+      color: 'primary',
+      density: 'compact',
+      showScores: true,
+      showSeed: false,
+      showRoundTitles: true,
+      elevation: 'md'
+    },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
-    'origam-pagination': { density: 'default', size: 'large', color: 'primary', bgColor: 'primary', showFirstLastPage: false },
+    'origam-pagination': {
+      density: 'default',
+      size: 'large',
+      color: 'primary',
+      bgColor: 'primary',
+      showFirstLastPage: false
+    },
     'origam-breadcrumb': { density: 'compact', divider: '›' },
     'origam-avatar': { rounded: 'full', size: 'default' },
     'origam-empty-state': { size: 'lg', align: 'center' },
@@ -172,7 +213,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Pastilles (F-00q) : la maquette donne 4 px / 12 px de padding et une interligne de 1,3 (snug) pour du texte xs, soit 24,64 px de haut ; Origam fixe line-height: 1 et mesure la hauteur en content-box (`size` small : 24 px, padding 0 10 px).
     '--origam-chip---height-sm': 'calc(var(--origam-font__size---xs) * var(--origam-font__lineHeight---snug) + 2 * var(--origam-space---1))',
     '--origam-chip---padding-sm': 'var(--origam-space---3)',
-    // Pagination (F-04-PAG) : page courante en ambre plein, les autres en texte secondaire.
+    // Pagination (F-04-PAG) : page courante en or plein, les autres en texte secondaire.
     '--origam-pagination--primary---background-color': 'transparent',
     '--origam-pagination--primary---color': 'var(--origam-color__text---secondary)',
     '--origam-pagination---background-color-hover': 'var(--origam-color__action--ghost---bgHover)',
@@ -194,8 +235,15 @@ export const CCC_HH_BASE: IOrigamTheme = {
       // Échelle modulaire 1.25 (tierce majeure) à partir de 16 px. xs = sm : plancher de lisibilité (12,8 px),
       // pour qu'aucun palier ne soit à moins de 1.25 du suivant.
       size: {
-        xs: '0.8rem', sm: '0.8rem', md: '1rem', lg: '1.25rem', xl: '1.5625rem',
-        '2xl': '1.953rem', '3xl': 'clamp(1.953rem, 3.2vw, 2.441rem)', '4xl': 'clamp(2.441rem, 5.4vw, 3.815rem)', '5xl': 'clamp(3.815rem, 9vw, 7.451rem)'
+        xs: '0.8rem',
+        sm: '0.8rem',
+        md: '1rem',
+        lg: '1.25rem',
+        xl: '1.5625rem',
+        '2xl': '1.953rem',
+        '3xl': 'clamp(1.953rem, 3.2vw, 2.441rem)',
+        '4xl': 'clamp(2.441rem, 5.4vw, 3.815rem)',
+        '5xl': 'clamp(3.815rem, 9vw, 7.451rem)'
       },
       weight: { regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800 },
       lineHeight: { none: 0.88, tight: 1.08, snug: 1.3, normal: 1.55, relaxed: 1.7, loose: 2 },
@@ -205,7 +253,13 @@ export const CCC_HH_BASE: IOrigamTheme = {
     motion: {
       // Courbes exponentielles uniquement, aucun rebond ni élastique (aucune valeur > 1).
       duration: { instant: '0ms', fast: '120ms', normal: '200ms', medium: '320ms', slow: '600ms', xslow: '900ms' },
-      easing: { standard: 'cubic-bezier(0.25, 1, 0.5, 1)' /* ease-out-quart */, decelerate: 'cubic-bezier(0.16, 1, 0.3, 1)' /* ease-out-expo */, accelerate: 'cubic-bezier(0.5, 0, 0.75, 0)' /* ease-in-quart */, sharp: 'cubic-bezier(0.83, 0, 0.17, 1)' /* ease-in-out-quint */, linear: 'linear' }
+      easing: {
+        standard: 'cubic-bezier(0.25, 1, 0.5, 1)' /* ease-out-quart */,
+        decelerate: 'cubic-bezier(0.16, 1, 0.3, 1)' /* ease-out-expo */,
+        accelerate: 'cubic-bezier(0.5, 0, 0.75, 0)' /* ease-in-quart */,
+        sharp: 'cubic-bezier(0.83, 0, 0.17, 1)' /* ease-in-out-quint */,
+        linear: 'linear'
+      }
     }
   }
 }
@@ -215,46 +269,108 @@ export const CCC_HH_DARK: IOrigamTheme = {
   mode: 'dark',
   vars: {
     color: {
-      surface: { default: '#160b2e', raised: '#22113f', overlay: '#2c1752', sunken: '#0e0620', disabled: '#2c1752' },
+      surface: { default: '#112631', raised: '#1c3745', overlay: '#284758', sunken: '#0a1b24', disabled: '#2a404b' },
       text: {
-        primary: '#fff4dc',   // mousse — 15.76:1 sur raised
-        secondary: '#c9b8e8', // lilas — 8.51:1 sur overlay
-        tertiary: '#a99ad0',  // 6.74:1 sur raised
-        disabled: '#6d5f92',
-        inverse: '#160b2e',
-        onColor: '#160b2e',
-        ink: '#fff4dc'
+        primary: '#f3eedd',   // mousse — 10.75:1 sur raised
+        secondary: '#a9c3d1', // mer claire — 5.35:1 sur overlay
+        tertiary: '#98b4c3',  // 5.74:1 sur raised
+        disabled: '#537c93',
+        inverse: '#0e242f',
+        onColor: '#0e242f',
+        ink: '#f3eedd'
       },
       action: {
-        // Ambre = action. Encre de nuit dessus : 10.38:1.
-        primary: { bg: '#ffb21a', bgHover: '#ffc24a', bgActive: '#ffb21a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ffb21a' },
-        // Néon = accent éditorial (chips, onglet actif, extrusion des titres). 5.69:1 avec la nuit.
-        secondary: { bg: '#ff3d9a', bgHover: '#ff5aa8', bgActive: '#ff3d9a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 61, 154, 0.16)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ff5aa8' },
-        ghost: { bg: 'rgba(255, 244, 220, 0)', bgHover: 'rgba(255, 244, 220, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#fff4dc', fgDisabled: '#6d5f92' }
+        // Or = action. Encre pétrole dessus : 7.87:1.
+        primary: {
+          bg: '#e2ac65',
+          bgHover: '#e7b16a',
+          bgActive: '#e2ac65',
+          bgDisabled: '#284758',
+          bgSubtle: 'rgba(226, 172, 101, 0.14)',
+          fg: '#0e242f',
+          fgDisabled: '#537c93',
+          fgSubtle: '#e2ac65'
+        },
+        // Crème = accent éditorial (chips, onglet actif). Encre dessus : 13.78:1.
+        secondary: {
+          bg: '#f3eedd',
+          bgHover: '#f8f6ec',
+          bgActive: '#f3eedd',
+          bgDisabled: '#284758',
+          bgSubtle: 'rgba(243, 238, 221, 0.16)',
+          fg: '#0e242f',
+          fgDisabled: '#537c93',
+          fgSubtle: '#f3eedd'
+        },
+        ghost: {
+          bg: 'rgba(243, 238, 221, 0)',
+          bgHover: 'rgba(243, 238, 221, 0.08)',
+          bgDisabled: 'rgba(0, 0, 0, 0)',
+          fg: '#f3eedd',
+          fgDisabled: '#537c93'
+        }
       },
-      border: { default: 'rgba(201, 184, 232, 0.18)', subtle: 'rgba(201, 184, 232, 0.09)', strong: 'rgba(201, 184, 232, 0.38)', focus: '#3ee8ff' },
+      border: {
+        // Cible 3:1 (WCAG 1.4.11) : 3.97:1 sur sunken, 3.17:1 sur raised — corrige le M1 de T-A11Y-01 (le HH ne faisait 1,3–1,4:1).
+        default: 'rgba(131, 166, 185, 0.7)',
+        subtle: 'rgba(131, 166, 185, 0.3)',
+        strong: 'rgba(131, 166, 185, 1)',
+        focus: '#3ec8da'
+      },
       // `bgHover` et `bgActive` = `bg` : `origam-alert` est « survolée » (`hover` vrai par défaut) et « active » (sa visibilité sert d'état actif) sans aucune
-      // interaction ; le fond au repos est donc celui de ces jetons, qui retombaient sur un `color-mix` (#cc5667 pour `danger`) ou sur un noir à 30 %
-      // avec un texte basculé en blanc. Défaut Origam : docs/tickets/origam/alert-etat-survol-au-repos.md (Elyseranet/origam#1307).
+      // interaction ; le fond au repos est donc celui de ces jetons, qui retombaient sur un `color-mix` du jeton ou sur un noir à 30 % avec un texte
+      // basculé en blanc. Défaut Origam : docs/tickets/origam/alert-etat-survol-au-repos.md (Elyseranet/origam#1307).
       feedback: {
-        success: { bg: '#4ff0a8', bgHover: '#4ff0a8', bgActive: '#4ff0a8', bgSubtle: 'rgba(79, 240, 168, 0.14)', fg: '#160b2e', fgSubtle: '#4ff0a8', border: '#4ff0a8' },
-        warning: { bg: '#ffb21a', bgHover: '#ffb21a', bgActive: '#ffb21a', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgSubtle: '#ffb21a', border: '#ffb21a' },
-        danger: { bg: '#ff6b81', bgHover: '#ff6b81', bgActive: '#ff6b81', bgSubtle: 'rgba(255, 107, 129, 0.14)', fg: '#160b2e', fgSubtle: '#ff6b81', border: '#ff6b81' },
-        info: { bg: '#7fd4ff', bgHover: '#7fd4ff', bgActive: '#7fd4ff', bgSubtle: 'rgba(127, 212, 255, 0.14)', fg: '#160b2e', fgSubtle: '#7fd4ff', border: '#7fd4ff' }
+        success: {
+          bg: '#41c89b',
+          bgHover: '#41c89b',
+          bgActive: '#41c89b',
+          bgSubtle: 'rgba(65, 200, 155, 0.14)',
+          fg: '#0e242f',
+          fgSubtle: '#41c89b',
+          border: '#41c89b'
+        },
+        warning: {
+          bg: '#e2ac65',
+          bgHover: '#e2ac65',
+          bgActive: '#e2ac65',
+          bgSubtle: 'rgba(226, 172, 101, 0.14)',
+          fg: '#0e242f',
+          fgSubtle: '#e2ac65',
+          border: '#e2ac65'
+        },
+        danger: {
+          bg: '#e78474',
+          bgHover: '#e78474',
+          bgActive: '#e78474',
+          bgSubtle: 'rgba(231, 132, 116, 0.14)',
+          fg: '#0e242f',
+          fgSubtle: '#e78474',
+          border: '#e78474'
+        },
+        info: {
+          bg: '#62b4da',
+          bgHover: '#62b4da',
+          bgActive: '#62b4da',
+          bgSubtle: 'rgba(98, 180, 218, 0.14)',
+          fg: '#0e242f',
+          fgSubtle: '#62b4da',
+          border: '#62b4da'
+        }
       },
-      // Couleurs d'univers (décor : capsules, pinte, glaçon). Pas de rôle sémantique dans le DS.
-      bar: { foam: '#fff4dc', amber: '#ffb21a', neon: '#ff3d9a', ice: '#3ee8ff', night: '#160b2e', glow: '#3a1f66' }
+      // Couleurs d'univers (décor : pinte, halos, or des titres). Pas de rôle sémantique dans le DS.
+      bar: { foam: '#f3eedd', amber: '#e2ac65', neon: '#c17825', ice: '#92c5dd', night: '#0b1e28', glow: '#2a576f' }
     },
     shadow: {
       none: 'none',
-      xs: '0 1px 0 rgba(255, 244, 220, 0.06) inset',
-      sm: '0 1px 0 rgba(255, 244, 220, 0.06) inset, 0 8px 20px -10px rgba(5, 2, 12, 0.8)',
-      md: '0 1px 0 rgba(255, 244, 220, 0.08) inset, 0 24px 48px -24px rgba(5, 2, 12, 0.9)',
-      // Ombre « néon » décalée : l'élévation des actions.
-      lg: '0 6px 0 #ff3d9a',
-      xl: '0 10px 0 #ff3d9a, 0 24px 48px -12px rgba(255, 61, 154, 0.45)'
+      xs: '0 1px 0 rgba(243, 238, 221, 0.06) inset',
+      sm: '0 1px 0 rgba(243, 238, 221, 0.06) inset, 0 8px 20px -10px rgba(2, 10, 14, 0.8)',
+      md: '0 1px 0 rgba(243, 238, 221, 0.08) inset, 0 24px 48px -24px rgba(2, 10, 14, 0.9)',
+      // Extrusion ambre décalée : l'élévation des actions (lettrage rétro).
+      lg: '0 6px 0 #855123',
+      xl: '0 10px 0 #855123, 0 24px 48px -12px rgba(226, 172, 101, 0.45)'
     }
   }
 }
 
-export const CCC_HH_THEMES: IOrigamTheme[] = [CCC_HH_BASE, CCC_HH_DARK]
+export const CCC_HH_THEMES: IOrigamTheme[] = [ CCC_HH_BASE, CCC_HH_DARK ]

@@ -56,7 +56,7 @@ import type { IGoldenRulesProps } from '~/interfaces/common-components.interface
  *
  * @description
  * Bandeau STATIQUE des huit règles d'or (RG25 à RG32) : grille 4 × 2 en bureau, défilement manuel à l'aimant sur mobile.
- * Aucun défilement automatique (décision utilisateur).
+ * Aucun défilement automatique (décision utilisateur). Sur mobile, le dernier item est aligné en fin de défilement (`end`) : sa position de départ dépasse la plage scrollable, et sans cet alignement la 8ᵉ règle resterait illisible.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IGoldenRulesProps>(), {
@@ -197,11 +197,19 @@ defineExpose({})
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .golden-rules__item {
     flex: 0 0 var(--golden-rules---item-width, 78%);
     scroll-snap-align: start;
+
+    &:last-child {
+      scroll-snap-align: end;
+    }
   }
 }
 </style>

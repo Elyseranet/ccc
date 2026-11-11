@@ -1,13 +1,12 @@
 import type { IOrigamTheme } from 'origam/interfaces'
 
 /*********************************************************
- * CCC — thème « Happy Hour » (direction retenue le 2026-10-20)
+ * CCC — thème « Au bord de la mer » (décision utilisateur 2026-11-08, remplace « Happy Hour »)
  *
  * @description
- * La soirée au bar : nuit violette, néon rose, ambre de la bière, crème de la mousse.
- * Mode SOMBRE uniquement. Un mode clair n'a pas été retenu : sur fond crème, le néon
- * rose et l'ambre perdent leur rôle de lumière et l'univers « soirée » disparaît.
- * Voir notes dans mapping.md.
+ * L'affiche du festival de bières de Cherbourg : bleu pétrole profond du fond, or chaud
+ * des lettres, crème de la mousse. Mode SOMBRE uniquement : même raison que le HH, l'or
+ * et la crème perdraient leur rôle de lumière en mode clair. Voir notes dans mapping.md.
  *
  * @description
  * Découpage conforme à `activeDefaultsFor` (origam.ts) :
@@ -23,16 +22,16 @@ import type { IOrigamTheme } from 'origam/interfaces'
 
 export const CCC_HH_BASE: IOrigamTheme = {
   name: 'ccc',
-  label: 'CCC · Happy Hour',
-  description: 'Nuit violette, néon rose, ambre bière et mousse.',
-  swatch: 'linear-gradient(135deg, #160b2e 45%, #ff3d9a 45% 70%, #ffb21a 70%)',
+  label: 'CCC · Au bord de la mer',
+  description: 'Bleu pétrole, or chaud et crème de la mousse.',
+  swatch: 'linear-gradient(135deg, #112631 45%, #c17825 45% 70%, #f3eedd 70%)',
 
   // ── 1) PROPS D'ABORD ────────────────────────────────────────────
   components: {
     global: { density: 'default' },
 
     // Actions : défaut texte neutre. CTA = `variant="flat" bg-color="primary" elevation="lg" :hover="{ elevation: 'xl' }"`, sans `color`
-    // (fond ambre action.primary.bg, texte action.primary.fg, ombre néon shadow.lg) ; `size="x-large"` pour les CTA de formulaire (48 px, F-00m).
+    // (fond or action.primary.bg, texte action.primary.fg, extrusion ambre shadow.lg) ; `size="x-large"` pour les CTA de formulaire (48 px, F-00m).
     'origam-btn': { variant: 'text', size: 'large', rounded: 'full', elevation: 'none', fontWeight: 'bold' },
     'origam-btn-group': { rounded: 'full' },
 
@@ -104,41 +103,43 @@ export const CCC_HH_DARK: IOrigamTheme = {
   mode: 'dark',
   vars: {
     color: {
-      surface: { default: '#160b2e', raised: '#22113f', overlay: '#2c1752', sunken: '#0e0620', disabled: '#2c1752' },
+      surface: { default: '#112631', raised: '#1c3745', overlay: '#284758', sunken: '#0a1b24', disabled: '#2a404b' },
       text: {
-        primary: '#fff4dc',   // mousse — 15.76:1 sur raised
-        secondary: '#c9b8e8', // lilas — 8.51:1 sur overlay
-        tertiary: '#a99ad0',  // 6.74:1 sur raised
-        disabled: '#6d5f92',
-        inverse: '#160b2e',
-        onColor: '#160b2e',
-        ink: '#fff4dc'
+        primary: '#f3eedd',   // mousse — 10.75:1 sur raised
+        secondary: '#a9c3d1', // mer claire — 5.35:1 sur overlay
+        tertiary: '#98b4c3',  // 5.74:1 sur raised
+        disabled: '#537c93',
+        inverse: '#0e242f',
+        onColor: '#0e242f',
+        ink: '#f3eedd'
       },
       action: {
-        // Ambre = action. Encre de nuit dessus : 10.38:1.
-        primary: { bg: '#ffb21a', bgHover: '#ffc24a', bgActive: '#ffb21a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ffb21a' },
-        // Néon = accent éditorial (chips, onglet actif, extrusion des titres). 5.69:1 avec la nuit.
-        secondary: { bg: '#ff3d9a', bgHover: '#ff5aa8', bgActive: '#ff3d9a', bgDisabled: '#2c1752', bgSubtle: 'rgba(255, 61, 154, 0.16)', fg: '#160b2e', fgDisabled: '#6d5f92', fgSubtle: '#ff5aa8' },
-        ghost: { bg: 'rgba(255, 244, 220, 0)', bgHover: 'rgba(255, 244, 220, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#fff4dc', fgDisabled: '#6d5f92' }
+        // Or = action. Encre pétrole dessus : 7.87:1.
+        primary: { bg: '#e2ac65', bgHover: '#e7b16a', bgActive: '#e2ac65', bgDisabled: '#284758', bgSubtle: 'rgba(226, 172, 101, 0.14)', fg: '#0e242f', fgDisabled: '#537c93', fgSubtle: '#e2ac65' },
+        // Crème = accent éditorial (chips, onglet actif). Encre dessus : 13.78:1.
+        secondary: { bg: '#f3eedd', bgHover: '#f8f6ec', bgActive: '#f3eedd', bgDisabled: '#284758', bgSubtle: 'rgba(243, 238, 221, 0.16)', fg: '#0e242f', fgDisabled: '#537c93', fgSubtle: '#f3eedd' },
+        ghost: { bg: 'rgba(243, 238, 221, 0)', bgHover: 'rgba(243, 238, 221, 0.08)', bgDisabled: 'rgba(0, 0, 0, 0)', fg: '#f3eedd', fgDisabled: '#537c93' }
       },
-      border: { default: 'rgba(201, 184, 232, 0.18)', subtle: 'rgba(201, 184, 232, 0.09)', strong: 'rgba(201, 184, 232, 0.38)', focus: '#3ee8ff' },
+      // Cible 3:1 (WCAG 1.4.11) : 3.97:1 sur sunken, 3.17:1 sur raised — corrige le M1 de T-A11Y-01 (le HH ne faisait 1,3–1,4:1).
+      border: { default: 'rgba(131, 166, 185, 0.7)', subtle: 'rgba(131, 166, 185, 0.3)', strong: 'rgba(131, 166, 185, 1)', focus: '#3ec8da' },
+      // `bgHover` et `bgActive` = `bg` : `origam-alert` est « survolée » et « active » au repos (Elyseranet/origam#1307).
       feedback: {
-        success: { bg: '#4ff0a8', bgSubtle: 'rgba(79, 240, 168, 0.14)', fg: '#160b2e', fgSubtle: '#4ff0a8', border: '#4ff0a8' },
-        warning: { bg: '#ffb21a', bgSubtle: 'rgba(255, 178, 26, 0.14)', fg: '#160b2e', fgSubtle: '#ffb21a', border: '#ffb21a' },
-        danger: { bg: '#ff6b81', bgSubtle: 'rgba(255, 107, 129, 0.14)', fg: '#160b2e', fgSubtle: '#ff6b81', border: '#ff6b81' },
-        info: { bg: '#7fd4ff', bgSubtle: 'rgba(127, 212, 255, 0.14)', fg: '#160b2e', fgSubtle: '#7fd4ff', border: '#7fd4ff' }
+        success: { bg: '#41c89b', bgHover: '#41c89b', bgActive: '#41c89b', bgSubtle: 'rgba(65, 200, 155, 0.14)', fg: '#0e242f', fgSubtle: '#41c89b', border: '#41c89b' },
+        warning: { bg: '#e2ac65', bgHover: '#e2ac65', bgActive: '#e2ac65', bgSubtle: 'rgba(226, 172, 101, 0.14)', fg: '#0e242f', fgSubtle: '#e2ac65', border: '#e2ac65' },
+        danger: { bg: '#e78474', bgHover: '#e78474', bgActive: '#e78474', bgSubtle: 'rgba(231, 132, 116, 0.14)', fg: '#0e242f', fgSubtle: '#e78474', border: '#e78474' },
+        info: { bg: '#62b4da', bgHover: '#62b4da', bgActive: '#62b4da', bgSubtle: 'rgba(98, 180, 218, 0.14)', fg: '#0e242f', fgSubtle: '#62b4da', border: '#62b4da' }
       },
-      // Couleurs d'univers (décor : capsules, pinte, glaçon). Pas de rôle sémantique dans le DS.
-      bar: { foam: '#fff4dc', amber: '#ffb21a', neon: '#ff3d9a', ice: '#3ee8ff', night: '#160b2e', glow: '#3a1f66' }
+      // Couleurs d'univers (décor : pinte, halos, or des titres). Pas de rôle sémantique dans le DS.
+      bar: { foam: '#f3eedd', amber: '#e2ac65', neon: '#c17825', ice: '#92c5dd', night: '#0b1e28', glow: '#2a576f' }
     },
     shadow: {
       none: 'none',
-      xs: '0 1px 0 rgba(255, 244, 220, 0.06) inset',
-      sm: '0 1px 0 rgba(255, 244, 220, 0.06) inset, 0 8px 20px -10px rgba(5, 2, 12, 0.8)',
-      md: '0 1px 0 rgba(255, 244, 220, 0.08) inset, 0 24px 48px -24px rgba(5, 2, 12, 0.9)',
-      // Ombre « néon » décalée : l'élévation des actions.
-      lg: '0 6px 0 #ff3d9a',
-      xl: '0 10px 0 #ff3d9a, 0 24px 48px -12px rgba(255, 61, 154, 0.45)'
+      xs: '0 1px 0 rgba(243, 238, 221, 0.06) inset',
+      sm: '0 1px 0 rgba(243, 238, 221, 0.06) inset, 0 8px 20px -10px rgba(2, 10, 14, 0.8)',
+      md: '0 1px 0 rgba(243, 238, 221, 0.08) inset, 0 24px 48px -24px rgba(2, 10, 14, 0.9)',
+      // Extrusion ambre décalée : l'élévation des actions (lettrage rétro).
+      lg: '0 6px 0 #855123',
+      xl: '0 10px 0 #855123, 0 24px 48px -12px rgba(226, 172, 101, 0.45)'
     }
   }
 }

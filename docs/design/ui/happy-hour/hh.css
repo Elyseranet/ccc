@@ -184,7 +184,9 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
   .section { padding-block: var(--origam-space---14) 0; }
   .card { padding: var(--origam-space---5); }
   .ticker__list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .ticker__list::-webkit-scrollbar { display: none; } /* parité avec scrollbar-width: none (Firefox) — pas de barre sous le bandeau sur iOS/Chrome */
   .ticker__list li { flex: 0 0 78%; scroll-snap-align: start; }
+  .ticker__list li:last-child { scroll-snap-align: end; } /* 8 × 78 % : le départ du dernier item dépasse la fin du défilement ; sans `end`, l'aimant (mandatory) rendrait la 8ᵉ règle illisible sur mobile */
 }
 
 /* ── Garde-fou motion ─────────────────────────────────────────────────── */
