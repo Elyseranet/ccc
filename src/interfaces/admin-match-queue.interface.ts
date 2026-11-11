@@ -13,6 +13,8 @@ export interface IMatchCard {
   /** N° du match `{édition}-{rang}` (RG24). */
   number: string
   poolRank: number | null
+  /** Match de départage (`purpose: TIEBREAK`) : pastille et eyebrow dédiés. */
+  isTiebreak: boolean
   round: ITranslatableText
   statusLabel: ITranslatableText
   family: EDITION_CHIP_FAMILY

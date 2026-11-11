@@ -1,5 +1,6 @@
 import { test } from '@playwright/test'
 import { signIn } from '../helpers/session'
+import { alignToPixel } from '../helpers/home-visual'
 import { alignMockupText, box, compare, MOCKUP_DIR, open } from '../visual.util'
 import type { IDataMasks } from '../visual.util'
 
@@ -61,6 +62,8 @@ for (const viewport of VIEWPORTS) {
         { mockup: '.duel__p label', app: '[role=dialog] .score-entry-form__name' },
         { mockup: '.sheet__meta', app: '[data-cy="admin-score-meta"]' }
       ])
+      await alignToPixel(mockup, '.sheet')
+      await alignToPixel(page, '.origam-overlay__content')
       const mockBox = await box(mockup, '.sheet')
       const appBox = await box(page, '[role=dialog]')
       await compare(page, mockup, 'matchs-saisie', viewport.name, mockBox, appBox, DIALOG_MASKS)

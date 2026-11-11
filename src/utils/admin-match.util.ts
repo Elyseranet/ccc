@@ -10,7 +10,7 @@ import { ROUND_KIND } from '../enums/round.enum.js'
 import type { TAdminMatchRound } from '../types/admin-match-round.type.js'
 import { ADMIN_MATCH_FILTER } from '../enums/admin-match-filter.enum.js'
 import { MATCH_ACTION } from '../enums/match-action.enum.js'
-import { MATCH_STATUS } from '../enums/match.enum.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
 import type { IMatchCard } from '../interfaces/admin-match-queue.interface.js'
 
@@ -108,6 +108,7 @@ export const toMatchCard = (match: IAdminMatch, editionCode: string, readonly: b
     match,
     number: `${editionCode}-${match.sequence}`,
     poolRank: match.poolRank,
+    isTiebreak: match.purpose === MATCH_PURPOSE.TIEBREAK,
     round: { key: round.key, fallback: round.label },
     statusLabel: view.label,
     family: view.family,

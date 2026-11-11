@@ -29,6 +29,7 @@
             :model-value="values[index]"
             :label="name"
             single-line
+            hide-details="auto"
             :error-messages="fieldMessages[index]"
             :autofocus="focusOnMount && index === 0"
             :disabled="busy"
@@ -36,7 +37,8 @@
             :maxlength="maxLength"
             autocomplete="off"
             rounded="lg"
-            class="score-entry-form__field"
+            color="primary"
+            class="score-entry-form__field font-display"
             :data-cy="`admin-score-input-${index}`"
             :aria-describedby="ruleId"
             @update:model-value="handleInput(index, $event)"
@@ -196,15 +198,10 @@ defineExpose({})
   }
 
   &__field {
-    --origam-input__control---height: var(--score-entry-form__field---height, 5rem);
-
-    :deep(input) {
-      font-family: var(--score-entry-form__field---font-family, var(--origam-font__family---display, inherit));
-      color: var(--origam-color__bar---amber);
-      font-size: var(--origam-font__size---4xl);
-      font-variant-numeric: tabular-nums;
-      text-align: center;
-    }
+    --origam-field---font-size: var(--origam-font__size---4xl);
+    --origam-field---border-width-outlined: 2px;
+    --origam-field---border-color: var(--origam-color__border---strong);
+    --origam-field---border-opacity-outlined: 1;
   }
 
   &__meta {
@@ -225,7 +222,6 @@ defineExpose({})
 :root {
   --score-entry-form---gap: var(--origam-space---5);
   --score-entry-form__duel---gap: var(--origam-space---3);
-  --score-entry-form__field---height: 5rem;
   --score-entry-form__player---gap: var(--origam-space---2);
   --score-entry-form__actions---gap: var(--origam-space---3);
 }

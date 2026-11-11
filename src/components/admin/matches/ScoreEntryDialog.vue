@@ -44,7 +44,7 @@ import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
 import { DIALOG_SLOT, SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
-import { MATCH_STATUS } from '~/enums/match.enum'
+import { MATCH_PURPOSE, MATCH_STATUS } from '~/enums/match.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { IScoreEntryDialogEmits, IScoreEntryDialogProps } from '~/interfaces/score-entry.interface'
 
@@ -115,16 +115,27 @@ const eyebrow = computed(() => {
   if (!match) {
     return ''
   }
+  const number = `${props.editionCode}-${match.sequence}`
+  if (match.purpose === MATCH_PURPOSE.TIEBREAK) {
+    return match.poolRank === null
+      ? t('admin.matches.dialog_eyebrow_tiebreak_inter', 'Départage entre poules · match {number}', { number })
+      : t('admin.matches.dialog_eyebrow_tiebreak_pool', 'Poule {rank} · départage · match {number}', { rank: match.poolRank, number })
+  }
   const label = ROUND_LABELS[match.roundKind].match
   const round = match.poolRank === null
     ? t(label.key, label.label)
     : t('admin.matches.pool_n', 'Poule {rank}', { rank: match.poolRank })
-  return t('admin.matches.dialog_eyebrow', '{round} · match {number}', { round, number: `${props.editionCode}-${match.sequence}` })
+  return t('admin.matches.dialog_eyebrow', '{round} · match {number}', { round, number })
 })
 const ruleTitle = computed(() => t('admin.matches.rule_title', 'Cible {target}', { target: entry.target.value }))
-const ruleText = computed(() => isPool.value
-  ? t('admin.matches.rule_pool', 'En poule, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
-  : t('admin.matches.rule_knockout', 'En phase finale, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le tableau ne bouge qu’à la validation.', { target: entry.target.value }))
+const ruleText = computed(() => {
+  if (props.match?.purpose === MATCH_PURPOSE.TIEBREAK) {
+    return t('admin.matches.rule_tiebreak', 'Départage : le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
+  }
+  return isPool.value
+    ? t('admin.matches.rule_pool', 'En poule, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
+    : t('admin.matches.rule_knockout', 'En phase finale, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le tableau ne bouge qu’à la validation.', { target: entry.target.value })
+})
 const meta = computed(() => props.match?.status === MATCH_STATUS.RECORDED
   ? t('admin.matches.meta_recorded', 'Score saisi · en attente de validation')
   : t('admin.matches.meta_scheduled', 'Aucun score saisi pour ce match'))

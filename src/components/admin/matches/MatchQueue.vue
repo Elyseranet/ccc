@@ -21,11 +21,18 @@
           <p class="match-queue__title">
             {{ card.eyebrow }}
           </p>
-          <edition-chip
-            class="match-queue__status"
-            :family="card.family"
-            :text="card.statusText"
-          />
+          <span class="match-queue__chips">
+            <edition-chip
+              v-if="card.isTiebreak"
+              :family="tiebreakFamily"
+              :text="tiebreakText"
+              data-cy="admin-match-tiebreak"
+            />
+            <edition-chip
+              :family="card.family"
+              :text="card.statusText"
+            />
+          </span>
           <span class="match-queue__name">{{ card.firstName }}</span>
           <span
             class="match-queue__score font-display"
@@ -65,7 +72,8 @@ import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
 import { MATCH_ACTION_VIEW } from '~/consts/admin-match-status.const'
 import { MATCH_ACTION } from '~/enums/match-action.enum'
-import type { IMatchQueueEmits, IMatchQueueProps } from '~/interfaces/admin-match-queue.interface'
+import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
+import type { IMatchCard, IMatchQueueEmits, IMatchQueueProps } from '~/interfaces/admin-match-queue.interface'
 
 /*********************************************************
  * Global
@@ -88,6 +96,16 @@ defineSlots<{}>()
  * Tous les textes sont calculés ici (clés de traduction), le gabarit ne fait que les afficher.
  ********************************************************/
 const listLabel = computed(() => t('admin.matches.list_label', 'Matchs à traiter'))
+const tiebreakFamily = EDITION_CHIP_FAMILY.TINTED_INFO
+const tiebreakText = computed(() => t('admin.matches.tiebreak_chip', 'Départage'))
+const eyebrowOf = (card: IMatchCard, round: string): string => {
+  if (!card.isTiebreak) {
+    return t('admin.matches.card_eyebrow', '{round} · {number}', { round, number: card.number })
+  }
+  return card.poolRank === null
+    ? t('admin.matches.eyebrow_tiebreak_inter', 'Départage entre poules · {number}', { number: card.number })
+    : t('admin.matches.eyebrow_tiebreak_pool', 'Poule {rank} · départage · {number}', { rank: card.poolRank, number: card.number })
+}
 const views = computed(() => props.cards.map((card) => {
   const action = card.action ? MATCH_ACTION_VIEW[card.action] : null
   const players = { first: card.firstName, second: card.secondName }
@@ -98,7 +116,7 @@ const views = computed(() => props.cards.map((card) => {
   return {
     ...card,
     dataCy: `admin-match-${card.id}`,
-    eyebrow: t('admin.matches.card_eyebrow', '{round} · {number}', { round, number: card.number }),
+    eyebrow: eyebrowOf(card, round),
     statusText: t(card.statusLabel.key, card.statusLabel.fallback),
     hasScore,
     scoreLabel: hasScore
@@ -178,8 +196,10 @@ defineExpose({})
     text-transform: uppercase;
   }
 
-  &__status {
+  &__chips {
+    display: flex;
     grid-area: chip;
+    gap: var(--match-queue__chips---gap, var(--origam-space---2));
     justify-self: end;
   }
 
@@ -221,6 +241,7 @@ defineExpose({})
 <style>
 :root {
   --match-queue---gap: var(--origam-space---3);
+  --match-queue__chips---gap: var(--origam-space---2);
   --match-queue__card---gap: var(--origam-space---3);
   --match-queue__card---padding: var(--origam-space---5);
   --match-queue__action---min-height: var(--origam-space---11);
