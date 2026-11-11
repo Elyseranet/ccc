@@ -23,21 +23,7 @@ Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
 
 ## Docker
 
-En local, la commande suivante construit l'image et démarre l'application avec PostgreSQL (le compose de production ne publie aucun port ; `docker-compose.local.yml` publie `APP_PORT`, 3000 par défaut) :
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
-```
-
-`NUXT_DATABASE_PASSWORD` est obligatoire (dans `.env` ou l'environnement) ; sans lui, Compose refuse de démarrer. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur. Les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
-
-Pour arrêter les conteneurs sans supprimer les données :
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.local.yml down
-```
-
-Ne pas utiliser `down -v` sauf si la suppression des données PostgreSQL est intentionnelle.
+En local, on développe avec `npm run dev` seulement (décision utilisateur 2026-11-01). L'image (`Dockerfile`, `docker/`) et `docker-compose.yml` servent au déploiement Coolify, décrit plus bas. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur ; les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
 
 ## Déploiement Coolify
 
@@ -375,7 +361,7 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
 
 ## Architecture
 
-Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les frontières applicatives, invariants métier et décisions confirmées ou encore ouvertes.
+Les règles d'arborescence font foi dans `CLAUDE.md` (ARCH-1 à ARCH-14), les décisions dans `docs/design/ux/decisions.md`. L'architecture initiale du 2026-10-10, périmée, est archivée dans le dossier Obsidian du projet (« Architecture initiale (2026-10-10) »).
 
 ## Routes disponibles
 

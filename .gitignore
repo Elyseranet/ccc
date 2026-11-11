@@ -31,3 +31,6 @@ logs
 test-results
 playwright-report
 visual-results
+
+# Outils locaux
+.impeccable

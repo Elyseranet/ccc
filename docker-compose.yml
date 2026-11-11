@@ -1,7 +1,6 @@
 # Compose de production (utilisable tel quel comme ressource « Docker Compose » de Coolify).
 # Aucune valeur secrète par défaut : une variable obligatoire absente fait échouer `compose config`.
 # Aucun port publié : Coolify (Traefik) route le domaine vers le port 3000 du service `app`.
-# En local, ajouter docker-compose.local.yml pour publier le port.
 services:
   db:
     image: postgres:16-alpine
