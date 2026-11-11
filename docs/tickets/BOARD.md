@@ -127,6 +127,8 @@ Tests d'API sensibles à la charge, ralentissement par compte SEC-A2 (`auth.test
 
 Tests `tests/nuxt/front` en délai dépassé (5 s) sous forte charge (`admin-more`, `players`, load 29 à 35) : [T-QA-08](T-QA-08.md), **À faire**.
 
+e2e a11y et visual alignés sur le thème 32c99a70 (develop : 36 échecs, 21 non lancés) : [T-QA-09](T-QA-09.md), **En cours**, branche `feature/T-QA-09-theme-e2e` sur T-SEC-21 @ 5d833e49 ; Playwright complet 307 passés, 0 échec.
+
 Liste admin des éditions avec compteur d'inscrits en direct, pour F-13 (décision utilisateur 2026-11-05) : [B-20](B-20.md), **À faire**.
 
 Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1) : [T-SEC-17](T-SEC-17.md), **À faire**.
@@ -225,6 +227,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-09, B-16 (mergés, vague 3a 640842b) | **Fermé** — mergé dans `develop` @ `db8a0e2` (2026-11-04) | worktree de dev-f05, branche `feature/F-10` |
 | [F-11](F-11.md) | Admin : tirage des poules (`/admin/tirages`) | `admin-tirages.html` | F-00, B-17 (DTO), B-11 (routes) | À faire (créé, FA-09) | `../CCC-F-11` |
 | [F-12](F-12.md) | Admin : page « Plus » mobile (`/admin/plus`) | `admin-plus.html` | F-00 | **Fermé** — squash dans `develop` @ `ef81699` (branche `3d1e91a`) | `../CCC-F-12` |
+| [F-12b](F-12b.md) | Admin « Plus » : entrée « Phase finale » pilotée par PAGE_DELIVERY | `admin-plus.html` (491ecd55) | F-12, T-QA-09 | En cours, branche `feature/T-QA-09-theme-e2e` | `.claude/worktrees/fl-qa09` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | À faire, maquette validée bb6f998 ; en file PAR-1 | à créer |
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Fermé** (2026-10-28) : mergé @ `88da4af` (branche 7ef01ec) ; preuve conteneur 200/302/404 | à créer |
 | [F-14](F-14.md) | Écarts visuels résiduels de develop : sélecteur d'édition `solo` (D1), filet absent aux angles (D2), décalages de 1 px (D3, D4), masque trop large (M1) | maquettes de F-00, F-06, F-12 | — | **Fermé** (2026-10-22) : M1+D1 `f17e215`, D2 `f7fd47c`, D3 `5b52e83`, D4 par F-00r `9253c71` ; mesure post-fermeture 784f401 | `../CCC-F-14` |
