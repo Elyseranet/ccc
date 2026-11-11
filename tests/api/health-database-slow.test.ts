@@ -1,11 +1,10 @@
-import { createServer } from 'node:net'
-import type { Server } from 'node:net'
 import { fileURLToPath } from 'node:url'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { afterAll, describe, expect, it } from 'vitest'
 import { HEALTH_STATUS } from '../../src/enums/health-status.enum'
 import { requireTestDatabaseEnv } from './helpers/test-database'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
+import { startBlackHole } from './helpers/black-hole'
 
 // Le HEALTHCHECK de l'image attend 5 s (Dockerfile) : la sonde doit avoir répondu avant.
 const HEALTHCHECK_TIMEOUT_MS = 5000
@@ -16,9 +15,8 @@ const HEALTHCHECK_TIMEOUT_MS = 5000
  */
 describe('GET /api/v1/health (database accepts the connection and never answers)', async () => {
   const env = requireTestDatabaseEnv()
-  const blackHole: Server = createServer(() => undefined)
-  await new Promise<void>((resolve) => blackHole.listen(0, '127.0.0.1', resolve))
-  const port = (blackHole.address() as { port: number }).port
+  const blackHole = await startBlackHole()
+  const port = blackHole.port
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
@@ -28,7 +26,7 @@ describe('GET /api/v1/health (database accepts the connection and never answers)
   })
 
   afterAll(async () => {
-    await new Promise<void>((resolve) => blackHole.close(() => resolve()))
+    await blackHole.close()
   })
 
   it('answers 503 within the healthcheck delay, in the usual format, with no driver detail', async () => {
