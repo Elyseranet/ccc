@@ -6,13 +6,19 @@
       :aria-label="searchLabel"
       @submit.prevent
     >
+      <origam-label
+        :for="searchId"
+        class="competitors-toolbar__label"
+        :text="searchLabel"
+      />
       <origam-text-field
+        :id="searchId"
         type="search"
+        single-line
         rounded="full"
         clearable
-        hide-details
+        hide-details="auto"
         autocomplete="off"
-        :label="searchLabel"
         :placeholder="searchPlaceholder"
         :model-value="query"
         data-cy="competitors-search"
@@ -30,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { OrigamForm, OrigamTextField } from 'origam/components'
+import { computed, useId } from 'vue'
+import { OrigamForm, OrigamLabel, OrigamTextField } from 'origam/components'
 import { useT } from '~/composables/useT'
 import type { ICompetitorsToolbarEmits, ICompetitorsToolbarProps } from '~/interfaces/admin-competitors.interface'
 
@@ -46,6 +52,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<ICompetitorsToolbarProps>(), {})
 const emits = defineEmits<ICompetitorsToolbarEmits>()
 defineSlots<{}>()
+const searchId = useId()
 const searchLabel = computed(() => t('admin.competitors.search_label', 'Rechercher un compétiteur'))
 const searchPlaceholder = computed(() => t('admin.competitors.search_placeholder', 'Nom, prénom ou pseudo'))
 const countText = computed(() => props.total === 1
@@ -80,7 +87,17 @@ defineExpose({})
   gap: var(--competitors-toolbar---gap, var(--origam-space---4));
 
   &__search {
+    display: grid;
+    gap: var(--origam-space---1);
     min-width: min(100%, 22rem);
+  }
+
+  &__label {
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    text-transform: uppercase;
+    color: var(--origam-color__text---tertiary);
   }
 
   &__count {

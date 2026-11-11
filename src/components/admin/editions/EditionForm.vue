@@ -17,6 +17,10 @@
           :id="titleId"
           tag="h2"
           class="edition-form__title"
+          font-size="xl"
+          font-weight="bold"
+          line-height="tight"
+          letter-spacing="normal"
           :text="title"
         />
       </div>
@@ -55,9 +59,11 @@
           <origam-label
             :for="yearId"
             class="edition-form__label"
-            required
-            :text="yearLabel"
-          />
+          >
+            <template #default>
+              {{ yearLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
+            </template>
+          </origam-label>
           <origam-text-field
             :id="yearId"
             v-model="draft.year"
@@ -76,9 +82,14 @@
           <origam-label
             :for="nameId"
             class="edition-form__label"
-            :required="!isEdit"
-            :text="nameLabel"
-          />
+          >
+            <template #default>
+              {{ nameLabel }} <span
+                v-if="!isEdit"
+                aria-hidden="true"
+              >{{ requiredMark }}</span>
+            </template>
+          </origam-label>
           <origam-text-field
             :id="nameId"
             v-model="draft.name"
@@ -138,7 +149,7 @@
             single-line
             auto-grow
             rounded="lg"
-            :rows="3"
+            :rows="5"
             hide-details="auto"
             :rules="descriptionRules"
             :placeholder="descriptionPlaceholder"
@@ -215,6 +226,7 @@ import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
 import { EDITION_READONLY_EDIT_FIELDS, EDITION_YEAR_LENGTH } from '~/consts/admin-editions.const'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
+import { ADMIN_REQUIRED_MARK } from '~/consts/admin-form.const'
 import { EDITION_HERO_STATUS } from '~/consts/edition-view.const'
 import { EDITION_DESCRIPTION_MAX_LENGTH, EDITION_LOCATION_MAX_LENGTH, EDITION_NAME_MAX_LENGTH } from '~/consts/edition.const'
 import { EDITION_FORM_MODE, EDITION_YEAR_ISSUE } from '~/enums/admin-editions.enum'
@@ -242,6 +254,7 @@ const descriptionId = useId()
 const yearLength = EDITION_YEAR_LENGTH
 const readonlyFields = EDITION_READONLY_EDIT_FIELDS
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
+const requiredMark = ADMIN_REQUIRED_MARK
 const isEdit = computed(() => props.mode === EDITION_FORM_MODE.EDIT)
 
 /*********************************************************
@@ -385,7 +398,7 @@ defineExpose({})
 
   &__heading {
     display: grid;
-    gap: var(--origam-space---1);
+    gap: 0;
   }
 
   &__eyebrow {

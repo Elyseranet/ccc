@@ -3,7 +3,7 @@ import { EDITION_READONLY_FIELD } from '../enums/admin-editions.enum.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { EDITION_ORIGIN } from '../enums/edition.enum.js'
 import type { IAdminFailureMessages, IAdminFailureText } from '../interfaces/admin-failure.interface.js'
-import type { IAdminEditionColumn } from '../interfaces/admin-editions.interface.js'
+import type { IAdminEditionColumn, IEditionReadonlyEntry } from '../interfaces/admin-editions.interface.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 
 /** Quatre chiffres, ni signe ni espace : l'`<input>` reste un champ texte au clavier numérique (décision 87eea8e). */
@@ -21,14 +21,14 @@ export const ADMIN_EDITIONS_CACHE_KEY = 'editions'
 
 
 export const ADMIN_EDITION_COLUMNS: IAdminEditionColumn[] = [
-  { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: true },
-  { field: 'year', title: { key: 'admin.editions.column_year', fallback: 'Année' }, sortable: true },
-  { field: 'name', title: { key: 'admin.editions.column_name', fallback: 'Nom' }, sortable: false },
-  { field: 'heldOn', title: { key: 'admin.editions.column_date', fallback: 'Date' }, sortable: false },
-  { field: 'status', title: { key: 'admin.editions.column_status', fallback: 'Statut' }, sortable: false },
-  { field: 'origin', title: { key: 'admin.editions.column_origin', fallback: 'Origine' }, sortable: false },
-  { field: 'participantCount', title: { key: 'admin.editions.column_participants', fallback: 'Participants' }, sortable: false, align: ALIGN.END },
-  { field: 'actions', title: { key: 'admin.editions.column_action', fallback: 'Action' }, sortable: false, align: ALIGN.END }
+  { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: true, width: '7.77%', minWidth: '68px' },
+  { field: 'year', title: { key: 'admin.editions.column_year', fallback: 'Année' }, sortable: true, width: '8.38%', minWidth: '73px' },
+  { field: 'name', title: { key: 'admin.editions.column_name', fallback: 'Nom' }, sortable: false, width: '12.98%', minWidth: '114px' },
+  { field: 'heldOn', title: { key: 'admin.editions.column_date', fallback: 'Date' }, sortable: false, width: '12.98%', minWidth: '114px' },
+  { field: 'status', title: { key: 'admin.editions.column_status', fallback: 'Statut' }, sortable: false, width: '16.87%', minWidth: '148px' },
+  { field: 'origin', title: { key: 'admin.editions.column_origin', fallback: 'Origine' }, sortable: false, width: '13.82%', minWidth: '121px' },
+  { field: 'participantCount', title: { key: 'admin.editions.column_participants', fallback: 'Participants' }, sortable: false, align: ALIGN.END, width: '13.55%', minWidth: '119px' },
+  { field: 'actions', title: { key: 'admin.editions.column_action', fallback: 'Action' }, sortable: false, align: ALIGN.END, width: '13.64%', minWidth: '119px' }
 ]
 
 /** Titre et texte du message d'alerte de chaque erreur d'API connue (B-10) ; `{code}` est le code de l'édition. */
@@ -88,28 +88,32 @@ export const ADMIN_EDITION_FAILURE_MESSAGES: IAdminFailureMessages = {
   unknown: ADMIN_EDITION_FAILURE_UNKNOWN
 }
 
-/** Modification : code, année et statut ne changent jamais par ce formulaire (R-9). */
-export const EDITION_READONLY_EDIT_FIELDS: EDITION_READONLY_FIELD[] = [EDITION_READONLY_FIELD.CODE, EDITION_READONLY_FIELD.YEAR, EDITION_READONLY_FIELD.STATUS]
-
-/** Édition clôturée : tout est en lecture seule. */
-export const EDITION_READONLY_CLOSED_FIELDS: EDITION_READONLY_FIELD[] = [
-  EDITION_READONLY_FIELD.CODE,
-  EDITION_READONLY_FIELD.YEAR,
-  EDITION_READONLY_FIELD.NAME,
-  EDITION_READONLY_FIELD.DATE,
-  EDITION_READONLY_FIELD.LOCATION,
-  EDITION_READONLY_FIELD.PARTICIPANTS
+/** Un champ en lecture seule et la précision écrite sous sa valeur (`null` : aucune). */
+export const EDITION_READONLY_EDIT_FIELDS: IEditionReadonlyEntry[] = [
+  { field: EDITION_READONLY_FIELD.CODE, hint: { key: 'admin.editions.readonly_code_hint', fallback: 'Immuable : adresse publique' } },
+  { field: EDITION_READONLY_FIELD.YEAR, hint: { key: 'admin.editions.readonly_year_hint', fallback: 'Non modifiable' } },
+  { field: EDITION_READONLY_FIELD.STATUS, hint: { key: 'admin.editions.readonly_status_hint', fallback: 'Suit le déroulé du tournoi' } }
 ]
 
-/** Libellé et précision de chaque champ en lecture seule. */
-export const EDITION_READONLY_LABELS: Record<EDITION_READONLY_FIELD, { label: ITranslatableText, hint?: ITranslatableText }> = {
-  [EDITION_READONLY_FIELD.CODE]: { label: { key: 'admin.editions.readonly_code', fallback: 'Code' }, hint: { key: 'admin.editions.readonly_code_hint', fallback: 'Immuable : adresse publique' } },
-  [EDITION_READONLY_FIELD.YEAR]: { label: { key: 'admin.editions.readonly_year', fallback: 'Année' }, hint: { key: 'admin.editions.readonly_year_hint', fallback: 'Non modifiable' } },
-  [EDITION_READONLY_FIELD.STATUS]: { label: { key: 'admin.editions.readonly_status', fallback: 'Statut' }, hint: { key: 'admin.editions.readonly_status_hint', fallback: 'Suit le déroulé du tournoi' } },
-  [EDITION_READONLY_FIELD.NAME]: { label: { key: 'admin.editions.readonly_name', fallback: 'Nom' } },
-  [EDITION_READONLY_FIELD.DATE]: { label: { key: 'admin.editions.readonly_date', fallback: 'Date' } },
-  [EDITION_READONLY_FIELD.LOCATION]: { label: { key: 'admin.editions.readonly_location', fallback: 'Lieu' } },
-  [EDITION_READONLY_FIELD.PARTICIPANTS]: { label: { key: 'admin.editions.readonly_participants', fallback: 'Participants' }, hint: { key: 'admin.editions.readonly_participants_hint', fallback: 'N figé à la clôture' } }
+/** Édition clôturée : tout est en lecture seule. */
+export const EDITION_READONLY_CLOSED_FIELDS: IEditionReadonlyEntry[] = [
+  { field: EDITION_READONLY_FIELD.CODE, hint: { key: 'admin.editions.readonly_code_hint_closed', fallback: 'Immuable' } },
+  { field: EDITION_READONLY_FIELD.YEAR, hint: null },
+  { field: EDITION_READONLY_FIELD.NAME, hint: null },
+  { field: EDITION_READONLY_FIELD.DATE, hint: null },
+  { field: EDITION_READONLY_FIELD.LOCATION, hint: null },
+  { field: EDITION_READONLY_FIELD.PARTICIPANTS, hint: { key: 'admin.editions.readonly_participants_hint', fallback: 'N figé à la clôture' } }
+]
+
+/** Libellé de chaque champ en lecture seule. */
+export const EDITION_READONLY_LABELS: Record<EDITION_READONLY_FIELD, ITranslatableText> = {
+  [EDITION_READONLY_FIELD.CODE]: { key: 'admin.editions.readonly_code', fallback: 'Code' },
+  [EDITION_READONLY_FIELD.YEAR]: { key: 'admin.editions.readonly_year', fallback: 'Année' },
+  [EDITION_READONLY_FIELD.STATUS]: { key: 'admin.editions.readonly_status', fallback: 'Statut' },
+  [EDITION_READONLY_FIELD.NAME]: { key: 'admin.editions.readonly_name', fallback: 'Nom' },
+  [EDITION_READONLY_FIELD.DATE]: { key: 'admin.editions.readonly_date', fallback: 'Date' },
+  [EDITION_READONLY_FIELD.LOCATION]: { key: 'admin.editions.readonly_location', fallback: 'Lieu' },
+  [EDITION_READONLY_FIELD.PARTICIPANTS]: { key: 'admin.editions.readonly_participants', fallback: 'Participants' }
 }
 
 /** Origine d'une édition (EDITION_ORIGIN) : libellé et props d'origam-chip (pleine primaire pour l'application, neutre pour l'archive). */

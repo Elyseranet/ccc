@@ -46,7 +46,7 @@ defineExpose({})
 <style scoped lang="scss">
 .edition-readonly-value {
   display: grid;
-  gap: var(--edition-readonly-value---gap, var(--origam-space---1));
+  gap: var(--edition-readonly-value---gap, calc(var(--origam-space---1) / 2));
   justify-items: start;
 
   &__text {
@@ -67,7 +67,7 @@ defineExpose({})
 
 <style>
 :root {
-  --edition-readonly-value---gap: var(--origam-space---1);
+  --edition-readonly-value---gap: calc(var(--origam-space---1) / 2);
   --edition-readonly-value__missing---color: var(--origam-color__text---tertiary);
   --edition-readonly-value__hint---color: var(--origam-color__text---tertiary);
 }

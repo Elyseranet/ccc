@@ -17,6 +17,10 @@
           :id="titleId"
           tag="h2"
           class="edition-closed__title"
+          font-size="xl"
+          font-weight="bold"
+          line-height="tight"
+          letter-spacing="normal"
           :text="title"
         />
       </div>
@@ -117,7 +121,7 @@ defineExpose({})
 
   &__heading {
     display: grid;
-    gap: var(--origam-space---1);
+    gap: 0;
   }
 
   &__eyebrow {

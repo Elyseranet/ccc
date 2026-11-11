@@ -10,8 +10,11 @@
     <div class="competitor-photo__row">
       <origam-avatar
         class="competitor-photo__avatar font-display"
-        size="x-large"
+        :size="avatarSize"
         rounded="full"
+        bg-color="primary"
+        elevation="lg"
+        font-size="2xl"
         role="img"
         :aria-label="avatarLabel"
         :image="avatarUrl ?? undefined"
@@ -77,6 +80,7 @@ import { computed, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamAvatar, OrigamBtn, OrigamFileField, OrigamLabel } from 'origam/components'
 import { useAccountError } from '~/composables/useAccountError'
 import { useT } from '~/composables/useT'
+import { ADMIN_COMPETITOR_PHOTO_SIZE } from '~/consts/admin-competitors.const'
 import { ACCOUNT_AVATAR_ACCEPT, ACCOUNT_AVATAR_MAX_BYTES } from '~/consts/account.const'
 import { ACCOUNT_ERROR } from '~/enums/account.enum'
 import type { ICompetitorPhotoEmits, ICompetitorPhotoProps } from '~/interfaces/admin-competitors.interface'
@@ -101,6 +105,7 @@ const hintId = useId()
 const errorId = useId()
 const accept = ACCOUNT_AVATAR_ACCEPT
 const maxBytes = ACCOUNT_AVATAR_MAX_BYTES
+const avatarSize = ADMIN_COMPETITOR_PHOTO_SIZE
 const initials = computed(() => getInitials(props.displayName))
 const canRemove = computed(() => props.avatarUrl !== null && !props.pending)
 

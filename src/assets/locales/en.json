@@ -1141,5 +1141,6 @@
   "admin.competitors.photo_remove": "Delete the photo",
   "admin.competitors.photo_initials_hint": "Without a photo, the avatar shows the initials. “Delete the photo” goes back to the initials.",
   "admin.competitors.photo_alt": "Photo of {name}",
-  "admin.competitors.photo_alt_initials": "No photo: initials {initials}"
+  "admin.competitors.photo_alt_initials": "No photo: initials {initials}",
+  "admin.editions.readonly_code_hint_closed": "Immutable"
 }

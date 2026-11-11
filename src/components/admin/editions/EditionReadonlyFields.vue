@@ -1,6 +1,7 @@
 <template>
   <origam-data-list
     mode="kv"
+    :border="false"
     density="compact"
     rounded="lg"
     class="edition-readonly"
@@ -29,7 +30,9 @@ import { formatEditionDate } from '~/utils/admin-editions.util'
  *
  * @description
  * Champs de l'édition en lecture seule, dans `origam-data-list` : code, année et statut en modification (R-9), tous les
- * champs d'une édition clôturée. Une valeur absente est annoncée « Non renseigné » (les éditions de l'archive n'ont ni nom,
+ * champs d'une édition clôturée. Les lignes sont stylées par des `:deep` (tuile en colonne, fond, rayon, capitales de la clé) :
+ * ces propriétés n'ont pas de variable dans Origam, défaut suivi dans Elyseranet/origam#1267 (même cas que le profil du compte
+ * et que les bilans du face-à-face). Tout ce qui a une variable passe par elle. Une valeur absente est annoncée « Non renseigné » (les éditions de l'archive n'ont ni nom,
  * ni date, ni lieu). Le N d'une édition non close n'est pas connu : « — ».
  ********************************************************/
 const { t } = useT()
@@ -70,12 +73,12 @@ const valueOf = (field: EDITION_READONLY_FIELD): { text: string, missing: boolea
         : { text: String(edition.participantCount), missing: false }
   }
 }
-const rows = computed<IEditionReadonlyRow[]>(() => props.fields.map((field) => {
-  const labels = EDITION_READONLY_LABELS[field]
+const rows = computed<IEditionReadonlyRow[]>(() => props.fields.map(({ field, hint }) => {
+  const label = EDITION_READONLY_LABELS[field]
   return {
     id: field,
-    label: t(labels.label.key, labels.label.fallback),
-    hint: labels.hint ? t(labels.hint.key, labels.hint.fallback) : null,
+    label: t(label.key, label.fallback),
+    hint: hint ? t(hint.key, hint.fallback) : null,
     chip: field === EDITION_READONLY_FIELD.STATUS ? EDITION_HERO_STATUS[props.edition.status].family : null,
     ...valueOf(field)
   }
@@ -94,12 +97,44 @@ defineExpose({})
 
 <style scoped lang="scss">
 .edition-readonly {
-  padding: var(--edition-readonly---padding, var(--origam-space---2));
+  --origam-data-list---padding: 0;
+  --origam-data-list__kv---display: grid;
+  --origam-data-list__kv---row-padding-block: var(--origam-space---3);
+  --origam-data-list__kv---key-font-size: var(--origam-font__size---xs);
+  --origam-data-list__kv---key-font-weight: var(--origam-font__weight---bold);
+  --origam-data-list__kv---key-color: var(--origam-color__text---tertiary);
+  --origam-data-list__kv---value-font-size: var(--origam-font__size---md);
+
+  margin: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--origam-space---2);
+
+  :deep(.origam-data-list__kv-row) {
+    grid-template-columns: 1fr;
+    row-gap: calc(var(--origam-space---1) / 2);
+    border-bottom: 0;
+    padding-inline: var(--origam-space---4);
+    border-radius: var(--origam-radius---lg);
+    background: var(--origam-color__surface---sunken);
+  }
+
+  :deep(.origam-data-list__kv-key) {
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    text-transform: uppercase;
+  }
+
+  :deep(.origam-data-list__kv-value) {
+    font-weight: var(--origam-font__weight---bold);
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 
 <style>
 :root {
-  --edition-readonly---padding: var(--origam-space---2);
+  --edition-readonly---gap: var(--origam-space---2);
 }
 </style>

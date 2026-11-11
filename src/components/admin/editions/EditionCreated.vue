@@ -21,6 +21,10 @@
         :id="titleId"
         tag="h2"
         class="edition-created__title"
+        font-size="xl"
+        font-weight="bold"
+        line-height="tight"
+        letter-spacing="normal"
         :text="title"
         data-cy="edition-created-title"
       />

@@ -16,6 +16,10 @@
         :id="titleId"
         tag="h2"
         class="identity-form__title"
+        font-size="xl"
+        font-weight="bold"
+        line-height="tight"
+        letter-spacing="normal"
         :text="competitor.displayName"
         data-cy="competitor-form-title"
       />
@@ -34,9 +38,11 @@
           <origam-label
             :for="displayNameId"
             class="identity-form__label"
-            required
-            :text="displayNameLabel"
-          />
+          >
+            <template #default>
+              {{ displayNameLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
+            </template>
+          </origam-label>
           <origam-text-field
             :id="displayNameId"
             v-model="draft.displayName"
@@ -156,6 +162,7 @@ import { computed, reactive, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamForm, OrigamLabel, OrigamSnackbar, OrigamTextField, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
+import { ADMIN_REQUIRED_MARK } from '~/consts/admin-form.const'
 import { COMPETITOR_DISPLAY_NAME_MAX_LENGTH, COMPETITOR_NAME_PART_MAX_LENGTH } from '~/consts/competitor.const'
 import type { ICompetitorFormValues, ICompetitorIdentityFormEmits, ICompetitorIdentityFormProps } from '~/interfaces/admin-competitors.interface'
 
@@ -177,6 +184,7 @@ const firstNameId = useId()
 const lastNameId = useId()
 const nicknameId = useId()
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
+const requiredMark = ADMIN_REQUIRED_MARK
 
 /*********************************************************
  * Saisie
@@ -272,7 +280,7 @@ defineExpose({})
 
   &__head {
     display: grid;
-    gap: var(--origam-space---1);
+    gap: 0;
   }
 
   &__eyebrow {

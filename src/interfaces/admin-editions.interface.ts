@@ -21,6 +21,10 @@ export interface IAdminEditionColumn {
   title: ITranslatableText
   sortable: boolean
   align?: ALIGN.START | ALIGN.END
+  /** Largeur à 1440 px, en pourcentage de la table (celle de la maquette). */
+  width: string
+  /** Largeur minimale : celle de la maquette à 390 px, où la table défile dans son conteneur. */
+  minWidth: string
 }
 
 export interface IEditionFormProps {
@@ -54,9 +58,15 @@ export interface IEditionCreatedProps {
   edition: IEditionSummary
 }
 
+/** Un champ en lecture seule et la précision écrite sous sa valeur. */
+export interface IEditionReadonlyEntry {
+  field: EDITION_READONLY_FIELD
+  hint: ITranslatableText | null
+}
+
 export interface IEditionReadonlyFieldsProps {
   edition: IEditionSummary
-  fields: EDITION_READONLY_FIELD[]
+  fields: IEditionReadonlyEntry[]
 }
 
 export interface IEditionClosedProps {

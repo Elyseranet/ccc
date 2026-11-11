@@ -2,7 +2,6 @@
   <div class="competitors-table">
     <app-data-table
       hide-default-footer
-      density="compact"
       hover
       :caption="caption"
       :headers="headers"
@@ -34,7 +33,9 @@
       </template>
       <template #[`item.actions`]="{ item }">
         <origam-btn
+          class="competitors-table__action"
           variant="text"
+          color="primary"
           size="small"
           :to="linkOf(item)"
           :text="actionLabel"
@@ -111,6 +112,8 @@ const headers = computed(() => ADMIN_COMPETITOR_COLUMNS.map(column => ({
   title: t(column.title.key, column.title.fallback),
   ...(column.align ? { align: column.align } : {}),
   sortable: false,
+  width: column.width,
+  minWidth: column.minWidth,
   nowrap: true
 })))
 const nicknameOf = (item: ICompetitorListItem): string => item.nickname
@@ -147,6 +150,12 @@ defineExpose({})
     display: flex;
     align-items: center;
     gap: var(--competitors-table__cell---gap, var(--origam-space---3));
+  }
+
+  &__action {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__num {

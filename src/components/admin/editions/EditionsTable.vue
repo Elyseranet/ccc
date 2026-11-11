@@ -2,7 +2,6 @@
   <app-data-table
     class="editions-table"
     hide-default-footer
-    density="compact"
     hover
     :caption="caption"
     :headers="headers"
@@ -43,7 +42,9 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <origam-btn
+        class="editions-table__action"
         variant="text"
+        color="primary"
         size="small"
         :to="linkOf(item)"
         :text="actionOf(item)"
@@ -94,6 +95,8 @@ const headers = computed(() => ADMIN_EDITION_COLUMNS.map(column => ({
   title: t(column.title.key, column.title.fallback),
   ...(column.align ? { align: column.align } : {}),
   sortable: column.sortable,
+  width: column.width,
+  minWidth: column.minWidth,
   nowrap: true
 })))
 const sortBy = ref<Array<{ key: string, order?: boolean | 'asc' | 'desc' }>>([...ADMIN_EDITIONS_DEFAULT_SORT])
@@ -137,6 +140,12 @@ defineExpose({})
 .editions-table {
   &__num {
     font-variant-numeric: tabular-nums;
+  }
+
+  &__action {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__missing {

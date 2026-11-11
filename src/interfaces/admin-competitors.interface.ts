@@ -17,6 +17,9 @@ export interface IAdminCompetitorColumn {
   field: string
   title: ITranslatableText
   align?: ALIGN.START | ALIGN.END
+  /** Largeur et largeur minimale : celles de la maquette (la table défile dans son conteneur). */
+  width: string
+  minWidth: string
 }
 
 export interface ICompetitorsToolbarProps {

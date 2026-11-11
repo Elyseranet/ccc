@@ -15,16 +15,19 @@ export const ADMIN_COMPETITORS_CACHE_SCOPE = 'admin'
 /** Paramètres d'URL de l'annuaire admin. */
 export const ADMIN_COMPETITORS_QUERY_KEYS = { SEARCH: 'q', PAGE: 'page' } as const
 
+/** Côté de l'avatar de la fiche (maquette : 5,5 rem, soit 88 px). */
+export const ADMIN_COMPETITOR_PHOTO_SIZE = 88
+
 /** Pastilles de page visibles dans la pagination. */
 export const ADMIN_COMPETITORS_PAGINATION_VISIBLE = 5
 
 export const ADMIN_COMPETITOR_COLUMNS: IAdminCompetitorColumn[] = [
-  { field: 'displayName', title: { key: 'admin.competitors.column_display_name', fallback: 'Nom affiché' } },
-  { field: 'firstName', title: { key: 'admin.competitors.column_first_name', fallback: 'Prénom' } },
-  { field: 'lastName', title: { key: 'admin.competitors.column_last_name', fallback: 'Nom' } },
-  { field: 'nickname', title: { key: 'admin.competitors.column_nickname', fallback: 'Pseudo' } },
-  { field: 'editionsPlayed', title: { key: 'admin.competitors.column_editions', fallback: 'Éditions' }, align: ALIGN.END },
-  { field: 'actions', title: { key: 'admin.competitors.column_action', fallback: 'Action' }, align: ALIGN.END }
+  { field: 'displayName', title: { key: 'admin.competitors.column_display_name', fallback: 'Nom affiché' }, width: '177px', minWidth: '177px' },
+  { field: 'firstName', title: { key: 'admin.competitors.column_first_name', fallback: 'Prénom' }, width: '85px', minWidth: '85px' },
+  { field: 'lastName', title: { key: 'admin.competitors.column_last_name', fallback: 'Nom' }, width: '80px', minWidth: '80px' },
+  { field: 'nickname', title: { key: 'admin.competitors.column_nickname', fallback: 'Pseudo' }, width: '119px', minWidth: '119px' },
+  { field: 'editionsPlayed', title: { key: 'admin.competitors.column_editions', fallback: 'Éditions' }, align: ALIGN.END, width: '89px', minWidth: '89px' },
+  { field: 'actions', title: { key: 'admin.competitors.column_action', fallback: 'Action' }, align: ALIGN.END, width: '111px', minWidth: '111px' }
 ]
 
 /** Messages d'alerte des écritures d'identité (B-10, T-SEC-10 : 428 sans `If-Match`, 412 si la version est périmée). */

@@ -1141,5 +1141,6 @@
   "admin.competitors.photo_remove": "Supprimer la photo",
   "admin.competitors.photo_initials_hint": "Sans photo, l’avatar affiche les initiales. « Supprimer la photo » ramène aux initiales.",
   "admin.competitors.photo_alt": "Photo de {name}",
-  "admin.competitors.photo_alt_initials": "Aucune photo : initiales {initials}"
+  "admin.competitors.photo_alt_initials": "Aucune photo : initiales {initials}",
+  "admin.editions.readonly_code_hint_closed": "Immuable"
 }
