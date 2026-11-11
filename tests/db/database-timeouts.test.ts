@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { createServer } from 'node:net'
-import type { Server } from 'node:net'
+import type { Server, Socket } from 'node:net'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { DataSource } from 'typeorm'
 import type { IDatabaseTimeouts } from '../../src/interfaces/database-config.interface'
@@ -45,6 +45,7 @@ const timed = async <T>(work: Promise<T>): Promise<{ error: unknown, value?: T, 
 }
 
 let blackHole: Server
+const blackHoleSockets = new Set<Socket>()
 let blackHolePort: number
 let schemaSource: DataSource
 
@@ -53,13 +54,15 @@ beforeAll(async () => {
   await schemaSource.query('CREATE TABLE "t_sec17_lock" ("id" integer PRIMARY KEY)')
   await schemaSource.query('INSERT INTO "t_sec17_lock" VALUES (1)')
   // Accepte la connexion TCP et ne répond jamais : le démarrage du protocole PostgreSQL reste en suspens.
-  blackHole = createServer(() => undefined)
+  blackHole = createServer((socket) => { blackHoleSockets.add(socket) })
   await new Promise<void>((resolve) => blackHole.listen(0, '127.0.0.1', resolve))
   blackHolePort = (blackHole.address() as { port: number }).port
 })
 
 afterAll(async () => {
   await Promise.all(opened.filter((dataSource) => dataSource.isInitialized).map((dataSource) => dataSource.destroy()))
+  // close() attend la fin des connexions ouvertes : le pilote abandonne la sienne au délai sans forcément la fermer.
+  blackHoleSockets.forEach((socket) => socket.destroy())
   await new Promise<void>((resolve) => blackHole.close(() => resolve()))
   await schemaSource.query('DROP TABLE IF EXISTS "t_sec17_lock"')
   await cleanup()
@@ -90,19 +93,22 @@ describe('query_timeout (client-side net)', () => {
 })
 
 describe('lock waits count in statement_timeout, and a short legitimate wait succeeds', () => {
-  const holdLock = async (holdMs: number): Promise<Promise<void>> => {
+  // Renvoie un objet, pas la promesse nue : une fonction async qui renvoie une promesse l'aplatit, et l'appelant attendrait
+  // alors la libération du verrou avant de lancer sa requête.
+  const holdLock = async (holdMs: number): Promise<{ released: Promise<void> }> => {
     const holder = await open({ connectionTimeoutMs: 3000, statementTimeoutMs: 0, queryTimeoutMs: 0 })
     const runner = holder.createQueryRunner()
     await runner.connect()
     await runner.startTransaction()
     await runner.query('SELECT * FROM "t_sec17_lock" WHERE "id" = 1 FOR UPDATE')
-    return new Promise<void>((resolve) => setTimeout(() => {
+    const released = new Promise<void>((resolve) => setTimeout(() => {
       void runner.commitTransaction().then(() => runner.release()).then(() => resolve())
     }, holdMs))
+    return { released }
   }
 
   it('turns a lock wait longer than the delay into a database timeout', async () => {
-    const released = await holdLock(1200)
+    const { released } = await holdLock(1200)
     const waiter = await open(RUNTIME_LIKE)
     const { error, elapsedMs } = await timed(waiter.query('SELECT * FROM "t_sec17_lock" WHERE "id" = 1 FOR UPDATE'))
     expect(isDatabaseTimeout(error)).toBe(true)
@@ -111,7 +117,7 @@ describe('lock waits count in statement_timeout, and a short legitimate wait suc
   })
 
   it('lets a lock wait shorter than the delay finish, like two simultaneous draw validations', async () => {
-    const released = await holdLock(150)
+    const { released } = await holdLock(150)
     const waiter = await open({ connectionTimeoutMs: 3000, statementTimeoutMs: 3000, queryTimeoutMs: 3500 })
     const { error, value } = await timed(waiter.query('SELECT * FROM "t_sec17_lock" WHERE "id" = 1 FOR UPDATE'))
     expect(error).toBeUndefined()
