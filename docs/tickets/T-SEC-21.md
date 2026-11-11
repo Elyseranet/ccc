@@ -1,9 +1,9 @@
 # T-SEC-21 — `npm audit` : 2 critical et 3 high dans l'arbre de dev, gate rouge sur develop
 
-- **Statut** : En cours. Ouvert le 2026-11-11 par `backend-lead`, sur décision de l'utilisateur relayée par le `project-manager` (option « ticket dédié, `npm audit fix` sans `--force`, en premier »).
+- **Statut** : En cours. Ouvert le 2026-11-11 par `backend-lead`, sur décision de l'utilisateur relayée par le `project-manager` (option « ticket dédié, correction des dépendances sans `--force`, en premier »).
 - **Origine** : gates de merge des branches back du 2026-11-11. La gate « `npm audit` : zéro high ou critical » échoue sur develop @ `226e94a4` lui-même, sans rapport avec les branches.
 - **Worktree** : `.claude/worktrees/bl-sec21`, branche `feature/T-SEC-21`, depuis develop @ `226e94a4`, avec son propre `npm ci`.
-- **Lien** : recouvre en partie [T-SEC-18](T-SEC-18.md) (voir plus bas).
+- **Lien** : [T-SEC-18](T-SEC-18.md) (montée de nuxt), voir plus bas.
 
 ## Constat (develop @ `226e94a4`, `npm audit --json`)
 
@@ -16,28 +16,30 @@
 
 ## Correction
 
-`npm audit fix`, sans `--force`. Seul `package-lock.json` change, `package.json` est intact (`nuxt` reste `^4.6.0`).
+Mise à jour ciblée, `nuxt` reste en 4.6.1 : `npm update @nuxt/devtools node-forge undici simple-git @simple-git/argv-parser`. Seul `package-lock.json` change ; `package.json` est intact.
 
 | Paquet | Avant | Après |
 |---|---|---|
-| nuxt | 4.6.1 | 4.6.4 |
-| nitropack | 2.13.4 | 2.13.6 |
+| nuxt | 4.6.1 | 4.6.1 (inchangé) |
 | @nuxt/devtools | 3.4.2 | 3.4.4 (ne tire plus `simple-git`) |
 | node-forge | 1.4.0 | 1.4.3 |
 | undici | 8.11.2 | 8.12.4 |
-| simple-git | 3.36.0 | absent |
+| simple-git, @simple-git/*, @kwsites/*, nypm | présents | retirés de l'arbre |
 
-- `npm ls axios` : vide.
-- Le lockfile perd l'entrée orpheline `@napi-rs/lzma-linux-x64-gnu` (aucun paquet ne la déclarait, aucune autre variante `lzma` dans l'arbre). Les 64 autres binaires Linux optionnels restent : l'image Docker (Linux) n'en perd aucun.
+- `npm ls axios` : vide. Tous les `resolved` ajoutés pointent vers `registry.npmjs.org`. Les 65 binaires Linux optionnels du lockfile sont inchangés (image Docker).
+
+### Pourquoi pas `npm audit fix`
+
+Un premier essai (`npm audit fix` sans `--force`, commit `7397387a`, remplacé) montait `nuxt` en 4.6.4, ce que permet `^4.6.0`. Les high et critical disparaissaient, mais **`nuxt dev` ne démarrait plus** : `ERROR options.hostname.toLowerCase is not a function` (`@nuxt/cli` 4.0.1, `#syncAllowedHosts`). La cause, mesurée : dans `@nuxt/schema` 4.6.4, le resolver `devServer.host` renvoie `{}` quand `HOST`, `NUXT_HOST` et `NITRO_HOST` sont absents (`loadNuxtConfig` → `typeof devServer.host === 'object'`). La version 4.6.3 n'a pas ce resolver. Épingler `nuxt@4.6.3` ne suffisait pas : `@nuxt/cli` et `@nuxt/test-utils` tiraient encore `@nuxt/schema` 4.6.4, et l'erreur restait. Les e2e Playwright (`nuxt dev`) et `npm run dev` étaient donc cassés.
 
 ## Mesure après correction
 
-- Arbre complet : 16 vulnérabilités (6 low, 10 moderate, **0 high, 0 critical**). `--omit=dev` : 3 moderate, inchangé (T-SEC-14).
-- Les trois avis de T-SEC-18 (GHSA-9v7c-q64q-vv33, GHSA-vjh5-4x84-xrqp, GHSA-xfq5-w38q-pc2x) ont disparu du rapport : nuxt passe à 4.6.4, au-delà du 4.6.3 visé.
+- Arbre complet : 18 vulnérabilités (3 low, 15 moderate, **0 high, 0 critical**). `--omit=dev` : 3 moderate, inchangé (T-SEC-14).
+- `nuxt dev` démarre (Nuxt 4.6.1, Nitro 2.13.4).
 
 ## Effet sur T-SEC-18
 
-T-SEC-18 reste ouvert : la montée de nuxt est faite par ce ticket, mais il reste son épinglage exact, son test de régression GHSA-9v7c dans `tests/api/` et sa preuve Docker.
+Aucun : `nuxt` reste en 4.6.1, et les trois avis moderate de T-SEC-18 sont toujours là. À la montée, T-SEC-18 devra vérifier que `nuxt dev` démarre : 4.6.4 casse le démarrage (voir plus haut), à revérifier sur la version visée.
 
 ## Critères d'acceptation
 
