@@ -15,7 +15,7 @@ import type { IClip, ITextPair } from '../visual.util'
  * poule 7 en cours (1/5), poule 8 à suivre (1/5), comme dans la maquette. Les VALEURS (noms, initiales, rangs ACP, liste d'édition)
  * sont masquées des deux côtés par de l'encre transparente : gabarit, filets, fonds, rayons et chips restent comparés.
  * La maquette est un aperçu composite (étape 3, bloc « 5 · Validation » désactivé, aperçu de la confirmation) : seuls l'en-tête,
- * le stepper, la saisie et les trois cartes latérales sont comparés, les autres états sont couverts par les e2e fonctionnels
+ * le stepper (`.ostep` : rendu d'`origam-stepper`, recette F-07, maquette redessinée par ui-designer), la saisie et les trois cartes latérales sont comparés, les autres états sont couverts par les e2e fonctionnels
  * (`writes/F-11.spec.ts`). La barre basse fixe (390 px) et le snackbar « Brouillon enregistré » sont masqués des deux côtés.
  ********************************************************/
 const VIEWPORTS = [
@@ -50,6 +50,7 @@ const TEXT_PAIRS: ITextPair[] = [
 
 const ZONES: Array<{ name: string, mockup: string, app: string }> = [
   { name: 'ti-entete', mockup: '.adm-head', app: '.admin-draws__head' },
+  { name: 'ti-etapes', mockup: '.ostep', app: '[data-cy="draw-steps"]' },
   { name: 'ti-saisie', mockup: '.tir-main', app: '.draw-assignment__main' },
   { name: 'ti-parametres', mockup: '.tir-side > section:nth-child(1)', app: '[data-cy="draw-side-params"]' },
   { name: 'ti-a-placer', mockup: '.tir-side > section:nth-child(2)', app: '[data-cy="draw-rest"]' },
