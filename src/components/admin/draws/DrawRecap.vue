@@ -43,6 +43,7 @@
               <origam-chip
                 v-if="member.isSeed"
                 color="secondary"
+                bg-color="secondary"
                 size="small"
                 pill
                 :text="seedLabel"

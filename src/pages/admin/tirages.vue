@@ -364,7 +364,6 @@ defineExpose({})
   }
 
   &__lead {
-    max-width: 36rem;
     margin: 0;
     color: var(--origam-color__text---secondary);
   }

@@ -131,7 +131,33 @@ test.describe('admin tirages : parcours complet sur une édition créée par le 
     expect(total).toBe(EXPECTED_POOLS * ((POOL_SIZE * (POOL_SIZE - 1)) / 2))
   })
 
-  test('annuler la confirmation ne valide rien ; Échap ferme le dialogue', async ({ page, context }) => {
+  test('saisie à l’étape 3 : 0 violation axe, un seul champ actif nommé, saisie au clavier seul, liste « À placer » atteignable', async ({ page, context }) => {
+    test.setTimeout(240_000)
+    const edition = await editionWithPlayers(page, 'tirage clavier')
+    await selectAdminEdition(context, edition)
+    await openDraws(page)
+    await reachEntry(page)
+
+    expect(await violationsOf(page)).toEqual([])
+    const select = page.locator('[data-cy^="draw-select-"]')
+    await expect(select).toHaveCount(1)
+    await expect(page.getByRole('combobox', { name: /Poule 1 : joueur tiré/ }).first()).toBeVisible()
+    await expect(page.getByTestId('draw-rest')).toBeVisible()
+
+    // Clavier seul : focus sur le champ actif, ouverture de la liste, premier joueur, validation.
+    await select.locator('input').focus()
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId('draw-progress-text')).toContainText(`${EXPECTED_POOLS + 1} / ${PLAYER_COUNT}`)
+
+    // La liste « À placer » défile : elle est focalisable et nommée (axe : scrollable-region-focusable).
+    const rest = page.getByRole('list', { name: 'Joueurs à placer' })
+    await rest.focus()
+    await expect(rest).toBeFocused()
+    expect(await violationsOf(page)).toEqual([])
+  })
+
+  test('annuler la confirmation ne valide rien ; Échap et le clic extérieur ferment le dialogue', async ({ page, context }) => {
     test.setTimeout(240_000)
     const edition = await editionWithPlayers(page, 'tirage annule')
     await selectAdminEdition(context, edition)
@@ -146,6 +172,11 @@ test.describe('admin tirages : parcours complet sur une édition créée par le 
     await page.getByTestId('draw-validate-open').click()
     await expect(page.getByTestId('draw-validate-dialog')).toBeVisible()
     await page.keyboard.press('Escape')
+    await expect(page.getByTestId('draw-validate-dialog')).toHaveCount(0)
+    // Le clic hors du dialogue annule aussi (décision ux 0ea5092e) : la validation n'a lieu que par le bouton explicite.
+    await page.getByTestId('draw-validate-open').click()
+    await expect(page.getByTestId('draw-validate-dialog')).toBeVisible()
+    await page.mouse.click(5, 5)
     await expect(page.getByTestId('draw-validate-dialog')).toHaveCount(0)
     expect((await draftsOf(page, edition)).find(entry => entry.kind === 'POOLS')?.status).toBe('DRAFT')
   })

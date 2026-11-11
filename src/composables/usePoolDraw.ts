@@ -112,10 +112,26 @@ export const usePoolDraw = async () => {
     poolCount.value = current.parameters.poolCount
     step.value = current.status === DRAW_STATUS.VALIDATED ? POOL_DRAW_STEP.VALIDATION : POOL_DRAW_STEP.ENTRY
   }
+  /**
+   * Reprise d'un brouillon : la liste « Têtes de série » du panneau latéral vient du classement ACP, qui n'est pas dans le brouillon.
+   * Lecture silencieuse côté navigateur : un échec laisse la liste vide, la saisie n'en dépend pas.
+   */
+  const loadProposalForDraft = async () => {
+    if (!import.meta.client || !draft.value || proposal.value || !editionId.value) {
+      return
+    }
+    try {
+      proposal.value = await drawService.seedProposal(editionId.value, draft.value.parameters.poolCount)
+    } catch {
+      proposal.value = null
+    }
+  }
   hydrate()
-  watch(editionId, () => {
+  void loadProposalForDraft()
+  watch(editionId, async () => {
     proposal.value = null
     hydrate()
+    await loadProposalForDraft()
   })
 
   /*********************************************************

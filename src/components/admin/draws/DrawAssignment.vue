@@ -22,7 +22,10 @@
       <origam-progress
         :model-value="progress.percent"
         color="primary"
-        rounded
+        :bg-color="trackColor"
+        :thickness="thickness"
+        rounded="full"
+        class="draw-assignment__progress"
         :aria-label="progressLabel"
         data-cy="draw-progress"
       />
@@ -116,12 +119,14 @@
                   <origam-chip
                     v-if="slot.isSeed"
                     color="secondary"
+                    bg-color="secondary"
                     size="small"
                     pill
                     :text="seedLabel"
                   />
                   <origam-btn
                     v-else-if="!readOnly"
+                    class="draw-assignment__change"
                     variant="text"
                     size="small"
                     :text="changeLabel"
@@ -142,11 +147,46 @@
         rounded="xl"
         border
         elevation="md"
-        padding="5"
+        padding="6"
+        class="draw-assignment__side-card"
+        :aria-labelledby="`${titleId}-params`"
+        data-cy="draw-side-params"
+      >
+        <h2
+          :id="`${titleId}-params`"
+          class="draw-assignment__pool-title"
+        >
+          {{ paramsTitle }}
+        </h2>
+        <dl class="draw-assignment__params">
+          <div>
+            <dt>{{ paramsPoolsLabel }}</dt>
+            <dd class="font-display">
+              {{ poolCount }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ paramsSeedsLabel }}</dt>
+            <dd class="font-display">
+              {{ poolCount }}
+            </dd>
+          </div>
+        </dl>
+        <p class="draw-assignment__muted">
+          {{ paramsNote }}
+        </p>
+      </origam-card>
+      <origam-card
+        tag="section"
+        rounded="xl"
+        border
+        elevation="md"
+        padding="6"
+        class="draw-assignment__side-card"
         :aria-labelledby="`${titleId}-rest`"
         data-cy="draw-rest"
       >
-        <header class="draw-assignment__pool-head">
+        <header class="draw-assignment__card-head">
           <h2
             :id="`${titleId}-rest`"
             class="draw-assignment__pool-title"
@@ -155,22 +195,24 @@
           </h2>
           <origam-chip
             color="secondary"
+            bg-color="secondary"
             size="small"
             pill
             :text="String(unplaced.length)"
           />
         </header>
-        <ul class="draw-assignment__rest">
+        <ul
+          class="draw-assignment__rest"
+          tabindex="0"
+          :aria-label="restLabel"
+        >
           <li
             v-for="player in unplaced"
             :key="player.participationId"
             class="draw-assignment__rest-item"
             data-cy="draw-rest-item"
           >
-            <span
-              class="draw-assignment__avatar"
-              aria-hidden="true"
-            >{{ player.initials }}</span>
+            <player-avatar :display-name="player.competitor.displayName" />
             {{ player.competitor.displayName }}
           </li>
         </ul>
@@ -186,7 +228,8 @@
         rounded="xl"
         border
         elevation="md"
-        padding="5"
+        padding="6"
+        class="draw-assignment__side-card"
         :aria-labelledby="`${titleId}-seeds`"
         data-cy="draw-seeds-list"
       >
@@ -229,7 +272,9 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamSelect } from 'origam/components'
+import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
+import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
 import { EDITION_CHIP_PROPS } from '~/consts/edition-view.const'
 import { POOL_DRAW_CHIP_CURRENT } from '~/consts/pool-draw.const'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
@@ -256,6 +301,8 @@ const emits = defineEmits<{
 }>()
 defineSlots<{}>()
 const titleId = useId()
+const thickness = HOME_PROGRESS_THICKNESS
+const trackColor = HOME_PROGRESS_TRACK_COLOR
 const editing = ref<string | null>(null)
 const title = computed(() => t('admin.draws.entry_title', '3 · Saisie du tirage'))
 const progressText = computed(() => t('admin.draws.progress', '{placed} / {total} joueurs placés', { placed: props.progress.placed, total: props.progress.total }))
@@ -265,7 +312,12 @@ const retryLabel = computed(() => t('admin.draws.retry_save', 'Réessayer'))
 const seedLabel = computed(() => t('admin.draws.seed_chip', 'Tête de série'))
 const changeLabel = computed(() => t('admin.draws.change', 'Changer'))
 const freeLabel = computed(() => t('admin.draws.slot_free', 'Libre'))
+const paramsTitle = computed(() => t('admin.draws.side_params_title', 'Paramètres'))
+const paramsPoolsLabel = computed(() => t('admin.draws.parameters_pools', 'Poules'))
+const paramsSeedsLabel = computed(() => t('admin.draws.parameters_seeds', 'Têtes de série'))
+const paramsNote = computed(() => t('admin.draws.side_params_note', 'Autant de têtes de série que de poules (RG9). Les joueurs des plus petites poules boivent une bière avant les matchs (RG17).'))
 const restTitle = computed(() => t('admin.draws.rest_title', 'À placer'))
+const restLabel = computed(() => t('admin.draws.rest_label', 'Joueurs à placer'))
 const restEmpty = computed(() => t('admin.draws.rest_empty', 'Tous les joueurs sont placés.'))
 const seedsTitle = computed(() => t('admin.draws.seeds_side_title', 'Têtes de série'))
 const seedsLead = computed(() => t('admin.draws.seeds_side_lead', 'Les {count} meilleurs du classement ACP sur les 5 dernières éditions clôturées (A8).', { count: props.poolCount }))
@@ -342,10 +394,32 @@ defineExpose({})
 
   &__main {
     display: grid;
-    gap: var(--origam-space---4);
+    gap: 0;
   }
 
-  &__head,
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---3);
+    margin-bottom: var(--origam-space---4);
+  }
+
+  &__progress {
+    --origam-progress-linear__background---opacity: 1;
+    margin-bottom: var(--origam-space---5);
+  }
+
+  &__unsaved {
+    margin-bottom: var(--origam-space---4);
+  }
+
+  &__change {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
+  }
+
   &__pool-head {
     display: flex;
     flex-wrap: wrap;
@@ -363,15 +437,44 @@ defineExpose({})
   }
 
   &__count,
-  &__muted,
   &__seed-acp {
     color: var(--origam-color__text---secondary);
     font-variant-numeric: tabular-nums;
   }
 
+  &__params {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--origam-space---2);
+    margin: var(--origam-space---3) 0;
+
+    div {
+      padding: var(--origam-space---3);
+      border-radius: var(--origam-radius---lg);
+      background: var(--origam-color__surface---sunken);
+    }
+
+    dt {
+      font-size: var(--origam-font__size---xs);
+      font-weight: var(--origam-font__weight---bold);
+      letter-spacing: var(--origam-font__letterSpacing---wide);
+      text-transform: uppercase;
+      color: var(--origam-color__text---tertiary);
+    }
+
+    dd {
+      margin: 0;
+      font-size: var(--origam-font__size---2xl);
+      line-height: var(--origam-font__lineHeight---normal);
+      color: var(--origam-color__bar---amber);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
   &__muted {
     margin: 0;
     font-size: var(--origam-font__size---sm);
+    color: var(--origam-color__text---secondary);
   }
 
   &__pools {
@@ -428,30 +531,39 @@ defineExpose({})
     gap: var(--origam-space---4);
   }
 
-  &__rest,
-  &__seeds {
+  &__card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---3);
+    margin-bottom: var(--origam-space---4);
+  }
+
+  &__rest {
     display: grid;
-    gap: var(--origam-space---2);
-    margin: var(--origam-space---3) 0 0;
+    gap: var(--origam-space---1);
+    max-height: 16rem;
+    margin: 0;
     padding: 0;
+    overflow: auto;
     list-style: none;
   }
 
   &__rest-item {
     display: flex;
     align-items: center;
-    gap: var(--origam-space---2);
+    gap: var(--origam-space---3);
+    padding: var(--origam-space---1) 0;
+    font-size: var(--origam-font__size---sm);
+    font-weight: var(--origam-font__weight---semibold);
   }
 
-  &__avatar {
+  &__seeds {
     display: grid;
-    place-items: center;
-    width: var(--origam-space---8);
-    aspect-ratio: 1;
-    border-radius: var(--origam-radius---full);
-    background: var(--origam-color__surface---sunken);
-    font-size: var(--origam-font__size---xs);
-    font-weight: var(--origam-font__weight---bold);
+    gap: var(--origam-space---1);
+    margin: var(--origam-space---3) 0 0;
+    padding: 0;
+    list-style: none;
   }
 
   &__seeds li {
@@ -459,10 +571,15 @@ defineExpose({})
     grid-template-columns: var(--origam-space---8) minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--origam-space---2);
+    padding: var(--origam-space---2) var(--origam-space---3);
+    border-radius: var(--origam-radius---md);
+    background: var(--origam-color__surface---sunken);
+    font-size: var(--origam-font__size---sm);
   }
 
   &__seed-rank {
-    color: var(--origam-color__bar---amber);
+    color: var(--origam-color__action--secondary---fgSubtle);
+    font-size: var(--origam-font__size---lg);
   }
 
   &__next {
@@ -479,6 +596,10 @@ defineExpose({})
 }
 
 @media (max-width: 760px) {
+  .draw-assignment__side-card {
+    padding: var(--origam-space---5);
+  }
+
   .draw-assignment__pools {
     grid-template-columns: minmax(0, 1fr);
   }
