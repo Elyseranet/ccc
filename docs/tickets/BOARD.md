@@ -133,6 +133,8 @@ Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1)
 
 Purge planifiée des sessions expirées (durée maximale garantie pour la politique de confidentialité, F-19 ; décision utilisateur 2026-11-05) : [T-SEC-20](T-SEC-20.md), **À faire**.
 
+`npm audit` : 2 critical et 3 high dans l'arbre de dev (simple-git, node-forge, undici sous nuxt 4.6.1), gate rouge sur develop @ `226e94a4` : [T-SEC-21](T-SEC-21.md), **En cours** (2026-11-11), `npm audit fix` sur `feature/T-SEC-21`.
+
 Montée de nuxt 4.6.1 vers 4.6.3 : trois avis moderate dans le runtime embarqué en production (remesure de T-SEC-01 du 2026-11-04) : [T-SEC-18](T-SEC-18.md), **À faire**, après la vague T-SEC-08/10 et T-OPS-03.
 
 Délai de lecture : RST possible au lieu du 408, test `request-body-destroy` instable (develop rouge environ 3 fois sur 4 chez le front) : [T-SEC-15](T-SEC-15.md), **Fermé** — mergé @ `4ef010c` (2026-11-04).
