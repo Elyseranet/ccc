@@ -43,10 +43,13 @@
           :rounds="rounds"
           :round="round"
           :has-pool-filter="hasPoolFilter"
+          :tiebreak-only="tiebreakOnly"
+          :can-tiebreak-filter="canTiebreakFilter"
           :pools="pools"
           :pool="pool"
           @update:filter="handleFilter"
           @update:round="handleRound"
+          @update:tiebreak-only="handleTiebreakOnly"
           @update:pool="handlePool"
         />
         <match-queue
@@ -126,7 +129,7 @@ const title = computed(() => t('pages.admin_matches.title', 'Poules et matchs'))
 useHead({ title })
 useSeo({ noindex: true })
 const queue = await useMatchQueue()
-const { filter, round, rounds, hasPoolFilter, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending } = queue
+const { filter, round, rounds, hasPoolFilter, canTiebreakFilter, tiebreakOnly, pool, pools, filterViews, cards, isEmpty, isReadonly, edition, pageError, pending } = queue
 const hasCards = computed(() => cards.value.length > 0)
 const editionCode = computed(() => edition.value?.code ?? '')
 const eyebrow = computed(() => edition.value ? t('admin.matches.eyebrow', 'Édition {year}', { year: edition.value.year }) : '')
@@ -152,13 +155,16 @@ const viewEmptyDescription = computed(() => t('admin.matches.view_empty_text', '
  * Filtres
  *
  * @description
- * Le filtre, le tour et la poule sont portés par l'URL (`?f=`, `?tour=`, `?poule=`).
+ * Le filtre, le tour et la poule sont portés par l'URL (`?f=`, `?tour=`, `?poule=`, `?departages=1`).
  ********************************************************/
 const handleFilter = (value: ADMIN_MATCH_FILTER) => {
   filter.value = value
 }
 const handleRound = (value: TAdminMatchRound) => {
   round.value = value
+}
+const handleTiebreakOnly = (value: boolean) => {
+  tiebreakOnly.value = value
 }
 const handlePool = (value: number | null) => {
   pool.value = value

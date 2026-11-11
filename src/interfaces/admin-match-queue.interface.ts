@@ -41,6 +41,10 @@ export interface IMatchQueueFiltersProps {
   round: TAdminMatchRound
   /** Rangs de poule du tour affiché ; le sélecteur de poule n'existe que pour le tour « Poules ». */
   hasPoolFilter: boolean
+  /** « Départages seulement » est actif. */
+  tiebreakOnly: boolean
+  /** Le filtre n'est offert que pour « Tous les tours » et « Poules » ; désactivé sinon, avec sa raison. */
+  canTiebreakFilter: boolean
   pools: number[]
   /** `null` : toutes les poules. */
   pool: number | null
@@ -49,6 +53,7 @@ export interface IMatchQueueFiltersProps {
 export interface IMatchQueueFiltersEmits {
   (event: 'update:filter', value: ADMIN_MATCH_FILTER): void
   (event: 'update:round', value: TAdminMatchRound): void
+  (event: 'update:tiebreakOnly', value: boolean): void
   (event: 'update:pool', value: number | null): void
 }
 

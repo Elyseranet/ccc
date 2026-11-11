@@ -278,6 +278,8 @@
   "admin.matches.filters_label": "Filter the matches · counts for: {scope}",
   "admin.matches.round_all": "All rounds",
   "admin.matches.tiebreak_chip": "Tiebreak",
+  "admin.matches.tiebreak_only_label": "Tiebreaks only",
+  "admin.matches.tiebreak_only_disabled": "No tiebreak outside the pools",
   "admin.matches.eyebrow_tiebreak_inter": "Tiebreak between pools · {number}",
   "admin.matches.eyebrow_tiebreak_pool": "Pool {rank} · tiebreak · {number}",
   "admin.matches.dialog_eyebrow_tiebreak_inter": "Tiebreak between pools · match {number}",

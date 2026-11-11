@@ -78,13 +78,32 @@
           @update:model-value="handlePool"
         />
       </div>
+      <div class="match-queue-filters__field match-queue-filters__field--switch">
+        <origam-label
+          :for="tiebreakId"
+          class="match-queue-filters__field-label"
+          :text="tiebreakLabel"
+        />
+        <origam-switch
+          :id="tiebreakId"
+          :model-value="tiebreakOnly"
+          :label="tiebreakLabel"
+          :disabled="!canTiebreakFilter"
+          :hint="tiebreakHint"
+          :persistent-hint="!canTiebreakFilter"
+          hide-details
+          color="primary"
+          data-cy="admin-matches-tiebreak-only"
+          @update:model-value="handleTiebreak"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, useId } from 'vue'
-import { OrigamChip, OrigamChipGroup, OrigamLabel, OrigamSelect } from 'origam/components'
+import { OrigamChip, OrigamChipGroup, OrigamLabel, OrigamSelect, OrigamSwitch } from 'origam/components'
 import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_ALL_POOLS_VALUE, ADMIN_MATCH_ALL_ROUNDS_VALUE } from '~/consts/admin-match-filters.const'
@@ -107,6 +126,7 @@ const emits = defineEmits<IMatchQueueFiltersEmits>()
 defineSlots<{}>()
 const roundId = useId()
 const poolId = useId()
+const tiebreakId = useId()
 
 /*********************************************************
  * Filtres
@@ -151,6 +171,19 @@ const roundItems = computed(() => [
 ])
 const handleRound = (value: TAdminMatchRound) => {
   emits('update:round', value)
+}
+
+/*********************************************************
+ * Départages seulement
+ *
+ * @description
+ * Interrupteur indépendant du tour et de la poule (ET), désactivé hors « Tous les tours » et « Poules » avec sa raison (un départage
+ * est un match de poule). Un départage entre poules n'apparaît que sous « Toutes les poules ».
+ ********************************************************/
+const tiebreakLabel = computed(() => t('admin.matches.tiebreak_only_label', 'Départages seulement'))
+const tiebreakHint = computed(() => props.canTiebreakFilter ? undefined : t('admin.matches.tiebreak_only_disabled', 'Aucun départage hors des poules'))
+const handleTiebreak = (value: boolean | null) => {
+  emits('update:tiebreakOnly', value === true)
 }
 
 /*********************************************************

@@ -36,3 +36,9 @@ export const ADMIN_MATCH_ROUND_QUERY_PARAM = 'tour'
 
 /** Valeur de « Tous les tours » dans l'URL et dans le sélecteur. */
 export const ADMIN_MATCH_ALL_ROUNDS_VALUE = 'all'
+
+/** Paramètre d'URL de « Départages seulement » (`/admin/matchs?departages=1`). Absent : tous les matchs. */
+export const ADMIN_MATCH_TIEBREAK_QUERY_PARAM = 'departages'
+
+/** Valeur de l'URL quand « Départages seulement » est actif. */
+export const ADMIN_MATCH_TIEBREAK_ON_VALUE = '1'

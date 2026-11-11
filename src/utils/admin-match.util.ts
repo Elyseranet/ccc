@@ -1,5 +1,6 @@
 import {
   ADMIN_MATCH_ALL_ROUNDS_VALUE,
+  ADMIN_MATCH_TIEBREAK_ON_VALUE,
   ADMIN_MATCH_DEFAULT_FILTER,
   ADMIN_MATCH_FILTER_STATUSES,
   ADMIN_MATCH_FILTERS
@@ -43,6 +44,13 @@ export const parseAdminMatchRound = (raw: unknown): TAdminMatchRound | null => {
   }
   return Object.values(ROUND_KIND).find(kind => kind === value) ?? null
 }
+
+/** `?departages=1` : seuls les matchs de départage (`purpose: TIEBREAK`). */
+export const parseAdminMatchTiebreak = (raw: unknown): boolean => first(raw) === ADMIN_MATCH_TIEBREAK_ON_VALUE
+
+/** Un départage appartient au tour « Poules » : le filtre n'a de sens que pour « Tous les tours » et « Poules ». */
+export const canFilterTiebreaks = (round: TAdminMatchRound): boolean =>
+  round === ADMIN_MATCH_ALL_ROUNDS_VALUE || round === ROUND_KIND.POOLS
 
 /** Tours présents dans l'édition, dans l'ordre de `ROUND_KIND`. */
 export const roundsOf = (matches: readonly IAdminMatch[]): ROUND_KIND[] =>

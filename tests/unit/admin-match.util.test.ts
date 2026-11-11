@@ -6,6 +6,7 @@ import { MATCH_ACTION } from '../../src/enums/match-action.enum'
 import { MATCH_STATUS } from '../../src/enums/match.enum'
 import { ROUND_KIND } from '../../src/enums/round.enum'
 import {
+  canFilterTiebreaks,
   countByFilter,
   currentRoundOf,
   initialScoreInputs,
@@ -13,6 +14,7 @@ import {
   parseAdminMatchFilter,
   parseAdminMatchPool,
   parseAdminMatchRound,
+  parseAdminMatchTiebreak,
   poolsOf,
   roundsOf,
   sortForQueue,
@@ -94,6 +96,16 @@ describe('file admin des matchs (F-08)', () => {
     expect(parseAdminMatchRound('all')).toBe('all')
     expect(parseAdminMatchRound('ROUND_OF_32')).toBeNull()
     expect(parseAdminMatchRound(undefined)).toBeNull()
+  })
+
+  it('« Départages seulement » : ?departages=1 seul l’active, offert pour « Tous les tours » et « Poules » (c9790abd)', () => {
+    expect(parseAdminMatchTiebreak('1')).toBe(true)
+    expect(parseAdminMatchTiebreak(['1'])).toBe(true)
+    expect(parseAdminMatchTiebreak('0')).toBe(false)
+    expect(parseAdminMatchTiebreak(undefined)).toBe(false)
+    expect(canFilterTiebreaks('all')).toBe(true)
+    expect(canFilterTiebreaks(ROUND_KIND.POOLS)).toBe(true)
+    expect(canFilterTiebreaks(ROUND_KIND.QUARTER)).toBe(false)
   })
 
   it('seuls les tours présents sont proposés, dans l’ordre de ROUND_KIND', () => {

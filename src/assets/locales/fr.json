@@ -278,6 +278,8 @@
   "admin.matches.filters_label": "Filtrer les matchs · compteurs pour : {scope}",
   "admin.matches.round_all": "Tous les tours",
   "admin.matches.tiebreak_chip": "Départage",
+  "admin.matches.tiebreak_only_label": "Départages seulement",
+  "admin.matches.tiebreak_only_disabled": "Aucun départage hors des poules",
   "admin.matches.eyebrow_tiebreak_inter": "Départage entre poules · {number}",
   "admin.matches.eyebrow_tiebreak_pool": "Poule {rank} · départage · {number}",
   "admin.matches.dialog_eyebrow_tiebreak_inter": "Départage entre poules · match {number}",
