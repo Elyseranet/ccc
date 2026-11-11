@@ -392,3 +392,25 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## 2026-11-05 — B-13 / F-25 : tours hors puissance de 2
 
 - **Décision utilisateur** : quand le nombre de qualifiés n'est pas une puissance de 2, l'admin choisit le tour qu'il tire. Le serveur vérifie seulement que chaque affiche a deux joueurs et que personne n'est oublié, avec une garde sur les huitièmes. On enregistre ce qui s'est passé en salle ; aucune règle de barrage calculée n'est inventée.
+
+## 2026-11-08 — Palette « Au bord de la mer » (rethème)
+
+- **Décision utilisateur** : l'ancien thème « Happy Hour » (nuit violette / néon rose / ambre) est remplacé par la palette de l'affiche du festival de bières de Cherbourg — **bleu pétrole, or chaud, crème de la mousse**. Le rethème est porté par `src/themes/ccc.theme.ts` et la copie maquette `docs/design/ui/happy-hour/theme.ts` ; `tokens.css` est régénéré (`npm run docs:tokens`, script `scripts/gen-mockup-tokens.mjs`).
+- **Inchangé** : le nom du thème (`ccc`), le mode sombre, les props des composants, la typo (Bagel Fat One / Gabarito), rayons, espaces, motion. Seuls les tokens de couleur et d'ombre changent.
+- **Palette** : surfaces pétrole `#112631` (default) → `#284758` (overlay) → `#0a1b24` (sunken) ; texte crème `#f3eedd` (10,75:1 sur raised), mer claire `#a9c3d1` ; action primaire **or** `#e2ac65` (encre `#0e242f`, 7,87:1) ; accent éditorial **crème** (13,78:1) ; feedback mint / or / terracotta `#e78474` / mer `#62b4da` ; focus cyan `#3ec8da` ; `bar` = mousse / or / or riche `#c17825` / mer claire / pétrole ; ombres = filet crème + ambiance `rgba(2, 10, 14)` + **extrusion ambre** `#855123` (remplace l'extrusion néon).
+- **Bordures** : `border.default` passe de `rgba(201, 184, 232, 0.18)` à `rgba(131, 166, 185, 0.7)` — **3,97:1 sur sunken / 3,17:1 sur raised**, au lieu de 1,3–1,4:1 (le M1 de T-A11Y-01, « aucun jeton de bordure n'atteint 3:1 »). C'est un correctif d'accessibilité qui tombe avec le rethème.
+- **Aucune maquette ne change de structure** : `hh.css` / `pages.css` / `admin.css` ne font que référencer `var(--origam-*)`, ils suivent les nouveaux tokens. Les comparaisons visuelles (FA-04-seuil, 1 % par zone) restent valables.
+- La police display Bagel Fat One et l'exception PROPS-FIRST (`.font-display`) restent en vigueur (Elyseranet/origam#1212).
+
+## 2026-11-10 — Correction mobile du bandeau des règles d’or
+
+- **Bug signalé (utilisateur)** : en version mobile, le bandeau des règles d’or (accueil) était cassé. En cause : sur ≤760 px, le défilement `scroll-snap-type: x mandatory` n’avait que des points d’aimant en début d’item (`start`) ; avec 8 items de 78 %, le début de la 8ᵉ règle dépasse la fin de la plage scrollable, l’aimant renvoyait donc toujours sur la 7ᵉ règle et la 8ᵉ ne s’affichait qu’amputée, impossible à lire.
+- **Correction** : `scroll-snap-align: end` sur le dernier item — un point d’aimant atteignable en fin de défilement, la 8ᵉ règle devient entièrement lisible. Portée dans `src/components/common/GoldenRules.vue` (variante `band`) et en parité dans la maquette `docs/design/ui/happy-hour/hh.css` (`.ticker__list li:last-child`).
+- **En parité** : scrollbar masquée sur WebKit (`::-webkit-scrollbar { display: none }`) en plus de `scrollbar-width: none` (Firefox), application et maquette — l’intent du design était « pas de barre » ; iOS/Chrome l’ignoraient.
+- **Aucun autre changement** : largeur d’item (78 %), aimant `mandatory`, grille 4 × 2 bureau, contenus RG25–RG32 inchangés.
+
+## 2026-11-06 — Passes lourdes : seuil de charge assoupli
+
+- **Décision utilisateur** : les passes lourdes (test:api, test:db, Playwright complet) peuvent tourner jusqu'à une charge machine (load sur 1 minute) de **10**, au lieu de 4 pour le back et 6 pour le front. La charge est relevée et notée pour chaque passe.
+- Une passe qui échoue par délai dépassé est **refaite au calme**. Seule une passe complète, sans exclusion, avec 0 échec et 0 test instable, vaut preuve pour un merge.
+- Une seule passe lourde à la fois (règle des fenêtres inchangée).
