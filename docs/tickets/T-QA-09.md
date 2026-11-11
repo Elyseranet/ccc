@@ -1,6 +1,7 @@
 # T-QA-09 — e2e a11y et visual alignés sur le thème 32c99a70
 
-- **Statut** : En cours. Ouvert le 2026-11-11 par `frontend-lead`, à la demande du `project-manager` (arbitrage utilisateur : option 1, le thème « Au bord de la mer » fait foi).
+- **Statut** : **Fermé** (2026-11-11) par le chef de projet, mergé dans `develop` @ `3dd0ca0c` ; voir « Fermeture ».
+- **Historique** : En cours. Ouvert le 2026-11-11 par `frontend-lead`, à la demande du `project-manager` (arbitrage utilisateur : option 1, le thème « Au bord de la mer » fait foi).
 - **Branche** : `feature/T-QA-09-theme-e2e`, rebasée sur `feature/T-SEC-21` @ 5d833e49 (audit à 0 high/critical, nuxt 4.6.1). Elle sera validée avec T-SEC-21 sur une intégration develop + T-SEC-21 + T-QA-09.
 
 ## Constat (develop 226e94a4, Playwright complet, base `ccc_frontlead_test`)
@@ -36,3 +37,10 @@ Toutes les `origam-card` passent en `border.default`. Les zones visuelles compar
 - npm audit : 0 high, 0 critical (3 low, 15 moderate).
 - gitleaks `5d833e49..HEAD` : aucune fuite.
 - Revue de sécurité du diff : faite à la main par le `frontend-lead`, l'agent de revue n'ayant rendu aucun rapport. Aucune vulnérabilité. Relu : nouvelle page derrière `middleware: 'admin'` ; aucun import de `src/server` ; aucun secret ; relèvement de budget limité à `nuxt dev` lancé par Playwright.
+
+## Fermeture (2026-11-11, chef de projet)
+
+- Mergé dans `develop` @ `3dd0ca0c` (fast-forward, au-dessus de T-SEC-21 `5d833e49`).
+- Mesures `frontend-lead` sur `3dd0ca0c` : Playwright complet 307 passés, 0 échec, 0 non lancé, writes compris, deux runs consécutifs (base develop : 249 / 36 / 21) ; TU 740 réussis, 1 ignoré ; typecheck vert ; `npm audit` 0 high, 0 critical ; gitleaks aucune fuite. test:db et test:api : mesures T-SEC-21 sur `5d833e49`, aucun fichier `src/server` dans ce diff.
+- Revue de sécurité : faite à la main par `frontend-lead` (l'agent de revue n'a rendu aucun rapport) et relue par le chef de projet ; aucune vulnérabilité. Le budget public relevé n'existe que dans la commande du serveur Playwright, et `tests/unit/e2e-rate-limit.test.ts` garde les 300/min de production.
+- Non vérifié : l'onglet « Tirages » de la page édition (`EditionDraws.vue`), seul écran à carte sans zone visuelle, n'a pas été regardé avec la nouvelle bordure. Les variables posées dans Coolify ne sont pas vérifiables depuis le dépôt.

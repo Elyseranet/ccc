@@ -1,6 +1,7 @@
 # T-SEC-21 — `npm audit` : 2 critical et 3 high dans l'arbre de dev, gate rouge sur develop
 
-- **Statut** : En cours. Ouvert le 2026-11-11 par `backend-lead`, sur décision de l'utilisateur relayée par le `project-manager` (option « ticket dédié, correction des dépendances sans `--force`, en premier »).
+- **Statut** : **Fermé** (2026-11-11) par le chef de projet, mergé dans `develop` @ `3dd0ca0c` (fast-forward, avec T-QA-09 et F-12b) ; voir « Fermeture ».
+- **Historique** : En cours. Ouvert le 2026-11-11 par `backend-lead`, sur décision de l'utilisateur relayée par le `project-manager` (option « ticket dédié, correction des dépendances sans `--force`, en premier »).
 - **Origine** : gates de merge des branches back du 2026-11-11. La gate « `npm audit` : zéro high ou critical » échoue sur develop @ `226e94a4` lui-même, sans rapport avec les branches.
 - **Worktree** : `.claude/worktrees/bl-sec21`, branche `feature/T-SEC-21`, depuis develop @ `226e94a4`, avec son propre `npm ci`.
 - **Lien** : [T-SEC-18](T-SEC-18.md) (montée de nuxt), voir plus bas.
@@ -46,3 +47,11 @@ Aucun : `nuxt` reste en 4.6.1, et les trois avis moderate de T-SEC-18 sont toujo
 - [ ] `npm audit` : 0 high, 0 critical.
 - [ ] typecheck, `test:run`, `test:db`, `test:api`, Playwright complet : verts, sans test exclu.
 - [ ] gitleaks propre, `/security-review` sur le diff.
+
+## Fermeture (2026-11-11, chef de projet)
+
+- Mergé dans `develop` @ `3dd0ca0c` en fast-forward. La correction retenue est `5d833e49` ; `7397387a` (nuxt 4.6.4) est abandonné parce qu'il cassait `nuxt dev`.
+- Mesures de `backend-lead` sur `5d833e49`, après `npm ci` : typecheck vert (0 erreur hors Origam) ; test:run 737 réussis, 1 ignoré, 0 échec ; test:db 120/120 ; test:api 314/314 ; gitleaks aucune fuite ; `npm audit` 18 alertes (3 low, 15 moderate, **0 high, 0 critical**) ; `--omit=dev` 3 moderate.
+- Playwright : validé sur la tête combinée `3dd0ca0c` (T-QA-09) : 307 passés, 0 échec, writes compris, deux runs consécutifs (`frontend-lead`). Le diff `5d833e49..3dd0ca0c` ne touche pas `src/server`, donc les mesures db et api ci-dessus valent pour la tête.
+- Revue de sécurité : le diff ne contient que le lockfile et la doc ; chaque `resolved` pointe vers registry.npmjs.org avec son integrity ; aucun `hasInstallScript` ajouté ; axios absent.
+- Reste ailleurs : les 3 moderate de production → [T-SEC-14](T-SEC-14.md) ; la montée de nuxt → [T-SEC-18](T-SEC-18.md).
