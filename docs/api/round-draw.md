@@ -45,9 +45,8 @@ Réponse **201** `IAdminDraw` (`kind: "ROUND"`, `roundKind`, `status: "DRAFT"`, 
 | 400 | `VALIDATION_FAILED` | `roundKind` inconnu ; `roundKind` manquant quand il n'est pas déduit ; champ inconnu |
 | 404 | `NOT_FOUND` | édition inconnue |
 | 409 | `QUALIFICATION_NOT_DONE` | liste des qualifiés non figée |
-| 409 | `ROUND_NOT_COMPLETED` | un match du tour précédent n'est pas validé (ce cas couvre aussi un tour déjà tiré dont les matchs se jouent) |
+| 409 | `DRAW_ALREADY_VALIDATED` | le tirage du tour en cours est validé et ses matchs ne sont pas tous validés : le tour ne peut plus être changé (un tour n'existe qu'une fois son tirage validé). Le `GET` de l'aperçu, lui, renvoie `blockedBy: ROUND_NOT_COMPLETED` |
 | 409 | `DRAW_INCONSISTENT` | `roundKind` différent du tour déduit ou hors `allowedRoundKinds` ; rien de tirable |
-| 409 | `DRAW_ALREADY_VALIDATED` | le tour demandé existe déjà |
 | 409 | `EDITION_CLOSED` | édition clôturée |
 
 ## `PUT /api/v1/tirages/{id}/affectations` (tirage de tour)
@@ -67,4 +66,4 @@ Crée le tour (`DRAWN`), ses matchs (`REGULAR`, cible 10) et leurs côtés, pass
 |---|---|---|
 | 409 | `DRAW_INCOMPLETE` | une affiche n'a pas deux joueurs, ou un joueur du vivier n'est pas tiré (sauf barrages, où seuls les barragistes le sont) |
 | 409 | `DRAW_INCONSISTENT` | affectations incohérentes, tour de 16 sans 16 joueurs, finale sans 2 joueurs |
-| 409 | `ROUND_NOT_COMPLETED` / `QUALIFICATION_NOT_DONE` | comme à la création |
+| 409 | `QUALIFICATION_NOT_DONE` / `ROUND_NOT_COMPLETED` | liste non figée ; matchs du tour précédent non validés |

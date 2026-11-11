@@ -494,6 +494,10 @@ export const createRoundDraw = (
       throw editionClosed()
     }
     const context = await loadRoundDrawContext(manager, edition)
+    // Un tour n'existe qu'une fois son tirage validé (B-18) : « dernier tour inachevé » = tirage du tour en cours déjà validé.
+    if (context.plan.blockedBy === API_ERROR_CODE.ROUND_NOT_COMPLETED) {
+      throw roundDrawAlreadyValidated()
+    }
     const roundKind = resolveRoundKind(context, request.roundKind)
     if (await manager.getRepository(RoundEntity).existsBy({ editionId: edition.id, kind: roundKind })) {
       throw roundDrawAlreadyValidated()

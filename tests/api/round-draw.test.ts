@@ -171,14 +171,14 @@ describe('round draw (B-13)', async () => {
       expect(await dataSource.getRepository(RoundEntity).countBy({ editionId: semis.edition.id, kind: ROUND_KIND.SEMI })).toBe(1)
     })
 
-    it('refuses with 409 after the validation: the draft cannot be edited, and the next round waits for the matches (ROUND_NOT_COMPLETED)', async () => {
+    it('refuses with 409 after the validation: the draft cannot be edited, and a POST answers DRAW_ALREADY_VALIDATED while the preview says ROUND_NOT_COMPLETED', async () => {
       const edit = await send('PUT', `/api/v1/tirages/${draw.id}/affectations`, adminCookie, assignments([]))
       expect(edit.status).toBe(409)
       expect((await errorOf(edit)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
       expect(await preview(semis)).toMatchObject({ roundKind: null, blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED })
       const next = await openDraw(semis)
       expect(next.status).toBe(409)
-      expect((await errorOf(next)).code).toBe(API_ERROR_CODE.ROUND_NOT_COMPLETED)
+      expect((await errorOf(next)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
     })
   })
 
