@@ -10,6 +10,7 @@ export const ROUTES = {
   ADMIN_PARTICIPANTS: '/admin/participants',
   ADMIN_DRAWS: '/admin/tirages',
   ADMIN_MATCHES: '/admin/matchs',
+  ADMIN_FINAL_PHASE: '/admin/phase-finale',
   ADMIN_MORE: '/admin/plus',
   EDITION: '/editions/:id',
   PLAYER: '/joueurs/:id',

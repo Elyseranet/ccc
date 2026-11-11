@@ -18,6 +18,7 @@ export const ADMIN_PAGES = [
   '/admin/matchs',
   '/admin/participants',
   '/admin/tirages',
+  '/admin/phase-finale',
   '/admin/plus'
 ]
 

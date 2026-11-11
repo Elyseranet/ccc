@@ -21,13 +21,14 @@ test.describe('F-12 admin Plus', () => {
     expect(results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)).toEqual([])
   })
 
-  test('un seul h1, navigation nommée, trois entrées vers les bonnes routes', async ({ page }) => {
+  test('un seul h1, navigation nommée, quatre entrées vers les bonnes routes (Phase finale visible hors production, F-12b)', async ({ page }) => {
     await page.goto(ROUTE)
     await expect(page.locator('h1')).toHaveCount(1)
     const nav = page.getByRole('navigation', { name: 'Plus d’options' })
     // Origam#1249 : origam-list-item pose role="listitem" sur l'<a>, qui perd son rôle link. On cible donc listitem ; à repasser sur link à la correction.
     const items = nav.getByRole('listitem')
-    await expect(items).toHaveCount(3)
+    await expect(items).toHaveCount(4)
+    await expect(items.filter({ hasText: 'Phase finale' })).toHaveAttribute('href', '/admin/phase-finale')
     await expect(items.filter({ hasText: 'Participants' })).toHaveAttribute('href', '/admin/participants')
     await expect(items.filter({ hasText: 'Voir le site public' })).toHaveAttribute('href', '/')
     await expect(items.filter({ hasText: 'Mon compte' })).toHaveAttribute('href', '/profil')

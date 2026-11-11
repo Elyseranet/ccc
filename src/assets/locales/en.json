@@ -637,5 +637,8 @@
   "account.profile.incomplete": "Incomplete profile: {fields} missing.",
   "account.profile.missing_nickname": "nickname (set by the organizers)",
   "account.profile.missing_phone": "phone",
-  "account.profile.missing_avatar": "photo"
+  "account.profile.missing_avatar": "photo",
+  "admin.more.final_phase": "Final phase",
+  "admin.more.final_phase_description": "Qualification, round draws, closing",
+  "pages.admin_final_phase.title": "Final phase"
 }

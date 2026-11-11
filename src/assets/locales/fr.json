@@ -637,5 +637,8 @@
   "account.profile.incomplete": "Profil incomplet : il manque {fields}.",
   "account.profile.missing_nickname": "pseudo (renseigné par l’organisation)",
   "account.profile.missing_phone": "téléphone",
-  "account.profile.missing_avatar": "photo"
+  "account.profile.missing_avatar": "photo",
+  "admin.more.final_phase": "Phase finale",
+  "admin.more.final_phase_description": "Qualification, tirage des tours, clôture",
+  "pages.admin_final_phase.title": "Phase finale"
 }

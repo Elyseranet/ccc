@@ -76,6 +76,7 @@ import IconChevronRight from '~/components/icons/IconChevronRight.vue'
 import { useLogout } from '~/composables/useLogout'
 import { useT } from '~/composables/useT'
 import { ADMIN_MORE_ITEMS } from '~/consts/admin-more.const'
+import { isPageAccessible } from '~/utils/page-delivery.util'
 
 /*********************************************************
  * Page
@@ -112,9 +113,10 @@ const logoutError = computed(() => t('admin.more.logout_error', 'La déconnexion
  * Liens
  *
  * @description
- * Participants, site public et compte. Bracket, Compétiteurs et Éditions restent masqués (FA-09).
+ * Phase finale, participants, site public et compte. Bracket, Compétiteurs et Éditions restent masqués (FA-09).
+ * Une entrée vers une page non livrée disparaît en production (`PAGE_DELIVERY`) et revient à sa livraison (F-12b).
  ********************************************************/
-const links = computed(() => ADMIN_MORE_ITEMS.map(item => ({
+const links = computed(() => ADMIN_MORE_ITEMS.filter(item => isPageAccessible(item.to)).map(item => ({
   title: t(item.key, item.label),
   subtitle: t(item.description.key, item.description.label),
   to: item.to,

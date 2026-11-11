@@ -127,6 +127,11 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
       API_ENDPOINT.MATCH_VALIDATION
     ]
   },
+  [ROUTES.ADMIN_FINAL_PHASE]: {
+    delivered: false,
+    layout: LAYOUT.ADMIN,
+    endpoints: []
+  },
   [ROUTES.ADMIN_MORE]: {
     delivered: true,
     layout: LAYOUT.ADMIN,

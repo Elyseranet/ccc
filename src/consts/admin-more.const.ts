@@ -1,10 +1,18 @@
 import IconAccount from '~/components/icons/IconAccount.vue'
 import IconExternal from '~/components/icons/IconExternal.vue'
+import IconFinalPhase from '~/components/icons/IconFinalPhase.vue'
 import IconParticipants from '~/components/icons/IconParticipants.vue'
 import { ROUTES } from './routes.const.js'
 import type { IAdminMoreItem } from '../interfaces/admin-more.interface.js'
 
 export const ADMIN_MORE_ITEMS: IAdminMoreItem[] = [
+  {
+    key: 'admin.more.final_phase',
+    label: 'Phase finale',
+    description: { key: 'admin.more.final_phase_description', label: 'Qualification, tirage des tours, clôture' },
+    to: ROUTES.ADMIN_FINAL_PHASE,
+    icon: IconFinalPhase
+  },
   {
     key: 'admin.more.participants',
     label: 'Participants',
