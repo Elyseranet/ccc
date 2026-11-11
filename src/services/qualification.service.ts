@@ -99,7 +99,7 @@ const assertParametersWithinPools = (parameters: Pick<IQualificationParameters, 
   }
 }
 
-const toMember = (participation: ParticipationEntity): IQualificationMember =>
+export const toQualificationMember = (participation: ParticipationEntity): IQualificationMember =>
   ({ participationId: participation.id, competitor: toCompetitorPublic(participation.competitor) })
 
 const toGroup = (tie: IQualificationTie, byId: Map<string, ParticipationEntity>): ITiebreakGroup => ({
@@ -108,14 +108,14 @@ const toGroup = (tie: IQualificationTie, byId: Map<string, ParticipationEntity>)
   startRank: tie.startRank,
   format: tie.format,
   slots: tie.slots,
-  members: tie.playerIds.map((id) => toMember(byId.get(id)!))
+  members: tie.playerIds.map((id) => toQualificationMember(byId.get(id)!))
 })
 
 const toQualified = (computation: IQualificationComputation, byId: Map<string, ParticipationEntity>): IQualifiedParticipant[] | null =>
   computation.qualified === null
     ? null
     : computation.qualified.map((entry) => ({
-      ...toMember(byId.get(entry.playerId)!),
+      ...toQualificationMember(byId.get(entry.playerId)!),
       poolId: entry.poolId,
       poolRank: entry.poolRank,
       route: entry.route

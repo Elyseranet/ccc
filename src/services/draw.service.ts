@@ -9,6 +9,9 @@ import type {
   ISeedRankingContext,
   IUpdateDrawAssignmentsRequest
 } from '../interfaces/draw.interface.js'
+import type { IRoundDrawContext } from '../interfaces/qualification-plan.interface.js'
+import type { ICreateRoundDrawRequest, IRoundDrawAssignmentInput, IRoundDrawPreview, IUpdateRoundDrawRequest } from '../interfaces/qualification.interface.js'
+import type { TUpdateDrawRequest } from '../types/draw.type.js'
 import type { IRankingEdition, IScoredParticipation, IStagedParticipation } from '../interfaces/ranking.interface.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
 import { ADMIN_DRAW_RELATIONS, ASSIGNMENT_RELATIONS } from '../consts/draw.const.js'
@@ -16,7 +19,7 @@ import { PARTICIPANT_EDITABLE_STATUSES } from '../consts/edition.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
-import { MATCH_PURPOSE } from '../enums/match.enum.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import { PARTICIPATION_STATUS } from '../enums/participation.enum.js'
 import { ROUND_KIND, ROUND_STATUS } from '../enums/round.enum.js'
 import { DrawAssignmentEntity } from '../server/db/typeorm/entities/draw-assignment.entity.js'
@@ -27,16 +30,18 @@ import { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
 import { ParticipationEntity } from '../server/db/typeorm/entities/participation.entity.js'
 import { PoolEntity } from '../server/db/typeorm/entities/pool.entity.js'
 import { RoundEntity } from '../server/db/typeorm/entities/round.entity.js'
-import { badRequest, conflictWithCode, notFound } from '../utils/api-error.util.js'
+import { badRequest, conflictWithCode, notFound, validationFailed } from '../utils/api-error.util.js'
 import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { toAdminDraw } from '../utils/draw-public.mapper.util.js'
 import { generateRoundRobin } from '../utils/round-robin.util.js'
 import { targetScore } from '../utils/score-rules.util.js'
 import { boundaryTies, competitionRank, isValidSeedSelection, rankSeedCandidates, countStagesReached } from '../utils/seeding.util.js'
 import { computeAcp } from '../utils/ranking.util.js'
+import { checkRoundDrawAssignments, planRoundDraw } from '../utils/qualification-plan.util.js'
 import { BaseService } from './base.service.js'
 import { generateUuids } from '../utils/uuid.util.js'
 import { editionClosed, findEditionLocked, findEditionOrThrow, registrationClosed } from './edition.service.js'
+import { toQualificationMember } from './qualification.service.js'
 
 /*********************************************************
  * DrawService
@@ -79,16 +84,20 @@ const loadAdminDraw = async (manager: EntityManager, drawId: string): Promise<IA
  * `drawId` lit d'abord son `editionId` sans verrou, verrouille l'édition, verrouille le tirage, puis revérifie que le
  * tirage existe encore (un brouillon remplacé entre-temps disparaît : 404) et appartient bien à cette édition. Aucun
  * verrou n'est pris dans l'ordre inverse, donc deux écritures simultanées se sérialisent sans interblocage.
- * 404 si le tirage n'existe pas ou n'est pas un tirage de poules.
+ * 404 si le tirage n'existe pas ou n'est pas du `kind` demandé (tirage de poules par défaut).
  */
-const lockEditionThenDraw = async (manager: EntityManager, drawId: string): Promise<{ draw: DrawEntity, edition: EditionEntity }> => {
+const lockEditionThenDraw = async (
+  manager: EntityManager,
+  drawId: string,
+  kind: DRAW_KIND = DRAW_KIND.POOLS
+): Promise<{ draw: DrawEntity, edition: EditionEntity }> => {
   const peek = await manager.getRepository(DrawEntity).findOne({ where: { id: drawId }, select: { id: true, editionId: true, kind: true } })
-  if (!peek || peek.kind !== DRAW_KIND.POOLS) {
+  if (!peek || peek.kind !== kind) {
     throw notFound(API_ERROR_MESSAGE.DRAW_NOT_FOUND)
   }
   const edition = await manager.getRepository(EditionEntity).findOneOrFail({ where: { id: peek.editionId }, lock: { mode: 'pessimistic_write' } })
   const draw = await manager.getRepository(DrawEntity).findOne({ where: { id: drawId }, lock: { mode: 'pessimistic_write' } })
-  if (!draw || draw.editionId !== edition.id || draw.kind !== DRAW_KIND.POOLS) {
+  if (!draw || draw.editionId !== edition.id || draw.kind !== kind) {
     throw notFound(API_ERROR_MESSAGE.DRAW_NOT_FOUND)
   }
   return { draw, edition }
@@ -233,11 +242,11 @@ const assertAssignmentsConsistent = (assignments: readonly IDrawAssignmentInput[
 }
 
 /**
- * `PUT /tirages/{id}/affectations` : enregistre le tirage physique (A1). Le contenu du brouillon est remplacé, donc
+ * `PUT /tirages/{id}/affectations` d'un tirage de POULES : enregistre le tirage physique (A1). Le contenu du brouillon est remplacé, donc
  * l'appel est idempotent. Chaque participation doit appartenir à l'édition du tirage (vérifié en base), et les têtes de
  * série fixées à la création restent les `seedCount` premières affectations.
  */
-export const saveDrawAssignments = (
+export const savePoolDrawAssignments = (
   dataSource: DataSource,
   drawId: string,
   request: IUpdateDrawAssignmentsRequest
@@ -385,6 +394,284 @@ export const validatePoolDraw = (dataSource: DataSource, drawId: string, userId:
     })
     return { draw: await loadAdminDraw(manager, drawId), editionId: edition.id, replayed: false, matchCount: pairs.length }
   })
+
+/*********************************************************
+ * Tirage d'un tour de phase finale (B-13)
+ *
+ * @description
+ * Les affiches sont tirées physiquement (A1, RG12) : le serveur n'a aucun aléa, il enregistre. Le tour n'existe qu'à la
+ * validation du tirage (B-18) et naît avec le statut explicite DRAWN. Tout est idempotent, sans retour arrière.
+ ********************************************************/
+const roundDrawAlreadyValidated = () =>
+  conflictWithCode(API_ERROR_CODE.DRAW_ALREADY_VALIDATED, API_ERROR_MESSAGE.ROUND_DRAW_ALREADY_VALIDATED)
+
+const loadRoundDrawContext = async (manager: EntityManager, edition: EditionEntity): Promise<IRoundDrawContext> => {
+  const participations = await manager.getRepository(ParticipationEntity).find({
+    where: { editionId: edition.id },
+    relations: { competitor: true },
+    order: { id: 'ASC' }
+  })
+  const candidates = participations.filter((participation) => participation.status === PARTICIPATION_STATUS.QUALIFIED)
+  const rounds = await manager.getRepository(RoundEntity).find({ where: { editionId: edition.id }, order: { sequence: 'ASC' } })
+  const knockout = rounds.filter((round) => round.kind !== ROUND_KIND.POOLS)
+  const matches = knockout.length === 0
+    ? []
+    : await manager.getRepository(MatchEntity).find({ where: { editionId: edition.id }, select: { id: true, roundId: true, status: true } })
+  const plan = planRoundDraw({
+    editionStatus: edition.status,
+    qualification: edition.qualification,
+    knockoutRounds: knockout.map((round) => ({
+      kind: round.kind,
+      completed: matches.filter((match) => match.roundId === round.id)
+        .every((match) => match.status === MATCH_STATUS.VALIDATED || match.status === MATCH_STATUS.RESULT_UNKNOWN)
+    })),
+    candidateCount: candidates.length
+  })
+  return {
+    candidates,
+    poolWinnerIds: participations.filter((participation) => participation.poolRank === 1).map((participation) => participation.id),
+    plan
+  }
+}
+
+/**
+ * Le tour à tirer, ou l'erreur : la liste non figée (QUALIFICATION_NOT_DONE), le tour précédent inachevé (ROUND_NOT_COMPLETED),
+ * rien de tirable (DRAW_INCONSISTENT). Tour déduit (vivier de 2, 4, 8, 16 ou barrages) : `requested` peut manquer, sinon il doit
+ * le valoir. Autre taille (decisions 673e5b4b) : `requested` est OBLIGATOIRE (400) et doit être permis (409).
+ */
+const resolveRoundKind = (context: IRoundDrawContext, requested: ROUND_KIND | null | undefined): ROUND_KIND => {
+  const { roundKind, allowedRoundKinds, blockedBy } = context.plan
+  if (blockedBy === API_ERROR_CODE.QUALIFICATION_NOT_DONE) {
+    throw conflictWithCode(API_ERROR_CODE.QUALIFICATION_NOT_DONE, API_ERROR_MESSAGE.QUALIFICATION_NOT_DONE)
+  }
+  if (blockedBy === API_ERROR_CODE.ROUND_NOT_COMPLETED) {
+    throw conflictWithCode(API_ERROR_CODE.ROUND_NOT_COMPLETED, API_ERROR_MESSAGE.ROUND_NOT_COMPLETED)
+  }
+  if (roundKind !== null) {
+    if (requested != null && requested !== roundKind) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, API_ERROR_MESSAGE.ROUND_DRAW_KIND_MISMATCH)
+    }
+    return roundKind
+  }
+  if (allowedRoundKinds.length === 0) {
+    throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, API_ERROR_MESSAGE.ROUND_DRAW_UNSUPPORTED_SIZE)
+  }
+  if (requested == null) {
+    throw validationFailed([{ path: 'roundKind', message: `Required for this number of qualified players: one of ${allowedRoundKinds.join(', ')}` }])
+  }
+  if (!allowedRoundKinds.includes(requested)) {
+    throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, API_ERROR_MESSAGE.ROUND_DRAW_KIND_MISMATCH)
+  }
+  return requested
+}
+
+/** `GET /admin/editions/{id}/tirages/tour` : le prochain tirage de tour, sans rien écrire (même déduction que la création). */
+export const loadRoundDrawPreview = async (dataSource: DataSource, idOrCode: string): Promise<IRoundDrawPreview> => {
+  const edition = await findEditionOrThrow(dataSource, idOrCode)
+  const context = await loadRoundDrawContext(dataSource.manager, edition)
+  return {
+    roundKind: context.plan.roundKind,
+    allowedRoundKinds: context.plan.allowedRoundKinds,
+    candidates: context.candidates.map(toQualificationMember),
+    blockedBy: context.plan.blockedBy
+  }
+}
+
+/**
+ * `POST /editions/{id}/tirages/tour` : ouvre le brouillon du tirage du tour suivant (RG13). Un brouillon existant est remplacé.
+ * Le type du tour visé est enregistré dès maintenant (`draws.round_kind`) : le tour n'existe pas encore, et la garde R-3 de
+ * B-12 s'en sert pour refuser la correction du tour précédent.
+ */
+export const createRoundDraw = (
+  dataSource: DataSource,
+  idOrCode: string,
+  userId: string,
+  request: ICreateRoundDrawRequest
+): Promise<IDrawWriteOutcome> =>
+  dataSource.transaction(async (manager) => {
+    const edition = await findEditionLocked(manager, idOrCode)
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      throw editionClosed()
+    }
+    const context = await loadRoundDrawContext(manager, edition)
+    const roundKind = resolveRoundKind(context, request.roundKind)
+    if (await manager.getRepository(RoundEntity).existsBy({ editionId: edition.id, kind: roundKind })) {
+      throw roundDrawAlreadyValidated()
+    }
+    await manager.getRepository(DrawEntity).delete({ editionId: edition.id, kind: DRAW_KIND.ROUND, status: DRAW_STATUS.DRAFT })
+    const draw = await manager.getRepository(DrawEntity).save({
+      editionId: edition.id,
+      kind: DRAW_KIND.ROUND,
+      roundId: null,
+      roundKind,
+      status: DRAW_STATUS.DRAFT,
+      parameters: { poolCount: 0, seedCount: 0 },
+      createdByUserId: userId
+    })
+    return { draw: await loadAdminDraw(manager, draw.id), editionId: edition.id, replayed: false, matchCount: 0 }
+  })
+
+/**
+ * `PUT /tirages/{id}/affectations` d'un tirage de TOUR : remplace tout le brouillon (une affiche absente du corps est retirée),
+ * donc idempotent. Une saisie partielle est permise ; la complétude n'est exigée qu'à la validation.
+ */
+export const saveRoundDrawAssignments = (
+  dataSource: DataSource,
+  drawId: string,
+  request: IUpdateRoundDrawRequest
+): Promise<IDrawWriteOutcome> =>
+  dataSource.transaction(async (manager) => {
+    const { draw, edition } = await lockEditionThenDraw(manager, drawId, DRAW_KIND.ROUND)
+    if (draw.status === DRAW_STATUS.VALIDATED) {
+      throw roundDrawAlreadyValidated()
+    }
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      throw editionClosed()
+    }
+    const context = await loadRoundDrawContext(manager, edition)
+    const roundKind = resolveRoundKind(context, draw.roundKind)
+    const invalid = checkRoundDrawAssignments({
+      assignments: request.assignments,
+      candidateIds: context.candidates.map((candidate) => candidate.id),
+      roundKind,
+      poolWinnerIds: context.poolWinnerIds,
+      complete: false
+    })
+    if (invalid !== null) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, `${API_ERROR_MESSAGE.ROUND_DRAW_INVALID}: ${invalid}`)
+    }
+    await manager.getRepository(DrawAssignmentEntity).delete({ drawId })
+    if (request.assignments.length > 0) {
+      await manager.getRepository(DrawAssignmentEntity).insert(request.assignments.map((assignment) => ({
+        drawId,
+        participationId: assignment.participationId,
+        poolNumber: null,
+        pairingIndex: assignment.pairingIndex,
+        sidePosition: assignment.sidePosition,
+        drawnOrder: assignment.drawnOrder
+      })))
+    }
+    return { draw: await loadAdminDraw(manager, drawId), editionId: draw.editionId, replayed: false, matchCount: 0 }
+  })
+
+/**
+ * `POST /tirages/{id}/validation` d'un tirage de TOUR : crée le tour avec le statut explicite DRAWN (jamais PENDING, B-18) et
+ * ses matchs (cible 10, RG22), passe l'édition à PLAYOFFS, fige le tirage. Idempotent : rejouée, elle renvoie l'état courant
+ * sans match de plus (invariant 6). Mêmes verrous que le tirage des poules : l'édition, puis le tirage.
+ */
+export const validateRoundDraw = (dataSource: DataSource, drawId: string, userId: string, now = new Date()): Promise<IDrawWriteOutcome> =>
+  dataSource.transaction(async (manager) => {
+    const { draw, edition } = await lockEditionThenDraw(manager, drawId, DRAW_KIND.ROUND)
+    if (draw.status === DRAW_STATUS.VALIDATED) {
+      return { draw: await loadAdminDraw(manager, drawId), editionId: draw.editionId, replayed: true, matchCount: 0 }
+    }
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      throw editionClosed()
+    }
+    const context = await loadRoundDrawContext(manager, edition)
+    const roundKind = resolveRoundKind(context, draw.roundKind)
+    const assignments = await manager.getRepository(DrawAssignmentEntity).find({ where: { drawId }, order: { drawnOrder: 'ASC' } })
+    const drawn = assignments.map((assignment): IRoundDrawAssignmentInput => ({
+      participationId: assignment.participationId,
+      pairingIndex: assignment.pairingIndex ?? 0,
+      sidePosition: assignment.sidePosition === 2 ? 2 : 1,
+      drawnOrder: assignment.drawnOrder
+    }))
+    const check = (complete: boolean) => checkRoundDrawAssignments({
+      assignments: drawn,
+      candidateIds: context.candidates.map((candidate) => candidate.id),
+      roundKind,
+      poolWinnerIds: context.poolWinnerIds,
+      complete
+    })
+    const invalid = check(false)
+    if (invalid !== null || assignments.some((assignment) => assignment.pairingIndex === null || assignment.sidePosition === null)) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, `${API_ERROR_MESSAGE.ROUND_DRAW_INVALID}: ${invalid ?? 'missing pairing'}`)
+    }
+    if (check(true) !== null) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCOMPLETE, API_ERROR_MESSAGE.ROUND_DRAW_INCOMPLETE)
+    }
+    if (await manager.getRepository(RoundEntity).existsBy({ editionId: edition.id, kind: roundKind })) {
+      throw roundDrawAlreadyValidated()
+    }
+
+    const last = await manager.getRepository(RoundEntity).createQueryBuilder('r').select('MAX(r.sequence)', 'max')
+      .where('r.editionId = :editionId', { editionId: edition.id }).getRawOne<{ max: number | null }>()
+    const round = await manager.getRepository(RoundEntity).save({
+      editionId: edition.id,
+      kind: roundKind,
+      sequence: (last?.max ?? 0) + 1,
+      status: ROUND_STATUS.DRAWN
+    })
+    const lastMatch = await manager.getRepository(MatchEntity).createQueryBuilder('m').select('MAX(m.sequence)', 'max')
+      .where('m.editionId = :editionId', { editionId: edition.id }).getRawOne<{ max: number | null }>()
+    const pairingIndexes = [...new Set(drawn.map((assignment) => assignment.pairingIndex))].sort((a, b) => a - b)
+    const matchIds = await generateUuids(pairingIndexes.length)
+    const target = targetScore(roundKind, MATCH_PURPOSE.REGULAR, 2)
+    await manager.getRepository(MatchEntity).insert(pairingIndexes.map((_pairing, index) => ({
+      id: matchIds[index]!,
+      editionId: edition.id,
+      roundId: round.id,
+      poolId: null,
+      sequence: (lastMatch?.max ?? 0) + index + 1,
+      purpose: MATCH_PURPOSE.REGULAR,
+      targetScore: target
+    })))
+    await manager.getRepository(MatchSideEntity).insert(pairingIndexes.flatMap((pairing, index) =>
+      drawn.filter((assignment) => assignment.pairingIndex === pairing).map((assignment) => ({
+        matchId: matchIds[index]!, position: assignment.sidePosition, participationId: assignment.participationId
+      }))))
+
+    if (edition.status !== EDITION_STATUS.PLAYOFFS) {
+      await manager.getRepository(EditionEntity).update({ id: edition.id }, { status: EDITION_STATUS.PLAYOFFS })
+    }
+    await manager.getRepository(DrawEntity).update({ id: drawId }, {
+      status: DRAW_STATUS.VALIDATED,
+      roundId: round.id,
+      validatedAt: now,
+      validatedByUserId: userId
+    })
+    return { draw: await loadAdminDraw(manager, drawId), editionId: edition.id, replayed: false, matchCount: pairingIndexes.length }
+  })
+
+/** Lit le type du tirage sans verrou : la fonction appelée le revérifie sous verrou. */
+const peekDrawKind = async (dataSource: DataSource, drawId: string): Promise<DRAW_KIND> => {
+  const peek = await dataSource.getRepository(DrawEntity).findOne({ where: { id: drawId }, select: { id: true, kind: true } })
+  if (!peek) {
+    throw notFound(API_ERROR_MESSAGE.DRAW_NOT_FOUND)
+  }
+  return peek.kind
+}
+
+const isRoundRequest = (request: TUpdateDrawRequest): request is IUpdateRoundDrawRequest =>
+  request.assignments.length > 0 && 'pairingIndex' in request.assignments[0]!
+const isPoolRequest = (request: TUpdateDrawRequest): request is IUpdateDrawAssignmentsRequest =>
+  request.assignments.length > 0 && 'poolNumber' in request.assignments[0]!
+
+/** `PUT /tirages/{id}/affectations` : tirage de poules (`poolNumber`) ou de tour (`pairingIndex`, `sidePosition`). 400 si le corps n'est pas de la forme du tirage. */
+export const saveDrawAssignments = async (
+  dataSource: DataSource,
+  drawId: string,
+  request: TUpdateDrawRequest
+): Promise<IDrawWriteOutcome> => {
+  const kind = await peekDrawKind(dataSource, drawId)
+  if (kind === DRAW_KIND.ROUND) {
+    if (isPoolRequest(request)) {
+      throw validationFailed([{ path: 'assignments', message: 'A round draw takes pairingIndex and sidePosition, not poolNumber' }])
+    }
+    return saveRoundDrawAssignments(dataSource, drawId, request as IUpdateRoundDrawRequest)
+  }
+  if (isRoundRequest(request)) {
+    throw validationFailed([{ path: 'assignments', message: 'A pools draw takes poolNumber, not pairingIndex' }])
+  }
+  return savePoolDrawAssignments(dataSource, drawId, request as IUpdateDrawAssignmentsRequest)
+}
+
+/** `POST /tirages/{id}/validation` : tirage de poules ou de tour. */
+export const validateDraw = async (dataSource: DataSource, drawId: string, userId: string): Promise<IDrawWriteOutcome> =>
+  (await peekDrawKind(dataSource, drawId)) === DRAW_KIND.ROUND
+    ? validateRoundDraw(dataSource, drawId, userId)
+    : validatePoolDraw(dataSource, drawId, userId)
 
 /** `GET /admin/editions/{id}/tirages` (C7) : tous les tirages de l'édition, brouillons compris, avec auteur et horodatages. */
 export const loadAdminDraws = async (dataSource: DataSource, idOrCode: string): Promise<IAdminDraw[]> => {

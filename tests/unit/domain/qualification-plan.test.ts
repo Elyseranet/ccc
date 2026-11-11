@@ -82,21 +82,46 @@ describe('computeQualification (RG18 à RG20, A10)', () => {
   })
 })
 
-describe('planRoundDraw (RG13, RG14)', () => {
+describe('planRoundDraw (RG13, RG14, decisions 673e5b4b)', () => {
   const finalized = { editionStatus: EDITION_STATUS.QUALIFIED, qualification: { topPerPool: 2, bestNextCount: 0, withPlayoff: false } }
+  const playingOff = { editionStatus: EDITION_STATUS.PLAYOFFS, qualification: { topPerPool: 2, bestNextCount: 0, withPlayoff: false } }
 
   it('is blocked by QUALIFICATION_NOT_DONE until the list is finalized', () => {
     expect(planRoundDraw({ editionStatus: EDITION_STATUS.POOLS_DRAWN, qualification: null, knockoutRounds: [], candidateCount: 8 }))
-      .toEqual({ roundKind: null, blockedBy: API_ERROR_CODE.QUALIFICATION_NOT_DONE })
+      .toEqual({ roundKind: null, allowedRoundKinds: [], blockedBy: API_ERROR_CODE.QUALIFICATION_NOT_DONE })
   })
 
   it.each([[16, ROUND_KIND.ROUND_OF_16], [8, ROUND_KIND.QUARTER], [4, ROUND_KIND.SEMI], [2, ROUND_KIND.FINAL]])(
     'deduces the round from the pool size: %i -> %s', (candidateCount, roundKind) => {
-      expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount })).toEqual({ roundKind, blockedBy: null })
+      expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount }))
+        .toEqual({ roundKind, allowedRoundKinds: [roundKind], blockedBy: null })
     })
 
-  it('answers no round for a size outside 2, 4, 8, 16 (Q2: no power-of-two check at qualification, none here either)', () => {
-    expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount: 12 })).toEqual({ roundKind: null, blockedBy: null })
+  it('leaves the choice to the admin for a pool size outside 2, 4, 8, 16: no deduced round, the possible rounds listed', () => {
+    // 12 joueurs, aucun tour tiré : barrages, quarts ou demies (pas les huitièmes qui exigent 16, pas la finale qui exige 2).
+    expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount: 12 }))
+      .toEqual({ roundKind: null, allowedRoundKinds: [ROUND_KIND.PLAYOFF, ROUND_KIND.QUARTER, ROUND_KIND.SEMI], blockedBy: null })
+    // 14 joueurs : le tour de huitièmes n'est pas permis (16 exigés).
+    expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount: 14 }).allowedRoundKinds).not.toContain(ROUND_KIND.ROUND_OF_16)
+    // 4 joueurs : demie déduite, jamais la finale à 4 (2 exigés).
+    expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount: 6 }).allowedRoundKinds).not.toContain(ROUND_KIND.FINAL)
+  })
+
+  it('an odd pool can only play the playoff, and only while no knockout round is drawn', () => {
+    expect(planRoundDraw({ ...finalized, knockoutRounds: [], candidateCount: 13 }).allowedRoundKinds).toEqual([ROUND_KIND.PLAYOFF])
+    expect(planRoundDraw({
+      ...playingOff, knockoutRounds: [{ kind: ROUND_KIND.QUARTER, completed: true }], candidateCount: 7
+    }).allowedRoundKinds).toEqual([])
+  })
+
+  it('a chosen round never precedes a round already drawn, and the playoff is no longer possible after one', () => {
+    const afterQuarters = planRoundDraw({ ...playingOff, knockoutRounds: [{ kind: ROUND_KIND.QUARTER, completed: true }], candidateCount: 6 })
+    expect(afterQuarters.allowedRoundKinds).toEqual([ROUND_KIND.SEMI])
+    expect(afterQuarters.allowedRoundKinds).not.toContain(ROUND_KIND.PLAYOFF)
+    expect(afterQuarters.allowedRoundKinds).not.toContain(ROUND_KIND.QUARTER)
+    // 4 joueurs après les demies : la demie n'est plus déduite (elle précède un tour tiré).
+    expect(planRoundDraw({ ...playingOff, knockoutRounds: [{ kind: ROUND_KIND.SEMI, completed: true }], candidateCount: 4 }))
+      .toEqual({ roundKind: null, allowedRoundKinds: [], blockedBy: null })
   })
 
   it('draws the playoff first when the qualification has withPlayoff, whatever the pool size', () => {
@@ -105,12 +130,12 @@ describe('planRoundDraw (RG13, RG14)', () => {
       qualification: { topPerPool: 3, bestNextCount: 2, withPlayoff: true },
       knockoutRounds: [],
       candidateCount: 22
-    })).toEqual({ roundKind: ROUND_KIND.PLAYOFF, blockedBy: null })
+    })).toEqual({ roundKind: ROUND_KIND.PLAYOFF, allowedRoundKinds: [ROUND_KIND.PLAYOFF], blockedBy: null })
   })
 
   it('is blocked by ROUND_NOT_COMPLETED while the last round has a match to validate (RG13)', () => {
-    expect(planRoundDraw({ ...finalized, editionStatus: EDITION_STATUS.PLAYOFFS, knockoutRounds: [{ kind: ROUND_KIND.QUARTER, completed: false }], candidateCount: 4 }))
-      .toEqual({ roundKind: null, blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED })
+    expect(planRoundDraw({ ...playingOff, knockoutRounds: [{ kind: ROUND_KIND.QUARTER, completed: false }], candidateCount: 4 }))
+      .toEqual({ roundKind: null, allowedRoundKinds: [], blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED })
   })
 
   it('follows the playoff with the round of 16 once the playoff is complete', () => {
@@ -119,12 +144,12 @@ describe('planRoundDraw (RG13, RG14)', () => {
       qualification: { topPerPool: 3, bestNextCount: 2, withPlayoff: true },
       knockoutRounds: [{ kind: ROUND_KIND.PLAYOFF, completed: true }],
       candidateCount: 16
-    })).toEqual({ roundKind: ROUND_KIND.ROUND_OF_16, blockedBy: null })
+    })).toEqual({ roundKind: ROUND_KIND.ROUND_OF_16, allowedRoundKinds: [ROUND_KIND.ROUND_OF_16], blockedBy: null })
   })
 
   it('draws nothing after the final', () => {
-    expect(planRoundDraw({ ...finalized, editionStatus: EDITION_STATUS.PLAYOFFS, knockoutRounds: [{ kind: ROUND_KIND.FINAL, completed: true }], candidateCount: 1 }))
-      .toEqual({ roundKind: null, blockedBy: null })
+    expect(planRoundDraw({ ...playingOff, knockoutRounds: [{ kind: ROUND_KIND.FINAL, completed: true }], candidateCount: 1 }))
+      .toEqual({ roundKind: null, allowedRoundKinds: [], blockedBy: null })
   })
 })
 
@@ -168,5 +193,13 @@ describe('checkRoundDrawAssignments (A1)', () => {
     const playoff = [pair('p2', 1, 1, 1), pair('p3', 1, 2, 2)]
     expect(check(playoff, { roundKind: ROUND_KIND.PLAYOFF, winners: ['p1'] })).toBeNull()
     expect(check([pair('p1', 1, 1, 1), pair('p3', 1, 2, 2)], { roundKind: ROUND_KIND.PLAYOFF, winners: ['p1'], complete: false })).not.toBeNull()
+  })
+
+  it('a round of 16 draws exactly 16 players and a final exactly 2 (integrity: a single champion)', () => {
+    const ids = Array.from({ length: 14 }, (_, index) => `q${index + 1}`)
+    const pairs14 = ids.map((id, index) => pair(id, Math.floor(index / 2) + 1, index % 2 === 0 ? 1 : 2, index + 1))
+    expect(check(pairs14, { roundKind: ROUND_KIND.ROUND_OF_16, ids })).not.toBeNull()
+    expect(check(full, { roundKind: ROUND_KIND.FINAL })).not.toBeNull()
+    expect(check([pair('p1', 1, 1, 1), pair('p2', 1, 2, 2)], { roundKind: ROUND_KIND.FINAL, ids: ['p1', 'p2'] })).toBeNull()
   })
 })

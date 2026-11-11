@@ -88,20 +88,42 @@ export const planRoundDraw = (input: IRoundDrawPlanInput): IRoundDrawPlan => {
   const finalized = input.qualification !== null
     && ![EDITION_STATUS.CREATED, EDITION_STATUS.REGISTRATION, EDITION_STATUS.POOLS_DRAWN, EDITION_STATUS.POOLS_PLAYING].includes(input.editionStatus)
   if (!finalized) {
-    return { roundKind: null, blockedBy: API_ERROR_CODE.QUALIFICATION_NOT_DONE }
+    return { roundKind: null, allowedRoundKinds: [], blockedBy: API_ERROR_CODE.QUALIFICATION_NOT_DONE }
   }
   if (input.editionStatus === EDITION_STATUS.CLOSED || input.knockoutRounds.some((round) => round.kind === ROUND_KIND.FINAL)) {
-    return { roundKind: null, blockedBy: null }
+    return { roundKind: null, allowedRoundKinds: [], blockedBy: null }
   }
   if (input.knockoutRounds.some((round) => !round.completed)) {
-    return { roundKind: null, blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED }
+    return { roundKind: null, allowedRoundKinds: [], blockedBy: API_ERROR_CODE.ROUND_NOT_COMPLETED }
   }
-  if (input.knockoutRounds.length === 0 && input.qualification!.withPlayoff) {
-    return { roundKind: ROUND_KIND.PLAYOFF, blockedBy: null }
+  const noneDrawn = input.knockoutRounds.length === 0
+  if (noneDrawn && input.qualification!.withPlayoff) {
+    return { roundKind: ROUND_KIND.PLAYOFF, allowedRoundKinds: [ROUND_KIND.PLAYOFF], blockedBy: null }
   }
-  const kind = ROUND_KIND_BY_POOL_SIZE[input.candidateCount] ?? null
+  const size = input.candidateCount
   const lastIndex = Math.max(-1, ...input.knockoutRounds.map((round) => KNOCKOUT_ROUND_ORDER.indexOf(round.kind)))
-  return { roundKind: kind !== null && KNOCKOUT_ROUND_ORDER.indexOf(kind) > lastIndex ? kind : null, blockedBy: null }
+  const later = KNOCKOUT_ROUND_ORDER.filter((_kind, index) => index > lastIndex)
+
+  // Taille 2, 4, 8 ou 16 : le tour est déduit, s'il vient après le dernier tour tiré (un tour ne précède jamais un tour tiré).
+  const deduced = ROUND_KIND_BY_POOL_SIZE[size] ?? null
+  if (deduced !== null) {
+    const possible = later.includes(deduced)
+    return { roundKind: possible ? deduced : null, allowedRoundKinds: possible ? [deduced] : [], blockedBy: null }
+  }
+
+  // Autre taille (decisions 673e5b4b) : l'administrateur choisit. Gardes : ROUND_OF_16 exige 16 joueurs, FINAL exactement 2
+  // (intégrité : un seul champion), PLAYOFF tant qu'aucun tour de phase finale n'est tiré ; un vivier impair ne se tire que
+  // pour les barrages, où seuls les barragistes sont tirés. Aucune autre contrainte : on n'invente pas de règle de barrage.
+  const even = size % 2 === 0
+  const allowed = size < 2
+    ? []
+    : later.filter((kind) => {
+      if (kind === ROUND_KIND.PLAYOFF) {
+        return noneDrawn
+      }
+      return even && kind !== ROUND_KIND.ROUND_OF_16 && kind !== ROUND_KIND.FINAL
+    })
+  return { roundKind: null, allowedRoundKinds: allowed, blockedBy: null }
 }
 
 /**
@@ -139,6 +161,13 @@ export const checkRoundDrawAssignments = (input: IRoundDrawCheckInput): string |
   }
   if (roundKind !== ROUND_KIND.PLAYOFF && assignments.length !== candidates.size) {
     return 'Every qualified player must be drawn'
+  }
+  // Gardes de taille : huitièmes à 16 joueurs (demande de l'utilisateur), finale à 2 (intégrité : un seul champion).
+  if (roundKind === ROUND_KIND.ROUND_OF_16 && assignments.length !== 16) {
+    return 'A round of 16 draws exactly 16 players'
+  }
+  if (roundKind === ROUND_KIND.FINAL && assignments.length !== 2) {
+    return 'A final draws exactly 2 players'
   }
   return null
 }

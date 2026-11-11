@@ -54,7 +54,10 @@ export interface IRoundDrawPlanInput {
 }
 
 export interface IRoundDrawPlan {
+  /** Le tour DÉDUIT ; null quand le choix revient à l'administrateur ou que rien n'est tirable. */
   roundKind: ROUND_KIND | null
+  /** Les tours tirables : `[roundKind]` quand il est déduit, `[]` quand rien n'est tirable. */
+  allowedRoundKinds: ROUND_KIND[]
   blockedBy: TRoundDrawBlock | null
 }
 
@@ -79,4 +82,13 @@ export interface IPoolContext {
   poolInputs: IQualificationPoolInput[]
   /** Matchs VALIDATED ou RESULT_UNKNOWN uniquement (clé = participation). */
   records: IMatchRecord[]
+}
+
+/** Ce qu'il faut pour proposer, créer ou valider le tirage d'un tour : le vivier, les premiers de poule et la déduction du tour. */
+export interface IRoundDrawContext {
+  /** Participations au statut QUALIFIED (avec leur compétiteur). */
+  candidates: ParticipationEntity[]
+  /** Premiers de poule (place 1) : exclus des barrages. */
+  poolWinnerIds: string[]
+  plan: IRoundDrawPlan
 }
