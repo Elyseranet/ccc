@@ -24,10 +24,10 @@ const ranking = [1, 2].map(rank => ({ rank, competitor: person(`r${rank}`, `Joue
 const overview = buildHomeOverview({ editions: [closed], stats: { editions: 1, competitors: 10, matches: 10, scoredMatches: 10, unknownResultMatches: 0 }, detail: null, matches: [], ranking })
 
 describe('useHomeLinks', () => {
-  it('palmarès non livré en production : aucun lien', () => {
+  it('palmarès livré (F-02) : le lien est présent même en production', () => {
     const { hallOfFameLinked, hallOfFameTo } = useHomeLinks(false)
-    expect(hallOfFameLinked.value).toBe(false)
-    expect(hallOfFameTo.value).toBeUndefined()
+    expect(hallOfFameLinked.value).toBe(true)
+    expect(hallOfFameTo.value).toBe(ROUTES.HALL_OF_FAME)
   })
 
   it('dev et test : tout est accessible, le lien est présent', () => {
