@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { themeColor } from '../helpers/theme-color'
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
@@ -88,15 +89,15 @@ test.describe('accueil : comportements sur les vraies données', () => {
     await expect(page.getByTestId('home-cta-primary')).toBeVisible()
   })
 
-  test('la pastille « N éditions » est pleine, ambre, au texte « encre de nuit » (recette chips)', async ({ page }) => {
+  test('la pastille « N éditions » est pleine, couleur primary du thème, texte primary.fg (recette chips)', async ({ page }) => {
     await hydrated(page)
     const chip = page.getByTestId('home-hero-chip')
     const colors = await chip.evaluate((node) => {
       const style = getComputedStyle(node)
       return { color: style.color, background: style.backgroundColor }
     })
-    expect(colors.color).toBe('rgb(22, 11, 46)')
-    expect(colors.background).toBe('rgb(255, 178, 26)')
+    expect(colors.color).toBe(await themeColor(page, '--origam-color__action--primary---fg'))
+    expect(colors.background).toBe(await themeColor(page, '--origam-color__action--primary---bg'))
   })
 
   test('les liens de l’accueil : CTA vers l’édition, classement, face-à-face', async ({ page }) => {

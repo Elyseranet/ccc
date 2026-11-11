@@ -201,6 +201,7 @@
         bg-color="secondary"
         rounded="xl"
         border
+        border-color="transparent"
         elevation="md"
         hover
         class="home-bento__tile home-bento__tile--rule"
@@ -505,8 +506,6 @@ defineExpose({})
   }
 
   &__tile--rule {
-    border-color: transparent;
-
     .home-bento__eyebrow,
     .home-bento__label {
       color: inherit;

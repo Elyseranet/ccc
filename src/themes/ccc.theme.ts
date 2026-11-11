@@ -64,7 +64,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
-    'origam-card': { rounded: 'xl', border: true, elevation: 'md', density: 'comfortable' },
+    'origam-card': { rounded: 'xl', border: true, borderColor: 'var(--origam-color__border---default)', elevation: 'md', density: 'comfortable' },
     'origam-sheet': { rounded: 'xl', border: true, elevation: 'md' },
     'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560 },
     'origam-drawer': { elevation: 'none', border: true },

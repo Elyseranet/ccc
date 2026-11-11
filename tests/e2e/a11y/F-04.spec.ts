@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { themeColor } from '../helpers/theme-color'
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
@@ -151,16 +152,18 @@ test.describe('fiche joueur : accessibilité', () => {
     expect(await links.first().getAttribute('href')).toContain(`/joueurs/face-a-face?a=${id}&b=`)
   })
 
-  test('les pastilles pleines (primary et secondary) ont le texte nuit rgb(22, 11, 46), sans contraste forcé', async ({ page }) => {
+  test('les pastilles pleines (primary et secondary) ont le texte du thème (action.*.fg), sans contraste forcé', async ({ page }) => {
     const id = await mostTitledPlayerId(page)
     await page.goto(`/joueurs/${id}`)
     await page.waitForLoadState('networkidle')
     const chips = page.locator('[data-cy="player-titles"], [data-cy="player-journey-table"] .origam-chip')
     const count = await chips.count()
     expect(count).toBeGreaterThan(0)
+    const ink = await themeColor(page, '--origam-color__action--primary---fg')
+    expect(ink).toBe(await themeColor(page, '--origam-color__action--secondary---fg'))
     for (let index = 0; index < count; index += 1) {
       const chip = chips.nth(index)
-      await expect(chip).toHaveCSS('color', 'rgb(22, 11, 46)')
+      await expect(chip).toHaveCSS('color', ink)
       await expect(chip).not.toHaveAttribute('data-origam-contrast-fixed', /.*/)
     }
   })

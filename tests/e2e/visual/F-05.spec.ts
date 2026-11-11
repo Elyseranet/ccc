@@ -51,6 +51,8 @@ const hideInk = async (page: Page, selectors: string[]) => {
 }
 
 const alignToPixel = async (page: Page, selector: string) => {
+  // La zone se charge après l'hydratation (paire résolue côté client) : l'attendre avant de la mesurer (T-QA-09).
+  await page.locator(selector).first().waitFor()
   await page.evaluate((target) => {
     const element = document.querySelector(target) as HTMLElement
     const top = element.getBoundingClientRect().top + window.scrollY

@@ -32,6 +32,9 @@ const searchByName = async (request: APIRequestContext, name: string): Promise<I
 
 const findNeverMet = async (request: APIRequestContext, id: string): Promise<string> => {
   const response = await request.get('/api/v1/competiteurs', { params: { pageSize: 100, sort: 'matchesPlayed' } })
+  if (!response.ok()) {
+    throw new Error(`GET /competiteurs a répondu ${response.status()} pendant la recherche d'une paire`)
+  }
   const rows = (await response.json()).items as ICompetitorRow[]
   for (const row of rows) {
     if (row.id === id) {

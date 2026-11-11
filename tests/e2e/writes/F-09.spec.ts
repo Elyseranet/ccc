@@ -44,7 +44,9 @@ test.describe('admin participants : écritures sur une édition créée par le t
   test('rattacher un profil existant : aucun compte recréé, aucune invitation (invitationSent null)', async ({ page, context }) => {
     const { edition } = await createRegistrationEdition(context.request, 'rattacher')
     const profile = await createCompetitor(context.request, 'rattacher profil', { lastName: 'Rattachable Unique' })
-    const mailsBefore = readCapturedMails().length
+    // Courriels du seul profil : les autres tests d'écriture tournent en parallèle et envoient les leurs (T-QA-09).
+    const profileMails = () => readCapturedMails().filter(mail => mail.to === profile.email)
+    const mailsBefore = profileMails().length
     await selectAdminEdition(context, edition)
     await openParticipants(page)
 
@@ -57,7 +59,7 @@ test.describe('admin participants : écritures sur une édition créée par le t
     await expect(page.getByTestId('participant-table')).toContainText(profile.displayName)
     const rows = await adminParticipants(page, edition)
     expect(rows.filter(row => row.competitor.id === profile.id)).toHaveLength(1)
-    expect(readCapturedMails()).toHaveLength(mailsBefore)
+    expect(profileMails()).toHaveLength(mailsBefore)
   })
 
   test('créer un participant : invitation envoyée (invitationSent true), courriel capturé, compte invité', async ({ page, context }) => {
