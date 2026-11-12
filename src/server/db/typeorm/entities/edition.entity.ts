@@ -1,5 +1,6 @@
 import { Column, Entity, Unique } from 'typeorm'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../../enums/edition.enum.js'
+import type { IQualificationParameters } from '../../../../interfaces/qualification.interface.js'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
 /** `year` n'est pas unique : 2012 porte deux éditions (2012a, 2012b). */
@@ -44,4 +45,8 @@ export class EditionEntity extends UuidPrimaryEntity {
 
   @Column({ type: 'timestamptz', nullable: true })
   closedAt!: Date | null
+
+  /** Configuration de la qualification (RG18) figée par `POST …/qualification` ; null tant que la liste n'est pas arrêtée (B-13). */
+  @Column({ type: 'jsonb', nullable: true })
+  qualification!: IQualificationParameters | null
 }

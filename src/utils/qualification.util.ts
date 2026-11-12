@@ -38,9 +38,13 @@ export function selectQualifiers(
   tiebreakMatches: readonly IMatchRecord[] = [],
 ): IQualification {
   const frontierRank = topPerPool + 1
+  // Une égalité qui chevauche la frontière entre les n premiers et le reste décide des qualifiés : elle bloque toujours. Une
+  // égalité qui commence au (n+1)ème rang ne compte que s'il reste des places de meilleur (n+1)ème à pourvoir (m > 0).
+  const covers = (tie: ITiebreakRequirement, rank: number): boolean =>
+    tie.startRank <= rank && rank < tie.startRank + tie.playerIds.length
   const poolTies = standings.flatMap((standing) =>
     standing.requiresTiebreak.filter(
-      (tie) => tie.startRank <= frontierRank && frontierRank < tie.startRank + tie.playerIds.length,
+      (tie) => covers(tie, frontierRank) && (bestNextCount > 0 || covers(tie, topPerPool)),
     ),
   )
   if (poolTies.length > 0) {

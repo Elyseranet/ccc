@@ -16,6 +16,8 @@ export const LOG_EVENT = {
   AUTH_CROSS_ORIGIN_REFUSED: 'auth_cross_origin_refused',
   AVATAR_UPLOADED: 'avatar_uploaded',
   AVATAR_DELETED: 'avatar_deleted',
+  QUALIFICATION_FINALIZED: 'qualification_finalized',
+  TIEBREAK_CREATED: 'tiebreak_created',
   MATCH_RECORDED: 'match_recorded',
   MATCH_VALIDATED: 'match_validated',
   MATCH_CORRECTED: 'match_corrected',

@@ -22,7 +22,7 @@ const toPublicAssignment = (assignment: DrawAssignmentEntity): IDrawAssignment =
 export const toPublicDraw = (draw: DrawEntity, assignments: DrawAssignmentEntity[]): IDraw => ({
   id: draw.id,
   kind: draw.kind,
-  roundKind: draw.round?.kind ?? null,
+  roundKind: draw.round?.kind ?? draw.roundKind ?? null,
   status: draw.status,
   // Liste blanche : une clé parasite du jsonb ne devient jamais publique.
   parameters: { poolCount: draw.parameters.poolCount, seedCount: draw.parameters.seedCount },
