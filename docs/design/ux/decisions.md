@@ -432,3 +432,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : les quatre pages légales (`/mentions-legales`, `/confidentialite`, `/cgu`, `/accessibilite`) ne sont pas indexées. Elles restent accessibles depuis le pied de page et hors sitemap.
 - **Front** : chaque page appelle `useSeo({ noindex: true })` (meta `robots: noindex, nofollow`) et garde son titre d'onglet ; leurs routes sont dans `SEO_PRIVATE_ROUTE_PATTERNS`, ce qui pose aussi l'en-tête `X-Robots-Tag` par `routeRules`. Aucune clé `seo.*` pour ces pages.
 - **À suivre côté back de T-SEO-01** : l'exclusion du sitemap.
+
+## 2026-11-12 — F-13 : Éditions et Compétiteurs dans « Plus »
+
+- **Décision utilisateur** : les entrées « Éditions » et « Compétiteurs », livrées par F-13, rejoignent l’écran admin « Plus » (mobile). **FA-09 est levé pour ces deux entrées.**
+- Ordre : Éditions, Compétiteurs, Phase finale, Participants, Voir le site public, Mon compte. Les deux entrées vont en tête, comme dessiné dans `admin-editions.html` (écran « Menu Plus ») et noté dans `mapping.md`.
+- Le tiroir bureau de `admin-plus.html` porte la section « Référentiel » (Éditions, Compétiteurs), comme `admin-editions.html`.
