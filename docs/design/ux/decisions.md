@@ -247,6 +247,17 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## ARCH-15 — `src/server/routes/` autorisé (décision utilisateur 2026-11-12, T-SEO-01)
 - `src/server/routes/` rejoint `api/`, `middleware/` et `plugins/` comme dossier imposé par Nitro (routes hors `/api`, ex. `/robots.txt`, `/sitemap.xml`). À plat, comme les autres. Mis à jour dans `CLAUDE.md` du projet et `tests/unit/architecture.test.ts` par la branche T-SEO-01 back.
 
+## LEGAL-1 — Contenu des pages légales (décisions utilisateur 2026-11-12, F-19)
+- **Éditeur** : l'utilisateur, **particulier non professionnel, anonyme** dans les mentions légales (seuls l'hébergeur et un email de contact sont publiés ; régime LCEN art. 6 cité par l'audit, texte non vérifié sur Légifrance : à confirmer par la relecture juridique).
+- **Hébergeur** (dev et production) : **Hetzner Online GmbH**, Industriestr. 25, 91710 Gunzenhausen, Allemagne, tél. +49 9831 505-0 (mentions légales Hetzner). Données dans l'UE. Tranche aussi T-SEC-02 pour le choix de l'hébergeur.
+- **Contact unique** : `contact@elysera.net` (mentions, RGPD, accessibilité).
+- **Comptes inactifs** : conservés tant que le compte existe, suppression sur demande ; pas de purge automatique.
+- **Journaux serveur** : 6 mois, avec rotation configurée (ticket ops) ; la page n'annonce 6 mois qu'une fois la rotation en place.
+- **Origam** : lien du pied de page vers https://github.com/Elyseranet/origam.
+- **Public** : adultes seulement.
+- **Polices** : T-SEC-16 (polices hébergées sur le site) est fait **avant** la publication des pages légales ; aucun appel à Google à déclarer.
+- Les textes rédigés par ba-legal restent des propositions à faire relire par un juriste avant publication.
+
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
