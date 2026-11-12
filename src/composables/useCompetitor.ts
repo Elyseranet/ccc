@@ -7,14 +7,14 @@ import { toAsyncDataError } from '~/utils/async-data-error.util'
  * useCompetitor
  *
  * @description
- * Fiche d'un compétiteur (`GET /competiteurs/{id}`), clé de cache stable par identifiant.
+ * Fiche d'un compétiteur (`GET /competiteurs/{id}`), clé de cache calculée sur l'identifiant COURANT (clé réactive de `useAsyncData` : un getter) : deux instances d'identifiants différents ne partagent jamais leur état, et un changement d'identifiant change de clé.
  * Sans identifiant (`null`), aucune requête n'est émise et la donnée vaut `null`. Le statut réel d'une erreur (404…)
  * est conservé pour l'écran.
  ********************************************************/
 export const useCompetitor = (id: MaybeRefOrGetter<string | null>) => {
   const service = new CompetitorService({ fetcher: useRequestFetch() })
   return useAsyncData<ICompetitorDetail | null>(
-    `competitor:${toValue(id)}`,
+    () => `competitor:${toValue(id)}`,
     async () => {
       const identifier = toValue(id)
       if (!identifier) {
