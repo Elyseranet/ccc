@@ -4,12 +4,12 @@
     aria-labelledby="edition-matches-title"
     data-cy="edition-matches"
   >
-    <h2
+    <origam-title
       id="edition-matches-title"
+      tag="h2"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <async-state
       :empty="isEmpty"
       :empty-title="emptyTitle"
@@ -126,7 +126,7 @@
 import { computed, ref, watch } from 'vue'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'
-import { OrigamChip, OrigamChipGroup, OrigamPagination } from 'origam/components'
+import { OrigamChip, OrigamChipGroup, OrigamPagination, OrigamTitle } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'

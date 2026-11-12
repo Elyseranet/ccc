@@ -4,12 +4,12 @@
     aria-labelledby="edition-groups-title"
     data-cy="edition-groups"
   >
-    <h2
+    <origam-title
       id="edition-groups-title"
+      tag="h2"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <async-state
       :empty="isEmpty"
       :empty-title="emptyTitle"
@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { OrigamTitle } from 'origam/components'
 import { computed } from 'vue'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'

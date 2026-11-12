@@ -4,12 +4,12 @@
     aria-labelledby="edition-draws-title"
     data-cy="edition-draws"
   >
-    <h2
+    <origam-title
       id="edition-draws-title"
+      tag="h2"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <div class="edition-draws__layout">
       <origam-card
         tag="article"
@@ -22,12 +22,16 @@
         data-cy="edition-draws-pools"
       >
         <header class="edition-draws__head">
-          <h3
+          <origam-title
             id="edition-draws-pools-title"
+            tag="h3"
             class="edition-draws__title"
-          >
-            {{ poolsTitle }}
-          </h3>
+            font-size="xl"
+            font-weight="bold"
+            line-height="tight"
+            letter-spacing="normal"
+            :text="poolsTitle"
+          />
           <edition-chip
             v-if="poolsStatusRow"
             :family="poolsStatusRow.family"
@@ -67,9 +71,15 @@
         </async-state>
       </origam-card>
       <div class="edition-draws__rounds">
-        <h3 class="edition-draws__title">
-          {{ roundsTitle }}
-        </h3>
+        <origam-title
+          tag="h3"
+          class="edition-draws__title"
+          font-size="xl"
+          font-weight="bold"
+          line-height="tight"
+          letter-spacing="normal"
+          :text="roundsTitle"
+        />
         <p class="edition-draws__note">
           {{ roundsNote }}
         </p>
@@ -92,9 +102,15 @@
                 :data-cy="draw.dataCy"
               >
                 <header class="edition-draws__head">
-                  <h4 class="edition-draws__draw-title">
-                    {{ draw.title }}
-                  </h4>
+                  <origam-title
+                    tag="h4"
+                    class="edition-draws__draw-title"
+                    font-size="xl"
+                    font-weight="bold"
+                    line-height="tight"
+                    letter-spacing="normal"
+                    :text="draw.title"
+                  />
                   <edition-chip
                     :family="draw.family"
                     :text="draw.status"
@@ -132,7 +148,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamCard } from 'origam/components'
+import { OrigamCard, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
