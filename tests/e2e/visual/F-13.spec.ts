@@ -45,21 +45,10 @@ const hydrated = async (page: Page) => {
 }
 
 /**
- * Données réelles contre données de maquette (même principe qu'`alignMockupText`) : la largeur d'une colonne d'un tableau en
- * disposition automatique suit son contenu le plus long, et la pagination dépend du nombre de pages (15 avec 146 compétiteurs,
- * 5 pastilles dans la maquette). On recopie dans la maquette, en mémoire, les largeurs de colonnes et la liste des pastilles de
- * l'application : la comparaison ne porte alors que sur le gabarit (hauteurs, marges, fonds, rayons, typographie, positions).
+ * Données réelles contre données de maquette (même principe qu'`alignMockupText`) : la pagination dépend du nombre de pages
+ * (15 avec 146 compétiteurs, 5 pastilles dans la maquette). On recopie dans la maquette, en mémoire, la liste des pastilles de
+ * l'application. Les largeurs de colonnes ne sont PAS recopiées : l'application les fixe elle-même et la mesure doit les juger.
  */
-const alignTableWidths = async (mockup: Page, page: Page, mockupTable: string, appTable: string) => {
-  const widths = await page.locator(`${appTable} thead th`).evaluateAll(cells => cells.map(cell => cell.getBoundingClientRect().width))
-  await mockup.evaluate(([selector, values]) => {
-    document.querySelectorAll(`${selector as string} thead th`).forEach((cell, index) => {
-      const width = `${(values as number[])[index]}px`
-      Object.assign((cell as HTMLElement).style, { boxSizing: 'border-box', width, minWidth: width })
-    })
-  }, [mockupTable, widths] as [string, number[]])
-}
-
 const alignPager = async (mockup: Page, page: Page) => {
   const range = await page.getByTestId('competitors-pager-range').innerText()
   const pages = await page.locator('[data-cy="competitors-pagination"] .origam-pagination__item').allInnerTexts()
@@ -127,7 +116,6 @@ for (const viewport of VIEWPORTS) {
       await hydrated(page)
       await showScreen(mockup, 'ed-p-list', `${ORIGIN_HIDDEN} `)
       await hideOrigin(page)
-      await alignTableWidths(mockup, page, '#ed-p-list table', field('editions-table'))
       await compareAll(page, mockup, viewport.name, [
         { zone: 'editions-barre', mockup: '#ed-p-list .ed-bar', app: '.editions-toolbar' },
         { zone: 'editions-entete-table', mockup: '#ed-p-list thead', app: field('editions-table') + ' thead' },
@@ -214,7 +202,6 @@ for (const viewport of VIEWPORTS) {
       await hydrated(page)
       await showScreen(mockup, 'ed-p-comp', '#ed-p-comp .cp-photo .alert { display: none !important; }')
       const masks = { mockup: [] as string[], app: [] as string[] }
-      await alignTableWidths(mockup, page, '#ed-p-comp table', field('competitors-table'))
       await alignPager(mockup, page)
       await compareAll(page, mockup, viewport.name, [
         { zone: 'competiteurs-barre', mockup: '#ed-p-comp .ed-bar', app: '.competitors-toolbar', masks },
