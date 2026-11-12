@@ -1,6 +1,7 @@
 # T-REL-03 — e2e de release rouges sur develop : accueil « sans palmarès » obsolète, unicité des métadonnées SEO
 
-- **Statut** : À faire. Ouvert le 2026-11-12 par `frontend-lead`, constaté pendant les vérifications de `feature/F-08-delivered`.
+- **Statut** : À faire. Décision utilisateur du 2026-11-12 : supprimer `home-sans-palmares.visual.spec.ts` (sans objet depuis la livraison de `/palmares`, F-02). Reste à établir la cause de l'échec de seo.spec:84. Ce ticket porte aussi l'exception de merge de F-08 (`c9d2704a`).
+- **Historique** : À faire. Ouvert le 2026-11-12 par `frontend-lead`, constaté pendant les vérifications de `feature/F-08-delivered`.
 - **Pilote proposé** : `frontend-lead`.
 
 ## Constat
