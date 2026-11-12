@@ -42,3 +42,4 @@
 | à déposer | `data-table` : `text-align: end` de `--align-end` sans effet sur le `th` (style calculé `start`) | `:deep(th.origam-data-table-cell--align-end)` dans `AppDataTable.vue` (F-13) |
 | à déposer | `btn` : l'état désactivé ignore les tokens `action.*.bgDisabled` / `fgDisabled` (opacité 0,5 seule) | aucun, zone `competiteurs-photo` à 0,96 % (F-13) |
 | à déposer | `useStack` : `globalTop` mis à jour une tâche après l'ouverture, Échap ou clic extérieur ignoré dans cet intervalle (fiche `stack-globaltop-apres-ouverture.md`) | aucun dans l'application ; `dismissDialog` réessaie dans le e2e (F-11) |
+| à déposer | `list` : `tabindex="0"` posé sur toute liste, même non sélectionnable (`role="list"`) ; focalisable dans une zone `aria-hidden` (fiche `liste-non-focalisable-hors-selection.md`) | `ul`/`ol` natifs pour les listes statiques (F-28) |
