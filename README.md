@@ -1,6 +1,6 @@
 # CCC
 
-Application de gestion du championnat CCC, avec un site public et un back-office organisateur.
+Application de gestion du championnat CCC (**Cotentin Caps Cup**, du nom de la presqu'île du Cotentin, dans la Manche), avec un site public et un back-office organisateur.
 
 Le socle technique utilise Nuxt 4 et Nitro, PostgreSQL et TypeORM. Les premières vues suivent l'export de design fourni : accueil, compétition, compétiteurs, face-à-face, règlement, variantes, Hall of Fame et espace d'administration.
 

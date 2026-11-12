@@ -457,3 +457,8 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : les entrées « Éditions » et « Compétiteurs », livrées par F-13, rejoignent l’écran admin « Plus » (mobile). **FA-09 est levé pour ces deux entrées.**
 - Ordre : Éditions, Compétiteurs, Phase finale, Participants, Voir le site public, Mon compte. Les deux entrées vont en tête, comme dessiné dans `admin-editions.html` (écran « Menu Plus ») et noté dans `mapping.md`.
 - Le tiroir bureau de `admin-plus.html` porte la section « Référentiel » (Éditions, Compétiteurs), comme `admin-editions.html`.
+
+## 2026-11-12 — Nom : CCC = Cotentin Caps Cup
+
+- **Décision (utilisateur, 2026-11-12)** : « CCC » signifie **Cotentin Caps Cup**, du nom de la presqu'île du Cotentin (Manche). Orthographe confirmée par l'utilisateur : « Cotentin », sans « n » après le « o ».
+- Ne pas l'inventer ailleurs : toute nouvelle occurrence du nom développé (site, mentions légales) reprend exactement cette graphie.
