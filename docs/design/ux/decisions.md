@@ -462,3 +462,4 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 
 - **Décision (utilisateur, 2026-11-12)** : « CCC » signifie **Cotentin Caps Cup**, du nom de la presqu'île du Cotentin (Manche). Orthographe confirmée par l'utilisateur : « Cotentin », sans « n » après le « o ».
 - Ne pas l'inventer ailleurs : toute nouvelle occurrence du nom développé (site, mentions légales) reprend exactement cette graphie.
+- **Nom SEO (utilisateur, 2026-11-12)** : les titres et descriptions SEO (`seo.*`) emploient « Cotentin Caps Cup » au lieu de « Championnat de Caps ».
