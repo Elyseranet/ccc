@@ -32,6 +32,8 @@ export interface IPlayerLinkProps {
   inline?: boolean
   /** Le nom peut passer à la ligne (sinon il reste sur une ligne, comme un bouton). */
   wrap?: boolean
+  /** Le lien coule comme du texte en ligne (nom et étoiles passent à la ligne comme dans une phrase). */
+  flow?: boolean
 }
 
 export interface IAsyncStateProps {
