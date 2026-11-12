@@ -6,8 +6,7 @@ import type { ITextPair } from '../visual.util'
  * Accueil : constantes et gestes communs des comparaisons visuelles (FA-04, ARCH-9)
  *
  * @description
- * Partagés par `visual/F-01.spec.ts` (nuxt dev, tous les liens visibles) et `e2e-release/home-sans-palmares.visual.spec.ts` (conteneur de
- * production, liens vers le palmarès masqués). Seules les VALEURS de données sont masquées (encre transparente) ; le texte réel de
+ * Partagés par `visual/F-01.spec.ts` (nuxt dev, tous les liens visibles). Seules les VALEURS de données sont masquées (encre transparente) ; le texte réel de
  * l'application est écrit dans la maquette (`alignMockupText`) pour que les deux côtés renvoient à la ligne de la même façon.
  ********************************************************/
 export const HOME_VIEWPORTS = [

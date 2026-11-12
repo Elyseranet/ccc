@@ -57,6 +57,7 @@ test.describe('pages privées : noindex, nofollow', () => {
 })
 
 test.describe('pages publiques livrées : métadonnées', () => {
+  test.describe.configure({ mode: 'serial' })
   const seen: Array<{ page: string, title: string, description: string }> = []
 
   for (const page of PUBLIC_PAGES) {
