@@ -173,6 +173,7 @@
           class="legal-page__card"
           rounded="xl"
           border
+          border-color="var(--origam-color__border---subtle)"
           elevation="md"
           padding="6"
           aria-labelledby="legal-related-title"

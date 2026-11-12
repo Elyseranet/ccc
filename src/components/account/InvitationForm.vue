@@ -126,13 +126,13 @@
                 v-if="link.separated"
                 aria-hidden="true"
               >{{ separator }}</span>
-              <origam-btn
-                variant="text"
+              <nuxt-link
                 :to="link.to"
                 class="invitation-form__legal-link"
                 :data-cy="`invitation-legal-${link.to}`"
-                :text="link.text"
-              />
+              >
+                {{ link.text }}
+              </nuxt-link>
             </template>
           </p>
           <origam-btn
@@ -197,7 +197,7 @@ const title = computed(() => t('account.invitation.title', 'Bienvenue au CCC'))
 const intro = computed(() => t('account.invitation.intro', 'L’organisation vous a inscrit·e. Choisissez votre mot de passe, ajoutez une photo et votre téléphone si vous le souhaitez.'))
 const hint = computed(() => t('account.invitation.hint', 'Le lien ne sert qu’une fois.'))
 const submitLabel = computed(() => t('account.invitation.submit', 'Activer mon compte'))
-const separator = LEGAL_LINKS_SEPARATOR
+const separator = ` ${LEGAL_LINKS_SEPARATOR} `
 const legalLinks = computed(() => INVITATION_LEGAL_NAVIGATION.map((item, index) => ({
   to: item.to,
   text: t(item.key, item.label),
@@ -280,16 +280,13 @@ defineExpose({})
   }
 
   &__legal {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     margin: calc(-1 * var(--origam-space---2)) 0 0;
     font-size: var(--origam-font__size---sm);
     color: var(--origam-color__text---secondary);
   }
 
   &__legal-link {
-    color: var(--origam-color__text---secondary);
+    color: inherit;
     text-decoration: underline;
   }
 
