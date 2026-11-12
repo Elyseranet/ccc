@@ -30,7 +30,7 @@ const STEPS_MASKS: IDataMasks = {
   app: ['[data-cy="admin-control-center-progress"]', '[data-cy="admin-control-center"] .origam-stepper-item__subtitle']
 }
 const TODO_MASKS: IDataMasks = {
-  mockup: ['.adm-todo .todo__n', '.adm-todo .todo small'],
+  mockup: ['.adm-task__n', '.adm-task small'],
   app: ['[data-cy^="admin-todo-"] .todo__count', '[data-cy^="admin-todo-"] small']
 }
 const LOG_MASKS: IDataMasks = {

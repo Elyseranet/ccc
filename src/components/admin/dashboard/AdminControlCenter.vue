@@ -1,7 +1,6 @@
 <template>
   <origam-card
     tag="section"
-    padding="6"
     :aria-labelledby="titleId"
     class="control-center"
     data-cy="admin-control-center"
@@ -77,6 +76,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .control-center {
+  padding: var(--control-center---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--control-center---padding-mobile, var(--origam-space---5));
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -88,6 +93,7 @@ defineExpose({})
   &__title {
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
+    letter-spacing: normal;
     line-height: var(--origam-font__lineHeight---tight);
   }
 
@@ -95,5 +101,12 @@ defineExpose({})
     color: var(--origam-color__text---secondary);
     font-variant-numeric: tabular-nums;
   }
+}
+</style>
+
+<style>
+:root {
+  --control-center---padding: var(--origam-space---6);
+  --control-center---padding-mobile: var(--origam-space---5);
 }
 </style>

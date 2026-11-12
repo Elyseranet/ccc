@@ -1,7 +1,6 @@
 <template>
   <origam-card
     tag="section"
-    padding="6"
     :aria-labelledby="titleId"
     class="activity"
     data-cy="admin-activity"
@@ -113,6 +112,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .activity {
+  padding: var(--activity---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--activity---padding-mobile, var(--origam-space---5));
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -124,6 +129,7 @@ defineExpose({})
   &__title {
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
+    letter-spacing: normal;
     line-height: var(--origam-font__lineHeight---tight);
   }
 
@@ -132,20 +138,16 @@ defineExpose({})
   }
 
   &__list {
+    display: grid;
+    gap: var(--activity__list---gap, var(--origam-space---3));
     margin: 0;
-    padding: var(--origam-space---2) 0;
-    border-radius: var(--origam-radius---lg);
-    background: var(--origam-color__surface---default);
+    padding: 0;
     list-style: none;
   }
 
   &__item {
     display: flex;
     align-items: center;
-    box-sizing: border-box;
-    min-height: var(--origam-space---12);
-    padding: var(--origam-space---2);
-    border-radius: var(--origam-radius---lg);
   }
 
   &__row {
@@ -168,5 +170,13 @@ defineExpose({})
     font-size: var(--origam-font__size---xs);
     color: var(--origam-color__text---secondary);
   }
+}
+</style>
+
+<style>
+:root {
+  --activity---padding: var(--origam-space---6);
+  --activity---padding-mobile: var(--origam-space---5);
+  --activity__list---gap: var(--origam-space---3);
 }
 </style>

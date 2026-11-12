@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { ROUTES } from '../../../src/consts/routes.const'
 import { E2E_BASE_URL, E2E_SESSION_COOKIE } from '../helpers/e2e.const'
 import { markAwaitingRoutes } from '../helpers/pending-routes'
 import { signIn } from '../helpers/session'
@@ -61,11 +62,11 @@ for (const viewport of [{ name: '390', width: 390, height: 844 }, { name: '1440'
       await expect(page.getByTestId('admin-dashboard-cta')).toHaveAttribute('href', /\/admin\/matchs\?f=saisis$/)
     })
 
-    test('route d’activité absente : le bloc est en erreur annoncée et le reste de la page reste complet', async ({ page }) => {
-      const awaiting = markAwaitingRoutes(ROUTE)
-      test.skip(awaiting.length === 0, 'la route d’activité existe : cas couvert par le rendu nominal')
-      await page.goto(ROUTE)
+    test('route d’activité en erreur (500) : le bloc est en erreur annoncée et le reste de la page reste complet', async ({ page }) => {
+      await page.goto(ROUTES.ADMIN_MORE)
       await page.waitForLoadState('networkidle')
+      await page.route('**/api/v1/admin/editions/*/activite*', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }))
+      await page.evaluate(() => (window as unknown as { useNuxtApp: () => { $router: { push: (path: string) => Promise<unknown> } } }).useNuxtApp().$router.push('/admin'))
       await expect(page.locator('[data-cy="admin-activity"] [data-cy="async-state-error"]')).toBeVisible()
       await expect(page.getByTestId('admin-control-center')).toBeVisible()
       await expect(page.getByTestId('admin-todo')).toBeVisible()
