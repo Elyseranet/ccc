@@ -10,3 +10,5 @@
 - **Référence** : la mesure de dev-f06 sur `wip/F-03b-origam-bracket` (adf07fa) donne 23,2 % à 1440 et 41,0 % à 390.
 
 - **2026-11-12 — référence visuelle** (décision utilisateur) : capture de référence Playwright du rendu validé, relue par un humain, versionnée ; régénérée seulement pour un changement voulu. Plan front-lead : 1 dev (dev-f11 après le merge de F-11), Origam 2.37.4.
+
+- **2026-11-12 — cadre et fond de carte non réglables** : `origam-bracket` restreint ses surfaces `border` et `rounded` (`bracket.interface.d.ts`, Origam #1013) ; `border`, `borderColor`, `rounded` et `bgColor` posés dans le thème n'ont aucun effet visible (captures de référence sans cadre ni fond) et ont été retirés. Écart accepté par F-03-BRK bis.
