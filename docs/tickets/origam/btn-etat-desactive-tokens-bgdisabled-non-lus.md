@@ -4,7 +4,7 @@
 
 ## Constat
 
-Le thème expose, par intention, `--origam-color__action--<intent>---bgDisabled` et `---fgDisabled` (tokens.css). `OrigamBtn.vue` ne les lit pas : l'état désactivé n'est rendu que par `--origam-btn---opacity: var(--origam-btn---opacity-disabled, 0.5)` (classe `origam-btn--disabled`). Aucun composant bouton ne consomme ces deux tokens ; seule la feuille d'aides `assets/scss/_helpers.scss` (l.32-33) les lit.
+Le thème expose, par intention, `--origam-color__action--<intent>---bgDisabled` et `---fgDisabled` (tokens.css). `OrigamBtn.vue` ne les lit pas : l'état désactivé n'est rendu que par `--origam-btn---opacity: var(--origam-btn---opacity-disabled, 0.5)` (classe `origam-btn--disabled`). Aucun composant bouton ne consomme ces deux tokens ; seule la feuille d'aides `assets/scss/_helpers.scss` (l.32-33) les lit. Les tokens propres au bouton `--origam-btn---background-color-disabled` et `--origam-btn---color-disabled` sont déclarés par `tokens/light.css` et `tokens/dark.css` (ils valent `bgDisabled` / `fgDisabled` de `action.primary`) mais `OrigamBtn.vue` ne les lit jamais non plus (aucune occurrence dans `components/Btn`).
 
 Mesuré dans CCC (F-13, « Supprimer la photo » sans photo, variante `outlined`, 1440 px) : le bouton garde son filet de 2 px et passe à l'opacité 0,5 ; la maquette le peint en aplat `bgDisabled` avec le texte `fgDisabled`, sans filet. Écart de la zone `competiteurs-photo` : 0,96 % (seuil 1 %).
 
@@ -19,6 +19,10 @@ Un thème ne peut pas styler l'état désactivé par ses tokens : les tokens exi
 ## Proposition
 
 Lire `bgDisabled` / `fgDisabled` dans l'état `--disabled` (avec repli sur l'opacité actuelle, rendu inchangé sans token).
+
+## Contournement CCC
+
+Règle centrale dans `src/assets/css/main.css`, listée dans l'en-tête de `ccc.theme.ts` : bouton désactivé (hors pagination) à opacité 1, fond `action.primary.bgDisabled`, texte `text.tertiary` (la maquette `hh.css` : `.btn:disabled`), filet transparent, sans ombre.
 
 ## Critère d'acceptation
 
