@@ -111,7 +111,11 @@ const waitForStableLayout = async (page: Page) => {
   }), { frames: STABLE_FRAMES, timeout: STABLE_TIMEOUT_MS })
 }
 
+/** Les deux familles de l'application, auto-hébergées (T-SEC-16) : chargées à la première utilisation, donc à attendre avant toute capture. */
+const FONT_LOADS = ['400 1em Gabarito', '700 1em Gabarito', '1em "Bagel Fat One"']
+
 export const settle = async (page: Page) => {
+  await page.evaluate(loads => Promise.all(loads.map(load => document.fonts.load(load))), FONT_LOADS)
   await page.evaluate(() => document.fonts.ready)
   await page.waitForLoadState('networkidle')
   await waitForStableLayout(page)
