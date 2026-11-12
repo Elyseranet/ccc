@@ -67,7 +67,7 @@ defineExpose({})
 </script>
 
 <style scoped lang="scss">
-// Origam : le `text-align: end` de `--align-end` n'atteint pas le `th` mesuré (calculé à `start`) : l'en-tête d'une colonne alignée à droite restait à gauche.
+// Défaut Origam (fiche docs/tickets/origam/data-table-th-align-end-sans-effet.md, à déposer) : `text-align: end` de `--align-end` n'atteint pas le `th` (calculé à `start`).
 :deep(th.origam-data-table-cell--align-end) {
   text-align: end;
 }
