@@ -38,6 +38,9 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *     token) : Elyseranet/origam#1266 ;
  *   - `.origam-field.origam-field.origam-field input` (retrait de 2 px de l'`<input>`, jamais remis à zéro) :
  *     Elyseranet/origam#1280 ;
+ *   - `.origam-btn.origam-btn.origam-btn--disabled:not(.origam-pagination *)` (état désactivé : Origam n'applique qu'une opacité de
+ *     0,5 et ignore `action.*.bgDisabled` ; la maquette peint un aplat `bgDisabled`, texte tertiaire, sans filet ; la pagination garde
+ *     sa règle) : fiche docs/tickets/origam/btn-etat-desactive-tokens-bgdisabled-non-lus.md (à déposer) ;
  *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
  *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276 ;
  *   - les 6 règles `.origam-pagination.origam-pagination.origam-pagination …` (pagination de l'annuaire : flèches
