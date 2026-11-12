@@ -2,8 +2,8 @@ import { createError } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { buildDataSourceOptions } from '../../src/server/db/typeorm/data-source-options'
-import { toApiError } from '../../src/utils/api-error.util'
-import { databaseTimeoutError, isDatabaseTimeout, resolveDatabaseTimeouts } from '../../src/utils/database-timeouts.util'
+import { databaseTimeoutError, toApiError } from '../../src/utils/api-error.util'
+import { isDatabaseTimeout, resolveDatabaseTimeouts } from '../../src/utils/database-timeouts.util'
 import { DeadlineExceededError, withDeadline } from '../../src/utils/deadline.util'
 
 describe('resolveDatabaseTimeouts', () => {

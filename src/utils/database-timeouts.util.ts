@@ -1,15 +1,11 @@
-import { createError } from 'h3'
-import type { H3Error } from 'h3'
 import {
   DATABASE_TIMEOUT_DEFAULTS,
   DATABASE_TIMEOUT_ENV_VARIABLES,
   DATABASE_TIMEOUT_MAX_MS,
   DATABASE_TIMEOUT_MESSAGES,
-  DATABASE_TIMEOUT_RETRY_AFTER_SECONDS,
   PG_QUERY_CANCELED
 } from '../consts/database-config.const.js'
-import { SERVICE_UNAVAILABLE_MESSAGE } from '../consts/api-error.const.js'
-import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+// Chargé par la DataSource de la CLI (migrations dans l'image) : aucune dépendance serveur (h3), voir cli-dependencies.test.ts.
 import type { IDatabaseTimeouts, IResolvedDatabaseTimeouts } from '../interfaces/database-config.interface.js'
 
 /** Entier de 0 à 600000 (0 = pas de délai). Une valeur absente ou vide garde le défaut sans être « invalide ». */
@@ -62,10 +58,3 @@ const errorChain = (error: unknown): Array<{ code?: unknown, message?: unknown }
 export const isDatabaseTimeout = (error: unknown): boolean =>
   errorChain(error).some((link) =>
     link.code === PG_QUERY_CANCELED || (typeof link.message === 'string' && DATABASE_TIMEOUT_MESSAGES.includes(link.message)))
-
-/** 503 générique avec `Retry-After` : la réponse ne porte aucun détail du pilote (le plugin api-response pose l'en-tête). */
-export const databaseTimeoutError = (): H3Error => createError({
-  statusCode: 503,
-  message: SERVICE_UNAVAILABLE_MESSAGE,
-  data: { code: API_ERROR_CODE.SERVICE_UNAVAILABLE, retryAfterSeconds: DATABASE_TIMEOUT_RETRY_AFTER_SECONDS }
-})
