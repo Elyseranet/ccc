@@ -39,6 +39,8 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
   const boundary = await seedPoolStage(dataSource, { code: '2064', rank: 4, pools: [clearPool('e'), clearPool('f')] })
   // 2065 : quatre poules identiques, deux places de meilleur 2e pour quatre ex æquo (R-7).
   const multi = await seedPoolStage(dataSource, { code: '2065', rank: 5, pools: [clearPool('g'), clearPool('h'), clearPool('i'), clearPool('j')] })
+  // 2067 : trois poules identiques, deux places de meilleur 2e pour trois ex æquo : un départage à trois, puis un 1v1 entre ses deux perdants (R-7).
+  const triple = await seedPoolStage(dataSource, { code: '2067', rank: 7, pools: [clearPool('k'), clearPool('l'), clearPool('m')] })
   const unseeded = await dataSource.getRepository(EditionEntity).save({
     code: '2066', year: 2166, chronologicalRank: 6, status: EDITION_STATUS.REGISTRATION, origin: EDITION_ORIGIN.APP
   })
@@ -311,6 +313,45 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
       expect(done.status).toBe(200)
       const qualified = await done.json() as IQualificationResult
       expect(qualified.qualified.filter((entry) => entry.route === QUALIFICATION_ROUTE.BEST_NEXT).map((entry) => entry.participationId).sort())
+        .toEqual([firstWinner, secondWinner].sort())
+    })
+
+    it('R-7 end to end: three tied players for two places need a 3-sided tiebreak (3-1-0), then a 1v1 between its two losers; the two qualified are the two winners', async () => {
+      const parameters = { topPerPool: 1, bestNextCount: 2 }
+      const query = '?topPerPool=1&bestNextCount=2'
+      const first = (await status(triple, query)).ties
+      expect(first).toHaveLength(1)
+      expect(first[0]).toMatchObject({ scope: TIEBREAK_SCOPE.BOUNDARY, format: TIEBREAK_FORMAT.MULTI_SIDES, slots: 2 })
+      expect(first[0]!.members).toHaveLength(3)
+
+      const three = await createTiebreak(triple, first[0]!.members.map((member) => member.participationId), parameters)
+      expect(three.status).toBe(201)
+      const threeMatch = await three.json() as IAdminMatch
+      expect(threeMatch).toMatchObject({ purpose: MATCH_PURPOSE.TIEBREAK, targetScore: 3 })
+      expect(threeMatch.sides).toHaveLength(3)
+      await play(threeMatch, [3, 1, 0])
+      const firstWinner = threeMatch.sides[0]!.participationId
+      const losers = [threeMatch.sides[1]!.participationId, threeMatch.sides[2]!.participationId]
+
+      // R-2 : malgré 1 et 0, les deux perdants restent ex æquo.
+      const second = (await status(triple, query)).ties
+      expect(second).toHaveLength(1)
+      expect(second[0]).toMatchObject({ format: TIEBREAK_FORMAT.ONE_VS_ONE, slots: 1 })
+      expect(second[0]!.members.map((member) => member.participationId).sort()).toEqual([...losers].sort())
+      expect(second[0]!.members.map((member) => member.participationId)).not.toContain(firstWinner)
+
+      const duel = await createTiebreak(triple, losers, parameters)
+      expect(duel.status).toBe(201)
+      const duelMatch = await duel.json() as IAdminMatch
+      expect(duelMatch).toMatchObject({ purpose: MATCH_PURPOSE.TIEBREAK, targetScore: 5 })
+      expect(duelMatch.sides).toHaveLength(2)
+      await play(duelMatch, [5, 2])
+      const secondWinner = duelMatch.sides[0]!.participationId
+
+      const done = await finalize(triple, { topPerPool: 1, bestNextCount: 2, withPlayoff: false })
+      expect(done.status).toBe(200)
+      const result = await done.json() as IQualificationResult
+      expect(result.qualified.filter((entry) => entry.route === QUALIFICATION_ROUTE.BEST_NEXT).map((entry) => entry.participationId).sort())
         .toEqual([firstWinner, secondWinner].sort())
     })
   })
