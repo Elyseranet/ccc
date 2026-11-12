@@ -1,5 +1,6 @@
 import { CCC_HH_THEMES } from './src/themes/ccc.theme'
 import { clientBundleGuard, isServerOnlyModule } from './src/utils/client-bundle-guard.util'
+import { DATABASE_RUNTIME_CONNECTION_TIMEOUT_MS, DATABASE_RUNTIME_QUERY_TIMEOUT_MS, DATABASE_RUNTIME_STATEMENT_TIMEOUT_MS } from './src/consts/database-config.const'
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_INDEXABLE, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
 import { SEO_PRIVATE_ROUTE_PATTERNS, SEO_ROBOTS_NOINDEX } from './src/consts/seo.const'
 
@@ -79,7 +80,11 @@ export default defineNuxtConfig({
       port: 5432,
       username: '',
       password: '',
-      database: ''
+      database: '',
+      // T-SEC-17 : délais en millisecondes (0 = aucun). NUXT_DATABASE_CONNECTION_TIMEOUT_MS, _STATEMENT_TIMEOUT_MS, _QUERY_TIMEOUT_MS.
+      connectionTimeoutMs: DATABASE_RUNTIME_CONNECTION_TIMEOUT_MS,
+      statementTimeoutMs: DATABASE_RUNTIME_STATEMENT_TIMEOUT_MS,
+      queryTimeoutMs: DATABASE_RUNTIME_QUERY_TIMEOUT_MS
     },
     cache: {
       closedEditionMaxAgeSeconds: 3600

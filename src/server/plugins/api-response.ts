@@ -2,6 +2,7 @@ import { send, setResponseHeader, setResponseStatus } from 'h3'
 import { LOG_EVENT } from '../../consts/log-event.const'
 import { API_PREFIX } from '../../consts/request.const'
 import { toApiError } from '../../utils/api-error.util'
+import { databaseTimeoutError, isDatabaseTimeout } from '../../utils/database-timeouts.util'
 import { sanitizeRouteForLog } from '../../utils/log-sanitize.util'
 import { logger } from '../../utils/logger.util'
 
@@ -15,8 +16,21 @@ export default defineNitroPlugin((nitroApp) => {
       return originalOnError?.(error, event)
     }
 
-    const apiError = toApiError(error)
-    if (apiError.statusCode >= 500) {
+    // T-SEC-17 : un délai de la base (connexion, instruction annulée) répond 503 + Retry-After, jamais un 500 ni le message
+    // du pilote. Toute autre erreur 5xx garde exactement son traitement.
+    const databaseTimeout = isDatabaseTimeout(error)
+    if (databaseTimeout) {
+      const cause = ((error as { cause?: unknown }).cause ?? error) as { name?: string, code?: string }
+      logger.error(LOG_EVENT.DATABASE_TIMEOUT, {
+        requestId: event.context.requestId,
+        route: sanitizeRouteForLog(event.path),
+        errorName: cause.name,
+        errorCode: cause.code
+      })
+    }
+    const handled = databaseTimeout ? databaseTimeoutError() : error
+    const apiError = toApiError(handled)
+    if (apiError.statusCode >= 500 && !databaseTimeout) {
       logger.error(LOG_EVENT.UNHANDLED_ERROR, {
         requestId: event.context.requestId,
         route: sanitizeRouteForLog(event.path),
@@ -24,7 +38,7 @@ export default defineNitroPlugin((nitroApp) => {
       })
     }
 
-    const retryAfterSeconds = (error.data as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds
+    const retryAfterSeconds = (handled.data as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds
     if (apiError.statusCode === 503 && typeof retryAfterSeconds === 'number' && retryAfterSeconds > 0) {
       setResponseHeader(event, 'Retry-After', Math.ceil(retryAfterSeconds))
     }

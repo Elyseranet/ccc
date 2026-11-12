@@ -65,6 +65,11 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | Variable | Obligatoire | Rôle |
 |---|---|---|
 | `NUXT_DATABASE_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_DATABASE` | oui (sauf `_PORT`, 5432) | Connexion PostgreSQL (serveur et migrations). Le démarrage échoue si l'une est vide. |
+| `NUXT_DATABASE_CONNECTION_TIMEOUT_MS` | non (3000) | Délai de connexion à PostgreSQL du serveur, en millisecondes (T-SEC-17) : ouverture d'une connexion ET attente d'un client libre dans le pool. `0` = aucun. Une valeur invalide (non entière, négative, au-delà de 600000) garde le défaut ; le log `database_timeout_config_invalid` nomme la variable, jamais sa valeur. |
+| `NUXT_DATABASE_STATEMENT_TIMEOUT_MS` | non (3000) | `statement_timeout` PostgreSQL du serveur : la base annule l'instruction (SQLSTATE 57014). **Il compte aussi l'attente d'un verrou** (`SELECT … FOR UPDATE` des écritures de match et du tirage) : une attente plus longue devient un 503. `0` = aucun. |
+| `NUXT_DATABASE_QUERY_TIMEOUT_MS` | non (3500) | `query_timeout` du pilote `pg`, filet côté client si la base ne répond plus (la requête n'est pas annulée côté serveur). Garder au-dessus du délai d'instruction pour que la base annule d'abord. `0` = aucun. |
+| `NUXT_DATABASE_CLI_CONNECTION_TIMEOUT_MS` | non (10000) | Délai de connexion de la CLI (`ccc-ops migrate`, `db:seed:archives`, `user:*`, `db:migration:*`) : une base injoignable fait échouer l'entrypoint au lieu de l'attendre sans fin. |
+| `NUXT_DATABASE_CLI_STATEMENT_TIMEOUT_MS`, `NUXT_DATABASE_CLI_QUERY_TIMEOUT_MS` | non (0, aucun) | Délais d'instruction et de requête de la CLI. **Aucun par défaut** : une migration ou le seed ne doivent pas être coupés. À ne renseigner qu'en connaissance de cause. |
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | oui en production (B-08) | Secret du cookie d'appareil, 32 caractères minimum. Obligatoire dans le compose ; l'application refuse de démarrer en production sans lui (SEC-A4). Disponible après intégration de B-08. |
 | `NUXT_AUTH_SECURE_COOKIE` | non (vrai) | Cookies `Secure` + préfixe `__Host-` (T-SEC-04, L3). **Ne jamais positionner `false` sur un déploiement Coolify en HTTPS** (laisser la variable absente) ; `false` ne sert qu'au développement local en HTTP. |
 | `NUXT_AUTH_PASSWORD_HASH_CONCURRENCY` | non (2) | Calculs scrypt simultanés, de 1 à 64 ; au-delà, 503 `SERVICE_BUSY` avec `Retry-After` (T-SEC-04, L2). |
@@ -78,6 +83,12 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | `NUXT_CACHE_CLOSED_EDITION_MAX_AGE_SECONDS` | non (3600) | `Cache-Control` public des lectures d'une édition CLOSED (vague 2). |
 
 Aucune variable de session (`NUXT_SESSION_*`) ni SMTP n'existe dans le code à ce jour : à ajouter à ce tableau quand l'authentification (B-08) et l'envoi de courriel seront intégrés.
+
+### Délais de la base (T-SEC-17)
+
+Le serveur borne chaque appel à PostgreSQL : 3 s de connexion, 3 s d'instruction, 3,5 s de requête côté client (variables ci-dessus). Un délai dépassé répond **503** `SERVICE_UNAVAILABLE` avec `Retry-After: 5` et un message générique, jamais le message du pilote ; le log `database_timeout` ne porte que le nom et le code de l'erreur. `GET /api/v1/health` a en plus un délai global de 4 s sur son bloc base (connexion, puis requête), sous les 5 s du `HEALTHCHECK` de l'image : elle répond 503 à temps même quand la base ne répond plus. Les écritures qui attendent un verrou (validation d'un tirage, saisie d'un score) ont donc au plus 3 s d'attente.
+
+La CLI (migrations, seed, scripts) ne borne que la connexion : elle n'a ni `statement_timeout` ni `query_timeout` par défaut, pour qu'une migration longue ne soit pas coupée.
 
 ### Domaine et sonde de santé
 
