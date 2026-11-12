@@ -14,7 +14,7 @@ import { E2E_SESSIONS_FILE } from '../e2e/helpers/e2e.const'
  ********************************************************/
 const INVITATION_PAGE = '/invitation/jeton-de-test'
 const ROBOTS_META = `<meta name="robots" content="${SEO_ROBOTS_NOINDEX}">`
-const PUBLIC_PAGES = ['/', ROUTES.RULES, ROUTES.PLAYERS, ROUTES.HEAD_TO_HEAD, '/editions/2025']
+const PUBLIC_PAGES = ['/', ROUTES.RULES, ROUTES.PLAYERS, ROUTES.HEAD_TO_HEAD, ROUTES.HALL_OF_FAME, '/editions/2025']
 
 const adminToken = (): string | undefined => process.env.E2E_ADMIN_SESSION ?? (existsSync(E2E_SESSIONS_FILE) ? (JSON.parse(readFileSync(E2E_SESSIONS_FILE, 'utf8')) as Record<string, string>).admin : undefined)
 
@@ -57,6 +57,7 @@ test.describe('pages privées : noindex, nofollow', () => {
 })
 
 test.describe('pages publiques livrées : métadonnées', () => {
+  test.describe.configure({ mode: 'serial' })
   const seen: Array<{ page: string, title: string, description: string }> = []
 
   for (const page of PUBLIC_PAGES) {
