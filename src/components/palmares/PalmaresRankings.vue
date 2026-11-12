@@ -5,12 +5,15 @@
     data-cy="palmares-rankings"
   >
     <div class="palmares-rankings__head">
-      <h2
+      <origam-title
         id="palmares-rankings-title"
+        tag="h2"
+        margin="0"
+        font-size="4xl"
+        line-height="none"
         class="palmares-rankings__title font-display neon--sm"
-      >
-        {{ title }}
-      </h2>
+        :text="title"
+      />
       <p class="palmares-rankings__note">
         {{ note }}
       </p>
@@ -60,7 +63,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamTab, OrigamTabPanel, OrigamTabPanels, OrigamTabs } from 'origam/components'
+import { OrigamTab, OrigamTabPanel, OrigamTabPanels, OrigamTabs, OrigamTitle } from 'origam/components'
 import PalmaresEvolution from '~/components/palmares/PalmaresEvolution.vue'
 import PalmaresRankingTable from '~/components/palmares/PalmaresRankingTable.vue'
 import { usePalmaresTabs } from '~/composables/usePalmaresTabs'
@@ -112,12 +115,6 @@ defineExpose({})
     justify-content: space-between;
     gap: var(--origam-space---4);
     margin-bottom: var(--origam-space---8);
-  }
-
-  &__title {
-    margin: 0;
-    font-size: var(--origam-font__size---4xl);
-    line-height: var(--origam-font__lineHeight---none);
   }
 
   &__note {

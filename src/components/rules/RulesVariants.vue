@@ -6,12 +6,13 @@
     tabindex="-1"
     data-cy="rules-variants"
   >
-    <h2
+    <origam-title
       id="rules-variants-title"
+      tag="h2"
+      margin="0"
       class="sr-only"
-    >
-      {{ heading }}
-    </h2>
+      :text="heading"
+    />
     <p class="rules-variants__lead">
       {{ lead }}
     </p>
