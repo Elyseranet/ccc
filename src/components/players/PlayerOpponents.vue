@@ -13,69 +13,61 @@
       />
       <p class="player-opponents__lead">{{ lead }}</p>
     </div>
-    <origam-list
+    <ul
       class="player-opponents__list"
-      density="comfortable"
       :aria-label="title"
       data-cy="player-opponents-list"
     >
-      <template #default>
-        <origam-list-item
-          v-for="summary in opponents"
-          :key="summary.opponent.id"
-          class="player-opponents__item"
-          rounded="lg"
-          :padding-block="rowPaddingBlock"
-          :padding-inline="rowPaddingInline"
-          data-cy="player-opponent"
-        >
-          <template #default>
-            <div class="player-opponents__row">
-              <player-avatar
-                :display-name="summary.opponent.displayName"
-                :avatar-url="summary.opponent.avatarUrl"
-              />
-              <player-link
-                inline
-                class="player-opponents__name"
-                :competitor="summary.opponent"
-              />
-              <span class="player-opponents__count">{{ countText(summary) }}</span>
-              <span
-                class="player-opponents__record"
-                data-cy="player-opponent-record"
-              >
-                <template v-if="hasRatio(summary)">
-                  <b>{{ winsText(summary) }}</b>{{ lossesText(summary) }}
-                </template>
-                <template v-else>
-                  {{ withoutRatioText(summary) }}
-                </template>
-              </span>
-              <span
-                v-if="hasRatio(summary)"
-                class="player-opponents__bar"
-                aria-hidden="true"
-                :style="barStyle(summary)"
-              />
-              <origam-btn
-                class="player-opponents__link"
-                variant="text"
-                color="primary"
-                size="small"
-                :to="linkOf(summary)"
-                data-cy="player-opponent-link"
-              >
-                <template #default>
-                  {{ compareLabel }}
-                  <span class="sr-only">{{ compareWith(summary) }}</span>
-                </template>
-              </origam-btn>
-            </div>
-          </template>
-        </origam-list-item>
-      </template>
-    </origam-list>
+      <li
+        v-for="summary in opponents"
+        :key="summary.opponent.id"
+        class="player-opponents__item"
+        data-cy="player-opponent"
+      >
+        <div class="player-opponents__row">
+          <player-avatar
+            :display-name="summary.opponent.displayName"
+            :avatar-url="summary.opponent.avatarUrl"
+          />
+          <player-link
+            inline
+            class="player-opponents__name"
+            :competitor="summary.opponent"
+          />
+          <span class="player-opponents__count">{{ countText(summary) }}</span>
+          <span
+            class="player-opponents__record"
+            data-cy="player-opponent-record"
+          >
+            <template v-if="hasRatio(summary)">
+              <b>{{ winsText(summary) }}</b>{{ lossesText(summary) }}
+            </template>
+            <template v-else>
+              {{ withoutRatioText(summary) }}
+            </template>
+          </span>
+          <span
+            v-if="hasRatio(summary)"
+            class="player-opponents__bar"
+            aria-hidden="true"
+            :style="barStyle(summary)"
+          />
+          <origam-btn
+            class="player-opponents__link"
+            variant="text"
+            color="primary"
+            size="small"
+            :to="linkOf(summary)"
+            data-cy="player-opponent-link"
+          >
+            <template #default>
+              {{ compareLabel }}
+              <span class="sr-only">{{ compareWith(summary) }}</span>
+            </template>
+          </origam-btn>
+        </div>
+      </li>
+    </ul>
     <p
       v-if="hasMore"
       class="player-opponents__more"
@@ -97,7 +89,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamBtn, OrigamList, OrigamListItem, OrigamTitle } from 'origam/components'
+import { OrigamBtn, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
@@ -153,8 +145,6 @@ const compareWith = (summary: IPlayerOpponent): string => t('player.opponents.co
  * @description
  * La barre est proportionnelle au taux de victoires, sans le chiffrer.
  ********************************************************/
-const rowPaddingBlock = 'var(--origam-space---3)'
-const rowPaddingInline = 'var(--origam-space---4)'
 const hasMore = computed(() => props.total > props.opponents.length)
 const seeAllLabel = computed(() => t('player.opponents.see_all', 'Voir les {count} adversaires', { count: props.total }))
 const seeAllLink = computed(() => buildHeadToHeadLink(props.playerId))
@@ -197,14 +187,17 @@ defineExpose({})
   &__list {
     display: grid;
     gap: var(--origam-space---2);
+    margin: 0;
     padding: 0;
-    background: none;
+    list-style: none;
   }
 
   &__item {
     position: relative;
     overflow: hidden;
+    padding: var(--origam-space---3) var(--origam-space---4);
     border: 1px solid var(--origam-color__border---subtle);
+    border-radius: var(--origam-radius---lg);
     background: var(--origam-color__surface---raised);
   }
 

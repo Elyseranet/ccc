@@ -24,40 +24,35 @@
         @retry="handleRetry"
       >
         <template #default>
-          <origam-list
-            density="compact"
+          <ul
             class="activity__list"
             :aria-label="title"
           >
-            <template #default>
-              <origam-list-item
-                v-for="row in rows"
-                :key="row.id"
-                class="activity__item"
-                :data-cy="`admin-activity-${row.id}`"
-              >
-                <template #default>
-                  <span class="activity__row">
-                    <origam-chip
-                      :text="row.kindLabel"
-                      :color="row.color"
-                      size="small"
-                    />
-                    <span class="activity__label">{{ row.head }}
-                      <b
-                        v-if="row.score"
-                        class="activity__score"
-                      >{{ row.score }}</b>
-                      {{ row.tail }}</span>
-                    <small
-                      v-if="row.context"
-                      class="activity__context"
-                    >{{ row.context }}</small>
-                  </span>
-                </template>
-              </origam-list-item>
-            </template>
-          </origam-list>
+            <li
+              v-for="row in rows"
+              :key="row.id"
+              class="activity__item"
+              :data-cy="`admin-activity-${row.id}`"
+            >
+              <span class="activity__row">
+                <origam-chip
+                  :text="row.kindLabel"
+                  :color="row.color"
+                  size="small"
+                />
+                <span class="activity__label">{{ row.head }}
+                  <b
+                    v-if="row.score"
+                    class="activity__score"
+                  >{{ row.score }}</b>
+                  {{ row.tail }}</span>
+                <small
+                  v-if="row.context"
+                  class="activity__context"
+                >{{ row.context }}</small>
+              </span>
+            </li>
+          </ul>
         </template>
       </async-state>
     </template>
@@ -66,7 +61,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamCard, OrigamChip, OrigamList, OrigamListItem, OrigamTitle } from 'origam/components'
+import { OrigamCard, OrigamChip, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_DASHBOARD_ACTIVITY_KINDS } from '~/consts/admin-dashboard.const'
@@ -134,6 +129,23 @@ defineExpose({})
 
   &__note {
     color: var(--origam-color__text---secondary);
+  }
+
+  &__list {
+    margin: 0;
+    padding: var(--origam-space---2) 0;
+    border-radius: var(--origam-radius---lg);
+    background: var(--origam-color__surface---default);
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    min-height: var(--origam-space---12);
+    padding: var(--origam-space---2);
+    border-radius: var(--origam-radius---lg);
   }
 
   &__row {
