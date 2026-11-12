@@ -66,7 +66,7 @@ for (const screen of SCREENS) {
     await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false).catch(() => undefined)
     await page.waitForTimeout(1500)
     const after = await page.evaluate(MEASURE)
-    await page.addStyleTag({ content: '.origam-card, .origam-dialog { --origam-field---border-color: var(--origam-color__border---default) !important; }' })
+    await page.addStyleTag({ content: 'html, body, .origam-card, .origam-dialog { --origam-field---border-color: var(--origam-color__border---default) !important; }' })
     await page.waitForTimeout(300)
     const before = await page.evaluate(MEASURE)
     console.log(`RATIO ${screen.path} url=${page.url().replace(/^https?:\/\/[^/]+/, '')}\n  AVANT: ${before.join(' ; ')}\n  APRES: ${after.join(' ; ')}`)
