@@ -9,13 +9,6 @@ import type { IAdminMoreItem } from '../interfaces/admin-more.interface.js'
 
 export const ADMIN_MORE_ITEMS: IAdminMoreItem[] = [
   {
-    key: 'admin.more.final_phase',
-    label: 'Phase finale',
-    description: { key: 'admin.more.final_phase_description', label: 'Qualification, tirage des tours, clôture' },
-    to: ROUTES.ADMIN_FINAL_PHASE,
-    icon: IconFinalPhase
-  },
-  {
     key: 'admin.more.editions',
     label: 'Éditions',
     description: { key: 'admin.more.editions_description', label: 'Créer une édition, modifier ses informations' },
@@ -28,6 +21,13 @@ export const ADMIN_MORE_ITEMS: IAdminMoreItem[] = [
     description: { key: 'admin.more.competitors_description', label: 'Corriger une identité, gérer la photo' },
     to: ROUTES.ADMIN_COMPETITORS,
     icon: IconCompetitors
+  },
+  {
+    key: 'admin.more.final_phase',
+    label: 'Phase finale',
+    description: { key: 'admin.more.final_phase_description', label: 'Qualification, tirage des tours, clôture' },
+    to: ROUTES.ADMIN_FINAL_PHASE,
+    icon: IconFinalPhase
   },
   {
     key: 'admin.more.participants',

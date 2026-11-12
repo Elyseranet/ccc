@@ -35,6 +35,7 @@ import EditionsToolbar from '~/components/admin/editions/EditionsToolbar.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import { useAdminEditions } from '~/composables/useAdminEditions'
 import { useT } from '~/composables/useT'
+import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
  * Page
@@ -50,6 +51,7 @@ defineSlots<{}>()
 const { editions, query, pending, failure, isEmpty, hasNoMatch, refresh } = useAdminEditions()
 const title = computed(() => t('pages.admin_editions.title', 'Éditions'))
 useHead({ title })
+useSeo({ noindex: true })
 const emptyTitle = computed(() => ({ key: 'admin.editions.empty', fallback: 'Aucune édition pour le moment' }))
 const noMatchText = computed(() => t('admin.editions.no_match', 'Aucune édition ne correspond à cette recherche.'))
 const note = computed(() => t('admin.editions.archive_note', 'Les éditions de l’archive (2012a à 2025) ont été importées : nom, date et lieu n’y sont pas renseignés. Le code d’une édition ne change jamais, c’est son adresse publique (/editions/2012a).'))

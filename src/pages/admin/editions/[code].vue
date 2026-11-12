@@ -38,6 +38,7 @@ import { useT } from '~/composables/useT'
 import { EDITION_FORM_MODE } from '~/enums/admin-editions.enum'
 import type { IEditionFormValues } from '~/interfaces/admin-editions.interface'
 import { emptyEditionFormValues, toEditionFormValues } from '~/utils/admin-editions.util'
+import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
  * Page
@@ -56,6 +57,7 @@ const code = computed(() => String(route.params.code ?? ''))
 const { edition, loading, loadFailure, isClosed, update, saving, saved, failure, refresh } = useEditionEdit(code)
 const title = computed(() => t('pages.admin_edition.title', 'Édition {code}', { code: code.value }))
 useHead({ title })
+useSeo({ noindex: true })
 const mode = EDITION_FORM_MODE.EDIT
 const values = computed(() => edition.value ? toEditionFormValues(edition.value) : emptyEditionFormValues())
 

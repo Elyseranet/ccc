@@ -26,6 +26,7 @@ import { useT } from '~/composables/useT'
 import { EDITION_FORM_MODE } from '~/enums/admin-editions.enum'
 import type { IEditionFormValues } from '~/interfaces/admin-editions.interface'
 import { emptyEditionFormValues } from '~/utils/admin-editions.util'
+import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
  * Page
@@ -42,6 +43,7 @@ defineSlots<{}>()
 const { create, pending, failure, created } = useEditionCreate()
 const title = computed(() => t('pages.admin_edition_new.title', 'Nouvelle édition'))
 useHead({ title })
+useSeo({ noindex: true })
 const mode = EDITION_FORM_MODE.CREATE
 const values = emptyEditionFormValues()
 

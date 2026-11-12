@@ -17,8 +17,8 @@ import { buildMe } from '../../helpers/me'
 const mountPage = () => mountSuspended(AdminMorePage, { route: ROUTES.ADMIN_MORE, global: { components: { RouterLink } } })
 
 describe('page « Plus » de l’admin (F-12)', () => {
-  it('propose exactement Phase finale, Éditions, Compétiteurs, Participants, site public et Mon compte, sans rien de ce que masque FA-09', () => {
-    expect(ADMIN_MORE_ITEMS.map(item => item.to)).toEqual([ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
+  it('propose exactement Éditions, Compétiteurs, Phase finale, Participants, site public et Mon compte, sans rien de ce que masque FA-09', () => {
+    expect(ADMIN_MORE_ITEMS.map(item => item.to)).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
   })
 
   it('en production, les entrées des pages non livrées restent masquées (PAGE_DELIVERY, F-12b, F-13)', () => {

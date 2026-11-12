@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import CompetitorsScreen from '~/components/admin/competitors/CompetitorsScreen.vue'
+import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
  * Page
@@ -15,6 +16,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
+useSeo({ noindex: true })
 
 /*********************************************************
  * Expose
