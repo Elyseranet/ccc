@@ -244,6 +244,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Les compteurs d'autres écrans (accueil, matchs) peuvent changer : vérification au Playwright complet de la PR vers main (T-REL-04).
 - Maquette `admin.html` : la classe `todo` (réservée aux marqueurs « [À FOURNIR] » par `hh.css`) est renommée dans `admin.html` et `admin.css`.
 
+## ARCH-15 — `src/server/routes/` autorisé (décision utilisateur 2026-11-12, T-SEO-01)
+- `src/server/routes/` rejoint `api/`, `middleware/` et `plugins/` comme dossier imposé par Nitro (routes hors `/api`, ex. `/robots.txt`, `/sitemap.xml`). À plat, comme les autres. Mis à jour dans `CLAUDE.md` du projet et `tests/unit/architecture.test.ts` par la branche T-SEO-01 back.
+
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
