@@ -239,6 +239,11 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Merge sur `develop`** : le chef de projet merge lui-même, sans attendre la file Playwright. Contrôle minimal sur le résultat du merge : **typecheck + `test:run`**. Remplace, pour develop seulement, les gates complètes de la politique de livraison.
 - **PR `develop` → `main`** : gates complètes obligatoires (Playwright complet à 0 échec, `test:db`, `test:api`, `npm audit` 0 high/critical, gitleaks, revue de sécurité).
 
+## QA-2 bis — État nominal de l'édition 2026 en base e2e (décision utilisateur 2026-11-12, F-07)
+- QA-2 est étendue : après la remise de 2026 en phase de poules, la préparation de la base e2e (`tests/e2e/helpers/in-progress-edition.ts`) laisse, **par mises à jour seules, sans aucune insertion ni suppression**, une part fixe et documentée de matchs à l'état saisi (`recorded_at` posé) et pose `validated_at` sur les matchs validés, pour que le tableau de bord admin montre son état nominal (scores à valider, fil d'activité rempli). Un brouillon de tirage n'est ajouté que s'il est possible sans insertion.
+- Les compteurs d'autres écrans (accueil, matchs) peuvent changer : vérification au Playwright complet de la PR vers main (T-REL-04).
+- Maquette `admin.html` : la classe `todo` (réservée aux marqueurs « [À FOURNIR] » par `hh.css`) est renommée dans `admin.html` et `admin.css`.
+
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
