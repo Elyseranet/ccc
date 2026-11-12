@@ -227,6 +227,13 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Une fiche Origam demande ces trois réglages en variables. Le ticket CCC **F-03-BRK** suit la migration vers `origam-bracket` quand Origam les livre.
 - Précision sur FA-11 : un slot `connector` **vide** ne supprime pas les traits, car Vue rend le contenu de repli. Il faut un nœud (`<template #connector><g /></template>`).
 
+## F-03-BRK bis — Migration immédiate vers origam-bracket (décision utilisateur 2026-11-12)
+- Remplace F-03-BRK : le tableau des phases finales passe **maintenant** à `origam-bracket`, sans attendre Elyseranet/origam#1282 (toujours ouverte le 2026-11-12 ; les fichiers `Bracket/` d'origam 2.37.42 sont identiques à ceux de la 2.37.4 installée).
+- L'écart à la maquette `edition.html` est **accepté** pour le tableau (mesure de référence 23,2 % à 1440, 41,0 % à 390). Le thème le réduit autant que possible (props d'abord), sans contourner Origam par du CSS qui force ses styles en ligne.
+- Restent exigés : aucun trait de liaison (RG13, slot `connector` avec `<g />`, FA-11), lien vers la fiche joueur et score dans le slot `competitor`, vainqueur non porté par la couleur seule, alternative en liste, région de défilement focalisable et nommée.
+- e2e visuel : la zone du tableau ne se compare plus à la maquette. Sa référence devient le rendu `origam-bracket` validé, documenté dans le commit (exception approuvée par l'utilisateur). Quand #1282 sera livrée, F-03-BRK rapprochera le rendu de la maquette.
+- Consigne générale rappelée par l'utilisateur : utiliser au maximum les composants Origam (audit : F-28).
+
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.

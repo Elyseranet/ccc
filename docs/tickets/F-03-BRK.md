@@ -1,7 +1,8 @@
 # F-03-BRK — Migrer le tableau des phases finales vers origam-bracket
 
 - **Statut** : Ouvert (2026-10-28). Décision utilisateur F-03-BRK (`docs/design/ux/decisions.md`).
-- **Bloqué par** : l'évolution Origam qui rend réglables en variables la largeur de tour, la hauteur minimale et l'alignement du titre de tour (fiche `docs/tickets/origam/`, numéro au merge de F-03b).
+- **2026-11-12 — débloqué par décision utilisateur F-03-BRK bis** : migration **immédiate**, écart à la maquette accepté, sans attendre Elyseranet/origam#1282 (ouverte ; origam 2.37.42 ne change rien au bracket, fichiers comparés). Étapes 1 et 3 inchangées ; l'étape 2 devient « réduire l'écart par le thème autant que possible », la référence visuelle de la zone tableau devient le rendu `origam-bracket` validé. L'objectif < 1 % reviendra quand #1282 sera livrée.
+- **Était bloqué par** : l'évolution Origam qui rend réglables en variables la largeur de tour, la hauteur minimale et l'alignement du titre de tour (fiche `docs/tickets/origam/`, numéro au merge de F-03b).
 - **À faire** quand Origam livre :
   1. remplacer le tableau maison de F-03b par `origam-bracket` (variante `single-elimination`, `showScores`, slot `connector` avec `<g />` selon FA-11, slot `competitor`) ;
   2. régler l'écart par le thème (props d'abord) jusqu'à repasser sous 1 % aux deux largeurs ;
