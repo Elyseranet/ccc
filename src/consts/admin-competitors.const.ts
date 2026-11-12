@@ -25,7 +25,7 @@ export const ADMIN_COMPETITOR_COLUMNS: IAdminCompetitorColumn[] = [
   { field: 'displayName', title: { key: 'admin.competitors.column_display_name', fallback: 'Nom affiché' }, width: '191px', minWidth: '191px' },
   { field: 'firstName', title: { key: 'admin.competitors.column_first_name', fallback: 'Prénom' }, width: '85px', minWidth: '85px' },
   { field: 'lastName', title: { key: 'admin.competitors.column_last_name', fallback: 'Nom' }, width: '88px', minWidth: '88px' },
-  { field: 'nickname', title: { key: 'admin.competitors.column_nickname', fallback: 'Pseudo' }, width: '119px', minWidth: '119px' },
+  { field: 'nickname', title: { key: 'admin.competitors.column_nickname', fallback: 'Pseudo' }, width: '118.75px', minWidth: '118.75px' },
   { field: 'editionsPlayed', title: { key: 'admin.competitors.column_editions', fallback: 'Éditions' }, align: ALIGN.END, width: '89px', minWidth: '89px' },
   { field: 'actions', title: { key: 'admin.competitors.column_action', fallback: 'Action' }, align: ALIGN.END, width: '111px', minWidth: '111px' }
 ]
