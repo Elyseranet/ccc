@@ -1,6 +1,6 @@
 # T-OPS-03 — Contrôle de santé : version déployée et état des migrations
 
-- **Statut** : En revue (2026-11-12), à merger par le `project-manager` (GATE-DEV). Ouvert le 2026-11-04 par le chef de projet (demande et décision utilisateur du 2026-11-04).
+- **Statut** : Mergé dans develop @ `43462a46` (branche `9e171cc3`) le 2026-11-12, **reste ouvert** jusqu'à la vérification sur l'env de dev redéployé. Preuve (backend-lead, sur `9e171cc3`) : typecheck vert, test:run 1291 / 0, tests d'API de la sonde 12/12 (dont délais T-SEC-17), avant rebase test:db 120/120 et test:api 336/336. Conflit `health.get.ts` résolu en gardant `withDeadline(HEALTH_DEADLINE_MS)` sur connexion + `SELECT 1` (vérifié par le chef de projet). Sur le merge : typecheck vert, test:run 1291 / 0. **Reste** : sur `https://ccc.dev.elysera.net` après redéploiement, `GET /api/v1/health` doit renvoyer `version` et `migrations`, et aucun fichier de migration ne doit être servi en HTTP (avant redéploiement, la dev renvoyait encore `{"status":"ok"}`).
 - **Pilote** : `backend-lead`.
 - **Origine** : l'utilisateur veut savoir, sur l'environnement de dev (T-OPS-04), quelle version du code il teste.
 
