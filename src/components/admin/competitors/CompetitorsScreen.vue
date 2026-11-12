@@ -162,7 +162,7 @@ defineExpose({})
 
   &__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) var(--competitors-screen__panel---width, 24rem);
     align-items: start;
     gap: var(--competitors-screen__grid---gap, var(--origam-space---5));
   }
@@ -190,6 +190,7 @@ defineExpose({})
   --competitors-screen---gap: var(--origam-space---5);
   --competitors-screen---padding-block: var(--origam-space---12) var(--origam-space---10);
   --competitors-screen__grid---gap: var(--origam-space---5);
+  --competitors-screen__panel---width: 24rem;
   --competitors-screen__hint---color: var(--origam-color__text---tertiary);
 }
 </style>
