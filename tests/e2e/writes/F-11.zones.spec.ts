@@ -3,7 +3,7 @@ import type { APIRequestContext, Page } from '@playwright/test'
 import { attachParticipant, createCompetitor, createRegistrationEdition, selectAdminEdition } from '../helpers/edition-write'
 import type { IWriteEdition, IWriteParticipant } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
-import { alignMockupText, box, compare, open } from '../visual.util'
+import { alignMockupText, box, compare, open, settle } from '../visual.util'
 import type { IClip, ITextPair } from '../visual.util'
 
 /*********************************************************
@@ -130,6 +130,10 @@ for (const viewport of VIEWPORTS) {
       // La liste des têtes de série vient d'une lecture silencieuse après le montage (reprise d'un brouillon).
       await expect(page.getByTestId('draw-seeds-list').locator('li')).toHaveCount(POOLS)
 
+      // La liste des têtes de série n'existe qu'après `open` : ses polices (Bagel Fat One, Gabarito) se chargent après le premier `settle`.
+      // Sous charge, une ligne passait à la ligne le temps de l'échange de police et la zone était mesurée à 533 px au lieu de 541 (ti-tetes @1440).
+      await settle(page)
+      await settle(mockup)
       await mockup.addStyleTag({ content: '.adm-bottom, .snack { display: none !important; }' })
       await page.addStyleTag({ content: '.admin-bottom, [data-cy="draw-saved"], [data-cy="draw-feedback"] { display: none !important; }' })
       await alignMockupText(mockup, page, TEXT_PAIRS)
