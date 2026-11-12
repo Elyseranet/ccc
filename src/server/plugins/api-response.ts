@@ -1,8 +1,8 @@
 import { send, setResponseHeader, setResponseStatus } from 'h3'
 import { LOG_EVENT } from '../../consts/log-event.const'
 import { API_PREFIX } from '../../consts/request.const'
-import { toApiError } from '../../utils/api-error.util'
-import { databaseTimeoutError, isDatabaseTimeout } from '../../utils/database-timeouts.util'
+import { databaseTimeoutError, toApiError } from '../../utils/api-error.util'
+import { isDatabaseTimeout } from '../../utils/database-timeouts.util'
 import { sanitizeRouteForLog } from '../../utils/log-sanitize.util'
 import { logger } from '../../utils/logger.util'
 

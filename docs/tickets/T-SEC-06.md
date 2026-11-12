@@ -1,7 +1,7 @@
 # T-SEC-06 — Garde PROD-1 : contournements de la configuration stricte
 
 - **Origine** : revue de sécurité de la vague 3a (`5efed01..feature/integration-wave3a`), finding LOW L1, le 2026-10-22.
-- **Statut** : **Ouvert** : code et tests mergés @ `207d1af5` ; **reste la preuve Docker** (critère 3). Q1 tranchée par l'utilisateur (SEC-Q).
+- **Statut** : **Fermé** le 2026-11-12. Code et tests mergés @ `207d1af5` ; preuve Docker faite (voir « Preuve Docker »). Q1 tranchée par l'utilisateur (SEC-Q).
 - **2026-11-12 — mergé dans develop @ `207d1af5`** (branche @ `5d50f5ad`), sous GATE-DEV (décision utilisateur : merge develop = typecheck + test:run ; gates complètes à la PR vers main, [T-REL-04](T-REL-04.md)). Preuve : typecheck vert et test:run 1126 réussis / 1 ignoré / 0 échec sur le résultat des 5 merges (chef de projet, worktree temporaire). **Reste ouvert** jusqu'à ce que le lead confirme, critère par critère, ce qui est couvert par le code mergé et ce qui reste.
 - **Fichiers** : `src/consts/runtime-config.const.ts` (`LOCAL_HOSTNAMES`, `STRICT_RUNTIME_CONFIG_OFF_VALUES`), `src/utils/runtime-config-guard.util.ts`, `src/server/plugins/runtime-config-guard.ts`, `src/utils/create-admin-cli.util.ts`.
 
@@ -65,3 +65,17 @@ Par ailleurs, `NUXT_STRICT_RUNTIME_CONFIG=false`, `0` ou vide désactive toute l
 - **Critère 2 fait** : les messages nomment les variables, jamais leurs valeurs ; testé avec de faux secrets (`tests/unit/runtime-config-guard.test.ts`, cas `s3cret`). La revue de sécurité du diff le confirme.
 - **Critère 3 reste** : la preuve Docker (refus au démarrage avec une configuration fautive, démarrage réussi avec une configuration valide) n'a pas été faite. Le ticket reste ouvert pour ce seul critère.
 - **Hors critères, à revoir avec A3** : les identifiants SMTP ne sont pas rendus obligatoires, parce que le fournisseur n'est pas choisi (A3). À rouvrir dans un ticket quand A3 sera tranché.
+
+## Preuve Docker (backend-lead, 2026-11-12)
+
+Image de production construite depuis `a9ec8379` (develop + correctif T-OPS-05 ; avant ce correctif, l'image ne démarrait pas du tout). Chaque conteneur est lancé avec les variables en ligne de commande, sans `.env`, sur la base `ccc_bl_docker_test`. Résultats :
+
+| Configuration | Résultat |
+|---|---|
+| Site `http://localhost:3000`, SMTP absent, `from` par défaut | sortie 1 : `Invalid production configuration (NUXT_STRICT_RUNTIME_CONFIG is on): NUXT_PUBLIC_SITE_URL must be a public https URL (…); NUXT_MAIL_HOST must name a real SMTP server (…); NUXT_MAIL_FROM must be set to a real sender, not the default` |
+| Même configuration avec `NUXT_STRICT_RUNTIME_CONFIG=false` | sortie 1 : `NUXT_STRICT_RUNTIME_CONFIG cannot be turned off in the production image` (Q1, marqueur de l'image) |
+| Site https, SMTP réel, mais `NUXT_AUTH_SECURE_COOKIE=false` | sortie 1 : `NUXT_AUTH_SECURE_COOKIE must not be turned off` |
+| Secret d'appareil absent | sortie 1 : `NUXT_AUTH_DEVICE_COOKIE_SECRET is required in production (at least 32 characters)` |
+| Configuration valide (site https, SMTP réel, `from` réel, secret de 32 octets) | migrations appliquées, serveur à l'écoute, `GET /api/v1/health` → 200 |
+
+Les messages nomment les variables, jamais leurs valeurs : ni le mot de passe de la base ni le secret d'appareil n'apparaissent dans les logs (0 occurrence, vérifié avec `grep`).

@@ -1,6 +1,7 @@
 import { createError } from 'h3'
 import type { H3Error } from 'h3'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import { DATABASE_TIMEOUT_RETRY_AFTER_SECONDS } from '../consts/database-config.const.js'
 import { API_ERROR_MESSAGE, DEFAULT_CODE_BY_STATUS, DEFAULT_MESSAGE_BY_STATUS, INTERNAL_ERROR_MESSAGE, SERVICE_UNAVAILABLE_MESSAGE } from '../consts/api-error.const.js'
 import type { TApiErrorDetails } from '../types/api-error-details.type.js'
 import type { IApiError } from '../interfaces/error.interface.js'
@@ -145,3 +146,10 @@ export const toApiError = (error: unknown): IApiError => {
   }
   return apiError
 }
+
+/** 503 générique d'un délai de la base, avec `Retry-After` : aucun détail du pilote (le plugin api-response pose l'en-tête). */
+export const databaseTimeoutError = (): H3Error => createError({
+  statusCode: 503,
+  message: SERVICE_UNAVAILABLE_MESSAGE,
+  data: { code: API_ERROR_CODE.SERVICE_UNAVAILABLE, retryAfterSeconds: DATABASE_TIMEOUT_RETRY_AFTER_SECONDS }
+})
