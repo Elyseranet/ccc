@@ -366,6 +366,23 @@ export const loadAllEditionSummaries = async (dataSource: DataSource): Promise<I
   return loadEditionSummaries(dataSource, editions)
 }
 
+/**
+ * B-20 : la liste des éditions pour l'administrateur, avec le nombre d'inscrits en direct. Les résumés sont ceux de la liste
+ * publique ; le compte vient d'UNE requête `COUNT(*) GROUP BY edition_id` sur les participations (pas de requête par
+ * édition), et une édition sans inscrit vaut 0.
+ */
+export const loadAllAdminEditionSummaries = async (dataSource: DataSource): Promise<IAdminEditionSummary[]> => {
+  const editions = await dataSource.getRepository(EditionEntity).find({ order: { chronologicalRank: 'DESC' } })
+  if (editions.length === 0) {
+    return []
+  }
+  const [summaries, registered] = await Promise.all([
+    loadEditionSummaries(dataSource, editions),
+    loadParticipationCounts(dataSource, editions.map((edition) => edition.id))
+  ])
+  return summaries.map((summary) => ({ ...summary, registeredCount: registered.get(summary.id) ?? 0 }))
+}
+
 /** A16 : les matchs comptés sont les matchs joués (VALIDATED ou RESULT_UNKNOWN) ; un match à jouer n'en est pas un. */
 export const loadArchiveStats = async (dataSource: DataSource): Promise<IArchiveStats> => {
   const [editions, competitors, scoredMatches, unknownResultMatches] = await Promise.all([
