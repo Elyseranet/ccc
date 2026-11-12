@@ -73,3 +73,5 @@ Requêtes réelles sur l'environnement de dev déployé par Coolify (`https://cc
 | `https://evil.example` | 403 `FORBIDDEN_ORIGIN` |
 
 L'origine propre est donc reconstruite correctement, et `NUXT_AUTH_ALLOWED_ORIGINS` n'est pas nécessaire sur cet environnement. À refaire sur l'environnement de production, au premier déploiement, avec la même commande `curl`.
+
+Contre-vérification du chef de projet (2026-11-12, mêmes trois requêtes) : 204 / 403 / 403, identique.
