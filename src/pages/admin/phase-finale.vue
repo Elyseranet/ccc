@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamTitle } from 'origam/components'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 
 /*********************************************************
@@ -27,6 +28,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const title = computed(() => t('pages.admin_final_phase.title', 'Phase finale'))
 useHead({ title })
+useSeo({ noindex: true })
 
 /*********************************************************
  * Expose
