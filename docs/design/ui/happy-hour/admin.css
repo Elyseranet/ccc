@@ -21,7 +21,8 @@
 .adm-content { padding: var(--origam-space---8); max-width: 80rem; }
 .adm-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--origam-space---4); margin-bottom: var(--origam-space---6); }
 .adm-h1 { margin-top: var(--origam-space---2); font-size: var(--origam-font__size---4xl); line-height: 1; }
-.adm-head .btn .chip { margin-left: var(--origam-space---1); }
+/* origam-badge inline : cercle de 20 px (mesuré 2.37.4), fond et texte de l’intention secondaire */
+.adm-badge { display: grid; place-items: center; flex: none; width: var(--origam-space---5); height: var(--origam-space---5); margin-left: var(--origam-space---1); border-radius: var(--origam-radius---full); background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); font-size: var(--origam-font__size---xs); font-weight: var(--origam-font__weight---bold); line-height: 1; }
 
 .adm-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--origam-space---5); grid-template-areas: 'steps todo' 'steps log'; align-items: start; }
 .adm-steps { grid-area: steps; } .adm-todo { grid-area: todo; display: grid; gap: var(--origam-space---3); } .adm-log { grid-area: log; }
