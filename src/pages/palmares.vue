@@ -19,6 +19,9 @@
           <palmares-most-titled :most-titled="mostTitled" />
         </template>
       </page-hero>
+      <div class="page-wrap">
+        <motion-toggle />
+      </div>
     </div>
     <div class="page-wrap">
       <async-state
@@ -48,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import MotionToggle from '~/components/common/MotionToggle.vue'
 import { computed } from 'vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import BubblesBackdrop from '~/components/common/BubblesBackdrop.vue'

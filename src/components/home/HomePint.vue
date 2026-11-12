@@ -242,6 +242,14 @@ defineExpose({})
   }
 }
 
+html[data-motion="paused"] {
+  .home-pint__drip,
+  .home-pint__bubbles circle,
+  .home-pint__cap {
+    animation-play-state: paused;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-pint__drip,
   .home-pint__bubbles circle,

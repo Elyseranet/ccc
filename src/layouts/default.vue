@@ -1,7 +1,6 @@
 <template>
   <div class="public-shell">
     <skip-link />
-    <motion-toggle />
     <div class="public-shell__header">
       <div class="page-wrap">
         <origam-toolbar
@@ -186,7 +185,6 @@
 </template>
 
 <script setup lang="ts">
-import MotionToggle from '~/components/common/MotionToggle.vue'
 import { computed, watch } from 'vue'
 import { OrigamBtn, OrigamMain, OrigamToolbar } from 'origam/components'
 import BrandMark from '~/components/common/BrandMark.vue'
