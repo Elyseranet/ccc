@@ -5,7 +5,7 @@ import { useT } from '~/composables/useT'
 import { ADMIN_PARTICIPANTS_CACHE_KEY } from '~/consts/admin-participants.const'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
 import { PARTICIPANT_EDITABLE_STATUSES } from '~/consts/edition.const'
-import { PARTICIPANT_FEEDBACK_STATUS } from '~/enums/participant-feedback.enum'
+import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import type { IParticipantFeedback, IParticipantFormValues, IPendingAvatar } from '~/interfaces/admin-participants.interface'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import { CompetitorService } from '~/services/competitor.service'
@@ -58,7 +58,7 @@ export const useAdminParticipants = () => {
   const emailTaken = ref(false)
   const pendingAvatar = ref<IPendingAvatar | null>(null)
 
-  const notify = (status: PARTICIPANT_FEEDBACK_STATUS, message: ITranslatableText) => {
+  const notify = (status: FEEDBACK_STATUS, message: ITranslatableText) => {
     feedback.value = { status, message }
   }
   const dismissFeedback = () => {
@@ -69,7 +69,7 @@ export const useAdminParticipants = () => {
   }
   /** Un refus « inscriptions closes » ou « édition close » apprend à l'écran l'état de l'édition : on la recharge, les actions se masquent. */
   const fail = async (cause: unknown) => {
-    notify(PARTICIPANT_FEEDBACK_STATUS.ERROR, toParticipantError(cause))
+    notify(FEEDBACK_STATUS.ERROR, toParticipantError(cause))
     if (hasErrorCode(cause, API_ERROR_CODE.REGISTRATION_CLOSED) || hasErrorCode(cause, API_ERROR_CODE.EDITION_CLOSED)) {
       await reload()
     }
@@ -82,7 +82,7 @@ export const useAdminParticipants = () => {
     busy.value = true
     try {
       await editionService.addParticipant(editionId.value, { competitorId })
-      notify(PARTICIPANT_FEEDBACK_STATUS.SUCCESS, {
+      notify(FEEDBACK_STATUS.SUCCESS, {
         key: 'admin.participants.feedback_attached',
         fallback: 'Profil rattaché à l’édition {year}',
         params: { year: edition.value?.year ?? '' }
@@ -105,7 +105,7 @@ export const useAdminParticipants = () => {
     } catch (cause) {
       pendingAvatar.value = pending
       const reason = toParticipantError(cause)
-      notify(PARTICIPANT_FEEDBACK_STATUS.ERROR, {
+      notify(FEEDBACK_STATUS.ERROR, {
         key: 'admin.participants.feedback_avatar_failed',
         fallback: '{name} est créé, mais sa photo n’a pas été envoyée : {reason}',
         params: { name: pending.displayName, reason: t(reason.key, reason.fallback, reason.params) }
@@ -123,7 +123,7 @@ export const useAdminParticipants = () => {
     try {
       const result = await editionService.addParticipant(editionId.value, { newCompetitor: toNewCompetitor(values) })
       const sent = result.invitationSent === true
-      notify(sent ? PARTICIPANT_FEEDBACK_STATUS.SUCCESS : PARTICIPANT_FEEDBACK_STATUS.WARNING, sent
+      notify(sent ? FEEDBACK_STATUS.SUCCESS : FEEDBACK_STATUS.WARNING, sent
         ? { key: 'admin.participants.feedback_invitation_sent', fallback: 'Invitation envoyée' }
         : { key: 'admin.participants.feedback_invitation_failed', fallback: 'Participant créé, mais l’invitation n’a pas pu être envoyée : renvoyez-la depuis la liste.' })
       if (values.avatar) {
@@ -152,7 +152,7 @@ export const useAdminParticipants = () => {
     try {
       const done = await uploadAvatar(pendingAvatar.value)
       if (done) {
-        notify(PARTICIPANT_FEEDBACK_STATUS.SUCCESS, { key: 'admin.participants.feedback_avatar_sent', fallback: 'Photo envoyée' })
+        notify(FEEDBACK_STATUS.SUCCESS, { key: 'admin.participants.feedback_avatar_sent', fallback: 'Photo envoyée' })
         await reload()
       }
       return done
@@ -169,7 +169,7 @@ export const useAdminParticipants = () => {
     busyParticipationId.value = participationId
     try {
       await editionService.removeParticipant(editionId.value, participationId)
-      notify(PARTICIPANT_FEEDBACK_STATUS.SUCCESS, { key: 'admin.participants.feedback_removed', fallback: 'Participant retiré de l’édition' })
+      notify(FEEDBACK_STATUS.SUCCESS, { key: 'admin.participants.feedback_removed', fallback: 'Participant retiré de l’édition' })
       await reload()
       return true
     } catch (cause) {
@@ -188,7 +188,7 @@ export const useAdminParticipants = () => {
     busy.value = true
     try {
       const result = await competitorService.resendInvitation(competitorId)
-      notify(result.invitationSent ? PARTICIPANT_FEEDBACK_STATUS.SUCCESS : PARTICIPANT_FEEDBACK_STATUS.WARNING, result.invitationSent
+      notify(result.invitationSent ? FEEDBACK_STATUS.SUCCESS : FEEDBACK_STATUS.WARNING, result.invitationSent
         ? { key: 'admin.participants.feedback_resent', fallback: 'Invitation renvoyée : l’ancien lien est annulé' }
         : { key: 'admin.participants.feedback_resend_failed', fallback: 'L’invitation n’a pas pu être envoyée : réessayez.' })
       await reload()

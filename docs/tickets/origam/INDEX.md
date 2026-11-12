@@ -35,8 +35,10 @@
 | #1307 | `alert` : au repos, l'alerte prend les états survol et actif, fond assombri | thème : `feedback.*.bgHover` et `bgActive` égaux à `bg` (F-10) |
 | #1327 | `number-field` : retrait vide de 27 px avec `hideControls` ; valeur bornée au montage et à la sortie, sans pouvoir le désactiver | champ « Année » en `origam-text-field` `inputmode="numeric"`, number-field non utilisé (F-13, 87eea8e) |
 | #1331 | `select` : deux `role="combobox"` imbriqués (champ et saisie) et `role="menu"` sur un overlay qui contient un `listbox` (menu ouvert) | les 2 règles axe tolérées sur le menu ouvert seulement, restreintes aux 2 éléments (F-09) |
+| #1332 | les composants qui exposent `forwardRefs(...)` (`dialog`, `form`, `menu`, `tooltip`, `snackbar`, `text-field`) n'acceptent aucun slot au typecheck (TS2339) | noms de slot dynamiques dans `DrawValidateDialog.vue` (F-11) |
 | #1334 | `password-field` : règle de longueur toujours ajoutée à la validation, même champ vide et sans `requirements` ; message non surchargeable par champ | `minLength: 0` + `requirementRules` + `rules` (F-10) |
 | #1317 | `chart` : surface de dessin figée à 600 x 360 (le viewBox ne suit pas la largeur), étiquettes d'axe qui se chevauchent | tracé du graphique exclu de la mesure visuelle (F-02, F-02-CHART) |
 | #1318 | `chart` : points et barres `role="button"` focusables dans un `<svg role="img">` (axe `nested-interactive`) | règle désactivée sur l'onglet Évolution (F-02, F-02-AXE) |
 | à déposer | `data-table` : `text-align: end` de `--align-end` sans effet sur le `th` (style calculé `start`) | `:deep(th.origam-data-table-cell--align-end)` dans `AppDataTable.vue` (F-13) |
 | à déposer | `btn` : l'état désactivé ignore les tokens `action.*.bgDisabled` / `fgDisabled` (opacité 0,5 seule) | aucun, zone `competiteurs-photo` à 0,96 % (F-13) |
+| à déposer | `useStack` : `globalTop` mis à jour une tâche après l'ouverture, Échap ou clic extérieur ignoré dans cet intervalle (fiche `stack-globaltop-apres-ouverture.md`) | aucun dans l'application ; `dismissDialog` réessaie dans le e2e (F-11) |
