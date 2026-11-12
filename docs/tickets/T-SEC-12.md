@@ -1,7 +1,7 @@
 # T-SEC-12 — Comptes et déploiement : création d'admin, CSRF, origine derrière proxy, secret d'appareil
 
 - **Origine** : seconde revue de sécurité de la vague 3a, findings LOW L8 à L12, le 2026-10-22.
-- **Statut** : **Ouvert** : L8, L9, L10 et L12 sont faits, mergés @ `207d1af5` ; **reste L11**, la vérification réelle au premier déploiement. L10 tranché par l'utilisateur (SEC-Q, Q1).
+- **Statut** : **Fermé** le 2026-11-12. L8, L9, L10 et L12 mergés @ `207d1af5` ; L11 vérifié sur le déploiement de dev (voir « L11 vérifié »). L10 tranché par l'utilisateur (SEC-Q, Q1).
 - **2026-11-12 — mergé dans develop @ `207d1af5`** (branche @ `5d50f5ad`), sous GATE-DEV (décision utilisateur : merge develop = typecheck + test:run ; gates complètes à la PR vers main, [T-REL-04](T-REL-04.md)). Preuve : typecheck vert et test:run 1126 réussis / 1 ignoré / 0 échec sur le résultat des 5 merges (chef de projet, worktree temporaire). **Reste ouvert** jusqu'à ce que le lead confirme, critère par critère, ce qui est couvert par le code mergé et ce qui reste.
 
 ## L8 — `user:create-admin` : course sur l'email
@@ -61,3 +61,15 @@
 - **L10 fait** : accepté tel quel (SEC-Q, Q1), documenté dans le README.
 - **L12 fait** : garde stricte, secret d'appareil d'au moins 32 caractères : `tests/unit/runtime-config-guard.test.ts` (secret absent, indéfini, 31 caractères refusés ; 32 acceptés).
 - **L11 reste** : vérifier au premier déploiement réel (Coolify) que l'origine reconstruite derrière le proxy est bien celle du domaine, ou poser `NUXT_AUTH_ALLOWED_ORIGINS`, puis consigner le résultat ici. Je ne sais pas si ce déploiement a déjà eu lieu : rien n'est consigné dans ce ticket. Le ticket reste ouvert pour ce seul point.
+
+## L11 vérifié (backend-lead, 2026-11-12)
+
+Requêtes réelles sur l'environnement de dev déployé par Coolify (`https://ccc.dev.elysera.net`, T-OPS-04 ; `NUXT_TRUST_PROXY_HOPS=1`). Écriture sans session, `POST /api/v1/auth/logout`, corps `{}` :
+
+| En-tête `Origin` | Réponse |
+|---|---|
+| `https://ccc.dev.elysera.net` | **204** : l'origine reconstruite derrière le proxy est bien celle du domaine en https |
+| `http://ccc.dev.elysera.net` | 403 `FORBIDDEN_ORIGIN` |
+| `https://evil.example` | 403 `FORBIDDEN_ORIGIN` |
+
+L'origine propre est donc reconstruite correctement, et `NUXT_AUTH_ALLOWED_ORIGINS` n'est pas nécessaire sur cet environnement. À refaire sur l'environnement de production, au premier déploiement, avec la même commande `curl`.
