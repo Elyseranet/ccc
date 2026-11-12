@@ -35,7 +35,8 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'fr' },
       link: [
         { rel: 'preload', href: '/gabarito-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
-        { rel: 'preload', href: '/bagel-fat-one-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' }
+        { rel: 'preload', href: '/bagel-fat-one-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
+        { rel: 'stylesheet', href: '/fonts.css' }
       ]
     }
   },
