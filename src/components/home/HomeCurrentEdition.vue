@@ -68,10 +68,8 @@
               <player-link :competitor="score.winner" inline wrap />
             </span>
             <span class="home-current__score num font-display">
-              {{ score.winnerScore }}<span
-                class="home-current__sep"
-                aria-hidden="true"
-              >{{ separator }}</span>{{ score.loserScore }}
+              <span class="sr-only">{{ score.scoreText }}</span>
+              <span aria-hidden="true">{{ score.winnerScore }}<span class="home-current__sep">{{ separator }}</span>{{ score.loserScore }}</span>
             </span>
             <span class="home-current__player">
               <player-link :competitor="score.loser" inline wrap />
@@ -176,11 +174,12 @@ const metaText = computed(() => {
  * Scores
  *
  * @description
- * La puce de poule n'existe que pour un match de poule. Elle est masquée sur mobile par le CSS.
+ * La puce de poule n'existe que pour un match de poule. Elle est masquée sur mobile par le CSS. Le score est lu « 5 à 2 » (texte `sr-only`) : les deux chiffres visibles, collés au séparateur masqué, étaient lus « 52 » (T-A11Y-01, M4).
  ********************************************************/
 const scores = computed(() => (props.current?.latestScores ?? []).map(score => ({
   ...score,
-  poolText: score.poolRank === null ? '' : t('home.current.pool', 'Poule {rank}', { rank: score.poolRank })
+  poolText: score.poolRank === null ? '' : t('home.current.pool', 'Poule {rank}', { rank: score.poolRank }),
+  scoreText: t('home.current.score_accessible', '{winner} à {loser}', { winner: score.winnerScore, loser: score.loserScore })
 })))
 const hasScores = computed(() => scores.value.length > 0)
 const noScoresText = computed(() => t('home.current.no_scores', 'Aucun score validé pour le moment.'))

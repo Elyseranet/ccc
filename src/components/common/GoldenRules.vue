@@ -26,7 +26,7 @@
         <p class="golden-rules__card-text">
           {{ rule.text }}
         </p>
-        <small class="golden-rules__card-code">{{ rule.code }}</small>
+        <small class="golden-rules__card-code"><abbr-text :text="rule.code" /></small>
       </li>
     </ol>
     <ol
@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { OrigamTitle } from 'origam/components'
 import { computed } from 'vue'
 import { useT } from '~/composables/useT'

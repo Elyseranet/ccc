@@ -196,7 +196,7 @@
           v-if="!noSeeds"
           class="edition-draws__note"
         >
-          {{ poolsNote }}
+          <abbr-text :text="poolsNote" />
         </p>
         <async-state
           :empty="noSeeds"
@@ -235,7 +235,7 @@
           :text="roundsTitle"
         />
         <p class="edition-draws__note">
-          {{ roundsNote }}
+          <abbr-text :text="roundsNote" />
         </p>
         <async-state
           :empty="noRounds"
@@ -301,6 +301,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamAlert, OrigamCard, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'

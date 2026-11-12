@@ -100,6 +100,7 @@ export interface IEditionOption {
 export interface IEditionChipProps {
   family: EDITION_CHIP_FAMILY
   text: string
+  srText?: string
 }
 
 export interface IEditionSelectorProps {

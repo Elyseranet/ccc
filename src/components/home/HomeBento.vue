@@ -145,8 +145,11 @@
               font-weight="bold"
               line-height="tight"
               letter-spacing="normal"
-              :text="rankTitle"
-            />
+            >
+              <template #default>
+                <abbr-text :text="rankTitle" />
+              </template>
+            </origam-title>
             <p class="home-bento__eyebrow">
               {{ rankEyebrow }}
             </p>
@@ -223,6 +226,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'

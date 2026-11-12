@@ -14,7 +14,7 @@
         :text="title"
       />
       <p class="head-to-head-history__hint">
-        {{ hint }}
+        <abbr-text :text="hint" />
       </p>
     </div>
     <section
@@ -69,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamTitle } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'

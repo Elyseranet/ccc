@@ -2,12 +2,14 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import { RouterLink } from 'vue-router'
 import EditionDraws from '~/components/edition/EditionDraws.vue'
+import EditionGroups from '~/components/edition/EditionGroups.vue'
 import EditionMatches from '~/components/edition/EditionMatches.vue'
 import EditionParticipants from '~/components/edition/EditionParticipants.vue'
 import EditionSelector from '~/components/edition/EditionSelector.vue'
 import EditionSummary from '~/components/edition/EditionSummary.vue'
 import { DRAW_STATUS } from '~/enums/draw.enum'
 import { EDITION_CHIP_FAMILY, EDITION_STEP_STATE } from '~/enums/edition-tab.enum'
+import { MATCH_STATUS } from '~/enums/match.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 
 const withRouterLink = { global: { components: { RouterLink } } }
@@ -162,3 +164,37 @@ describe('EditionDraws : tirages reconstitués (F-35)', () => {
   })
 })
 
+describe('EditionMatches : filtres (T-A11Y-01, M3)', () => {
+  const row = (id: string, roundKind: ROUND_KIND) => ({
+    id, sequence: 1, number: `2025-${id}`, roundKind, poolRank: roundKind === ROUND_KIND.POOLS ? 1 : null, isTiebreak: false,
+    first: person('a', 'Lou Bernard'), second: person('b', 'Inès Perrin'), firstScore: 5, secondScore: 3, hasWinner: true, status: MATCH_STATUS.VALIDATED
+  })
+
+  it('chaque puce est un bouton qui annonce son état (aria-pressed), et l’état suit la sélection', async () => {
+    const wrapper = await mountSuspended(EditionMatches, {
+      ...withRouterLink,
+      props: { rows: [row('1', ROUND_KIND.POOLS), row('2', ROUND_KIND.FINAL)], counts: { all: 2, pools: 1, knockout: 1 }, code: '2025' }
+    })
+    const chips = wrapper.get('[data-cy="edition-matches-filters"]').findAll('button')
+    expect(chips).toHaveLength(3)
+    expect(chips.map(chip => chip.attributes('aria-pressed'))).toEqual(['true', 'false', 'false'])
+    await chips[1]!.trigger('click')
+    expect(wrapper.get('[data-cy="edition-matches-filters"]').findAll('button').map(chip => chip.attributes('aria-pressed'))).toEqual(['false', 'true', 'false'])
+  })
+})
+
+describe('EditionGroups : abréviations (T-A11Y-01, M6, S1)', () => {
+  const table = { id: 'p1', rank: 1, rows: [{ participationId: 'x', competitor: person('a', 'Lou Bernard'), rank: 1, played: 3, wins: 2, losses: 1, pointsFor: 12, pointsAgainst: 9, capsAverage: 3, qualified: true }] }
+
+  it('J, V, D et Diff. portent leur sens dans un abbr ; la pastille Q est masquée aux lecteurs d’écran et remplacée par « Qualifié·e » en sr-only, sans aria-label', async () => {
+    const wrapper = await mountSuspended(EditionGroups, { ...withRouterLink, props: { tables: [table] } })
+    const heads = wrapper.findAll('th abbr').map(abbr => `${abbr.text()}=${abbr.attributes('title')}`)
+    expect(heads).toEqual(['J=Matchs joués', 'V=Victoires', 'D=Défaites', 'Diff.=Différentiel de points'])
+    const chip = wrapper.get('.edition-chip')
+    expect(chip.find('[aria-hidden="true"]').text()).toBe('Q')
+    expect(chip.get('.sr-only').text()).toBe('Qualifié·e')
+    expect(chip.attributes('aria-label')).toBeUndefined()
+    const note = wrapper.get('.edition-groups__note')
+    expect(note.findAll('abbr').map(abbr => `${abbr.text()}=${abbr.attributes('title')}`)).toEqual(['RG19=Règle de gestion 19', 'RG18=Règle de gestion 18'])
+  })
+})

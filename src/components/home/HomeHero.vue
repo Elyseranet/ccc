@@ -18,7 +18,7 @@
             data-cy="home-hero-chip"
             :text="chipText"
           />
-          <span class="home-hero__eyebrow">{{ eyebrow }}</span>
+          <span class="home-hero__eyebrow"><abbr-text :text="eyebrow" /></span>
         </p>
         <origam-title
           id="home-hero-title"
@@ -70,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamBtn, OrigamChip, OrigamTitle } from 'origam/components'
 import BubblesBackdrop from '~/components/common/BubblesBackdrop.vue'
