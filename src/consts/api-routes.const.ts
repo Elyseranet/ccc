@@ -35,6 +35,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.EDITION_PARTICIPANT_ADD]: { file: 'editions/[id]/participants.post.ts' },
   [API_ENDPOINT.EDITION_PARTICIPANT_REMOVE]: { file: 'editions/[id]/participants/[participationId].delete.ts' },
   [API_ENDPOINT.ADMIN_DRAWS]: { file: 'admin/editions/[id]/tirages.get.ts' },
+  [API_ENDPOINT.ADMIN_ACTIVITY]: { file: 'admin/editions/[id]/activite.get.ts' },
   [API_ENDPOINT.DRAW_SEEDS]: { file: 'editions/[id]/tetes-de-serie.get.ts' },
   [API_ENDPOINT.DRAW_POOLS_CREATE]: { file: 'editions/[id]/tirages/poules.post.ts' },
   [API_ENDPOINT.DRAW_ASSIGNMENTS]: { file: 'tirages/[id]/affectations.put.ts' },
