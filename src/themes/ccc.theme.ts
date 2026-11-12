@@ -28,10 +28,6 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-stepper .origam-stepper-item__subtitle…` (sous-titre d'étape en `white-space: nowrap`, il déborde à 390 px) :
  *     Elyseranet/origam#1340 ;
  *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
- *   - `.origam-card, .origam-dialog { --origam-field---border-color: … }` (T-A11Y-01 M1, WCAG 1.4.11 : le filet `border.default` d'un champ posé sur une
- *     carte ou un dialogue tombe à 2,8:1 contre la surface ; Origam n'offre ni prop ni token contextuel, on redéclare la variable de filet des champs
- *     dans ces conteneurs, `border.strong`. Un champ en erreur pose lui-même `--origam-field---border-color` et garde sa bordure danger) :
- *     fiche docs/tickets/origam/champ-bordure-contextuelle-carte-dialogue.md (à déposer) ;
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
  *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
@@ -232,9 +228,11 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-input---line-height': 'var(--origam-font__lineHeight---normal)',
     '--origam-field---letter-spacing': 'normal',
     '--origam-field__input---opacity': '1',
-    // Champs outlined : fond surface.sunken, filet 1 px border.default, sans atténuation d'opacité.
+    // Champs outlined : fond surface.sunken, filet 1 px border.strong (T-A11Y-01 M1, WCAG 1.4.11 : border.default aplati tombe à 2,8:1 contre la
+    // carte ; décision utilisateur : border.strong sur tous les champs), sans atténuation d'opacité. Un champ en erreur repose lui-même
+    // `--origam-field---border-color` sur son propre élément (OrigamField.vue) : sa bordure danger l'emporte sur cette valeur héritée.
     '--origam-field---background-color': 'var(--origam-color__surface---sunken)',
-    '--origam-field---border-color': 'var(--origam-color__border---default)',
+    '--origam-field---border-color': 'var(--origam-color__border---strong)',
     '--origam-field---focus-ring-width': 'calc(var(--origam-border__width---2) + var(--origam-border__width---thin))',
     '--origam-field---focus-ring-offset': 'var(--origam-border__width---2)',
     '--origam-field---focus-ring-color': 'var(--origam-color__border---focus)',

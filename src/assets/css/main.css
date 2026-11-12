@@ -21,7 +21,6 @@ button, input, select, textarea { font: inherit; }
 .origam-field.origam-field.origam-field.origam-field input::placeholder, .origam-field.origam-field.origam-field.origam-field textarea::placeholder { color: var(--origam-color__text---tertiary); opacity: 1; }
 .origam-field.origam-field.origam-field input { padding-inline: 0; }
 .origam-field.origam-field.origam-field { --origam-field---corner-clearance: var(--origam-space---5); }
-.origam-card, .origam-dialog { --origam-field---border-color: var(--origam-color__border---strong); }
 .origam-btn.origam-btn.origam-btn--disabled:not(.origam-pagination *) { --origam-btn---opacity: 1; background-color: var(--origam-color__action--primary---bgDisabled); color: var(--origam-color__text---tertiary); border-color: transparent; box-shadow: none; }
 .origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large { padding-inline: calc(var(--origam-btn---padding-xl, var(--origam-space---6)) + var(--origam-btn---density-padding-x, 0px) - var(--origam-btn---border-width-outlined, var(--origam-border__width---thin))); }
 .origam-card > .origam-card__overlay.origam-card__overlay { opacity: var(--origam-card__overlay---opacity, 0); }
