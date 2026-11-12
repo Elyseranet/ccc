@@ -39,3 +39,4 @@
 | #1317 | `chart` : surface de dessin figée à 600 x 360 (le viewBox ne suit pas la largeur), étiquettes d'axe qui se chevauchent | tracé du graphique exclu de la mesure visuelle (F-02, F-02-CHART) |
 | #1318 | `chart` : points et barres `role="button"` focusables dans un `<svg role="img">` (axe `nested-interactive`) | règle désactivée sur l'onglet Évolution (F-02, F-02-AXE) |
 | à déposer | `data-table` : `text-align: end` de `--align-end` sans effet sur le `th` (style calculé `start`) | `:deep(th.origam-data-table-cell--align-end)` dans `AppDataTable.vue` (F-13) |
+| à déposer | `btn` : l'état désactivé ignore les tokens `action.*.bgDisabled` / `fgDisabled` (opacité 0,5 seule) | aucun, zone `competiteurs-photo` à 0,96 % (F-13) |
