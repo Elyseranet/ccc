@@ -2,7 +2,7 @@ export const LEGAL_PUBLISHER_NAME = 'Elysera'
 
 export const LEGAL_PUBLISHER_URL = 'https://elysera.net'
 
-export const LEGAL_DESIGN_SYSTEM_NAME = 'Origam'
+export const ORIGAM_REPOSITORY_URL = 'https://github.com/Elyseranet/origam'
 
 /** Séparateur entre deux liens légaux d'une même ligne (écran d'invitation). */
 export const LEGAL_LINKS_SEPARATOR = '·'

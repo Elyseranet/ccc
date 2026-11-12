@@ -171,8 +171,12 @@
               data-cy="footer-credit-publisher"
             >{{ publisherName }}</a>
             {{ creditMiddle }}
-            {{ designSystemName }}
-            <legal-text :text="designSystemUrlTodo" />
+            <a
+              class="public-footer__credit"
+              :href="designSystemUrl"
+              rel="noopener noreferrer"
+              data-cy="footer-credit-design-system"
+            >{{ designSystemName }}</a>
           </p>
         </div>
       </div>
@@ -189,8 +193,7 @@ import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
 import { INTENT, VARIANT } from 'origam/enums'
 import { ROUTES } from '~/consts/routes.const'
-import LegalText from '~/components/legal/LegalText.vue'
-import { LEGAL_DESIGN_SYSTEM_NAME, LEGAL_PUBLISHER_NAME, LEGAL_PUBLISHER_URL } from '~/consts/legal.const'
+import { LEGAL_PUBLISHER_NAME, LEGAL_PUBLISHER_URL, ORIGAM_REPOSITORY_URL } from '~/consts/legal.const'
 import { FOOTER_NAVIGATION, LEGAL_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
 import { useAuthStore } from '~/composables/useAuthStore'
 import { useLogout } from '~/composables/useLogout'
@@ -246,11 +249,11 @@ const legalNavigation = computed(() => LEGAL_NAVIGATION.map(item => ({
 const hasLegalNavigation = computed(() => legalNavigation.value.length > 0)
 const publisherName = LEGAL_PUBLISHER_NAME
 const publisherUrl = LEGAL_PUBLISHER_URL
-const designSystemName = LEGAL_DESIGN_SYSTEM_NAME
+const designSystemUrl = ORIGAM_REPOSITORY_URL
 const copyright = computed(() => t('layout.footer.copyright', '© {year} {publisher}', { year: new Date().getFullYear(), publisher: LEGAL_PUBLISHER_NAME }))
 const creditPrefix = computed(() => t('layout.footer.credit_prefix', 'Site réalisé par'))
 const creditMiddle = computed(() => t('layout.footer.credit_middle', 'avec'))
-const designSystemUrlTodo = computed(() => t('layout.footer.origam_url_todo', '[À FOURNIR : URL d’Origam]'))
+const designSystemName = computed(() => t('layout.footer.design_system_name', 'Origam'))
 
 /*********************************************************
  * Navigation
