@@ -55,6 +55,7 @@ for (const viewport of VIEWPORTS) {
       await page.locator('[data-cy="admin-score-input-0"] input').fill('5')
       await page.locator('[data-cy="admin-score-input-1"] input').fill('1')
       await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+      await page.evaluate(() => window.scrollTo(0, 0))
       await page.addStyleTag({ content: '*, *::before, *::after { caret-color: transparent !important; transition: none !important; animation: none !important; }' })
       await page.evaluate(() => document.fonts.ready)
       await alignMockupText(mockup, page, [

@@ -137,20 +137,16 @@ defineExpose({})
   }
 
   &__list {
+    display: grid;
+    gap: var(--activity__list---gap, var(--origam-space---3));
     margin: 0;
-    padding: var(--origam-space---2) 0;
-    border-radius: var(--origam-radius---lg);
-    background: var(--origam-color__surface---default);
+    padding: 0;
     list-style: none;
   }
 
   &__item {
     display: flex;
     align-items: center;
-    box-sizing: border-box;
-    min-height: var(--origam-space---12);
-    padding: var(--origam-space---2);
-    border-radius: var(--origam-radius---lg);
   }
 
   &__row {
@@ -180,5 +176,6 @@ defineExpose({})
 :root {
   --activity---padding: var(--origam-space---6);
   --activity---padding-mobile: var(--origam-space---5);
+  --activity__list---gap: var(--origam-space---3);
 }
 </style>
