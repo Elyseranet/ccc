@@ -43,3 +43,4 @@
 | à déposer | `btn` : l'état désactivé ignore les tokens `action.*.bgDisabled` / `fgDisabled` (opacité 0,5 seule) | aucun, zone `competiteurs-photo` à 0,96 % (F-13) |
 | à déposer | `useStack` : `globalTop` mis à jour une tâche après l'ouverture, Échap ou clic extérieur ignoré dans cet intervalle (fiche `stack-globaltop-apres-ouverture.md`) | aucun dans l'application ; `dismissDialog` réessaie dans le e2e (F-11) |
 | à déposer | `list` : `tabindex="0"` posé sur toute liste, même non sélectionnable (`role="list"`) ; focalisable dans une zone `aria-hidden` (fiche `liste-non-focalisable-hors-selection.md`) | `ul`/`ol` natifs pour les listes statiques (F-28) |
+| à déposer | `origam-field` : aucun réglage du filet selon le conteneur (carte, dialogue), `border.default` aplati à 2,83:1 contre la carte (WCAG 1.4.11) | `.origam-card, .origam-dialog { --origam-field---border-color: … }` dans `main.css` (T-A11Y-01 M1) |

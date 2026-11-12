@@ -28,6 +28,10 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-stepper .origam-stepper-item__subtitle…` (sous-titre d'étape en `white-space: nowrap`, il déborde à 390 px) :
  *     Elyseranet/origam#1340 ;
  *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
+ *   - `.origam-card, .origam-dialog { --origam-field---border-color: … }` (T-A11Y-01 M1, WCAG 1.4.11 : le filet `border.default` d'un champ posé sur une
+ *     carte ou un dialogue tombe à 2,8:1 contre la surface ; Origam n'offre ni prop ni token contextuel, on redéclare la variable de filet des champs
+ *     dans ces conteneurs, `border.strong`. Un champ en erreur pose lui-même `--origam-field---border-color` et garde sa bordure danger) :
+ *     fiche docs/tickets/origam/champ-bordure-contextuelle-carte-dialogue.md (à déposer) ;
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
  *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
