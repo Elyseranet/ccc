@@ -464,3 +464,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Ne pas l'inventer ailleurs : toute nouvelle occurrence du nom développé (site, mentions légales) reprend exactement cette graphie.
 - **Nom SEO (utilisateur, 2026-11-12)** : les titres et descriptions SEO (`seo.*`) emploient « Cotentin Caps Cup » au lieu de « Championnat de Caps ».
   - Appliqué @ `7df5dbf4` (branche `a9c7761d`, ba-legal) : clés `seo.*` fr/en, `src/consts/seo.const.ts`, tests `useSeo.test.ts` ; typecheck vert, test:run 1303 / 1 ignoré / 0 sur le merge.
+
+## 2026-11-12 — Dev redéployée après chaque merge
+
+- **Décision (utilisateur, 2026-11-12)** : après chaque merge dans develop qui touche l'app, le chef de projet relance un Redeploy de l'app `ccc` (env dev) dans Coolify, puis vérifie que `/api/v1/health` renvoie le nouveau SHA dans `version`. Tant qu'aucun webhook n'existe (T-OPS-04), c'est la seule mise à jour de la dev. Les commits qui ne touchent que la doc ne déclenchent pas de redéploiement.
