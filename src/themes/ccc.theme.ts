@@ -116,7 +116,11 @@ export const CCC_HH_BASE: IOrigamTheme = {
       showScores: true,
       showSeed: false,
       showRoundTitles: true,
-      elevation: 'none'
+      elevation: 'none',
+      border: true,
+      borderColor: 'var(--origam-color__border---default)',
+      rounded: 'xl',
+      bgColor: 'var(--origam-color__surface---raised)'
     },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
     'origam-pagination': {

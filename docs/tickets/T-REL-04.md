@@ -8,4 +8,5 @@
   - B-13 @ `eab64fb0`, F-07 @ `2b725955`, T-SEC-06/12-r3 @ `207d1af5`.
   - F-13 @ `6bed4417` (colonnes du tableau des compétiteurs à mesurer) ;
   - F-11 @ `08adda09` (`e2e-release/page-delivery.spec.ts` relu, non lancé).
+  - F-03-BRK : captures de référence `bracket-1440.png` et `bracket-390.png` reproductibles sur la machine de dev, pas prouvées entre machines (polices chargées en ligne) ; si la comparaison diffère au run de la PR, régénérer délibérément (commit dédié), jamais relever le seuil.
 - **Ajout (2026-11-12, T-OPS-05)** : la PR vers main doit aussi **construire l'image Docker et la démarrer** (migrations puis serveur) ; aucune autre gate ne l'a fait, d'où la régression T-OPS-05.

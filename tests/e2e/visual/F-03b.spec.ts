@@ -124,6 +124,8 @@ for (const viewport of VIEWPORTS) {
       await expect(region).toBeVisible()
       // En-tête et onglets collants, halo fixe du fond : ils passeraient sur la capture selon le défilement. Seul le tableau est la référence.
       await page.addStyleTag({ content: '.public-shell__header, .edition-page__tabs { position: static !important; } .public-shell::before { display: none !important; }' })
+      // La souris reste sur la page après le clic sur l'onglet : un match en état survol serait capturé.
+      await page.mouse.move(0, 0)
       await settle(page)
       await expect(region).toHaveScreenshot(`bracket-${viewport.name}.png`, { animations: 'disabled' })
     })
