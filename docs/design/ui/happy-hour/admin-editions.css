@@ -62,7 +62,7 @@
 /* Menu « Plus » mis à jour */
 .ed-plus { max-width: 34rem; }
 
-@media (max-width: 1200px) {
+@media (max-width: 1424px) { /* une colonne sous 1425 px : formulaire sous le tableau (F-31, décision utilisateur) */
   .cp-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
