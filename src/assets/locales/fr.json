@@ -818,7 +818,6 @@
   "admin.dashboard.step_pool_matches": "Matchs de poules",
   "admin.dashboard.activity_draw_pools": "Tirage des poules · {pools} poules, {seeds} têtes de série",
   "admin.dashboard.step_bracket_draw": "Tirage du bracket",
-  "admin.dashboard.activity_match_corrected": "Match corrigé",
   "admin.dashboard.status_active": "En cours",
   "admin.dashboard.todo_recorded_subtitle": "La validation met à jour le classement de poule",
   "admin.dashboard.activity_score": "{home}–{away}",

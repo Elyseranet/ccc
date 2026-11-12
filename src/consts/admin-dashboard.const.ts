@@ -49,7 +49,6 @@ export const ADMIN_DASHBOARD_ACTIVITY_LIMIT = 5
  ********************************************************/
 export const ADMIN_DASHBOARD_ACTIVITY_KINDS: Record<ADMIN_ACTIVITY_KIND, { text: ITranslatableText, color: string }> = {
   [ADMIN_ACTIVITY_KIND.MATCH_VALIDATED]: { text: { key: 'admin.dashboard.activity_match_validated', fallback: 'Match validé' }, color: 'success' },
-  [ADMIN_ACTIVITY_KIND.MATCH_CORRECTED]: { text: { key: 'admin.dashboard.activity_match_corrected', fallback: 'Match corrigé' }, color: 'warning' },
   [ADMIN_ACTIVITY_KIND.DRAW_CREATED]: { text: { key: 'admin.dashboard.activity_draw_created', fallback: 'Tirage créé' }, color: 'info' },
   [ADMIN_ACTIVITY_KIND.DRAW_VALIDATED]: { text: { key: 'admin.dashboard.activity_draw_validated', fallback: 'Tirage validé' }, color: 'success' }
 }

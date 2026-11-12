@@ -818,7 +818,6 @@
   "admin.dashboard.step_pool_matches": "Pool matches",
   "admin.dashboard.activity_draw_pools": "Pool draw · {pools} pools, {seeds} seeds",
   "admin.dashboard.step_bracket_draw": "Bracket draw",
-  "admin.dashboard.activity_match_corrected": "Match corrected",
   "admin.dashboard.status_active": "In progress",
   "admin.dashboard.todo_recorded_subtitle": "Validation updates the pool standings",
   "admin.dashboard.activity_score": "{home}–{away}",

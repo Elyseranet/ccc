@@ -67,8 +67,8 @@ describe('page /admin, tableau de bord (F-07)', () => {
     useAdminEditionStore(useNuxtApp().$pinia).editionId = 'e1'
   })
 
-  it('B-15 est déclarée en attente dans API_ROUTES tant que la route n’existe pas (ARCH-11)', () => {
-    expect(API_ROUTES[API_ENDPOINT.ADMIN_ACTIVITY].pendingTicket).toBe('B-15')
+  it('la route du flux d’activité est livrée (B-15 mergé) : plus de pendingTicket (ARCH-11)', () => {
+    expect(API_ROUTES[API_ENDPOINT.ADMIN_ACTIVITY].pendingTicket).toBeUndefined()
   })
 
   it('rend un h1 « Édition 2026 », le centre de contrôle à neuf étapes dont l’étape 4 active, les trois cartes et le bouton avec son compteur', async () => {
