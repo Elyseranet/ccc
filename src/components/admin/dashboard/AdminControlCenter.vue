@@ -93,6 +93,7 @@ defineExpose({})
   &__title {
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
+    letter-spacing: normal;
     line-height: var(--origam-font__lineHeight---tight);
   }
 

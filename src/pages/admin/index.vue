@@ -20,6 +20,7 @@
         :to="validateTarget"
         variant="flat"
         size="x-large"
+        font-size="md"
         bg-color="primary"
         elevation="lg"
         :disabled="!view.canValidate"
