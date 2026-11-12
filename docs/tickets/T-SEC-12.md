@@ -1,7 +1,7 @@
 # T-SEC-12 — Comptes et déploiement : création d'admin, CSRF, origine derrière proxy, secret d'appareil
 
 - **Origine** : seconde revue de sécurité de la vague 3a, findings LOW L8 à L12, le 2026-10-22.
-- **Statut** : À faire. Hors vague 3a, sauf L11, documenté dans la vague (README, commit `cf960ac`). L10 contient une **question ouverte** à poser à l'utilisateur.
+- **Statut** : **Ouvert** : L8, L9, L10 et L12 sont faits, mergés @ `207d1af5` ; **reste L11**, la vérification réelle au premier déploiement. L10 tranché par l'utilisateur (SEC-Q, Q1).
 - **2026-11-12 — mergé dans develop @ `207d1af5`** (branche @ `5d50f5ad`), sous GATE-DEV (décision utilisateur : merge develop = typecheck + test:run ; gates complètes à la PR vers main, [T-REL-04](T-REL-04.md)). Preuve : typecheck vert et test:run 1126 réussis / 1 ignoré / 0 échec sur le résultat des 5 merges (chef de projet, worktree temporaire). **Reste ouvert** jusqu'à ce que le lead confirme, critère par critère, ce qui est couvert par le code mergé et ce qui reste.
 
 ## L8 — `user:create-admin` : course sur l'email
@@ -53,3 +53,11 @@
 - **L10** : accepté tel quel (SEC-Q Q1), documenté dans le README avec la raison.
 - **L11** : déjà documenté (README, `NUXT_AUTH_ALLOWED_ORIGINS`) ; la vérification réelle reste à faire au premier déploiement.
 - **L12** : `NUXT_AUTH_DEVICE_COOKIE_SECRET` d'au moins 32 caractères exigé par la garde stricte (voir T-SEC-06).
+
+## Point au 2026-11-12 (backend-lead), après le merge `207d1af5`
+
+- **L8 fait** : `tests/db/invitation-acceptance.test.ts` (« stores the email normalized », « a race on the same email surfaces as a recognizable unique violation, one admin remains ») ; `tests/unit/email-collision.util.test.ts` ; message « Un compte existe déjà pour cet email. » (`src/utils/create-admin-cli.util.ts:53,60`).
+- **L9 fait** : runbook dans le README (Authentification, « Premier administrateur »).
+- **L10 fait** : accepté tel quel (SEC-Q, Q1), documenté dans le README.
+- **L12 fait** : garde stricte, secret d'appareil d'au moins 32 caractères : `tests/unit/runtime-config-guard.test.ts` (secret absent, indéfini, 31 caractères refusés ; 32 acceptés).
+- **L11 reste** : vérifier au premier déploiement réel (Coolify) que l'origine reconstruite derrière le proxy est bien celle du domaine, ou poser `NUXT_AUTH_ALLOWED_ORIGINS`, puis consigner le résultat ici. Je ne sais pas si ce déploiement a déjà eu lieu : rien n'est consigné dans ce ticket. Le ticket reste ouvert pour ce seul point.
