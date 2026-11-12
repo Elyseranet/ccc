@@ -1,5 +1,5 @@
 import type { SEO_PAGE } from '../enums/seo.enum.js'
-import type { IAccountMessage } from './account.interface.js'
+import type { IAccountMessage } from './account-message.interface.js'
 
 /** Titre et description d'une page publique : clé de traduction et libellé de repli. */
 export interface ISeoPageMessages {

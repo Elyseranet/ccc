@@ -1,13 +1,10 @@
 import type { ACCOUNT_ERROR, ACCOUNT_STATE_TONE, INVITATION_STATE } from '../enums/account.enum.js'
+import type { IAccountMessage } from './account-message.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { IInvitationPreview } from './invitation.interface.js'
 import type { IMe } from './me.interface.js'
 
-/** Un message du compte : sa clé de traduction et son libellé de repli. */
-export interface IAccountMessage {
-  key: string
-  label: string
-}
+export type { IAccountMessage }
 
 export interface IAccountFormProps {
   /** Une action est en cours : le formulaire se désactive. */
