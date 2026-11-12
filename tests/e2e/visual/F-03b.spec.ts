@@ -1,6 +1,6 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { alignMockupText, box, compare, open } from '../visual.util'
+import { alignMockupText, box, compare, open, settle } from '../visual.util'
 import type { IClip, ITextPair } from '../visual.util'
 
 /*********************************************************
@@ -65,25 +65,18 @@ const MATCH_PAIRS: ITextPair[] = [
   { mockup: '.fchip .num', app: '[data-cy^="edition-matches-filter-"] .edition-matches__count' },
   { mockup: '#ed-p-mat .pager .num', app: '[data-cy="edition-matches-range"]' }
 ]
-const BRACKET_PAIRS: ITextPair[] = [
-  { mockup: '.bk .bm__p a', app: '.edition-bracket__name .player-link__name' },
-  { mockup: '.bk .bm__p b', app: '.edition-bracket__score' }
-]
-
 const MOCKUP_INK = [
   '.pools .table tbody td', '.pools .table tbody td a', '.pools caption', '#ed-p-mat tbody td', '#ed-p-mat tbody td a', '.fchip .num', '#ed-p-mat .pager .num',
-  '.bk .bm__p a', '.bk .bm__p b', '.bk .stars'
+  '.bk .stars'
 ]
 const APP_INK = [
   '[data-cy^="edition-pool-"] tbody td', '[data-cy^="edition-pool-"] tbody td *', '[data-cy^="edition-pool-"] caption',
-  '[data-cy="edition-matches-table"] tbody td', '[data-cy="edition-matches-table"] tbody td *', '[data-cy="edition-matches-range"]',
-  '.edition-bracket__name *', '.edition-bracket__score'
+  '[data-cy="edition-matches-table"] tbody td', '[data-cy="edition-matches-table"] tbody td *', '[data-cy="edition-matches-range"]'
 ]
 
 const ZONES = [
   { zone: 'poules-note', tab: 'edition-tab-pools', mockTab: '#ed-t-pou', mockup: '#ed-p-pou .pool-note', app: '.edition-groups__note' },
   { zone: 'poules-tableau', tab: 'edition-tab-pools', mockTab: '#ed-t-pou', mockup: '.pools .table-wrap:first-child', app: '[data-cy="edition-pool-1"]', upTo: 'tbody tr' },
-  { zone: 'bracket', tab: 'edition-tab-bracket', mockTab: '#ed-t-bra', mockup: '.bk', app: '[data-cy="edition-bracket-region"]' },
   { zone: 'bracket-note', tab: 'edition-tab-bracket', mockTab: '#ed-t-bra', mockup: '#ed-p-bra .pool-note', app: '.edition-bracket__note' },
   { zone: 'matchs-filtres', tab: 'edition-tab-matches', mockTab: '#ed-t-mat', mockup: '.m-filters', app: '[data-cy="edition-matches-filters"]' },
   { zone: 'matchs-tableau', tab: 'edition-tab-matches', mockTab: '#ed-t-mat', mockup: '#ed-p-mat .table-wrap', app: '[data-cy="edition-matches-scroll"]' },
@@ -101,19 +94,7 @@ for (const viewport of VIEWPORTS) {
         await page.getByTestId(entry.tab).click()
         await mockup.locator(entry.mockTab).click()
         await mockup.addStyleTag({ content: '.stars { display: none !important; }' })
-        await alignMockupText(mockup, page, [...POOL_PAIRS, ...MATCH_PAIRS, ...BRACKET_PAIRS])
-        if (entry.zone === 'bracket') {
-          // La maquette place le vainqueur au hasard ; l'app suit les données : chaque match de la maquette est mis dans l'ordre de l'app.
-          const winnerFirst = await page.locator('.edition-bracket__match').evaluateAll(
-            matches => matches.map(match => match.querySelector('.edition-bracket__side')?.classList.contains('edition-bracket__side--win') ?? false)
-          )
-          await mockup.evaluate((order) => {
-            document.querySelectorAll('.bk .bm').forEach((match, index) => {
-              const [first, second] = [...match.querySelectorAll('.bm__p')]
-              if (first && second && first.classList.contains('is-win') !== order[index]) match.insertBefore(second, first)
-            })
-          }, winnerFirst)
-        }
+        await alignMockupText(mockup, page, [...POOL_PAIRS, ...MATCH_PAIRS])
         if (entry.zone === 'poules-tableau') {
           await page.addStyleTag({ content: '[data-cy="edition-pool-1"] tbody tr:nth-child(n+7) { display: none !important; }' })
         }
@@ -129,5 +110,20 @@ for (const viewport of VIEWPORTS) {
         await mockContext.close()
       })
     }
+
+    /**
+     * Tableau des phases finales : exception approuvée par l'utilisateur (F-03-BRK bis, 2026-11-12). Le rendu `origam-bracket` s'écarte de la maquette
+     * (Elyseranet/origam#1282) ; la référence est une capture Playwright du rendu validé, relue par un humain et versionnée dans
+     * `tests/e2e/__screenshots__`. Elle n'est régénérée (`--update-snapshots`) que pour un changement voulu du tableau ou du thème.
+     */
+    test('bracket (capture de référence, rendu origam-bracket validé)', async ({ page }) => {
+      await page.goto(`/editions/${EDITION_CODE}`)
+      await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+      await page.getByTestId('edition-tab-bracket').click()
+      const region = page.getByTestId('edition-bracket-region')
+      await expect(region).toBeVisible()
+      await settle(page)
+      await expect(region).toHaveScreenshot(`bracket-${viewport.name}.png`, { animations: 'disabled' })
+    })
   })
 }

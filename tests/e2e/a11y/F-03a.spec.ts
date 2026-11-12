@@ -87,7 +87,9 @@ test.describe('édition : accessibilité et comportement (F-03a)', () => {
     expect(await region.getAttribute('aria-label')).toBeTruthy()
     const columns = await region.locator('h3').count()
     expect(columns).toBeGreaterThan(0)
-    expect(await region.locator('ol').count()).toBe(columns)
+    expect(await region.locator('[role="group"][aria-labelledby]').count()).toBe(columns)
+    await expect(region.locator('svg.origam-bracket__connectors path')).toHaveCount(0)
+    await expect(region.locator('[data-cy="player-link"]').first()).toBeVisible()
     await expect(page.getByTestId('edition-bracket-list')).toBeAttached()
   })
 
