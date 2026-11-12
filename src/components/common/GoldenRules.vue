@@ -5,12 +5,13 @@
     aria-labelledby="golden-rules-title"
     data-cy="golden-rules"
   >
-    <h2
+    <origam-title
       id="golden-rules-title"
+      tag="h2"
+      margin="0"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <ol
       v-if="isCards"
       class="golden-rules__cards"
@@ -45,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { OrigamTitle } from 'origam/components'
 import { computed } from 'vue'
 import { useT } from '~/composables/useT'
 import { GOLDEN_RULES } from '~/consts/golden-rules.const'

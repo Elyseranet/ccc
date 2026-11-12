@@ -4,12 +4,13 @@
     aria-labelledby="rules-tournament-title"
     data-cy="rules-tournament"
   >
-    <h2
+    <origam-title
       id="rules-tournament-title"
+      tag="h2"
+      margin="0"
       class="sr-only"
-    >
-      {{ heading }}
-    </h2>
+      :text="heading"
+    />
     <ul class="rules-tournament__grid">
       <li
         v-for="card in cards"

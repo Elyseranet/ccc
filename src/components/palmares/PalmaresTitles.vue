@@ -5,12 +5,15 @@
     data-cy="palmares-titles"
   >
     <div class="palmares-titles__head">
-      <h2
+      <origam-title
         id="palmares-titles-title"
+        tag="h2"
+        margin="0"
+        font-size="4xl"
+        line-height="none"
         class="palmares-titles__title font-display neon--sm"
-      >
-        {{ title }}
-      </h2>
+        :text="title"
+      />
       <p class="palmares-titles__note">
         {{ note }}
       </p>
@@ -87,7 +90,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamBtn, OrigamCard } from 'origam/components'
+import { OrigamBtn, OrigamCard, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import { useT } from '~/composables/useT'
 import { ROUTES } from '~/consts/routes.const'
@@ -147,12 +150,6 @@ defineExpose({})
     justify-content: space-between;
     gap: var(--origam-space---4);
     margin-bottom: var(--origam-space---8);
-  }
-
-  &__title {
-    margin: 0;
-    font-size: var(--origam-font__size---4xl);
-    line-height: var(--origam-font__lineHeight---none);
   }
 
   &__note {
