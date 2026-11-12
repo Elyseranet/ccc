@@ -13,6 +13,17 @@
   const colors = ['--origam-color__bar---foam', '--origam-color__bar---amber', '--origam-color__bar---neon']
     .map((v) => css.getPropertyValue(v).trim()).filter(Boolean)
 
+  // T-A11Y-01 M5 : bouton à bascule « Mettre en pause les animations » ; état pressé dessiné avec ?pause (l'app le mémorise)
+  const root = document.documentElement
+  const paused = () => root.classList.contains('motion-paused')
+  const setPaused = (on) => {
+    root.classList.toggle('motion-paused', on)
+    document.querySelectorAll('.motion-btn').forEach((b) => b.setAttribute('aria-pressed', String(on)))
+    document.dispatchEvent(new Event('motionchange'))
+  }
+  if (new URLSearchParams(location.search).has('pause')) setPaused(true)
+  document.querySelectorAll('.motion-btn').forEach((b) => b.addEventListener('click', () => setPaused(!paused())))
+
   document.querySelectorAll('canvas.bubbles').forEach((cv) => {
     const ctx = cv.getContext('2d')
     let w = 0, h = 0, raf = 0, bubbles = []
@@ -39,10 +50,13 @@
       }
       raf = requestAnimationFrame(draw)
     }
-    const start = () => { if (!raf && !reduce.matches && !document.hidden) raf = requestAnimationFrame(draw) }
+    const start = () => { if (!raf && !reduce.matches && !document.hidden && !paused()) raf = requestAnimationFrame(draw) }
+    const freeze = () => { cancelAnimationFrame(raf); raf = 0 } // pause : la dernière image reste affichée
     const stop = () => { cancelAnimationFrame(raf); raf = 0; ctx.clearRect(0, 0, w, h) }
 
     resize(); start()
+    if (paused() && !reduce.matches) { draw(); freeze() } // en pause dès le chargement : une image fixe
+    document.addEventListener('motionchange', () => (paused() ? freeze() : start()))
     addEventListener('resize', () => { resize() })
     document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()))
     reduce.addEventListener('change', () => (reduce.matches ? stop() : start()))

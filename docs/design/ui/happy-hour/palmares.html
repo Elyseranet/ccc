@@ -39,6 +39,8 @@
         <ul class="palm-podium__ties"><li><span class="palm-podium__name palm-podium__name--tie font-display neon--sm">Lou Bernard</span><span class="muted">« La Mousse » · 10 participations</span></li><li><span class="palm-podium__name palm-podium__name--tie font-display neon--sm">Nina Perrin</span><span class="muted">5 participations</span></li><li><span class="palm-podium__name palm-podium__name--tie font-display neon--sm">Inès Perrin</span><span class="muted">8 participations</span></li></ul></div>
     </div>
   </div>
+  <!-- T-A11Y-01 M5 (décision utilisateur, WCAG 2.2.2) : origam-btn variant="text" size="small" prependIcon pause, bouton à bascule aria-pressed ; libellé constant via t() ; état pressé = pastille pleine (action.secondary). Visible pour tous ; masqué sous prefers-reduced-motion (rien ne bouge). État dessiné : ?pause -->
+  <p class="wrap motion-ctl"><button class="btn btn--text btn--sm motion-btn" type="button" aria-pressed="false" data-cy="motion-toggle"><svg class="motion-btn__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>Mettre en pause les animations</button></p>
 </section>
 <section class="section section--tight" aria-labelledby="h-titles">
   <div class="wrap">
