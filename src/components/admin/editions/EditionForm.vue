@@ -149,10 +149,10 @@
             single-line
             auto-grow
             rounded="lg"
-            :rows="5"
+            :rows="3"
             hide-details="auto"
             :rules="descriptionRules"
-            :placeholder="descriptionPlaceholder"
+            :placeholder="isEdit ? undefined : descriptionPlaceholder"
             data-cy="edition-form-description"
           />
         </div>
@@ -446,6 +446,26 @@ defineExpose({})
     letter-spacing: var(--origam-font__letterSpacing---wide);
     text-transform: uppercase;
     color: var(--origam-color__text---tertiary);
+  }
+
+  // Origam : le sélecteur de date se déclare « focused » dès qu'il porte une valeur (pour le libellé flottant) et peint l'anneau de focus sans que le champ ait le focus.
+  &__field :deep(.origam-field--focused:not(:focus-within)) {
+    outline: 0;
+  }
+
+  // Zone de texte de la maquette : 7 rem de haut, texte à 12 px du filet de 1 px, interligne du corps de page.
+  &__field--full :deep(.origam-field) {
+    min-height: 7rem;
+  }
+
+  &__field--full :deep(.origam-field__input) {
+    align-items: start;
+    padding-block: calc(var(--origam-space---3) + 1px);
+  }
+
+  &__field--full :deep(textarea) {
+    padding: 0;
+    line-height: inherit;
   }
 
   &__cta {

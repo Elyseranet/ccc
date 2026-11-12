@@ -35,22 +35,61 @@ const alignToPixel = async (target: Page, selector: string) => {
   }, selector)
 }
 
+// La barre basse (fixe, sous 1000 px) recouvre les zones du bas de page dans la capture ; elle a ses propres zones (F-12, coque admin).
+const BOTTOM_BAR_HIDDEN = '.adm-bottom, .admin-bottom { visibility: hidden !important; }'
+
 const hydrated = async (page: Page) => {
   await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
   await page.waitForLoadState('networkidle')
+  await page.addStyleTag({ content: BOTTOM_BAR_HIDDEN })
+}
+
+/**
+ * Données réelles contre données de maquette (même principe qu'`alignMockupText`) : la largeur d'une colonne d'un tableau en
+ * disposition automatique suit son contenu le plus long, et la pagination dépend du nombre de pages (15 avec 146 compétiteurs,
+ * 5 pastilles dans la maquette). On recopie dans la maquette, en mémoire, les largeurs de colonnes et la liste des pastilles de
+ * l'application : la comparaison ne porte alors que sur le gabarit (hauteurs, marges, fonds, rayons, typographie, positions).
+ */
+const alignTableWidths = async (mockup: Page, page: Page, mockupTable: string, appTable: string) => {
+  const widths = await page.locator(`${appTable} thead th`).evaluateAll(cells => cells.map(cell => cell.getBoundingClientRect().width))
+  await mockup.evaluate(([selector, values]) => {
+    document.querySelectorAll(`${selector as string} thead th`).forEach((cell, index) => {
+      const width = `${(values as number[])[index]}px`
+      Object.assign((cell as HTMLElement).style, { boxSizing: 'border-box', width, minWidth: width })
+    })
+  }, [mockupTable, widths] as [string, number[]])
+}
+
+const alignPager = async (mockup: Page, page: Page) => {
+  const range = await page.getByTestId('competitors-pager-range').innerText()
+  const pages = await page.locator('[data-cy="competitors-pagination"] .origam-pagination__item').allInnerTexts()
+  await mockup.evaluate(([text, labels]) => {
+    const pager = document.querySelector('#ed-p-comp .pager') as HTMLElement
+    pager.querySelector('.num')!.textContent = text as string
+    const list = pager.querySelector('ol') as HTMLElement
+    const model = list.querySelector('li:not(:first-child)') as HTMLElement
+    const current = list.querySelector('li:first-child') as HTMLElement
+    list.replaceChildren(...(labels as string[]).map((label, index) => {
+      const item = (index === 0 ? current : model).cloneNode(true) as HTMLElement
+      item.querySelector('a')!.textContent = label
+      return item
+    }))
+  }, [range, pages] as [string, string[]])
 }
 
 const showScreen = async (mockup: Page, anchor: string, extraCss = '') => {
   await mockup.evaluate((hash) => {
     location.hash = hash
   }, `#${anchor}`)
-  await mockup.addStyleTag({ content: `.snack { display: none !important; } .adm-head, .screens { display: none !important; } ${extraCss}` })
+  await mockup.addStyleTag({ content: `.snack { display: none !important; } ${BOTTOM_BAR_HIDDEN} .adm-head, .screens { display: none !important; } ${extraCss}` })
   await mockup.waitForTimeout(100)
 }
 
 interface IZone { zone: string, mockup: string, app: string, ink?: { mockup: string[], app: string[] }, masks?: IDataMasks }
 
 const compareZone = async (page: Page, mockup: Page, viewport: string, entry: IZone) => {
+  // Le pointeur reste là où le test a cliqué : à 390 px, il survole une zone et peint son état « hover », absent de la maquette.
+  await page.mouse.move(0, 0)
   await page.evaluate(() => {
     (document.activeElement as HTMLElement | null)?.blur()
     window.scrollTo(0, 0)
@@ -71,6 +110,10 @@ const compareAll = async (page: Page, mockup: Page, viewport: string, entries: I
 
 const field = (testId: string) => `[data-cy="${testId}"]`
 
+/** L'origine d'une édition (archive ou application) est une donnée : la pastille est masquée des deux côtés, sa colonne reste comparée. */
+const ORIGIN_HIDDEN = '#ed-p-list tbody td:nth-child(6) > * { visibility: hidden !important; }'
+const hideOrigin = (target: Page) => target.addStyleTag({ content: `${field('editions-table')} tbody td:nth-child(6) .origam-chip { visibility: hidden !important; }` })
+
 for (const viewport of VIEWPORTS) {
   test.describe(`éditions et compétiteurs @${viewport.name}`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } })
@@ -82,7 +125,9 @@ for (const viewport of VIEWPORTS) {
     test('editions-liste', async ({ page, browser }) => {
       const { mockup, mockContext } = await open(page, browser, viewport, 'admin-editions.html', '/admin/editions')
       await hydrated(page)
-      await showScreen(mockup, 'ed-p-list')
+      await showScreen(mockup, 'ed-p-list', `${ORIGIN_HIDDEN} `)
+      await hideOrigin(page)
+      await alignTableWidths(mockup, page, '#ed-p-list table', field('editions-table'))
       await compareAll(page, mockup, viewport.name, [
         { zone: 'editions-barre', mockup: '#ed-p-list .ed-bar', app: '.editions-toolbar' },
         { zone: 'editions-entete-table', mockup: '#ed-p-list thead', app: field('editions-table') + ' thead' },
@@ -133,7 +178,7 @@ for (const viewport of VIEWPORTS) {
       await page.getByTestId('edition-form-name').locator('input').fill('Championnat de Caps 2027')
       await page.getByTestId('edition-form-submit').click()
       await expect(page.getByTestId('edition-form-error')).toBeVisible()
-      await compareZone(page, mockup, viewport.name, { zone: 'creation-erreur-409', mockup: '#ed-p-new .alert--error:nth-of-type(2)', app: field('edition-form-error') })
+      await compareZone(page, mockup, viewport.name, { zone: 'creation-erreur-409', mockup: '#ed-p-new .alert--error:last-of-type', app: field('edition-form-error') })
       await mockContext.close()
     })
 
@@ -169,6 +214,8 @@ for (const viewport of VIEWPORTS) {
       await hydrated(page)
       await showScreen(mockup, 'ed-p-comp', '#ed-p-comp .cp-photo .alert { display: none !important; }')
       const masks = { mockup: [] as string[], app: [] as string[] }
+      await alignTableWidths(mockup, page, '#ed-p-comp table', field('competitors-table'))
+      await alignPager(mockup, page)
       await compareAll(page, mockup, viewport.name, [
         { zone: 'competiteurs-barre', mockup: '#ed-p-comp .ed-bar', app: '.competitors-toolbar', masks },
         { zone: 'competiteurs-entete-table', mockup: '#ed-p-comp thead', app: field('competitors-table') + ' thead', masks },

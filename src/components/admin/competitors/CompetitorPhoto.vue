@@ -53,6 +53,7 @@
         <origam-btn
           variant="outlined"
           size="small"
+          class="competitor-photo__remove"
           :disabled="!canRemove"
           :text="removeLabel"
           data-cy="competitor-photo-remove"
@@ -217,10 +218,16 @@ defineExpose({})
     color: var(--origam-color__text---tertiary);
   }
 
+  &__remove {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
+  }
+
   &__hint {
     margin: 0;
     font-size: var(--origam-font__size---sm);
-    color: var(--competitor-photo__hint---color, var(--origam-color__text---tertiary));
+    color: var(--competitor-photo__hint---color, var(--origam-color__text---secondary));
   }
 
   @media (max-width: 760px) {
@@ -235,6 +242,6 @@ defineExpose({})
 :root {
   --competitor-photo---gap: var(--origam-space---3);
   --competitor-photo---padding: var(--origam-space---4);
-  --competitor-photo__hint---color: var(--origam-color__text---tertiary);
+  --competitor-photo__hint---color: var(--origam-color__text---secondary);
 }
 </style>

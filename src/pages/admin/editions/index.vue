@@ -68,6 +68,7 @@ defineExpose({})
 <style scoped lang="scss">
 .admin-editions {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-editions---gap, var(--origam-space---5));
   padding-block: var(--admin-editions---padding-block, var(--origam-space---12) var(--origam-space---10));
 

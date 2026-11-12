@@ -98,6 +98,7 @@ defineExpose({})
 <style scoped lang="scss">
 .edition-readonly {
   --origam-data-list---padding: 0;
+  --origam-data-list---background-color: transparent;
   --origam-data-list__kv---display: grid;
   --origam-data-list__kv---row-padding-block: var(--origam-space---3);
   --origam-data-list__kv---key-font-size: var(--origam-font__size---xs);
@@ -111,11 +112,17 @@ defineExpose({})
 
   :deep(.origam-data-list__kv-row) {
     grid-template-columns: 1fr;
+    align-content: start;
     row-gap: calc(var(--origam-space---1) / 2);
     border-bottom: 0;
     padding-inline: var(--origam-space---4);
     border-radius: var(--origam-radius---lg);
     background: var(--origam-color__surface---sunken);
+  }
+
+  // Une tuile sans précision garde la place de la ligne de précision (la maquette la réserve), donc la même cadence que les autres.
+  :deep(.origam-data-list__kv-row:not(:has(.edition-readonly-value__hint))) {
+    padding-block-end: calc(var(--origam-space---3) + var(--origam-space---1) / 2);
   }
 
   :deep(.origam-data-list__kv-key) {

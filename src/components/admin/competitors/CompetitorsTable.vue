@@ -37,6 +37,7 @@
           variant="text"
           color="primary"
           size="small"
+          font-weight="semibold"
           :to="linkOf(item)"
           :text="actionLabel"
           :aria-label="actionLabelOf(item)"

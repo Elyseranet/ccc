@@ -87,12 +87,13 @@ defineExpose({})
   gap: var(--competitors-toolbar---gap, var(--origam-space---4));
 
   &__search {
-    display: grid;
-    gap: var(--origam-space---1);
     min-width: min(100%, 22rem);
   }
 
+  // Le label d'Origam est en ligne : sa boîte prendrait la hauteur de ligne du parent (24,8 px au lieu de 19,84).
   &__label {
+    display: block;
+    margin-block-end: var(--origam-space---1);
     font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
     letter-spacing: var(--origam-font__letterSpacing---wide);

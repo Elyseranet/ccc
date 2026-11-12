@@ -34,7 +34,7 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *     Elyseranet/origam#1262 ;
  *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,
  *     `line-height: 1.6` en dur) : Elyseranet/origam#1265 ;
- *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` (couleur du placeholder, sans
+ *   - `.origam-field.origam-field.origam-field.origam-field input::placeholder` et `… textarea::placeholder` (couleur du placeholder, sans
  *     token) : Elyseranet/origam#1266 ;
  *   - `.origam-field.origam-field.origam-field input` (retrait de 2 px de l'`<input>`, jamais remis à zéro) :
  *     Elyseranet/origam#1280 ;

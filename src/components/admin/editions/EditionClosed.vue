@@ -139,6 +139,10 @@ defineExpose({})
     letter-spacing: normal;
     line-height: var(--origam-font__lineHeight---tight);
   }
+
+  @media (max-width: 760px) {
+    padding: var(--origam-space---5);
+  }
 }
 </style>
 

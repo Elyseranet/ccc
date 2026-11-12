@@ -45,22 +45,24 @@ defineExpose({})
 
 <style scoped lang="scss">
 .edition-readonly-value {
-  display: grid;
-  gap: var(--edition-readonly-value---gap, calc(var(--origam-space---1) / 2));
-  justify-items: start;
+  display: block;
 
   &__text {
     font-weight: var(--origam-font__weight---bold);
+    font-variant-numeric: tabular-nums;
 
     &--missing {
       font-weight: var(--origam-font__weight---regular);
-      color: var(--edition-readonly-value__missing---color, var(--origam-color__text---tertiary));
+      color: var(--edition-readonly-value__missing---color, var(--origam-color__text---secondary));
     }
   }
 
   &__hint {
+    display: block;
+    margin-block-start: var(--edition-readonly-value---gap, calc(var(--origam-space---1) / 2));
     font-size: var(--origam-font__size---sm);
-    color: var(--edition-readonly-value__hint---color, var(--origam-color__text---tertiary));
+    font-weight: var(--origam-font__weight---regular);
+    color: var(--edition-readonly-value__hint---color, var(--origam-color__text---secondary));
   }
 }
 </style>
@@ -68,7 +70,7 @@ defineExpose({})
 <style>
 :root {
   --edition-readonly-value---gap: calc(var(--origam-space---1) / 2);
-  --edition-readonly-value__missing---color: var(--origam-color__text---tertiary);
-  --edition-readonly-value__hint---color: var(--origam-color__text---tertiary);
+  --edition-readonly-value__missing---color: var(--origam-color__text---secondary);
+  --edition-readonly-value__hint---color: var(--origam-color__text---secondary);
 }
 </style>

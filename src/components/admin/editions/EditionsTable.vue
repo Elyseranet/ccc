@@ -46,6 +46,7 @@
         variant="text"
         color="primary"
         size="small"
+        font-weight="semibold"
         :to="linkOf(item)"
         :text="actionOf(item)"
         :aria-label="actionLabelOf(item)"
@@ -149,13 +150,13 @@ defineExpose({})
   }
 
   &__missing {
-    color: var(--editions-table__missing---color, var(--origam-color__text---tertiary));
+    color: var(--editions-table__missing---color, var(--origam-color__text---secondary));
   }
 }
 </style>
 
 <style>
 :root {
-  --editions-table__missing---color: var(--origam-color__text---tertiary);
+  --editions-table__missing---color: var(--origam-color__text---secondary);
 }
 </style>

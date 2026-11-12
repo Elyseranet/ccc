@@ -65,3 +65,10 @@ const forwardedProps = computed(() => ({
  ********************************************************/
 defineExpose({})
 </script>
+
+<style scoped lang="scss">
+// Origam : le `text-align: end` de `--align-end` n'atteint pas le `th` mesuré (calculé à `start`) : l'en-tête d'une colonne alignée à droite restait à gauche.
+:deep(th.origam-data-table-cell--align-end) {
+  text-align: end;
+}
+</style>

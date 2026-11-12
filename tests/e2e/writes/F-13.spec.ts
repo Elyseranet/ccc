@@ -58,7 +58,6 @@ test.describe('admin éditions : écritures sur une édition créée par le test
   })
 
   test('année « 27 » : refus sur place, message sous le champ, rien n’est créé', async ({ page }) => {
-    const before = (await editions(page)).length
     await page.goto('/admin/editions/nouvelle')
     await hydrated(page)
     await field(page, 'edition-form-year').fill('27')
@@ -68,7 +67,8 @@ test.describe('admin éditions : écritures sur une édition créée par le test
     await expect(page.getByTestId('edition-form-year')).toContainText('année sur 4 chiffres')
     await expect(field(page, 'edition-form-year')).toHaveValue('27')
     await expect(page.getByTestId('edition-created')).toHaveCount(0)
-    expect((await editions(page)).length).toBe(before)
+    // Les autres tests créent des éditions en parallèle : on cherche le nom de celle-ci plutôt que de compter.
+    expect((await editions(page)).filter(edition => edition.name === 'Année trop courte')).toHaveLength(0)
   })
 
   test('modifier une édition : snackbar de confirmation qui disparaît, valeurs enregistrées, code et année inchangés', async ({ page, context }) => {
