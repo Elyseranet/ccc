@@ -388,7 +388,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-30](F-30.md) : ouvert — reste de F-11 (dialogue de validation, un seul PUT en e2e, focus du dialogue, édition archivée).
 - [F-13](F-13.md) : **Fermé** (2026-11-12) @ `bd2e62ff`, colonnes compétiteurs sous 1 %.
 - [F-31](F-31.md) : **Fermé** (2026-11-12) @ `d7eb4eb6`.
-- [F-32](F-32.md) : ouvert — zone photo Compétiteurs à 1,019 % après F-31 (bouton désactivé Origam).
+- [F-32](F-32.md) : ouvert — zone photo Compétiteurs à 1,019 % après F-31 (bouton désactivé Origam) ; contournement central prêt sur `feature/F-32-disabled-btn` (dev-f13), à mesurer sur les écrans listés dans F-32.md.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; reste le back (robots.txt, sitemap.xml, X-Robots-Tag).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
