@@ -26,7 +26,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-10](B-10.md) | Admin : éditions, identité d'un compétiteur, participants | 3 | B-08 (et le service de B-09) | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-10` @ `d2563c3`, email branché) ; à réappliquer par dev-b10 sur `feature/wave3a-identity`, après B-09 |
 | [B-11](B-11.md) | Tirage des poules : têtes de série, affectations, validation, round-robin | 4 | B-10, B-03 | — | **Fermé** — mergé dans `develop` @ `8c30c09` (2026-11-04) |
 | [B-12](B-12.md) | Scores : enregistrer, valider (idempotent), corriger | 3 | B-08, B-02, B-03 | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : réappliqué par dev-b12 (`feature/B-12-r` @ `a97dd60`, légers verts) ; test:db, test:api et doc d'API `docs/api/matchs.md` en cours |
-| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | À faire |
+| [B-13](B-13.md) | Qualification, barrages, départages, tirage de tour | 4 | B-11, B-12 | — (R-1, R-2, R-6, R-7 tranchés le 2026-10-20) | **Mergé** @ `eab64fb0`, à confirmer par backend-lead |
 | [B-14](B-14.md) | Clôture et gel des points | 5 | B-12, B-13 | — | À faire |
 | [B-15](B-15.md) | Admin : flux d'activité du tableau de bord (C7) | 4 | B-11, B-12 | — (A17 tranché le 2026-10-20 : flux dérivé) | **Fermé** — mergé dans `develop` @ `db0bac91` (2026-11-12) |
 | [B-16](B-16.md) | Avatar : téléversement d'une photo stockée en base, EXIF supprimé (AV-1) | 3 | B-08, B-09, B-10 | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-16` @ `4e39f80`) ; à réappliquer par dev-b16 sur `feature/wave3a-identity`, après B-10 |
@@ -119,7 +119,7 @@ Dérive de schéma de M0 sur `legacy_workbook_rows` : [T-DB-01](T-DB-01.md), **f
 
 Durcissement du convertisseur XLSX (Python) et des migrations du seed legacy (relecture de sécurité de B-04) : [T-SEC-05](T-SEC-05.md), vague 3. **Fermé sans objet** par le `project-manager` le 2026-10-22 : le convertisseur Python et le seed legacy sont supprimés (ARCH-5), la branche n'est pas mergée.
 
-Constats LOW de la revue de sécurité de la vague 3a (2026-10-22), hors vague 3a : [T-SEC-06](T-SEC-06.md) garde PROD-1 contournable (question ouverte : refuser `NUXT_STRICT_RUNTIME_CONFIG=false` ?), [T-SEC-07](T-SEC-07.md) concurrence de sharp et cache d'un avatar supprimé (question ouverte sur le cache), [T-SEC-08](T-SEC-08.md) `If-Match` sur score et validation (**Fermé** 2026-11-05, merge `4e87bfc`), [T-SEC-09](T-SEC-09.md) message `pg` dans les logs de migration et lecture du corps après un 408. Tous **À faire**. Seconde revue (2026-10-22) : [T-SEC-10](T-SEC-10.md) concurrence et cohérence des écritures admin (L1 réglé @ `4e87bfc` ; L2, L3, L5 ouverts), [T-SEC-11](T-SEC-11.md) contrainte de taille d'avatar et index d'expiration (migration), [T-SEC-12](T-SEC-12.md) création d'admin, CSRF sans en-tête (question ouverte), origine derrière proxy, secret d'appareil. Tous **À faire**. Corrigés dans la vague 3a : M1 (ETag après avatar) et L4 (borne de `heldOn`).
+Constats LOW de la revue de sécurité de la vague 3a (2026-10-22), hors vague 3a : [T-SEC-06](T-SEC-06.md) garde PROD-1 contournable (question ouverte : refuser `NUXT_STRICT_RUNTIME_CONFIG=false` ?), [T-SEC-07](T-SEC-07.md) concurrence de sharp et cache d'un avatar supprimé (question ouverte sur le cache), [T-SEC-08](T-SEC-08.md) `If-Match` sur score et validation (**Fermé** 2026-11-05, merge `4e87bfc`), [T-SEC-09](T-SEC-09.md) message `pg` dans les logs de migration et lecture du corps après un 408. Tous **À faire**. Seconde revue (2026-10-22) : [T-SEC-10](T-SEC-10.md) concurrence et cohérence des écritures admin (L1 réglé @ `4e87bfc` ; L2, L3, L5 ouverts), [T-SEC-11](T-SEC-11.md) contrainte de taille d'avatar et index d'expiration (migration), [T-SEC-12](T-SEC-12.md) création d'admin, CSRF sans en-tête (question ouverte), origine derrière proxy, secret d'appareil. Tous **À faire**. **2026-11-12 : T-SEC-06 et T-SEC-12 mergés @ `207d1af5`, fermeture à confirmer par backend-lead.** Corrigés dans la vague 3a : M1 (ETag après avatar) et L4 (borne de `heldOn`).
 
 Statuts HTTP du back à migrer vers `src/consts/http-status.const.ts` (fichier unique front et back, ARCH-2), proposé par le `frontend-lead` : [T-HTTP-01](T-HTTP-01.md), **À faire**, après le merge de F-00h et de la vague 3a.
 
@@ -221,7 +221,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-04](F-04.md) | Joueurs et fiche joueur | `joueurs.html`, `joueur.html` | F-00, F-00h, F-00o, F-00p, B-17 (parcours, titres de l'adversaire, enums de tri) | **Fermé** (2026-11-02) : dernier lot @ `60d9987` ; suite F-04-PAG, T-QA-06 | `../CCC-F-04` |
 | [F-05](F-05.md) | Face-à-face | `face-a-face.html` | F-00, F-00h | **Fermé** (2026-10-22) : mergé @ `67270bd` (branche abf0653) ; Origam #1267 | `../CCC-F-05` |
 | [F-06](F-06.md) | Règles et Variantes | `regles.html` | F-00 | **Fermé** (squash f85ef6e, ticket fermé acc6406) | `../CCC-F-06` |
-| [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | À faire | `../CCC-F-07` |
+| [F-07](F-07.md) | Admin : tableau de bord | `admin.html` | F-00, F-00b, F-00c, B-17 (types de l'activité) | **Mergé** @ `2b725955`, à confirmer par frontend-lead | `../CCC-F-07` |
 | [F-08](F-08.md) | Admin : poules et matchs (`/admin/matchs`), saisie de score | `admin-matchs.html` | F-00 | **Fermé** — code @ `29e823d9`, page livrée @ `c9d2704a` (exception release approuvée, T-REL-03) | `.claude/worktrees/agent-adf15423d0d20e4bf` |
 | [F-09](F-09.md) | Admin : participants | `admin-participants.html` | F-00, B-09, B-10, B-16 (mergés, vague 3a) | **Fermé** — écran mergé @ `b9af32a`, e2e du 409 après tirage mergé @ `44f60df9` (2026-11-12) | **Mergé** @ `b9af32a` (2026-11-05), écran livré ; e2e du 409 après tirage sur `feature/F-09-draw-409`, gates vertes le 2026-11-12 (Playwright 310/0, TU 741), prête au merge |
 | [F-10](F-10.md) | Compte : `/connexion`, `/invitation/[jeton]`, `/profil` | `compte.html` | F-00, B-08, B-09, B-16 (mergés, vague 3a 640842b) | **Fermé** — mergé dans `develop` @ `db8a0e2` (2026-11-04) | worktree de dev-f05, branche `feature/F-10` |
@@ -244,7 +244,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-26](F-26.md) | Admin : clôture de l'édition | à dessiner | B-14 | À faire |
 | [F-27](F-27.md) | Bouton d'appel « grand » 48 / 24 : une seule recette (surcharges locales de `--origam-btn---*-lg`) | — | F-19, F-26 | À faire (2026-11-05) | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
-| [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | À faire |
+| [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | **Mergé** @ `75d95e59`, à confirmer (infos éditeur `[À FOURNIR]`) |
 
 **Compteur** (2026-10-22) : 14 tickets front ouverts (F-01 à F-05, F-07 à F-11, F-13, F-14, T-LIVE-01 partiel ; 2 en cours : F-04, F-05), 3 fermés (F-00, F-06, F-12). Prérequis en cours : F-00h, F-00n. Aucun arbitrage front en attente.
 
@@ -383,7 +383,8 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
 - [T-REL-03](T-REL-03.md) : **Fermé** (2026-11-12) @ `3d0719c5`, release 50 passés / 0 échoué ; exception de F-08 levée.
-- [F-29](F-29.md) : code prêt, en attente de la vérification visual F-01 et du merge — suppression de l'état `?sans-palmares` de la maquette d'accueil (décision utilisateur 2026-11-12).
+- [F-29](F-29.md) : **Fermé** (2026-11-12) @ `9e81f13f`.
+- [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; reste le back (robots.txt, sitemap.xml, X-Robots-Tag).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.

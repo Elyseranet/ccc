@@ -2,6 +2,7 @@
 
 - **Origine** : seconde revue de sécurité de la vague 3a, findings LOW L8 à L12, le 2026-10-22.
 - **Statut** : À faire. Hors vague 3a, sauf L11, documenté dans la vague (README, commit `cf960ac`). L10 contient une **question ouverte** à poser à l'utilisateur.
+- **2026-11-12 — mergé dans develop @ `207d1af5`** (branche @ `5d50f5ad`), sous GATE-DEV (décision utilisateur : merge develop = typecheck + test:run ; gates complètes à la PR vers main, [T-REL-04](T-REL-04.md)). Preuve : typecheck vert et test:run 1126 réussis / 1 ignoré / 0 échec sur le résultat des 5 merges (chef de projet, worktree temporaire). **Reste ouvert** jusqu'à ce que le lead confirme, critère par critère, ce qui est couvert par le code mergé et ce qui reste.
 
 ## L8 — `user:create-admin` : course sur l'email
 
