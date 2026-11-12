@@ -63,6 +63,7 @@ export const useAdminParticipants = () => {
   }
   const dismissFeedback = () => {
     feedback.value = null
+  }
   const reload = async () => {
     await Promise.all([refresh(), refreshNuxtData('editions')])
   }
