@@ -45,7 +45,7 @@
 .cp-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--origam-space---5); align-items: start; }
 .cp-grid > * { min-width: 0; }
 /* Minimums aux largeurs des vraies données, aucun nom tronqué (décision utilisateur 2026-11-12, F-13) */
-.cp-table th:nth-child(1) { min-width: 191px; }
+.cp-table th:nth-child(1) { min-width: 191.4px; }
 .cp-table th:nth-child(3) { min-width: 88px; }
 .table .is-sel td { background: var(--origam-color__action--primary---bgSubtle); }
 .table .is-sel td:first-child { box-shadow: inset 3px 0 0 var(--origam-color__action--primary---bg); }
