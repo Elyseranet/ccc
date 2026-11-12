@@ -379,7 +379,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-01](T-OPS-01.md) : **Fermé** — mergé dans `develop` @ `a72f3ac` (branche `de8704e`).
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
-- [T-OPS-03](T-OPS-03.md) : **À faire** (2026-11-04) — santé : version déployée et état des migrations (backend-lead).
+- [T-OPS-03](T-OPS-03.md) : **En revue** (2026-11-12) — santé : version déployée et état des migrations ; merge par le chef de projet.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
 - [T-REL-03](T-REL-03.md) : **Fermé** (2026-11-12) @ `3d0719c5`, release 50 passés / 0 échoué ; exception de F-08 levée.

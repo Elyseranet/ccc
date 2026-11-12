@@ -37,7 +37,7 @@ describe('GET /api/v1/health (database accepts the connection and never answers)
 
     expect(response.status).toBe(503)
     expect(elapsedMs).toBeLessThan(HEALTHCHECK_TIMEOUT_MS)
-    expect(JSON.parse(text)).toEqual({ status: HEALTH_STATUS.UNAVAILABLE })
+    expect(JSON.parse(text)).toEqual({ status: HEALTH_STATUS.UNAVAILABLE, version: null, migrations: null })
     expect(text).not.toMatch(/timeout|127\.0\.0\.1|postgres|password|connect/i)
   })
 })

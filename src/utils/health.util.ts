@@ -1,0 +1,82 @@
+import type { DataSource } from 'typeorm'
+import {
+  HEALTH_VERSION_PATTERN,
+  MIGRATION_FILE_PATTERN,
+  MIGRATIONS_TABLE_QUERY,
+  PG_UNDEFINED_TABLE
+} from '../consts/health.const.js'
+import { LOG_EVENT } from '../consts/log-event.const.js'
+import type { IHealthMigrations } from '../interfaces/health.interface.js'
+import { logger } from './logger.util.js'
+
+/**
+ * La version déployée. Nitro convertit les valeurs de `NUXT_*` avec `destr` : `3555796` devient le nombre 3555796 et
+ * `1234e56` le nombre 1.234e+59, deux SHA courts valables que `runtimeConfig` ne rend plus comme des chaînes. On lit donc la
+ * variable d'environnement brute en premier ; `runtimeConfig` ne sert que de repli et une valeur non textuelle y est refusée.
+ */
+export const resolveAppVersion = (rawEnvironmentValue: unknown, runtimeConfigValue: unknown): string | null =>
+  normalizeAppVersion(rawEnvironmentValue) ?? normalizeAppVersion(runtimeConfigValue)
+
+/** La version vient de l'environnement : on ne la renvoie que si elle a la forme d'un SHA, d'un tag ou d'un numéro. */
+export const normalizeAppVersion = (raw: unknown): string | null => {
+  const value = typeof raw === 'string' ? raw.trim() : ''
+  return HEALTH_VERSION_PATTERN.test(value) ? value : null
+}
+
+/** Horodatages des migrations livrées, d'après les noms de fichiers (`1793180000000-Nom.ts`). Les autres fichiers sont ignorés. */
+export const parseMigrationTimestamps = (fileNames: readonly string[]): number[] =>
+  fileNames.flatMap((name) => {
+    const match = MIGRATION_FILE_PATTERN.exec(name.split(/[/:]/).pop() ?? '')
+    return match ? [Number(match[1])] : []
+  })
+
+/** Migrations livrées qui ne figurent pas encore dans la table de suivi. */
+export const countPendingMigrations = (shipped: readonly number[], executed: readonly number[]): number => {
+  const done = new Set(executed)
+  return shipped.filter((timestamp) => !done.has(timestamp)).length
+}
+
+export const toHealthMigrations = (pendingCount: number): IHealthMigrations => ({ upToDate: pendingCount === 0, pendingCount })
+
+/**
+ * État des migrations, en lecture seule (une requête sur la table de suivi, quelques lignes) : ni `showMigrations()` ni
+ * `getPendingMigrations()`, qui créent la table de suivi si elle manque. Une base neuve sans table : tout est en attente.
+ * `null` quand la liste des migrations livrées est vide, car « à jour » serait alors une affirmation sans preuve.
+ */
+export const loadMigrationsHealth = async (dataSource: DataSource, shipped: readonly number[]): Promise<IHealthMigrations | null> => {
+  if (shipped.length === 0) {
+    return null
+  }
+  let executed: number[]
+  try {
+    const rows = await dataSource.query(MIGRATIONS_TABLE_QUERY) as Array<{ timestamp: string | number }>
+    executed = rows.map((row) => Number(row.timestamp))
+  } catch (error) {
+    if ((error as { code?: string } | null)?.code !== PG_UNDEFINED_TABLE) {
+      throw error
+    }
+    executed = []
+  }
+  return toHealthMigrations(countPendingMigrations(shipped, executed))
+}
+
+/**
+ * État des migrations pour la sonde. La lecture de la liste embarquée (`listShippedFiles`, le stockage serverAssets de
+ * Nitro) a son PROPRE `try` : si elle échoue, la base va peut-être très bien, donc `null` (inconnu) et un log structuré
+ * sans détail, jamais un 503 qui ferait redémarrer un conteneur sain. Une erreur de la base, elle, remonte : c'est le 503.
+ */
+export const resolveMigrationsHealth = async (
+  dataSource: DataSource,
+  listShippedFiles: () => Promise<readonly string[]>,
+  requestId?: string
+): Promise<IHealthMigrations | null> => {
+  let shipped: number[]
+  try {
+    shipped = parseMigrationTimestamps(await listShippedFiles())
+  } catch (error) {
+    const cause = error as { name?: string, code?: string } | null
+    logger.warn(LOG_EVENT.HEALTH_MIGRATIONS_UNKNOWN, { requestId, errorName: cause?.name, errorCode: cause?.code })
+    return null
+  }
+  return loadMigrationsHealth(dataSource, shipped)
+}

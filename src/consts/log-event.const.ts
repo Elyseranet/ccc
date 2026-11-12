@@ -27,6 +27,7 @@ export const LOG_EVENT = {
   COMPETITOR_UPDATED: 'competitor_updated',
   PARTICIPANT_ADDED: 'participant_added',
   PARTICIPANT_REMOVED: 'participant_removed',
+  HEALTH_MIGRATIONS_UNKNOWN: 'health_migrations_unknown',
   DRAW_CREATED: 'draw_created',
   DRAW_ASSIGNMENTS_SAVED: 'draw_assignments_saved',
   DRAW_VALIDATED: 'draw_validated',

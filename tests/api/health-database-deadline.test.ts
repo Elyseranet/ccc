@@ -35,6 +35,6 @@ describe('GET /api/v1/health (database timeouts set far above the probe deadline
     expect(response.status).toBe(503)
     expect(elapsedMs).toBeLessThan(HEALTHCHECK_TIMEOUT_MS)
     expect(elapsedMs).toBeGreaterThanOrEqual(3500)
-    expect(await response.json()).toEqual({ status: HEALTH_STATUS.UNAVAILABLE })
+    expect(await response.json()).toEqual({ status: HEALTH_STATUS.UNAVAILABLE, version: null, migrations: null })
   })
 })

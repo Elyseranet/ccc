@@ -68,6 +68,9 @@ export default defineNuxtConfig({
     '/invitation/**': { headers: { 'x-robots-tag': SEO_ROBOTS_NOINDEX, 'referrer-policy': 'no-referrer', 'cache-control': 'no-store' } }
   },
   runtimeConfig: {
+    // Version déployée (T-OPS-03), SHA du commit : NUXT_APP_VERSION, posée par le Dockerfile depuis l'argument de build.
+    // Vide par défaut : /api/v1/health répond alors `version: null`, jamais une valeur inventée.
+    appVersion: '',
     // PROD-1 : garde-fou de configuration de production (NUXT_STRICT_RUNTIME_CONFIG), faux par défaut, posé à vrai par l'image
     // (Dockerfile, étage runner). Indépendant de NODE_ENV : le build des tests d'API est aussi un build de production.
     strictRuntimeConfig: false,
@@ -156,6 +159,9 @@ export default defineNuxtConfig({
   },
   nitro: {
     compressPublicAssets: true,
+    // T-OPS-03 : la liste des migrations livrées avec le build (noms de fichiers) est embarquée dans le serveur, pour que
+    // /api/v1/health compte celles qui manquent dans la table de suivi. Le serveur ne charge pas les migrations lui-même.
+    serverAssets: [{ baseName: 'migrations', dir: './src/server/db/migrations' }],
     // Les entités TypeORM utilisent des décorateurs « experimental » ; esbuild ne lit pas
     // typescript.tsConfig. esbuild ne gère pas emitDecoratorMetadata : chaque @Column doit
     // donc déclarer son `type` explicitement.
