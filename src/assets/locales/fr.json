@@ -21,7 +21,7 @@
   "layout.footer.copyright": "© {year} {publisher}",
   "layout.footer.credit_prefix": "Site réalisé par",
   "layout.footer.credit_middle": "avec",
-  "layout.footer.origam_url_todo": "[À FOURNIR : URL d’Origam]",
+  "layout.footer.design_system_name": "Origam",
   "layout.admin.brand_label": "CCC, tableau de bord",
   "layout.admin.aside_label": "Organisation",
   "layout.admin.group_organisation": "Organisation",
