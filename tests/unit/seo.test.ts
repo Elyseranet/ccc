@@ -121,11 +121,7 @@ describe('chaque page appelle useSeo', () => {
     'src/pages/joueurs/[id].vue': SEO_PAGE.PLAYER,
     'src/pages/joueurs/face-a-face.vue': SEO_PAGE.HEAD_TO_HEAD,
     'src/pages/regles.vue': SEO_PAGE.RULES,
-    'src/pages/palmares.vue': SEO_PAGE.HALL_OF_FAME,
-    'src/pages/mentions-legales.vue': SEO_PAGE.LEGAL_NOTICE,
-    'src/pages/confidentialite.vue': SEO_PAGE.PRIVACY,
-    'src/pages/cgu.vue': SEO_PAGE.TERMS,
-    'src/pages/accessibilite.vue': SEO_PAGE.ACCESSIBILITY
+    'src/pages/palmares.vue': SEO_PAGE.HALL_OF_FAME
   }
 
   it('chaque page publique appelle useSeo avec sa page, et une seule fois', () => {

@@ -921,13 +921,5 @@
   "seo.players.description": "The Caps Championship players directory: search a player by name or nickname and open their page.",
   "seo.head_to_head.title": "Head to head between two players",
   "seo.edition.description": "Caps Championship edition {code}: participants, pools, final stage, matches and results.",
-  "seo.player.title": "{name}: player page",
-  "seo.legal_notice.title": "Legal notice",
-  "seo.legal_notice.description": "Legal notice: publisher, publication director, host, contact, intellectual property and credits.",
-  "seo.privacy.title": "Privacy policy",
-  "seo.privacy.description": "Privacy policy: data collected, purposes and legal bases, retention periods, recipients, rights and complaints, cookies.",
-  "seo.terms.title": "Terms of use",
-  "seo.terms.description": "Terms of use: purpose and publisher, access to the service, accounts, content you upload, rules of conduct, liability, governing law.",
-  "seo.accessibility.title": "Accessibility statement",
-  "seo.accessibility.description": "Accessibility statement: conformance status, what has been done, what has not been done, known issues, contact and remedies."
+  "seo.player.title": "{name}: player page"
 }
