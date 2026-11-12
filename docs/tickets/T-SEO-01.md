@@ -28,3 +28,15 @@
   - les routes `robots.txt` et `sitemap.xml`, le `X-Robots-Tag` et la suppression de `public/robots.txt` (accordée), côté back ;
   - le front de dev-f05 (`useSeo`, noindex des pages privées), à rebaser sur ce merge.
   Le ticket reste ouvert.
+
+## Front prêt au merge (2026-11-12, frontend-lead)
+
+Branche `feature/T-SEO-01-front`, rebasée sur develop 4c23b788. Elle apporte `useSeo` (titre et description uniques par page publique), `noindex` sur les pages privées (y compris le squelette `/admin/phase-finale` venu de F-12b, et `/palmares` venu de F-02, passé à `useSeo`), les clés `seo.*`, et retire `pages.home.title`, remplacé par `seo.home.title`. Le SHA de code testé est `ca0a8a73`.
+
+- typecheck vert, 0 erreur hors Origam.
+- test:run : 81/81 fichiers, 790 réussis, 1 ignoré, 0 en échec.
+- Playwright complet (base `ccc_fl_seo_test` remise à neuf) : 341 passés, 0 échec, 0 non lancé.
+- npm audit : 0 high, 0 critical. gitleaks `develop..HEAD` : aucune fuite.
+- Revue de sécurité (agent de revue, verdict relayé par le project-manager) : aucune vulnérabilité à haute confiance. Limite : `useSeo.ts` n'a été lu qu'en partie. L'URL canonique vient de `siteUrl`.
+- Locales : fusion clé par clé (3 voies). Valeurs contrôlées contre la pointe d'avant le rebase et contre develop : aucune valeur fausse, aucune clé perdue ni en double.
+- **Reste ouvert** : côté back, les routes `robots.txt` et `sitemap.xml`, le `X-Robots-Tag` et la suppression de `public/robots.txt`. Le ticket reste ouvert après ce merge.
