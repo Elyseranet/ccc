@@ -6,3 +6,5 @@
   - F-19 @ `75d95e59` (dernier run complet : 1 échec `net::ERR_ABORTED` sur visual/F-02 @1440, 30 non lancés) ;
   - F-29 @ `9e81f13f` (visual F-01 de la maquette non lancé) ;
   - B-13 @ `eab64fb0`, F-07 @ `2b725955`, T-SEC-06/12-r3 @ `207d1af5`.
+  - F-13 @ `6bed4417` (colonnes du tableau des compétiteurs à mesurer) ;
+  - F-11 @ `08adda09` (`e2e-release/page-delivery.spec.ts` relu, non lancé).
