@@ -19,6 +19,7 @@
         v-if="view"
         :to="validateTarget"
         variant="flat"
+        size="x-large"
         bg-color="primary"
         elevation="lg"
         :disabled="!view.canValidate"
@@ -30,6 +31,7 @@
             :model-value="true"
             :content="view.recordedCount"
             inline
+            class="dashboard__badge"
             color="secondary"
             :aria-label="badgeLabel"
           />
@@ -230,6 +232,10 @@ defineExpose({})
     line-height: 1;
   }
 
+  &__badge {
+    margin-inline-start: var(--dashboard__badge---margin-start, var(--origam-space---1));
+  }
+
   &__login {
     justify-self: start;
   }
@@ -269,5 +275,11 @@ defineExpose({})
       'steps'
       'log';
   }
+}
+</style>
+
+<style>
+:root {
+  --dashboard__badge---margin-start: var(--origam-space---1);
 }
 </style>
