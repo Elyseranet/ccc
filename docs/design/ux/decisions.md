@@ -426,3 +426,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **Décision utilisateur** : les passes lourdes (test:api, test:db, Playwright complet) peuvent tourner jusqu'à une charge machine (load sur 1 minute) de **10**, au lieu de 4 pour le back et 6 pour le front. La charge est relevée et notée pour chaque passe.
 - Une passe qui échoue par délai dépassé est **refaite au calme**. Seule une passe complète, sans exclusion, avec 0 échec et 0 test instable, vaut preuve pour un merge.
 - Une seule passe lourde à la fois (règle des fenêtres inchangée).
+
+## 2026-11-12 — Pages légales non indexées
+
+- **Décision utilisateur** : les quatre pages légales (`/mentions-legales`, `/confidentialite`, `/cgu`, `/accessibilite`) ne sont pas indexées. Elles restent accessibles depuis le pied de page et hors sitemap.
+- **Front** : chaque page appelle `useSeo({ noindex: true })` (meta `robots: noindex, nofollow`) et garde son titre d'onglet ; leurs routes sont dans `SEO_PRIVATE_ROUTE_PATTERNS`, ce qui pose aussi l'en-tête `X-Robots-Tag` par `routeRules`. Aucune clé `seo.*` pour ces pages.
+- **À suivre côté back de T-SEO-01** : l'exclusion du sitemap.

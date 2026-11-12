@@ -113,6 +113,28 @@
             :text="errorText"
             data-cy="invitation-error"
           />
+          <p
+            v-if="hasLegalLinks"
+            class="invitation-form__legal"
+            data-cy="invitation-legal"
+          >
+            <template
+              v-for="link in legalLinks"
+              :key="link.to"
+            >
+              <span
+                v-if="link.separated"
+                aria-hidden="true"
+              >{{ separator }}</span>
+              <nuxt-link
+                :to="link.to"
+                class="invitation-form__legal-link"
+                :data-cy="`invitation-legal-${link.to}`"
+              >
+                {{ link.text }}
+              </nuxt-link>
+            </template>
+          </p>
           <origam-btn
             type="submit"
             variant="flat"
@@ -145,6 +167,8 @@ import { usePasswordRequirements } from '~/composables/usePasswordRequirements'
 import { useT } from '~/composables/useT'
 import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
 import { PASSWORD_MAX_LENGTH } from '~/consts/auth.const'
+import { LEGAL_LINKS_SEPARATOR } from '~/consts/legal.const'
+import { INVITATION_LEGAL_NAVIGATION } from '~/consts/public-navigation.const'
 import type { ACCOUNT_ERROR } from '~/enums/account.enum'
 import type { IFormSubmitEvent, IInvitationFormEmits, IInvitationFormProps } from '~/interfaces/account.interface'
 
@@ -173,6 +197,13 @@ const title = computed(() => t('account.invitation.title', 'Bienvenue au CCC'))
 const intro = computed(() => t('account.invitation.intro', 'L’organisation vous a inscrit·e. Choisissez votre mot de passe, ajoutez une photo et votre téléphone si vous le souhaitez.'))
 const hint = computed(() => t('account.invitation.hint', 'Le lien ne sert qu’une fois.'))
 const submitLabel = computed(() => t('account.invitation.submit', 'Activer mon compte'))
+const separator = ` ${LEGAL_LINKS_SEPARATOR} `
+const legalLinks = computed(() => INVITATION_LEGAL_NAVIGATION.map((item, index) => ({
+  to: item.to,
+  text: t(item.key, item.label),
+  separated: index > 0
+})))
+const hasLegalLinks = computed(() => legalLinks.value.length > 0)
 const passwordLabel = { key: 'account.invitation.password', fallback: 'Mot de passe' }
 const confirmLabel = { key: 'account.invitation.confirm', fallback: 'Confirmer le mot de passe' }
 const avatarLabel = { key: 'account.invitation.avatar', fallback: 'Avatar' }
@@ -246,6 +277,17 @@ defineExpose({})
     margin: calc(-1 * var(--origam-space---2)) 0 0;
     font-size: var(--origam-font__size---sm);
     color: var(--origam-color__text---secondary);
+  }
+
+  &__legal {
+    margin: calc(-1 * var(--origam-space---2)) 0 0;
+    font-size: var(--origam-font__size---sm);
+    color: var(--origam-color__text---secondary);
+  }
+
+  &__legal-link {
+    color: inherit;
+    text-decoration: underline;
   }
 
   &__submit {

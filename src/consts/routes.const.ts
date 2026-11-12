@@ -15,5 +15,9 @@ export const ROUTES = {
   EDITION: '/editions/:id',
   PLAYER: '/joueurs/:id',
   HEAD_TO_HEAD: '/joueurs/face-a-face',
-  INVITATION: '/invitation/:jeton'
+  INVITATION: '/invitation/:jeton',
+  LEGAL_NOTICE: '/mentions-legales',
+  PRIVACY: '/confidentialite',
+  TERMS: '/cgu',
+  ACCESSIBILITY: '/accessibilite'
 } as const

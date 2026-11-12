@@ -83,6 +83,26 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
       API_ENDPOINT.AUTH_LOGOUT
     ]
   },
+  [ROUTES.LEGAL_NOTICE]: {
+    delivered: false,
+    layout: LAYOUT.DEFAULT,
+    endpoints: []
+  },
+  [ROUTES.PRIVACY]: {
+    delivered: false,
+    layout: LAYOUT.DEFAULT,
+    endpoints: []
+  },
+  [ROUTES.TERMS]: {
+    delivered: false,
+    layout: LAYOUT.DEFAULT,
+    endpoints: []
+  },
+  [ROUTES.ACCESSIBILITY]: {
+    delivered: false,
+    layout: LAYOUT.DEFAULT,
+    endpoints: []
+  },
   [ROUTES.ADMIN]: {
     delivered: false,
     layout: LAYOUT.ADMIN,

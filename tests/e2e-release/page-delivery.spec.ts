@@ -85,6 +85,19 @@ test.describe('pages livrées publiques (T-REL-02)', () => {
   }
 })
 
+test.describe('page d’erreur CCC (F-19, décision 9639ca1)', () => {
+  test('une adresse inconnue répond 404 avec la page d’erreur, noindex, le pied de page et aucun message technique', async ({ request }) => {
+    const response = await request.get('/page-qui-nexiste-pas', { maxRedirects: 0 })
+    expect(response.status()).toBe(404)
+    const html = await response.text()
+    expect(html).toContain('data-cy="error-page"')
+    expect(html).toContain('Erreur 404')
+    expect(html).toMatch(/<meta[^>]+name="robots"[^>]+content="[^"]*noindex/)
+    expect(html).toContain('data-cy="footer-copyright"')
+    expect(html).not.toContain('Cannot read properties')
+  })
+})
+
 test('la sonde de santé reste publique', async ({ request }) => {
   const response = await request.get('/api/v1/health')
   expect([200, 503]).toContain(response.status())

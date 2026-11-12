@@ -118,6 +118,7 @@ const INVITATION_ZONES: IZone[] = [
   { zone: 'compte-invitation-indice', mockup: '#pw-hint', app: '#invitation-hint' },
   { zone: 'compte-invitation-avatar', mockup: '#ac-p-first .acc-avatar', app: '[data-cy="avatar-field"]' },
   { zone: 'compte-invitation-telephone', mockup: '#tel', app: appField('invitation-phone') },
+  { zone: 'compte-invitation-liens-legaux', mockup: '#ac-p-first .acc-legal', app: '[data-cy="invitation-legal"]' },
   { zone: 'compte-invitation-bouton', mockup: '#ac-p-first .acc-form .btn', app: '[data-cy="invitation-submit"]' }
 ]
 
