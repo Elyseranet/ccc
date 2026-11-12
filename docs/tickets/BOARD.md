@@ -389,6 +389,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-13](F-13.md) : **Fermé** (2026-11-12) @ `bd2e62ff`, colonnes compétiteurs sous 1 %.
 - [F-31](F-31.md) : **Fermé** (2026-11-12) @ `d7eb4eb6`.
 - [F-32](F-32.md) : ouvert — zone photo Compétiteurs à 1,019 % après F-31 (bouton désactivé Origam).
+- [T-OPS-05](T-OPS-05.md) : **ouvert, priorité 1** — l'image de production ne démarre plus (`h3` absent pour la CLI de migration), régression de T-SEC-17 ; déploiements de la dev probablement en échec.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; reste le back (robots.txt, sitemap.xml, X-Robots-Tag).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
