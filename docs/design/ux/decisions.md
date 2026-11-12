@@ -468,3 +468,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## 2026-11-12 — Dev redéployée après chaque merge
 
 - **Décision (utilisateur, 2026-11-12)** : après chaque merge dans develop qui touche l'app, le chef de projet relance un Redeploy de l'app `ccc` (env dev) dans Coolify, puis vérifie que `/api/v1/health` renvoie le nouveau SHA dans `version`. Tant qu'aucun webhook n'existe (T-OPS-04), c'est la seule mise à jour de la dev. Les commits qui ne touchent que la doc ne déclenchent pas de redéploiement.
+
+## 2026-11-12 — Données d'archives
+
+- **R-5 bis (utilisateur, 2026-11-12, remplace R-5)** : les 175 matchs d'archives sans score comptent avec leur vainqueur, qui est le joueur listé en premier dans l'onglet `scores` du classeur, comme le fait son onglet `F2F`. Les bilans V/D, ratios, face-à-face et classements les incluent. Les points ne comptent que les matchs avec score. Tickets B-21 et F-34.
+- **DRAWS-ARCH (utilisateur, 2026-11-12)** : l'onglet Tirages d'une édition sans tirage enregistré affiche les tirages **reconstitués** (composition des poules, affiches de chaque tour) avec cette mention ; les têtes de série sont signalées non archivées. Ticket F-35.
+- **DATA-SRC (utilisateur, 2026-11-12)** : le classeur fait foi. Les matchs qu'il ne contient pas (poules d'avant 2015, l'essentiel de 2023) ne sont pas recherchés ailleurs ; les face-à-face anciens restent incomplets.
