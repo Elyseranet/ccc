@@ -73,6 +73,15 @@
 .mc__s { grid-area: s; font-size: var(--origam-font__size---2xl); color: var(--origam-color__bar---amber); }
 .mc__s i { font-style: normal; padding-inline: var(--origam-space---1); color: var(--origam-color__text---tertiary); }
 .mc .btn { grid-area: act; justify-self: stretch; }
+/* F-21 · départage à N côtés : liste des côtés, un score par ligne (pas de « a – b ») */
+.mc--multi { grid-template-areas: 't t chip' 'sides sides sides' 'act act act'; grid-template-rows: auto 1fr auto; }
+.mc--multi .mc__sides { align-self: start; }
+.mc__t .num { white-space: nowrap; }
+.mc__sides { grid-area: sides; display: grid; gap: var(--origam-space---1); margin: 0; padding: 0; list-style: none; }
+.mc__sides li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--origam-space---3); padding-block: var(--origam-space---1); border-top: 1px solid var(--origam-color__border---subtle); }
+.mc__sides li:first-child { border-top: 0; }
+.mc__n { min-width: 0; font-weight: var(--origam-font__weight---bold); overflow-wrap: anywhere; }
+.mc__v { flex: none; font-size: var(--origam-font__size---xl); color: var(--origam-color__bar---amber); }
 
 /* origam-dialog / tiroir bas — état ouvert pour la maquette */
 .sheet-scrim { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--origam-color__surface---sunken) 72%, transparent); backdrop-filter: blur(4px); }
@@ -88,6 +97,10 @@
 .duel__p:last-child { text-align: right; }
 .duel__p label { font-weight: var(--origam-font__weight---bold); }
 .duel__vs { padding-bottom: var(--origam-space---4); font-size: var(--origam-font__size---3xl); color: var(--origam-color__text---tertiary); }
+.multi { display: grid; gap: var(--origam-space---3); }
+.multi[hidden], .multi__p[hidden], .duel[hidden] { display: none; }
+.multi__p { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem; align-items: center; gap: var(--origam-space---4); margin: 0; }
+.multi__p label { font-weight: var(--origam-font__weight---bold); overflow-wrap: anywhere; }
 .score-in { width: 100%; padding: 5px calc(var(--origam-space---5) - 1px); border: 2px solid var(--origam-color__border---strong); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); color: var(--origam-color__action--primary---fgSubtle); font-size: var(--origam-font__size---4xl); line-height: var(--origam-font__lineHeight---normal); text-align: start; } /* origam-text-field single-line rounded lg, color primary, .font-display, vars --origam-field---font-size 4xl et bordure 2 px border.strong (mesuré 2.37.4) */
 .score-in:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
 .rule { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); padding: var(--origam-space---3) var(--origam-space---4); border-radius: var(--origam-radius---lg); background: var(--origam-color__feedback--info---bgSubtle); font-size: var(--origam-font__size---sm); }
