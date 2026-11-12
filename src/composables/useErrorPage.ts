@@ -1,6 +1,7 @@
 import { computed, nextTick, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import { INTENT, VARIANT } from 'origam/enums'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { HOME_CTA_HOVER } from '~/consts/home.const'
 import { ROUTES } from '~/consts/routes.const'
@@ -19,8 +20,7 @@ import { isKnownStatusCode, resolveErrorPageKind } from '~/utils/error-page.util
  * Le code affiché en eyebrow est le vrai `statusCode`, jamais écrit en dur ; sans code connu, pas d'eyebrow. Le message
  * technique de l'erreur n'est jamais affiché. À l'arrivée, le focus va sur le titre `h1` (un lecteur d'écran annonce
  * la page). La page porte `noindex` : une page d'erreur ne doit pas être indexée. Le titre du document est celui du
- * h1, sans nom de site : le suffixe sera ajouté en un seul endroit par `useSeo` (T-SEO-01), à brancher à son merge
- * à la place de `useSeoMeta` (`useSeo({ noindex: true })`).
+ * h1, sans nom de site : `useSeo({ noindex: true })` (T-SEO-01) ne pose que `robots` et garde ce titre.
  ********************************************************/
 export const useErrorPage = (error: Ref<IErrorPageError> | (() => IErrorPageError)) => {
   const { t } = useT()
@@ -50,7 +50,7 @@ export const useErrorPage = (error: Ref<IErrorPageError> | (() => IErrorPageErro
   const backHome = () => clearError({ redirect: ROUTES.HOME })
   const retry = () => clearError({ redirect: route.fullPath })
 
-  useSeoMeta({ robots: 'noindex, nofollow' })
+  useSeo({ noindex: true })
 
   onMounted(async () => {
     await nextTick()
