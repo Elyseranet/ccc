@@ -4,8 +4,6 @@ import { DATABASE_RUNTIME_CONNECTION_TIMEOUT_MS, DATABASE_RUNTIME_QUERY_TIMEOUT_
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_INDEXABLE, DEFAULT_SITE_URL } from './src/consts/runtime-config.const'
 import { SEO_PRIVATE_ROUTE_PATTERNS, SEO_ROBOTS_NOINDEX } from './src/consts/seo.const'
 
-const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gabarito:wght@400..900&display=swap'
-
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.E2E !== 'true' },
@@ -36,9 +34,8 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'fr' },
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: FONTS_URL }
+        { rel: 'preload', href: '/gabarito-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
+        { rel: 'preload', href: '/bagel-fat-one-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' }
       ]
     }
   },
