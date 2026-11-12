@@ -94,23 +94,5 @@
   </div>
 </div></footer>
 <script src="bulles.js" defer></script>
-<script>
-  // Maquette : état index.html?sans-palmares (T-REL-02, décision ab1a6b4) : palmarès non livré, tous ses liens sont masqués.
-  // Le rendu par défaut ne change pas. Aucune animation pilotée en JS.
-  if (new URLSearchParams(location.search).has('sans-palmares')) {
-    // Navigation principale et pied de page : même règle que la livraison des pages (PAGE_DELIVERY).
-    document.querySelectorAll('.hh-nav a[href="palmares.html"], .hh-footer a[href="palmares.html"]').forEach((a) => a.closest('li').remove())
-    // Héros : le CTA secondaire disparaît, le CTA principal reste seul, à la même place (rangée alignée à gauche).
-    document.querySelector('.home-hero__cta a[href="palmares.html"]').remove()
-    // Tuile champion·ne : reste une carte, sans lien ni état de survol (origam-card sans `to`, `hover` à false).
-    const champ = document.querySelector('a.t-champ')
-    const card = document.createElement('div')
-    card.className = 'card t-champ'
-    card.innerHTML = champ.innerHTML
-    champ.replaceWith(card)
-    // Carte classement : sans le lien « Tout le classement ».
-    document.querySelector('.t-rank a[href="palmares.html"]').remove()
-  }
-</script>
 </body>
 </html>
