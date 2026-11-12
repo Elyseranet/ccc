@@ -1,6 +1,6 @@
 # T-REL-03 — e2e de release rouges sur develop : accueil « sans palmarès » obsolète, unicité des métadonnées SEO
 
-- **Statut** : À faire. Décision utilisateur du 2026-11-12 : supprimer `home-sans-palmares.visual.spec.ts` (sans objet depuis la livraison de `/palmares`, F-02). Reste à établir la cause de l'échec de seo.spec:84. Ce ticket porte aussi l'exception de merge de F-08 (`c9d2704a`).
+- **Statut** : Code prêt, release verte à 96bd8e5a (50 passés, 0 échoué), en attente de revue et de merge. Décision utilisateur du 2026-11-12 : supprimer `home-sans-palmares.visual.spec.ts` (sans objet depuis la livraison de `/palmares`, F-02). Reste à établir la cause de l'échec de seo.spec:84. Ce ticket porte aussi l'exception de merge de F-08 (`c9d2704a`).
 - **Historique** : À faire. Ouvert le 2026-11-12 par `frontend-lead`, constaté pendant les vérifications de `feature/F-08-delivered`.
 - **Pilote proposé** : `frontend-lead`.
 
@@ -16,3 +16,11 @@ Sur develop 854f249f, build de production (`npm run build`), base amorcée par l
 1. Spec « sans palmarès » : la supprimer (elle n'a plus d'objet depuis la livraison de F-02) ou la convertir en contrôle de l'accueil avec palmarès. **Toute suppression de fichier demande l'accord de l'utilisateur.**
 2. `seo.spec.ts:84` : établir la cause par une mesure (titres et descriptions relevés page par page), corriger, et vérifier.
 3. Release verte sur develop, avec la commande du constat.
+
+
+## Résultat (dev-f08, 96bd8e5a sur b4cc9932)
+
+- **Spec supprimée** : `tests/e2e-release/home-sans-palmares.visual.spec.ts` (décision utilisateur du 2026-11-12) ; le commentaire de `tests/e2e/helpers/home-visual.ts` qui la citait est corrigé. Les helpers restent (utilisés par F-01 et F-08).
+- **Cause de seo.spec:84, mesurée** : la spec d'origine (b4cc9932) rejouée seule sur le build : `expect(seen).toHaveLength(5)` reçoit 1 (`/regles` seul). Le tableau `seen` est une variable de processus et `playwright.release.config.ts` est en `fullyParallel: true` : chaque test de page peut tourner dans un autre worker. Les titres et descriptions relevés sur le build sont uniques pour les 6 pages (/, /regles, /joueurs, /joueurs/face-a-face, /palmares, /editions/2025) : le défaut n'est pas dans les métadonnées. Correctif : `test.describe.configure({ mode: 'serial' })` sur ce bloc, assertions inchangées ; `ROUTES.HALL_OF_FAME` ajouté à `PUBLIC_PAGES`.
+- **Release** : build OK, projet routes 13 passés, `playwright.release.config.ts` 50 passés, 0 échoué (base ccc_dev_trel03_test, port 3982).
+- **Suite pour ui-designer** (non supprimé, accord de l'utilisateur requis) : l'état `?sans-palmares` de `docs/design/ui/happy-hour/index.html` (ligne 98) et la ligne « Accueil · Palmarès non livré » de `mapping.md` n'ont plus de spec qui les utilise.
