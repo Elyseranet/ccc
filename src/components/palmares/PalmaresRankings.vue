@@ -32,7 +32,11 @@
         :value="tab.value"
         :text="tab.text"
         :data-cy="tab.dataCy"
-      />
+      >
+        <template #default>
+          <abbr-text :text="tab.text" />
+        </template>
+      </origam-tab>
     </origam-tabs>
     <origam-tab-panels
       v-model="activeTab"

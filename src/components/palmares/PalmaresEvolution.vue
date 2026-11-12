@@ -18,7 +18,7 @@
           class="palmares-evolution__card"
         >
           <figcaption class="palmares-evolution__head">
-            <span class="palmares-evolution__title">{{ chartTitle }}</span>
+            <span class="palmares-evolution__title"><abbr-text :text="chartTitle" /></span>
             <span class="palmares-evolution__note"><abbr-text :text="chartNote" /></span>
           </figcaption>
           <origam-chart

@@ -23,7 +23,7 @@
         :data-cy="`sort-${header.key}`"
       >
         <span class="origam-data-table-header-cell__content">
-          <span>{{ header.title }}</span>
+          <span><abbr-text :text="String(header.title ?? header.key)" /></span>
           <origam-icon
             :icon="slotProps.getSortIcon(slotProps.column)"
             :class="{ 'origam-data-table-header-cell__sort-icon--active': slotProps.isSorted(slotProps.column) }"
@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed, getCurrentInstance, useSlots } from 'vue'
 import { OrigamDataTable, OrigamIcon } from 'origam/components'
 import type { IDataTableProps } from 'origam/interfaces'

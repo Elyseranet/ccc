@@ -117,7 +117,7 @@
             <small
               v-if="fact.detail"
               class="edition-summary__small"
-            >{{ fact.detail }}</small>
+            ><abbr-text :text="fact.detail" /></small>
             <small
               v-if="fact.extra"
               class="edition-summary__small"
@@ -167,6 +167,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamCard, OrigamTitle } from 'origam/components'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
