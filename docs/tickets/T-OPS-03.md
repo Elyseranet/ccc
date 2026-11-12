@@ -1,6 +1,6 @@
 # T-OPS-03 — Contrôle de santé : version déployée et état des migrations
 
-- **Statut** : **Partiellement vérifié, reste ouvert** (2026-11-12). Mergé @ `43462a46`. Sur la dev redéployée (Redéploiement Coolify de la dev le 2026-11-12 à 20:48 UTC+1, commit `8ce4a215` (build 1 min 49, rolling update, healthcheck du conteneur vert à la 1re tentative)) : `GET /api/v1/health` → `{"status":"ok","version":null,"migrations":{"upToDate":true,"pendingCount":0}}` ; `/server/db/migrations/` → 404 (aucun fichier de migration servi). **Reste** : `version` vaut `null` parce que Coolify ne passe pas `SOURCE_COMMIT` au build (Dockerfile l. 76-82) ; il faut activer « Include Source Commit in Build » dans Coolify (réglage utilisateur), redéployer, puis constater le SHA dans la réponse.
+- **Statut** : **Fermé** (2026-11-12). Mergé @ `43462a46`. Vérifié sur la dev : réglage Coolify « Include Source Commit in Build » activé (accord utilisateur), redéploiement à 20:52 UTC+1 ; `GET https://ccc.dev.elysera.net/api/v1/health` → `{"status":"ok","version":"62ed5a66bf2390fbcde788e4eba6a4159d690054","migrations":{"upToDate":true,"pendingCount":0}}` (SHA = tête de develop déployée) ; `/server/db/migrations/` → 404, aucun fichier de migration servi.
 - **Pilote** : `backend-lead`.
 - **Origine** : l'utilisateur veut savoir, sur l'environnement de dev (T-OPS-04), quelle version du code il teste.
 
