@@ -392,6 +392,8 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-05](T-OPS-05.md) : **mergé @ `8854badb`, vérification sur la dev en cours** — l'image de production ne démarre plus (`h3` absent pour la CLI de migration), régression de T-SEC-17 ; déploiements de la dev probablement en échec.
 - [F-03-BRK](F-03-BRK.md) : **Fermé** (2026-11-12) @ `07d2d78c`.
 - [T-SEC-06](T-SEC-06.md) : **Fermé** (2026-11-12), preuve Docker faite.
+- [T-SEC-16](T-SEC-16.md) : **Fermé** (2026-11-12) @ `5131c165`, polices hébergées sur le site.
+- [T-RGPD-01](T-RGPD-01.md) : **Fermé** (2026-11-12), réalisé par T-SEC-16.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; back **En revue** (branche `feature/T-SEO-01-back`, robots.txt, sitemap.xml, X-Robots-Tag).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).

@@ -1,6 +1,6 @@
 # T-SEC-16 — Auto-héberger les polices (plus de requête vers Google Fonts)
 
-- **Statut** : Ouvert (2026-11-02, chef de projet). Il fait suite à la revue de sécurité indépendante de F-10 (M1).
+- **Statut** : **Fermé** (2026-11-12), mergé @ `5131c165` : Bagel Fat One et Gabarito (sous-ensembles latin et latin-ext, OFL 1.1) hébergés dans `public/`, `@font-face` dans `public/fonts.css` lié dans le head après les préchargements, plus aucun lien Google. Mesure dev-f13 (sous verrou, nuxt dev, sur `cda333a2` rebasé sur develop 46e67d73) : 0 requête vers `fonts.googleapis.com` / `fonts.gstatic.com` sur 7 écrans, `/fonts.css` et les woff2 servis par le site ; F-01, F-02, F-04, F-06, F-13 et F-03b sans mise à jour des captures : **106/0 deux fois**, captures du bracket inchangées. Cause des échecs intermittents (réinjection des styles par Vite en dev, qui recréait les FontFace) établie par trace avant correctif ; build de production 3×80/0. typecheck vert, test:run 1303 / 0 sur le merge `5131c165`.
 - **Constat** : `nuxt.config.ts` (l. 36-42) charge Google Fonts sur toutes les pages, y compris `/invitation/<jeton>`. F-10 pose `referrer-policy: no-referrer` sur `/invitation/**` et `strict-origin-when-cross-origin` ailleurs, donc le jeton ne fuit plus par le Referer. Il reste une requête vers un tiers sur chaque page : l'IP et l'en-tête User-Agent du visiteur partent chez Google.
 - **À faire** :
   1. héberger les fichiers de police dans `src/assets/` (ou `public/`), avec les mêmes familles et graisses que celles utilisées ;
