@@ -5,6 +5,7 @@ import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { USER_ROLE, USER_STATUS } from '../../src/enums/user.enum'
 import { INVITATION_TTL_MS } from '../../src/consts/invitation.const'
 import { createAdminWithInvitation } from '../../src/utils/create-admin.util'
+import { isEmailCollision } from '../../src/utils/email-collision.util'
 import { CompetitorEntity } from '../../src/server/db/typeorm/entities/competitor.entity'
 import { InvitationEntity } from '../../src/server/db/typeorm/entities/invitation.entity'
 import { SessionEntity } from '../../src/server/db/typeorm/entities/session.entity'
@@ -169,5 +170,21 @@ describe('createAdminWithInvitation (user:create-admin)', () => {
     const before = await dataSource.getRepository(UserEntity).count()
     await expect(createAdminWithInvitation(dataSource, 'nolink@ccc.test', 'not a url', NOW)).rejects.toThrow(/siteUrl/)
     expect(await dataSource.getRepository(UserEntity).count()).toBe(before)
+  })
+
+  it('T-SEC-12 L8: stores the email normalized, whatever the caller passes', async () => {
+    await createAdminWithInvitation(dataSource, '  Mixed.Case@CCC.Test ', 'https://ccc.example.org', NOW)
+    expect(await dataSource.getRepository(UserEntity).countBy({ email: 'mixed.case@ccc.test' })).toBe(1)
+  })
+
+  it('T-SEC-12 L8: a race on the same email surfaces as a recognizable unique violation, one admin remains', async () => {
+    const outcomes = await Promise.allSettled([
+      createAdminWithInvitation(dataSource, 'race-admin@ccc.test', 'https://ccc.example.org', NOW),
+      createAdminWithInvitation(dataSource, 'race-admin@ccc.test', 'https://ccc.example.org', NOW)
+    ])
+    expect(outcomes.filter((outcome) => outcome.status === 'fulfilled')).toHaveLength(1)
+    const failure = outcomes.find((outcome) => outcome.status === 'rejected') as PromiseRejectedResult
+    expect(isEmailCollision(failure.reason)).toBe(true)
+    expect(await dataSource.getRepository(UserEntity).countBy({ email: 'race-admin@ccc.test' })).toBe(1)
   })
 })

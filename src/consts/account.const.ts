@@ -35,8 +35,8 @@ export const ACCOUNT_BODY_MAX_BYTES = 16 * 1024
 /** Même recette que le CTA de l'accueil : bouton d'action principal des formulaires (48 px). */
 export const ACCOUNT_SUBMIT_HOVER = { elevation: 'xl' } as const
 
-/** Contrôle d'adresse de retour immédiat ; le serveur valide à son tour (`loginSchema`). */
-export const ACCOUNT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/** Contrôle d'adresse de retour immédiat ; le serveur valide à son tour (`loginSchema`). Défini dans `email.const.ts`. */
+export { ACCOUNT_EMAIL_PATTERN } from './email.const.js'
 
 /** Côté (px) de l'avatar affiché dans les formulaires du compte : `--origam-space---16` des maquettes. */
 export const ACCOUNT_AVATAR_PREVIEW_SIZE = 64

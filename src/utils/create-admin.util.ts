@@ -1,6 +1,7 @@
 import type { DataSource } from 'typeorm'
 import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
 import { LOG_EVENT } from '../consts/log-event.const.js'
+import { normalizeEmail } from './email.util.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import { buildInvitationLink, resolveSiteOrigin } from './invitation-link.util.js'
 import { issueInvitation } from './invitation-store.util.js'
@@ -15,7 +16,7 @@ export const createAdminWithInvitation = async (dataSource: DataSource, email: s
   resolveSiteOrigin(siteUrl)
   const { userId, token } = await dataSource.transaction(async (manager) => {
     const admin = await manager.getRepository(UserEntity).save({
-      email,
+      email: normalizeEmail(email),
       role: USER_ROLE.ADMIN,
       status: USER_STATUS.INVITED,
       passwordHash: null,

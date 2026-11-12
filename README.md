@@ -23,7 +23,13 @@ Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
 
 ## Docker
 
-En local, on développe avec `npm run dev` seulement (décision utilisateur 2026-11-01). L'image (`Dockerfile`, `docker/`) et `docker-compose.yml` servent au déploiement Coolify, décrit plus bas. Les migrations TypeORM s'appliquent au démarrage du conteneur `app`, avant le serveur ; les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
+L'image Docker et `docker-compose.yml` servent au **déploiement** (voir « Déploiement Coolify »). Ils ne servent pas au développement local (décision utilisateur 2026-11-01) : l'image refuse de démarrer sans une configuration de production valide (site en https, SMTP réel, secret d'appareil), sans mode recette. En local, utiliser `npm run dev` (voir « Développement ») avec une base PostgreSQL locale, en passant les variables sur la ligne de commande, sans copier de `.env` ailleurs :
+
+```sh
+NUXT_DATABASE_HOST=localhost NUXT_DATABASE_PORT=5432 NUXT_DATABASE_USERNAME=ccc NUXT_DATABASE_PASSWORD=<mot de passe> NUXT_DATABASE_DATABASE=ccc npm run dev
+```
+
+Les migrations TypeORM s'appliquent avec `npm run db:migration:run` (voir « Migrations TypeORM »). Dans le conteneur de production, elles s'appliquent au démarrage, avant le serveur ; les données PostgreSQL restent dans le volume Docker `ccc_db_data`.
 
 ## Déploiement Coolify
 
@@ -33,17 +39,19 @@ Mode recommandé (décision OPS-1 et OPS-2) : Coolify construit l'image depuis l
 
 ### Variables obligatoires en production (garde-fou PROD-1)
 
-L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) : **ne pas la retirer ni la mettre à `false` dans Coolify**, il n'existe pas de mode recette. Avec cet indicateur, le serveur **et** `ccc-ops user:create-admin` refusent de démarrer, avec un message qui nomme la variable fautive (jamais sa valeur), si l'une de ces variables manque ou est locale :
+L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) **et un fichier marqueur** `/app/.ccc-production-image`, propriété de root (T-SEC-06, décision utilisateur SEC-Q). Tant que ce marqueur existe, la garde ne peut pas être éteinte : si `NUXT_STRICT_RUNTIME_CONFIG` est à `false`, `0`, vide ou absent, le serveur **et** `ccc-ops user:create-admin` refusent de démarrer (« NUXT_STRICT_RUNTIME_CONFIG cannot be turned off in the production image »). Il n'existe pas de mode recette : une recette sur cette image demande une vraie configuration. Avec la garde active, ils refusent aussi de démarrer, avec un message qui nomme la variable fautive (jamais sa valeur), si l'une de ces variables manque ou est locale :
 
 | Variable | Exigence |
 |---|---|
-| `NUXT_PUBLIC_SITE_URL` | URL en `https:`, qui ne désigne ni `localhost` ni `127.0.0.1` ; base des liens d'invitation |
+| `NUXT_PUBLIC_SITE_URL` | URL publique en `https:` : ni `localhost` ni `*.localhost`, ni une adresse locale (`127.0.0.0/8`, `0.0.0.0/8`, `::`, `::1`, IPv4 mappées, NAT64 `64:ff9b::/96`, 6to4 `2002::/16` et IPv4-compatibles `::/96` dont l'IPv4 embarquée est locale), ni une adresse privée ou link-local (`10/8`, `172.16/12`, `192.168/16`, `169.254/16`, `fc00::/7`, `fe80::/10`) ; base des liens d'invitation |
 | `NUXT_MAIL_TRANSPORT` | `smtp` (`capture` est réservé aux tests d'API) |
-| `NUXT_MAIL_HOST` | serveur SMTP réel, ni `localhost` ni `127.0.0.1` |
-| `NUXT_MAIL_PORT`, `NUXT_MAIL_SECURE`, `NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD` | à renseigner selon le fournisseur SMTP (le garde-fou ne contrôle que `host`, `transport`, `from` et `siteUrl`) |
-| `NUXT_MAIL_FROM` | expéditeur non vide, par ex. `CCC <no-reply@votre-domaine>` |
+| `NUXT_MAIL_HOST` | serveur SMTP réel, nom complet avec un point ou adresse IP : ni vide, ni local (`localhost`, `*.localhost`, `127.0.0.0/8`, `0.0.0.0/8`, `::`, `::1`, mêmes formes IPv6 embarquant une IPv4 locale), ni un nom de service sans point (`mailpit`). Les adresses privées et link-local sont **acceptées** pour le SMTP (relais interne de Coolify, décision du 2026-11-02) |
+| `NUXT_MAIL_FROM` | expéditeur réel sous l'une des deux formes `adresse` ou `Nom <adresse>`, par ex. `CCC <no-reply@votre-domaine>` : ni vide, ni une autre forme (commentaire, point-virgule, texte après les chevrons), ni le domaine par défaut `ccc.local` |
+| `NUXT_AUTH_SECURE_COOKIE` | ne doit pas être éteint (`false` ou `0`) |
+| `NUXT_AUTH_DEVICE_COOKIE_SECRET` | 32 caractères au moins (T-SEC-12, L12) |
+| `NUXT_MAIL_PORT`, `NUXT_MAIL_SECURE`, `NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD` | à renseigner selon le fournisseur SMTP. Non contrôlés par la garde : le fournisseur de production n'est pas choisi (A3) et certains relais n'exigent pas d'identifiants |
 
-L'indicateur est faux par défaut et ne dépend pas de `NODE_ENV` : le développement local et le build des tests d'API ne le posent pas.
+Hors de l'image (poste de développement, build des tests d'API), l'indicateur est faux par défaut, ne dépend pas de `NODE_ENV`, et rien n'est contrôlé. Le fichier `.ccc-production-image` est exclu du dépôt et du contexte de build (`.gitignore`, `.dockerignore`) : un fichier homonyme ne peut pas faire basculer un poste ou un build.
 
 Repli, ou usage local : `docker-compose.yml` (app + PostgreSQL 16 + volume) comme ressource « Docker Compose ». Aucun port n'y est publié : Coolify route le domaine vers le port 3000 du service `app`.
 
@@ -268,6 +276,8 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:api
 
 Le nom de la base doit se terminer par `_test` : sinon la suite refuse de démarrer, pour ne jamais toucher une base réelle.
 
+**Conteneurs de test (PostgreSQL jetable, image du projet).** Les lancer avec `docker run --rm` et les supprimer avec `docker rm -fv` : l'image PostgreSQL déclare un volume, et sans `-v` chaque conteneur laisse un volume anonyme orphelin sur la machine (755 constatés le 2026-11-02). Nommer les conteneurs et réseaux avec un préfixe propre à l'agent, et vérifier en fin de session avec `docker ps -a`, `docker images`, `docker network ls`.
+
 ### e2e sur les vraies données (ARCH-9)
 
 Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUXT_DATABASE_DATABASE` (suffixe `_test` obligatoire). Il applique les migrations et le dump des archives, puis crée des comptes de test (administrateur, participant) avec une session réelle. Aucun mot de passe utilisable n'est créé. Les specs posent le cookie `ccc_session` avec `signIn(context, role)`. Lancer sur un port libre, avec les seules variables nécessaires :
@@ -394,7 +404,7 @@ Session serveur en base (table `sessions`, seul le SHA-256 du jeton est stocké)
 | `GET /api/v1/moi` | authentifié | 200 `IMe` (seule route qui expose `phone`, à son titulaire) |
 | `PATCH /api/v1/moi` | authentifié | liste blanche `phone`, `currentPassword` + `newPassword` ; tout autre champ : 400. Un changement de mot de passe révoque les autres sessions (401 `INVALID_CURRENT_PASSWORD` si l'ancien est faux) |
 
-Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. **Une écriture sans en-tête `Origin` (ni `Sec-Fetch-Site`) est acceptée** : une telle requête ne vient pas d'un navigateur, et la défense CSRF repose sur `SameSite=Lax` plus la vérification d'`Origin` quand il est présent. Mots de passe : scrypt (`node:crypto`), 15 caractères minimum (OWASP Authentication Cheat Sheet, sans MFA), 128 maximum. Le limiteur de débit par IP est en mémoire (une instance).
+Les écritures dont l'`Origin` (ou `Sec-Fetch-Site`) n'est pas celle du site répondent 403 `FORBIDDEN_ORIGIN`. **Une écriture sans en-tête `Origin` (ni `Sec-Fetch-Site`) est acceptée** (risque accepté, T-SEC-12 L10, décision utilisateur SEC-Q du 2026-11-01) : une telle requête ne vient pas d'un navigateur (scripts, `curl`, tests), qu'un refus bloquerait, et aucun scénario navigateur n'a été identifié ; la défense CSRF repose sur `SameSite=Lax`, qui couvre les requêtes intersites des navigateurs actuels, plus la vérification d'`Origin` quand il est présent. Mots de passe : scrypt (`node:crypto`), 15 caractères minimum (OWASP Authentication Cheat Sheet, sans MFA), 128 maximum. Le limiteur de débit par IP est en mémoire (une instance).
 
 **Cookie `Secure` (T-SEC-04, L3).** L'attribut `Secure` et le préfixe `__Host-` des cookies de session et d'appareil dépendent de `runtimeConfig.auth.secureCookie` (**`NUXT_AUTH_SECURE_COOKIE`**), et non de `NODE_ENV`. Il est **vrai par défaut** ; seule une valeur explicitement fausse (`false` ou `0`) le désactive, toute autre valeur reste vraie. **Ne le désactiver qu'en développement local en HTTP** (sans lui, le navigateur refuse un cookie `Secure` sur `http://`) : en production, un cookie sans `Secure` circulerait en clair.
 
@@ -413,6 +423,8 @@ Cookie d'appareil de confiance (SEC-A4, migration M4, table `login_devices` ; m�
 **Risque accepté (N1, décision utilisateur 2026-10-21, `docs/design/ux/decisions.md`).** Un attaquant qui possède l'email ET un cookie d'appareil valide (le cookie est `HttpOnly` : il ne peut être volé que sur l'appareil lui-même) obtient un second flux d'essais, avec son propre compteur. Ce flux est ralenti comme les autres (5 essais libres, puis un délai de 2^(n−5) s plafonné à 300 s) et borné par la limite par IP. Un changement de mot de passe révoque tous les appareils de confiance du compte (N2). **Aucun plafond global d'essais par compte n'est appliqué.**
 
 Premier administrateur : `npm run user:create-admin` (email lu sur l'entrée standard, `NUXT_PUBLIC_SITE_URL` requis) crée un compte `INVITED` sans mot de passe et affiche une fois, sur la sortie standard, son lien de première connexion (7 jours, usage unique). Invitations, envoi d'email (SMTP, `NUXT_MAIL_*`) et routes : voir `docs/api/invitations.md`.
+
+**Runbook `ccc-ops user:create-admin` (T-SEC-12, L9).** Le lien affiché est un **secret valable 7 jours** : quiconque le possède devient administrateur. Ne le copier ni dans un ticket, ni dans un chat, ni dans un courriel. Lancer la commande depuis le terminal du conteneur dans Coolify ou avec `docker exec -it`, dans un terminal dont la sortie n'est ni journalisée ni partagée (pas de session enregistrée, pas d'écran partagé), ouvrir le lien tout de suite, et ne pas relancer la commande pour « retrouver » un lien : elle échoue (« Un compte existe déjà pour cet email »). Si le lien est perdu ou exposé avant usage, supprimer le compte `INVITED` de cet administrateur en base, puis recommencer.
 
 ## Avatars (B-16)
 
