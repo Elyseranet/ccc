@@ -73,7 +73,7 @@ describe('T-QA-03: la 2026 en phase de poules est publiée par l’API', async (
     const detail = await getJson<IEditionDetail>(`/api/v1/editions/${await currentId()}`)
     expect(detail.pools.length).toBeGreaterThan(0)
     const pools = detail.rounds[0]!
-    expect(pools.matchCount).toBe(state.matches.poolValidated + state.matches.poolScheduled)
+    expect(pools.matchCount).toBe(state.matches.poolValidated + state.matches.poolRecorded + state.matches.poolScheduled)
     expect(pools.validatedMatchCount).toBe(state.matches.poolValidated)
   })
 
@@ -88,7 +88,8 @@ describe('T-QA-03: la 2026 en phase de poules est publiée par l’API', async (
     expect(items.length).toBeGreaterThan(0)
     expect(items.every(match => match.roundKind === ROUND_KIND.POOLS)).toBe(true)
     const scheduled = items.filter(match => match.status === MATCH_STATUS.SCHEDULED)
-    expect(scheduled).toHaveLength(state.matches.poolScheduled)
+    // Un match saisi n'est pas public (« saisir n'est pas valider ») : l'API le publie à jouer, sans score.
+    expect(scheduled).toHaveLength(state.matches.poolScheduled + state.matches.poolRecorded)
     expect(scheduled.every(match => match.sides.every(side => side.score === null))).toBe(true)
   })
 

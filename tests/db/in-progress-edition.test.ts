@@ -1,7 +1,13 @@
 import 'reflect-metadata'
 import type { DataSource } from 'typeorm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { E2E_IN_PROGRESS_EDITION_CODE, E2E_POOL_REWIND_DENOMINATOR, E2E_POOL_REWIND_NUMERATOR } from '../e2e/helpers/e2e.const'
+import {
+  E2E_IN_PROGRESS_EDITION_CODE,
+  E2E_POOL_RECORDED_DENOMINATOR,
+  E2E_POOL_RECORDED_NUMERATOR,
+  E2E_POOL_REWIND_DENOMINATOR,
+  E2E_POOL_REWIND_NUMERATOR
+} from '../e2e/helpers/e2e.const'
 import { readInProgressEditionState, rewindEditionToPoolsPhase } from '../e2e/helpers/in-progress-edition'
 import type { IInProgressEditionState } from '../e2e/helpers/in-progress-edition'
 import { EDITION_STATUS } from '../../src/enums/edition.enum'
@@ -81,7 +87,40 @@ describe('2026 remise en phase de poules', () => {
     const totals = pools.map(pool => Number(pool.total))
     const expected = totals.reduce((sum, total) => sum + Math.floor(total * E2E_POOL_REWIND_NUMERATOR / E2E_POOL_REWIND_DENOMINATOR), 0)
     expect(first.matches.poolScheduled).toBe(expected)
-    expect(first.matches.poolScheduled + first.matches.poolValidated).toBe(totals.reduce((sum, total) => sum + total, 0))
+    expect(first.matches.poolScheduled + first.matches.poolRecorded + first.matches.poolValidated).toBe(totals.reduce((sum, total) => sum + total, 0))
+  })
+
+  it('la part de matchs saisis suit la règle fixe, par poule, avec arrondi à l’inférieur, et tient entre les matchs à jouer et les validés', async () => {
+    const pools: Array<{ total: string }> = await dataSource.query(
+      `SELECT count(*) AS total FROM matches m JOIN editions e ON e.id = m.edition_id JOIN rounds r ON r.id = m.round_id
+       WHERE e.code = $1 AND r.kind = $2 GROUP BY m.pool_id`, [E2E_IN_PROGRESS_EDITION_CODE, ROUND_KIND.POOLS]
+    )
+    const expected = pools.reduce((sum, pool) => sum + Math.floor(Number(pool.total) * E2E_POOL_RECORDED_NUMERATOR / E2E_POOL_RECORDED_DENOMINATOR), 0)
+    expect(expected).toBeGreaterThan(0)
+    expect(first.matches.poolRecorded).toBe(expected)
+    const ordered: Array<{ pool: string, status: string }> = await dataSource.query(
+      `SELECT m.pool_id AS pool, m.status FROM matches m JOIN editions e ON e.id = m.edition_id JOIN rounds r ON r.id = m.round_id
+       WHERE e.code = $1 AND r.kind = $2 ORDER BY m.pool_id, m.sequence DESC`, [E2E_IN_PROGRESS_EDITION_CODE, ROUND_KIND.POOLS]
+    )
+    const rank = (status: string): number => ['SCHEDULED', 'RECORDED', 'VALIDATED'].indexOf(status)
+    expect(ordered.every((match, index) => index === 0 || match.pool !== ordered[index - 1]!.pool || rank(match.status) >= rank(ordered[index - 1]!.status))).toBe(true)
+  })
+
+  it('un match saisi garde son score saisi, sans score validé ni validation ; un match validé a ses deux dates ; un match à jouer n’en a aucune', async () => {
+    const recorded = await dataSource.query(
+      `SELECT count(*) AS n FROM matches m JOIN editions e ON e.id = m.edition_id
+       WHERE e.code = $1 AND m.status = 'RECORDED'
+         AND (m.recorded_at IS NULL OR m.validated_at IS NOT NULL OR m.validated_by_user_id IS NOT NULL
+              OR EXISTS (SELECT 1 FROM match_sides s WHERE s.match_id = m.id AND (s.validated_score IS NOT NULL OR s.recorded_score IS NULL)))`,
+      [E2E_IN_PROGRESS_EDITION_CODE]
+    )
+    expect(Number(recorded[0].n)).toBe(0)
+    const validated = await dataSource.query(
+      `SELECT count(*) AS n FROM matches m JOIN editions e ON e.id = m.edition_id JOIN rounds r ON r.id = m.round_id
+       WHERE e.code = $1 AND r.kind = 'POOLS' AND m.status = 'VALIDATED' AND (m.recorded_at IS NULL OR m.validated_at IS NULL OR m.recorded_at >= m.validated_at)`,
+      [E2E_IN_PROGRESS_EDITION_CODE]
+    )
+    expect(Number(validated[0].n)).toBe(0)
   })
 
   it('un match à jouer n’a ni score enregistré, ni score validé, ni date de saisie ou de validation', async () => {
@@ -117,7 +156,7 @@ describe('cohérence de ce que l’API publie pour 2026', () => {
     const rounds = buildRounds(await loadRoundEntities(dataSource, edition.id), await loadEditionMatches(dataSource, edition.id))
     const pools = rounds.find(round => round.kind === ROUND_KIND.POOLS)!
     expect(pools.validatedMatchCount).toBe(first.matches.poolValidated)
-    expect(pools.matchCount).toBe(first.matches.poolValidated + first.matches.poolScheduled)
+    expect(pools.matchCount).toBe(first.matches.poolValidated + first.matches.poolRecorded + first.matches.poolScheduled)
     expect(rounds.filter(round => round.kind !== ROUND_KIND.POOLS).every(round => round.validatedMatchCount === 0)).toBe(true)
   })
 

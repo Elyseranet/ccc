@@ -41,6 +41,28 @@ export const E2E_POOL_REWIND_NUMERATOR = 1
 export const E2E_POOL_REWIND_DENOMINATOR = 3
 
 /**
+ * État nominal du tableau de bord (QA-2 bis, F-07) : dans chaque poule, la fraction `numérateur / dénominateur` des matchs
+ * de poule (arrondie à l'inférieur) qui suivent immédiatement ceux remis à « programmé » (par séquence décroissante) est
+ * laissée à l'état « saisi » : `recorded_at` posé, ni score validé ni date de validation. Avec les poules de 2026 (21, 15, 21 et 15 matchs)
+ * et un dixième : 2, 1, 2 et 1 matchs, soit 6 matchs saisis sur 72.
+ */
+export const E2E_POOL_RECORDED_NUMERATOR = 1
+
+export const E2E_POOL_RECORDED_DENOMINATOR = 10
+
+/**
+ * Dates de saisie et de validation des matchs de poule de 2026 (le dump n'en porte aucune) : les matchs de poule non
+ * programmés sont classés par séquence croissante puis par id ; le rang `r` (à partir de 1) donne `validated_at` =
+ * `E2E_POOL_ACTIVITY_START` + `r` × `E2E_POOL_ACTIVITY_STEP_MINUTES` minutes, et `recorded_at` deux minutes plus tôt. Les matchs saisis, qui ont
+ * les plus fortes séquences, sont donc les plus récents. Aucune insertion : ce sont des mises à jour de lignes existantes.
+ */
+export const E2E_POOL_ACTIVITY_START = '2026-06-01T10:00:00Z'
+
+export const E2E_POOL_ACTIVITY_STEP_MINUTES = 5
+
+export const E2E_POOL_RECORDED_LEAD_MINUTES = 2
+
+/**
  * Comptes de test rattachés à des compétiteurs réels des archives (ARCH-9), retrouvés par leur nom d'affichage :
  * `member` (lecture : profil, captures), `edit` (écritures : téléphone, avatar, mot de passe), `login` (connexion réelle), `logout` et `logoutHeader` (déconnexion depuis le profil et depuis l'en-tête, qui révoquent leur session),
  * `invited*` (invitations valide, d'activation, expirée, consommée). Aucun de ces compétiteurs n'est dans la paire du face-à-face.
