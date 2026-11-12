@@ -1,7 +1,6 @@
 <template>
   <origam-card
     tag="section"
-    padding="6"
     :aria-labelledby="titleId"
     class="activity"
     data-cy="admin-activity"
@@ -113,6 +112,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .activity {
+  padding: var(--activity---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--activity---padding-mobile, var(--origam-space---5));
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -168,5 +173,12 @@ defineExpose({})
     font-size: var(--origam-font__size---xs);
     color: var(--origam-color__text---secondary);
   }
+}
+</style>
+
+<style>
+:root {
+  --activity---padding: var(--origam-space---6);
+  --activity---padding-mobile: var(--origam-space---5);
 }
 </style>
