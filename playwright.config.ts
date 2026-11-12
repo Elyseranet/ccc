@@ -8,6 +8,8 @@ export default defineConfig({
   testDir: 'tests/e2e',
   // ARCH-9 : base de test réelle (suffixe _test), chargée par le seed SQL des archives, comptes et sessions de test.
   globalSetup: './tests/e2e/global-setup.ts',
+  // Captures de référence (toHaveScreenshot) : un seul fichier par capture, sans suffixe de plateforme ni de projet.
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   reporter: [['list']],
   use: {

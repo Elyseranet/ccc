@@ -116,7 +116,11 @@ export const CCC_HH_BASE: IOrigamTheme = {
       showScores: true,
       showSeed: false,
       showRoundTitles: true,
-      elevation: 'md'
+      elevation: 'none',
+      border: true,
+      borderColor: 'var(--origam-color__border---default)',
+      rounded: 'xl',
+      bgColor: 'var(--origam-color__surface---raised)'
     },
     'origam-stepper': { orientation: 'vertical', showConnectors: true, clickable: false, rounded: 'lg' },
     'origam-pagination': {
@@ -162,6 +166,23 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-table__header-cell---border-bottom-width': 'var(--origam-border__width---thin)',
     '--origam-data-table-header-cell---color': 'var(--origam-color__text---tertiary)',
     '--origam-data-table-header-cell---background': 'transparent',
+    // Tableau de la phase finale (F-03-BRK) : variables documentées d'`origam-bracket`, chacune pointe vers un token existant.
+    '--origam-bracket---round-gap': 'var(--origam-space---8)',
+    '--origam-bracket---padding-block': 'var(--origam-space---5)',
+    '--origam-bracket---padding-inline': 'var(--origam-space---5)',
+    '--origam-bracket-round---match-gap': 'var(--origam-space---3)',
+    '--origam-bracket-round-title---font-size': 'var(--origam-font__size---xs)',
+    '--origam-bracket-round-title---font-weight': 'var(--origam-font__weight---bold)',
+    '--origam-bracket-round-title---letter-spacing': 'var(--origam-font__letterSpacing---wider)',
+    '--origam-bracket-round-title---color': 'var(--origam-color__text---tertiary)',
+    '--origam-bracket-match---background-color': 'var(--origam-color__surface---sunken)',
+    '--origam-bracket-match---border-color': 'var(--origam-color__border---default)',
+    '--origam-bracket-match---border-radius': 'var(--origam-radius---md)',
+    '--origam-bracket-match---box-shadow': 'none',
+    '--origam-bracket-match---min-height': '0',
+    '--origam-bracket-match--final---background-color': 'var(--origam-color__surface---sunken)',
+    '--origam-bracket-match--final---border-color': 'var(--origam-color__bar---amber)',
+    '--origam-bracket-match--final---box-shadow': 'var(--origam-shadow---lg)',
     // Légende visible (F-03b) : titre de tableau de la maquette (`.table caption`), taille « lg », texte primaire (la graisse 700 n'a pas de variable : Elyseranet/origam#1283).
     '--origam-table__caption---padding': 'var(--origam-space---4) var(--origam-space---5) var(--origam-space---2)',
     '--origam-table__caption---font-size': 'var(--origam-font__size---lg)',
