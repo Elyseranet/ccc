@@ -122,6 +122,8 @@ for (const viewport of VIEWPORTS) {
       await page.getByTestId('edition-tab-bracket').click()
       const region = page.getByTestId('edition-bracket-region')
       await expect(region).toBeVisible()
+      // En-tête et onglets collants, halo fixe du fond : ils passeraient sur la capture selon le défilement. Seul le tableau est la référence.
+      await page.addStyleTag({ content: '.public-shell__header, .edition-page__tabs { position: static !important; } .public-shell::before { display: none !important; }' })
       await settle(page)
       await expect(region).toHaveScreenshot(`bracket-${viewport.name}.png`, { animations: 'disabled' })
     })
