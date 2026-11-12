@@ -4,12 +4,12 @@
     aria-labelledby="edition-participants-title"
     data-cy="edition-participants"
   >
-    <h2
+    <origam-title
       id="edition-participants-title"
+      tag="h2"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <async-state
       :empty="isEmpty"
       :empty-title="emptyTitle"
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamAvatar } from 'origam/components'
+import { OrigamAvatar, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'

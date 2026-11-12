@@ -4,12 +4,12 @@
     aria-labelledby="edition-summary-title"
     data-cy="edition-summary"
   >
-    <h2
+    <origam-title
       id="edition-summary-title"
+      tag="h2"
       class="sr-only"
-    >
-      {{ title }}
-    </h2>
+      :text="title"
+    />
     <origam-card
       v-if="podium"
       tag="article"
@@ -21,12 +21,12 @@
       class="edition-summary__podium"
       data-cy="edition-podium"
     >
-      <h3
+      <origam-title
         id="edition-podium-title"
+        tag="h3"
         class="sr-only"
-      >
-        {{ podiumTitle }}
-      </h3>
+        :text="podiumTitle"
+      />
       <div class="edition-summary__podium-body">
         <div class="edition-summary__champ">
           <svg
@@ -136,12 +136,16 @@
       class="edition-summary__steps"
       data-cy="edition-steps"
     >
-      <h3
+      <origam-title
         id="edition-steps-title"
+        tag="h3"
         class="edition-summary__steps-title"
-      >
-        {{ stepsTitle }}
-      </h3>
+        font-size="xl"
+        font-weight="bold"
+        line-height="tight"
+        letter-spacing="normal"
+        :text="stepsTitle"
+      />
       <ol class="edition-summary__stepper">
         <li
           v-for="step in stepRows"
@@ -164,7 +168,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamCard } from 'origam/components'
+import { OrigamCard, OrigamTitle } from 'origam/components'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
