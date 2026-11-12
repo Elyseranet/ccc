@@ -78,7 +78,7 @@ const placeNext = async (page: Page) => {
 /**
  * Ferme la confirmation par Échap ou clic extérieur. Origam (`useStack`) ne bascule `globalTop` qu'au tour de boucle qui suit l'ouverture :
  * une touche ou un clic envoyé dans cet intervalle est ignoré (mesuré : le premier Échap est perdu, le second, 25 ms plus tard, ferme).
- * Un humain n'y arrive pas, Playwright si. On réessaie donc jusqu'à la fermeture : une confirmation réellement persistante échouerait toujours.
+ * Un humain n'y arrive pas, Playwright si (fiche docs/tickets/origam/stack-globaltop-apres-ouverture.md, Origam : à déposer). On réessaie donc jusqu'à la fermeture : une confirmation réellement persistante échouerait toujours.
  */
 const dismissDialog = async (page: Page, dismiss: () => Promise<void>) => {
   await expect(async () => {

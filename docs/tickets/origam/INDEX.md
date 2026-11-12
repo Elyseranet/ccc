@@ -39,3 +39,4 @@
 | #1334 | `password-field` : règle de longueur toujours ajoutée à la validation, même champ vide et sans `requirements` ; message non surchargeable par champ | `minLength: 0` + `requirementRules` + `rules` (F-10) |
 | #1317 | `chart` : surface de dessin figée à 600 x 360 (le viewBox ne suit pas la largeur), étiquettes d'axe qui se chevauchent | tracé du graphique exclu de la mesure visuelle (F-02, F-02-CHART) |
 | #1318 | `chart` : points et barres `role="button"` focusables dans un `<svg role="img">` (axe `nested-interactive`) | règle désactivée sur l'onglet Évolution (F-02, F-02-AXE) |
+| à déposer | `useStack` : `globalTop` mis à jour une tâche après l'ouverture, Échap ou clic extérieur ignoré dans cet intervalle (fiche `stack-globaltop-apres-ouverture.md`) | aucun dans l'application ; `dismissDialog` réessaie dans le e2e (F-11) |
