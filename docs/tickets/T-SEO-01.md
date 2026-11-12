@@ -1,6 +1,7 @@
 # T-SEO-01 — Référencement : indexation de la dev, pages privées, métadonnées, sitemap
 
-- **Statut** : À faire. Ouvert le 2026-11-05 par le chef de projet (audit SEO du 2026-11-04, en lecture seule).
+- **Statut** : **Partiellement traité** (2026-11-12) : partie front mergée dans `develop` @ `6b42e4be` ; partie back à faire (voir « Avancement 2026-11-12 »).
+- **Historique** : À faire. Ouvert le 2026-11-05 par le chef de projet (audit SEO du 2026-11-04, en lecture seule).
 - **Pilote** : `frontend-lead` (pages, métadonnées) avec `backend-lead` (routes Nitro).
 
 ## Constats de l'audit (preuves citées)
@@ -40,3 +41,8 @@ Branche `feature/T-SEO-01-front`, rebasée sur develop 4c23b788. Elle apporte `u
 - Revue de sécurité (agent de revue, verdict relayé par le project-manager) : aucune vulnérabilité à haute confiance. Limite : `useSeo.ts` n'a été lu qu'en partie. L'URL canonique vient de `siteUrl`.
 - Locales : fusion clé par clé (3 voies). Valeurs contrôlées contre la pointe d'avant le rebase et contre develop : aucune valeur fausse, aucune clé perdue ni en double.
 - **Reste ouvert** : côté back, les routes `robots.txt` et `sitemap.xml`, le `X-Robots-Tag` et la suppression de `public/robots.txt`. Le ticket reste ouvert après ce merge.
+
+## Avancement 2026-11-12 (chef de projet) — ticket laissé OUVERT
+
+- **Fait (front)** : mergé dans `develop` @ `6b42e4be` en fast-forward (code testé `ca0a8a73`). Gates `frontend-lead` : typecheck vert ; TU 790/790 ; Playwright complet 341 passés, 0 échec, 0 non lancé ; `npm audit` 0 high/critical ; gitleaks propre ; revue de sécurité sans vulnérabilité (limite : `useSeo.ts` lu en partie). Le chef de projet a vérifié que en.json et fr.json sont valides (701 clés chacun) et qu'il n'y a aucun marqueur de conflit dans src/ ni tests/.
+- **Reste (back)** : `robots.txt` et `sitemap.xml` servis par le serveur, en-tête `X-Robots-Tag`, suppression de `public/robots.txt`.
