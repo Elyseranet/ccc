@@ -128,6 +128,8 @@ const readyDraft = async () => {
 describe('admin activity feed (B-15)', async () => {
   const env = requireTestDatabaseEnv()
   dataSource = await resetTestDatabase()
+  // Rang chronologique 1 posé avant toute création par l'API, qui prend MAX + 1 : sinon `uq_editions_chronological_rank`.
+  await closedEdition()
   // Un administrateur avec compétiteur : son nom affiché est le seul champ d'identité attendu dans le flux.
   const admin = await seedUser(dataSource, { email: 'boss-b15@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN, withCompetitor: true })
   const bareAdmin = await seedUser(dataSource, { email: 'bare-b15@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
