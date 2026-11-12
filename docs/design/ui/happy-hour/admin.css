@@ -44,13 +44,13 @@
 .st__b small { color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); line-height: var(--origam-font__lineHeight---normal); }
 
 .adm-todo .h-card { margin-bottom: var(--origam-space---1); }
-.todo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---4); padding: var(--origam-space---5); text-decoration: none; }
-.todo span:nth-child(2) { display: grid; gap: 2px; }
-.todo small { font-size: var(--origam-font__size---sm); }
-.todo__n { font-size: var(--origam-font__size---3xl); line-height: 1; min-width: 2ch; color: var(--origam-color__text---secondary); }
-.todo--hot { border-color: var(--origam-color__action--primary---bg); }
-.todo--hot .todo__n { color: var(--origam-color__bar---amber); }
-.todo--off { opacity: 1; background: var(--origam-color__surface---sunken); box-shadow: none; }
+.adm-task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---4); padding: var(--origam-space---5); text-decoration: none; }
+.adm-task span:nth-child(2) { display: grid; gap: 2px; }
+.adm-task small { font-size: var(--origam-font__size---sm); }
+.adm-task__n { font-size: var(--origam-font__size---3xl); line-height: 1; min-width: 2ch; color: var(--origam-color__text---secondary); }
+.adm-task--hot { border-color: var(--origam-color__action--primary---bg); }
+.adm-task--hot .adm-task__n { color: var(--origam-color__bar---amber); }
+.adm-task--off { opacity: 1; background: var(--origam-color__surface---sunken); box-shadow: none; }
 .log { display: grid; gap: var(--origam-space---3); }
 .log li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---3); font-size: var(--origam-font__size---sm); }
 .log small { font-size: var(--origam-font__size---xs); }
