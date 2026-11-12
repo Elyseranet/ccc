@@ -1,6 +1,6 @@
 # T-SEO-01 — Référencement : indexation de la dev, pages privées, métadonnées, sitemap
 
-- **Statut** : **Partiellement traité** (2026-11-12) : partie front mergée dans `develop` @ `6b42e4be` ; partie back à faire (voir « Avancement 2026-11-12 »).
+- **Statut** : **Fermé** (2026-11-12). Front @ `6b42e4be`, back @ `17df018a`. Vérifié par `curl` sur la dev redéployée (Redéploiement Coolify de la dev le 2026-11-12 à 20:48 UTC+1, commit `8ce4a215` (build 1 min 49, rolling update, healthcheck du conteneur vert à la 1re tentative)) : `/robots.txt` → `User-agent: *` / `Disallow: /` ; `/sitemap.xml` → 404 ; `X-Robots-Tag: noindex, nofollow` sur `/` et sur `/api/v1/health`.
 - **Historique** : À faire. Ouvert le 2026-11-05 par le chef de projet (audit SEO du 2026-11-04, en lecture seule).
 - **Pilote** : `frontend-lead` (pages, métadonnées) avec `backend-lead` (routes Nitro).
 

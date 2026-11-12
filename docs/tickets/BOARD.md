@@ -379,7 +379,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-01](T-OPS-01.md) : **Fermé** — mergé dans `develop` @ `a72f3ac` (branche `de8704e`).
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
-- [T-OPS-03](T-OPS-03.md) : **En revue** (2026-11-12) — santé : version déployée et état des migrations ; merge par le chef de projet.
+- [T-OPS-03](T-OPS-03.md) : **mergé @ `43462a46`, vérifié en partie sur la dev** (2026-11-12) — migrations OK et non servies ; `version` null tant que Coolify ne passe pas le commit au build.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
 - [T-REL-03](T-REL-03.md) : **Fermé** (2026-11-12) @ `3d0719c5`, release 50 passés / 0 échoué ; exception de F-08 levée.
@@ -389,13 +389,13 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [F-13](F-13.md) : **Fermé** (2026-11-12) @ `bd2e62ff`, colonnes compétiteurs sous 1 %.
 - [F-31](F-31.md) : **Fermé** (2026-11-12) @ `d7eb4eb6`.
 - [F-32](F-32.md) : **Fermé** (2026-11-12), `competiteurs-photo` @1440 0,492 % (55/55 sur les écrans à boutons désactivés).
-- [T-OPS-05](T-OPS-05.md) : **mergé @ `8854badb`, vérification sur la dev en cours** — l'image de production ne démarre plus (`h3` absent pour la CLI de migration), régression de T-SEC-17 ; déploiements de la dev probablement en échec.
+- [T-OPS-05](T-OPS-05.md) : **Fermé** (2026-11-12) — mergé @ `8854badb`, image de prod démarrée sur la dev redéployée (`8ce4a215`).
 - [F-03-BRK](F-03-BRK.md) : **Fermé** (2026-11-12) @ `07d2d78c`.
 - [T-SEC-06](T-SEC-06.md) : **Fermé** (2026-11-12), preuve Docker faite.
 - [T-SEC-16](T-SEC-16.md) : **Fermé** (2026-11-12) @ `5131c165`, polices hébergées sur le site.
 - [T-RGPD-01](T-RGPD-01.md) : **Fermé** (2026-11-12), réalisé par T-SEC-16.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
-- [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; back **En revue** (branche `feature/T-SEO-01-back`, robots.txt, sitemap.xml, X-Robots-Tag).
+- [T-SEO-01](T-SEO-01.md) : **Fermé** (2026-11-12) — front @ `6b42e4be`, back @ `17df018a` ; dev non indexable vérifiée par curl (robots `Disallow: /`, sitemap 404, `X-Robots-Tag`).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
