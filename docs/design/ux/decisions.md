@@ -235,6 +235,10 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Référence visuelle du tableau (décision utilisateur 2026-11-12) : **capture de référence Playwright** (`toHaveScreenshot`), prise une fois sur le rendu `origam-bracket` validé, relue par un humain, versionnée dans `tests/e2e`. Elle n'est régénérée que pour un changement voulu du tableau ou du thème, et le commit le dit.
 - Consigne générale rappelée par l'utilisateur : utiliser au maximum les composants Origam (audit : F-28).
 
+## GATE-DEV — Contrôles par branche (décision utilisateur 2026-11-12)
+- **Merge sur `develop`** : le chef de projet merge lui-même, sans attendre la file Playwright. Contrôle minimal sur le résultat du merge : **typecheck + `test:run`**. Remplace, pour develop seulement, les gates complètes de la politique de livraison.
+- **PR `develop` → `main`** : gates complètes obligatoires (Playwright complet à 0 échec, `test:db`, `test:api`, `npm audit` 0 high/critical, gitleaks, revue de sécurité).
+
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)
 - ARCH-11 est complétée : un endpoint peut n'être rattaché à **aucune page** s'il figure dans une **liste explicite**, avec sa raison. Le test reste strict pour tout le reste.
 - Premières entrées : `EDITION_POOLS` et `EDITION_DRAWS`. Leurs données sont redondantes avec `GET /editions/{code}`, qui sert la page édition, et ce sont des routes de l'API publique prévues par la Spec API. Aucune route n'est supprimée.
