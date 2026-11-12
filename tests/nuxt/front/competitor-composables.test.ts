@@ -1,7 +1,8 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineEventHandler, getQuery, setResponseStatus } from 'h3'
+import { flushPromises } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { useCompetitor } from '../../../src/composables/useCompetitor'
 import { useCompetitors } from '../../../src/composables/useCompetitors'
 import { useHeadToHead } from '../../../src/composables/useHeadToHead'
@@ -113,5 +114,39 @@ describe('composables compétiteurs à identifiants nullables', () => {
     }))
     const stored = Object.keys(result.nuxtApp.payload.data).filter((key) => key.startsWith('competitors:'))
     expect(stored).toEqual(expect.arrayContaining(['competitors:a', 'competitors:b']))
+  })
+})
+
+describe('useCompetitor : la clé de cache suit l’identifiant courant (F-22)', () => {
+  const SECOND = '00000000-0000-4000-0001-000000000006'
+  const endpoints = () => {
+    registerEndpoint(`/api/v1/competiteurs/${SAM}`, defineEventHandler(() => ({ id: SAM, displayName: 'Sam Dupont' })))
+    registerEndpoint(`/api/v1/competiteurs/${MAYA}`, defineEventHandler(() => ({ id: MAYA, displayName: 'Maya Legrand' })))
+    registerEndpoint(`/api/v1/competiteurs/${SECOND}`, defineEventHandler(() => ({ id: SECOND, displayName: 'Léa Martin' })))
+  }
+
+  it('deux instances démarrées sans identifiant, puis choisies sur deux joueurs, gardent chacune leur fiche', async () => {
+    endpoints()
+    const a = ref<string | null>(null)
+    const b = ref<string | null>(null)
+    const { first, second } = await harness(() => ({ first: useCompetitor(a), second: useCompetitor(b) }))
+    a.value = SAM
+    await vi.waitFor(() => expect(first.data.value?.displayName).toBe('Sam Dupont'))
+    b.value = MAYA
+    await vi.waitFor(() => expect(second.data.value?.displayName).toBe('Maya Legrand'))
+    await flushPromises()
+    expect(first.data.value?.displayName).toBe('Sam Dupont')
+    expect(second.data.value?.displayName).toBe('Maya Legrand')
+  })
+
+  it('un changement d’identifiant dans la même instance charge la nouvelle fiche, sous la clé de l’identifiant courant', async () => {
+    endpoints()
+    const id = ref<string | null>(SAM)
+    const { asyncData, nuxtApp } = await harness(() => ({ asyncData: useCompetitor(id), nuxtApp: useNuxtApp() }))
+    expect(asyncData.data.value?.displayName).toBe('Sam Dupont')
+    id.value = MAYA
+    await nextTick()
+    await vi.waitFor(() => expect(asyncData.data.value?.displayName).toBe('Maya Legrand'))
+    expect(Object.keys(nuxtApp.payload.data)).toContain(`competitor:${MAYA}`)
   })
 })
