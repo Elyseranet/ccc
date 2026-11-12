@@ -21,8 +21,8 @@ export const ADMIN_EDITIONS_CACHE_KEY = 'editions'
 
 
 export const ADMIN_EDITION_COLUMNS: IAdminEditionColumn[] = [
-  { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: true, width: '7.77%', minWidth: '68px' },
-  { field: 'year', title: { key: 'admin.editions.column_year', fallback: 'Année' }, sortable: true, width: '8.38%', minWidth: '73px' },
+  { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: false, width: '7.77%', minWidth: '68px' },
+  { field: 'year', title: { key: 'admin.editions.column_year', fallback: 'Année' }, sortable: false, width: '8.38%', minWidth: '73px' },
   { field: 'name', title: { key: 'admin.editions.column_name', fallback: 'Nom' }, sortable: false, width: '12.98%', minWidth: '114px' },
   { field: 'heldOn', title: { key: 'admin.editions.column_date', fallback: 'Date' }, sortable: false, width: '12.98%', minWidth: '114px' },
   { field: 'status', title: { key: 'admin.editions.column_status', fallback: 'Statut' }, sortable: false, width: '16.87%', minWidth: '148px' },
