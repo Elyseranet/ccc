@@ -130,8 +130,7 @@ for (const viewport of VIEWPORTS) {
       // La liste des têtes de série vient d'une lecture silencieuse après le montage (reprise d'un brouillon).
       await expect(page.getByTestId('draw-seeds-list').locator('li')).toHaveCount(POOLS)
 
-      // La liste des têtes de série n'existe qu'après `open` : ses polices (Bagel Fat One, Gabarito) se chargent après le premier `settle`.
-      // Sous charge, une ligne passait à la ligne le temps de l'échange de police et la zone était mesurée à 533 px au lieu de 541 (ti-tetes @1440).
+      // Hauteur d'une ligne instable sous charge tant que les polices ne sont pas chargées (mesuré : 47 → 55,66 px) ; la liste n'existe qu'après `open`.
       await settle(page)
       await settle(mockup)
       await mockup.addStyleTag({ content: '.adm-bottom, .snack { display: none !important; }' })
