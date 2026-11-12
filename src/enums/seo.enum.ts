@@ -7,5 +7,9 @@ export enum SEO_PAGE {
   PLAYER = 'player',
   HEAD_TO_HEAD = 'head_to_head',
   RULES = 'rules',
-  HALL_OF_FAME = 'hall_of_fame'
+  HALL_OF_FAME = 'hall_of_fame',
+  LEGAL_NOTICE = 'legal_notice',
+  PRIVACY = 'privacy',
+  TERMS = 'terms',
+  ACCESSIBILITY = 'accessibility'
 }

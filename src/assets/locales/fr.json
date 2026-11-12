@@ -921,5 +921,13 @@
   "seo.players.description": "L’annuaire des joueurs du Championnat de Caps : recherchez un joueur par nom ou pseudo et consultez sa fiche.",
   "seo.head_to_head.title": "Face-à-face entre deux joueurs",
   "seo.edition.description": "Édition {code} du Championnat de Caps : participants, poules, phase finale, matchs et résultats.",
-  "seo.player.title": "{name} : fiche joueur"
+  "seo.player.title": "{name} : fiche joueur",
+  "seo.legal_notice.title": "Mentions légales",
+  "seo.legal_notice.description": "Mentions légales : éditeur, directeur de la publication, hébergeur, contact, propriété intellectuelle et crédits.",
+  "seo.privacy.title": "Politique de confidentialité",
+  "seo.privacy.description": "Politique de confidentialité : données collectées, finalités et bases légales, durées de conservation, destinataires, droits et réclamation, cookies.",
+  "seo.terms.title": "Conditions d’utilisation",
+  "seo.terms.description": "Conditions d’utilisation : objet et éditeur, accès au service, comptes, contenus déposés, règles de conduite, responsabilité, droit applicable.",
+  "seo.accessibility.title": "Déclaration d’accessibilité",
+  "seo.accessibility.description": "Déclaration d’accessibilité : état de conformité, ce qui est fait, ce qui n’est pas fait, défauts connus, contact et voies de recours."
 }

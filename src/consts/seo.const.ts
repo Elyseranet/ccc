@@ -72,5 +72,21 @@ export const SEO_MESSAGES: Record<SEO_PAGE, ISeoPageMessages> = {
   [SEO_PAGE.HALL_OF_FAME]: {
     title: { key: 'seo.hall_of_fame.title', label: 'Palmarès du Championnat de Caps' },
     description: { key: 'seo.hall_of_fame.description', label: 'Le palmarès du Championnat de Caps.' }
+  },
+  [SEO_PAGE.LEGAL_NOTICE]: {
+    title: { key: 'seo.legal_notice.title', label: 'Mentions légales' },
+    description: { key: 'seo.legal_notice.description', label: 'Mentions légales : éditeur, directeur de la publication, hébergeur, contact, propriété intellectuelle et crédits.' }
+  },
+  [SEO_PAGE.PRIVACY]: {
+    title: { key: 'seo.privacy.title', label: 'Politique de confidentialité' },
+    description: { key: 'seo.privacy.description', label: 'Politique de confidentialité : données collectées, finalités et bases légales, durées de conservation, destinataires, droits et réclamation, cookies.' }
+  },
+  [SEO_PAGE.TERMS]: {
+    title: { key: 'seo.terms.title', label: 'Conditions d’utilisation' },
+    description: { key: 'seo.terms.description', label: 'Conditions d’utilisation : objet et éditeur, accès au service, comptes, contenus déposés, règles de conduite, responsabilité, droit applicable.' }
+  },
+  [SEO_PAGE.ACCESSIBILITY]: {
+    title: { key: 'seo.accessibility.title', label: 'Déclaration d’accessibilité' },
+    description: { key: 'seo.accessibility.description', label: 'Déclaration d’accessibilité : état de conformité, ce qui est fait, ce qui n’est pas fait, défauts connus, contact et voies de recours.' }
   }
 }
