@@ -31,7 +31,7 @@ src/
   themes/        thème Origam, à plat (ARCH-7)
   types/         kebab-case.type.ts, à plat
   utils/         kebab-case.util.ts, à plat : utils navigateur ET serveur, scripts CLI compris (*-cli.util.ts) (ARCH-1)
-  server/        uniquement ce que Nitro impose (api/, middleware/, plugins/), la base (ARCH-6) et les schémas (ARCH-13) :
+  server/        uniquement ce que Nitro impose (api/, middleware/, plugins/, routes/ pour `/robots.txt` et `/sitemap.xml`, T-SEO-01), la base (ARCH-6) et les schémas (ARCH-13) :
     schemas/             kebab-case.schema.ts : schémas zod, à plat, jamais importés côté client (ARCH-13)
     db/migrations/       migrations TypeORM
     db/typeorm/          data-source, options, stratégie de nommage, transformer

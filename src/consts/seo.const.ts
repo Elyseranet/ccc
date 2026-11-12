@@ -74,3 +74,17 @@ export const SEO_MESSAGES: Record<SEO_PAGE, ISeoPageMessages> = {
     description: { key: 'seo.hall_of_fame.description', label: 'Le palmarès du Championnat de Caps.' }
   }
 }
+
+/** Routes Nitro de référencement et leurs types de contenu (T-SEO-01). */
+export const SEO_ROBOTS_PATH = '/robots.txt'
+export const SEO_SITEMAP_PATH = '/sitemap.xml'
+export const SEO_ROBOTS_CONTENT_TYPE = 'text/plain; charset=utf-8'
+export const SEO_SITEMAP_CONTENT_TYPE = 'application/xml; charset=utf-8'
+
+/** Chemins interdits aux robots d'un site indexable (pages privées et API ; les pages légales restent crawlables mais `noindex`). */
+export const SEO_ROBOTS_DISALLOWED_PATHS = ['/admin', '/connexion', '/profil', '/invitation', '/api/'] as const
+
+export const SEO_XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>'
+export const SEO_SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+
+export const SEO_XML_ENTITIES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }

@@ -638,3 +638,7 @@ export const loadAdminParticipants = async (dataSource: DataSource, idOrCode: st
     }
   })
 }
+
+/** Codes de toutes les éditions, de la plus récente à la plus ancienne (sitemap, T-SEO-01). */
+export const listEditionCodes = async (dataSource: DataSource): Promise<string[]> =>
+  (await dataSource.getRepository(EditionEntity).find({ select: { code: true }, order: { chronologicalRank: 'DESC' } })).map(({ code }) => code)
