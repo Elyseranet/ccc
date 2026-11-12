@@ -15,7 +15,7 @@
         :value="entry.value"
         size="large"
         border
-        border-color="var(--origam-color__border---default)"
+        :border-color="entry.borderColor"
         pill
         filter-icon=""
         :color="entry.color"
@@ -87,12 +87,11 @@
         <origam-switch
           :id="tiebreakId"
           :model-value="tiebreakOnly"
-          :label="tiebreakLabel"
           :disabled="!canTiebreakFilter"
           :hint="tiebreakHint"
           :persistent-hint="!canTiebreakFilter"
           hide-details
-          color="primary"
+          class="match-queue-filters__switch"
           data-cy="admin-matches-tiebreak-only"
           @update:model-value="handleTiebreak"
         />
@@ -150,6 +149,7 @@ const views = computed(() => props.filters.map(entry => {
     selected,
     color: selected ? 'secondary' : 'var(--origam-color__text---secondary)',
     bgColor: selected ? 'secondary' : 'transparent',
+    borderColor: selected ? 'transparent' : 'var(--origam-color__border---default)',
     dataCy: `admin-matches-filter-${entry.value}`
   }
 }))
@@ -229,6 +229,7 @@ defineExpose({})
   &__chips :deep(.origam-slide-group__content) {
     flex-wrap: wrap;
     overflow: visible;
+    contain: none;
   }
 
   &__chips :deep(.origam-slide-group__content) {
@@ -251,6 +252,10 @@ defineExpose({})
     min-width: 0;
   }
 
+  &__field--switch {
+    flex: 0 0 auto;
+  }
+
   &__field-label {
     color: var(--origam-color__text---tertiary);
     font-size: var(--origam-font__size---xs);
@@ -261,7 +266,20 @@ defineExpose({})
   }
 
   &__select {
+    grid-template-rows: 1fr 0;
     min-width: 0;
+
+    :deep(.origam-input__control) {
+      height: 100%;
+    }
+
+    :deep(.origam-field__field) {
+      align-items: stretch;
+    }
+  }
+
+  &__switch {
+    margin-inline-start: var(--match-queue-filters__switch---margin-start, var(--origam-space---1));
   }
 
   &__label {
@@ -295,5 +313,6 @@ defineExpose({})
   --match-queue-filters__field---basis: 12rem;
   --match-queue-filters__field---max-width: 16rem;
   --match-queue-filters__field---gap: var(--origam-space---1);
+  --match-queue-filters__switch---margin-start: var(--origam-space---1);
 }
 </style>

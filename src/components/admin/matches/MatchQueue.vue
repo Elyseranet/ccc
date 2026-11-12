@@ -34,16 +34,16 @@
             />
           </span>
           <span class="match-queue__name">{{ card.firstName }}</span>
-          <span
-            class="match-queue__score font-display"
-            :aria-label="card.scoreLabel"
-          >
-            <template v-if="card.hasScore">
-              <b>{{ card.firstScore }}</b><i aria-hidden="true">–</i><b>{{ card.secondScore }}</b>
-            </template>
-            <template v-else>
-              <span aria-hidden="true">—</span>
-            </template>
+          <span class="match-queue__score font-display">
+            <span class="sr-only">{{ card.scoreLabel }}</span>
+            <span
+              v-if="card.hasScore"
+              aria-hidden="true"
+            ><b>{{ card.firstScore }}</b><i>–</i><b>{{ card.secondScore }}</b></span>
+            <span
+              v-else
+              aria-hidden="true"
+            >—</span>
           </span>
           <span class="match-queue__name match-queue__name--second">{{ card.secondName }}</span>
           <origam-btn

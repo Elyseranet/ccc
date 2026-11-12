@@ -62,6 +62,10 @@
       rounded="lg"
       :title="ruleTitle"
       :text="ruleText"
+      font-size="md"
+      font-weight="bold"
+      letter-spacing="normal"
+      line-height="normal"
       data-cy="admin-score-rule"
     />
     <p
@@ -82,6 +86,7 @@
     <div class="score-entry-form__actions">
       <origam-btn
         variant="outlined"
+        size="x-large"
         :disabled="busy"
         :loading="saving"
         :text="saveLabel"
@@ -91,6 +96,7 @@
       <origam-btn
         type="submit"
         variant="flat"
+        size="x-large"
         bg-color="primary"
         elevation="lg"
         :hover="ctaHover"
@@ -174,7 +180,7 @@ defineExpose({})
   &__duel {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: start;
+    align-items: end;
     gap: var(--score-entry-form__duel---gap, var(--origam-space---3));
   }
 
@@ -188,11 +194,12 @@ defineExpose({})
   }
 
   &__name {
+    color: var(--origam-color__text---primary);
     font-weight: var(--origam-font__weight---bold);
   }
 
   &__vs {
-    padding-top: var(--origam-space---8);
+    padding-bottom: var(--origam-space---4);
     color: var(--origam-color__text---tertiary);
     font-size: var(--origam-font__size---3xl);
   }

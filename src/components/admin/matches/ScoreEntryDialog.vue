@@ -7,6 +7,8 @@
     :location="location"
     :max-width="maxWidth"
     scrim
+    border
+    border-color="var(--origam-color__border---strong)"
     class="score-entry-dialog"
     :class="{ 'score-entry-dialog--sheet': isSheet }"
     data-cy="admin-score-dialog"
@@ -171,6 +173,8 @@ defineExpose({})
   }
 
   :deep(.origam-card-header) {
+    align-items: start;
+    height: auto;
     padding: var(--score-entry-dialog---padding, var(--origam-space---6)) var(--score-entry-dialog---padding, var(--origam-space---6)) 0;
   }
 
@@ -188,12 +192,14 @@ defineExpose({})
     font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
     letter-spacing: var(--origam-font__letterSpacing---wider);
+    line-height: var(--origam-font__lineHeight---normal);
     text-transform: uppercase;
   }
 
   :deep(.origam-card-header__title) {
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
+    letter-spacing: normal;
     line-height: var(--origam-font__lineHeight---tight);
   }
 
@@ -203,6 +209,22 @@ defineExpose({})
       width: 100%;
       margin: 0;
     }
+
+    :deep(.origam-card)::before {
+      content: '';
+      position: absolute;
+      inset-block-start: calc(var(--origam-space---6) - var(--origam-space---2) - var(--origam-border__width---thin));
+      inset-inline: 0;
+      width: var(--score-entry-dialog__grip---width, var(--origam-space---12));
+      height: var(--score-entry-dialog__grip---height, 5px);
+      margin-inline: auto;
+      border-radius: var(--origam-radius---full);
+      background: var(--origam-color__border---strong);
+    }
+
+    :deep(.origam-card-header) {
+      padding-block-start: calc(var(--score-entry-dialog---padding, var(--origam-space---6)) + var(--score-entry-dialog__grip---height, 5px) + var(--origam-space---4) - var(--origam-space---2));
+    }
   }
 }
 </style>
@@ -211,5 +233,7 @@ defineExpose({})
 :root {
   --score-entry-dialog---padding: var(--origam-space---6);
   --score-entry-dialog__content---padding-top: var(--origam-space---5);
+  --score-entry-dialog__grip---width: var(--origam-space---12);
+  --score-entry-dialog__grip---height: 5px;
 }
 </style>

@@ -194,8 +194,6 @@ export interface IDrawnEdition {
 interface ISeedProposalResponse { seeds: Array<{ participationId: string }> }
 interface IDrawResponse { id: string }
 
-const STATUS_OK = 200
-
 const expectStatus = async (response: Awaited<ReturnType<APIRequestContext['get']>>, label: string, expected: number): Promise<unknown> => {
   if (response.status() !== expected) {
     throw new Error(`${label} : ${response.status()} ${await response.text()}`)

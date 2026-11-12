@@ -242,7 +242,7 @@ defineExpose({})
     color: var(--origam-color__text---tertiary);
     font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
-    letter-spacing: var(--origam-font__letterSpacing---wide);
+    letter-spacing: var(--origam-font__letterSpacing---wider);
     text-transform: uppercase;
   }
 
