@@ -1,6 +1,6 @@
 # T-SEC-17 — Base de données : délais de connexion et de requête absents
 
-- **Statut** : En revue, gates vertes (2026-11-12), en attente du merge par le `project-manager`. Ouvert le 2026-11-04 par `backend-lead`, sur demande du `project-manager`. Il fait suite à la revue de sécurité de T-OPS-03 (finding M1, medium).
+- **Statut** : **Fermé** (2026-11-12), mergé dans develop @ `b0a06f43` (branche @ `8aa5a9b1` = code `b440a570` + doc). Preuves : sur `b440a570`, typecheck vert, test:run 904 réussis / 1 ignoré / 0 échec, Playwright complet 356 passés / 0 échec (sous verrou, caffeinate, port 3981 vérifié libre) ; test:db 127/127, test:api 316/316, npm audit 0 high/critical, gitleaks sans fuite, revue de sécurité sans constat à haute confiance (backend-lead). Sur le merge `b0a06f43` (seul fichier commun : BOARD.md), le chef de projet a relancé typecheck (vert) et test:run (904 réussis, 1 ignoré) dans un worktree temporaire. Ouvert le 2026-11-04 par `backend-lead`, sur demande du `project-manager`. Il fait suite à la revue de sécurité de T-OPS-03 (finding M1, medium).
 - **Origine** : défaut antérieur à T-OPS-03, un peu aggravé par lui, puisque la sonde de santé fait désormais une requête de plus sur la base.
 
 ## Constat (d'après la revue, à revérifier au traitement)
