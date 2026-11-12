@@ -27,9 +27,6 @@ export const POOL_DRAW_DEFAULT_POOL_COUNT: Readonly<Record<number, number>> = {
   70: 10 // 10 × 7
 }
 
-/** Sous ce seuil Origam (960 px), le stepper des étapes passe en vertical. */
-export const POOL_DRAW_STEPPER_MOBILE_BREAKPOINT = 'md'
-
 /** Chip de la poule en cours : pleine, `color` ET `bg-color` de la même intention (recette des chips, mapping.md). */
 export const POOL_DRAW_CHIP_CURRENT: { color: string, bgColor: string } = { color: 'primary', bgColor: 'primary' }
 

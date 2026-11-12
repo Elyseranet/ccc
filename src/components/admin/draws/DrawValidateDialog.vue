@@ -54,8 +54,8 @@ import type { IDrawValidateDialogProps } from '~/interfaces/pool-draw.interface'
  * Global
  *
  * @description
- * Confirmation de la validation du tirage : persistante (ni Échap ni clic extérieur ne la ferme sans « Annuler »), non annulable
- * (le texte le dit), focus initial sur « Annuler », bouton « Valider définitivement » inactif pendant l'envoi. `origam-dialog` piège
+ * Confirmation de la validation du tirage : Échap et le clic extérieur l'annulent (décision ux 0ea5092e), sauf pendant l'envoi
+ * (`persistent`) ; la validation, elle, n'est pas annulable (le texte le dit), focus initial sur « Annuler », bouton « Valider définitivement » inactif pendant l'envoi. `origam-dialog` piège
  * le focus et le rend à l'élément déclencheur à la fermeture.
  ********************************************************/
 const { t } = useT()

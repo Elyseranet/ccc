@@ -75,6 +75,18 @@ const placeNext = async (page: Page) => {
   await page.getByRole('option').first().click()
 }
 
+/**
+ * Ferme la confirmation par Échap ou clic extérieur. Origam (`useStack`) ne bascule `globalTop` qu'au tour de boucle qui suit l'ouverture :
+ * une touche ou un clic envoyé dans cet intervalle est ignoré (mesuré : le premier Échap est perdu, le second, 25 ms plus tard, ferme).
+ * Un humain n'y arrive pas, Playwright si. On réessaie donc jusqu'à la fermeture : une confirmation réellement persistante échouerait toujours.
+ */
+const dismissDialog = async (page: Page, dismiss: () => Promise<void>) => {
+  await expect(async () => {
+    await dismiss()
+    await expect(page.getByTestId('draw-validate-dialog')).toHaveCount(0, { timeout: 500 })
+  }).toPass({ timeout: 5000 })
+}
+
 test.describe('admin tirages : parcours complet sur une édition créée par le test', () => {
   test.beforeEach(async ({ context }) => {
     await signIn(context, 'admin')
@@ -171,13 +183,11 @@ test.describe('admin tirages : parcours complet sur une édition créée par le 
     await page.getByTestId('draw-recap-next').click()
     await page.getByTestId('draw-validate-open').click()
     await expect(page.getByTestId('draw-validate-dialog')).toBeVisible()
-    await page.keyboard.press('Escape')
-    await expect(page.getByTestId('draw-validate-dialog')).toHaveCount(0)
+    await dismissDialog(page, () => page.keyboard.press('Escape'))
     // Le clic hors du dialogue annule aussi (décision ux 0ea5092e) : la validation n'a lieu que par le bouton explicite.
     await page.getByTestId('draw-validate-open').click()
     await expect(page.getByTestId('draw-validate-dialog')).toBeVisible()
-    await page.mouse.click(5, 5)
-    await expect(page.getByTestId('draw-validate-dialog')).toHaveCount(0)
+    await dismissDialog(page, () => page.mouse.click(5, 5))
     expect((await draftsOf(page, edition)).find(entry => entry.kind === 'POOLS')?.status).toBe('DRAFT')
   })
 
