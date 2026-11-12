@@ -42,7 +42,8 @@
 .ed-done__cta { display: flex; flex-wrap: wrap; gap: var(--origam-space---3); }
 
 /* Compétiteurs */
-.cp-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--origam-space---5); align-items: start; }
+/* Formulaire à largeur fixe : à 1440 le tableau (683,72 px avec les minimums F-13) tient sans défilement interne dès 1425 (F-31, décision utilisateur) */
+.cp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 23.9375rem; gap: var(--origam-space---5); align-items: start; }
 .cp-grid > * { min-width: 0; }
 /* Minimums aux largeurs des vraies données, aucun nom tronqué (décision utilisateur 2026-11-12, F-13) */
 .cp-table th:nth-child(1) { min-width: 191.4px; }
@@ -61,7 +62,7 @@
 /* Menu « Plus » mis à jour */
 .ed-plus { max-width: 34rem; }
 
-@media (max-width: 1200px) {
+@media (max-width: 1424px) { /* une colonne sous 1425 px : formulaire sous le tableau (F-31, décision utilisateur) */
   .cp-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
