@@ -42,8 +42,8 @@
 .ed-done__cta { display: flex; flex-wrap: wrap; gap: var(--origam-space---3); }
 
 /* Compétiteurs */
-/* Formulaire à largeur fixe : à 1440 le tableau (683 px avec les minimums F-13) tient sans défilement interne (F-31, décision utilisateur) */
-.cp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 24rem; gap: var(--origam-space---5); align-items: start; }
+/* Formulaire à largeur fixe : à 1440 le tableau (683,72 px avec les minimums F-13) tient sans défilement interne dès 1425 (F-31, décision utilisateur) */
+.cp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 23.9375rem; gap: var(--origam-space---5); align-items: start; }
 .cp-grid > * { min-width: 0; }
 /* Minimums aux largeurs des vraies données, aucun nom tronqué (décision utilisateur 2026-11-12, F-13) */
 .cp-table th:nth-child(1) { min-width: 191.4px; }
