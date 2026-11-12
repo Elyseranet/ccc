@@ -33,13 +33,21 @@ let bareAdminCookie: string
 let year = 2030
 let competitorSerial = 0
 
-const send = (method: string, path: string, body?: unknown, cookie?: string): Promise<Response> =>
+const send = (method: string, path: string, body?: unknown, cookie?: string, headers: Record<string, string> = {}): Promise<Response> =>
   fetch(path, {
     method,
-    headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(cookie ? { Cookie: cookie } : {}) },
+    headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(cookie ? { Cookie: cookie } : {}), ...headers },
     body: body === undefined ? undefined : JSON.stringify(body)
   })
 const asAdmin = (method: string, path: string, body?: unknown) => send(method, path, body, adminCookie)
+
+/** Enregistre puis valide un score : chaque écriture porte `If-Match` de la version courante du match (T-SEC-08). */
+const recordAndValidate = async (match: IAdminMatch, body: { scores: Array<{ participationId: string, score: number }> }): Promise<void> => {
+  const recorded = await send('PUT', `/api/v1/matchs/${match.id}/score`, body, adminCookie, { 'If-Match': `"${match.version}"` })
+  expect(recorded.status).toBe(200)
+  const { version } = await recorded.json() as IAdminMatch
+  expect((await send('POST', `/api/v1/matchs/${match.id}/validation`, body, adminCookie, { 'If-Match': `"${version}"` })).status).toBe(200)
+}
 const errorOf = async (response: Response): Promise<IApiError> => await response.json() as IApiError
 
 /** Un compétiteur, avec au besoin un historique dans une édition close (points + stade final) qui fait son ACP. */
@@ -201,8 +209,7 @@ describe('admin activity feed (B-15)', async () => {
       const matches = await (await asAdmin('GET', `/api/v1/admin/editions/${editionId}/matchs`)).json() as IAdminMatch[]
       const match = matches[0]!
       const scores = match.sides.map((side, index) => ({ participationId: side.participationId, score: index === 0 ? match.targetScore : 0 }))
-      expect((await asAdmin('PUT', `/api/v1/matchs/${match.id}/score`, { scores })).status).toBe(200)
-      expect((await asAdmin('POST', `/api/v1/matchs/${match.id}/validation`, { scores })).status).toBe(200)
+      await recordAndValidate(match, { scores })
 
       const feed = await activityOf(editionId)
       expect(feed.map((item) => item.kind)).toEqual([
@@ -239,8 +246,7 @@ describe('admin activity feed (B-15)', async () => {
       const body = (values: number[]) => ({
         scores: match.sides.map((side, index) => ({ participationId: side.participationId, score: values[index]! }))
       })
-      expect((await asAdmin('PUT', `/api/v1/matchs/${match.id}/score`, body([match.targetScore, 0]))).status).toBe(200)
-      expect((await asAdmin('POST', `/api/v1/matchs/${match.id}/validation`, body([match.targetScore, 0]))).status).toBe(200)
+      await recordAndValidate(match, body([match.targetScore, 0]))
       const validated = (await activityOf(ready.edition.id)).filter((item) => item.target.id === match.id)
       expect(validated).toHaveLength(1)
 
