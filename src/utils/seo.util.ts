@@ -1,4 +1,19 @@
-import { SEO_ELLIPSIS } from '../consts/seo.const.js'
+import { PAGE_DELIVERY } from '../consts/page-delivery.const.js'
+import { ROUTES } from '../consts/routes.const.js'
+import {
+  SEO_ELLIPSIS,
+  SEO_PRIVATE_ROUTE_PATTERNS,
+  SEO_ROBOTS_DISALLOW_ALL_LINE,
+  SEO_ROBOTS_DISALLOW_PREFIX,
+  SEO_ROBOTS_SITEMAP_PREFIX,
+  SEO_ROBOTS_USER_AGENT_LINE,
+  SEO_ROBOTS_DISALLOWED_PATHS,
+  SEO_SITEMAP_NAMESPACE,
+  SEO_SITEMAP_PATH,
+  SEO_XML_DECLARATION,
+  SEO_XML_ENTITIES
+} from '../consts/seo.const.js'
+import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
 
 /**
  * URL canonique : l'origine du site (`runtimeConfig.public.siteUrl`, jamais déduite de l'en-tête Host) suivie du chemin, sans query ni
@@ -43,4 +58,44 @@ export const renderBounded = (render: (params: Record<string, string | number>) 
     text = render(current)
   }
   return text
+}
+
+/** Le chemin est-il privé ou légal (`SEO_PRIVATE_ROUTE_PATTERNS`) : jamais dans le sitemap. */
+export const isSeoPrivateRoute = (path: string): boolean =>
+  SEO_PRIVATE_ROUTE_PATTERNS.some((pattern) => {
+    const base = pattern.endsWith('/**') ? pattern.slice(0, -3) : undefined
+    return base === undefined ? path === pattern : path === base || path.startsWith(`${base}/`)
+  })
+
+/** Contenu de `robots.txt` : site non indexable, tout est interdit ; sinon pages privées et API interdites, sitemap annoncé. */
+export const buildRobotsTxt = (siteUrl: string, indexable: boolean): string => {
+  if (!indexable) {
+    return `${SEO_ROBOTS_USER_AGENT_LINE}\n${SEO_ROBOTS_DISALLOW_ALL_LINE}\n`
+  }
+  const disallows = SEO_ROBOTS_DISALLOWED_PATHS.map(path => `${SEO_ROBOTS_DISALLOW_PREFIX}${path}`)
+  return [SEO_ROBOTS_USER_AGENT_LINE, ...disallows, '', `${SEO_ROBOTS_SITEMAP_PREFIX}${buildCanonicalUrl(siteUrl, SEO_SITEMAP_PATH)}`, ''].join('\n')
+}
+
+export const escapeXml = (value: string): string => value.replace(/[&<>"']/g, char => SEO_XML_ENTITIES[char]!)
+
+/** Pages statiques publiques livrées : ni privées, ni légales, ni dynamiques (`:param`, ajoutées une par entité). */
+export const listSitemapStaticPaths = (table: Record<string, IPageDelivery> = PAGE_DELIVERY): string[] =>
+  Object.entries(table)
+    .filter(([path, page]) => page.delivered && !path.includes(':') && !isSeoPrivateRoute(path))
+    .map(([path]) => path)
+
+/** Chemins du sitemap : pages statiques, puis une URL par édition (si sa page est livrée) et par joueur (idem). */
+export const buildSitemapPaths = (
+  editionCodes: readonly string[],
+  playerIds: readonly string[],
+  table: Record<string, IPageDelivery> = PAGE_DELIVERY
+): string[] => [
+  ...listSitemapStaticPaths(table),
+  ...(table[ROUTES.EDITION]?.delivered ? editionCodes.map(code => ROUTES.EDITION.replace(':id', encodeURIComponent(code))) : []),
+  ...(table[ROUTES.PLAYER]?.delivered ? playerIds.map(id => ROUTES.PLAYER.replace(':id', encodeURIComponent(id))) : [])
+]
+
+export const buildSitemapXml = (siteUrl: string, paths: readonly string[]): string => {
+  const urls = paths.map(path => `<url><loc>${escapeXml(buildCanonicalUrl(siteUrl, path))}</loc></url>`).join('')
+  return `${SEO_XML_DECLARATION}<urlset xmlns="${SEO_SITEMAP_NAMESPACE}">${urls}</urlset>\n`
 }

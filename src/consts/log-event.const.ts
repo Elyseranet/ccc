@@ -5,6 +5,7 @@ export const LOG_EVENT = {
   DATABASE_TIMEOUT: 'database_timeout',
   DATABASE_TIMEOUT_CONFIG_INVALID: 'database_timeout_config_invalid',
   HEALTH_CHECK_FAILED: 'health_check_failed',
+  SITEMAP_SERVED: 'sitemap_served',
   COMPETITORS_SEARCH: 'competitors_search',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   AUTH_LOGIN_SUCCEEDED: 'auth_login_succeeded',

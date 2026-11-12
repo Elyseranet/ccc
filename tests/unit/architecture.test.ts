@@ -30,8 +30,8 @@ describe('arborescence (ARCH-1 à ARCH-14)', () => {
     expect(readdirSync('src/composables').filter((name) => !/^use[A-Z][A-Za-z0-9]*\.ts$/.test(name))).toEqual([])
   })
 
-  it('src/server ne contient que ce que Nitro impose (api, middleware, plugins), la base (ARCH-6) et les schémas (ARCH-13)', () => {
-    expect(subdirectories('src/server').sort()).toEqual(['api', 'db', 'middleware', 'plugins', 'schemas'])
+  it('src/server ne contient que ce que Nitro impose (api, middleware, plugins, routes), la base (ARCH-6) et les schémas (ARCH-13)', () => {
+    expect(subdirectories('src/server').sort()).toEqual(['api', 'db', 'middleware', 'plugins', 'routes', 'schemas'])
     expect(subdirectories('src/server/db').sort()).toEqual(['migrations', 'typeorm'])
     expect(subdirectories('src/server/db/typeorm')).toEqual(['entities'])
   })

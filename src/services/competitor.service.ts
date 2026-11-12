@@ -485,3 +485,7 @@ export const updateCompetitorIdentity = (
     const updated = await manager.findOneByOrFail(CompetitorEntity, { id: competitorId })
     return { ...toCompetitorPublic(updated), version: updated.version }
   })
+
+/** Identifiants de tous les joueurs de l'annuaire public (sitemap, T-SEO-01). */
+export const listCompetitorIds = async (db: DataSource): Promise<string[]> =>
+  (await db.getRepository(CompetitorEntity).find({ select: { id: true }, order: { id: 'ASC' } })).map(({ id }) => id)
