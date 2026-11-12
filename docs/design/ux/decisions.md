@@ -232,6 +232,7 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - L'écart à la maquette `edition.html` est **accepté** pour le tableau (mesure de référence 23,2 % à 1440, 41,0 % à 390). Le thème le réduit autant que possible (props d'abord), sans contourner Origam par du CSS qui force ses styles en ligne.
 - Restent exigés : aucun trait de liaison (RG13, slot `connector` avec `<g />`, FA-11), lien vers la fiche joueur et score dans le slot `competitor`, vainqueur non porté par la couleur seule, alternative en liste, région de défilement focalisable et nommée.
 - e2e visuel : la zone du tableau ne se compare plus à la maquette. Sa référence devient le rendu `origam-bracket` validé, documenté dans le commit (exception approuvée par l'utilisateur). Quand #1282 sera livrée, F-03-BRK rapprochera le rendu de la maquette.
+- Référence visuelle du tableau (décision utilisateur 2026-11-12) : **capture de référence Playwright** (`toHaveScreenshot`), prise une fois sur le rendu `origam-bracket` validé, relue par un humain, versionnée dans `tests/e2e`. Elle n'est régénérée que pour un changement voulu du tableau ou du thème, et le commit le dit.
 - Consigne générale rappelée par l'utilisateur : utiliser au maximum les composants Origam (audit : F-28).
 
 ## ARCH-11 bis — Endpoints sans page (décision utilisateur 2026-10-28, F-03b)

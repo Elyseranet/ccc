@@ -8,3 +8,5 @@
   2. régler l'écart par le thème (props d'abord) jusqu'à repasser sous 1 % aux deux largeurs ;
   3. conserver l'alternative en liste et les exigences d'accessibilité de F-03b.
 - **Référence** : la mesure de dev-f06 sur `wip/F-03b-origam-bracket` (adf07fa) donne 23,2 % à 1440 et 41,0 % à 390.
+
+- **2026-11-12 — référence visuelle** (décision utilisateur) : capture de référence Playwright du rendu validé, relue par un humain, versionnée ; régénérée seulement pour un changement voulu. Plan front-lead : 1 dev (dev-f11 après le merge de F-11), Origam 2.37.4.
