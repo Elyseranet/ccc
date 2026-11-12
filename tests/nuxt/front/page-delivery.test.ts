@@ -71,10 +71,10 @@ describe('table PAGE_DELIVERY', () => {
     }
   })
 
-  it('seules les pages des tickets fermés sont livrées (T-LIVE-01, F-01, F-03, F-04, F-05, F-06, F-09, F-10, T-REL-02, F-02, F-08, F-11), les autres sont masquées en production', () => {
+  it('seules les pages des tickets fermés sont livrées (T-LIVE-01, F-01, F-03, F-04, F-05, F-06, F-09, F-10, T-REL-02, F-02, F-08, F-11, F-07), les autres sont masquées en production', () => {
     const delivered = Object.entries(PAGE_DELIVERY).filter(([, page]) => page.delivered).map(([route]) => route)
     expect(delivered.sort()).toEqual([
-      ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.EDITION, ROUTES.EDITIONS, ROUTES.HALL_OF_FAME, ROUTES.HEAD_TO_HEAD, ROUTES.HOME, ROUTES.INVITATION, ROUTES.LOGIN, ROUTES.PLAYER, ROUTES.PLAYERS, ROUTES.PROFILE, ROUTES.RULES
+      ROUTES.ADMIN, ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.EDITION, ROUTES.EDITIONS, ROUTES.HALL_OF_FAME, ROUTES.HEAD_TO_HEAD, ROUTES.HOME, ROUTES.INVITATION, ROUTES.LOGIN, ROUTES.PLAYER, ROUTES.PLAYERS, ROUTES.PROFILE, ROUTES.RULES
     ].sort())
   })
 })
