@@ -20,6 +20,7 @@
         filter-icon=""
         :color="entry.color"
         :bg-color="entry.bgColor"
+        :aria-pressed="entry.selected"
         :data-cy="entry.dataCy"
       >
         <template #filter />
