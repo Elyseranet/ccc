@@ -46,8 +46,8 @@ describe('useSeo : page publique', () => {
 
   it('pose le titre, la description, la canonique et Open Graph depuis les clés seo.* et siteUrl', async () => {
     await mountSeo({ page: SEO_PAGE.RULES, path: '/regles?onglet=jeu#variantes' })
-    expect(documentTitle()).toBe('Règles du Championnat de Caps · CCC')
-    expect(meta('meta[name="description"]')).toBe('Les règles du Championnat de Caps : le jeu, le tournoi et les variantes.')
+    expect(documentTitle()).toBe('Règles de la Cotentin Caps Cup · CCC')
+    expect(meta('meta[name="description"]')).toBe('Les règles de la Cotentin Caps Cup : le jeu, le tournoi et les variantes.')
     expect(canonical()).toBe('https://ccc.example.test/regles')
     expect(meta('meta[property="og:url"]')).toBe('https://ccc.example.test/regles')
     expect(meta('meta[property="og:title"]')).toBe(documentTitle())
@@ -61,7 +61,7 @@ describe('useSeo : page publique', () => {
 
   it('remplace les paramètres du titre et de la description', async () => {
     await mountSeo({ page: SEO_PAGE.EDITION, path: '/editions/2025', params: { code: '2025' } })
-    expect(documentTitle()).toBe('Édition 2025 du Championnat de Caps · CCC')
+    expect(documentTitle()).toBe('Édition 2025 de la Cotentin Caps Cup · CCC')
     expect(meta('meta[name="description"]')).toContain('Édition 2025')
     await mountSeo({ page: SEO_PAGE.PLAYER, path: '/joueurs/abc', params: () => ({ name: 'Nicolas Deseine' }) })
     expect(documentTitle()).toBe('Nicolas Deseine : fiche joueur · CCC')

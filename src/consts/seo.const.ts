@@ -42,36 +42,36 @@ export const SEO_TWITTER_CARD_WITH_IMAGE = 'summary_large_image'
 /** Titre et description de chaque page : clé de traduction et libellé de repli (les clés sont écrites en toutes lettres pour le contrôle des clés mortes). */
 export const SEO_MESSAGES: Record<SEO_PAGE, ISeoPageMessages> = {
   [SEO_PAGE.HOME]: {
-    title: { key: 'seo.home.title', label: 'Championnat de Caps : éditions, joueurs, classements' },
-    description: { key: 'seo.home.description', label: 'Le Championnat de Caps : le classement ACP, les derniers scores validés et le champion de la dernière édition.' }
+    title: { key: 'seo.home.title', label: 'Cotentin Caps Cup : éditions, joueurs, classements' },
+    description: { key: 'seo.home.description', label: 'La Cotentin Caps Cup : le classement ACP, les derniers scores validés et le champion de la dernière édition.' }
   },
   [SEO_PAGE.EDITIONS]: {
-    title: { key: 'seo.editions.title', label: 'Éditions du Championnat de Caps' },
-    description: { key: 'seo.editions.description', label: 'Toutes les éditions du Championnat de Caps : poules, phase finale, matchs et classements de chaque édition.' }
+    title: { key: 'seo.editions.title', label: 'Éditions de la Cotentin Caps Cup' },
+    description: { key: 'seo.editions.description', label: 'Toutes les éditions de la Cotentin Caps Cup : poules, phase finale, matchs et classements de chaque édition.' }
   },
   [SEO_PAGE.EDITION]: {
-    title: { key: 'seo.edition.title', label: 'Édition {code} du Championnat de Caps' },
-    description: { key: 'seo.edition.description', label: 'Édition {code} du Championnat de Caps : participants, poules, phase finale, matchs et résultats.' }
+    title: { key: 'seo.edition.title', label: 'Édition {code} de la Cotentin Caps Cup' },
+    description: { key: 'seo.edition.description', label: 'Édition {code} de la Cotentin Caps Cup : participants, poules, phase finale, matchs et résultats.' }
   },
   [SEO_PAGE.PLAYERS]: {
-    title: { key: 'seo.players.title', label: 'Joueurs du Championnat de Caps' },
-    description: { key: 'seo.players.description', label: 'L’annuaire des joueurs du Championnat de Caps : recherchez un joueur par nom ou pseudo et consultez sa fiche.' }
+    title: { key: 'seo.players.title', label: 'Joueurs de la Cotentin Caps Cup' },
+    description: { key: 'seo.players.description', label: 'L’annuaire des joueurs de la Cotentin Caps Cup : recherchez un joueur par nom ou pseudo et consultez sa fiche.' }
   },
   [SEO_PAGE.PLAYER]: {
     title: { key: 'seo.player.title', label: '{name} : fiche joueur' },
-    description: { key: 'seo.player.description', label: 'Fiche de {name} au Championnat de Caps : parcours, victoires et défaites, adversaires fréquents.' }
+    description: { key: 'seo.player.description', label: 'Fiche de {name} à la Cotentin Caps Cup : parcours, victoires et défaites, adversaires fréquents.' }
   },
   [SEO_PAGE.HEAD_TO_HEAD]: {
     title: { key: 'seo.head_to_head.title', label: 'Face-à-face entre deux joueurs' },
-    description: { key: 'seo.head_to_head.description', label: 'Comparez deux joueurs du Championnat de Caps : le bilan de leurs rencontres, l’historique des scores et leurs statistiques globales.' }
+    description: { key: 'seo.head_to_head.description', label: 'Comparez deux joueurs de la Cotentin Caps Cup : le bilan de leurs rencontres, l’historique des scores et leurs statistiques globales.' }
   },
   [SEO_PAGE.RULES]: {
-    title: { key: 'seo.rules.title', label: 'Règles du Championnat de Caps' },
-    description: { key: 'seo.rules.description', label: 'Les règles du Championnat de Caps : le jeu, le tournoi et les variantes.' }
+    title: { key: 'seo.rules.title', label: 'Règles de la Cotentin Caps Cup' },
+    description: { key: 'seo.rules.description', label: 'Les règles de la Cotentin Caps Cup : le jeu, le tournoi et les variantes.' }
   },
   [SEO_PAGE.HALL_OF_FAME]: {
-    title: { key: 'seo.hall_of_fame.title', label: 'Palmarès du Championnat de Caps' },
-    description: { key: 'seo.hall_of_fame.description', label: 'Le palmarès du Championnat de Caps.' }
+    title: { key: 'seo.hall_of_fame.title', label: 'Palmarès de la Cotentin Caps Cup' },
+    description: { key: 'seo.hall_of_fame.description', label: 'Le palmarès de la Cotentin Caps Cup.' }
   }
 }
 
