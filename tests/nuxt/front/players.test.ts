@@ -244,6 +244,16 @@ describe('adversaires : ordre du serveur, winRatio null, résultats inconnus (G1
   })
 })
 
+describe('adversaires : liste statique native (F-28)', () => {
+  it('la liste est un ul sans tabindex : elle n’ajoute aucun arrêt de tabulation', async () => {
+    const wrapper = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS } })
+    const list = wrapper.get('[data-cy="player-opponents-list"]')
+    expect(list.element.tagName).toBe('UL')
+    expect(list.attributes('tabindex')).toBeUndefined()
+    expect(list.findAll('li')).toHaveLength(OPPONENTS.length)
+  })
+})
+
 describe('adversaires : lien « Voir tous » (F-04-ADV)', () => {
   it('absent sans adversaire en plus, présent au-delà et pointant vers le face-à-face du joueur', async () => {
     const without = await mountSuspended(PlayerOpponents, { ...withRouterLink, props: { playerId: PLAYER_ID, opponents: OPPONENTS } })
