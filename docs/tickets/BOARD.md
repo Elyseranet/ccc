@@ -129,7 +129,7 @@ Tests `tests/nuxt/front` en délai dépassé (5 s) sous forte charge (`admin-mor
 
 e2e a11y et visual alignés sur le thème 32c99a70 (develop : 36 échecs, 21 non lancés) : [T-QA-09](T-QA-09.md), **Fermé** — mergé dans `develop` @ `3dd0ca0c`, branche `feature/T-QA-09-theme-e2e` sur T-SEC-21 @ 5d833e49 ; Playwright complet 307 passés, 0 échec.
 
-Liste admin des éditions avec compteur d'inscrits en direct, pour F-13 (décision utilisateur 2026-11-05) : [B-20](B-20.md), **En revue** (2026-11-12) : `ADMIN_EDITIONS` livré, merge par le chef de projet.
+Liste admin des éditions avec compteur d'inscrits en direct, pour F-13 (décision utilisateur 2026-11-05) : [B-20](B-20.md), ****Fermé** @ `ff012588`** (2026-11-12) : `ADMIN_EDITIONS` livré, merge par le chef de projet.
 
 Base de données sans délai de connexion ni de requête (revue de T-OPS-03, M1) : [T-SEC-17](T-SEC-17.md), **Fermé** (2026-11-12) : mergé @ `b0a06f43`.
 
