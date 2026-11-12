@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import LegalPage from '~/components/legal/LegalPage.vue'
+import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { LEGAL_NOTICE_CONTENT } from '~/consts/legal-notice.const'
 
@@ -22,6 +23,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const content = LEGAL_NOTICE_CONTENT
 useHead({ title: computed(() => t(content.title.key, content.title.fallback)) })
+useSeo({ noindex: true })
 
 /*********************************************************
  * Expose

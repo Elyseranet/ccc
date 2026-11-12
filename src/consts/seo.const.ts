@@ -11,8 +11,8 @@ import type { ISeoPageMessages } from '../interfaces/seo.interface.js'
 /** Valeur de `robots` (meta) et d'`X-Robots-Tag` (en-tête) des pages privées : jamais indexées, aucun lien suivi. */
 export const SEO_ROBOTS_NOINDEX = 'noindex, nofollow'
 
-/** Pages privées : admin, connexion, profil, lien d'invitation. Elles portent `noindex` quelle que soit la variable d'indexation du site. */
-export const SEO_PRIVATE_ROUTE_PATTERNS = ['/admin/**', '/connexion', '/profil', '/invitation/**'] as const
+/** Pages non indexées : admin, connexion, profil, lien d'invitation, et les quatre pages légales (décision utilisateur 2026-11-12, accessibles depuis le pied de page). Elles portent `noindex` quelle que soit la variable d'indexation du site. */
+export const SEO_PRIVATE_ROUTE_PATTERNS = ['/admin/**', '/connexion', '/profil', '/invitation/**', '/mentions-legales', '/confidentialite', '/cgu', '/accessibilite'] as const
 
 /** `og:locale` par langue du site. */
 export const SEO_LOCALES: Record<string, string> = { fr: 'fr_FR', en: 'en_US' }
