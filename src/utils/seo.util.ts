@@ -3,6 +3,10 @@ import { ROUTES } from '../consts/routes.const.js'
 import {
   SEO_ELLIPSIS,
   SEO_PRIVATE_ROUTE_PATTERNS,
+  SEO_ROBOTS_DISALLOW_ALL_LINE,
+  SEO_ROBOTS_DISALLOW_PREFIX,
+  SEO_ROBOTS_SITEMAP_PREFIX,
+  SEO_ROBOTS_USER_AGENT_LINE,
   SEO_ROBOTS_DISALLOWED_PATHS,
   SEO_SITEMAP_NAMESPACE,
   SEO_SITEMAP_PATH,
@@ -66,10 +70,10 @@ export const isSeoPrivateRoute = (path: string): boolean =>
 /** Contenu de `robots.txt` : site non indexable, tout est interdit ; sinon pages privées et API interdites, sitemap annoncé. */
 export const buildRobotsTxt = (siteUrl: string, indexable: boolean): string => {
   if (!indexable) {
-    return 'User-agent: *\nDisallow: /\n'
+    return `${SEO_ROBOTS_USER_AGENT_LINE}\n${SEO_ROBOTS_DISALLOW_ALL_LINE}\n`
   }
-  const disallows = SEO_ROBOTS_DISALLOWED_PATHS.map(path => `Disallow: ${path}`)
-  return ['User-agent: *', ...disallows, '', `Sitemap: ${buildCanonicalUrl(siteUrl, SEO_SITEMAP_PATH)}`, ''].join('\n')
+  const disallows = SEO_ROBOTS_DISALLOWED_PATHS.map(path => `${SEO_ROBOTS_DISALLOW_PREFIX}${path}`)
+  return [SEO_ROBOTS_USER_AGENT_LINE, ...disallows, '', `${SEO_ROBOTS_SITEMAP_PREFIX}${buildCanonicalUrl(siteUrl, SEO_SITEMAP_PATH)}`, ''].join('\n')
 }
 
 export const escapeXml = (value: string): string => value.replace(/[&<>"']/g, char => SEO_XML_ENTITIES[char]!)

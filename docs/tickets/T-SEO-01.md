@@ -46,3 +46,7 @@ Branche `feature/T-SEO-01-front`, rebasée sur develop 4c23b788. Elle apporte `u
 
 - **Fait (front)** : mergé dans `develop` @ `6b42e4be` en fast-forward (code testé `ca0a8a73`). Gates `frontend-lead` : typecheck vert ; TU 790/790 ; Playwright complet 341 passés, 0 échec, 0 non lancé ; `npm audit` 0 high/critical ; gitleaks propre ; revue de sécurité sans vulnérabilité (limite : `useSeo.ts` lu en partie). Le chef de projet a vérifié que en.json et fr.json sont valides (701 clés chacun) et qu'il n'y a aucun marqueur de conflit dans src/ ni tests/.
 - **Reste (back)** : `robots.txt` et `sitemap.xml` servis par le serveur, en-tête `X-Robots-Tag`, suppression de `public/robots.txt`.
+
+## Partie back : En revue (2026-11-12, dev-seo)
+
+Branche `feature/T-SEO-01-back`. Routes `src/server/routes/robots.txt.ts` et `sitemap.xml.ts`, middleware `30.site-indexable.ts` (`X-Robots-Tag` sur toute réponse quand le site n'est pas indexable, lu à l'exécution), `public/robots.txt` supprimé (suppression accordée), contrat dans `docs/api/seo.md`. Tests : `tests/unit/seo-routes.test.ts`, `tests/api/seo-indexable.test.ts`, `tests/api/seo-not-indexable.test.ts`. Le SHA et les chiffres de vérification sont donnés au `backend-lead` dans le message de livraison. Le ticket reste ouvert jusqu'au merge.

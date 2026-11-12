@@ -1,6 +1,7 @@
 import { LOG_EVENT } from '../../consts/log-event.const'
 import { RATE_LIMIT_ROUTE_KEY } from '../../consts/rate-limit.const'
 import { SEO_SITEMAP_CONTENT_TYPE } from '../../consts/seo.const'
+import { notFound } from '../../utils/api-error.util'
 import { listCompetitorIds } from '../../services/competitor.service'
 import { listEditionCodes } from '../../services/edition.service'
 import { useDataSource } from '../../utils/database.util'
@@ -13,7 +14,7 @@ import { isSiteIndexable } from '../../utils/site-indexable.util'
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   if (!isSiteIndexable(config)) {
-    throw createError({ statusCode: 404 })
+    throw notFound()
   }
   enforceRateLimit(event, RATE_LIMIT_ROUTE_KEY.PUBLIC_READ)
   const db = await useDataSource()

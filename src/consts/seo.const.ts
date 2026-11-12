@@ -88,3 +88,9 @@ export const SEO_XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>'
 export const SEO_SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9'
 
 export const SEO_XML_ENTITIES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }
+
+/** Lignes de `robots.txt`. */
+export const SEO_ROBOTS_USER_AGENT_LINE = 'User-agent: *'
+export const SEO_ROBOTS_DISALLOW_ALL_LINE = 'Disallow: /'
+export const SEO_ROBOTS_DISALLOW_PREFIX = 'Disallow: '
+export const SEO_ROBOTS_SITEMAP_PREFIX = 'Sitemap: '
