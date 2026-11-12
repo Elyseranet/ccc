@@ -41,6 +41,9 @@ export const ADMIN_DASHBOARD_STATIC_SUBTITLES: Partial<Record<ADMIN_DASHBOARD_ST
 /** Nombre de lignes demandé au flux d'activité (`?limit=` de B-15 : défaut 20, maximum 100). */
 export const ADMIN_DASHBOARD_ACTIVITY_LIMIT = 5
 
+/** Bordure de la carte « À traiter » qui demande une action (maquette `.adm-task--hot`) : l'accent d'action, pas le filet par défaut. */
+export const ADMIN_TODO_HOT_BORDER_COLOR = 'var(--origam-color__action--primary---bg)'
+
 /*********************************************************
  * Types d'activité
  *

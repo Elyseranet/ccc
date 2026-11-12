@@ -233,7 +233,7 @@ defineExpose({})
   }
 
   &__badge {
-    margin-inline-start: var(--dashboard__badge---margin-start, var(--origam-space---1));
+    margin-inline-start: var(--dashboard__badge---margin-start, calc(var(--origam-space---1) + var(--origam-space---2)));
   }
 
   &__login {
@@ -280,6 +280,6 @@ defineExpose({})
 
 <style>
 :root {
-  --dashboard__badge---margin-start: var(--origam-space---1);
+  --dashboard__badge---margin-start: calc(var(--origam-space---1) + var(--origam-space---2));
 }
 </style>

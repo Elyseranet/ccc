@@ -16,6 +16,7 @@
       :to="item.to ?? undefined"
       rounded="xl"
       border
+      :border-color="item.hot ? hotBorderColor : undefined"
       padding="5"
       :hover="item.to !== null"
       :class="['todo__card', { 'todo__card--hot': item.hot, 'todo__card--off': item.to === null }]"
@@ -42,6 +43,7 @@
 import { computed } from 'vue'
 import { OrigamCard, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'
+import { ADMIN_TODO_HOT_BORDER_COLOR } from '~/consts/admin-dashboard.const'
 import type { IAdminTodoEmits, IAdminTodoProps, IAdminTodoSlots } from '~/interfaces/admin-dashboard.interface'
 
 /*********************************************************
@@ -56,6 +58,7 @@ const props = withDefaults(defineProps<IAdminTodoProps>(), {})
 const emits = defineEmits<IAdminTodoEmits>()
 defineSlots<IAdminTodoSlots>()
 const titleId = 'admin-todo-title'
+const hotBorderColor = ADMIN_TODO_HOT_BORDER_COLOR
 const title = computed(() => t('admin.dashboard.todo_title', 'À traiter maintenant'))
 
 /*********************************************************
@@ -107,10 +110,6 @@ defineExpose({})
       font-size: var(--origam-font__size---sm);
       color: var(--origam-color__text---secondary);
     }
-  }
-
-  &__card--hot {
-    border-color: var(--origam-color__action--primary---bg);
   }
 
   &__card--off {
