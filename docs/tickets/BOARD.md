@@ -384,6 +384,8 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
 - [T-REL-03](T-REL-03.md) : **Fermé** (2026-11-12) @ `3d0719c5`, release 50 passés / 0 échoué ; exception de F-08 levée.
 - [F-29](F-29.md) : **Fermé** (2026-11-12) @ `9e81f13f`.
+- [F-11](F-11.md) : **Fermé** (2026-11-12) @ `08adda09`, reste dans [F-30](F-30.md).
+- [F-30](F-30.md) : ouvert — reste de F-11 (dialogue de validation, un seul PUT en e2e, focus du dialogue, édition archivée).
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **En cours** (2026-11-05) — dev non indexable, noindex des pages privées, métadonnées, sitemap. Front mergé le 2026-11-12 @ `6b42e4be` (Playwright 341/0, TU 790) ; reste le back (robots.txt, sitemap.xml, X-Robots-Tag).
 - [T-A11Y-01](T-A11Y-01.md) : **À faire** (2026-11-05) — corrections de l'audit d'accessibilité (6 MUST, 18 SHOULD, à confirmer par mesure).
