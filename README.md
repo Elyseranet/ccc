@@ -92,7 +92,7 @@ Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01
 | `NUXT_APP_VERSION` | non (vide) | Version déployée, SHA du commit (T-OPS-03). **Posée par l'image** depuis l'argument de build `APP_VERSION` (ou `SOURCE_COMMIT`), ne pas la renseigner à la main. Vide : `/api/v1/health` répond `version: null`. N'accepte que `[A-Za-z0-9._-]`, 64 caractères au plus. |
 | `PORT` | non (3000) | Port d'écoute du serveur ; la sonde de santé de l'image le suit. |
 | `NUXT_RATE_LIMIT_WINDOW_MS`, `_MAX_REQUESTS`, `_MAX_KEYS` | non | Limiteur de débit (voir plus haut). |
-| `NUXT_TRUST_PROXY_HOPS` | **oui derrière Coolify** (défaut 0) | Nombre de reverse proxys de confiance devant le conteneur, de 0 à 5. À poser au nombre de proxys réellement traversés (le proxy de Coolify seul : 1 ; un CDN devant en ajoute un). La chaîne exacte du déploiement n'est pas encore connue : à vérifier au premier déploiement. |
+| `NUXT_TRUST_PROXY_HOPS` | **oui derrière Coolify** (défaut 0) | Nombre de reverse proxys de confiance devant le conteneur, de 0 à 5. À poser au nombre de proxys réellement traversés (le proxy de Coolify seul : 1 ; un CDN devant en ajoute un). **Mesuré le 2026-11-13 sur la dev (T-SEC-02) : 1** (Traefik de Coolify seul, sans CDN). Valeur à poser en production (même Coolify, décision PROD-HOSTING). |
 | `NUXT_RATE_LIMIT_PUBLIC_READ_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 300) | Budget partagé des routes publiques en lecture (vague 2). |
 | `NUXT_RATE_LIMIT_COMPETITORS_SEARCH_WINDOW_MS`, `_MAX_REQUESTS` | non (60000, 30) | Recherche publique `?q=` (vague 2). |
 | `NUXT_AUTH_LOGIN_RATE_LIMIT_WINDOW_MS`, `_MAX_IP_ATTEMPTS`, `_MAX_KEYS` | non (900000, 20, 10000) | Limiteur de connexion (B-08). |
@@ -111,7 +111,7 @@ La CLI (migrations, seed, scripts) ne borne que la connexion : elle n'a ni `stat
 
 - Le domaine n'est pas encore connu (OPS-4) : il se règle dans Coolify (service `app`, port 3000), aucune valeur n'est codée dans l'image ni dans le dépôt.
 - La sonde est `GET /api/v1/health` : 200 si la base répond, 503 sinon, avec le même format `{ status, version, migrations }` (T-OPS-03). `version` est le SHA du commit déployé, ou `null` s'il n'a pas été injecté au build (jamais une valeur inventée). `migrations` vaut `{ upToDate, pendingCount }` : les migrations livrées avec le build qui manquent encore dans la table de suivi TypeORM ; `null` en 503. Aucun hôte, utilisateur, nom de migration ni message du pilote n'y figure. Le `HEALTHCHECK` de l'image l'appelle avec `curl` (installé dans l'image). Dans Coolify, activer le healthcheck avec le chemin `/api/v1/health`, ou laisser celui de l'image.
-- La route est soumise au limiteur de débit par IP. Derrière le proxy de Coolify, poser `NUXT_TRUST_PROXY_HOPS` au nombre de proxys traversés (voir la table des variables) : sans lui, tous les clients partagent l'IP du proxy. Le SSL PostgreSQL (`NUXT_DATABASE_SSL` pressentie) reste à faire (T-SEC-02). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
+- La route est soumise au limiteur de débit par IP. Derrière le proxy de Coolify, poser `NUXT_TRUST_PROXY_HOPS` au nombre de proxys traversés (voir la table des variables) : sans lui, tous les clients partagent l'IP du proxy. Pas de SSL PostgreSQL : la base reste dans le réseau Docker interne de Coolify (décision PROD-HOSTING, T-SEC-02). T-RGPD-01 (Google Fonts) est à arbitrer avant la mise en production.
 
 ### Première mise en route
 

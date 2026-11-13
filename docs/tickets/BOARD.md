@@ -110,7 +110,7 @@ Waiver npm audit (AUDIT-1, 2026-10-20) : chaque merge le mentionne ; remédiatio
 
 R-7 (2026-10-20) : un départage qui doit pourvoir plusieurs places se rejoue entre les perdants jusqu'à pourvoir toutes les places (B-13).
 
-Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), bloqué par le choix d'hébergement.
+Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), **Fermé** (2026-11-13) : 1 proxy mesuré sur la dev (`NUXT_TRUST_PROXY_HOPS=1`), SSL inutile (PROD-HOSTING).
 
 Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
@@ -242,7 +242,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | **Fermé** (2026-11-13) @ `c758f358` | — |
 | [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | **Fermé** (2026-11-13) @ `46654e4d` | — |
 | [F-35](F-35.md) | Onglet Tirages des éditions archivées : tirages reconstitués (DRAWS-ARCH) | — | — | **Fermé** (2026-11-13) @ `d3bd4c68` | à créer |
-| [F-36](F-36.md) | `EditionChip` environ 2 px plus large que la `.chip` des maquettes (trouvé en revue F-24) | — | — | Ouvert | existe (`hh.css` `.chip`) |
+| [F-36](F-36.md) | F-24 : en-tête du classement au-dessus de 1 %, cause à établir (pastille mesurée, non en cause) | — | — | Ouvert | existe (`hh.css` `.chip`) |
 | [F-37](F-37.md) | F-24 : bouton « Arrêter la liste » 44 px au lieu de 48, désactivé sans changement visuel (Origam) | validée @ `409c253b` | — | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-38](F-38.md) | Boutons primaires désactivables : appliquer `usePrimaryActionButton` (suite F-37) | — | F-25 | **Fermé** (2026-11-13) @ `350c9d17` |
 | [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | à faire | F-26 | Ouvert |
