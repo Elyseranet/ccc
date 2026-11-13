@@ -13,9 +13,9 @@ import { requireTestDatabaseEnv } from './helpers/test-database'
 
 const env = requireTestDatabaseEnv()
 const REAL_EDITION_COUNT = 16
-/** Bilan global de Nicolas Deseine sur l'archive réelle (critère G2 de B-17). */
-const DESEINE_WINS = 39
-const DESEINE_LOSSES = 13
+/** Bilan global de Nicolas Deseine sur l'archive réelle (critère G2 de B-17), matchs au vainqueur importé compris (B-21, R-5 bis : 39/13 scorés + 14/5). */
+const DESEINE_WINS = 53
+const DESEINE_LOSSES = 18
 
 describe('B-17 contract on the real archive', async () => {
   Object.assign(process.env, env)
@@ -51,7 +51,7 @@ describe('B-17 contract on the real archive', async () => {
     return rows[0]!.id
   }
 
-  it('G2: Deseine editions add up to the global 39/13, and match a direct count in the database', async () => {
+  it('G2: Deseine editions add up to the global 53/18, and match a direct count in the database', async () => {
     const id = await deseineId()
     const detail = await getJson<ICompetitorDetail>(`/api/v1/competiteurs/${id}`)
     expect([detail.stats.wins, detail.stats.losses]).toEqual([DESEINE_WINS, DESEINE_LOSSES])
@@ -60,8 +60,8 @@ describe('B-17 contract on the real archive', async () => {
 
     const rows = await dataSource.query<Array<{ code: string, wins: string, losses: string, unknown: string }>>(
       `SELECT e.code,
-              count(*) FILTER (WHERE m.status = 'VALIDATED' AND ms.validated_score > o.validated_score) AS wins,
-              count(*) FILTER (WHERE m.status = 'VALIDATED' AND ms.validated_score < o.validated_score) AS losses,
+              count(*) FILTER (WHERE m.status = 'VALIDATED' AND (ms.validated_score > o.validated_score OR m.winner_participation_id = ms.participation_id)) AS wins,
+              count(*) FILTER (WHERE m.status = 'VALIDATED' AND (ms.validated_score < o.validated_score OR m.winner_participation_id = o.participation_id)) AS losses,
               count(*) FILTER (WHERE m.status = 'RESULT_UNKNOWN') AS unknown
          FROM match_sides ms
          JOIN participations p ON p.id = ms.participation_id
@@ -89,6 +89,17 @@ describe('B-17 contract on the real archive', async () => {
     }
   })
 
+  it('R-5 bis: the global balances read through the API are the workbook ones, in the detail and in the list (Fossati 40/10, Deseine 53/18)', async () => {
+    for (const [name, wins, losses] of [['Clément Fossati', 40, 10], ['Nicolas Deseine', DESEINE_WINS, DESEINE_LOSSES]] as const) {
+      const rows = await dataSource.query<Array<{ id: string }>>('SELECT id FROM competitors WHERE display_name = $1', [name])
+      expect(rows, name).toHaveLength(1)
+      const detail = await getJson<ICompetitorDetail>(`/api/v1/competiteurs/${rows[0]!.id}`)
+      expect(detail.stats, name).toMatchObject({ wins, losses, played: wins + losses, unknownResults: 0 })
+      const list = await getJson<IPaginated<ICompetitorListItem>>(`/api/v1/competiteurs?q=${encodeURIComponent(name)}`)
+      expect(list.items.find((item) => item.id === rows[0]!.id), name).toMatchObject({ wins, losses, matchesPlayed: wins + losses, unknownResults: 0 })
+    }
+  })
+
   it('G3: the titles of every opponent equal the ones of the competitor list', async () => {
     const id = await deseineId()
     const list = await getJson<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?pageSize=100&page=1')
@@ -101,21 +112,21 @@ describe('B-17 contract on the real archive', async () => {
     }
   })
 
-  it('G9, G10: unknownResults equals the direct count, and played + unknownResults is every REGULAR match of the pair', async () => {
-    const pairRows = await dataSource.query<Array<{ a: string, b: string, unknown: string }>>(
-      `SELECT pa.competitor_id AS a, pb.competitor_id AS b, count(*) AS unknown
+  it('G9, G10, B-21: a pair with imported-winner matches counts every REGULAR match, no unknown result, null scores on those matches', async () => {
+    const pairRows = await dataSource.query<Array<{ a: string, b: string, imported: string }>>(
+      `SELECT pa.competitor_id AS a, pb.competitor_id AS b, count(*) AS imported
          FROM matches m
          JOIN match_sides sa ON sa.match_id = m.id AND sa.position = 1
          JOIN match_sides sb ON sb.match_id = m.id AND sb.position = 2
          JOIN participations pa ON pa.id = sa.participation_id
          JOIN participations pb ON pb.id = sb.participation_id
-        WHERE m.purpose = 'REGULAR' AND m.status = 'RESULT_UNKNOWN'
+        WHERE m.purpose = 'REGULAR' AND m.winner_participation_id IS NOT NULL
         GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 5`
     )
     expect(pairRows.length).toBeGreaterThan(0)
     for (const row of pairRows) {
-      const total = await dataSource.query<Array<{ n: string, unknown: string }>>(
-        `SELECT count(*) AS n, count(*) FILTER (WHERE m.status = 'RESULT_UNKNOWN') AS unknown
+      const total = await dataSource.query<Array<{ n: string }>>(
+        `SELECT count(*) AS n
            FROM matches m
            JOIN match_sides sa ON sa.match_id = m.id
            JOIN match_sides sb ON sb.match_id = m.id AND sb.id <> sa.id
@@ -126,9 +137,15 @@ describe('B-17 contract on the real archive', async () => {
         [row.a, row.b]
       )
       const pair = await getJson<IHeadToHead>(`/api/v1/competiteurs/${row.a}/face-a-face?adversaire=${row.b}`)
-      expect(pair.unknownResults).toBe(Number(total[0]!.unknown))
-      expect(pair.played + pair.unknownResults).toBe(Number(total[0]!.n))
-      expect(pair.unknownResults).toBeGreaterThan(0)
+      expect(pair.unknownResults).toBe(0)
+      expect(pair.played).toBe(Number(total[0]!.n))
+      expect(pair.wins + pair.losses).toBe(pair.played)
+      const withoutScore = pair.matches.filter((match) => match.competitorScore === null)
+      expect(withoutScore.length).toBeGreaterThanOrEqual(Number(row.imported))
+      for (const match of withoutScore) {
+        expect(match.opponentScore).toBeNull()
+        expect([row.a, row.b]).toContain(match.winnerCompetitorId)
+      }
       for (const match of pair.matches) {
         expect(match.poolNumber === null || Number.isInteger(match.poolNumber)).toBe(true)
       }
@@ -169,7 +186,7 @@ describe('B-17 contract on the real archive', async () => {
     expect(editions).toHaveLength(REAL_EDITION_COUNT)
     expect(editions.reduce((total, edition) => total + edition.matchCount, 0)).toBe(729)
     const stats = await getJson<IArchiveStats>('/api/v1/stats')
-    expect(stats).toMatchObject({ editions: 16, matches: 729, scoredMatches: 554, unknownResultMatches: 175 })
+    expect(stats).toMatchObject({ editions: 16, matches: 729, scoredMatches: 729, unknownResultMatches: 0 })
     const [first] = editions
     const detail = await getJson<IEditionDetail>(`/api/v1/editions/${first!.id}`)
     expect(detail.matches).toHaveLength(first!.matchCount)

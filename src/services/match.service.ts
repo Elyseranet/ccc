@@ -86,7 +86,7 @@ const lockMatch = async (manager: EntityManager, matchId: string): Promise<ILock
 
 /** Écriture d'un score : ni archive sans résultat, ni édition close, ni tour fermé. */
 const assertWritable = ({ match, edition }: ILockedMatch): void => {
-  if (match.status === MATCH_STATUS.RESULT_UNKNOWN) {
+  if (match.status === MATCH_STATUS.RESULT_UNKNOWN || match.winnerParticipationId !== null) {
     throw conflict('The result of this match is unknown and cannot be scored')
   }
   if (edition.status === EDITION_STATUS.CLOSED) {
@@ -210,6 +210,9 @@ export const correctMatch = (dataSource: DataSource, command: IScoreCommand): Pr
     const scores = alignScores(match, command.scores)
     if (match.status !== MATCH_STATUS.VALIDATED) {
       throw conflict('Only a validated match can be corrected')
+    }
+    if (match.winnerParticipationId !== null) {
+      throw conflict('The result of this match is imported from the archives and cannot be corrected')
     }
     if (edition.status === EDITION_STATUS.CLOSED) {
       throw conflict('The edition is closed')

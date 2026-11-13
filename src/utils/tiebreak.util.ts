@@ -28,12 +28,12 @@ export function resolveTiedGroup(
       candidate.status === MATCH_STATUS.VALIDATED &&
       candidate.purpose === MATCH_PURPOSE.TIEBREAK &&
       candidate.sides.length === wanted.size &&
-      candidate.sides.every((side) => wanted.has(side.playerId)),
+      candidate.sides.every((side) => wanted.has(side.playerId) && side.score !== null),
   )
   if (!match) {
     return [[...playerIds]]
   }
-  const best = Math.max(...match.sides.map((side) => side.score))
+  const best = Math.max(...match.sides.map((side) => side.score!))
   const winners = match.sides.filter((side) => side.score === best).map((side) => side.playerId)
   const losers = match.sides.filter((side) => side.score !== best).map((side) => side.playerId)
   if (losers.length === 0) {

@@ -36,9 +36,9 @@ export const loadVerificationInput = async (dataSource: DataSource): Promise<ILe
   )
   const participations: Array<{ id: string, competitor_id: string, edition_id: string, points: string | null, final_stage: FINAL_STAGE | null }> =
     await dataSource.query('SELECT id, competitor_id, edition_id, points, final_stage FROM participations')
-  const sides: Array<{ match_id: string, status: MATCH_STATUS, purpose: MATCH_PURPOSE, participation_id: string, validated_score: number | null }> =
+  const sides: Array<{ match_id: string, status: MATCH_STATUS, purpose: MATCH_PURPOSE, participation_id: string, validated_score: number | null, winner_participation_id: string | null }> =
     await dataSource.query(
-      `SELECT s.match_id, m.status, m.purpose, s.participation_id, s.validated_score
+      `SELECT s.match_id, m.status, m.purpose, m.winner_participation_id, s.participation_id, s.validated_score
          FROM match_sides s JOIN matches m ON m.id = s.match_id ORDER BY s.match_id, s.position`
     )
   const aliases: Array<{ competitor_id: string, alias: string, source: COMPETITOR_ALIAS_SOURCE }> =
@@ -48,10 +48,15 @@ export const loadVerificationInput = async (dataSource: DataSource): Promise<ILe
   const competitorByParticipation = new Map(participations.map((row) => [row.id, row.competitor_id]))
   const matches = new Map<string, ILegacyVerificationInput['matches'][number]>()
   for (const side of sides) {
-    const match = matches.get(side.match_id) ?? { status: side.status, purpose: side.purpose, sides: [] }
+    const match = matches.get(side.match_id) ?? {
+      status: side.status,
+      purpose: side.purpose,
+      sides: [],
+      winnerPlayerId: side.winner_participation_id === null ? null : competitorByParticipation.get(side.winner_participation_id)!
+    }
     match.sides.push({
       playerId: competitorByParticipation.get(side.participation_id)!,
-      score: side.status === MATCH_STATUS.VALIDATED ? (side.validated_score ?? 0) : 0
+      score: side.status === MATCH_STATUS.VALIDATED ? side.validated_score : null
     })
     matches.set(side.match_id, match)
   }

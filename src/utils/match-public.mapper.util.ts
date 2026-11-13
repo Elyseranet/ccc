@@ -21,7 +21,7 @@ const toPublicSide = (side: MatchEntity['sides'][number], validated: boolean): I
   score: validated ? side.validatedScore : null
 })
 
-/** Vainqueur unique d'un match VALIDATED ; null sinon (égalité, pas de score, match non validé). */
+/** Vainqueur unique d'un match VALIDATED d'après les scores ; null sinon (égalité, pas de score). Le vainqueur importé (B-21) passe avant. */
 const findWinner = (sides: IMatchSide[]): string | null => {
   const scored = sides.filter((side): side is IMatchSide & { score: number } => side.score !== null)
   if (scored.length !== sides.length || scored.length < 2) {
@@ -51,6 +51,6 @@ export const toPublicMatch = (match: MatchEntity): IMatch => {
     targetScore: match.targetScore,
     status: toPublicMatchStatus(match.status),
     sides,
-    winnerParticipationId: validated ? findWinner(sides) : null
+    winnerParticipationId: validated ? (match.winnerParticipationId ?? findWinner(sides)) : null
   }
 }

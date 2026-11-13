@@ -16,10 +16,35 @@ export function isCountedMatch(match: IMatchRecord): boolean {
   return match.status === MATCH_STATUS.VALIDATED && match.purpose === MATCH_PURPOSE.REGULAR
 }
 
+/** Les deux scores du match sont connus : seuls ces matchs comptent dans les points marqués et encaissés (B-21). */
+export function hasKnownScores({ winner, loser }: IMatchOutcome): boolean {
+  return winner.score !== null && loser.score !== null
+}
+
 /**
- * Le vainqueur se déduit des scores, jamais de la position des côtés (RG24 ne vaut que
- * comme constat sur le classeur). Lève si le match n'a pas exactement deux côtés distincts
- * ou si les scores ne désignent pas un vainqueur unique.
+ * Ajoute les points d'un match aux totaux du vainqueur et du perdant, seulement si les deux scores sont connus (B-21 : un match
+ * d'archives dont seul le vainqueur est connu compte en victoire et en défaite, jamais en points).
+ */
+export function addOutcomePoints(
+  outcome: IMatchOutcome,
+  winnerTotals: { pointsFor: number, pointsAgainst: number },
+  loserTotals: { pointsFor: number, pointsAgainst: number },
+): void {
+  const { winner, loser } = outcome
+  if (winner.score === null || loser.score === null) {
+    return
+  }
+  winnerTotals.pointsFor += winner.score
+  winnerTotals.pointsAgainst += loser.score
+  loserTotals.pointsFor += loser.score
+  loserTotals.pointsAgainst += winner.score
+}
+
+/**
+ * Le vainqueur se déduit des scores quand ils existent, sinon du vainqueur importé (`winnerPlayerId`, B-21), jamais de la position
+ * des côtés (RG24 ne vaut que comme constat sur le classeur). Lève si le match n'a pas exactement deux côtés distincts, si ni les
+ * scores ni le vainqueur importé ne désignent un vainqueur unique, si le vainqueur importé n'est pas l'un des côtés, ou si les deux
+ * sources se contredisent.
  */
 export function resolveMatchOutcome(match: IMatchRecord): IMatchOutcome {
   if (match.sides.length !== SIDES_DUEL) {
@@ -32,10 +57,19 @@ export function resolveMatchOutcome(match: IMatchRecord): IMatchOutcome {
   if (a.playerId === b.playerId) {
     throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Un joueur ne joue pas contre lui-même')
   }
-  if (a.score === b.score) {
-    throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Match validé sans vainqueur (scores égaux)')
+  const stored = match.winnerPlayerId ?? null
+  if (stored !== null && stored !== a.playerId && stored !== b.playerId) {
+    throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Le vainqueur importé n’est pas l’un des côtés du match')
   }
-  return a.score > b.score ? { winner: a, loser: b } : { winner: b, loser: a }
+  const scoreWinner = a.score === null || b.score === null || a.score === b.score ? null : (a.score > b.score ? a : b)
+  if (scoreWinner !== null && stored !== null && stored !== scoreWinner.playerId) {
+    throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Le vainqueur importé contredit les scores')
+  }
+  const winner = scoreWinner ?? (stored === null ? null : (stored === a.playerId ? a : b))
+  if (winner === null) {
+    throw new DomainRuleError(DOMAIN_ERROR_CODE.INVALID_MATCH, 'Match validé sans vainqueur (scores égaux ou inconnus)')
+  }
+  return { winner, loser: winner === a ? b : a }
 }
 
 export function countedOutcomes(matches: readonly IMatchRecord[]): IMatchOutcome[] {
@@ -99,10 +133,7 @@ export function computePlayerBalance(matches: readonly IMatchRecord[]): IPlayerB
     const l = entry(loser.playerId)
     w.wins += 1
     l.losses += 1
-    w.pointsFor += winner.score
-    w.pointsAgainst += loser.score
-    l.pointsFor += loser.score
-    l.pointsAgainst += winner.score
+    addOutcomePoints({ winner, loser }, w, l)
   }
   for (const [playerId, count] of countUnknownResults(matches)) {
     entry(playerId).unknownResults = count
@@ -143,8 +174,10 @@ export function computeHeadToHead(
     result.encounters += 1
     result.winsA += sideA === winner ? 1 : 0
     result.winsB += sideB === winner ? 1 : 0
-    result.pointsA += sideA.score
-    result.pointsB += sideB.score
+    if (hasKnownScores({ winner, loser })) {
+      result.pointsA += sideA.score!
+      result.pointsB += sideB.score!
+    }
   }
   return result
 }

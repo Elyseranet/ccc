@@ -247,16 +247,34 @@ NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... 
 NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 ```
 
+### Vainqueur importé des matchs d'archives sans score (B-21, R-5 bis)
+
+La migration `AddMatchWinner` ajoute `matches.winner_participation_id` (clé étrangère composite `(id, winner_participation_id)` vers `match_sides (match_id, participation_id)`, donc le vainqueur est l'un des côtés ; vérifiée à la fin de la transaction ; un vainqueur n'existe que sur un match `VALIDATED`). `up` : pour chaque match `REGULAR` en `RESULT_UNKNOWN`, le vainqueur est le côté `position = 1` (Adv1 du classeur) et le match passe `VALIDATED`, **scores toujours NULL**. Sur une base vide (nouveau déploiement) elle ne change aucune ligne ; le dump `archives.sql` livre déjà ces vainqueurs.
+
+**Retour arrière** : `npm run db:migration:revert` (ou `ccc-ops migrate:revert`) repasse en `RESULT_UNKNOWN` les matchs `VALIDATED` qui ont un vainqueur et aucun score validé, puis supprime la colonne et ses contraintes. Rien d'autre n'est touché ; rejouer `up` redonne les mêmes vainqueurs (`tests/db/match-winner.test.ts`). Ce retour n'a de sens qu'avec le code précédent, qui compte ces matchs à part (`unknownResults`).
+
 ### Archives 2012-2026 : dump SQL figé (ARCH-5, ARCH-10)
 
-`src/assets/seeds/archives.sql` contient les archives sous forme d'`INSERT` : 16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score, et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes). Le dump a été généré une seule fois, le 2026-10-22, depuis une base neuve, par la chaîne de reprise de l'époque (seed du classeur puis reprise B-04). Les contrôles ont été faits avant la génération : Nicolas Deseine à 39/13, 0 écart bloquant entre les classements recalculés et le classeur. Cette chaîne (convertisseur, JSON, scripts de seed et d'import) a ensuite été supprimée. Le fichier ne s'édite pas à la main.
+`src/assets/seeds/archives.sql` contient les archives sous forme d'`INSERT` : 16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score et 175 au vainqueur importé sans score (B-21), et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes). Le dump a été généré une seule fois, le 2026-10-22, depuis une base neuve, par la chaîne de reprise de l'époque (seed du classeur puis reprise B-04). Les contrôles ont été faits avant la génération : Nicolas Deseine à 39/13, 0 écart bloquant entre les classements recalculés et le classeur. Cette chaîne (convertisseur, JSON, scripts de seed et d'import) a ensuite été supprimée. Le fichier ne s'édite pas à la main.
+
+**Régénération (SEED-1, B-21)** : par export outillé, jamais à la main. Sur une base `_test` jetable : charger le dump actuel sur le schéma d'avant la migration (migrations sauf la nouvelle, puis `db:seed:archives`), appliquer la migration, puis exporter et remettre dans l'ordre du dump actuel (les UUID et les dates sont conservés) :
+
+```sh
+docker exec ccc-db pg_dump -U ccc -d ccc_<agent>_test --data-only --column-inserts \
+  -t public.competitors -t public.competitor_aliases -t public.editions -t public.rounds -t public.pools \
+  -t public.participations -t public.legacy_workbook_imports -t public.legacy_workbook_rows \
+  -t public.matches -t public.match_sides \
+  | node scripts/archives-dump-order.mjs src/assets/seeds/archives.sql > nouveau.sql
+```
+
+`scripts/archives-dump-order.mjs` ne garde que les `INSERT`, dans l'ordre des tables et des lignes du dump actuel, et échoue si les deux dumps n'ont pas les mêmes lignes. Il faut ensuite remplacer l'en-tête de commentaires du fichier (une ligne « Régénéré le … » de plus) puis remplacer `archives.sql` par `nouveau.sql`.
 
 ```sh
 npm run db:migration:run    # schéma à jour
 npm run db:seed:archives    # une transaction ; refuse une base qui contient déjà des données
 ```
 
-Le test de non-régression `tests/db/archives-seed.test.ts` applique le dump sur une base neuve. Il revérifie les comptes, Deseine 39/13 et le « 0 écart avec le classeur » (`legacy-verification.util`, à partir des lignes brutes en base). Les cas « vraies données » du domaine (`tests/db/archives-*.test.ts`) lisent eux aussi le classeur depuis la base.
+Le test de non-régression `tests/db/archives-seed.test.ts` applique le dump sur une base neuve. Il revérifie les comptes (729 matchs `VALIDATED`, dont 175 au vainqueur importé et sans score, aucun `RESULT_UNKNOWN`), Deseine 53/18, Fossati 40/10 et le « 0 écart avec le classeur » (`legacy-verification.util`, à partir des lignes brutes en base). Les cas « vraies données » du domaine (`tests/db/archives-*.test.ts`) lisent eux aussi le classeur depuis la base.
 
 ```sh
 # base jetable dont le nom finit par _test, variables en ligne de commande
