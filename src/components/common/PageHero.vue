@@ -65,7 +65,8 @@ const hasBreadcrumb = computed(() => props.breadcrumb.length > 0)
 const breadcrumbItems = computed(() => props.breadcrumb.map(entry => ({
   title: t(entry.text.key, entry.text.fallback, entry.text.params),
   to: entry.to,
-  disabled: entry.to === undefined
+  disabled: entry.to === undefined,
+  active: entry.to === undefined
 })))
 
 /*********************************************************

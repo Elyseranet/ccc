@@ -97,6 +97,7 @@
         <origam-card
           v-for="player in players"
           :key="player.side"
+          tag="article"
           class="head-to-head-summary__player"
           :class="`head-to-head-summary__player--${player.side}`"
           rounded="xl"

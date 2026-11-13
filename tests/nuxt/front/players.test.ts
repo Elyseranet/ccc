@@ -293,6 +293,15 @@ describe('pages', () => {
     expect(wrapper.find('form[role="search"]').exists()).toBe(true)
   })
 
+  it('/joueurs/[id] : un titre h1 existe aussi tant que la fiche n’est pas chargée, et la page courante du fil porte aria-current (T-A11Y-01 S15, S9)', async () => {
+    registerProfile()
+    const wrapper = await mountSuspended(PlayerPage, { ...withRouterLink, route: `/joueurs/${PLAYER_ID}` })
+    await flushPromises()
+    expect(wrapper.findAll('h1')).toHaveLength(1)
+    expect(wrapper.find('[data-cy="player-page-title"]').exists()).toBe(false)
+    expect(wrapper.get('[data-cy="player-breadcrumb"] [aria-current="page"]').text()).toContain('Alix Bernard')
+  })
+
   it('/joueurs?q=zzzz : résultat vide annoncé', async () => {
     registerDirectory()
     const wrapper = await mountSuspended(PlayersPage, { ...withRouterLink, route: '/joueurs?q=zzzz' })

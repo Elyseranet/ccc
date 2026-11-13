@@ -10,6 +10,13 @@
       :aria-label="breadcrumbLabel"
       data-cy="player-breadcrumb"
     />
+    <h1
+      v-if="!competitor"
+      class="sr-only"
+      data-cy="player-page-title"
+    >
+      {{ pageTitle }}
+    </h1>
     <async-state
       :pending="pending"
       :error="displayedError"
@@ -122,8 +129,9 @@ const breadcrumbDivider = PLAYERS_BREADCRUMB_DIVIDER
 const breadcrumbItems = computed(() => [
   { title: t('player.breadcrumb.home', 'Accueil'), to: ROUTES.HOME, padding: 0 },
   { title: t('player.breadcrumb.players', 'Joueurs'), to: ROUTES.PLAYERS, padding: 0 },
-  { title: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur'), disabled: true, padding: 0 }
+  { title: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur'), disabled: true, active: true, padding: 0 }
 ])
+const pageTitle = computed(() => t('pages.player.title', 'Fiche joueur'))
 const notFoundTitle: ITranslatableText = { key: 'player.not_found.title', fallback: 'Joueur introuvable' }
 const notFoundDescription: ITranslatableText = { key: 'player.not_found.description', fallback: 'Cette fiche n’existe pas. Retrouvez le joueur dans l’annuaire.' }
 const noOpponentsTitle: ITranslatableText = { key: 'player.opponents.empty', fallback: 'Aucun adversaire rencontré avec un score connu' }

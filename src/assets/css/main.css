@@ -1,5 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; color-scheme: dark; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; color-scheme: dark; scroll-behavior: smooth; scroll-padding-top: calc(var(--origam-space---20) + var(--origam-space---2)); }
 body {
   margin: 0;
   min-width: 320px;
