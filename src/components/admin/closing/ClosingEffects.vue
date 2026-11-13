@@ -26,7 +26,7 @@
             v-for="(part, index) in effect.parts"
             :key="index"
           >
-            <b v-if="part.strong">{{ part.text }}</b>
+            <strong v-if="part.strong">{{ part.text }}</strong>
             <abbr-text
               v-else
               :text="part.text"
@@ -65,6 +65,7 @@ import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'
 import { OrigamCard } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
+import { splitEmphasis } from '~/utils/emphasis.util'
 import { useT } from '~/composables/useT'
 import { CLOSING_STAGE_TEXT } from '~/consts/edition-closing-view.const'
 import { POINTS_REFERENCE_PARTICIPANTS } from '~/consts/domain-rules.const'
@@ -88,22 +89,14 @@ const title = computed(() => t('admin.closing.effects_title', 'Ce que la clôtur
 const effects = computed(() => [
   {
     id: 'points',
-    parts: [
-      { text: t('admin.closing.effect_points_lead', 'Les points de chaque participation sont '), strong: false },
-      { text: t('admin.closing.effect_points_strong', 'figés'), strong: true },
-      { text: t('admin.closing.effect_points_tail', ' : barème × N / 50, N = nombre de participants (RG1, RG2).'), strong: false }
-    ]
+    parts: splitEmphasis(t('admin.closing.effect_points', 'Les points de chaque participation sont {strong} : barème × N / 50, N = nombre de participants (RG1, RG2).'), t('admin.closing.effect_points_strong', 'figés'))
   },
   {
     id: 'readonly',
-    parts: [
-      { text: t('admin.closing.effect_readonly_lead', 'L’édition passe en '), strong: false },
-      { text: t('admin.closing.effect_readonly_strong', 'lecture seule partout'), strong: true },
-      { text: t('admin.closing.effect_readonly_tail', ' : participants, tirages, scores, qualification.'), strong: false }
-    ]
+    parts: splitEmphasis(t('admin.closing.effect_readonly', 'L’édition passe en {strong} : participants, tirages, scores, qualification.'), t('admin.closing.effect_readonly_strong', 'lecture seule partout'))
   },
-  { id: 'rankings', parts: [{ text: t('admin.closing.effect_rankings', 'Les classements ACP et All Time intègrent l’édition.'), strong: false }] },
-  { id: 'scale', parts: [{ text: t('admin.closing.effect_scale', 'Un changement de barème ultérieur ne réécrit pas le palmarès.'), strong: false }] }
+  { id: 'rankings', parts: splitEmphasis(t('admin.closing.effect_rankings', 'Les classements ACP et All Time intègrent l’édition.'), '') },
+  { id: 'scale', parts: splitEmphasis(t('admin.closing.effect_scale', 'Un changement de barème ultérieur ne réécrit pas le palmarès.'), '') }
 ])
 const note = computed(() => t('admin.closing.preview_note', 'Un tour non disputé rapporte « / » (RG3).'))
 const caption = computed(() => t('admin.closing.preview_caption', 'Aperçu des points pour {count} participants', { count: props.participantCount }))
