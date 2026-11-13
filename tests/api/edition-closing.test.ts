@@ -195,7 +195,10 @@ describe('edition closing and frozen points (B-14)', async () => {
     const again = await close(ready.edition.id)
     expect(again.status).toBe(200)
     expect(again.headers.get('cache-control')).toBe('no-store')
-    expect(pointsOf(await again.json() as IEditionDetail, 1).points).toBe(12.96)
+    const replayed = await again.json() as IEditionDetail
+    expect(pointsOf(replayed, 1)).toMatchObject({ points: 12.96, status: PARTICIPATION_STATUS.WINNER })
+    expect(replayed.participants.filter((participant) => participant.status === PARTICIPATION_STATUS.ELIMINATED)).toHaveLength(PLAYERS - 1)
+    expect(replayed.participants.some((participant) => [PARTICIPATION_STATUS.QUALIFIED, PARTICIPATION_STATUS.IN_POOL].includes(participant.status))).toBe(false)
     expect((await dataSource.getRepository(EditionEntity).findOneByOrFail({ id: ready.edition.id })).closedAt!.toISOString()).toBe(stored.closedAt!.toISOString())
   })
 
