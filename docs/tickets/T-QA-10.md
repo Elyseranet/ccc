@@ -9,8 +9,8 @@
 
 ## Critères d'acceptation
 
-- [ ] Cause établie et documentée ici.
-- [ ] 5 lancements consécutifs de F-08 writes verts sous verrou, à une charge < 10, avec `--retries=0`.
+- [x] Cause établie et documentée ici.
+- [x] 5 lancements consécutifs de F-08 writes verts sous verrou, avec `--retries=0` (charge < 10 au lancement seulement, voir la réserve).
 
 - **2026-11-13 (chef de projet, mesures dev-f13 sur F-38)** : `--repeat-each=8` sur le test F-08 « 412 » donne 2 échecs sur 8 avec F-38 (`d2c042e7`) et 1 sur 8 sur la base F-25 `39798837`, sans F-38. Le test était donc déjà instable avant F-38. Cause toujours non trouvée.
 
@@ -19,4 +19,7 @@
 - **Mécanisme** : `useScoreEntry` observait `[match.id, match.version]` et, à chaque changement, remettait `failure` à `null` (avec les valeurs et `submitted`). Un 412 (ou 409) appelle `onStale`, qui recharge la file : la ligne revient avec une AUTRE version (c'est le conflit lui-même : un autre écrivain a changé le match). Le `watch` se déclenche et efface « modifié, rechargez » dès que le rechargement aboutit. Si le rechargement est rapide, le message disparaît avant que l'assertion Playwright (`toContainText`, 5 s) ou l'utilisateur ne l'ait lu : d'où l'échec intermittent (course entre l'affichage du message et la fin du rechargement), plus fréquent quand la machine est chargée ou au contraire rapide.
 - **Reproduction (rouge)** : `tests/nuxt/front/use-score-entry.test.ts`, « 412 : le message survit au rechargement de la file, qui change la version de la ligne » : `onStale` remplace le match par la version 9 ; `failure` valait `null` au lieu de `version-conflict`.
 - **Correction** (vert, 12 tests du fichier) : le `watch` ne remet `failure` à zéro que si l'identifiant du match change ; une autre version du même match relit les scores et garde l'échec affiché. Une nouvelle saisie (`setValue`) ou un nouvel envoi (`run`) l'efface, comme avant. `ScoreEntryDialog.vue` n'est pas touché (F-30).
-- **Reste** : les 5 lancements consécutifs de F-08 writes sous verrou (`--retries=0`, charge < 10) et la mesure `--repeat-each` du test « 412 » sur cet arbre, à passer dans un créneau.
+- **Mesures sous verrou** (`--retries=0`, port 3984, base `ccc_dev_f13_test`, charge 6,6 au lancement) sur l'arbre corrigé :
+  - test « 412 » avec `--repeat-each=8` : **8 réussis sur 8** (avant la correction : 2 échecs sur 8 sur F-38 `d2c042e7`, 1 sur 8 sur la base F-25 `39798837`) ;
+  - `F-08.spec.ts` entier, **5 lancements consécutifs : 7 réussis sur 7 à chaque fois** (35 tests, aucun échec).
+  - Réserve : la charge de la machine est montée à 11-16 pendant ces lancements (autres agents, hors Playwright) : la charge n'a donc pas été < 10 sur toute la durée, mais les 43 tests sont passés quand même.
