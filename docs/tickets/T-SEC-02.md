@@ -1,7 +1,7 @@
 # T-SEC-02 — Sécurité liée au déploiement : IP derrière proxy, SSL PostgreSQL
 
 - **Origine** : `/security-review` de `feature/integration-wave1` (6b56a5c), le 2026-10-20. Ce sont deux constats qui dépendent du mode de déploiement, et celui-ci n'est pas encore défini (ARCHITECTURE.md, « Hébergement et mode de déploiement : non spécifiés »).
-- **Statut** : **Fermé** (2026-11-13). Le nombre de proxys a été mesuré sur la dev : `NUXT_TRUST_PROXY_HOPS = 1`. Le SSL PostgreSQL n'est pas nécessaire (décision utilisateur PROD-HOSTING). La variable de prod sera posée à la création de l'application de production dans Coolify (voir « Mesure »).
+- **Statut** : **Fermé** (2026-11-13), mergé @ `da7319a6` (doc seule, branche `d7687eb4`, backend-lead). Le nombre de proxys a été mesuré sur la dev : `NUXT_TRUST_PROXY_HOPS = 1`. Le SSL PostgreSQL n'est pas nécessaire (décision utilisateur PROD-HOSTING). La variable de prod sera posée à la création de l'application de production dans Coolify (voir « Mesure »).
 - **Dépendances** : B-01 (limiteur de débit, DataSource).
 
 ## Constats
