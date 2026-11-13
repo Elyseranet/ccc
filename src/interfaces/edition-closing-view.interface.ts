@@ -54,6 +54,8 @@ export interface IClosingConfirmProps {
 export interface IClosingStateProps {
   kind: CLOSING_NOTICE
   year: number
+  /** Instant de clôture (ISO 8601) ; `null` pour les archives du dump, qui n'en ont pas (B-22). */
+  closedAt: string | null
 }
 
 export interface IClosingConfirmEmits {

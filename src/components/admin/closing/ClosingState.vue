@@ -36,6 +36,7 @@ import { ROUTES } from '~/consts/routes.const'
 import { CLOSING_NOTICE } from '~/enums/edition-closing-view.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { IClosingStateProps } from '~/interfaces/edition-closing-view.interface'
+import { formatClosingMoment } from '~/utils/edition-closing-view.util'
 
 /*********************************************************
  * Global
@@ -43,13 +44,15 @@ import type { IClosingStateProps } from '~/interfaces/edition-closing-view.inter
  * @description
  * Les trois messages d'état de la page, en `origam-alert` (maquette « États ») : finale non validée (lien vers les scores filtrés sur la finale,
  * `?tour=FINAL`, décision du chef de projet), édition clôturée (lien vers le palmarès) et clôture réussie. Le titre porte les quatre props de typographie
- * (même recette que les autres alertes, en attendant F-17).
+ * (même recette que les autres alertes, en attendant F-17). L'alerte « clôturée » dit le jour et l'heure quand `closedAt` est connu ; les 16 archives du dump n'en
+ * ont pas (B-22) : texte sans date, dont la formulation attend ui-plus (clé `state_closed_text_undated`, provisoire).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IClosingStateProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const status = computed(() => CLOSING_STATE_STATUS[props.kind])
+const closedMoment = computed(() => props.closedAt ? formatClosingMoment(props.closedAt) : null)
 const title = computed(() => {
   switch (props.kind) {
     case CLOSING_NOTICE.BLOCKED:
@@ -65,7 +68,9 @@ const text = computed(() => {
     case CLOSING_NOTICE.BLOCKED:
       return t('admin.closing.state_blocked_text', 'La clôture n’est possible qu’après validation de la finale.')
     case CLOSING_NOTICE.CLOSED:
-      return t('admin.closing.state_closed_text', 'Points figés.')
+      return closedMoment.value
+        ? t('admin.closing.state_closed_text_dated', 'Clôturée le {date} à {time}. Points figés.', closedMoment.value)
+        : t('admin.closing.state_closed_text_undated', 'Points figés.')
     default:
       return t('admin.closing.state_success_text', 'Les classements ont été mis à jour.')
   }

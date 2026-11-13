@@ -39,9 +39,10 @@ const semiMatch = (): IMatch => ({
 let status = EDITION_STATUS.PLAYOFFS
 let winner: string | null = 'p1'
 let closeFailure: API_ERROR_CODE | null = null
+let closedAt: string | null = null
 const closed = vi.fn()
 const detail = () => ({
-  ...edition(status), participants: participantIds.map(participationId => ({ participationId })), pools: [], draws: [], bracket: [],
+  ...edition(status), closedAt: status === EDITION_STATUS.CLOSED ? closedAt : null, participants: participantIds.map(participationId => ({ participationId })), pools: [], draws: [], bracket: [],
   rounds: [
     { id: 'r-semi', kind: ROUND_KIND.SEMI, sequence: 1, status: ROUND_STATUS.COMPLETED, matchCount: 1, validatedMatchCount: 1 },
     { id: 'r-final', kind: ROUND_KIND.FINAL, sequence: 2, status: winner === null ? ROUND_STATUS.DRAWN : ROUND_STATUS.COMPLETED, matchCount: 1, validatedMatchCount: winner === null ? 0 : 1 }
@@ -77,6 +78,7 @@ beforeEach(() => {
   status = EDITION_STATUS.PLAYOFFS
   winner = 'p1'
   closeFailure = null
+  closedAt = null
   closed.mockClear()
   document.body.innerHTML = ''
   clearNuxtData()
@@ -110,6 +112,23 @@ describe('page « Clôture » (F-26)', () => {
     expect(wrapper.get('[data-cy="closing-open"]').attributes('disabled')).toBeDefined()
     expect(wrapper.get('[data-cy="closing-why"]').text()).toContain('la finale doit d’abord être validée')
     expect(wrapper.find('[data-cy="closing-preview"]').exists()).toBe(false)
+  })
+
+  it('édition clôturée avec sa date (closedAt, B-22) : « Clôturée le … à … » puis « Points figés. »', async () => {
+    status = EDITION_STATUS.CLOSED
+    closedAt = '2026-06-16T00:20:00.000Z'
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="closing-state-closed"]').exists()).toBe(true))
+    expect(wrapper.get('[data-cy="closing-state-closed"]').text()).toMatch(/Clôturée le \d{2}\/\d{2} à \d{2}:\d{2}\. Points figés\./)
+  })
+
+  it('édition clôturée sans date (closedAt nul, les 16 archives du dump) : « Points figés. » seulement', async () => {
+    status = EDITION_STATUS.CLOSED
+    closedAt = null
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="closing-state-closed"]').exists()).toBe(true))
+    expect(wrapper.get('[data-cy="closing-state-closed"]').text()).toContain('Points figés.')
+    expect(wrapper.get('[data-cy="closing-state-closed"]').text()).not.toContain('Clôturée le')
   })
 
   it('édition déjà clôturée : l’alerte « Édition clôturée » avec le lien vers le palmarès, et aucun bouton de clôture', async () => {

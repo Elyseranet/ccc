@@ -1,3 +1,4 @@
+import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
 import { POINTS_BASE_SCALE } from '../consts/domain-rules.const.js'
 import { CLOSING_STAGES_DESC } from '../consts/edition-closing-view.const.js'
 import { CLOSING_STATE } from '../enums/edition-closing-view.enum.js'
@@ -61,3 +62,12 @@ export const buildClosingView = (detail: IEditionDetail, preview: IClosingPrevie
 
 /** La confirmation est valide quand le code saisi est celui de l'édition (espaces autour ignorés, casse respectée). */
 export const isClosingCodeConfirmed = (typed: string, code: string): boolean => typed.trim() === code
+
+/** « 16/06 » et « 00:20 » : le jour et l'heure de clôture, dans la langue de l'admin (maquette `admin-cloture`). */
+export const formatClosingMoment = (iso: string): { date: string, time: string } => {
+  const moment = new Date(iso)
+  return {
+    date: moment.toLocaleDateString(ADMIN_DATE_LOCALE, { day: '2-digit', month: '2-digit' }),
+    time: moment.toLocaleTimeString(ADMIN_DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
+  }
+}

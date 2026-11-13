@@ -94,8 +94,23 @@ test.describe('admin clôture : écritures sur une édition créée par le test'
     await openClosing(page)
     await expect(page.getByTestId('closing-state-closed')).toBeVisible()
     await expect(page.getByTestId('closing-state-closed-link')).toHaveAttribute('href', '/palmares')
+    await expect(page.getByTestId('closing-state-closed')).toContainText(/Clôturée le \d{2}\/\d{2} à \d{2}:\d{2}\. Points figés\./)
     await expect(page.getByTestId('closing-open')).toHaveCount(0)
     expect(await violationsOf(page)).toEqual([])
+  })
+
+  test('archive clôturée sans date (closedAt nul, B-22) : « Points figés. » seulement, aucun bouton', async ({ page, context }) => {
+    const list = await (await context.request.get('/api/v1/editions')).json() as Array<{ id: string, code: string, year: number, status: string }>
+    const archive = list.find(item => item.status === 'CLOSED')
+    expect(archive).toBeDefined()
+    const detail = await (await context.request.get(`/api/v1/editions/${archive!.id}`)).json() as { closedAt: string | null }
+    expect(detail.closedAt).toBeNull()
+    await selectAdminEdition(context, archive!)
+    await openClosing(page)
+    await expect(page.getByTestId('closing-state-closed')).toBeVisible()
+    await expect(page.getByTestId('closing-state-closed')).toContainText('Points figés.')
+    await expect(page.getByTestId('closing-state-closed')).not.toContainText('Clôturée le')
+    await expect(page.getByTestId('closing-open')).toHaveCount(0)
   })
 
   test('409 « finale non validée » renvoyé par le serveur : message d’erreur annoncé avec « Vérifier l’état »', async ({ page, context }) => {

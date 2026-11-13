@@ -29,6 +29,7 @@
       v-if="notice !== null && edition"
       :kind="notice"
       :year="edition.year"
+      :closed-at="edition.closedAt"
     />
     <origam-alert
       v-if="failureView"
@@ -118,7 +119,7 @@ import type { ITranslatableText } from '~/interfaces/common-components.interface
  * les trois blocs sont des composants, l'état dégradé (chargement, erreur, vide) est celui d'`AsyncState`. L'aperçu des points vient de la fonction même qui les fige
  * côté serveur (CLOSE-PREVIEW). Aucun retour arrière : la clôture est définitive et la confirmation le dit, et demande le code de l'édition (décision du 2026-11-05).
  * Sur une édition déjà clôturée la page est en lecture seule : l'alerte « Édition clôturée » et pas de bouton.
- * La date de clôture n'est pas affichée : `closedAt` n'est pas encore dans `IEditionDetail` (à ajouter côté back).
+ * La date de clôture vient de `closedAt` (B-22) ; nulle pour les archives du dump : l'alerte dit alors seulement « Points figés. ».
  ********************************************************/
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { t } = useT()

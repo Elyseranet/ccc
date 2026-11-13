@@ -6,7 +6,7 @@ import { FINAL_STAGE } from '../../src/enums/participation.enum'
 import { ROUND_KIND } from '../../src/enums/round.enum'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import type { IMatch } from '../../src/interfaces/match.interface'
-import { closingStateOf, finalistsOf, isClosingCodeConfirmed, prerequisitesOf, previewRowsOf } from '../../src/utils/edition-closing-view.util'
+import { closingStateOf, finalistsOf, formatClosingMoment, isClosingCodeConfirmed, prerequisitesOf, previewRowsOf } from '../../src/utils/edition-closing-view.util'
 
 const final = (winner: string | null): IMatch => ({
   id: 'f', sequence: 1, roundKind: ROUND_KIND.FINAL, poolRank: null, purpose: MATCH_PURPOSE.REGULAR, targetScore: 10,
@@ -79,5 +79,13 @@ describe('isClosingCodeConfirmed', () => {
 
   it('la casse compte (2012a ≠ 2012A)', () => {
     expect(isClosingCodeConfirmed('2012A', '2012a')).toBe(false)
+  })
+})
+
+describe('formatClosingMoment', () => {
+  it('le jour sur deux chiffres (jj/mm) et l’heure (hh:mm), comme la maquette', () => {
+    const moment = formatClosingMoment('2026-06-16T00:20:00.000Z')
+    expect(moment.date).toMatch(/^\d{2}\/\d{2}$/)
+    expect(moment.time).toMatch(/^\d{2}:\d{2}$/)
   })
 })
