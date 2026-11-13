@@ -38,10 +38,10 @@
         />
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           :hover="ctaHover"
-          :disabled="!canValidate"
+          :disabled="isBlocked"
           :loading="isBusy"
           :text="validateLabel"
           data-cy="admin-validate-confirm"
@@ -57,6 +57,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamDialog } from 'origam/components'
 import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { SIDES_MULTI_MIN } from '~/consts/domain-rules.const'
 import { DIALOG_SLOT, SCORE_CTA_HOVER, SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
@@ -147,6 +148,9 @@ const validateLabel = computed(() => t('admin.matches.action_validate', 'Valider
 const failureMessage = computed(() => entry.failure.value
   ? t(SCORE_FAILURE_TEXT[entry.failure.value].key, SCORE_FAILURE_TEXT[entry.failure.value].label)
   : null)
+
+const isBlocked = computed(() => !canValidate.value)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

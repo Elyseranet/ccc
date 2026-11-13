@@ -69,14 +69,14 @@
           <origam-btn
             type="submit"
             variant="flat"
-            bg-color="primary"
-            elevation="lg"
+            :bg-color="buttonColor"
+            :elevation="buttonElevation"
             :hover="submitHover"
             size="x-large"
             font-size="md"
             class="login-form__submit"
             :loading="pending"
-            :disabled="pending"
+            :disabled="isBlocked"
             :text="submitLabel"
             data-cy="login-submit"
           />
@@ -93,6 +93,7 @@ import AccountCard from '~/components/account/AccountCard.vue'
 import FormField from '~/components/common/FormField.vue'
 import { useAccountError } from '~/composables/useAccountError'
 import { useAccountRules } from '~/composables/useAccountRules'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
 import type { IFormSubmitEvent, ILoginFormEmits, ILoginFormProps } from '~/interfaces/account.interface'
@@ -142,6 +143,9 @@ const handleSubmit = async (event: IFormSubmitEvent) => {
     emits('submit', { email: email.value.trim(), password: password.value })
   }
 }
+
+const isBlocked = computed(() => props.pending)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

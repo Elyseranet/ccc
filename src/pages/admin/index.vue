@@ -21,9 +21,9 @@
         variant="flat"
         size="x-large"
         font-size="md"
-        bg-color="primary"
-        elevation="lg"
-        :disabled="!view.canValidate"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
+        :disabled="isBlocked"
         data-cy="admin-dashboard-cta"
       >
         <template #default>
@@ -117,6 +117,7 @@ import AsyncState from '~/components/common/AsyncState.vue'
 import { useAdminActivity } from '~/composables/useAdminActivity'
 import { useAdminDashboard } from '~/composables/useAdminDashboard'
 import { useSeo } from '~/composables/useSeo'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ROUTES } from '~/consts/routes.const'
 import { ADMIN_DASHBOARD_ERROR } from '~/enums/admin-dashboard.enum'
@@ -135,6 +136,8 @@ const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const { view, pending, error, errorKind, isEmpty, refresh, editionId } = await useAdminDashboard()
+const isBlocked = computed(() => !view.value?.canValidate)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 const { rows: activityRows, pending: activityPending, error: activityError, refresh: refreshActivity } = useAdminActivity(editionId)
 const pageTitle = computed(() => t('pages.admin_dashboard.title', 'Tableau de bord'))
 useHead({ title: pageTitle })

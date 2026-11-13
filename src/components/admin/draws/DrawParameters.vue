@@ -65,10 +65,10 @@
       <div class="draw-parameters__actions">
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           size="large"
-          :disabled="Boolean(issue) || readOnly"
+          :disabled="isBlocked"
           :loading="busy"
           :text="nextLabel"
           data-cy="draw-parameters-next"
@@ -82,6 +82,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamLabel, OrigamTextField } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import type { IDrawParametersProps } from '~/interfaces/pool-draw.interface'
 import { parameterIssue } from '~/utils/pool-draw.util'
@@ -129,6 +130,9 @@ watch(() => props.poolCount, (value) => {
     text.value = value > 0 ? String(value) : ''
   }
 })
+
+const isBlocked = computed(() => Boolean(props.issue) || props.readOnly)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

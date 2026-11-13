@@ -101,10 +101,10 @@
         type="submit"
         variant="flat"
         size="x-large"
-        bg-color="primary"
-        elevation="lg"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
         :hover="ctaHover"
-        :disabled="!canValidate"
+        :disabled="isBlocked"
         :loading="validating"
         :text="validateLabel"
         data-cy="admin-score-validate"
@@ -116,6 +116,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamForm, OrigamLabel, OrigamTextField } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { SIDES_MULTI_MIN } from '~/consts/domain-rules.const'
 import { SCORE_CTA_HOVER, SCORE_INPUT_MAX_LENGTH } from '~/consts/score-entry.const'
@@ -184,6 +185,9 @@ const handleSubmit = (event: Event) => {
   event.preventDefault()
   emits('validate')
 }
+
+const isBlocked = computed(() => !props.canValidate)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

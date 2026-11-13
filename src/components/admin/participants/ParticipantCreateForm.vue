@@ -148,8 +148,8 @@
         type="submit"
         class="participant-form__submit"
         variant="flat"
-        bg-color="primary"
-        elevation="lg"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
         size="x-large"
         font-size="md"
         :loading="pending"
@@ -164,6 +164,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamFileField, OrigamForm, OrigamLabel, OrigamTextField, OrigamTitle } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { PARTICIPANT_AVATAR_ACCEPT, PARTICIPANT_AVATAR_MAX_BYTES } from '~/consts/admin-participants.const'
 import { EMAIL_MAX_LENGTH, PHONE_PATTERN } from '~/consts/auth.const'
@@ -283,6 +284,9 @@ const handleSubmit = async (event: Event) => {
 const handleCancel = () => {
   emits('cancel')
 }
+
+const isBlocked = computed(() => props.pending)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

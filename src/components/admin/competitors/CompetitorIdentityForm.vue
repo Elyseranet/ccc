@@ -135,8 +135,8 @@
           type="submit"
           class="identity-form__submit"
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           size="x-large"
           font-size="md"
           :loading="pending"
@@ -160,6 +160,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamForm, OrigamLabel, OrigamSnackbar, OrigamTextField, OrigamTitle } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
 import { ADMIN_REQUIRED_MARK } from '~/consts/admin-form.const'
@@ -262,6 +263,9 @@ const handleSubmit = async (event: Event) => {
 const handleReset = () => {
   Object.assign(draft, props.values)
 }
+
+const isBlocked = computed(() => props.pending)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

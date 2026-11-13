@@ -22,10 +22,10 @@
       </p>
       <origam-btn
         variant="flat"
-        bg-color="primary"
-        elevation="lg"
-        size="large"
-        :disabled="!canStart"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
+        size="x-large"
+        :disabled="isBlocked"
         :loading="busy"
         :text="startLabel"
         data-cy="round-draw-start"
@@ -39,6 +39,7 @@
 import { computed, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamCard } from 'origam/components'
 import RoundKindRadios from '~/components/admin/round-draw/RoundKindRadios.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
 import type { ROUND_KIND } from '~/enums/round.enum'
@@ -78,6 +79,9 @@ const handleStart = () => {
     emits('start', selected.value)
   }
 }
+
+const isBlocked = computed(() => !canStart.value)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose
