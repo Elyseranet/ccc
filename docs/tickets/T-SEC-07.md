@@ -1,7 +1,7 @@
 # T-SEC-07 — Avatars : concurrence de sharp et cache d'un avatar supprimé
 
 - **Origine** : revue de sécurité de la vague 3a, findings LOW L2 et L3, le 2026-10-22.
-- **Statut** : À faire. Hors vague 3a. L3 contient une **question ouverte** à poser à l'utilisateur.
+- **Statut** : À faire. Hors vague 3a. La question L3 n'est plus ouverte : l'utilisateur l'a tranchée le 2026-10-28 (`decisions.md`, SEC-Q : cache court avec revalidation par ETag/304, sans `immutable`). Restent à faire L2 et l'application de cette décision à L3. Ligne corrigée le 2026-11-13 par le chef de projet.
 - **Fichiers** : `src/utils/avatar-image.util.ts`, `src/services/avatar.service.ts`, `src/consts/avatar.const.ts` (`AVATAR_CACHE_IMMUTABLE`), routes `src/server/api/v1/moi/avatar.*` et `src/server/api/v1/competiteurs/[id]/avatar.*`.
 
 ## L2 — Pas de plafond de concurrence sur sharp
