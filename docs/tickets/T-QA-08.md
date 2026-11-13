@@ -21,3 +21,5 @@
    - limiter `maxWorkers`.
    Ne pas se contenter d'une relance verte.
 3. Critère de fermeture : 10 passes de `test:run` complètes, sans exclusion, dont 5 sous une charge contrôlée (load ≥ 20), 0 échec.
+
+- **2026-11-13 — nouveau cas (F-35, dev-f13)** : deux lancements combinés (visuel F-35 + a11y F-03a, charge 4,8 à 7 au lancement, `--retries=0`) ont chacun eu un échec d'a11y F-03a, un `page.goto` interrompu à 35 s, sur deux tests différents (2012a, puis `/editions/1999`), hors de l'onglet Tirages. Les deux passent quand on les lance seuls. La charge est modérée, sous le seuil de 10 : le symptôme ne dépend donc pas seulement d'une forte charge. Cause : « Je ne sais pas » ; piste : serveur de dev saturé par les contextes parallèles.
