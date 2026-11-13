@@ -4,49 +4,16 @@
     :aria-labelledby="titleId"
     data-cy="round-draw-entry"
   >
-    <header class="round-draw-entry__head">
-      <h2
-        :id="titleId"
-        class="round-draw-entry__title"
-      >
-        {{ title }}
-      </h2>
-      <span
-        class="round-draw-entry__count"
-        data-cy="round-draw-count"
-      >{{ countText }}</span>
-    </header>
-    <p
-      v-if="changeable"
-      class="round-draw-entry__round"
-      data-cy="round-draw-round"
-    >
-      {{ roundPrefix }} <b>{{ roundLabel }}</b> · {{ roundDetail }}
-      <origam-btn
-        v-if="!readOnly"
-        variant="text"
-        size="small"
-        aria-haspopup="dialog"
-        :text="changeRoundLabel"
-        data-cy="round-draw-change-round"
-        @click="handleChangeRound"
-      />
-    </p>
-    <p
-      v-else
-      class="round-draw-entry__round"
-      role="status"
-      data-cy="round-draw-round"
-    >
-      {{ roundToDrawPrefix }} <b>{{ roundLabel }}</b>, {{ roundToDrawDetail }}
-    </p>
-    <p
-      v-if="waitText"
-      class="round-draw-entry__muted"
-      data-cy="round-draw-playoff-wait"
-    >
-      {{ waitText }}
-    </p>
+    <round-draw-head
+      v-if="!headless"
+      :round-kind="roundKind"
+      :progress="progress"
+      :read-only="readOnly"
+      :changeable="changeable"
+      :waiting-leaders="waitingLeaders"
+      :drawable-count="players.length"
+      @change-round="handleChangeRound"
+    />
     <origam-progress
       :model-value="progress.percent"
       color="primary"
@@ -149,13 +116,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamProgress, OrigamSelect } from 'origam/components'
+import RoundDrawHead from '~/components/admin/round-draw/RoundDrawHead.vue'
 import { useT } from '~/composables/useT'
 import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
-import { ROUND_KIND_BY_POOL_SIZE } from '~/consts/qualification.const'
-import { ROUND_DRAW_PLAYOFF_WAIT_TEXTS, ROUND_DRAW_SIDES, ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS, ROUND_DRAW_WAIT_ROUND_TEXTS } from '~/consts/round-draw.const'
-import { ROUND_LABELS } from '~/consts/round-labels.const'
+import { ROUND_DRAW_SIDES, ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TITLE_ID } from '~/consts/round-draw.const'
 import { ROUND_DRAW_PAIRING_STATE } from '~/enums/round-draw.enum'
 import type { IRoundDrawEntryEmits, IRoundDrawEntryProps } from '~/interfaces/round-draw.interface'
 import type { TSidePosition } from '~/types/draw.type'
@@ -176,29 +142,10 @@ const { t } = useT()
 const props = withDefaults(defineProps<IRoundDrawEntryProps>(), {})
 const emits = defineEmits<IRoundDrawEntryEmits>()
 defineSlots<{}>()
-const titleId = useId()
+const titleId = ROUND_DRAW_TITLE_ID
 const pairingState = ROUND_DRAW_PAIRING_STATE
 const thickness = HOME_PROGRESS_THICKNESS
 const trackColor = HOME_PROGRESS_TRACK_COLOR
-const roundText = computed(() => ROUND_DRAW_TEXTS[props.roundKind])
-const ofText = computed(() => t(roundText.value.of.key, roundText.value.of.fallback))
-const title = computed(() => t('admin.round_draw.entry_title', 'Saisir le tirage {round}, affiche par affiche', { round: ofText.value }))
-const roundLabel = computed(() => t(ROUND_LABELS[props.roundKind].key, ROUND_LABELS[props.roundKind].label))
-const playerTotal = computed(() => props.progress.placed + props.progress.remaining)
-const countText = computed(() => t('admin.round_draw.entry_count', '{done} / {total} affiches · {remaining} joueurs restants', { done: props.progress.pairings, total: props.progress.total, remaining: props.progress.remaining }))
-const roundPrefix = computed(() => t('admin.round_draw.round_prefix', 'Tour :'))
-const roundDetail = computed(() => t('admin.round_draw.round_detail', '{players} joueurs · {pairings} affiches', { players: playerTotal.value, pairings: props.progress.total }))
-const roundToDrawPrefix = computed(() => t('admin.round_draw.round_to_draw_prefix', 'Tour à tirer :'))
-const waitText = computed(() => {
-  const next = ROUND_DRAW_WAIT_ROUND_TEXTS[ROUND_KIND_BY_POOL_SIZE[props.waitingLeaders + props.players.length / 2]!]
-  if (!props.waitingLeaders || !next) {
-    return ''
-  }
-  const texts = props.waitingLeaders === 1 ? ROUND_DRAW_PLAYOFF_WAIT_TEXTS.one : ROUND_DRAW_PLAYOFF_WAIT_TEXTS.other
-  return t(texts.key, texts.fallback, { count: props.waitingLeaders, round: t(next.key, next.fallback) })
-})
-const roundToDrawDetail = computed(() => t('admin.round_draw.round_to_draw_detail', '{players} joueurs.', { players: playerTotal.value }))
-const changeRoundLabel = computed(() => t('admin.round_draw.change_round', 'Changer de tour'))
 const progressLabel = computed(() => t('admin.round_draw.progress_label', '{done} affiches saisies sur {total}', { done: props.progress.pairings, total: props.progress.total }))
 const versus = computed(() => t('admin.round_draw.versus', 'contre'))
 const changeLabel = computed(() => t('admin.round_draw.change', 'Changer'))
@@ -263,35 +210,6 @@ defineExpose({})
 
 <style scoped lang="scss">
 .round-draw-entry {
-  &__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--round-draw-entry---gap, var(--origam-space---3));
-    margin-bottom: var(--origam-space---4);
-  }
-
-  &__title {
-    margin: 0;
-    font-size: var(--origam-font__size---xl);
-    font-weight: var(--origam-font__weight---bold);
-    line-height: var(--origam-font__lineHeight---tight);
-  }
-
-  &__count {
-    color: var(--origam-color__text---secondary);
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__round {
-    margin: 0 0 var(--origam-space---3);
-  }
-
-  &__muted {
-    margin: 0;
-    color: var(--origam-color__text---secondary);
-  }
-
   &__progress {
     --origam-progress-linear__background---opacity: 1;
     margin-bottom: var(--origam-space---5);
@@ -315,9 +233,6 @@ defineExpose({})
 
   &__card--next &__row {
     grid-column: 1 / -1;
-  }
-
-  &__card--next &__row :deep(.origam-label) {
   }
 
   &__card--next &__row :deep(.origam-label) {

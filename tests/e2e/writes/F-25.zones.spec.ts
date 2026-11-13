@@ -45,7 +45,7 @@ const boxTo = async (page: Page, container: string, end: string) => page.evaluat
 const ZONES: Array<{ name: string, mockup: string, app: string, upTo?: { mockup: string, app: string }, masks?: IDataMasks }> = [
   { name: 'ti-phase', mockup: '.ostep--phase', app: '[data-cy="phase-steps"]' },
   { name: 'ti-entete', mockup: '.adm-head', app: '.admin-round-draw__head' },
-  { name: 'ti-saisie-titre', mockup: '.tir-main > header', app: '.round-draw-entry__head' },
+  { name: 'ti-saisie-titre', mockup: '.tir-main > header', app: '.round-draw-head__head' },
   { name: 'ti-tour', mockup: '.tir-main .r-round', app: '[data-cy="round-draw-round"]' },
   { name: 'ti-affiche-tiree', mockup: '.r-affs > li:nth-child(1)', app: '[data-cy="round-draw-pairing-1"]' },
   { name: 'ti-affiche-en-cours', mockup: '.r-aff--next', app: '[data-cy="round-draw-pairing-2"]' },
@@ -82,7 +82,7 @@ for (const viewport of VIEWPORTS) {
         await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
         await alignMockupText(mockup, page, [
           { mockup: '.adm-head .eyebrow', app: '.admin-round-draw__eyebrow' },
-          { mockup: '.tir-main > header h2', app: '.round-draw-entry__title' },
+          { mockup: '.tir-main > header h2', app: '.round-draw-head__title' },
           { mockup: '.tir-main > header .muted', app: '[data-cy="round-draw-count"]' },
           { mockup: '.tir-main .r-round', app: '[data-cy="round-draw-round"]' },
           { mockup: '.r-affs > li:nth-child(1) .r-aff__row b', app: '[data-cy="round-draw-pairing-1"] .round-draw-entry__row b' },
@@ -111,13 +111,10 @@ for (const viewport of VIEWPORTS) {
 }
 
 for (const viewport of VIEWPORTS) {
-  test.describe(`F-25 tirage des barrages, phrase d'attente @${viewport.name}`, () => {
+  test.describe(`F-25 tirage des barrages, carte d'état @${viewport.name}`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } })
 
-    const CARD_INNER = viewport.width - 74
-
-    test('ti-barrages-attente', async ({ page, browser, context }) => {
-      // La maquette montre cette phrase dans une carte d'état (rembourrée) : la largeur de texte est alignée sur son intérieur (316 px à 390) pour comparer la typographie, pas le cadre.
+    test('ti-barrages-carte', async ({ page, browser, context }) => {
       await signIn(context, 'admin')
       const edition = await createQualifiedEdition(context.request, `f25zbar${viewport.name}`, 4, true, 3)
       await selectAdminEdition(context, edition)
@@ -131,14 +128,18 @@ for (const viewport of VIEWPORTS) {
       await settle(page)
       await mockup.addStyleTag({ content: '.adm-bottom { display: none !important; }' })
       await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
-      await mockup.addStyleTag({ content: `.r-playoff > p.muted { width: fit-content !important; max-width: ${CARD_INNER}px !important; }` })
-      await page.addStyleTag({ content: `[data-cy="round-draw-playoff-wait"] { width: fit-content !important; max-width: ${CARD_INNER}px !important; }` })
-      await alignMockupText(mockup, page, [{ mockup: '.r-playoff > p.muted', app: '[data-cy="round-draw-playoff-wait"]' }])
+      await alignMockupText(mockup, page, [
+        { mockup: '.r-playoff .h-card', app: '#round-draw-title' },
+        { mockup: '.r-playoff > p.muted', app: '[data-cy="round-draw-playoff-wait"]' }
+      ])
+      // Compteur et ligne du tour sont des valeurs (nombres de joueurs, « Barrages » en gras) : encrées ; leur typographie est comparée par ti-saisie-titre et ti-tour.
+      await hideInk(mockup, ['.r-playoff header .muted', '.r-playoff .r-round'])
+      await hideInk(page, ['[data-cy="round-draw-playoff"] [data-cy="round-draw-count"]', '[data-cy="round-draw-playoff"] [data-cy="round-draw-round"]'])
       await mockup.evaluate(() => window.scrollTo(0, 0))
       await page.evaluate(() => window.scrollTo(0, 0))
-      await alignToPixel(mockup, '.r-playoff > p.muted')
-      await alignToPixel(page, '[data-cy="round-draw-playoff-wait"]')
-      await compare(page, mockup, 'ti-barrages-attente', viewport.name, await box(mockup, '.r-playoff > p.muted'), await box(page, '[data-cy="round-draw-playoff-wait"]'), NO_MASKS)
+      await alignToPixel(mockup, '.r-playoff')
+      await alignToPixel(page, '[data-cy="round-draw-playoff"]')
+      await compare(page, mockup, 'ti-barrages-carte', viewport.name, await box(mockup, '.r-playoff'), await box(page, '[data-cy="round-draw-playoff"]'), NO_MASKS)
       await mockContext.close()
     })
   })

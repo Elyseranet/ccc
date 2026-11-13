@@ -78,3 +78,6 @@ export const ROUND_DRAW_STATE_STATUS: Record<ROUND_DRAW_VIEW, string> = {
 
 /** Les deux côtés d'une affiche, dans l'ordre de saisie. */
 export const ROUND_DRAW_SIDES: readonly TSidePosition[] = [1, 2]
+
+/** Identifiant du titre de la saisie : l'en-tête peut être posé hors de la colonne de saisie (carte des barrages), la section de saisie le désigne par `aria-labelledby`. */
+export const ROUND_DRAW_TITLE_ID = 'round-draw-title'

@@ -81,6 +81,22 @@ export interface IRoundDrawEntryProps {
   saveState: POOL_DRAW_SAVE_STATE
   /** Barrages : nombre de premiers de poule qui attendent (0 sinon). */
   waitingLeaders: number
+  /** L'en-tête est posé par la page (carte des barrages). */
+  headless?: boolean
+}
+
+export interface IRoundDrawHeadProps {
+  roundKind: ROUND_KIND
+  progress: IRoundDrawProgress
+  readOnly: boolean
+  changeable: boolean
+  waitingLeaders: number
+  /** Joueurs à tirer : avec les premiers qui attendent, ils donnent le tour d'après les barrages. */
+  drawableCount: number
+}
+
+export interface IRoundDrawHeadEmits {
+  (event: 'change-round'): void
 }
 
 export interface IRoundDrawEntryEmits {

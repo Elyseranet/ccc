@@ -175,6 +175,7 @@
   "admin.round_draw.origin_leaders_wait": "Pool winners (waiting)",
   "admin.round_draw.origin_playoff_winners": "Playoff winners",
   "admin.round_draw.origin_qualified": "Qualified",
+  "admin.round_draw.playoff_title": "Playoff draw",
   "admin.round_draw.playoff_leaders_wait_one": "The pool winner is not drawn: they wait for {round}.",
   "admin.round_draw.playoff_leaders_wait_other": "The {count} pool winners are not drawn: they wait for {round}.",
   "admin.round_draw.wait_round_of_16": "the round of 16",

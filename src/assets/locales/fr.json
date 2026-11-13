@@ -175,6 +175,7 @@
   "admin.round_draw.origin_leaders_wait": "Premiers de poule (en attente)",
   "admin.round_draw.origin_playoff_winners": "Vainqueurs des barrages",
   "admin.round_draw.origin_qualified": "Qualifiés",
+  "admin.round_draw.playoff_title": "Tirage des barrages",
   "admin.round_draw.playoff_leaders_wait_one": "Le premier de poule n’est pas tiré : il attend {round}.",
   "admin.round_draw.playoff_leaders_wait_other": "Les {count} premiers de poule ne sont pas tirés : ils attendent {round}.",
   "admin.round_draw.wait_round_of_16": "les huitièmes",

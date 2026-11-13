@@ -103,6 +103,28 @@
           @start="handleStart"
         />
         <template v-else-if="view === entryView && roundKind">
+          <origam-card
+            v-if="isPlayoff"
+            tag="section"
+            rounded="xl"
+            border
+            elevation="md"
+            padding="0"
+            class="admin-round-draw__playoff"
+            data-cy="round-draw-playoff"
+          >
+            <template #default>
+              <round-draw-head
+                :round-kind="roundKind"
+                :progress="progress"
+                :read-only="isReadOnly"
+                :changeable="isChosen"
+                :waiting-leaders="waitingLeaders"
+                :drawable-count="drawable.length"
+                @change-round="handleChangeRound"
+              />
+            </template>
+          </origam-card>
           <div class="admin-round-draw__grid">
             <round-draw-entry
               :round-kind="roundKind"
@@ -113,6 +135,7 @@
               :changeable="isChosen"
               :save-state="saveState"
               :waiting-leaders="waitingLeaders"
+              :headless="isPlayoff"
               @place="handlePlace"
               @change="handleChange"
               @change-round="handleChangeRound"
@@ -157,12 +180,13 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamSnackbar, OrigamTitle } from 'origam/components'
+import { OrigamAlert, OrigamBtn, OrigamCard, OrigamSnackbar, OrigamTitle } from 'origam/components'
 import DrawSteps from '~/components/admin/draws/DrawSteps.vue'
 import PhaseSteps from '~/components/admin/phase/PhaseSteps.vue'
 import RoundDrawChangeDialog from '~/components/admin/round-draw/RoundDrawChangeDialog.vue'
 import RoundDrawChoice from '~/components/admin/round-draw/RoundDrawChoice.vue'
 import RoundDrawEntry from '~/components/admin/round-draw/RoundDrawEntry.vue'
+import RoundDrawHead from '~/components/admin/round-draw/RoundDrawHead.vue'
 import RoundDrawRecap from '~/components/admin/round-draw/RoundDrawRecap.vue'
 import RoundDrawSide from '~/components/admin/round-draw/RoundDrawSide.vue'
 import RoundDrawState from '~/components/admin/round-draw/RoundDrawState.vue'
@@ -213,7 +237,8 @@ const isEmpty = computed(() => preview.value === null)
 const allowedRoundKinds = computed(() => preview.value?.allowedRoundKinds ?? [])
 const showState = computed(() => view.value !== null && view.value !== ROUND_DRAW_VIEW.ENTRY && view.value !== ROUND_DRAW_VIEW.CHOICE)
 const leaderCount = computed(() => players.value.filter(player => player.isLeader).length)
-const waitingLeaders = computed(() => roundKind.value === ROUND_KIND.PLAYOFF ? leaderCount.value : 0)
+const isPlayoff = computed(() => roundKind.value === ROUND_KIND.PLAYOFF)
+const waitingLeaders = computed(() => isPlayoff.value ? leaderCount.value : 0)
 const hasPlayoff = computed(() => rounds.value.some(round => round.kind === ROUND_KIND.PLAYOFF))
 /** Le tour s'est choisi (vivier hors 2, 4, 8, 16) : « Changer de tour » est proposé tant que le tirage n'est pas validé. */
 const isChosen = computed(() => preview.value !== null && preview.value.roundKind === null && allowedRoundKinds.value.length > 1)
@@ -360,6 +385,18 @@ defineExpose({})
   &__lead {
     margin: 0;
     color: var(--origam-color__text---secondary);
+  }
+
+  &__playoff {
+    margin-bottom: var(--origam-space---5);
+  }
+
+  &__playoff :deep(.origam-card__content) {
+    padding: var(--origam-space---6);
+
+    @media (max-width: 760px) {
+      padding: var(--origam-space---5);
+    }
   }
 
   &__grid {
