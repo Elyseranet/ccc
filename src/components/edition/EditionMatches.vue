@@ -65,6 +65,9 @@
             class="edition-matches__table"
             data-cy="edition-matches-table"
           >
+            <template #item.number="{ item }">
+              <span class="edition-matches__number">{{ item.number }}</span>
+            </template>
             <template #item.first="{ item }">
               <span
                 class="edition-matches__side"
@@ -313,6 +316,10 @@ defineExpose({})
       background: var(--origam-color__surface---default);
       color: var(--origam-color__text---primary);
     }
+  }
+
+  &__number {
+    font-variant-numeric: tabular-nums;
   }
 
   &__score {
