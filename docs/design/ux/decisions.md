@@ -492,3 +492,13 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - La production tourne sur le **même Coolify chez Hetzner** que la dev, avec l'app et PostgreSQL dans le même réseau Docker interne.
 - **Pas de SSL PostgreSQL** : la base n'est pas exposée hors du réseau interne.
 - Reste à faire : régler `NUXT_TRUST_PROXY_HOPS` sur le nombre réel de proxys devant l'app (le proxy de Coolify), mesuré sur la dev, avec un test.
+
+## DIALOG-ALIGN et DIALOG-ZONES — Suite de DIALOG-THEME (décisions utilisateur 2026-11-13, F-30)
+
+- **DIALOG-ALIGN** : le texte et les boutons des dialogues s'alignent sur le retrait du titre (16 px).
+  - Texte : le contenu passe dans un `<origam-card-text>` (padding Origam par défaut de 1rem), sans entrée de thème ni style local.
+  - Boutons : Origam n'offre aucun réglage sur le pied de carte (`OrigamCard.vue` l.183-186, `<div class="origam-card__footer">` nu). Notre conteneur de boutons reçoit donc un padding de 16 px en token. C'est le seul style local autorisé ici, sans `:deep`. La limite est consignée dans une fiche `docs/tickets/origam/`.
+  - La maquette reprend le retrait de 16 px pour le texte et les boutons.
+- **DIALOG-ZONES** : dérogation au pixel perfect. Les zones visuelles des dialogues comparent la carte, ses dimensions et les boutons sous 1 %, avec le texte masqué. La taille, la graisse et l'interligne du texte sont vérifiés par une mesure du style calculé.
+  - Cause : Origam rend le dialogue sur un calque composité, ce qui décale les lignes de texte d'une fraction de pixel. L'image d'écart ne montre que les bords des glyphes. Mesuré par dev-f19 à tailles égales, sur maquette `8b144917` : F-11 4,44 / 9,49 %, F-24 4,54 / 7,19 %, F-25 2,96 / 7,62 %.
+  - La dérogation vaut pour les dialogues seulement. Le seuil de 1 % reste inchangé partout ailleurs.
