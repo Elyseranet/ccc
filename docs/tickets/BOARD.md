@@ -245,6 +245,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-36](F-36.md) | `EditionChip` environ 2 px plus large que la `.chip` des maquettes (trouvé en revue F-24) | — | — | Ouvert | existe (`hh.css` `.chip`) |
 | [F-37](F-37.md) | F-24 : bouton « Arrêter la liste » 44 px au lieu de 48, désactivé sans changement visuel (Origam) | validée @ `409c253b` | — | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-38](F-38.md) | Boutons primaires désactivables : appliquer `usePrimaryActionButton` (suite F-37) | — | F-25 | **Fermé** (2026-11-13) @ `350c9d17` |
+| [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | à faire | F-26 | Ouvert |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
