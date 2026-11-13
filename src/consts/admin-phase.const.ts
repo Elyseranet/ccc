@@ -8,6 +8,6 @@ import type { ITranslatableText } from '../interfaces/common-components.interfac
  */
 export const ADMIN_PHASE_STEPS: Array<{ step: PHASE_STEP, label: ITranslatableText, to: string | null }> = [
   { step: PHASE_STEP.QUALIFICATION, label: { key: 'admin.phase.step_qualification', fallback: 'Qualification' }, to: ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION },
-  { step: PHASE_STEP.ROUND_DRAW, label: { key: 'admin.phase.step_round_draw', fallback: 'Tirage de tour' }, to: null },
+  { step: PHASE_STEP.ROUND_DRAW, label: { key: 'admin.phase.step_round_draw', fallback: 'Tirage de tour' }, to: ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW },
   { step: PHASE_STEP.CLOSING, label: { key: 'admin.phase.step_closing', fallback: 'Clôture' }, to: null }
 ]

@@ -19,6 +19,7 @@
       >
         {{ text }} <strong v-if="warning">{{ warning }}</strong>
       </p>
+      <slot name="default" />
     </template>
     <template #[footerSlot]>
       <div class="confirm-dialog__actions">
@@ -69,7 +70,7 @@ const props = withDefaults(defineProps<IConfirmDialogProps>(), {
   appearance: CONFIRM_DIALOG_APPEARANCE.DEFAULT
 })
 const emits = defineEmits<IConfirmDialogEmits>()
-defineSlots<{}>()
+defineSlots<{ default?: () => unknown }>()
 const descriptionId = useId()
 const isMockup = computed(() => props.appearance === CONFIRM_DIALOG_APPEARANCE.MOCKUP)
 const padding = computed(() => isMockup.value ? '2' : '6')

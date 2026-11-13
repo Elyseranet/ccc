@@ -110,14 +110,14 @@ describe('texte d’une égalité entre poules selon le nombre de joueurs (RG20,
 })
 
 describe('page « Qualification » (F-24)', () => {
-  it('rend un h1 unique, la navigation de la phase finale (Tirage de tour et Clôture non cliquables), les quatre étapes et le classement', async () => {
+  it('rend un h1 unique, la navigation de la phase finale (Tirage de tour cliquable, Clôture non cliquable), les quatre étapes et le classement', async () => {
     const wrapper = await load()
     expect(wrapper.findAll('h1')).toHaveLength(1)
     expect(wrapper.get('h1').text()).toBe('Qualification')
     const phase = wrapper.get('[data-cy="phase-steps"]')
     expect(phase.text()).toContain('Tirage de tour')
     expect(phase.text()).toContain('Clôture')
-    expect(phase.findAll('button')).toHaveLength(0)
+    expect(phase.findAll('button')).toHaveLength(1)
     expect(phase.find('[aria-current="step"]').text()).toContain('Qualification')
     expect(wrapper.text()).toContain('Poules validées')
     expect(wrapper.get('[data-cy="qualification-ranking"]').text()).toContain('Maya Legrand')

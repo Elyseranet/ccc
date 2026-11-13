@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<IDrawStepsProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const label = computed(() => props.label ?? t('admin.draws.steps_label', 'Étapes du tirage'))
-const items = computed(() => props.steps.map(entry => ({ title: t(entry.label.key, entry.label.fallback), status: entry.state })))
+const items = computed(() => props.steps.map(entry => ({ title: t(entry.label.key, entry.label.fallback, entry.label.params), status: entry.state })))
 const activeIndex = computed(() => Math.max(0, props.steps.findIndex(entry => entry.state === POOL_DRAW_STEP_STATE.ACTIVE)))
 
 /*********************************************************

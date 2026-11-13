@@ -1,6 +1,6 @@
 import type { TIEBREAK_FORMAT } from '../enums/domain.enum.js'
 import type { POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
-import type { PHASE_STEP, QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_ROUTE, QUALIFICATION_STEP, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
+import type { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_ROUTE, QUALIFICATION_STEP, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 import type { IQualificationParameters, IQualificationStatus } from './qualification.interface.js'
 
@@ -88,10 +88,6 @@ export interface IQualificationViewInput {
 
 export interface IQualificationFailureView {
   failure: QUALIFICATION_FAILURE
-}
-
-export interface IQualificationPhaseStepsProps {
-  current: PHASE_STEP
 }
 
 export interface IQualificationPrerequisitesProps {

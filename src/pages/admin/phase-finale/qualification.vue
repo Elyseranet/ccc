@@ -4,7 +4,7 @@
     aria-labelledby="admin-qualification-title"
     data-cy="admin-qualification"
   >
-    <qualification-phase-steps :current="currentStep" />
+    <phase-steps :current="currentStep" />
     <header class="admin-qualification__head">
       <div class="admin-qualification__heading">
         <p
@@ -142,7 +142,7 @@ import { OrigamAlert, OrigamBtn, OrigamSnackbar, OrigamTitle } from 'origam/comp
 import DrawSteps from '~/components/admin/draws/DrawSteps.vue'
 import QualificationFinalize from '~/components/admin/qualification/QualificationFinalize.vue'
 import QualificationParameters from '~/components/admin/qualification/QualificationParameters.vue'
-import QualificationPhaseSteps from '~/components/admin/qualification/QualificationPhaseSteps.vue'
+import PhaseSteps from '~/components/admin/phase/PhaseSteps.vue'
 import QualificationPrerequisites from '~/components/admin/qualification/QualificationPrerequisites.vue'
 import QualificationRanking from '~/components/admin/qualification/QualificationRanking.vue'
 import QualificationTies from '~/components/admin/qualification/QualificationTies.vue'

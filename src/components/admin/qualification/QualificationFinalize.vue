@@ -54,9 +54,9 @@
       >
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
-          size="large"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
+          size="x-large"
           aria-haspopup="dialog"
           :disabled="isBlocked"
           :loading="busy"
@@ -98,6 +98,7 @@ import { OrigamBtn, OrigamCard } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
@@ -128,6 +129,7 @@ const emptyText = computed(() => t('admin.qualification.finalize_empty', 'L’ap
 const buttonLabel = computed(() => t('admin.qualification.finalize_button', 'Arrêter la liste…'))
 const hasRows = computed(() => props.rows.length > 0)
 const isBlocked = computed(() => props.blocker !== null || props.busy)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 const blockerText = computed(() => props.blocker === null ? '' : describeBlocker(t, props.blocker, props.pendingCount, props.tieCount))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: QUALIFIED_COLUMN.POOL, title: t('admin.qualification.finalize_col_pool', 'Poule'), sortable: false },
