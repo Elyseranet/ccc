@@ -24,9 +24,12 @@
         :text="recAlertText"
         data-cy="edition-draws-reconstituted"
       />
-      <div class="edition-draws__layout">
+      <div
+        class="edition-draws__layout"
+        :class="{ 'edition-draws__layout--single': !hasRecPools }"
+      >
         <origam-card
-          v-if="reconstituted.pools.length > 0"
+          v-if="hasRecPools"
           tag="article"
           rounded="xl"
           border
@@ -352,6 +355,7 @@ const seedRows = computed(() => props.seeds.map(seed => ({
   pool: t('edition.draws_pool_label', 'Poule {rank}', { rank: seed.poolRank })
 })))
 const recChipFamily = EDITION_CHIP_FAMILY.NEUTRAL
+const hasRecPools = computed(() => (props.reconstituted?.pools.length ?? 0) > 0)
 const recAlertTitle = computed(() => t('edition.draws_rec_alert_title', 'Tirages reconstitués à partir des résultats'))
 const recAlertText = computed(() => t('edition.draws_rec_alert_text', 'Les tirages de cette édition n’ont pas été archivés. La composition des poules et les affiches de chaque tour sont déduites des poules et des matchs joués.'))
 const recPoolsTitle = computed(() => t('edition.draws_rec_pools_title', 'Composition des poules'))
@@ -400,6 +404,10 @@ defineExpose({})
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
     gap: var(--edition-draws---gap, var(--origam-space---5));
     align-items: start;
+  }
+
+  &__layout--single {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   &__head {

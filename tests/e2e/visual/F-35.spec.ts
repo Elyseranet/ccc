@@ -9,7 +9,7 @@ import { box, compare, open } from '../visual.util'
  * barrages) comparée à `edition.html?tirages=reconstitue&barrages`. Les zones comparées ne dépendent d'aucune donnée : l'alerte, les titres
  * et leur pastille, les notes, l'en-tête d'une poule et d'une carte de tour. La composition des poules et les listes d'affiches portent
  * des noms et un nombre de joueurs qui viennent des archives (la maquette en dessine six par poule) : elles sont couvertes par les tests
- * d'unité et de composant. Seuil : 1 % par zone.
+ * d'unité et de composant. L'édition 2013 (aucune poule) n'a pas de carte de composition : seule l'alerte, pleine largeur comme dans la maquette, est comparée. Seuil : 1 % par zone.
  ********************************************************/
 const VIEWPORTS = [
   { name: '1440', width: 1440, height: 900 },
@@ -18,6 +18,7 @@ const VIEWPORTS = [
 
 const ZONES = [
   { zone: 'rec-alerte', code: '2025', mockQuery: '', mockup: '.tir-rec__note', app: '[data-cy="edition-draws-reconstituted"]' },
+  { zone: 'rec-alerte-sans-poule', code: '2013', mockQuery: '', mockup: '.tir-rec__note', app: '[data-cy="edition-draws-reconstituted"]' },
   { zone: 'rec-poules-entete', code: '2025', mockQuery: '', mockup: '.tir-rec .tir__pools .draw__head', app: '[data-cy="edition-draws-rec-pools"] .edition-draws__head' },
   { zone: 'rec-poules-note', code: '2025', mockQuery: '', mockup: '.tir-rec .tir__pools > p.muted', app: '[data-cy="edition-draws-rec-pools"] .edition-draws__note' },
   { zone: 'rec-poule-titre', code: '2025', mockQuery: '', mockup: '.tir-rec .rec-pool:first-child .rec-pool__t', app: '[data-cy="edition-rec-pool-1"] .edition-draws__rec-pool-title' },

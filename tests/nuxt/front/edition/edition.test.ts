@@ -136,7 +136,10 @@ describe('EditionDraws : tirages reconstitués (F-35)', () => {
 
   it('sans poule, la carte de composition n’est pas rendue et les affiches restent', async () => {
     const wrapper = await mountSuspended(EditionDraws, { ...withRouterLink, props: { seeds: [], poolsStatus: null, roundDraws: [], reconstituted: { ...reconstituted, pools: [] } } })
+    expect(wrapper.find('[data-cy="edition-draws-reconstituted"]').exists()).toBe(true)
     expect(wrapper.find('[data-cy="edition-draws-rec-pools"]').exists()).toBe(false)
+    expect(wrapper.find('[data-cy="edition-rec-pool-1"]').exists()).toBe(false)
+    expect(wrapper.find('.edition-draws__layout--single').exists()).toBe(true)
     expect(wrapper.find('[data-cy="edition-rec-draw-quarter"]').exists()).toBe(true)
   })
 

@@ -37,6 +37,17 @@ test.describe('édition : accessibilité et comportement (F-03a)', () => {
     expect(results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)).toEqual([])
   })
 
+  test('F-35 : édition sans poule en archives (2013) : l’alerte et les affiches, aucune carte de composition, 0 violation axe', async ({ page }) => {
+    await page.goto('/editions/2013?onglet=tirages')
+    await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+    await expect(page.getByTestId('edition-draws-reconstituted')).toBeVisible()
+    await expect(page.getByTestId('edition-rec-draw-quarter')).toBeVisible()
+    await expect(page.getByTestId('edition-draws-rec-pools')).toHaveCount(0)
+    await expect(page.getByText('Tour non encore tiré')).toHaveCount(0)
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
+    expect(results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)).toEqual([])
+  })
+
   test('recharger l’URL restaure l’onglet', async ({ page }) => {
     await page.goto(`${EDITION}?onglet=participants`)
     await expect(page.getByTestId('edition-tab-participants')).toHaveAttribute('aria-selected', 'true')
