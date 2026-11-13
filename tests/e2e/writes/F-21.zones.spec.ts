@@ -162,7 +162,7 @@ for (const viewport of VIEWPORTS) {
       ])
       const FIXED_NUMBER = '2025-106'
       await mockup.locator('#ed-p-mat .m-tb td:nth-child(1)').evaluate((cell, text) => { cell.textContent = text }, FIXED_NUMBER)
-      await page.locator(`${ROW} td:nth-child(1)`).evaluate((cell, text) => { cell.textContent = text }, FIXED_NUMBER)
+      await page.locator(`${ROW} .edition-matches__number`).evaluate((cell, text) => { cell.textContent = text }, FIXED_NUMBER)
       await hideInk(mockup, ['#ed-p-mat .m-tb td:nth-child(1)', '#ed-p-mat .m-tb td:nth-child(2)', '#ed-p-mat .m-tb a'])
       await hideInk(page, ['[data-cy="edition-matches-table"] tbody td:nth-child(1)', '[data-cy="edition-matches-table"] tbody td:nth-child(2)', '[data-cy="edition-matches-table"] tbody .player-link__name'])
       await mockup.evaluate(() => window.scrollTo(0, 0))
