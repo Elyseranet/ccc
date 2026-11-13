@@ -169,6 +169,15 @@ for (const viewport of VIEWPORTS) {
       await page.evaluate(() => window.scrollTo(0, 0))
       const columns = (target: Page, selector: string) => target.locator(selector).evaluateAll(cells => cells.map(cell => Number(cell.getBoundingClientRect().width.toFixed(1))))
       console.log(`COLONNES ${viewport.name} maquette ${(await columns(mockup, '#ed-p-mat .m-tb td')).join(' / ')} | app ${(await columns(page, `${ROW} td`)).join(' / ')}`)
+      // Le haut du tableau tombe, dans l'application, à une fraction de pixel qui dépend de la hauteur de ce qui le précède (la page de l'édition créée par le test) : mesuré 0,17 px
+      // lancé seul, 0,89 px avec le fichier entier, 0,17 px côté maquette. Avec 0,89 la ligne de pixels du bas de la bordure et les angles arrondis sont dans la capture d'un côté seulement
+      // (330 pixels sur la dernière ligne, 0,91 %). On pose donc la fraction de l'application sur celle de la maquette (déplacement relatif de moins d'un pixel, aucun gabarit touché).
+      const mockTop = await mockup.locator('#ed-p-mat .table-wrap').evaluate(element => element.getBoundingClientRect().top + window.scrollY)
+      await page.locator('[data-cy="edition-matches-scroll"]').evaluate((element, target) => {
+        const own = element.getBoundingClientRect().top + window.scrollY
+        element.style.position = 'relative'
+        element.style.top = `${(((target % 1) - (own % 1)) % 1 + 1) % 1}px`
+      }, mockTop)
       const mockBox = await box(mockup, '#ed-p-mat .table-wrap')
       const appBox = await box(page, '[data-cy="edition-matches-scroll"]')
       await compare(page, mockup, 'matchs-public-departage', viewport.name, mockBox, appBox, NO_MASKS)
