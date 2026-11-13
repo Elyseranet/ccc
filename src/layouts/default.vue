@@ -166,10 +166,10 @@
             {{ creditPrefix }}
             <a
               class="public-footer__credit"
-              :href="publisherUrl"
+              :href="creditUrl"
               rel="noopener"
               data-cy="footer-credit-publisher"
-            >{{ publisherName }}</a>
+            >{{ creditName }}</a>
             {{ creditMiddle }}
             <a
               class="public-footer__credit"
@@ -193,7 +193,7 @@ import { useNavigationState } from '~/composables/useNavigationState'
 import { useT } from '~/composables/useT'
 import { INTENT, VARIANT } from 'origam/enums'
 import { ROUTES } from '~/consts/routes.const'
-import { LEGAL_PUBLISHER_NAME, LEGAL_PUBLISHER_URL, ORIGAM_REPOSITORY_URL } from '~/consts/legal.const'
+import { LEGAL_SITE_CREDIT_NAME, LEGAL_SITE_CREDIT_URL, ORIGAM_REPOSITORY_URL } from '~/consts/legal.const'
 import { FOOTER_NAVIGATION, LEGAL_NAVIGATION, PUBLIC_NAVIGATION } from '~/consts/public-navigation.const'
 import { useAuthStore } from '~/composables/useAuthStore'
 import { useLogout } from '~/composables/useLogout'
@@ -247,10 +247,10 @@ const legalNavigation = computed(() => LEGAL_NAVIGATION.map(item => ({
   current: ariaCurrent(item.to, true)
 })))
 const hasLegalNavigation = computed(() => legalNavigation.value.length > 0)
-const publisherName = LEGAL_PUBLISHER_NAME
-const publisherUrl = LEGAL_PUBLISHER_URL
+const creditName = LEGAL_SITE_CREDIT_NAME
+const creditUrl = LEGAL_SITE_CREDIT_URL
 const designSystemUrl = ORIGAM_REPOSITORY_URL
-const copyright = computed(() => t('layout.footer.copyright', '© {year} {publisher}', { year: new Date().getFullYear(), publisher: LEGAL_PUBLISHER_NAME }))
+const copyright = computed(() => t('layout.footer.copyright', '© {year} Cotentin Caps Cup', { year: new Date().getFullYear() }))
 const creditPrefix = computed(() => t('layout.footer.credit_prefix', 'Site réalisé par'))
 const creditMiddle = computed(() => t('layout.footer.credit_middle', 'avec'))
 const designSystemName = computed(() => t('layout.footer.design_system_name', 'Origam'))
