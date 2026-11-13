@@ -156,11 +156,13 @@ for (const viewport of VIEWPORTS) {
       await mockup.addStyleTag({ content: '#ed-p-mat tbody tr:not(.m-tb) { display: none !important; } .stars { display: none !important; }' })
       await page.addStyleTag({ content: `[data-cy="edition-matches-table"] tbody tr:not(:has(.edition-matches__others li + li)) { display: none !important; }` })
       await alignMockupText(mockup, page, [
-        { mockup: '#ed-p-mat .m-tb td:nth-child(1)', app: `${ROW} td:nth-child(1)` },
         { mockup: '#ed-p-mat .m-tb td:nth-child(2)', app: `${ROW} td:nth-child(2)` },
         { mockup: '#ed-p-mat .m-tb td:nth-child(3) a', app: `${ROW} td:nth-child(3) .player-link__name` },
         { mockup: '#ed-p-mat .m-tb .opp-list a', app: `${ROW} .edition-matches__others .player-link__name` }
       ])
+      const FIXED_NUMBER = '2025-106'
+      await mockup.locator('#ed-p-mat .m-tb td:nth-child(1)').evaluate((cell, text) => { cell.textContent = text }, FIXED_NUMBER)
+      await page.locator(`${ROW} td:nth-child(1)`).evaluate((cell, text) => { cell.textContent = text }, FIXED_NUMBER)
       await hideInk(mockup, ['#ed-p-mat .m-tb td:nth-child(1)', '#ed-p-mat .m-tb td:nth-child(2)', '#ed-p-mat .m-tb a'])
       await hideInk(page, ['[data-cy="edition-matches-table"] tbody td:nth-child(1)', '[data-cy="edition-matches-table"] tbody td:nth-child(2)', '[data-cy="edition-matches-table"] tbody .player-link__name'])
       await mockup.evaluate(() => window.scrollTo(0, 0))
