@@ -11,9 +11,8 @@ import type { IDataMasks } from '../visual.util'
  * F-24 : zones visuelles de la qualification (admin-qualification.html)
  *
  * @description
- * Pourquoi `writes/` et non `visual/` : l'écran se mesure sur des éditions créées par le test (QA-3, jamais 2026), dans trois états que la base de test n'a pas :
- * « égalité » (3 poules de 2, une égalité entre poules à 3 joueurs : étapes Fait, Active, À venir, À venir comme la maquette), « prête » (aucune égalité, dialogue d'arrêt)
- * et « matchs à valider » (carte « Poules à jour »). Les VALEURS (noms, nombres, textes de données) sont rendues transparentes des deux côtés, ou recopiées de l'application
+ * Pourquoi `writes/` et non `visual/` : l'écran se mesure sur des éditions créées par le test (QA-3, jamais 2026), dans deux états que la base de test n'a pas :
+ * « égalité » (3 poules de 2, une égalité entre poules à 3 joueurs : étapes Fait, Active, À venir, À venir comme la maquette), et « matchs à valider » (carte « Poules à jour »). Le dialogue d'arrêt n'est pas dans ce test : voir F-24.md (renvoi à F-30). Les VALEURS (noms, nombres, textes de données) sont rendues transparentes des deux côtés, ou recopiées de l'application
  * dans la maquette (`alignMockupText`) ; gabarit, filets, pastilles, rayons, boutons restent comparés. Non comparés, parce qu'aucun état réel ne reproduit leur contenu
  * (la maquette montre 6 joueurs, 2 égalités dont une avec des matchs encore à valider) : le classement, la liste des égalités et l'aperçu des qualifiés.
  * Ils sont couverts par les tests de composant, les e2e fonctionnels et l'axe (`F-24.spec.ts`).
@@ -23,21 +22,6 @@ const VIEWPORTS = [
   { name: '390', width: 390, height: 844 }
 ]
 const PAGE = '/admin/phase-finale/qualification'
-const DIALOG_TEXT_FRACTION = 0.4
-/**
- * Cale le haut de `anchor` à `fraction` de pixel en déplaçant `shift` (moins d'un pixel, aucun gabarit touché). Le dialogue d'Origam est centré dans un calque composité, celui de la maquette
- * est dans la page : à une position quelconque, une ligne de texte tombe parfois pile sur un seuil d'arrondi et bascule d'un pixel d'un côté seulement (hauteur de ligne 24,797 px). On pose
- * donc les deux textes à la même fraction, choisie loin des seuils pour les quatre lignes.
- */
-const alignAnchorTo = async (page: Page, shift: string, anchor: string, fraction: number) => {
-  await page.evaluate(([shiftSelector, anchorSelector, target]) => {
-    const element = document.querySelector(shiftSelector as string) as HTMLElement
-    const top = (document.querySelector(anchorSelector as string) as HTMLElement).getBoundingClientRect().top + window.scrollY
-    const delta = ((((target as number) - (top % 1)) % 1) + 1) % 1
-    element.style.marginTop = `calc(${getComputedStyle(element).marginTop} + ${delta}px)`
-  }, [shift, anchor, fraction])
-}
-
 /** Boîte du haut d'un conteneur au bas de son premier élément `end`. */
 const boxTo = async (page: Page, container: string, end: string) => page.evaluate(([containerSelector, endSelector]) => {
   const root = document.querySelector(containerSelector as string) as HTMLElement
@@ -159,38 +143,6 @@ for (const viewport of VIEWPORTS) {
       await alignToPixel(mockup, '.q-pre')
       await alignToPixel(page, '[data-cy="qualification-prerequisites"]')
       await compare(page, mockup, 'qa-poules-a-jour', viewport.name, await box(mockup, '.q-pre'), await box(page, '[data-cy="qualification-prerequisites"]'), NO_MASKS)
-      await mockContext.close()
-    })
-  })
-
-  test.describe(`F-24 qualification, arrêt de la liste @${viewport.name}`, () => {
-    test.use({ viewport: { width: viewport.width, height: viewport.height } })
-
-    test('qa-dialogue', async ({ page, browser, context }) => {
-      await signIn(context, 'admin')
-      const { edition } = await createTiedPoolsEdition(context.request, `f24zdlg${viewport.name}`, 3)
-      await selectAdminEdition(context, edition)
-      const { mockup, mockContext } = await open(page, browser, viewport)
-      await page.goto(PAGE)
-      await hydrated(page)
-      await page.getByTestId('qualification-qualified').waitFor()
-      await page.getByTestId('qualification-finalize-open').click()
-      const dialog = page.getByTestId('qualification-finalize-dialog')
-      await dialog.waitFor()
-      // Derrière les angles arrondis du dialogue, l'application montre sa page sous le voile, la maquette son fond : on rend le voile et la page transparents pour comparer la carte seule.
-      await page.addStyleTag({ content: '*, *::before, *::after { caret-color: transparent !important; transition: none !important; animation: none !important; } .origam-scrim { display: none !important; } #__nuxt { visibility: hidden !important; }' })
-      await page.evaluate(() => document.fonts.ready)
-      await alignMockupText(mockup, page, [{ mockup: '#dq-d', app: '[data-cy="qualification-finalize-dialog"] .confirm-dialog__text' }])
-      // Le dialogue de la maquette est dans la page (largeur du contenu, 358 px à 390) ; celui d'Origam est un calque centré avec 24 px de marge de chaque côté (342 px) : on prend sa largeur.
-      const card = '[data-cy="qualification-finalize-dialog"] .origam-card'
-      const appWidth = (await box(page, card)).width
-      await mockup.addStyleTag({ content: `.odlg { margin-top: 0 !important; width: ${appWidth}px !important; }` })
-      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
-      await page.evaluate(() => window.scrollTo(0, 0))
-      const textAnchor = '[data-cy="qualification-finalize-dialog"] .confirm-dialog__text'
-      await alignAnchorTo(mockup, '.odlg', '#dq-d', DIALOG_TEXT_FRACTION)
-      await alignAnchorTo(page, '.origam-overlay__content', textAnchor, DIALOG_TEXT_FRACTION)
-      await compare(page, mockup, 'qa-dialogue', viewport.name, await box(mockup, '.odlg'), await box(page, card), NO_MASKS)
       await mockContext.close()
     })
   })
