@@ -151,9 +151,18 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_FINAL_PHASE]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: []
+  },
+  [ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION]: {
+    delivered: true,
+    layout: LAYOUT.ADMIN,
+    endpoints: [
+      API_ENDPOINT.ADMIN_QUALIFICATION,
+      API_ENDPOINT.QUALIFICATION_FINALIZE,
+      API_ENDPOINT.TIEBREAK_CREATE
+    ]
   },
   [ROUTES.ADMIN_EDITIONS]: {
     delivered: false,

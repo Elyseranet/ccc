@@ -85,7 +85,9 @@ export interface IPoolDrawContext {
 }
 
 export interface IDrawStepsProps {
-  steps: IPoolDrawStepView[]
+  steps: Array<Pick<IPoolDrawStepView, 'label' | 'state'>>
+  /** Nom du stepper pour les lecteurs d'écran ; à défaut, « Étapes du tirage ». */
+  label?: string
 }
 
 export interface IDrawParametersProps {

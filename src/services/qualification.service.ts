@@ -1,4 +1,6 @@
 import type { DataSource, EntityManager } from 'typeorm'
+import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import { BaseService } from './base.service.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
 import { POOLS_STAGE_STATUSES, PRE_POOLS_STATUSES } from '../consts/qualification.const.js'
 import { ADMIN_MATCH_RELATIONS, OPEN_ROUND_STATUSES } from '../consts/match-score.const.js'
@@ -38,6 +40,37 @@ import { computeQualification, sameMembers } from '../utils/qualification-plan.u
 import { targetScore } from '../utils/score-rules.util.js'
 import { generateUuids } from '../utils/uuid.util.js'
 import { editionClosed, findEditionLocked, findEditionOrThrow } from './edition.service.js'
+
+/*********************************************************
+ * QualificationService
+ *
+ * @description
+ * Service unique du domaine (ARCH-2) : la classe navigateur (`$fetch`, via BaseService) et, plus bas, les fonctions serveur de B-13
+ * (TypeORM), que le code navigateur ne référence jamais (le build client les élague, `tests/build/client-bundle.test.ts`).
+ * Ces routes ne portent pas `If-Match` : le serveur verrouille l'édition et rend les conflits en 409.
+ ********************************************************/
+export class QualificationService extends BaseService {
+  constructor (options: IBaseServiceOptions = {}) {
+    super(options)
+  }
+
+  /** `GET /admin/editions/{id}/qualification` : sans paramètres, la configuration enregistrée ; avec, la simulation (les deux ou aucun). */
+  status (editionId: string, parameters: Pick<IQualificationParameters, 'topPerPool' | 'bestNextCount'> | null = null): Promise<IQualificationStatus> {
+    return this.request<IQualificationStatus>(`/admin/editions/${encodeURIComponent(editionId)}/qualification`, {
+      query: parameters ? { topPerPool: parameters.topPerPool, bestNextCount: parameters.bestNextCount } : {}
+    })
+  }
+
+  /** `POST /editions/{id}/departages` : crée le match de départage d'une égalité (201), ou rend celui qui est déjà ouvert (200). */
+  createTiebreak (editionId: string, body: ICreateTiebreakRequest): Promise<IAdminMatch> {
+    return this.request<IAdminMatch>(`/editions/${encodeURIComponent(editionId)}/departages`, { method: 'POST', body: { ...body } })
+  }
+
+  /** `POST /editions/{id}/qualification` : arrête la liste des qualifiés, définitivement (409 si un match ou un départage reste à jouer). */
+  finalize (editionId: string, parameters: IQualificationParameters): Promise<IQualificationResult> {
+    return this.request<IQualificationResult>(`/editions/${encodeURIComponent(editionId)}/qualification`, { method: 'POST', body: { ...parameters } })
+  }
+}
 
 /*********************************************************
  * Qualification (B-13)

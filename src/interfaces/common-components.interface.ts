@@ -1,3 +1,4 @@
+import type { CONFIRM_DIALOG_APPEARANCE } from '../enums/confirm-dialog.enum.js'
 import type { GOLDEN_RULES_VARIANT } from '../enums/golden-rules-variant.enum.js'
 import type { ICompetitorPublic } from './competitor.interface.js'
 import type { TSize } from 'origam/types'
@@ -77,5 +78,29 @@ export interface IAppPaginationProps {
 
 export interface IAppPaginationEmits {
   (event: 'update:page', value: number): void
+}
+
+export interface IConfirmDialogProps {
+  open: boolean
+  busy: boolean
+  title: string
+  /** Ce qui va se passer. */
+  text: string
+  /** Phrase d'avertissement en gras après le texte (« Cette action n'est pas annulable. »). */
+  warning?: string
+  cancelLabel: string
+  confirmLabel: string
+  /** Préfixe des `data-cy` : `{préfixe}-dialog`, `{préfixe}-cancel`, `{préfixe}-confirm`. */
+  cyPrefix: string
+  confirmColor?: string
+  confirmSize?: string
+  confirmElevation?: string
+  /** `MOCKUP` : gabarit de la maquette d'F-24 ; `DEFAULT` : rendu historique du dialogue de validation du tirage (F-11), inchangé jusqu'à F-30. */
+  appearance?: CONFIRM_DIALOG_APPEARANCE
+}
+
+export interface IConfirmDialogEmits {
+  (event: 'cancel'): void
+  (event: 'confirm'): void
 }
 

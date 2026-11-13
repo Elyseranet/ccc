@@ -16,9 +16,9 @@ describe('navigation publique (A5, E-d)', () => {
 describe('navigation admin (A7, FA-05, FA-09)', () => {
   const items = ADMIN_NAVIGATION.flatMap(group => group.items)
 
-  it('masque Bracket tant qu’aucun ticket ne le porte, et porte Éditions et Compétiteurs (F-13) dans le Référentiel', () => {
+  it('masque Bracket tant qu’aucun ticket ne le porte, porte Phase finale après Poules et matchs (F-24) et Éditions et Compétiteurs (F-13) dans le Référentiel', () => {
     const paths = items.map(item => item.to)
-    expect(paths).toEqual(['/admin', '/admin/participants', '/admin/tirages', '/admin/matchs', '/admin/editions', '/admin/competiteurs'])
+    expect(paths).toEqual(['/admin', '/admin/participants', '/admin/tirages', '/admin/matchs', '/admin/phase-finale', '/admin/editions', '/admin/competiteurs'])
     expect(paths).not.toContain('/admin/bracket')
   })
 

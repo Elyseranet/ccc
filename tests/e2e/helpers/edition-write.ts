@@ -241,7 +241,7 @@ export interface IMultiTiebreakEdition {
   tiebreak: { id: string, sides: Array<{ participationId: string, displayName: string }>, version: number, targetScore: number }
 }
 
-interface IAdminMatchView { id: string, version: number, purpose: string, sides: Array<{ participationId: string }> }
+export interface IAdminMatchView { id: string, version: number, purpose: string, sides: Array<{ participationId: string }> }
 
 const STATUS_PUT_OK = 200
 
@@ -251,7 +251,11 @@ const scoreAndValidate = async (request: APIRequestContext, match: IAdminMatchVi
   await expectStatus(await request.post(`/api/v1/matchs/${match.id}/validation`, { data: submission, headers: { 'If-Match': `"${recorded.version}"` } }), 'POST validation', STATUS_OK)
 }
 
-export const createMultiTiebreakEdition = async (request: APIRequestContext, label: string, sideCount: number): Promise<IMultiTiebreakEdition> => {
+/**
+ * `sideCount` poules de deux joueurs, chaque match validé 5-2 : `sideCount` perdants à égalité parfaite. Avec `topPerPool: 1` et `bestNextCount: 1` ils se disputent
+ * une seule place de « meilleur 2e » : une égalité entre poules à `sideCount` joueurs. Rien n'est créé de plus (le départage est à créer par l'écran ou l'API).
+ */
+export const createTiedPoolsEdition = async (request: APIRequestContext, label: string, sideCount: number): Promise<{ edition: IWriteEdition, losers: string[] }> => {
   const { edition } = await createDrawnEdition(request, label, sideCount * 2, sideCount)
   const matches = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/matchs`), 'GET matchs admin', STATUS_OK) as IAdminMatchView[]
   const losers: string[] = []
@@ -259,10 +263,20 @@ export const createMultiTiebreakEdition = async (request: APIRequestContext, lab
     await scoreAndValidate(request, match, [5, 2])
     losers.push(match.sides[1]!.participationId)
   }
+  return { edition, losers }
+}
+
+export const createMultiTiebreakEdition = async (request: APIRequestContext, label: string, sideCount: number): Promise<IMultiTiebreakEdition> => {
+  const { edition, losers } = await createTiedPoolsEdition(request, label, sideCount)
   const tiebreak = await expectStatus(
     await request.post(`/api/v1/editions/${edition.id}/departages`, { data: { participationIds: losers, parameters: { topPerPool: 1, bestNextCount: 1 } } }),
     'POST departages',
     STATUS_CREATED
   ) as IMultiTiebreakEdition['tiebreak']
   return { edition, tiebreak }
+}
+
+/** Saisit puis valide le score d'un match par l'API réelle (`scores` dans l'ordre des côtés), comme un administrateur sur l'écran des matchs. */
+export const playMatch = async (request: APIRequestContext, match: IAdminMatchView, scores: number[]): Promise<void> => {
+  await scoreAndValidate(request, match, scores)
 }
