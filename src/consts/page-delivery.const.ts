@@ -151,7 +151,8 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.ADMIN_FINAL_PHASE]: {
     delivered: true,
     layout: LAYOUT.ADMIN,
-    endpoints: []
+    // Provisoire : F-26 déplace EDITION_CLOSE sur la page de clôture quand elle existe.
+    endpoints: [API_ENDPOINT.EDITION_CLOSE]
   },
   [ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION]: {
     delivered: true,

@@ -25,6 +25,7 @@ export const LOG_EVENT = {
   ADMIN_CREATED: 'admin_created',
   EDITION_CREATED: 'edition_created',
   EDITION_UPDATED: 'edition_updated',
+  EDITION_CLOSED: 'edition_closed',
   COMPETITOR_UPDATED: 'competitor_updated',
   PARTICIPANT_ADDED: 'participant_added',
   PARTICIPANT_REMOVED: 'participant_removed',

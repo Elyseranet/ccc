@@ -40,6 +40,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.DRAW_POOLS_CREATE]: { file: 'editions/[id]/tirages/poules.post.ts' },
   [API_ENDPOINT.DRAW_ROUND_CREATE]: { file: 'editions/[id]/tirages/tour.post.ts' },
   [API_ENDPOINT.ADMIN_ROUND_DRAW]: { file: 'admin/editions/[id]/tirages/tour.get.ts' },
+  [API_ENDPOINT.EDITION_CLOSE]: { file: 'editions/[id]/cloture.post.ts' },
   [API_ENDPOINT.DRAW_ASSIGNMENTS]: { file: 'tirages/[id]/affectations.put.ts' },
   [API_ENDPOINT.DRAW_VALIDATION]: { file: 'tirages/[id]/validation.post.ts' },
   [API_ENDPOINT.ADMIN_MATCHES]: { file: 'admin/editions/[id]/matchs.get.ts' },
