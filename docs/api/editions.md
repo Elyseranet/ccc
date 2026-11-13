@@ -7,7 +7,7 @@ Toutes les routes sont publiques et en lecture seule, sous `/api/v1`. Les DTO so
 | Route | Réponse | Notes |
 |---|---|---|
 | `GET /editions` | `IEditionSummary[]` | ordre `chronological_rank` décroissant, sans pagination ; champion, finale (`final`) et compteurs embarqués |
-| `GET /stats` | `IArchiveStats` | `matches` = matchs joués (`VALIDATED` + `RESULT_UNKNOWN`), `scoredMatches` = avec score, `unknownResultMatches` (A16, R-5) |
+| `GET /stats` | `IArchiveStats` | `matches` = matchs joués (`VALIDATED` + `RESULT_UNKNOWN`), `scoredMatches` = `VALIDATED` (B-21 : y compris les 175 matchs au vainqueur importé, sans score), `unknownResultMatches` = `RESULT_UNKNOWN` (0 sur les archives livrées) (A16, R-5 bis) |
 | `GET /editions/{id}` | `IEditionDetail` | participants, poules et classements, tours, matchs, tirages validés, tableau final |
 | `GET /editions/{id}/participants` | `IEditionParticipant[]` | aucun champ de contact |
 | `GET /editions/{id}/poules` | `IPool[]` | classement RG19 / A10 / R-6 sur les seuls matchs `VALIDATED` |
@@ -60,7 +60,7 @@ Rangé dans `src/interfaces`, `src/enums` et `src/types` pour que le front avanc
 - Édition en cours visible (E-f). Un match saisi mais non validé est sérialisé `SCHEDULED`, avec `score = null` : `recordedScore` n'est jamais lu.
 - Aucun commentaire de match (A13) ni d'édition (R-4), aucun email ni téléphone, dans aucune réponse.
 - Un tirage `DRAFT` n'est jamais public, ni dans `/tirages` ni dans `/editions/{id}`.
-- R-5 : `played`, `wins`, `losses` ne comptent que les matchs avec score. Les matchs au résultat inconnu sont exposés à côté : `unknownResults` (ligne de classement), `unknownResultMatchCount` (édition), `unknownResultMatches` (`/stats`).
+- R-5 bis (B-21) : `played`, `wins`, `losses` comptent les matchs `VALIDATED`, dont ceux sans score au vainqueur importé ; `pointsFor`, `pointsAgainst`, `capsAverage` ne comptent que les matchs avec score. Les matchs au résultat inconnu (ni score ni vainqueur) sont exposés à côté : `unknownResults` (ligne de classement), `unknownResultMatchCount` (édition), `unknownResultMatches` (`/stats`).
 - **Tours non tirés (B-18)** : un tour `PENDING` n'est pas encore tiré (B-13 crée chaque tour au moment de son tirage ; un tour `PENDING` ne vient que du dump ou d'un état de test). Ni ce tour ni ses matchs ne sont publiés : ils sont absents de `rounds`, `bracket` et `matches` (`GET /editions/{id}`), de `GET /editions/{id}/tours`, de `GET /editions/{id}/matchs` (avec ou sans `statut`), de `matchCount`, `scoredMatchCount` et `unknownResultMatchCount`, de `final`, de `/stats`, des classements de poule et des bilans de compétiteur (fiche, face-à-face). Les tours `DRAWN`, `PLAYING` et `COMPLETED` (`PUBLIC_ROUND_STATUSES`) sont publiés comme avant. Aucun champ `status` de tour n'est ajouté au contrat. Les routes admin de lecture des matchs (`GET /admin/editions/{id}/matchs`) ne sont pas filtrées ; en revanche `POST /editions` et `PATCH /editions/{id}` renvoient le même `IEditionSummary` que la lecture publique, donc leurs compteurs de matchs sont filtrés de la même façon, ce qui est voulu. L'ETag d'une édition tient compte des tours publics : un tour qui passe de `PENDING` à `DRAWN` le change.
 - A6 : `participantCount` est le N figé (16 pour 2012a et 2012b) ; `unidentifiedParticipantCount` est l'écart avec les participants listés, `null` si N est inconnu.
 

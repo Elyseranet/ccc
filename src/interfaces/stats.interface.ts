@@ -14,7 +14,8 @@ export interface IArchiveStats {
 
 export interface IScoredSide {
   playerId: string
-  score: number
+  /** null : score inconnu (match d'archives dont seul le vainqueur est connu, B-21). */
+  score: number | null
 }
 
 /** Un match vu par les fonctions de domaine : l'ordre des côtés n'encode rien. */
@@ -22,6 +23,8 @@ export interface IMatchRecord {
   status: MATCH_STATUS
   purpose: MATCH_PURPOSE
   sides: IScoredSide[]
+  /** Vainqueur importé quand les scores sont inconnus (B-21), même clé que `sides[].playerId` ; absent sinon. */
+  winnerPlayerId?: string | null
 }
 
 export interface IMatchOutcome {

@@ -1,4 +1,3 @@
-import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import { LEGACY_POINTS_TOLERANCE_CENTS, NOTE_FLOAT_TIE, NOTE_MERGED_ALIAS } from '../consts/legacy-import.const.js'
 import { LEGACY_VERIFICATION_METRIC } from '../enums/legacy-import.enum.js'
 import type {
@@ -37,22 +36,7 @@ export function verifyAgainstWorkbook(input: ILegacyVerificationInput): ILegacyV
   const winLoss = new Map(
     computeWinLoss(input.matches).map((row) => [input.nameByPlayerId.get(row.playerId) ?? row.playerId, row]),
   )
-  // Le classeur compte aussi les 175 matchs au résultat inconnu : Adv1 y vaut une victoire, Adv2 une défaite.
-  const unknownWins = new Map<string, number>()
-  const unknownLosses = new Map<string, number>()
-  for (const match of input.matches) {
-    if (match.status === MATCH_STATUS.RESULT_UNKNOWN && match.purpose === MATCH_PURPOSE.REGULAR) {
-      const [first, second] = match.sides
-      const bump = (map: Map<string, number>, playerId: string | undefined) => {
-        const name = playerId === undefined ? undefined : (input.nameByPlayerId.get(playerId) ?? playerId)
-        if (name !== undefined) {
-          map.set(name, (map.get(name) ?? 0) + 1)
-        }
-      }
-      bump(unknownWins, first?.playerId)
-      bump(unknownLosses, second?.playerId)
-    }
-  }
+  // B-21 : les 175 matchs sans score sont VALIDATED avec leur vainqueur (Adv1 du classeur) : `computeWinLoss` les compte déjà.
 
   const merged = new Set(input.mergedPlayerNames)
   const metric = (
@@ -117,8 +101,8 @@ export function verifyAgainstWorkbook(input: ILegacyVerificationInput): ILegacyV
     ]),
     metric(LEGACY_VERIFICATION_METRIC.TITLES, (p) => [[p.titles, titles.get(p.name) ?? 0, 0, p.name]]),
     metric(LEGACY_VERIFICATION_METRIC.WIN_LOSS, (p) => [
-      [p.wins, (winLoss.get(p.name)?.wins ?? 0) + (unknownWins.get(p.name) ?? 0), 0, `${p.name} (V)`],
-      [p.losses, (winLoss.get(p.name)?.losses ?? 0) + (unknownLosses.get(p.name) ?? 0), 0, `${p.name} (D)`],
+      [p.wins, winLoss.get(p.name)?.wins ?? 0, 0, `${p.name} (V)`],
+      [p.losses, winLoss.get(p.name)?.losses ?? 0, 0, `${p.name} (D)`],
     ]),
   ]
   const blockingMismatches = metrics

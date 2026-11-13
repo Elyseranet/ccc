@@ -120,7 +120,7 @@ const loadRegularMatches = async (db: DataSource, competitorId?: string): Promis
     .innerJoin('m.edition', 'e')
     .innerJoin('m.round', 'r')
     .leftJoin('m.pool', 'po')
-    .select(['m.id', 'm.status', 'm.purpose', 'm.sequence', 's.id', 's.participationId', 's.validatedScore', 'p.id', 'p.competitorId', 'e.id', 'e.code', 'e.chronologicalRank', 'r.id', 'r.kind', 'po.id', 'po.rank'])
+    .select(['m.id', 'm.status', 'm.purpose', 'm.sequence', 'm.winnerParticipationId', 's.id', 's.participationId', 's.validatedScore', 'p.id', 'p.competitorId', 'e.id', 'e.code', 'e.chronologicalRank', 'r.id', 'r.kind', 'po.id', 'po.rank'])
     .where('m.purpose = :purpose', { purpose: MATCH_PURPOSE.REGULAR })
     .andWhere('m.status IN (:...statuses)', { statuses: STATS_MATCH_STATUSES })
     .andWhere('r.status IN (:...roundStatuses)', { roundStatuses: PUBLIC_ROUND_STATUSES })
@@ -353,7 +353,7 @@ export const getHeadToHead = async (id: string, opponentId: string): Promise<IHe
     .filter(({ record }) => countedOutcomes([record]).length === 1)
     .map(({ match, record }): IHeadToHeadMatch => {
       const { winner } = resolveMatchOutcome(record)
-      const score = (playerId: string): number => record.sides.find((side) => side.playerId === playerId)!.score
+      const score = (playerId: string): number | null => record.sides.find((side) => side.playerId === playerId)!.score
       return {
         matchId: match.id,
         editionId: match.edition.id,

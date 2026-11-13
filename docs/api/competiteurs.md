@@ -6,7 +6,7 @@ Routes publiques, en lecture seule, sous `/api/v1`. Aucune ne renvoie d'email, d
 
 - `titles` ne compte que les éditions `CLOSED` (A8), par la même fonction `countTitles` que le classement.
 - Les statistiques ne comptent que les matchs `REGULAR` (le départage est exclu).
-- R-5 : victoires, défaites et `matchesPlayed` ne comptent que les matchs **avec score** (`VALIDATED`). Un match `RESULT_UNKNOWN` n'est ni une victoire ni une défaite : il est compté à part dans `unknownResults`.
+- R-5 bis (B-21) : victoires, défaites et `matchesPlayed` comptent les matchs `VALIDATED`, y compris les 175 matchs d'archives **sans score** dont le vainqueur est importé du classeur (`matches.winner_participation_id`). Les points marqués et encaissés (`pointsFor`, `pointsAgainst`, `differential`) ne comptent que les matchs avec score. `unknownResults` garde son sens (ni score ni vainqueur connu : un match `RESULT_UNKNOWN`) et vaut 0 sur les archives livrées.
 - FA-12 : aucun ratio sur la fiche ni dans la liste. Le ratio n'existe que dans le face-à-face (`winRatio`, `null` si aucun match de la paire n'a de score).
 
 ## `GET /competiteurs`
@@ -116,7 +116,7 @@ Content-Type: application/json
 
 RG36, RG37. Avec `?adversaire={id}` : `IHeadToHead` (bilan de la paire vu du côté de `{id}`, plus la liste des matchs comptés). `adversaire` mal formé ou égal à `{id}` : 400 ; l'un des deux joueurs inconnu : 404 `COMPETITOR_NOT_FOUND`. Une paire qui ne s'est jamais rencontrée renvoie `played: 0`, `winRatio: null`, `matches: []`.
 
-`opponent` est un `ICompetitorWithTitles` (identité publique plus `titles`, G3) : les titres sont comptés comme dans la liste (éditions `CLOSED`, `countTitles`). `unknownResults` (G9) est le nombre de matchs `REGULAR` de la paire au résultat inconnu (R-5) : `played + unknownResults` est le nombre total de matchs `REGULAR` de la paire. Chaque match porte `poolNumber` (G10), `null` hors poule.
+`opponent` est un `ICompetitorWithTitles` (identité publique plus `titles`, G3) : les titres sont comptés comme dans la liste (éditions `CLOSED`, `countTitles`). `unknownResults` (G9) est le nombre de matchs `REGULAR` de la paire au résultat inconnu (R-5) : `played + unknownResults` est le nombre total de matchs `REGULAR` de la paire. Chaque match porte `poolNumber` (G10), `null` hors poule. B-21 : `competitorScore` et `opponentScore` valent `null` pour un match d'archives dont seul le vainqueur est connu ; `winnerCompetitorId` est toujours renseigné.
 
 Sans `adversaire` : `IHeadToHeadSummary[]`, une entrée par adversaire déjà rencontré, y compris quand tous les matchs de la paire ont un résultat inconnu (`played: 0`, `wins: 0`, `losses: 0`, `unknownResults: n`, `winRatio: null`, G11). Tri côté serveur : `wins + losses + unknownResults` décroissant, puis `displayName` de l'adversaire.
 

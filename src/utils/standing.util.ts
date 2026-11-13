@@ -5,7 +5,7 @@ import type {
 } from '../interfaces/pool.interface.js'
 import type { IMatchRecord } from '../interfaces/stats.interface.js'
 import { splitByKey } from './group.util.js'
-import { countedOutcomes } from './record.util.js'
+import { addOutcomePoints, countedOutcomes } from './record.util.js'
 import { resolveTiedGroup, tiebreakFormatFor } from './tiebreak.util.js'
 
 /**
@@ -41,10 +41,7 @@ export function computePoolStanding(
     l.played += 1
     w.wins += 1
     l.losses += 1
-    w.pointsFor += winner.score
-    w.pointsAgainst += loser.score
-    l.pointsFor += loser.score
-    l.pointsAgainst += winner.score
+    addOutcomePoints({ winner, loser }, w, l)
   }
   for (const entry of stats.values()) {
     entry.capsAverage = entry.pointsFor - entry.pointsAgainst

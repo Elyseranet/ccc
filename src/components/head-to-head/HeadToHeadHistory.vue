@@ -119,15 +119,16 @@ const headers = computed<IDataTableHeader[]>(() => [
 ])
 const rows = computed<IHeadToHeadRow[]>(() => props.comparison.matches.map((match) => {
   const firstWon = match.winnerCompetitorId === props.comparison.competitor.id
-  const high = Math.max(match.competitorScore, match.opponentScore)
-  const low = Math.min(match.competitorScore, match.opponentScore)
+  const scored = match.competitorScore !== null && match.opponentScore !== null
+  const high = scored ? Math.max(match.competitorScore!, match.opponentScore!) : null
+  const low = scored ? Math.min(match.competitorScore!, match.opponentScore!) : null
   const round = ROUND_LABELS[match.roundKind].match
   const pool = match.roundKind === ROUND_KIND.POOLS ? match.poolNumber : null
   return {
     id: match.matchId,
     edition: match.editionCode,
     round: pool !== null ? t('head_to_head.history.round_pool', 'Poule {pool}', { pool }) : t(round.key, round.label),
-    score: `${high} ${HEAD_TO_HEAD_SCORE_SEPARATOR} ${low}`,
+    score: scored ? `${high} ${HEAD_TO_HEAD_SCORE_SEPARATOR} ${low}` : '',
     winner: firstWon ? props.comparison.competitor : props.comparison.opponent,
     winnerTitles: (firstWon ? props.detailA : props.detailB)?.stats.titles ?? 0
   }

@@ -11,6 +11,7 @@ import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 @Entity({ name: 'matches' })
 @Unique('uq_matches_edition_sequence', ['editionId', 'sequence'])
 @Unique('uq_matches_legacy_code', ['legacyCode'])
+@Check('ck_matches_winner_validated', `"winner_participation_id" IS NULL OR "status" = 'VALIDATED'`)
 @Check('ck_matches_target_score', `"target_score" IN (${MATCH_TARGET_SCORES.join(', ')})`)
 export class MatchEntity extends UuidPrimaryEntity {
   @Column({ type: 'uuid' })
@@ -39,6 +40,13 @@ export class MatchEntity extends UuidPrimaryEntity {
 
   @Column({ type: 'enum', enum: MATCH_STATUS, enumName: 'match_status', default: MATCH_STATUS.SCHEDULED })
   status!: MATCH_STATUS
+
+  /**
+   * Vainqueur importé du classeur pour un match d'archives sans score (B-21, R-5 bis) ; null sinon (le vainqueur se déduit alors des
+   * scores). Clé étrangère composite vers `match_sides (match_id, participation_id)` posée par la migration `AddMatchWinner`.
+   */
+  @Column({ type: 'uuid', nullable: true })
+  winnerParticipationId!: string | null
 
   /** Visible par l'administrateur uniquement (A13). */
   @Column({ type: 'text', nullable: true })
