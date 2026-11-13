@@ -108,3 +108,37 @@ for (const viewport of VIEWPORTS) {
     }
   })
 }
+
+for (const viewport of VIEWPORTS) {
+  test.describe(`F-25 tirage des barrages, phrase d'attente @${viewport.name}`, () => {
+    test.use({ viewport: { width: viewport.width, height: viewport.height } })
+
+    const CARD_INNER = viewport.width - 74
+
+    test('ti-barrages-attente', async ({ page, browser, context }) => {
+      // La maquette montre cette phrase dans une carte d'état (rembourrée) : la largeur de texte est alignée sur son intérieur (316 px à 390) pour comparer la typographie, pas le cadre.
+      await signIn(context, 'admin')
+      const edition = await createQualifiedEdition(context.request, `f25zbar${viewport.name}`, 4, true, 3)
+      await selectAdminEdition(context, edition)
+      const mockContext = await browser.newContext({ viewport, reducedMotion: 'reduce' })
+      const mockup = await mockContext.newPage()
+      await mockup.goto(`file://${MOCKUP_DIR}/admin-tirage-tour.html`)
+      await settle(mockup)
+      await page.goto(PAGE)
+      await hydrated(page)
+      await page.getByTestId('round-draw-playoff-wait').waitFor()
+      await settle(page)
+      await mockup.addStyleTag({ content: '.adm-bottom { display: none !important; }' })
+      await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
+      await mockup.addStyleTag({ content: `.r-playoff > p.muted { width: fit-content !important; max-width: ${CARD_INNER}px !important; }` })
+      await page.addStyleTag({ content: `[data-cy="round-draw-playoff-wait"] { width: fit-content !important; max-width: ${CARD_INNER}px !important; }` })
+      await alignMockupText(mockup, page, [{ mockup: '.r-playoff > p.muted', app: '[data-cy="round-draw-playoff-wait"]' }])
+      await mockup.evaluate(() => window.scrollTo(0, 0))
+      await page.evaluate(() => window.scrollTo(0, 0))
+      await alignToPixel(mockup, '.r-playoff > p.muted')
+      await alignToPixel(page, '[data-cy="round-draw-playoff-wait"]')
+      await compare(page, mockup, 'ti-barrages-attente', viewport.name, await box(mockup, '.r-playoff > p.muted'), await box(page, '[data-cy="round-draw-playoff-wait"]'), NO_MASKS)
+      await mockContext.close()
+    })
+  })
+}

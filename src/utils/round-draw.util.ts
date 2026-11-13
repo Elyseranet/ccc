@@ -25,7 +25,9 @@ import { getInitials } from './player.util.js'
  * Fonctions pures : elles ne traduisent rien et ne font aucun appel. Le tirage est PHYSIQUE (A1, RG12) : rien ici ne tire au sort, on range ce que
  * l'administrateur saisit, affiche par affiche (c9790abd (5)). Le serveur reste l'autorité (taille du vivier, premiers de poule hors barrages, tour déduit) ;
  * aucun contrôle « puissance de 2 » (c9790abd (6)). Barrages (RG14, PLAYOFF-DRAW) : les premiers de poule attendent sans jouer, seuls les autres joueurs sont
- * tirés et le nombre d'affiches n'est pas fixé par une règle : on en propose la moitié des joueurs tirables, la validation accepte les affiches complètes saisies.
+ * tirés, deux par affiche, donc la moitié des non-premiers : cela découle du contrat (`docs/api/round-draw.md` l.67 : `DRAW_INCOMPLETE` sauf barrages, où seuls les barragistes
+ * doivent être tirés ; premiers de poule refusés en barrages, `DRAW_INCONSISTENT`). La règle des barrages elle-même reste non calculée (decisions.md l.425) ; un nombre impair de barragistes
+ * n'est pas proposé par l'aperçu (`allowedRoundKinds`), on ne le recalcule pas.
  ********************************************************/
 /** Premiers de leur poule : les participations au rang 1 d'un classement de poule (le serveur les écarte des barrages, RG14). */
 export const leaderIdsOf = (pools: IPool[]): Set<string> =>

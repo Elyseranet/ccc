@@ -255,8 +255,8 @@ const scoreAndValidate = async (request: APIRequestContext, match: IAdminMatchVi
  * `sideCount` poules de deux joueurs, chaque match validé 5-2 : `sideCount` perdants à égalité parfaite. Avec `topPerPool: 1` et `bestNextCount: 1` ils se disputent
  * une seule place de « meilleur 2e » : une égalité entre poules à `sideCount` joueurs. Rien n'est créé de plus (le départage est à créer par l'écran ou l'API).
  */
-export const createTiedPoolsEdition = async (request: APIRequestContext, label: string, sideCount: number): Promise<{ edition: IWriteEdition, losers: string[] }> => {
-  const { edition } = await createDrawnEdition(request, label, sideCount * 2, sideCount)
+export const createTiedPoolsEdition = async (request: APIRequestContext, label: string, sideCount: number, poolSize = 2): Promise<{ edition: IWriteEdition, losers: string[] }> => {
+  const { edition } = await createDrawnEdition(request, label, sideCount * poolSize, sideCount)
   const matches = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/matchs`), 'GET matchs admin', STATUS_OK) as IAdminMatchView[]
   const losers: string[] = []
   for (const match of matches) {
@@ -283,11 +283,11 @@ export const playMatch = async (request: APIRequestContext, match: IAdminMatchVi
 
 /**
  * Une édition dont la liste des qualifiés est ARRÊTÉE (F-25) : `poolCount` poules de deux joueurs jouées comme dans `createTiedPoolsEdition`, puis
- * `POST /qualification` avec 2 premiers par poule (tout le monde est qualifié : `2 × poolCount` joueurs) ; `withPlayoff` ajoute les barrages (les premiers de poule attendent).
+ * `POST /qualification` avec 2 premiers par poule (tout le monde est qualifié : `2 × poolCount` joueurs) ; `withPlayoff` ajoute les barrages (les premiers de poule attendent) ; `poolSize` joueurs par poule, tous qualifiés (4 poules de 3 : 12 joueurs, 4 premiers qui attendent, 4 affiches de barrage, puis les quarts).
  * Le tour à tirer se déduit du nombre de joueurs : 4 poules = 8 joueurs = quarts, 2 poules = 4 joueurs = demies, 6 poules = 12 joueurs = tour à choisir.
  */
-export const createQualifiedEdition = async (request: APIRequestContext, label: string, poolCount: number, withPlayoff = false): Promise<IWriteEdition> => {
-  const { edition } = await createTiedPoolsEdition(request, label, poolCount)
-  await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: 2, bestNextCount: 0, withPlayoff } }), 'POST qualification', STATUS_OK)
+export const createQualifiedEdition = async (request: APIRequestContext, label: string, poolCount: number, withPlayoff = false, poolSize = 2): Promise<IWriteEdition> => {
+  const { edition } = await createTiedPoolsEdition(request, label, poolCount, poolSize)
+  await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: poolSize, bestNextCount: 0, withPlayoff } }), 'POST qualification', STATUS_OK)
   return { ...edition, status: 'QUALIFIED' }
 }

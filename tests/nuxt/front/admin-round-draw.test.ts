@@ -258,12 +258,20 @@ describe('tour à choisir et « Changer de tour » (673e5b4b)', () => {
 describe('barrages (RG14, PLAYOFF-DRAW)', () => {
   it('les premiers de poule n’entrent pas dans la liste « À placer » ; leur ligne du vivier dit qu’ils attendent', async () => {
     leaders = ['part-p1', 'part-p2']
-    current = preview(8, { roundKind: ROUND_KIND.PLAYOFF, allowedRoundKinds: [ROUND_KIND.PLAYOFF] })
+    current = preview(6, { roundKind: ROUND_KIND.PLAYOFF, allowedRoundKinds: [ROUND_KIND.PLAYOFF] })
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.find('[data-cy="round-draw-entry"]').exists()).toBe(true))
-    expect(wrapper.findAll('[data-cy="round-draw-rest-item"]')).toHaveLength(6)
+    expect(wrapper.findAll('[data-cy="round-draw-rest-item"]')).toHaveLength(4)
     expect(wrapper.get('[data-cy="round-draw-pool"]').text()).toContain('Premiers de poule (en attente)')
-    expect(wrapper.find('[data-cy="round-draw-playoff-wait"]').exists()).toBe(true)
-    expect(wrapper.get('[data-cy="round-draw-count"]').text()).toBe('0 / 3 affiches · 6 joueurs restants')
+    expect(wrapper.get('[data-cy="round-draw-playoff-wait"]').text()).toBe('Les 2 premiers de poule ne sont pas tirés : ils attendent les demi-finales.')
+    expect(wrapper.get('[data-cy="round-draw-count"]').text()).toBe('0 / 2 affiches · 4 joueurs restants')
+  })
+
+  it('un seul premier de poule : la phrase est au singulier', async () => {
+    leaders = ['part-p1']
+    current = preview(3, { roundKind: ROUND_KIND.PLAYOFF, allowedRoundKinds: [ROUND_KIND.PLAYOFF] })
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="round-draw-entry"]').exists()).toBe(true))
+    expect(wrapper.get('[data-cy="round-draw-playoff-wait"]').text()).toBe('Le premier de poule n’est pas tiré : il attend la finale.')
   })
 })

@@ -78,6 +78,8 @@ export interface IRoundDrawEntryProps {
   /** Le tour a été choisi (vivier hors 2, 4, 8, 16) : « Changer de tour » est proposé. */
   changeable: boolean
   saveState: POOL_DRAW_SAVE_STATE
+  /** Barrages : nombre de premiers de poule qui attendent (0 sinon). */
+  waitingLeaders: number
 }
 
 export interface IRoundDrawEntryEmits {
@@ -94,7 +96,6 @@ export interface IRoundDrawSideProps {
   hasPlayoff: boolean
   unplaced: IRoundDrawPlayer[]
   /** Barrages en cours de tirage : la phrase des premiers de poule en attente s'affiche. */
-  playoffWaiting: boolean
 }
 
 export interface IRoundDrawRecapProps {

@@ -32,13 +32,6 @@
           hide-default-footer
           class="round-draw-side__table"
         />
-        <p
-          v-if="playoffWaiting"
-          class="round-draw-side__muted"
-          data-cy="round-draw-playoff-wait"
-        >
-          {{ playoffWaitText }}
-        </p>
       </template>
     </origam-card>
     <origam-card
@@ -100,7 +93,7 @@ import { OrigamCard, OrigamChip } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
-import { ROUND_DRAW_PLAYOFF_WAIT_TEXT, ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
+import { ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
 import { ROUND_DRAW_POOL_COLUMN } from '~/enums/round-draw.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { IRoundDrawSideProps } from '~/interfaces/round-draw.interface'
@@ -112,7 +105,7 @@ import { pairingTotal } from '~/utils/round-draw.util'
  * @description
  * Colonne latérale : la composition du vivier (origine et nombre : premiers de poule en direct, vainqueurs des barrages ; sans barrages le vivier est la liste des qualifiés) et les
  * joueurs « À placer », qui disparaissent de la liste dès qu'ils sont placés. Pour les barrages, les premiers de poule attendent sans jouer (RG14) : leur ligne le dit, la phrase
- * d'attente est une clé en attente du texte de ui-plus (voir F-25.md).
+ * d'attente est dans l'en-tête de saisie.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IRoundDrawSideProps>(), {})
@@ -128,7 +121,6 @@ const caption = computed(() => t('admin.round_draw.pool_caption', 'Composition d
 const restTitle = computed(() => t('admin.round_draw.rest_title', 'À placer'))
 const restLabel = computed(() => t('admin.round_draw.rest_label', 'Joueurs à placer'))
 const restEmpty = computed(() => t('admin.round_draw.rest_empty', 'Tous les joueurs sont placés.'))
-const playoffWaitText = computed(() => t(ROUND_DRAW_PLAYOFF_WAIT_TEXT.key, ROUND_DRAW_PLAYOFF_WAIT_TEXT.fallback))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: ROUND_DRAW_POOL_COLUMN.ORIGIN, title: t('admin.round_draw.pool_col_origin', 'Origine'), sortable: false },
   { key: ROUND_DRAW_POOL_COLUMN.COUNT, title: t('admin.round_draw.pool_col_count', 'Joueurs'), sortable: false, align: ALIGN.END }

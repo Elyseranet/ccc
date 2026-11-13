@@ -9,7 +9,7 @@ import { signIn } from '../helpers/session'
  *
  * @description
  * Chaque test crée SON édition par l'API réelle (`createQualifiedEdition` : poules de deux joueurs jouées, liste des qualifiés arrêtée) ; le tirage lui-même passe par l'écran,
- * joueur par joueur. 4 poules donnent 8 joueurs (quarts, tour déduit), 6 poules 12 joueurs (tour à choisir, 673e5b4b), 4 poules avec barrages 4 joueurs à tirer, les 4 premiers de poule attendent (RG14).
+ * joueur par joueur. 4 poules donnent 8 joueurs (quarts, tour déduit), 6 poules 12 joueurs (tour à choisir, 673e5b4b), 4 poules de 3 avec barrages : 8 joueurs à tirer, les 4 premiers de poule attendent les quarts (RG14).
  ********************************************************/
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const PAGE = '/admin/phase-finale/tirage'
@@ -139,19 +139,20 @@ test.describe('admin tirage du tour : écritures sur une édition créée par le
   })
 
   test('barrages : les premiers de poule attendent et ne sont pas proposés ; les affiches tirées créent le tour de barrages', async ({ page, context }) => {
-    const edition = await createQualifiedEdition(context.request, 'f25 barrages', 4, true)
+    const edition = await createQualifiedEdition(context.request, 'f25 barrages', 4, true, 3)
     await selectAdminEdition(context, edition)
     await openRoundDraw(page)
     await expect(page.getByTestId('round-draw-entry')).toBeVisible()
     await expect(page.getByTestId('round-draw-pool')).toContainText('Premiers de poule (en attente)')
-    await expect(page.getByTestId('round-draw-rest').getByTestId('round-draw-rest-item')).toHaveCount(4)
-    await expect(page.getByTestId('round-draw-count')).toContainText('0 / 2 affiches · 4 joueurs restants')
-    await placePairings(page, 2)
+    await expect(page.getByTestId('round-draw-rest').getByTestId('round-draw-rest-item')).toHaveCount(8)
+    await expect(page.getByTestId('round-draw-count')).toContainText('0 / 4 affiches · 8 joueurs restants')
+    await expect(page.getByTestId('round-draw-playoff-wait')).toHaveText('Les 4 premiers de poule ne sont pas tirés : ils attendent les quarts.')
+    await placePairings(page, 4)
     expect(await violationsOf(page)).toEqual([])
     await page.getByTestId('round-draw-validate-open').click()
     await page.getByTestId('round-draw-validate-confirm').click()
     await expect(page.getByTestId('round-draw-state-drawn')).toBeVisible()
     const detail = await (await page.request.get(`/api/v1/editions/${edition.id}`)).json() as { rounds: Array<{ kind: string, status: string, matchCount: number }> }
-    expect(detail.rounds.find(entry => entry.kind === 'PLAYOFF')).toMatchObject({ status: 'DRAWN', matchCount: 2 })
+    expect(detail.rounds.find(entry => entry.kind === 'PLAYOFF')).toMatchObject({ status: 'DRAWN', matchCount: 4 })
   })
 })

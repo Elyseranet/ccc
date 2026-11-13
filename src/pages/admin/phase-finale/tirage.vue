@@ -112,6 +112,7 @@
               :read-only="isReadOnly"
               :changeable="isChosen"
               :save-state="saveState"
+              :waiting-leaders="waitingLeaders"
               @place="handlePlace"
               @change="handleChange"
               @change-round="handleChangeRound"
@@ -122,7 +123,6 @@
               :leader-count="leaderCount"
               :has-playoff="hasPlayoff"
               :unplaced="unplaced"
-              :playoff-waiting="roundKind === playoffKind"
             />
           </div>
           <round-draw-recap
@@ -199,7 +199,6 @@ defineSlots<{}>()
 const currentStep = PHASE_STEP.ROUND_DRAW
 const choiceView = ROUND_DRAW_VIEW.CHOICE
 const entryView = ROUND_DRAW_VIEW.ENTRY
-const playoffKind = ROUND_KIND.PLAYOFF
 const matchesRoute = ROUTES.ADMIN_MATCHES
 const title = computed(() => t('pages.admin_round_draw.title', 'Tirage du tour'))
 useHead({ title })
@@ -213,6 +212,7 @@ const isEmpty = computed(() => preview.value === null)
 const allowedRoundKinds = computed(() => preview.value?.allowedRoundKinds ?? [])
 const showState = computed(() => view.value !== null && view.value !== ROUND_DRAW_VIEW.ENTRY && view.value !== ROUND_DRAW_VIEW.CHOICE)
 const leaderCount = computed(() => players.value.filter(player => player.isLeader).length)
+const waitingLeaders = computed(() => roundKind.value === ROUND_KIND.PLAYOFF ? leaderCount.value : 0)
 const hasPlayoff = computed(() => rounds.value.some(round => round.kind === ROUND_KIND.PLAYOFF))
 /** Le tour s'est choisi (vivier hors 2, 4, 8, 16) : « Changer de tour » est proposé tant que le tirage n'est pas validé. */
 const isChosen = computed(() => preview.value !== null && preview.value.roundKind === null && allowedRoundKinds.value.length > 1)

@@ -51,11 +51,19 @@ export const ROUND_DRAW_TEXTS: Record<ROUND_KIND, { of: ITranslatableText, bare:
   [ROUND_KIND.FINAL]: { of: { key: 'admin.round_draw.of_final', fallback: 'de la finale' }, bare: { key: 'admin.round_draw.bare_final', fallback: 'finale' } }
 }
 
-/**
- * TODO(ui-plus) : phrase qui dit que les premiers de poule attendent les barrages sans les jouer (RG14). Le texte n'est pas dans la maquette : il est demandé à
- * ui-plus (voir `docs/tickets/F-25.md`). Le repli ci-dessous est un marqueur, pas un texte de produit ; aucun test ne l'affirme.
- */
-export const ROUND_DRAW_PLAYOFF_WAIT_TEXT: ITranslatableText = { key: 'admin.round_draw.playoff_leaders_wait', fallback: 'TODO : texte des premiers de poule en attente (ui-plus)' }
+/** Phrase des barrages (maquette 13b43ad8) : les premiers de poule ne sont pas tirés (RG14) et attendent le tour qui suit ; `{round}` = le tour d'après, déduit des données. */
+export const ROUND_DRAW_PLAYOFF_WAIT_TEXTS: { one: ITranslatableText, other: ITranslatableText } = {
+  one: { key: 'admin.round_draw.playoff_leaders_wait_one', fallback: 'Le premier de poule n’est pas tiré : il attend {round}.' },
+  other: { key: 'admin.round_draw.playoff_leaders_wait_other', fallback: 'Les {count} premiers de poule ne sont pas tirés : ils attendent {round}.' }
+}
+
+/** Le tour d'après les barrages, avec son article (« les huitièmes », « la finale »). */
+export const ROUND_DRAW_WAIT_ROUND_TEXTS: Partial<Record<ROUND_KIND, ITranslatableText>> = {
+  [ROUND_KIND.ROUND_OF_16]: { key: 'admin.round_draw.wait_round_of_16', fallback: 'les huitièmes' },
+  [ROUND_KIND.QUARTER]: { key: 'admin.round_draw.wait_quarter', fallback: 'les quarts' },
+  [ROUND_KIND.SEMI]: { key: 'admin.round_draw.wait_semi', fallback: 'les demi-finales' },
+  [ROUND_KIND.FINAL]: { key: 'admin.round_draw.wait_final', fallback: 'la finale' }
+}
 
 /** Gravité de l'alerte de chaque état sans saisie (valeurs de `origam-alert`) : le vivier qui ne se tire pas est une erreur, la fin de la phase finale un succès, le reste une information. */
 export const ROUND_DRAW_STATE_STATUS: Record<ROUND_DRAW_VIEW, string> = {

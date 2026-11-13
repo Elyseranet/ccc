@@ -40,6 +40,13 @@
     >
       {{ roundToDrawPrefix }} <b>{{ roundLabel }}</b>, {{ roundToDrawDetail }}
     </p>
+    <p
+      v-if="waitText"
+      class="round-draw-entry__muted"
+      data-cy="round-draw-playoff-wait"
+    >
+      {{ waitText }}
+    </p>
     <origam-progress
       :model-value="progress.percent"
       color="primary"
@@ -146,7 +153,8 @@ import { computed, useId } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamProgress, OrigamSelect } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
-import { ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
+import { ROUND_KIND_BY_POOL_SIZE } from '~/consts/qualification.const'
+import { ROUND_DRAW_PLAYOFF_WAIT_TEXTS, ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS, ROUND_DRAW_WAIT_ROUND_TEXTS } from '~/consts/round-draw.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { ROUND_DRAW_PAIRING_STATE } from '~/enums/round-draw.enum'
 import type { IRoundDrawEntryEmits, IRoundDrawEntryProps } from '~/interfaces/round-draw.interface'
@@ -177,6 +185,14 @@ const countText = computed(() => t('admin.round_draw.entry_count', '{done} / {to
 const roundPrefix = computed(() => t('admin.round_draw.round_prefix', 'Tour :'))
 const roundDetail = computed(() => t('admin.round_draw.round_detail', '{players} joueurs · {pairings} affiches', { players: playerTotal.value, pairings: props.progress.total }))
 const roundToDrawPrefix = computed(() => t('admin.round_draw.round_to_draw_prefix', 'Tour à tirer :'))
+const waitText = computed(() => {
+  const next = ROUND_DRAW_WAIT_ROUND_TEXTS[ROUND_KIND_BY_POOL_SIZE[props.waitingLeaders + props.players.length / 2]!]
+  if (!props.waitingLeaders || !next) {
+    return ''
+  }
+  const texts = props.waitingLeaders === 1 ? ROUND_DRAW_PLAYOFF_WAIT_TEXTS.one : ROUND_DRAW_PLAYOFF_WAIT_TEXTS.other
+  return t(texts.key, texts.fallback, { count: props.waitingLeaders, round: t(next.key, next.fallback) })
+})
 const roundToDrawDetail = computed(() => t('admin.round_draw.round_to_draw_detail', '{players} joueurs.', { players: playerTotal.value }))
 const changeRoundLabel = computed(() => t('admin.round_draw.change_round', 'Changer de tour'))
 const progressLabel = computed(() => t('admin.round_draw.progress_label', '{done} affiches saisies sur {total}', { done: props.progress.pairings, total: props.progress.total }))
@@ -267,6 +283,11 @@ defineExpose({})
 
   &__round {
     margin: 0 0 var(--origam-space---3);
+  }
+
+  &__muted {
+    margin: 0;
+    color: var(--origam-color__text---secondary);
   }
 
   &__progress {
