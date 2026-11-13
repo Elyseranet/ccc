@@ -233,6 +233,7 @@
 /* États de la maquette (hors produit) et points ouverts (à confirmer par team-lead) */
 .mock-states { display: grid; gap: var(--origam-space---3); margin-top: var(--origam-space---10); padding-top: var(--origam-space---6); border-top: 1px dashed var(--origam-color__border---strong); }
 .open-pt { display: grid; gap: var(--origam-space---2); margin-top: var(--origam-space---3); padding: var(--origam-space---3); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---lg); }
+.c-preview { display: grid; gap: var(--origam-space---2); margin-top: var(--origam-space---3); }
 .open-pt__tag { font-family: var(--origam-font__family---mono); font-size: var(--origam-font__size---xs); color: var(--origam-color__feedback--warning---fgSubtle); }
 @media (max-width: 1000px) {
   .q-grid, .q-ties, .q-params { grid-template-columns: minmax(0, 1fr); }
@@ -281,7 +282,7 @@
 @media (max-width: 760px) {
   .q-rank .table th, .q-rank .table td, .q-sec .table th, .q-sec .table td { white-space: normal; padding-inline: var(--origam-space---2); }
   .q-rank .table .chip, .q-sec .table .chip { white-space: normal; }
-  .open-pt .table th, .open-pt .table td { white-space: normal; padding-inline: var(--origam-space---2); } /* clôture : aperçu des points */
+  .c-preview .table th, .c-preview .table td { white-space: normal; padding-inline: var(--origam-space---2); } /* clôture : aperçu des points */
 }
 .adm-dep { flex: 0 0 auto; }
 .mc[hidden] { display: none; }
