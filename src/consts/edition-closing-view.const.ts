@@ -1,7 +1,6 @@
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { CLOSING_FAILURE, CLOSING_NOTICE } from '../enums/edition-closing-view.enum.js'
 import { FINAL_STAGE } from '../enums/participation.enum.js'
-import { ROUND_KIND } from '../enums/round.enum.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import { FINAL_STAGE_ORDER } from './edition-closing.const.js'
 import { HTTP_STATUS_FORBIDDEN, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_UNAUTHORIZED } from './http-status.const.js'
@@ -71,15 +70,4 @@ export const CLOSING_STATE_STATUS: Record<CLOSING_NOTICE, 'info' | 'success'> = 
   [CLOSING_NOTICE.BLOCKED]: 'info',
   [CLOSING_NOTICE.CLOSED]: 'info',
   [CLOSING_NOTICE.SUCCESS]: 'success'
-}
-
-/** Tour qui doit exister dans l'édition pour que le résultat soit possible (RG3) ; `null` : une élimination en poule est toujours possible. */
-export const CLOSING_ROUND_KIND_BY_STAGE: Readonly<Record<FINAL_STAGE, ROUND_KIND | null>> = {
-  [FINAL_STAGE.CHAMPION]: ROUND_KIND.FINAL,
-  [FINAL_STAGE.FINALIST]: ROUND_KIND.FINAL,
-  [FINAL_STAGE.SEMI]: ROUND_KIND.SEMI,
-  [FINAL_STAGE.QUARTER]: ROUND_KIND.QUARTER,
-  [FINAL_STAGE.ROUND_OF_16]: ROUND_KIND.ROUND_OF_16,
-  [FINAL_STAGE.PLAYOFF]: ROUND_KIND.PLAYOFF,
-  [FINAL_STAGE.POOL_ELIMINATED]: null
 }

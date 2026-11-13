@@ -21,7 +21,7 @@ export const computeClosingPreview = (edition: TClosingInput): IClosingPreview =
     match.purpose === MATCH_PURPOSE.REGULAR && CLOSING_STAGE_BY_ROUND_KIND[match.roundKind] !== undefined)
   const finals = knockout.filter((match) => match.roundKind === ROUND_KIND.FINAL)
   if (finals.length === 0 || finals.some((match) => match.winnerParticipationId === null)) {
-    return { participantCount, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [] }
+    return { participantCount, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [], playedStages: [] }
   }
 
   const reached = new Map<string, FINAL_STAGE>()
@@ -52,6 +52,7 @@ export const computeClosingPreview = (edition: TClosingInput): IClosingPreview =
   return {
     participantCount,
     blockedBy: null,
+    playedStages,
     results: edition.participants.map((participant) => {
       const finalStage = reached.get(participant.participationId) ?? FINAL_STAGE.POOL_ELIMINATED
       return {

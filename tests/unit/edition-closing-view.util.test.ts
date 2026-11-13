@@ -30,8 +30,8 @@ describe('finalistsOf', () => {
 })
 
 describe('closingStateOf', () => {
-  const open = { participantCount: 4, blockedBy: null, results: [] }
-  const blocked = { participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED as const, results: [] }
+  const open = { participantCount: 4, blockedBy: null, results: [], playedStages: [] }
+  const blocked = { participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED as const, results: [], playedStages: [] }
 
   it('clôturée d’abord, sinon bloquée par la finale, sinon prête', () => {
     expect(closingStateOf(EDITION_STATUS.CLOSED, blocked)).toBe(CLOSING_STATE.CLOSED)
@@ -51,10 +51,10 @@ describe('previewRowsOf', () => {
     { participationId: 'b', finalStage: FINAL_STAGE.CHAMPION, points: 16.2 },
     { participationId: 'c', finalStage: FINAL_STAGE.SEMI, points: 8.1 }
   ]
-  const kinds = (...list: ROUND_KIND[]) => list.map(kind => ({ kind }))
+  const played = (...stages: FINAL_STAGE[]) => stages
 
   it('tout le barème, du plus haut au plus bas : les tours disputés portent base × N / 50, les autres « / » (RG3), ici sans barrages ni huitièmes', () => {
-    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results }, kinds(ROUND_KIND.POOLS, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL))
+    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results, playedStages: played(FINAL_STAGE.QUARTER, FINAL_STAGE.SEMI, FINAL_STAGE.FINALIST, FINAL_STAGE.CHAMPION) })
     expect(rows.map(row => row.stage)).toEqual([
       FINAL_STAGE.CHAMPION, FINAL_STAGE.FINALIST, FINAL_STAGE.SEMI, FINAL_STAGE.QUARTER, FINAL_STAGE.ROUND_OF_16, FINAL_STAGE.PLAYOFF, FINAL_STAGE.POOL_ELIMINATED
     ])
@@ -63,12 +63,12 @@ describe('previewRowsOf', () => {
   })
 
   it('avec des barrages, la ligne Barragiste porte ses points', () => {
-    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results }, kinds(ROUND_KIND.POOLS, ROUND_KIND.PLAYOFF, ROUND_KIND.SEMI, ROUND_KIND.FINAL))
+    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results, playedStages: played(FINAL_STAGE.PLAYOFF, FINAL_STAGE.SEMI, FINAL_STAGE.FINALIST, FINAL_STAGE.CHAMPION) })
     expect(rows.find(row => row.stage === FINAL_STAGE.PLAYOFF)?.points).toBe(0.9)
   })
 
   it('aucune ligne quand la finale n’est pas validée', () => {
-    expect(previewRowsOf({ participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [] }, [])).toEqual([])
+    expect(previewRowsOf({ participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [], playedStages: [] })).toEqual([])
   })
 })
 
