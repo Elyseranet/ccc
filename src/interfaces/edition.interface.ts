@@ -88,6 +88,8 @@ export interface IEditionParticipant {
  */
 export interface IEditionDetail extends IEditionSummary {
   description: string | null
+  /** Date de la clôture (ISO 8601) ; null tant que l'édition n'est pas close, et pour les éditions d'archives, dont le dump n'a pas de `closed_at`. */
+  closedAt: string | null
   participants: IEditionParticipant[]
   pools: IPool[]
   rounds: IRound[]

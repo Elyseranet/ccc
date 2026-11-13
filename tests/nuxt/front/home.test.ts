@@ -35,7 +35,7 @@ const match = (id: string, status: MATCH_STATUS, scores: [number | null, number 
   winnerParticipationId: scores[0] !== null && scores[1] !== null ? (scores[0] > scores[1] ? 'pa' : 'pb') : null
 })
 const detail: IEditionDetail = {
-  ...current2026, description: null, participants: [], draws: [], matches: [], bracket: [],
+  ...current2026, description: null, closedAt: null, participants: [], draws: [], matches: [], bracket: [],
   pools: Array.from({ length: 8 }, (_, index) => ({ id: `p${index}`, rank: index + 1, participantCount: 5, matchCount: 10 })) as unknown as IEditionDetail['pools'],
   rounds: [{ id: 'r1', kind: ROUND_KIND.POOLS, sequence: 1, status: ROUND_STATUS.PLAYING, matchCount: 105, validatedMatchCount: 68 }]
 }

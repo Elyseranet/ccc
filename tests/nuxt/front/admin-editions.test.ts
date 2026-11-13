@@ -54,6 +54,7 @@ const summary = (overrides: Partial<IEditionSummary> = {}): IEditionSummary => (
 const detail = (overrides: Partial<IEditionDetail> = {}): IEditionDetail => ({
   ...summary(),
   description: null,
+  closedAt: null,
   participants: [],
   pools: [],
   rounds: [],

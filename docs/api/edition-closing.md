@@ -16,7 +16,7 @@ Les points et les stades finals sont calculés par `computeClosingPreview` (`src
 
 `{id}` = UUID ou code. Pas de corps. Dans **une transaction**, sous le verrou de l'édition : recalcule par `computeClosingPreview`, écrit `final_stage` et `points` de chaque participation, `participant_count = N`, passe l'édition à `CLOSED`, pose `closed_at`. Les points figés ne sont jamais réécrits par un changement ultérieur de barème.
 
-Réponse **200** `IEditionDetail` de l'édition close (mêmes données que `GET /editions/{id}`).
+Réponse **200** `IEditionDetail` de l'édition close (mêmes données que `GET /editions/{id}`), `closedAt` compris (ISO 8601, B-22) : la date posée par la clôture, identique sur le `GET` suivant et inchangée par une seconde clôture.
 
 **Idempotent** : une édition déjà `CLOSED` renvoie 200 avec son état, sans recalcul ni changement de `closed_at`.
 
