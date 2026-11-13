@@ -184,7 +184,6 @@
   "edition.matches_range": "{from}–{to} of {total}",
   "edition.matches_round_pool": "Pool {rank}",
   "edition.matches_round_tiebreak": "{round} · tiebreak",
-  "edition.matches_score_separator": " – ",
   "edition.matches_title": "Matches",
   "admin.participants.account_active": "Active",
   "admin.participants.account_expired": "Invitation expired",

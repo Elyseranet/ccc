@@ -116,17 +116,20 @@ describe('Matchs : départage à 3 côtés ou plus (F-21)', () => {
     expect(three!.first?.id).toBe('c-b')
     expect(three!.others.map(person => person.id)).toEqual(['c-a', 'c-c'])
     expect([three!.firstScore, ...three!.otherScores]).toEqual([3, 1, 0])
+    expect(three!.scoreText).toBe('3 – 1 – 0')
   })
 
   it('sans vainqueur, aucun des quatre côtés ne montre de score, mais tous sont listés', () => {
     expect(four!.others).toHaveLength(3)
     expect(four!.otherScores).toEqual([null, null, null])
     expect(four!.hasWinner).toBe(false)
+    expect(four!.scoreText).toBeNull()
   })
 
   it('un duel garde un seul adversaire', () => {
     expect(duel!.others.map(person => person.id)).toEqual(['c-a'])
     expect(duel!.otherScores).toEqual([4])
+    expect(duel!.scoreText).toBe('10 – 4')
   })
 })
 

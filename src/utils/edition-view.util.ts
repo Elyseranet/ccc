@@ -2,6 +2,7 @@ import { CENTS_PER_POINT, POINTS_BASE_SCALE, POINTS_REFERENCE_PARTICIPANTS } fro
 import {
   EDITION_BRACKET_ROUND_ORDER,
   EDITION_FINAL_STAGE_LABELS,
+  EDITION_MATCH_SCORE_SEPARATOR,
   EDITION_HERO_STATUS,
   EDITION_PARTICIPATION_STATUS_LABELS,
   EDITION_STEPS,
@@ -316,6 +317,7 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
     const first = winner ?? match.sides[0]
     const others = match.sides.filter(side => side !== first)
     const scored = (side: IEditionDetail['matches'][number]['sides'][number] | undefined): number | null => (match.winnerParticipationId !== null && side ? side.score : null)
+    const scores = [scored(first), ...others.map(scored)]
     return {
       id: match.id,
       sequence: match.sequence,
@@ -327,6 +329,7 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
       others: others.map(side => ({ id: side.competitorId, displayName: side.displayName })),
       firstScore: scored(first),
       otherScores: others.map(scored),
+      scoreText: scores.every(score => score !== null) ? scores.join(EDITION_MATCH_SCORE_SEPARATOR) : null,
       hasWinner: winner !== undefined,
       winnerWithoutScore: isArchivedWinnerWithoutScore(match),
       status: match.status

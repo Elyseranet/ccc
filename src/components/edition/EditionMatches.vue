@@ -225,10 +225,7 @@ const scoreOf = (row: IEditionMatchesProps['rows'][number]): string => {
   if (row.winnerWithoutScore) {
     return t('edition.matches_score_not_archived', 'score non archivé')
   }
-  const scores = [row.firstScore, ...row.otherScores]
-  return scores.every(score => score !== null)
-    ? scores.join(t('edition.matches_score_separator', ' – '))
-    : t('edition.matches_no_score', '–')
+  return row.scoreText ?? t('edition.matches_no_score', '–')
 }
 const pageRows = computed(() => slice.value.items.map((row) => {
   const status = EDITION_MATCH_STATUS_VIEW[row.status]
