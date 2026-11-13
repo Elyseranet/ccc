@@ -26,7 +26,7 @@
       />
       <div
         class="edition-draws__layout"
-        :class="{ 'edition-draws__layout--single': !hasRecPools }"
+        :class="recLayoutClass"
       >
         <origam-card
           v-if="hasRecPools"
@@ -356,6 +356,7 @@ const seedRows = computed(() => props.seeds.map(seed => ({
 })))
 const recChipFamily = EDITION_CHIP_FAMILY.NEUTRAL
 const hasRecPools = computed(() => (props.reconstituted?.pools.length ?? 0) > 0)
+const recLayoutClass = computed(() => (hasRecPools.value ? '' : 'edition-draws__layout--single'))
 const recAlertTitle = computed(() => t('edition.draws_rec_alert_title', 'Tirages reconstitués à partir des résultats'))
 const recAlertText = computed(() => t('edition.draws_rec_alert_text', 'Les tirages de cette édition n’ont pas été archivés. La composition des poules et les affiches de chaque tour sont déduites des poules et des matchs joués.'))
 const recPoolsTitle = computed(() => t('edition.draws_rec_pools_title', 'Composition des poules'))
