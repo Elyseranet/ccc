@@ -70,6 +70,8 @@ for (const viewport of VIEWPORTS) {
         await page.addStyleTag({ content: '.admin-bottom { display: none !important; }' })
         const appItem = `${STEPS} [data-cy="stepper-item-${zone.appIndex}"]`
         const demoItem = `.st-demo li:nth-child(${zone.demo})`
+        // La maquette pose cette liste de démonstration hors d'une carte, sans la contrainte de largeur d'Origam (colonne des étapes plus étroite que la carte) : sa largeur est celle de l'étape de l'application, qui passe donc à la ligne au même endroit.
+        await mockup.addStyleTag({ content: `.st-demo { width: ${(await rectOf(page, appItem)).width}px; }` })
         await alignMockupText(mockup, page, [
           { mockup: `${demoItem} .st__b b`, app: `${appItem} .origam-stepper-item__title` },
           { mockup: `${demoItem} .st__b small`, app: `${appItem} .origam-stepper-item__subtitle` }
@@ -85,6 +87,7 @@ for (const viewport of VIEWPORTS) {
           await page.keyboard.press('Shift+Tab')
           await page.keyboard.press('Tab')
         }
+        await page.evaluate(() => window.scrollTo(0, 0))
         await page.waitForTimeout(400)
         const mockClip = grow(await rectOf(mockup, `${demoItem} .st__a`))
         const appClip = grow(await rectOf(page, appItem))
