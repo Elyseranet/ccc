@@ -1,6 +1,7 @@
-export const LEGAL_PUBLISHER_NAME = 'Elysera'
+/** Crédit « Site réalisé par … » du pied de page. Elysera n'est pas l'éditeur du site (LEGAL-1, COPYRIGHT-1) : le © dit « Cotentin Caps Cup ». */
+export const LEGAL_SITE_CREDIT_NAME = 'Elysera'
 
-export const LEGAL_PUBLISHER_URL = 'https://elysera.net'
+export const LEGAL_SITE_CREDIT_URL = 'https://elysera.net'
 
 export const ORIGAM_REPOSITORY_URL = 'https://github.com/Elyseranet/origam'
 
