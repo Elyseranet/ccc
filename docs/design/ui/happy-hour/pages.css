@@ -180,6 +180,8 @@
 .fchip[aria-pressed="true"] { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); border-color: transparent; }
 .fchip[aria-pressed="true"] .num { background: var(--origam-color__surface---default); color: var(--origam-color__text---primary); }
 .font-score { font-family: var(--origam-font__family---display); font-size: var(--origam-font__size---lg); color: var(--origam-color__bar---amber); }
+.table .opp-list { display: grid; gap: var(--origam-space---1); margin: 0; padding: 0; list-style: none; } /* F-21 : adversaires d’un départage à N côtés */
+.table tr[hidden] { display: none; }
 
 /* ═══ FICHE JOUEUR ══════════════════════════════════════════════════════ */
 .pl-crumbs { padding-top: var(--origam-space---8); }
