@@ -41,7 +41,7 @@ import type { IRoundDrawStatePanelProps } from '~/interfaces/round-draw.interfac
  * @description
  * Les états de la page où il n'y a rien à saisir, dits en toutes lettres avec ce qu'il faut faire : liste non arrêtée (lien vers la qualification), tour précédent inachevé et tour
  * tiré aux matchs à jouer (lien vers « Poules et matchs », filtre par tour : le filtre `?tour=` est géré côté application, décision du chef de projet), vivier qui ne se tire pas, tous les tours
- * validés. Le lien « Clôturer l'édition » n'existe pas tant que la page de clôture (F-26) n'est pas livrée.
+ * validés. Le lien « Clôturer l'édition » mène à la page de clôture (F-26) : tous les tours sont validés.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IRoundDrawStatePanelProps>(), {})
@@ -88,6 +88,9 @@ const text = computed(() => {
 const link = computed(() => {
   if (props.view === ROUND_DRAW_VIEW.QUALIFICATION_PENDING) {
     return { to: ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION, label: t('admin.round_draw.state_qualification_link', 'Aller à la qualification') }
+  }
+  if (props.view === ROUND_DRAW_VIEW.FINISHED) {
+    return { to: ROUTES.ADMIN_FINAL_PHASE_CLOSING, label: t('admin.round_draw.state_closing_link', 'Clôturer l’édition') }
   }
   return props.view === ROUND_DRAW_VIEW.PREVIOUS_INCOMPLETE || props.view === ROUND_DRAW_VIEW.DRAWN ? scoresLink.value : null
 })

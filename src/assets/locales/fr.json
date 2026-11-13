@@ -212,6 +212,7 @@
   "admin.round_draw.state_drawn_text": "Validé le {date} : {count} matchs créés, à jouer ({round}).",
   "admin.round_draw.state_drawn_text_no_date": "{count} matchs créés, à jouer ({round}).",
   "admin.round_draw.state_drawn_title": "Tirage {round} validé",
+  "admin.round_draw.state_closing_link": "Clôturer l’édition",
   "admin.round_draw.state_finished_text": "La phase finale est jouée : l’édition peut être clôturée.",
   "admin.round_draw.state_finished_title": "Tous les tours sont validés.",
   "admin.round_draw.state_previous_text": "Le tirage du tour suivant n’est possible qu’après validation de tous les matchs des {round} ({count} restants).",

@@ -212,6 +212,7 @@
   "admin.round_draw.state_drawn_text": "Validated on {date}: {count} matches created, to be played ({round}).",
   "admin.round_draw.state_drawn_text_no_date": "{count} matches created, to be played ({round}).",
   "admin.round_draw.state_drawn_title": "Draw {round} validated",
+  "admin.round_draw.state_closing_link": "Close the edition",
   "admin.round_draw.state_finished_text": "The final phase is played: the edition can be closed.",
   "admin.round_draw.state_finished_title": "All rounds are validated.",
   "admin.round_draw.state_previous_text": "The next round can only be drawn once every match of the {round} is validated ({count} left).",
