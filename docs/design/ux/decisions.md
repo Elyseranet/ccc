@@ -479,3 +479,16 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **DRAWS-ARCH, précisions (utilisateur, 2026-11-13)** : une édition archivée sans poule (2012a, 2012b, 2013, 2014, 2018 à 2021, 2023) n'affiche pas la carte « Composition des poules » ; seuls restent l'encadré « reconstitué » et les affiches de la phase finale. Les étoiles de titres ne sont pas affichées dans Tirages ni dans Poules pour l'instant : écart à la maquette accepté, sans ticket.
 - **CLOSE-PREVIEW (utilisateur, 2026-11-13)** : la page de clôture (F-26) montre, AVANT la clôture, un aperçu des points que recevra chaque résultat (RG1, RG2, RG3, N = nombre de participations). Le calcul passe par la même fonction que celle qui fige les points côté serveur (B-14), placée dans `src/utils` et partagée navigateur et serveur (ARCH-1) : aucun écart possible, aucun endpoint d'aperçu.
 - **PLAYOFF-DRAW (utilisateur, 2026-11-13)** : la qualification (F-24) n'a qu'un interrupteur « Avec barrages ». Les affiches des barrages se tirent dans l'écran de tirage (F-25), affiche par affiche, comme les autres tours. Pas d'écran de composition dédié. Lève le « Je ne sais pas » de parcours.md sur la composition des barrages.
+
+## DIALOG-THEME — Apparence des dialogues de confirmation (décision utilisateur 2026-11-13, F-30)
+
+- **Thème Origam d'abord, maquettes ajustées.** Le titre des dialogues (grand, gras) se règle dans le thème Origam (props de `origam-card-header`, PROPS-FIRST) : tous les dialogues changent d'un coup, la confirmation de score F-08 comprise. Aucun style local par instance.
+- **Largeur** : Origam impose une marge de 24 px (`.origam-overlay__content`), sans prop ni token. Les maquettes sont recalées sur cette contrainte (342 px à 390 px de large). Pas de surcharge `:deep`.
+- **Marge intérieure** : on garde le défaut d'Origam (8, comme la maquette) et on retire nos `padding="6"` locaux. Le padding n'est pas réglé dans le thème : mesuré par dev-f19, ça casse la saisie de score F-08.
+- **Conséquences** : la prop `appearance` du `ConfirmDialog` partagé (DEFAULT / MOCKUP, introduite par F-24) disparaît, puisque tous les dialogues suivent le thème. Les zones « dialogue » écartées de F-24, F-25 et F-30 sont remesurées après l'ajustement des maquettes.
+
+## PROD-HOSTING — Hébergement de la production (décision utilisateur 2026-11-13, T-SEC-02)
+
+- La production tourne sur le **même Coolify chez Hetzner** que la dev, avec l'app et PostgreSQL dans le même réseau Docker interne.
+- **Pas de SSL PostgreSQL** : la base n'est pas exposée hors du réseau interne.
+- Reste à faire : régler `NUXT_TRUST_PROXY_HOPS` sur le nombre réel de proxys devant l'app (le proxy de Coolify), mesuré sur la dev, avec un test.
