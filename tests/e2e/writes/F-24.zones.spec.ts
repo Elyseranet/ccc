@@ -31,6 +31,28 @@ const boxTo = async (page: Page, container: string, end: string) => page.evaluat
   return { x: a.left + window.scrollX, y: a.top + window.scrollY, width: a.width, height: b.bottom - a.top }
 }, [container, end])
 
+/**
+ * Recopie les lignes du premier tableau du classement de l'application dans celui de la maquette (valeurs de données, ARCH-9) : un tableau en `table-layout: auto` dimensionne
+ * ses colonnes sur le contenu de TOUTES ses cellules, la maquette montre six joueurs de son choix, l'état réel en montre d'autres. Sans cela les colonnes ne peuvent pas coïncider
+ * au pixel (mesuré F-36 : pastilles identiques à 0,001 px, colonnes à 0,57 px d'écart au plus à données égales).
+ */
+const copyRankingRows = async (mockup: Page, page: Page) => {
+  const rows = await page.evaluate(() => [...document.querySelectorAll('[data-cy="qualification-ranking"] table')[0]!.querySelectorAll('tbody tr')].map(row => [...row.querySelectorAll('td')].map(cell => (cell.textContent ?? '').trim())))
+  await mockup.evaluate((values) => {
+    const body = document.querySelector('.q-rank table tbody') as HTMLElement
+    const template = body.querySelector('tr') as HTMLElement
+    const rowsHtml = values.map((cells) => {
+      const row = template.cloneNode(true) as HTMLElement
+      row.querySelectorAll('td').forEach((cell, index) => {
+        const target = cell.querySelector('.chip, b') ?? cell
+        target.textContent = cells[index] ?? ''
+      })
+      return row.outerHTML
+    })
+    body.innerHTML = rowsHtml.join('')
+  }, rows)
+}
+
 const NO_MASKS: IDataMasks = { mockup: [], app: [] }
 const INK_RULE = '{ color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent !important; }'
 
@@ -72,6 +94,7 @@ for (const viewport of VIEWPORTS) {
       // état vide de l'aperçu des qualifiés.
       { name: 'qa-egalites-titre', mockup: 'section[aria-labelledby="h-eg"] > header', app: '.qualification-ties__head' },
       { name: 'qa-egalite-haut', mockup: '.q-ties > li:nth-child(2)', app: '[data-cy="qualification-tie-0"]', upTo: { mockup: 'p.muted', app: '.qualification-ties__muted' } },
+      { name: 'qa-classement-thead', mockup: '.q-rank table thead', app: '[data-cy="qualification-ranking"] table thead' },
       { name: 'qa-classement-entete', mockup: '.q-rank .adm-card-h', app: '.qualification-ranking__head', masks: { mockup: [], app: [], values: { mockup: ['.q-rank__sel .input'], app: ['.qualification-ranking__select'] } } },
       { name: 'qa-arret', mockup: '.q-sec .q-act', app: '.qualification-finalize__action' },
       { name: 'qa-apercu-vide', mockup: '.q-empty p.muted', app: '[data-cy="qualification-qualified-empty"]' }
@@ -91,6 +114,7 @@ for (const viewport of VIEWPORTS) {
         await settle(page)
         await hideBottomBars(mockup, page)
         await mockup.addStyleTag({ content: '.q-rank .table-wrap { overflow: visible; }' })
+        await copyRankingRows(mockup, page)
         await alignMockupText(mockup, page, [
           { mockup: '.adm-head .eyebrow', app: '.admin-qualification__eyebrow' },
           { mockup: 'section[aria-labelledby="h-eg"] > header [role="status"]', app: '[data-cy="qualification-ties-count"]' },
