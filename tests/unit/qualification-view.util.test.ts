@@ -6,6 +6,7 @@ import { ApiRequestError } from '../../src/utils/api-request-error.util'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { toQualificationFailure } from '../../src/utils/qualification-failure.util'
 import { QUALIFICATION_FAILURE } from '../../src/enums/qualification.enum'
+import { blockerText, countPending, countTies } from '../../src/utils/qualification-text.util'
 import { blockerOf, boundsOf, checkInputs, initialInputs, pendingRegularCount, previewCount, prerequisitesOf, qualifiedRowsOf, rankTablesOf, stepsOf, tieViewsOf } from '../../src/utils/qualification-view.util'
 import { boundaryTie, buildQualificationStatus, member, pairTie, qualifiedEntry, tiebreakMatch } from '../helpers/qualification'
 
@@ -125,5 +126,20 @@ describe('échec d’écriture (B-13)', () => {
     expect(toQualificationFailure(apiError(403, API_ERROR_CODE.FORBIDDEN))).toBe(QUALIFICATION_FAILURE.FORBIDDEN)
     expect(toQualificationFailure(apiError(500, API_ERROR_CODE.INTERNAL_ERROR))).toBe(QUALIFICATION_FAILURE.UNKNOWN)
     expect(toQualificationFailure(new ApiRequestError({ statusCode: 0, code: API_ERROR_CODE.INTERNAL_ERROR, message: 'x' }, true))).toBe(QUALIFICATION_FAILURE.OFFLINE)
+  })
+})
+
+describe('textes accordés en nombre', () => {
+  const t = (key: string, fallback: string, params: Record<string, string | number> = {}) =>
+    Object.entries(params).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, String(value)), fallback)
+
+  it('écrit le singulier à un et le pluriel sinon, et la raison d’inactivité qui compose les deux', () => {
+    expect(countTies(t, 1)).toBe('1 égalité restante')
+    expect(countTies(t, 2)).toBe('2 égalités restantes')
+    expect(countPending(t, 1)).toBe('1 match de poule à valider')
+    expect(blockerText(t, QUALIFICATION_BLOCKER.PENDING_MATCHES, 3, 0)).toBe('Indisponible : 3 matchs de poule à valider.')
+    expect(blockerText(t, QUALIFICATION_BLOCKER.TIES_LEFT, 0, 1)).toBe('Indisponible : 1 égalité restante.')
+    expect(blockerText(t, QUALIFICATION_BLOCKER.PENDING_AND_TIES, 3, 2)).toBe('Indisponible : 2 égalités restantes et 3 matchs de poule à valider.')
+    expect(blockerText(t, QUALIFICATION_BLOCKER.CLOSED, 0, 0)).toBe('Indisponible : l’édition est clôturée.')
   })
 })
