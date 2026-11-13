@@ -51,7 +51,7 @@ test.describe('admin qualification : écritures sur une édition créée par le 
     await expect(page).toHaveURL(new RegExp(`${PAGE}$`))
     await expect(page.getByTestId('page-title')).toHaveText('Qualification')
     await expect(page.getByRole('link', { name: 'Phase finale' }).first()).toHaveAttribute('aria-current', 'true')
-    await expect(page.getByTestId('phase-steps').locator('button')).toHaveCount(1)
+    await expect(page.getByTestId('phase-steps').locator('button')).toHaveCount(2)
     expect(await violationsOf(page)).toEqual([])
   })
 
