@@ -4,7 +4,6 @@
     rounded="xl"
     border
     elevation="md"
-    padding="6"
     :aria-labelledby="titleId"
     class="qualification-parameters"
     data-cy="qualification-parameters"
@@ -49,8 +48,11 @@
             <origam-label
               :for="bestId"
               class="qualification-parameters__label"
-              :text="bestLabel"
-            />
+            >
+              <template #default>
+                {{ bestLabelStart }}<sup>{{ bestLabelEnd }}</sup>
+              </template>
+            </origam-label>
             <origam-text-field
               :id="bestId"
               :model-value="inputs.bestNextCount"
@@ -126,7 +128,9 @@ const bestId = useId()
 const playoffId = useId()
 const title = computed(() => t('admin.qualification.parameters_title', '3 · Paramètres de qualification'))
 const topLabel = computed(() => t('admin.qualification.parameters_top', 'Premiers de chaque poule'))
-const bestLabel = computed(() => t('admin.qualification.parameters_best', 'Meilleurs (n+1)es'))
+const bestLabelStart = computed(() => t('admin.qualification.parameters_best_start', 'Meilleurs (n+1)'))
+const bestLabelEnd = computed(() => t('admin.qualification.parameters_best_end', 'es'))
+const bestLabel = computed(() => `${bestLabelStart.value}${bestLabelEnd.value}`)
 const playoffLabel = computed(() => t('admin.qualification.parameters_playoff', 'Avec barrages'))
 const note = computed(() => t('admin.qualification.parameters_note', 'Avec barrages, la liste des qualifiés est la même ; seul le premier tour change : « Premier tour à tirer : Barrages ».'))
 const messageOf = (error: QUALIFICATION_PARAMETER_ERROR | null, min: number, max: number): string[] => error === null
@@ -166,6 +170,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .qualification-parameters {
+  padding: var(--qualification-parameters---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--origam-space---5);
+  }
+
   margin-top: var(--qualification-parameters---margin-top, var(--origam-space---6));
 
   &__head {
@@ -198,8 +208,12 @@ defineExpose({})
   }
 
   &__label {
-    color: var(--origam-color__text---primary);
+    color: var(--origam-color__text---tertiary);
+    font-size: var(--origam-font__size---xs);
     font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    line-height: var(--origam-font__lineHeight---normal);
+    text-transform: uppercase;
   }
 
   &__preview {
@@ -220,6 +234,7 @@ defineExpose({})
 
 <style>
 :root {
+  --qualification-parameters---padding: var(--origam-space---6);
   --qualification-parameters---margin-top: var(--origam-space---6);
   --qualification-parameters__fields---gap: var(--origam-space---4);
 }

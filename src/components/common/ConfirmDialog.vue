@@ -4,7 +4,8 @@
     :persistent="busy"
     :max-width="560"
     scrim
-    padding="6"
+    padding="2"
+    class="confirm-dialog"
     :title="title"
     role="alertdialog"
     :aria-describedby="descriptionId"
@@ -99,9 +100,24 @@ defineExpose({})
 
 <style scoped lang="scss">
 .confirm-dialog {
+  // Gabarit de la maquette (`.odlg`, motif `.confirm` des tirages) : carte à 8 px, en-tête à 16 px, texte à 24 px, pied à 16 px, boutons de 44 px.
   &__text {
     margin: 0;
-    color: var(--origam-color__text---secondary);
+    color: var(--origam-color__text---primary);
+    font-size: var(--origam-font__size---md);
+    line-height: var(--origam-font__lineHeight---normal);
+  }
+
+  :deep(.origam-card-header__title) {
+    font-size: var(--origam-font__size---xl);
+    font-weight: var(--origam-font__weight---bold);
+    line-height: var(--origam-font__lineHeight---tight);
+    letter-spacing: normal;
+    white-space: normal;
+  }
+
+  :deep(.origam-card__content) {
+    padding: 0 var(--origam-space---6) var(--origam-space---6);
   }
 
   &__actions {
@@ -109,6 +125,14 @@ defineExpose({})
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: var(--origam-space---3);
+    margin: 0 var(--confirm-dialog__actions---margin-inline, var(--origam-space---4)) var(--confirm-dialog__actions---margin-bottom, var(--origam-space---4));
   }
+}
+</style>
+
+<style>
+:root {
+  --confirm-dialog__actions---margin-inline: var(--origam-space---4);
+  --confirm-dialog__actions---margin-bottom: var(--origam-space---4);
 }
 </style>

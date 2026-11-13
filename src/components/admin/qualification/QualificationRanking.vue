@@ -4,7 +4,6 @@
     rounded="xl"
     border
     elevation="md"
-    padding="6"
     :aria-labelledby="titleId"
     class="qualification-ranking"
     data-cy="qualification-ranking"
@@ -140,6 +139,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .qualification-ranking {
+  padding: var(--qualification-ranking---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--origam-space---5);
+  }
+
   &__head {
     display: flex;
     flex-wrap: wrap;
@@ -195,6 +200,7 @@ defineExpose({})
 
 <style>
 :root {
+  --qualification-ranking---padding: var(--origam-space---6);
   --qualification-ranking---gap: var(--origam-space---3);
   --qualification-ranking__select---width: 12rem;
 }

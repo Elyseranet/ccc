@@ -35,6 +35,27 @@ export const useQualification = async () => {
   const inputsReady = ref(false)
   const simulated = ref<Pick<IQualificationParameters, 'topPerPool' | 'bestNextCount'> | null>(null)
 
+  /**
+   * Premier état : sans simulation, le serveur ne calcule ni égalité entre poules ni qualifiés. On relit donc tout de suite avec les champs de départ (la
+   * configuration enregistrée, sinon 2 et 0), dans la même requête de données : l'état rendu côté serveur est complet, rien ne dépend d'un `watch` qui ne
+   * relance pas la lecture pendant l'hydratation. Un départ invalide pour cette édition (n plus grand que la plus grande poule) garde l'état sans simulation.
+   */
+  const readStatus = async (id: string): Promise<IQualificationStatus> => {
+    const first = await service.status(id, simulated.value)
+    if (simulated.value !== null || first.listFinalized || first.parameters !== null) {
+      return first
+    }
+    const start = checkInputs(initialInputs(first), boundsOf(first)).parameters
+    if (start === null) {
+      return first
+    }
+    try {
+      return await service.status(id, { topPerPool: start.topPerPool, bestNextCount: start.bestNextCount })
+    } catch {
+      return first
+    }
+  }
+
   const request = useAsyncData(
     ADMIN_QUALIFICATION_ASYNC_KEY,
     async (): Promise<IQualificationStatus | null> => {
@@ -43,7 +64,7 @@ export const useQualification = async () => {
         return null
       }
       try {
-        return await service.status(editionId.value, simulated.value)
+        return await readStatus(editionId.value)
       } catch (cause) {
         throw toAsyncDataError(cause)
       }
@@ -62,16 +83,15 @@ export const useQualification = async () => {
   const check = computed(() => checkInputs(inputs.value, bounds.value))
   const parameters = computed(() => check.value.parameters)
 
+  const wanted = computed(() => inputsReady.value && !isFinalized.value && parameters.value
+    ? { topPerPool: parameters.value.topPerPool, bestNextCount: parameters.value.bestNextCount }
+    : null)
   watch(status, (value) => {
     if (value && !inputsReady.value) {
       inputs.value = initialInputs(value)
       inputsReady.value = true
     }
   }, { immediate: true })
-
-  const wanted = computed(() => inputsReady.value && !isFinalized.value && parameters.value
-    ? { topPerPool: parameters.value.topPerPool, bestNextCount: parameters.value.bestNextCount }
-    : null)
   const debouncedWanted = useDebouncedValue(wanted, QUALIFICATION_SIMULATION_DELAY_MS)
   watch(debouncedWanted, (value) => {
     const same = value?.topPerPool === simulated.value?.topPerPool && value?.bestNextCount === simulated.value?.bestNextCount

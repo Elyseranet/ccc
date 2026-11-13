@@ -4,7 +4,6 @@
     rounded="xl"
     border
     elevation="md"
-    padding="6"
     :aria-labelledby="titleId"
     class="qualification-prerequisites"
     data-cy="qualification-prerequisites"
@@ -40,6 +39,7 @@
         v-if="hasPending"
         variant="text"
         size="small"
+        class="qualification-prerequisites__link"
         :to="matchesRoute"
         :text="linkLabel"
         data-cy="qualification-matches-link"
@@ -94,6 +94,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .qualification-prerequisites {
+  padding: var(--qualification-prerequisites---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--origam-space---5);
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -114,8 +120,14 @@ defineExpose({})
     margin-bottom: var(--origam-space---5);
   }
 
+  &__link {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
+  }
+
   &__text {
-    margin: 0 0 var(--origam-space---3);
+    margin: 0;
     color: var(--origam-color__text---secondary);
   }
 }
@@ -123,6 +135,7 @@ defineExpose({})
 
 <style>
 :root {
+  --qualification-prerequisites---padding: var(--origam-space---6);
   --qualification-prerequisites---gap: var(--origam-space---3);
 }
 </style>

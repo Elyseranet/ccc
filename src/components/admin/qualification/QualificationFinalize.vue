@@ -4,7 +4,6 @@
     rounded="xl"
     border
     elevation="md"
-    padding="6"
     :aria-labelledby="titleId"
     class="qualification-finalize"
     data-cy="qualification-finalize"
@@ -176,6 +175,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .qualification-finalize {
+  padding: var(--qualification-finalize---padding, var(--origam-space---6));
+
+  @media (max-width: 760px) {
+    padding: var(--origam-space---5);
+  }
+
   margin-top: var(--qualification-finalize---margin-top, var(--origam-space---6));
 
   &__head {
@@ -215,6 +220,7 @@ defineExpose({})
 
 <style>
 :root {
+  --qualification-finalize---padding: var(--origam-space---6);
   --qualification-finalize---margin-top: var(--origam-space---6);
 }
 </style>

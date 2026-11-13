@@ -42,7 +42,6 @@
           rounded="xl"
           border
           elevation="md"
-          padding="6"
           class="qualification-ties__card"
           :data-cy="tie.dataCy"
         >
@@ -238,6 +237,14 @@ defineExpose({})
     }
   }
 
+  &__card {
+    padding: var(--qualification-ties__card---padding, var(--origam-space---6));
+
+    @media (max-width: 760px) {
+      padding: var(--origam-space---5);
+    }
+  }
+
   &__card :deep(.origam-card__content) {
     display: grid;
     align-content: start;
@@ -281,6 +288,7 @@ defineExpose({})
 
 <style>
 :root {
+  --qualification-ties__card---padding: var(--origam-space---6);
   --qualification-ties---margin-top: var(--origam-space---6);
   --qualification-ties__list---gap: var(--origam-space---4);
 }
