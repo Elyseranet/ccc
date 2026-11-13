@@ -181,6 +181,10 @@ describe('edition closing and frozen points (B-14)', async () => {
     expect(pointsOf(detail, 3)).toMatchObject({ finalStage: FINAL_STAGE.SEMI, points: 6.48 })
     expect(pointsOf(detail, 5)).toMatchObject({ finalStage: FINAL_STAGE.QUARTER, points: 4.32 })
     expect(pointsOf(detail, 20)).toMatchObject({ finalStage: FINAL_STAGE.POOL_ELIMINATED, points: 0 })
+    // Comme les archives : WINNER pour le champion, ELIMINATED pour tous les autres, quel que soit leur stade.
+    expect(pointsOf(detail, 1).status).toBe(PARTICIPATION_STATUS.WINNER)
+    expect(detail.participants.filter((participant) => participant.status === PARTICIPATION_STATUS.WINNER)).toHaveLength(1)
+    expect(detail.participants.filter((participant) => participant.status === PARTICIPATION_STATUS.ELIMINATED)).toHaveLength(PLAYERS - 1)
     const stored = await dataSource.getRepository(EditionEntity).findOneByOrFail({ id: ready.edition.id })
     expect(stored).toMatchObject({ status: EDITION_STATUS.CLOSED, participantCount: PLAYERS })
     expect(stored.closedAt).toBeInstanceOf(Date)

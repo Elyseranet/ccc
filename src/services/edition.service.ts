@@ -11,7 +11,7 @@ import type { DataSource, EntityManager } from 'typeorm'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../enums/edition.enum.js'
-import { FINAL_STAGE } from '../enums/participation.enum.js'
+import { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import type { IDraw } from '../interfaces/draw.interface.js'
@@ -696,7 +696,12 @@ export const closeEdition = (
       throw conflictWithCode(preview.blockedBy, API_ERROR_MESSAGE.FINAL_NOT_VALIDATED)
     }
     for (const result of preview.results) {
-      await manager.getRepository(ParticipationEntity).update({ id: result.participationId }, { finalStage: result.finalStage, points: result.points })
+      await manager.getRepository(ParticipationEntity).update({ id: result.participationId }, {
+        finalStage: result.finalStage,
+        points: result.points,
+        // Comme les archives : le champion est WINNER, tous les autres ELIMINATED, quel que soit leur stade.
+        status: result.finalStage === FINAL_STAGE.CHAMPION ? PARTICIPATION_STATUS.WINNER : PARTICIPATION_STATUS.ELIMINATED
+      })
     }
     await manager.getRepository(EditionEntity).update({ id: edition.id }, {
       status: EDITION_STATUS.CLOSED,
