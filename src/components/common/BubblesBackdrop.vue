@@ -10,6 +10,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useBubbles } from '~/composables/useBubbles'
+import { useMotionPreference } from '~/composables/useMotionPreference'
 
 /*********************************************************
  * Global
@@ -22,7 +23,8 @@ const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-const { start, stop } = useBubbles(canvasRef)
+const { paused } = useMotionPreference()
+const { start, stop } = useBubbles(canvasRef, paused)
 
 onMounted(start)
 onBeforeUnmount(stop)

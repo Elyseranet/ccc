@@ -376,6 +376,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) { .bubbles { display: none; } }
+/* T-A11Y-01 M5 : bouton « Mettre en pause les animations » (vitrines). Seules les animations en boucle sont gelées : l'entrée du titre (rise) et les barres (lift) jouent une fois et ne doivent pas rester figées à mi-course */
+.motion-ctl { display: flex; justify-content: flex-end; margin-top: var(--origam-space---6); }
+.motion-btn { color: var(--origam-color__text---secondary); }
+.motion-btn__ic { flex: none; width: var(--origam-space---4); height: var(--origam-space---4); fill: currentColor; }
+.motion-btn[aria-pressed="true"] { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); }
+.motion-paused :is(.pint__drip, .pint__bubbles circle, .flycap) { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .motion-ctl { display: none; } }
 
 /* ═══ PAGES LÉGALES (F-19) ═══════════════════════════════════════════════ */
 .legal-page { padding-top: var(--origam-space---10); }

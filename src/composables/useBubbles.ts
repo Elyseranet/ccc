@@ -1,3 +1,4 @@
+import { watch } from 'vue'
 import type { Ref } from 'vue'
 import { BUBBLE_COLOR_TOKENS, BUBBLE_DENSITY_DIVISOR, BUBBLE_MAX_DPR } from '~/consts/bubbles.const'
 import type { IBubble } from '~/interfaces/bubbles.interface'
@@ -7,10 +8,11 @@ import type { IBubble } from '~/interfaces/bubbles.interface'
  *
  * @description
  * Décor des vitrines (canvas de `bulles.js`). requestAnimationFrame, aucun setInterval ni setTimeout.
- * Ne démarre pas sous `prefers-reduced-motion: reduce`, s'arrête si la préférence change ou si l'onglet est masqué.
+ * Ne démarre pas sous `prefers-reduced-motion: reduce`, s'arrête si la préférence change ou si l'onglet est masqué, et suit la
+ * préférence « animations en pause » (`paused`, T-A11Y-01 M5).
  * Réservé aux pages vitrines (exception de CLAUDE.md, 2026-10-19).
  ********************************************************/
-export const useBubbles = (canvasRef: Ref<HTMLCanvasElement | null>) => {
+export const useBubbles = (canvasRef: Ref<HTMLCanvasElement | null>, paused?: Ref<boolean>) => {
   let frame = 0
   let stopListening: Array<() => void> = []
 
@@ -70,7 +72,7 @@ export const useBubbles = (canvasRef: Ref<HTMLCanvasElement | null>) => {
     }
 
     const play = () => {
-      if (!frame && !reduce.matches && !document.hidden) {
+      if (!frame && !reduce.matches && !document.hidden && !paused?.value) {
         frame = requestAnimationFrame(draw)
       }
     }
@@ -87,7 +89,9 @@ export const useBubbles = (canvasRef: Ref<HTMLCanvasElement | null>) => {
     window.addEventListener('resize', resize)
     document.addEventListener('visibilitychange', handleVisibility)
     reduce.addEventListener('change', handlePreference)
+    const stopWatchingPause = paused ? watch(paused, value => (value ? pause() : play())) : () => undefined
     stopListening = [
+      stopWatchingPause,
       () => window.removeEventListener('resize', resize),
       () => document.removeEventListener('visibilitychange', handleVisibility),
       () => reduce.removeEventListener('change', handlePreference),

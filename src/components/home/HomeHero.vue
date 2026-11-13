@@ -66,11 +66,15 @@
       </div>
       <home-pint />
     </div>
+    <div class="page-wrap">
+      <motion-toggle />
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import AbbrText from '~/components/common/AbbrText.vue'
+import MotionToggle from '~/components/common/MotionToggle.vue'
 import { computed } from 'vue'
 import { OrigamBtn, OrigamChip, OrigamTitle } from 'origam/components'
 import BubblesBackdrop from '~/components/common/BubblesBackdrop.vue'

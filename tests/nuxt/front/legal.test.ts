@@ -50,10 +50,13 @@ describe('pages légales (F-19)', () => {
     ])
   })
 
-  it('la politique liste les trois cookies', () => {
+  it('la politique liste les quatre cookies, dont la préférence d’animation (ccc_motion, 12 mois)', () => {
     const cookies = LEGAL_PRIVACY_CONTENT.sections.find(section => section.id === 'cookies')
     const names = cookies?.blocks.flatMap(block => block.table?.rows.map(row => row[0]?.code) ?? [])
-    expect(names).toEqual(['ccc_session', 'ccc_device', 'ccc_admin_edition'])
+    expect(names).toEqual(['ccc_session', 'ccc_device', 'ccc_admin_edition', 'ccc_motion'])
+    const motion = cookies?.blocks.flatMap(block => block.table?.rows ?? []).find(row => row[0]?.code === 'ccc_motion')
+    expect(motion?.[1]?.text?.fallback).toContain('Préférence d’animation')
+    expect(motion?.[2]?.text?.fallback).toBe('12 mois')
   })
 
   it('la déclaration d’accessibilité n’affirme jamais être conforme', () => {

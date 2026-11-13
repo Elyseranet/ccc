@@ -1,4 +1,5 @@
 import { ROUTES } from './routes.const.js'
+import { MOTION_COOKIE } from './motion.const.js'
 import { LEGAL_BLOCK } from '../enums/legal-block.enum.js'
 import type { ILegalPageContent } from '../interfaces/legal.interface.js'
 
@@ -107,7 +108,8 @@ export const LEGAL_PRIVACY_CONTENT: ILegalPageContent = {
           rows: [
             [{ code: 'ccc_session' }, { text: { key: 'legal.privacy.cookies_session_role', fallback: 'Authentification' } }, { text: { key: 'legal.privacy.cookies_session_duration', fallback: 'Session valable 12 h au plus, 2 h sans activité ; [À FOURNIR : durée garantie, après le merge de T-SEC-20]' } }],
             [{ code: 'ccc_device' }, { text: { key: 'legal.privacy.cookies_device_role', fallback: 'Sécurité de la connexion' } }, { text: { key: 'legal.privacy.cookies_device_duration', fallback: '90 jours' } }],
-            [{ code: 'ccc_admin_edition' }, { text: { key: 'legal.privacy.cookies_admin_role', fallback: 'Édition choisie par l’administrateur' } }, { text: { key: 'legal.privacy.cookies_admin_duration', fallback: 'Durée de la session du navigateur (aucune durée fixée) [À CONFIRMER : décision utilisateur]' } }]
+            [{ code: 'ccc_admin_edition' }, { text: { key: 'legal.privacy.cookies_admin_role', fallback: 'Édition choisie par l’administrateur' } }, { text: { key: 'legal.privacy.cookies_admin_duration', fallback: 'Durée de la session du navigateur (aucune durée fixée) [À CONFIRMER : décision utilisateur]' } }],
+            [{ code: MOTION_COOKIE }, { text: { key: 'legal.privacy.cookies_motion_role', fallback: 'Préférence d’animation (pause des animations demandée par le visiteur)' } }, { text: { key: 'legal.privacy.cookies_motion_duration', fallback: '12 mois' } }]
           ]
         }
       }
