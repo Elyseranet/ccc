@@ -217,12 +217,20 @@ const roundLabel = (row: IEditionMatchesProps['rows'][number]): string => {
     : t(ROUND_LABELS[row.roundKind].match.key, ROUND_LABELS[row.roundKind].match.label)
   return row.isTiebreak ? t('edition.matches_round_tiebreak', '{round} · départage', { round: base }) : base
 }
+const scoreOf = (row: IEditionMatchesProps['rows'][number]): string => {
+  if (row.winnerWithoutScore) {
+    return t('edition.matches_score_not_archived', 'score non archivé')
+  }
+  return row.firstScore !== null && row.secondScore !== null
+    ? t('edition.matches_score', '{first} – {second}', { first: row.firstScore, second: row.secondScore })
+    : t('edition.matches_no_score', '–')
+}
 const pageRows = computed(() => slice.value.items.map((row) => {
   const status = EDITION_MATCH_STATUS_VIEW[row.status]
   return {
     ...row,
     round: roundLabel(row),
-    score: row.firstScore !== null && row.secondScore !== null ? t('edition.matches_score', '{first} – {second}', { first: row.firstScore, second: row.secondScore }) : t('edition.matches_no_score', '–'),
+    score: scoreOf(row),
     family: status.family,
     statusText: t(status.label.key, status.label.fallback)
   }

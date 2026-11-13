@@ -26,8 +26,9 @@ export interface IHeadToHeadMatch {
   roundKind: ROUND_KIND
   /** Numéro de la poule du match (1-based) ; null hors poule. */
   poolNumber: number | null
-  competitorScore: number
-  opponentScore: number
+  /** `null` : match d'archive sans score (B-21) ; `winnerCompetitorId` reste renseigné. */
+  competitorScore: number | null
+  opponentScore: number | null
   winnerCompetitorId: string
 }
 

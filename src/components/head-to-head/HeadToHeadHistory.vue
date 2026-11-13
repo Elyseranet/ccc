@@ -80,6 +80,7 @@ import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { ROUND_KIND } from '~/enums/round.enum'
 import { HEAD_TO_HEAD_SCORE_SEPARATOR, HEAD_TO_HEAD_TABLE_BREAKPOINT } from '~/consts/head-to-head.const'
 import { HEAD_TO_HEAD_COLUMN } from '~/enums/head-to-head.enum'
+import type { IHeadToHeadMatch } from '~/interfaces/head-to-head.interface'
 import type { IHeadToHeadHistoryProps, IHeadToHeadRow } from '~/interfaces/head-to-head-page.interface'
 
 /*********************************************************
@@ -117,17 +118,21 @@ const headers = computed<IDataTableHeader[]>(() => [
   { key: HEAD_TO_HEAD_COLUMN.SCORE, title: t('head_to_head.history.col_score', 'Score'), sortable: false, nowrap: true, align: ALIGN.END },
   { key: HEAD_TO_HEAD_COLUMN.WINNER, title: t('head_to_head.history.col_winner', 'Vainqueur'), sortable: false, nowrap: true }
 ])
+const scoreOf = (match: IHeadToHeadMatch): string => {
+  if (match.competitorScore === null || match.opponentScore === null) {
+    return t('head_to_head.history.score_not_archived', 'score non archivé')
+  }
+  return `${Math.max(match.competitorScore, match.opponentScore)} ${HEAD_TO_HEAD_SCORE_SEPARATOR} ${Math.min(match.competitorScore, match.opponentScore)}`
+}
 const rows = computed<IHeadToHeadRow[]>(() => props.comparison.matches.map((match) => {
   const firstWon = match.winnerCompetitorId === props.comparison.competitor.id
-  const high = Math.max(match.competitorScore, match.opponentScore)
-  const low = Math.min(match.competitorScore, match.opponentScore)
   const round = ROUND_LABELS[match.roundKind].match
   const pool = match.roundKind === ROUND_KIND.POOLS ? match.poolNumber : null
   return {
     id: match.matchId,
     edition: match.editionCode,
     round: pool !== null ? t('head_to_head.history.round_pool', 'Poule {pool}', { pool }) : t(round.key, round.label),
-    score: `${high} ${HEAD_TO_HEAD_SCORE_SEPARATOR} ${low}`,
+    score: scoreOf(match),
     winner: firstWon ? props.comparison.competitor : props.comparison.opponent,
     winnerTitles: (firstWon ? props.detailA : props.detailB)?.stats.titles ?? 0
   }

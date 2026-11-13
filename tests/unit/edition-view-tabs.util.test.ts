@@ -99,3 +99,40 @@ describe('Matchs (RG24)', () => {
     expect(pageSlice([], 3, 16)).toEqual({ items: [], page: 1, pageCount: 1 })
   })
 })
+
+describe('Match d’archive sans score : lignes et tableau (B-21, F-34)', () => {
+  const archived = {
+    ...detail,
+    bracket: [{ kind: ROUND_KIND.QUARTER, matches: [{ id: 'qa', status: 'VALIDATED', winnerParticipationId: 'a', sides: [side('a', null), side('b', null)] }] }],
+    matches: [
+      { id: 'ma', sequence: 5, roundKind: ROUND_KIND.QUARTER, poolRank: null, purpose: 'REGULAR', status: 'VALIDATED', winnerParticipationId: 'a', sides: [side('a', null), side('b', null)] },
+      { id: 'mb', sequence: 4, roundKind: ROUND_KIND.POOLS, poolRank: 1, purpose: 'REGULAR', status: 'VALIDATED', winnerParticipationId: 'b', sides: [side('a', 4), side('b', 10)] },
+      { id: 'mc', sequence: 3, roundKind: ROUND_KIND.POOLS, poolRank: 1, purpose: 'REGULAR', status: 'RESULT_UNKNOWN', winnerParticipationId: null, sides: [side('a', null), side('b', null)] }
+    ]
+  } as unknown as IEditionDetail
+
+  it('la ligne porte le vainqueur en premier, sans score, marquée « sans score archivé »', () => {
+    const [row] = buildEditionMatchRows(archived)
+    expect(row!.first?.id).toBe('c-a')
+    expect(row!.hasWinner).toBe(true)
+    expect(row!.firstScore).toBeNull()
+    expect(row!.winnerWithoutScore).toBe(true)
+  })
+
+  it('un match avec score, ou un résultat inconnu d’avant B-21, n’est pas marqué', () => {
+    const rows = buildEditionMatchRows(archived)
+    expect(rows.map(row => row.winnerWithoutScore)).toEqual([true, false, false])
+  })
+
+  it('le tableau marque le match sans score et garde son vainqueur', () => {
+    const [round] = buildEditionBracket(archived)
+    expect(round!.matches[0]!.winnerWithoutScore).toBe(true)
+    expect(round!.matches[0]!.sides.map(entry => entry.isWinner)).toEqual([true, false])
+  })
+
+  it('sans le champ vainqueur du contrat B-21 (détail d’avant B-21), rien n’est marqué', () => {
+    const before = { ...archived, matches: (archived.matches as unknown as Array<Record<string, unknown>>).map(({ winnerParticipationId: _w, ...rest }) => rest) } as unknown as IEditionDetail
+    expect(() => buildEditionMatchRows(before)).not.toThrow()
+    expect(buildEditionMatchRows(before).every(row => !row.winnerWithoutScore)).toBe(true)
+  })
+})
