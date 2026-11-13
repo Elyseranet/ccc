@@ -73,4 +73,24 @@ describe('computeClosingPreview (B-14, RG1 à RG3)', () => {
     const noisy = computeClosingPreview(edition([...noise, ...knockout], [ROUND_KIND.POOLS, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL]))
     expect(noisy.results).toEqual(preview.results)
   })
+
+  it('barrages : les perdants sont PLAYOFF, les premiers de poule exemptés (qui entrent en quarts) ne le sont pas', () => {
+    const matches = [match(ROUND_KIND.PLAYOFF, 'p9', 'p10'), match(ROUND_KIND.QUARTER, 'p1', 'p9'), ...knockout.filter((candidate) => candidate.id !== 'QUARTER-p5')]
+    const withPlayoff = computeClosingPreview(edition(matches, [ROUND_KIND.PLAYOFF, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL]))
+    expect(pointsOf(withPlayoff, 'p10')).toMatchObject({ finalStage: FINAL_STAGE.PLAYOFF, points: 0.72 })
+    expect(pointsOf(withPlayoff, 'p9')).toMatchObject({ finalStage: FINAL_STAGE.QUARTER })
+    expect(pointsOf(withPlayoff, 'p1')).toMatchObject({ finalStage: FINAL_STAGE.CHAMPION })
+  })
+
+  it('édition sans poule : seule la phase finale compte, aucune donnée de poule n\'est lue', () => {
+    expect(Object.keys(edition(knockout, [])).sort()).toEqual(['matches', 'participants', 'rounds'])
+    expect(computeClosingPreview(edition(knockout, [])).results).toEqual(preview.results)
+  })
+
+  it('un départage à 3 côtés est ignoré, sans plantage', () => {
+    const threeSides = match(ROUND_KIND.POOLS, 'p20', 'p21', { purpose: MATCH_PURPOSE.TIEBREAK })
+    threeSides.sides.push({ participationId: 'p22', competitorId: 'p22', displayName: 'p22', score: 0 })
+    const noisy = computeClosingPreview(edition([threeSides, ...knockout], [ROUND_KIND.POOLS, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL]))
+    expect(noisy.results).toEqual(preview.results)
+  })
 })

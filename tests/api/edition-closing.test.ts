@@ -31,8 +31,18 @@ describe('edition closing and frozen points (B-14)', async () => {
   await seedUser(dataSource, { email: 'boss-b14@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
   await seedUser(dataSource, { email: 'player-b14@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT, withCompetitor: true })
 
-  /** Une édition de 36 joueurs en phase finale : quarts, demies, finale (validée ou non). Les 28 autres sont éliminés en poule. */
-  const seedEdition = async (code: string, rank: number, finalValidated: boolean) => {
+  /** Un tour de phase finale : [vainqueur, perdant] par match (indices de joueurs, 1 à 36). */
+  interface IRoundPlan { kind: ROUND_KIND, matches: Array<readonly [number, number]>, validated?: boolean }
+  const STANDARD_PLAN: IRoundPlan[] = [
+    { kind: ROUND_KIND.QUARTER, matches: [[1, 5], [2, 6], [3, 7], [4, 8]] },
+    { kind: ROUND_KIND.SEMI, matches: [[1, 3], [2, 4]] }
+  ]
+
+  /**
+   * Une édition de 36 joueurs, SANS poule (aucun `poolId`, comme les éditions d'archives sans poule) : le stade se déduit des
+   * seuls matchs de phase finale. `withTiebreak` ajoute un départage à 3 côtés (3-1-0) dans le tour de poules.
+   */
+  const seedEdition = async (code: string, rank: number, plan: IRoundPlan[], finalValidated: boolean, withTiebreak = false) => {
     const edition = await dataSource.getRepository(EditionEntity).save({
       code, year: 2100 + rank, chronologicalRank: rank, status: EDITION_STATUS.PLAYOFFS, origin: EDITION_ORIGIN.APP
     })
@@ -40,36 +50,44 @@ describe('edition closing and frozen points (B-14)', async () => {
       Array.from({ length: PLAYERS }, (_unused, index) => ({ displayName: `${code}-p${index + 1}` })))
     const participations = await dataSource.getRepository(ParticipationEntity).save(competitors.map((competitor, index) => ({
       editionId: edition.id, competitorId: competitor.id,
-      status: index < 8 ? PARTICIPATION_STATUS.QUALIFIED : PARTICIPATION_STATUS.ELIMINATED,
-      finalStage: index < 8 ? null : FINAL_STAGE.POOL_ELIMINATED
+      status: index < 12 ? PARTICIPATION_STATUS.QUALIFIED : PARTICIPATION_STATUS.ELIMINATED,
+      finalStage: index < 12 ? null : FINAL_STAGE.POOL_ELIMINATED
     })))
     const p = (n: number) => participations[n - 1]!.id
     let sequence = 0
-    const play = async (kind: ROUND_KIND, round: RoundEntity, winner: number, loser: number, validated = true) => {
+    const save = async (round: RoundEntity, players: number[], scores: Array<number | null>, purpose: MATCH_PURPOSE, targetScore: number) => {
       sequence += 1
+      const validated = scores[0] !== null
       const match = await dataSource.getRepository(MatchEntity).save({
-        editionId: edition.id, roundId: round.id, sequence, targetScore: 10, purpose: MATCH_PURPOSE.REGULAR,
+        editionId: edition.id, roundId: round.id, sequence, targetScore, purpose,
         status: validated ? MATCH_STATUS.VALIDATED : MATCH_STATUS.SCHEDULED, validatedAt: validated ? new Date() : null
       })
-      await dataSource.getRepository(MatchSideEntity).save([
-        { matchId: match.id, position: 1, participationId: p(winner), validatedScore: validated ? 10 : null, recordedScore: validated ? 10 : null },
-        { matchId: match.id, position: 2, participationId: p(loser), validatedScore: validated ? 4 : null, recordedScore: validated ? 4 : null }
-      ])
-      return kind
+      await dataSource.getRepository(MatchSideEntity).save(players.map((player, index) => ({
+        matchId: match.id, position: index + 1, participationId: p(player), validatedScore: scores[index], recordedScore: scores[index]
+      })))
     }
     const round = (kind: ROUND_KIND, sequenceNumber: number, status = ROUND_STATUS.COMPLETED) =>
       dataSource.getRepository(RoundEntity).save({ editionId: edition.id, kind, sequence: sequenceNumber, status })
-    const quarter = await round(ROUND_KIND.QUARTER, 1)
-    for (const [winner, loser] of [[1, 5], [2, 6], [3, 7], [4, 8]] as const) await play(ROUND_KIND.QUARTER, quarter, winner, loser)
-    const semi = await round(ROUND_KIND.SEMI, 2)
-    await play(ROUND_KIND.SEMI, semi, 1, 3)
-    await play(ROUND_KIND.SEMI, semi, 2, 4)
-    const final = await round(ROUND_KIND.FINAL, 3, finalValidated ? ROUND_STATUS.COMPLETED : ROUND_STATUS.DRAWN)
-    await play(ROUND_KIND.FINAL, final, 1, 2, finalValidated)
+    if (withTiebreak) {
+      await save(await round(ROUND_KIND.POOLS, 0), [20, 21, 22], [3, 1, 0], MATCH_PURPOSE.TIEBREAK, 3)
+    }
+    for (const [index, step] of [...plan, { kind: ROUND_KIND.FINAL, matches: [[1, 2]] as const, validated: finalValidated }].entries()) {
+      const stored = await round(step.kind, index + 1, step.validated === false ? ROUND_STATUS.DRAWN : ROUND_STATUS.COMPLETED)
+      for (const [winner, loser] of step.matches) {
+        await save(stored, [winner, loser], step.validated === false ? [null, null] : [10, 4], MATCH_PURPOSE.REGULAR, 10)
+      }
+    }
     return { edition, participations }
   }
-  const ready = await seedEdition('2081', 21, true)
-  const notReady = await seedEdition('2082', 22, false)
+  const ready = await seedEdition('2081', 21, STANDARD_PLAN, true)
+  const notReady = await seedEdition('2082', 22, STANDARD_PLAN, false)
+  // Barrages : p9 et p11 gagnent le leur et jouent un quart contre des premiers de poule exemptés (p1, p2) ; p10 et p12 perdent.
+  const playoff = await seedEdition('2083', 23, [
+    { kind: ROUND_KIND.PLAYOFF, matches: [[9, 10], [11, 12]] },
+    { kind: ROUND_KIND.QUARTER, matches: [[1, 9], [2, 11], [3, 7], [4, 8]] },
+    STANDARD_PLAN[1]!
+  ], true)
+  const tiebreak = await seedEdition('2084', 24, STANDARD_PLAN, true, true)
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
@@ -118,16 +136,42 @@ describe('edition closing and frozen points (B-14)', async () => {
     expect((await dataSource.getRepository(ParticipationEntity).findBy({ editionId: notReady.edition.id })).every((participation) => participation.points === null)).toBe(true)
   })
 
-  it('the preview computed in the browser shape equals what the server freezes', async () => {
-    const before = await (await send('GET', `/api/v1/editions/${ready.edition.id}`)).json() as IEditionDetail
+  /** L'aperçu calculé sur la forme publique, avant la clôture, doit être exactement ce que le serveur fige. */
+  const expectFreezeEqualsPreview = async (editionId: string) => {
+    const before = await (await send('GET', `/api/v1/editions/${editionId}`)).json() as IEditionDetail
     const preview = computeClosingPreview(before)
     expect(preview).toMatchObject({ participantCount: PLAYERS, blockedBy: null })
+    expect((await close(editionId)).status).toBe(200)
+    const after = await (await send('GET', `/api/v1/editions/${editionId}`)).json() as IEditionDetail
+    const byId = (rows: Array<{ participationId: string }>) => [...rows].sort((a, b) => a.participationId.localeCompare(b.participationId))
+    expect(byId(after.participants.map(({ participationId, finalStage, points }) => ({ participationId, finalStage, points }))))
+      .toEqual(byId(preview.results))
+    return after
+  }
 
-    expect((await close(ready.edition.id)).status).toBe(200)
-    const after = await (await send('GET', `/api/v1/editions/${ready.edition.id}`)).json() as IEditionDetail
-    expect(after.participants.map(({ participationId, finalStage, points }) => ({ participationId, finalStage, points }))
-      .sort((a, b) => a.participationId.localeCompare(b.participationId)))
-      .toEqual([...preview.results].sort((a, b) => a.participationId.localeCompare(b.participationId)))
+  it('the preview computed in the browser shape equals what the server freezes', async () => {
+    await expectFreezeEqualsPreview(ready.edition.id)
+  })
+
+  it('with playoffs: the losers of the playoffs are PLAYOFF (0.72), the pool winners exempted from them are not', async () => {
+    const detail = await expectFreezeEqualsPreview(playoff.edition.id)
+    const of = (n: number) => detail.participants.find((participant) => participant.participationId === playoff.participations[n - 1]!.id)!
+    expect(of(10)).toMatchObject({ finalStage: FINAL_STAGE.PLAYOFF, points: 0.72 })
+    expect(of(12)).toMatchObject({ finalStage: FINAL_STAGE.PLAYOFF, points: 0.72 })
+    expect(of(9)).toMatchObject({ finalStage: FINAL_STAGE.QUARTER, points: 4.32 })
+    for (const exempt of [3, 4, 7, 8]) {
+      expect(of(exempt).finalStage, `p${exempt}`).not.toBe(FINAL_STAGE.PLAYOFF)
+    }
+    expect(of(7)).toMatchObject({ finalStage: FINAL_STAGE.QUARTER })
+  })
+
+  it('a 3-sided tiebreak in the pool round is ignored by the stage deduction, preview and freeze alike', async () => {
+    const detail = await expectFreezeEqualsPreview(tiebreak.edition.id)
+    for (const n of [20, 21, 22]) {
+      expect(detail.participants.find((participant) => participant.participationId === tiebreak.participations[n - 1]!.id))
+        .toMatchObject({ finalStage: FINAL_STAGE.POOL_ELIMINATED, points: 0 })
+    }
+    expect(detail.participants.find((participant) => participant.participationId === tiebreak.participations[0]!.id)).toMatchObject({ finalStage: FINAL_STAGE.CHAMPION, points: 12.96 })
   })
 
   it('froze 12.96 for the champion of 36, the other stages, N and the closing date', async () => {
