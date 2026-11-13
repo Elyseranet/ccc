@@ -24,4 +24,5 @@
 - 390 px : 0,000 % aux 5 lancements (la colonne Score est hors de la zone visible, le tableau défile).
 - 1440 px : 0,444 / 0,438 / 0,441 / 0,444 / 0,465 %, maximum 0,465 %.
 - Reste à 1440 : la colonne « Score » plus étroite de 1,8 px (390) à 2,6 px (1440) que celle de la maquette, qui décale d'autant les textes des colonnes suivantes (en-têtes Vainqueur, Score, Adversaire, texte de la pastille). Cause non vérifiée (th SCORE aligné à droite, police display) ; notée dans `F-21.md`, sous le seuil, `AppDataTable` non touché.
+- **Contrôle sur la base `develop`** (3 lancements du fichier entier, 2 de la seule zone publique, sous verrou, charge 6,5 à 7,8) : 1440 px entre 0,425 et 0,444 % ; 390 px à 0,000 % quand on ne lance que la zone publique, mais à 0,908 % (identique aux 3 lancements) quand le fichier entier tourne (les autres tests ont créé des éditions avant). Sous le seuil dans les deux cas ; la cause de cet écart entre les deux modes de lancement n'est pas établie.
 
