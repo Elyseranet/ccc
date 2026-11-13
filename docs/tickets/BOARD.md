@@ -236,7 +236,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-03c](F-03c.md) | Podium de l'édition : étoiles du finaliste et des demi-finalistes (B-19) | `edition.html` | F-03b, B-19 (mergé 566525c) | **Fermé** (2026-11-02) : mergé @ `819bc3f` | worktree de dev-f06 |
 | [F-17](F-17.md) | Titre des `origam-alert` à la taille du texte et en gras partout (défaut de thème, AsyncState compris) | `admin-participants.html` (e27446e) | F-09 | À faire, décision prise (24cd3d3) : défaut de thème ; après le merge de F-09 ; titre de l'état d'erreur 31 → 16 px (F-01, F-03, F-04, F-05) | à créer |
 | [F-20](F-20.md) | Composant partagé de puces de filtre (doublon EditionMatches / MatchQueueFilters) | — | F-08 | À faire (2026-11-05) | à créer |
-| [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | À faire (2026-11-05) | à créer |
+| [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | **Fermé** (2026-11-13) @ `7c28e546` | à créer |
 | [F-22](F-22.md) | `useCompetitor` : clé de cache figée au premier id (fiche joueur, face-à-face, F-13) | — | — | **Fermé** (2026-11-12) @ `407b6534` : face-à-face, les deux côtés ne partagent plus la même fiche | — |
 | [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | **Fermé** (2026-11-13) @ `c758f358` | — |
 | [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | **Fermé** (2026-11-13) @ `46654e4d` | — |
@@ -383,6 +383,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
+- [T-QA-11](T-QA-11.md) : **À faire** (2026-11-13) — zone publique F-21 à 0,997 % à 390, l'injection du test fait monter l'écart.
 - [T-QA-10](T-QA-10.md) : **À faire** (2026-11-13) — test e2e F-08 « 412 » instable, déjà présent sur develop ; piste : `watch` de `useScoreEntry`.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
