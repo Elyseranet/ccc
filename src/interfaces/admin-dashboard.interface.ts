@@ -30,6 +30,8 @@ export interface IAdminDashboardStepItem {
   title: string
   subtitle: string
   status: ADMIN_DASHBOARD_STEP_STATUS
+  /** Page de l'étape ; `null` : pas de page, l'étape n'est pas cliquable. */
+  to: string | null
 }
 
 export interface IAdminDashboardTodoItem {
