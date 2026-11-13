@@ -315,14 +315,14 @@ defineExpose({})
   }
 
   &__others {
+    display: grid;
+    gap: var(--edition-matches__others---gap, calc(var(--origam-space---1) + 1px));
     margin: 0;
     padding: 0;
     list-style: none;
 
-    li:not(:only-child) {
+    li {
       display: flex;
-      align-items: center;
-      min-block-size: var(--edition-matches__other---min-height, var(--origam-space---6));
     }
   }
 
@@ -356,6 +356,6 @@ defineExpose({})
 <style>
 :root {
   --edition-matches---gap: var(--origam-space---3);
-  --edition-matches__other---min-height: var(--origam-space---6);
+  --edition-matches__others---gap: calc(var(--origam-space---1) + 1px);
 }
 </style>
