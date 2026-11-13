@@ -228,9 +228,11 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-input---line-height': 'var(--origam-font__lineHeight---normal)',
     '--origam-field---letter-spacing': 'normal',
     '--origam-field__input---opacity': '1',
-    // Champs outlined : fond surface.sunken, filet 1 px border.default, sans atténuation d'opacité.
+    // Champs outlined : fond surface.sunken, filet 1 px border.strong (T-A11Y-01 M1, WCAG 1.4.11 : border.default aplati tombe à 2,8:1 contre la
+    // carte ; décision utilisateur : border.strong sur tous les champs), sans atténuation d'opacité. Un champ en erreur repose lui-même
+    // `--origam-field---border-color` sur son propre élément (OrigamField.vue) : sa bordure danger l'emporte sur cette valeur héritée.
     '--origam-field---background-color': 'var(--origam-color__surface---sunken)',
-    '--origam-field---border-color': 'var(--origam-color__border---default)',
+    '--origam-field---border-color': 'var(--origam-color__border---strong)',
     '--origam-field---focus-ring-width': 'calc(var(--origam-border__width---2) + var(--origam-border__width---thin))',
     '--origam-field---focus-ring-offset': 'var(--origam-border__width---2)',
     '--origam-field---focus-ring-color': 'var(--origam-color__border---focus)',
