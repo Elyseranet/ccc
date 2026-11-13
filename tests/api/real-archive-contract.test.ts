@@ -89,6 +89,17 @@ describe('B-17 contract on the real archive', async () => {
     }
   })
 
+  it('R-5 bis: the global balances read through the API are the workbook ones, in the detail and in the list (Fossati 40/10, Deseine 53/18)', async () => {
+    for (const [name, wins, losses] of [['Clément Fossati', 40, 10], ['Nicolas Deseine', DESEINE_WINS, DESEINE_LOSSES]] as const) {
+      const rows = await dataSource.query<Array<{ id: string }>>('SELECT id FROM competitors WHERE display_name = $1', [name])
+      expect(rows, name).toHaveLength(1)
+      const detail = await getJson<ICompetitorDetail>(`/api/v1/competiteurs/${rows[0]!.id}`)
+      expect(detail.stats, name).toMatchObject({ wins, losses, played: wins + losses, unknownResults: 0 })
+      const list = await getJson<IPaginated<ICompetitorListItem>>(`/api/v1/competiteurs?q=${encodeURIComponent(name)}`)
+      expect(list.items.find((item) => item.id === rows[0]!.id), name).toMatchObject({ wins, losses, matchesPlayed: wins + losses, unknownResults: 0 })
+    }
+  })
+
   it('G3: the titles of every opponent equal the ones of the competitor list', async () => {
     const id = await deseineId()
     const list = await getJson<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?pageSize=100&page=1')
