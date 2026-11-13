@@ -5,6 +5,8 @@
 - **Piste, non vérifiée (dev-f13)** : le rechargement de la file après le 412 remet `failure` à zéro par le `watch` de `useScoreEntry`, et le message disparaît avant l'assertion. Ce peut être un défaut de l'app et pas seulement du test.
 - **Attendu** : établir la cause par la reproduction. Si c'est l'app, le message « modifié, rechargez » doit rester affiché après le rechargement : corriger le composable et ajouter un test unitaire. Si c'est le test, attendre l'état stable sans allonger les délais. Ne jamais contourner l'échec par un retry ou une exclusion.
 
+- **À faire au prochain échec** : relever le message d'erreur exact de Playwright et la capture, qui n'ont pas été conservés jusqu'ici (front-lead).
+
 ## Critères d'acceptation
 
 - [ ] Cause établie et documentée ici.
