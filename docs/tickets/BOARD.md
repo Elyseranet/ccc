@@ -239,7 +239,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | À faire (2026-11-05) | à créer |
 | [F-22](F-22.md) | `useCompetitor` : clé de cache figée au premier id (fiche joueur, face-à-face, F-13) | — | — | **Fermé** (2026-11-12) @ `407b6534` : face-à-face, les deux côtés ne partagent plus la même fiche | — |
 | [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | À faire (2026-11-12) | — |
-| [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | À faire (2026-11-12) | — |
+| [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | **Fermé** (2026-11-13) @ `46654e4d` | — |
 | [F-35](F-35.md) | Onglet Tirages des éditions archivées : tirages reconstitués (DRAWS-ARCH) | — | — | À faire (2026-11-12) | à créer |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | à dessiner | B-13 | À faire |
@@ -382,7 +382,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-01](T-OPS-01.md) : **Fermé** — mergé dans `develop` @ `a72f3ac` (branche `de8704e`).
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
-- [B-21](B-21.md) : **À faire** (2026-11-12) — matchs d'archives sans score : vainqueur importé (R-5 bis), 175 matchs.
+- [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
