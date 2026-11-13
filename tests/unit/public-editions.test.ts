@@ -44,6 +44,12 @@ describe('toPublicMatch', () => {
     expect(dto.poolRank).toBe(2)
   })
 
+  it('B-21: a VALIDATED archive match without score publishes its imported winner and null scores', () => {
+    const dto = toPublicMatch({ ...buildMatch(MATCH_STATUS.VALIDATED, [null, null]), winnerParticipationId: 'p0' } as MatchEntity)
+    expect(dto.sides.map((side) => side.score)).toEqual([null, null])
+    expect(dto.winnerParticipationId).toBe('p0')
+  })
+
   it('keeps RESULT_UNKNOWN distinct from SCHEDULED, without score nor winner', () => {
     const dto = toPublicMatch(buildMatch(MATCH_STATUS.RESULT_UNKNOWN, [null, null]))
     expect(dto.status).toBe(MATCH_STATUS.RESULT_UNKNOWN)
