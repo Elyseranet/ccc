@@ -46,7 +46,7 @@
                 v-if="isUnscored(match)"
                 class="edition-bracket__score"
                 :title="noScoreLabel"
-              >–<span class="sr-only">{{ noScoreLabel }}</span></b>
+              >{{ noScoreMark }}<span class="sr-only">{{ noScoreLabel }}</span></b>
               <b
                 v-else
                 class="edition-bracket__score"
@@ -101,7 +101,7 @@ import { ROUND_KIND } from '~/enums/round.enum'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
 import type { IBracketMatch } from 'origam/interfaces'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
-import type { IEditionBracketProps } from '~/interfaces/edition-view.interface'
+import type { IEditionBracketMatch, IEditionBracketProps } from '~/interfaces/edition-view.interface'
 
 /*********************************************************
  * Global
@@ -145,15 +145,22 @@ const bracketRounds = computed(() => props.rounds.map(round => ({
 })))
 const unscoredIds = computed(() => new Set(props.rounds.flatMap(round => round.matches.filter(match => match.winnerWithoutScore).map(match => match.id))))
 const noScoreLabel = computed(() => t('edition.bracket_score_not_archived', 'score non archivé'))
+const noScoreMark = computed(() => t('edition.matches_no_score', '–'))
 const isUnscored = (match: IBracketMatch): boolean => unscoredIds.value.has(String(match.id))
 const scoreOf = (match: IBracketMatch, side: 'A' | 'B'): number | string => (side === 'A' ? match.scoreA : match.scoreB) ?? ''
+const matchText = (match: IEditionBracketMatch): string => match.sides
+  .map(side => side.score === null ? side.competitor.displayName : `${side.competitor.displayName} ${side.score}`)
+  .join(t('edition.bracket_versus', ' contre '))
+const listText = (match: IEditionBracketMatch): string => match.winnerWithoutScore
+  ? t('edition.bracket_match_score_not_archived', '{match} (score non archivé)', { match: matchText(match) })
+  : matchText(match)
 const listRounds = computed(() => props.rounds.map(round => ({
   kind: round.kind,
   titleId: `${baseId}-list-${round.kind}`,
   title: roundTitle(round.kind),
   matches: round.matches.map(match => ({
     id: match.id,
-    text: match.sides.map(side => side.score === null ? side.competitor.displayName : `${side.competitor.displayName} ${side.score}`).join(t('edition.bracket_versus', ' contre ')) + (match.winnerWithoutScore ? ` (${noScoreLabel.value})` : '')
+    text: listText(match)
   }))
 })))
 

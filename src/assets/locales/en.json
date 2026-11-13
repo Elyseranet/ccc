@@ -138,6 +138,7 @@
   "edition.bracket_region": "Knockout bracket, horizontal scroll",
   "edition.bracket_title": "Bracket",
   "edition.bracket_versus": " against ",
+  "edition.bracket_match_score_not_archived": "{match} (score not archived)",
   "edition.bracket_score_not_archived": "score not archived",
   "edition.bracket_winner": "Winner",
   "edition.groups_caption": "Pool {rank}",

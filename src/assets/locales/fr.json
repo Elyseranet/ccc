@@ -138,6 +138,7 @@
   "edition.bracket_region": "Tableau à élimination directe, défilement horizontal",
   "edition.bracket_title": "Tableau",
   "edition.bracket_versus": " contre ",
+  "edition.bracket_match_score_not_archived": "{match} (score non archivé)",
   "edition.bracket_score_not_archived": "score non archivé",
   "edition.bracket_winner": "Vainqueur",
   "edition.groups_caption": "Poule {rank}",
