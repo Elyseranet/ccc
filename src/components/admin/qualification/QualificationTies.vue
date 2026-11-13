@@ -108,11 +108,11 @@ import { OrigamAlert, OrigamBtn, OrigamCard } from 'origam/components'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_TIEBREAK_ON_VALUE, ADMIN_MATCH_TIEBREAK_QUERY_PARAM } from '~/consts/admin-match-filters.const'
-import { QUALIFICATION_BLOCKER_TEXT } from '~/consts/qualification-view.const'
 import { ROUTES } from '~/consts/routes.const'
 import { TIEBREAK_FORMAT } from '~/enums/domain.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { TIEBREAK_SCOPE } from '~/enums/qualification.enum'
+import { blockerText, countTies } from '~/utils/qualification-text.util'
 import type { IQualificationTieView, IQualificationTiesEmits, IQualificationTiesProps } from '~/interfaces/qualification-view.interface'
 
 /*********************************************************
@@ -132,7 +132,7 @@ const titleId = useId()
 const scoreRoute = `${ROUTES.ADMIN_MATCHES}?${ADMIN_MATCH_TIEBREAK_QUERY_PARAM}=${ADMIN_MATCH_TIEBREAK_ON_VALUE}`
 const hasTies = computed(() => props.ties.length > 0)
 const title = computed(() => t('admin.qualification.ties_title', '2 · Égalités à départager'))
-const countText = computed(() => t('admin.qualification.ties_count', '{count} égalités restantes pour une place qualificative', { count: props.ties.length }))
+const countText = computed(() => t('admin.qualification.ties_count', '{ties} pour une place qualificative', { ties: countTies(t, props.ties.length) }))
 const settledText = computed(() => t('admin.qualification.ties_none', 'Aucune égalité à départager. Vous pouvez passer aux paramètres.'))
 const scoreLabel = computed(() => t('admin.qualification.ties_score_link', 'Saisir le score dans « Poules et matchs » →'))
 
@@ -146,7 +146,7 @@ const ordinal = (rank: number): string => rank === 1
   ? t('admin.qualification.ordinal_first', '{n}re', { n: rank })
   : t('admin.qualification.ordinal_other', '{n}e', { n: rank })
 const eyebrowOf = (tie: IQualificationTieView): string => {
-  const params = { place: ordinal(tie.startRank), count: tie.members.length }
+  const params = { place: ordinal(tie.placeRank), count: tie.members.length }
   return tie.scope === TIEBREAK_SCOPE.POOL
     ? t('admin.qualification.tie_pool_eyebrow', 'Poule {rank} · {place} place · {count} joueurs', { ...params, rank: tie.poolRank ?? 0 })
     : t('admin.qualification.tie_boundary_eyebrow', 'Meilleur {place} entre poules · {count} joueurs', params)
@@ -182,7 +182,7 @@ const views = computed(() => props.ties.map((tie, index) => {
     busy: props.busyTie === tie.key,
     buttonLabel: tie.isFollowUp ? t('admin.qualification.tie_create_next', 'Créer le départage suivant') : t('admin.qualification.tie_create', 'Créer le départage'),
     buttonDataCy: `qualification-create-tiebreak-${index}`,
-    blockerText: blocker === null ? null : t(QUALIFICATION_BLOCKER_TEXT[blocker].key, QUALIFICATION_BLOCKER_TEXT[blocker].fallback, { pending: props.pendingCount, ties: props.ties.length }),
+    blockerText: blocker === null ? null : blockerText(t, blocker, props.pendingCount, props.ties.length),
     whyDataCy: `qualification-tie-why-${index}`,
     scoreDataCy: `qualification-tie-score-link-${index}`
   }

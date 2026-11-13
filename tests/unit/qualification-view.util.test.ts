@@ -66,7 +66,7 @@ describe('classement provisoire', () => {
 describe('égalités à départager (A11, R-1, R-7)', () => {
   it('rend une carte par égalité, dans l’ordre du serveur, avec le rang de la poule', () => {
     const views = tieViewsOf(buildQualificationStatus({ ties: [pairTie('pool-2'), boundaryTie()] }), false)
-    expect(views.map(view => [view.poolRank, view.startRank, view.members.length, view.slots])).toEqual([[2, 2, 2, 0], [null, 3, 3, 2]])
+    expect(views.map(view => [view.poolRank, view.placeRank, view.members.length, view.slots])).toEqual([[2, 2, 2, 0], [null, 3, 3, 2]])
     expect(views.every(view => view.blocker === null)).toBe(true)
   })
 

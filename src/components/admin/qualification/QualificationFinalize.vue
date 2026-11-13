@@ -98,9 +98,10 @@ import AppDataTable from '~/components/common/AppDataTable.vue'
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
-import { QUALIFICATION_BLOCKER_TEXT, QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
+import { QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { QUALIFIED_COLUMN } from '~/enums/qualification.enum'
+import { blockerText as describeBlocker } from '~/utils/qualification-text.util'
 import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~/interfaces/qualification-view.interface'
 
 /*********************************************************
@@ -124,9 +125,7 @@ const emptyText = computed(() => t('admin.qualification.finalize_empty', 'L’ap
 const buttonLabel = computed(() => t('admin.qualification.finalize_button', 'Arrêter la liste…'))
 const hasRows = computed(() => props.rows.length > 0)
 const isBlocked = computed(() => props.blocker !== null || props.busy)
-const blockerText = computed(() => props.blocker === null
-  ? ''
-  : t(QUALIFICATION_BLOCKER_TEXT[props.blocker].key, QUALIFICATION_BLOCKER_TEXT[props.blocker].fallback, { pending: props.pendingCount, ties: props.tieCount }))
+const blockerText = computed(() => props.blocker === null ? '' : describeBlocker(t, props.blocker, props.pendingCount, props.tieCount))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: QUALIFIED_COLUMN.POOL, title: t('admin.qualification.finalize_col_pool', 'Poule'), sortable: false },
   { key: QUALIFIED_COLUMN.RANK, title: t('admin.qualification.finalize_col_rank', 'Rang'), sortable: false, align: ALIGN.END },

@@ -58,7 +58,8 @@ export interface IQualificationTieView {
   scope: TIEBREAK_SCOPE
   /** Rang de la poule pour une égalité de poule, `null` pour une égalité entre poules. */
   poolRank: number | null
-  startRank: number
+  /** Place disputée : le rang dans la poule (égalité de poule) ou le rang que les joueurs ont dans leur poule (« meilleur 3e » entre poules). */
+  placeRank: number
   format: TIEBREAK_FORMAT
   slots: number
   members: TEditionPerson[]

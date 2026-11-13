@@ -2,6 +2,7 @@ import { QUALIFICATION_BEST_NEXT_MAX, QUALIFICATION_TOP_PER_POOL_MAX } from '../
 import { OPEN_TIEBREAK_STATUSES, QUALIFICATION_INTEGER_PATTERN, QUALIFICATION_PERCENT_BASE } from '../consts/qualification-view.const.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import { POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
+import { TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
 import { QUALIFICATION_BLOCKER, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_STEP } from '../enums/qualification.enum.js'
 import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
 import type {
@@ -130,6 +131,7 @@ export const blockerOf = (pending: number, ties: number, closed: boolean): QUALI
 export const tieViewsOf = (status: IQualificationStatus, closed: boolean): IQualificationTieView[] => {
   const pending = pendingRegularCount(status)
   const poolRankById = new Map(status.pools.map(pool => [pool.id, pool.rank]))
+  const rankOf = new Map(status.pools.flatMap(pool => pool.standing.map(row => [row.participationId, row.rank] as const)))
   return status.ties.map((tie, index) => {
     const participationIds = tie.members.map(member => member.participationId)
     const matchesOf = status.tiebreakMatches.map(match => ({ match, ids: match.sides.map(side => side.participationId) }))
@@ -149,7 +151,7 @@ export const tieViewsOf = (status: IQualificationStatus, closed: boolean): IQual
       key: `${tie.scope}-${tie.poolId ?? 'x'}-${tie.startRank}-${index}`,
       scope: tie.scope,
       poolRank: tie.poolId === null ? null : poolRankById.get(tie.poolId) ?? null,
-      startRank: tie.startRank,
+      placeRank: tie.scope === TIEBREAK_SCOPE.POOL ? tie.startRank : rankOf.get(tie.members[0]?.participationId ?? '') ?? tie.startRank,
       format: tie.format,
       slots: tie.slots,
       members: tie.members.map(member => ({ id: member.competitor.id, displayName: member.competitor.displayName })),

@@ -79,7 +79,9 @@ const title = computed(() => t('admin.qualification.prerequisites_title', '1 · 
 const countText = computed(() => t('admin.qualification.prerequisites_count', '{validated} / {total}', { validated: props.prerequisites.validated, total: props.prerequisites.total }))
 const progressLabel = computed(() => t('admin.qualification.prerequisites_progress', '{validated} matchs de poule validés sur {total}', { validated: props.prerequisites.validated, total: props.prerequisites.total }))
 const text = computed(() => t('admin.qualification.prerequisites_text', 'Tant que tous les matchs de poule ne sont pas validés, les actions de cette page restent inactives (la raison est affichée sous chaque bouton).'))
-const linkLabel = computed(() => t('admin.qualification.prerequisites_link', 'Voir les {pending} matchs restants →', { pending: props.prerequisites.pending }))
+const linkLabel = computed(() => props.prerequisites.pending === 1
+  ? t('admin.qualification.prerequisites_link_one', 'Voir le match restant →')
+  : t('admin.qualification.prerequisites_link', 'Voir les {pending} matchs restants →', { pending: props.prerequisites.pending }))
 
 /*********************************************************
  * Expose

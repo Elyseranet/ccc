@@ -43,11 +43,8 @@ export const QUALIFICATION_STEP_LABELS: Record<QUALIFICATION_STEP, ITranslatable
   [QUALIFICATION_STEP.FINALIZE]: { key: 'admin.qualification.step_finalize', fallback: 'Arrêter la liste' }
 }
 
-/** Raison écrite sous un bouton inactif (`{pending}` matchs à valider, `{ties}` égalités restantes). */
-export const QUALIFICATION_BLOCKER_TEXT: Record<QUALIFICATION_BLOCKER, ITranslatableText> = {
-  [QUALIFICATION_BLOCKER.PENDING_MATCHES]: { key: 'admin.qualification.blocker_pending', fallback: 'Indisponible : {pending} matchs de poule à valider.' },
-  [QUALIFICATION_BLOCKER.TIES_LEFT]: { key: 'admin.qualification.blocker_ties', fallback: 'Indisponible : {ties} égalités restantes.' },
-  [QUALIFICATION_BLOCKER.PENDING_AND_TIES]: { key: 'admin.qualification.blocker_pending_and_ties', fallback: 'Indisponible : {ties} égalités restantes et {pending} matchs de poule à valider.' },
+/** Raison écrite sous un bouton inactif quand elle ne dépend d'aucun compte (les autres sont composées par `blockerText`, qui accorde les nombres). */
+export const QUALIFICATION_BLOCKER_TEXT: Partial<Record<QUALIFICATION_BLOCKER, ITranslatableText>> = {
   [QUALIFICATION_BLOCKER.TIEBREAK_OPEN]: { key: 'admin.qualification.blocker_tiebreak_open', fallback: 'Départage créé : saisissez son score dans « Poules et matchs ».' },
   [QUALIFICATION_BLOCKER.INVALID_PARAMETERS]: { key: 'admin.qualification.blocker_invalid_parameters', fallback: 'Indisponible : corrigez les paramètres de qualification.' },
   [QUALIFICATION_BLOCKER.CLOSED]: { key: 'admin.qualification.blocker_closed', fallback: 'Indisponible : l’édition est clôturée.' }
