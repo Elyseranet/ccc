@@ -11,6 +11,7 @@ import {
   clearPairing,
   currentPairingIndex,
   currentRoundKind,
+  defaultRoundKind,
   drawablePlayers,
   isRoundDrawComplete,
   leaderIdsOf,
@@ -136,6 +137,14 @@ describe('vue de la page selon le serveur', () => {
     expect(viewOf(preview(12), open, [])).toBe(ROUND_DRAW_VIEW.ENTRY)
     expect(currentRoundKind(preview(12), open)).toBe(ROUND_KIND.SEMI)
     expect(currentRoundKind(preview(16), null)).toBe(ROUND_KIND.ROUND_OF_16)
+  })
+})
+
+describe('tour proposé d’office', () => {
+  it('le premier tour qui n’est pas les barrages (maquette : quarts cochés), sinon le premier', () => {
+    expect(defaultRoundKind([ROUND_KIND.PLAYOFF, ROUND_KIND.QUARTER, ROUND_KIND.SEMI])).toBe(ROUND_KIND.QUARTER)
+    expect(defaultRoundKind([ROUND_KIND.PLAYOFF])).toBe(ROUND_KIND.PLAYOFF)
+    expect(defaultRoundKind([])).toBeNull()
   })
 })
 

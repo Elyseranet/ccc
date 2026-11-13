@@ -280,3 +280,14 @@ export const createMultiTiebreakEdition = async (request: APIRequestContext, lab
 export const playMatch = async (request: APIRequestContext, match: IAdminMatchView, scores: number[]): Promise<void> => {
   await scoreAndValidate(request, match, scores)
 }
+
+/**
+ * Une édition dont la liste des qualifiés est ARRÊTÉE (F-25) : `poolCount` poules de deux joueurs jouées comme dans `createTiedPoolsEdition`, puis
+ * `POST /qualification` avec 2 premiers par poule (tout le monde est qualifié : `2 × poolCount` joueurs) ; `withPlayoff` ajoute les barrages (les premiers de poule attendent).
+ * Le tour à tirer se déduit du nombre de joueurs : 4 poules = 8 joueurs = quarts, 2 poules = 4 joueurs = demies, 6 poules = 12 joueurs = tour à choisir.
+ */
+export const createQualifiedEdition = async (request: APIRequestContext, label: string, poolCount: number, withPlayoff = false): Promise<IWriteEdition> => {
+  const { edition } = await createTiedPoolsEdition(request, label, poolCount)
+  await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: 2, bestNextCount: 0, withPlayoff } }), 'POST qualification', STATUS_OK)
+  return { ...edition, status: 'QUALIFIED' }
+}

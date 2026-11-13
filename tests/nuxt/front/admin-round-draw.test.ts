@@ -49,7 +49,7 @@ registerEndpoint('/api/v1/editions/e1/tirages/tour', { method: 'POST', handler: 
   return draft
 }) })
 registerEndpoint('/api/v1/tirages/draw-1/affectations', { method: 'PUT', handler: defineEventHandler(async (event) => {
-  const body = await readBody(event) as { assignments: Array<[string, number, 1 | 2, number]> & Array<{ participationId: string, pairingIndex: number, sidePosition: 1 | 2, drawnOrder: number }> }
+  const body = await readBody(event) as { assignments: Array<{ participationId: string, pairingIndex: number, sidePosition: 1 | 2, drawnOrder: number }> }
   saved(body)
   drafts = [draftOf(body.assignments.map(entry => [entry.participationId.replace('part-', ''), entry.pairingIndex, entry.sidePosition, entry.drawnOrder]), { roundKind: drafts[0]?.roundKind ?? null })]
   return drafts[0]
@@ -63,7 +63,7 @@ registerEndpoint('/api/v1/tirages/draw-1/validation', { method: 'POST', handler:
   const draft = { ...drafts[0]!, status: DRAW_STATUS.VALIDATED, validatedAt: '2026-11-13T10:10:00.000Z' }
   drafts = [draft]
   rounds = [round(drafts[0]!.roundKind ?? ROUND_KIND.SEMI, ROUND_STATUS.DRAWN, 2)]
-  current = { ...blocked(API_ERROR_CODE.ROUND_NOT_COMPLETED), candidates: current.candidates }
+  current = preview(0, blocked(API_ERROR_CODE.ROUND_NOT_COMPLETED))
   return draft
 }) })
 
@@ -230,7 +230,7 @@ describe('tour à choisir et « Changer de tour » (673e5b4b)', () => {
     await vi.waitFor(() => expect(wrapper.find('[data-cy="round-draw-choice"]').exists()).toBe(true))
     const choice = wrapper.get('[data-cy="round-draw-choice"]')
     expect(choice.text()).toContain('Quel tour tirez-vous avec ces 12 joueurs ? (6 affiches)')
-    expect(choice.get('fieldset legend').exists()).toBe(true)
+    expect(choice.find('fieldset legend').exists()).toBe(true)
     expect(choice.text()).toContain('Quarts')
     expect(choice.text()).toContain('Demi-finales')
     expect(choice.text()).not.toContain('Finale')

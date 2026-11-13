@@ -43,7 +43,7 @@ import { useT } from '~/composables/useT'
 import { ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
 import type { ROUND_KIND } from '~/enums/round.enum'
 import type { IRoundDrawChoiceEmits, IRoundDrawChoiceProps } from '~/interfaces/round-draw.interface'
-import { pairingTotal } from '~/utils/round-draw.util'
+import { defaultRoundKind, pairingTotal } from '~/utils/round-draw.util'
 
 /*********************************************************
  * Global
@@ -57,10 +57,10 @@ const props = withDefaults(defineProps<IRoundDrawChoiceProps>(), {})
 const emits = defineEmits<IRoundDrawChoiceEmits>()
 defineSlots<{}>()
 const titleId = useId()
-const selected = ref<ROUND_KIND | null>(props.allowedRoundKinds[0] ?? null)
+const selected = ref<ROUND_KIND | null>(defaultRoundKind(props.allowedRoundKinds))
 watch(() => props.allowedRoundKinds, (kinds) => {
   if (selected.value === null || !kinds.includes(selected.value)) {
-    selected.value = kinds[0] ?? null
+    selected.value = defaultRoundKind(kinds)
   }
 })
 const legend = computed(() => t('admin.round_draw.choice_legend', 'Quel tour tirez-vous avec ces {count} joueurs ?', { count: props.playerCount }))

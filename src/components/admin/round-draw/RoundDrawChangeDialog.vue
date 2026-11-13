@@ -33,6 +33,7 @@ import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import { useT } from '~/composables/useT'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { ROUND_KIND } from '~/enums/round.enum'
+import { defaultRoundKind } from '~/utils/round-draw.util'
 import type { IRoundDrawChangeDialogEmits, IRoundDrawChangeDialogProps } from '~/interfaces/round-draw.interface'
 
 /*********************************************************
@@ -49,10 +50,10 @@ const emits = defineEmits<IRoundDrawChangeDialogEmits>()
 defineSlots<{}>()
 const appearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const choices = computed(() => props.allowedRoundKinds.filter(kind => kind !== props.currentKind))
-const selected = ref<ROUND_KIND | null>(choices.value[0] ?? null)
+const selected = ref<ROUND_KIND | null>(defaultRoundKind(choices.value))
 watch(choices, (kinds) => {
   if (selected.value === null || !kinds.includes(selected.value)) {
-    selected.value = kinds[0] ?? null
+    selected.value = defaultRoundKind(kinds)
   }
 })
 const title = computed(() => t('admin.round_draw.change_title', 'Changer de tour ?'))

@@ -39,6 +39,10 @@ export const toRoundPlayers = (candidates: IQualificationMember[], leaders: Read
     isLeader: leaders.has(member.participationId)
   }))
 
+/** Tour proposé d'office parmi ceux que le serveur autorise : les barrages sont l'exception (maquette : « Quarts de finale » coché), on prend donc le premier tour qui n'en est pas un. */
+export const defaultRoundKind = (kinds: readonly ROUND_KIND[]): ROUND_KIND | null =>
+  kinds.find(kind => kind !== ROUND_KIND.PLAYOFF) ?? kinds[0] ?? null
+
 /** Joueurs qu'on peut tirer : tout le vivier, sauf les premiers de poule pour les barrages. */
 export const drawablePlayers = (players: IRoundDrawPlayer[], roundKind: ROUND_KIND): IRoundDrawPlayer[] =>
   roundKind === ROUND_KIND.PLAYOFF ? players.filter(player => !player.isLeader) : players
