@@ -1,6 +1,6 @@
 import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
 import { POINTS_BASE_SCALE } from '../consts/domain-rules.const.js'
-import { CLOSING_STAGES_DESC } from '../consts/edition-closing-view.const.js'
+import { CLOSING_ROUND_KIND_BY_STAGE, CLOSING_STAGES_DESC } from '../consts/edition-closing-view.const.js'
 import { CLOSING_STATE } from '../enums/edition-closing-view.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
@@ -9,6 +9,8 @@ import type { IClosingPerson, IClosingPrerequisite, IClosingPreviewRow, IEdition
 import type { IClosingPreview } from '../interfaces/edition-closing.interface.js'
 import type { IEditionDetail } from '../interfaces/edition.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
+import type { IRound } from '../interfaces/round.interface.js'
+import { computeParticipationPoints } from './points.util.js'
 
 /** Le match de finale (le seul match régulier du tour `FINAL`) ; `null` tant qu'il n'est pas créé. */
 const finalMatchOf = (matches: IMatch[]): IMatch | null =>
@@ -38,12 +40,25 @@ export const prerequisitesOf = (detail: Pick<IEditionDetail, 'matches'>, preview
   }
 ]
 
-/** Une ligne par résultat présent dans l'aperçu, du plus haut au plus bas ; les points sont ceux que la fonction de clôture donnera. */
-export const previewRowsOf = (preview: IClosingPreview): IClosingPreviewRow[] =>
-  CLOSING_STAGES_DESC.flatMap((stage) => {
+/**
+ * Tout le barème, du plus haut au plus bas (maquette `admin-cloture`) : un résultat dont le tour a été disputé porte les points de la fonction de clôture
+ * (`base × N / 50`) ; un tour non disputé dans l'édition porte `null`, affiché « / » (RG3). Aucune ligne tant que la finale n'est pas validée.
+ */
+export const previewRowsOf = (preview: IClosingPreview, rounds: Pick<IRound, 'kind'>[]): IClosingPreviewRow[] => {
+  if (preview.blockedBy !== null) {
+    return []
+  }
+  return CLOSING_STAGES_DESC.map((stage) => {
+    const kind = CLOSING_ROUND_KIND_BY_STAGE[stage]
+    const played = kind === null || rounds.some(round => round.kind === kind)
     const result = preview.results.find(entry => entry.finalStage === stage)
-    return result ? [{ stage, base: POINTS_BASE_SCALE[stage], points: result.points }] : []
+    return {
+      stage,
+      base: POINTS_BASE_SCALE[stage],
+      points: played ? result?.points ?? computeParticipationPoints(stage, preview.participantCount) : null
+    }
   })
+}
 
 export const closingStateOf = (status: EDITION_STATUS, preview: IClosingPreview): CLOSING_STATE => {
   if (status === EDITION_STATUS.CLOSED) {
@@ -57,7 +72,7 @@ export const buildClosingView = (detail: IEditionDetail, preview: IClosingPrevie
   participantCount: preview.participantCount,
   prerequisites: prerequisitesOf(detail, preview),
   ...finalistsOf(detail.matches),
-  rows: previewRowsOf(preview)
+  rows: previewRowsOf(preview, detail.rounds)
 })
 
 /** La confirmation est valide quand le code saisi est celui de l'édition (espaces autour ignorés, casse respectée). */

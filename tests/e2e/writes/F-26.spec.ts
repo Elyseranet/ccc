@@ -55,6 +55,8 @@ test.describe('admin clôture : écritures sur une édition créée par le test'
     await expect(page.getByTestId('closing-facts')).toContainText('4')
     await expect(page.getByTestId('closing-preview')).toContainText('Aperçu des points pour 4 participants')
     await expect(page.getByTestId('closing-preview')).toContainText('18 × 4 / 50 = 1,44')
+    await expect(page.getByTestId('closing-preview').locator('tbody tr')).toHaveCount(7)
+    await expect(page.getByTestId('closing-preview').locator('tbody tr', { hasText: 'Barragiste' }).locator('td').last()).toHaveText('/')
     expect(await violationsOf(page)).toEqual([])
   })
 

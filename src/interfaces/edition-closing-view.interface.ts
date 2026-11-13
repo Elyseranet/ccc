@@ -17,7 +17,8 @@ export interface IClosingPerson {
 export interface IClosingPreviewRow {
   stage: FINAL_STAGE
   base: number
-  points: number
+  /** `null` : tour non disputé dans cette édition, affiché « / » (RG3). */
+  points: number | null
 }
 
 export interface IEditionClosingView {

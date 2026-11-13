@@ -94,7 +94,7 @@ const headers = computed<IDataTableHeader[]>(() => [
 const rowViews = computed(() => props.rows.map(row => ({
   [CLOSING_PREVIEW_COLUMN.RESULT]: t(CLOSING_STAGE_TEXT[row.stage].key, CLOSING_STAGE_TEXT[row.stage].fallback),
   [CLOSING_PREVIEW_COLUMN.BASE]: String(row.base),
-  [CLOSING_PREVIEW_COLUMN.POINTS]: t('admin.closing.preview_formula', '{base} × {count} / {reference} = {points}', {
+  [CLOSING_PREVIEW_COLUMN.POINTS]: row.points === null ? t('admin.closing.preview_not_played', '/') : t('admin.closing.preview_formula', '{base} × {count} / {reference} = {points}', {
     base: row.base,
     count: props.participantCount,
     reference: POINTS_REFERENCE_PARTICIPANTS,

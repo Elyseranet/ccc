@@ -46,26 +46,29 @@ describe('closingStateOf', () => {
 })
 
 describe('previewRowsOf', () => {
-  it('une ligne par résultat présent, du plus haut au plus bas, avec la base du barème et les points de la fonction de clôture', () => {
-    const rows = previewRowsOf({
-      participantCount: 45,
-      blockedBy: null,
-      results: [
-        { participationId: 'a', finalStage: FINAL_STAGE.POOL_ELIMINATED, points: 0 },
-        { participationId: 'b', finalStage: FINAL_STAGE.CHAMPION, points: 16.2 },
-        { participationId: 'c', finalStage: FINAL_STAGE.SEMI, points: 8.1 },
-        { participationId: 'd', finalStage: FINAL_STAGE.SEMI, points: 8.1 }
-      ]
-    })
-    expect(rows).toEqual([
-      { stage: FINAL_STAGE.CHAMPION, base: 18, points: 16.2 },
-      { stage: FINAL_STAGE.SEMI, base: 9, points: 8.1 },
-      { stage: FINAL_STAGE.POOL_ELIMINATED, base: 0, points: 0 }
+  const results = [
+    { participationId: 'a', finalStage: FINAL_STAGE.POOL_ELIMINATED, points: 0 },
+    { participationId: 'b', finalStage: FINAL_STAGE.CHAMPION, points: 16.2 },
+    { participationId: 'c', finalStage: FINAL_STAGE.SEMI, points: 8.1 }
+  ]
+  const kinds = (...list: ROUND_KIND[]) => list.map(kind => ({ kind }))
+
+  it('tout le barème, du plus haut au plus bas : les tours disputés portent base × N / 50, les autres « / » (RG3), ici sans barrages ni huitièmes', () => {
+    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results }, kinds(ROUND_KIND.POOLS, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL))
+    expect(rows.map(row => row.stage)).toEqual([
+      FINAL_STAGE.CHAMPION, FINAL_STAGE.FINALIST, FINAL_STAGE.SEMI, FINAL_STAGE.QUARTER, FINAL_STAGE.ROUND_OF_16, FINAL_STAGE.PLAYOFF, FINAL_STAGE.POOL_ELIMINATED
     ])
+    expect(rows.map(row => row.points)).toEqual([16.2, 11.7, 8.1, 5.4, null, null, 0])
+    expect(rows.find(row => row.stage === FINAL_STAGE.PLAYOFF)).toEqual({ stage: FINAL_STAGE.PLAYOFF, base: 1, points: null })
+  })
+
+  it('avec des barrages, la ligne Barragiste porte ses points', () => {
+    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results }, kinds(ROUND_KIND.POOLS, ROUND_KIND.PLAYOFF, ROUND_KIND.SEMI, ROUND_KIND.FINAL))
+    expect(rows.find(row => row.stage === FINAL_STAGE.PLAYOFF)?.points).toBe(0.9)
   })
 
   it('aucune ligne quand la finale n’est pas validée', () => {
-    expect(previewRowsOf({ participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [] })).toEqual([])
+    expect(previewRowsOf({ participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [] }, [])).toEqual([])
   })
 })
 
