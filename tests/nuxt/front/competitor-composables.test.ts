@@ -150,3 +150,21 @@ describe('useCompetitor : la clé de cache suit l’identifiant courant (F-22)',
     expect(Object.keys(nuxtApp.payload.data)).toContain(`competitor:${MAYA}`)
   })
 })
+
+describe('useHeadToHead : la clé de cache suit la paire courante (F-33)', () => {
+  it('une paire choisie après le montage, puis une autre, change de clé et de données', async () => {
+    const SECOND = '00000000-0000-4000-0001-000000000006'
+    registerEndpoint(`/api/v1/competiteurs/${SAM}/face-a-face`, defineEventHandler((event) => ({ played: getQuery(event).adversaire === MAYA ? 4 : 7 })))
+    const a = ref<string | null>(null)
+    const b = ref<string | null>(null)
+    const { asyncData, nuxtApp } = await harness(() => ({ asyncData: useHeadToHead(a, b), nuxtApp: useNuxtApp() }))
+    a.value = SAM
+    b.value = MAYA
+    await vi.waitFor(() => expect(asyncData.data.value).toEqual({ played: 4 }))
+    expect(Object.keys(nuxtApp.payload.data)).toContain(`head-to-head:${SAM}:${MAYA}`)
+    b.value = SECOND
+    await vi.waitFor(() => expect(asyncData.data.value).toEqual({ played: 7 }))
+    expect(Object.keys(nuxtApp.payload.data)).toContain(`head-to-head:${SAM}:${SECOND}`)
+  })
+})
+
