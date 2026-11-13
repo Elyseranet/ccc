@@ -167,7 +167,8 @@ describe('EditionDraws : tirages reconstitués (F-35)', () => {
 describe('EditionMatches : filtres (T-A11Y-01, M3)', () => {
   const row = (id: string, roundKind: ROUND_KIND) => ({
     id, sequence: 1, number: `2025-${id}`, roundKind, poolRank: roundKind === ROUND_KIND.POOLS ? 1 : null, isTiebreak: false,
-    first: person('a', 'Lou Bernard'), second: person('b', 'Inès Perrin'), firstScore: 5, secondScore: 3, hasWinner: true, status: MATCH_STATUS.VALIDATED
+    first: person('a', 'Lou Bernard'), others: [person('b', 'Inès Perrin')], firstScore: 5, otherScores: [3], hasManyOthers: false, scoreText: '5 – 3',
+    hasWinner: true, winnerWithoutScore: false, status: MATCH_STATUS.VALIDATED
   })
 
   it('chaque puce est un bouton qui annonce son état (aria-pressed), et l’état suit la sélection', async () => {
