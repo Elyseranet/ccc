@@ -151,6 +151,14 @@
 .draw__list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--origam-space---2); }
 .draw__list a { text-decoration: none; font-weight: var(--origam-font__weight---semibold); }
 .draw__list i { font-style: normal; color: var(--origam-color__action--secondary---fgSubtle); font-weight: var(--origam-font__weight---bold); font-size: var(--origam-font__size---xs); }
+/* F-35 · tirages reconstitués (édition archivée sans tirage enregistré) */
+.tir-live[hidden], .tir-rec[hidden], .draw[hidden] { display: none; }
+.tir-rec__note { margin-bottom: var(--origam-space---5); }
+.rec-pools { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--origam-space---4); margin-top: var(--origam-space---5); }
+.rec-pool { display: grid; align-content: start; gap: var(--origam-space---2); padding: var(--origam-space---3); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); }
+.rec-pool__t { margin: 0; font-size: inherit; }
+.rec-pool__l { display: grid; gap: var(--origam-space---1); margin: 0; padding: 0; list-style: none; font-size: var(--origam-font__size---sm); }
+.rec-pool__l a { text-decoration: none; font-weight: var(--origam-font__weight---semibold); }
 .pools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---4); }
 .pool-note { margin-bottom: var(--origam-space---5); font-size: var(--origam-font__size---sm); }
 .bk + .pool-note { margin-top: var(--origam-space---4); }
