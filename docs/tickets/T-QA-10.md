@@ -11,3 +11,5 @@
 
 - [ ] Cause établie et documentée ici.
 - [ ] 5 lancements consécutifs de F-08 writes verts sous verrou, à une charge < 10, avec `--retries=0`.
+
+- **2026-11-13 (chef de projet, mesures dev-f13 sur F-38)** : `--repeat-each=8` sur le test F-08 « 412 » donne 2 échecs sur 8 avec F-38 (`d2c042e7`) et 1 sur 8 sur la base F-25 `39798837`, sans F-38. Le test était donc déjà instable avant F-38. Cause toujours non trouvée.
