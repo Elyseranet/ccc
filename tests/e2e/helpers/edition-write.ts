@@ -225,3 +225,44 @@ export const createDrawnEdition = async (request: APIRequestContext, label: stri
   await expectStatus(await request.post(`/api/v1/tirages/${draw.id}/validation`), 'POST validation', STATUS_OK)
   return { edition: { ...edition, status: 'POOLS_DRAWN' }, participants, competitors }
 }
+
+/*********************************************************
+ * Départage à N côtés par l'API réelle (F-21)
+ *
+ * @description
+ * Un départage à 3 côtés ou plus ne naît que d'une égalité réelle entre N joueurs. `createMultiTiebreakEdition` en fabrique une
+ * sans rien écrire en base à la main : `sideCount` poules de deux joueurs, chaque match joué et validé 5-2, donc `sideCount` perdants
+ * à égalité parfaite (0 victoire, 2 pour, 5 contre) pour une seule place de « meilleur 2e » (`topPerPool: 1`, `bestNextCount: 1`).
+ * `POST /editions/{id}/departages` crée alors le match `TIEBREAK` à `sideCount` côtés (B-13, cible 3). Il reste à saisir.
+ ********************************************************/
+export interface IMultiTiebreakEdition {
+  edition: IWriteEdition
+  /** Le match de départage (`IAdminMatch` de la réponse 201), à `sideCount` côtés, sans score. */
+  tiebreak: { id: string, sides: Array<{ participationId: string, displayName: string }>, version: number, targetScore: number }
+}
+
+interface IAdminMatchView { id: string, version: number, purpose: string, sides: Array<{ participationId: string }> }
+
+const STATUS_PUT_OK = 200
+
+const scoreAndValidate = async (request: APIRequestContext, match: IAdminMatchView, scores: number[]): Promise<void> => {
+  const submission = { scores: match.sides.map((side, index) => ({ participationId: side.participationId, score: scores[index]! })) }
+  const recorded = await expectStatus(await request.put(`/api/v1/matchs/${match.id}/score`, { data: submission, headers: { 'If-Match': `"${match.version}"` } }), 'PUT score', STATUS_PUT_OK) as { version: number }
+  await expectStatus(await request.post(`/api/v1/matchs/${match.id}/validation`, { data: submission, headers: { 'If-Match': `"${recorded.version}"` } }), 'POST validation', STATUS_OK)
+}
+
+export const createMultiTiebreakEdition = async (request: APIRequestContext, label: string, sideCount: number): Promise<IMultiTiebreakEdition> => {
+  const { edition } = await createDrawnEdition(request, label, sideCount * 2, sideCount)
+  const matches = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/matchs`), 'GET matchs admin', STATUS_OK) as IAdminMatchView[]
+  const losers: string[] = []
+  for (const match of matches) {
+    await scoreAndValidate(request, match, [5, 2])
+    losers.push(match.sides[1]!.participationId)
+  }
+  const tiebreak = await expectStatus(
+    await request.post(`/api/v1/editions/${edition.id}/departages`, { data: { participationIds: losers, parameters: { topPerPool: 1, bestNextCount: 1 } } }),
+    'POST departages',
+    STATUS_CREATED
+  ) as IMultiTiebreakEdition['tiebreak']
+  return { edition, tiebreak }
+}

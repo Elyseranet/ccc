@@ -78,13 +78,29 @@
               </span>
             </template>
             <template #item.second="{ item }">
+              <ul
+                v-if="item.hasManyOthers"
+                class="edition-matches__others"
+                :class="{ 'edition-matches__side--lose': item.hasWinner }"
+              >
+                <li
+                  v-for="other in item.others"
+                  :key="other.id"
+                >
+                  <common-player-link
+                    :competitor="other"
+                    inline
+                  />
+                </li>
+              </ul>
               <span
+                v-else
                 class="edition-matches__side"
                 :class="{ 'edition-matches__side--lose': item.hasWinner }"
               >
                 <common-player-link
-                  v-if="item.second"
-                  :competitor="item.second"
+                  v-if="item.others[0]"
+                  :competitor="item.others[0]"
                   inline
                 />
               </span>
@@ -221,9 +237,7 @@ const scoreOf = (row: IEditionMatchesProps['rows'][number]): string => {
   if (row.winnerWithoutScore) {
     return t('edition.matches_score_not_archived', 'score non archivé')
   }
-  return row.firstScore !== null && row.secondScore !== null
-    ? t('edition.matches_score', '{first} – {second}', { first: row.firstScore, second: row.secondScore })
-    : t('edition.matches_no_score', '–')
+  return row.scoreText ?? t('edition.matches_no_score', '–')
 }
 const pageRows = computed(() => slice.value.items.map((row) => {
   const status = EDITION_MATCH_STATUS_VIEW[row.status]
@@ -309,6 +323,18 @@ defineExpose({})
     color: var(--origam-color__bar---amber);
   }
 
+  &__others {
+    display: grid;
+    gap: var(--edition-matches__others---gap, calc(var(--origam-space---1) + 1px));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+    }
+  }
+
   &__side {
     &--win {
       font-weight: var(--origam-font__weight---bold);
@@ -339,5 +365,6 @@ defineExpose({})
 <style>
 :root {
   --edition-matches---gap: var(--origam-space---3);
+  --edition-matches__others---gap: calc(var(--origam-space---1) + 1px);
 }
 </style>

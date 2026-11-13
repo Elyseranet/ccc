@@ -14,7 +14,9 @@
         rounded="xl"
         border
         elevation="sm"
+        padding="0"
         class="match-queue__card"
+        :class="card.cardClass"
         :data-cy="card.dataCy"
       >
         <template #default>
@@ -33,19 +35,43 @@
               :text="card.statusText"
             />
           </span>
-          <span class="match-queue__name">{{ card.firstName }}</span>
-          <span class="match-queue__score font-display">
-            <span class="sr-only">{{ card.scoreLabel }}</span>
-            <span
-              v-if="card.hasScore"
-              aria-hidden="true"
-            ><b>{{ card.firstScore }}</b><i>–</i><b>{{ card.secondScore }}</b></span>
-            <span
-              v-else
-              aria-hidden="true"
-            >—</span>
-          </span>
-          <span class="match-queue__name match-queue__name--second">{{ card.secondName }}</span>
+          <ul
+            v-if="card.isMulti"
+            class="match-queue__sides"
+            :data-cy="card.sidesDataCy"
+          >
+            <li
+              v-for="side in card.sideViews"
+              :key="side.key"
+            >
+              <span class="match-queue__side-name">{{ side.name }}</span>
+              <span class="match-queue__side-score font-display">
+                <span
+                  v-if="side.hasScore"
+                  class="match-queue__side-value"
+                >{{ side.score }}</span>
+                <template v-else>
+                  <span class="sr-only">{{ noScoreLabel }}</span>
+                  <span aria-hidden="true">—</span>
+                </template>
+              </span>
+            </li>
+          </ul>
+          <template v-else>
+            <span class="match-queue__name">{{ card.firstName }}</span>
+            <span class="match-queue__score font-display">
+              <span class="sr-only">{{ card.scoreLabel }}</span>
+              <span
+                v-if="card.hasScore"
+                aria-hidden="true"
+              ><b>{{ card.firstScore }}</b><i>–</i><b>{{ card.secondScore }}</b></span>
+              <span
+                v-else
+                aria-hidden="true"
+              >—</span>
+            </span>
+            <span class="match-queue__name match-queue__name--second">{{ card.secondName }}</span>
+          </template>
           <origam-btn
             v-if="card.actionLabel"
             :variant="card.actionVariant"
@@ -70,6 +96,7 @@ import { computed } from 'vue'
 import { OrigamBtn, OrigamCard } from 'origam/components'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
+import { ADMIN_DATE_LOCALE } from '~/consts/admin-editions.const'
 import { MATCH_ACTION_VIEW } from '~/consts/admin-match-status.const'
 import { MATCH_ACTION } from '~/enums/match-action.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
@@ -106,9 +133,11 @@ const eyebrowOf = (card: IMatchCard, round: string): string => {
     ? t('admin.matches.eyebrow_tiebreak_inter', 'Départage entre poules · {number}', { number: card.number })
     : t('admin.matches.eyebrow_tiebreak_pool', 'Poule {rank} · départage · {number}', { rank: card.poolRank, number: card.number })
 }
+const noScoreLabel = computed(() => t('admin.matches.no_score_label', 'Aucun score'))
+const namesList = new Intl.ListFormat(ADMIN_DATE_LOCALE, { style: 'long', type: 'conjunction' })
 const views = computed(() => props.cards.map((card) => {
   const action = card.action ? MATCH_ACTION_VIEW[card.action] : null
-  const players = { first: card.firstName, second: card.secondName }
+  const players = { first: card.firstName, second: card.secondName, players: namesList.format(card.sides.map(side => side.name)) }
   const round = card.poolRank === null
     ? t(card.round.key, card.round.fallback)
     : t('admin.matches.pool_n', 'Poule {rank}', { rank: card.poolRank })
@@ -116,6 +145,9 @@ const views = computed(() => props.cards.map((card) => {
   return {
     ...card,
     dataCy: `admin-match-${card.id}`,
+    cardClass: { 'match-queue__card--multi': card.isMulti },
+    sidesDataCy: `admin-match-sides-${card.id}`,
+    sideViews: card.sides.map((side, index) => ({ key: index, name: side.name, score: side.score, hasScore: side.score !== null })),
     eyebrow: eyebrowOf(card, round),
     statusText: t(card.statusLabel.key, card.statusLabel.fallback),
     hasScore,
@@ -128,7 +160,7 @@ const views = computed(() => props.cards.map((card) => {
       })
       : t('admin.matches.no_score_label', 'Aucun score'),
     actionLabel: action ? t(action.label.key, action.label.fallback) : null,
-    actionAriaLabel: action ? t(action.aria.key, action.aria.fallback, players) : undefined,
+    actionAriaLabel: action ? t(card.isMulti ? action.ariaMulti.key : action.aria.key, card.isMulti ? action.ariaMulti.fallback : action.aria.fallback, players) : undefined,
     actionVariant: action?.variant,
     actionBgColor: action?.bgColor,
     actionElevation: action?.elevation,
@@ -198,9 +230,10 @@ defineExpose({})
 
   &__chips {
     display: flex;
+    flex-wrap: wrap;
     grid-area: chip;
-    gap: var(--match-queue__chips---gap, var(--origam-space---2));
-    justify-self: end;
+    justify-content: end;
+    gap: var(--match-queue__chips---gap, var(--origam-space---1));
   }
 
   &__name {
@@ -230,6 +263,47 @@ defineExpose({})
     }
   }
 
+  &__card--multi :deep(.origam-card__content) {
+    grid-template-areas: 't t chip' 'sides sides sides' 'act act act';
+    grid-template-rows: auto 1fr auto;
+  }
+
+  &__sides {
+    display: grid;
+    grid-area: sides;
+    gap: var(--match-queue__sides---gap, var(--origam-space---1));
+    align-self: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--match-queue__sides---gap-inline, var(--origam-space---3));
+      padding-block: var(--origam-space---1);
+      border-top: var(--origam-border__width---thin) solid var(--origam-color__border---subtle);
+
+      &:first-child {
+        border-top: 0;
+      }
+    }
+  }
+
+  &__side-name {
+    min-width: 0;
+    font-weight: var(--origam-font__weight---bold);
+    overflow-wrap: anywhere;
+  }
+
+  &__side-score {
+    flex: none;
+    color: var(--origam-color__bar---amber);
+    font-size: var(--origam-font__size---xl);
+    font-variant-numeric: tabular-nums;
+  }
+
   &__action {
     grid-area: act;
     justify-self: stretch;
@@ -241,9 +315,11 @@ defineExpose({})
 <style>
 :root {
   --match-queue---gap: var(--origam-space---3);
-  --match-queue__chips---gap: var(--origam-space---2);
+  --match-queue__chips---gap: var(--origam-space---1);
   --match-queue__card---gap: var(--origam-space---3);
   --match-queue__card---padding: var(--origam-space---5);
+  --match-queue__sides---gap: var(--origam-space---1);
+  --match-queue__sides---gap-inline: var(--origam-space---3);
   --match-queue__action---min-height: var(--origam-space---11);
 }
 </style>

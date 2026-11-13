@@ -101,6 +101,40 @@ describe('Matchs (RG24)', () => {
   })
 })
 
+describe('Matchs : départage à 3 côtés ou plus (F-21)', () => {
+  const multi = {
+    ...detail,
+    matches: [
+      { id: 'm3', sequence: 7, roundKind: ROUND_KIND.POOLS, poolRank: 5, purpose: 'TIEBREAK', status: 'VALIDATED', winnerParticipationId: 'b', sides: [side('a', 1), side('b', 3), side('c', 0)] },
+      { id: 'm4', sequence: 6, roundKind: ROUND_KIND.POOLS, poolRank: null, purpose: 'TIEBREAK', status: 'SCHEDULED', winnerParticipationId: null, sides: [side('a', null), side('b', null), side('c', null), side('d', null)] },
+      { id: 'm2', sequence: 5, roundKind: ROUND_KIND.POOLS, poolRank: 1, purpose: 'REGULAR', status: 'VALIDATED', winnerParticipationId: 'b', sides: [side('a', 4), side('b', 10)] }
+    ]
+  } as unknown as IEditionDetail
+  const [three, four, duel] = buildEditionMatchRows(multi)
+
+  it('un match à 3 côtés garde les trois joueurs, le vainqueur en premier, puis les autres dans l’ordre du match', () => {
+    expect(three!.first?.id).toBe('c-b')
+    expect(three!.others.map(person => person.id)).toEqual(['c-a', 'c-c'])
+    expect([three!.firstScore, ...three!.otherScores]).toEqual([3, 1, 0])
+    expect(three!.scoreText).toBe('3 – 1 – 0')
+    expect(three!.hasManyOthers).toBe(true)
+  })
+
+  it('sans vainqueur, aucun des quatre côtés ne montre de score, mais tous sont listés', () => {
+    expect(four!.others).toHaveLength(3)
+    expect(four!.otherScores).toEqual([null, null, null])
+    expect(four!.hasWinner).toBe(false)
+    expect(four!.scoreText).toBeNull()
+  })
+
+  it('un duel garde un seul adversaire', () => {
+    expect(duel!.others.map(person => person.id)).toEqual(['c-a'])
+    expect(duel!.otherScores).toEqual([4])
+    expect(duel!.scoreText).toBe('10 – 4')
+    expect(duel!.hasManyOthers).toBe(false)
+  })
+})
+
 describe('Match d’archive sans score : lignes et tableau (B-21, F-34)', () => {
   const archived = {
     ...detail,

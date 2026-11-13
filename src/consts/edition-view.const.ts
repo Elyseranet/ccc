@@ -120,6 +120,8 @@ export const EDITION_DRAW_STATUS_VIEW: Record<DRAW_STATUS, { family: EDITION_CHI
 /** Tours du tableau, dans l'ordre de la phase finale. Le tour des poules n'en fait pas partie. */
 export const EDITION_BRACKET_ROUND_ORDER: ROUND_KIND[] = [ROUND_KIND.PLAYOFF, ROUND_KIND.ROUND_OF_16, ROUND_KIND.QUARTER, ROUND_KIND.SEMI, ROUND_KIND.FINAL]
 
+/** Entre deux scores d'une ligne de la liste des matchs : « 10 – 7 », « 3 – 1 – 0 ». */
+export const EDITION_MATCH_SCORE_SEPARATOR = ' – '
 export const EDITION_MATCHES_PAGE_SIZE = 16
 export const EDITION_MATCHES_PAGINATION_VISIBLE = 4
 

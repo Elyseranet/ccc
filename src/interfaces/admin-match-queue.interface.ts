@@ -6,6 +6,12 @@ import type { TAdminMatchRound } from '../types/admin-match-round.type.js'
 import type { IAdminMatch } from './admin-match.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 
+/** Un côté d'une carte : son nom et son score affiché (`null` tant qu'il n'y en a pas). */
+export interface IMatchCardSide {
+  name: string
+  score: number | null
+}
+
 /** Une carte de la file : tout ce que la vue affiche, calculé hors du composant. */
 export interface IMatchCard {
   id: string
@@ -23,6 +29,10 @@ export interface IMatchCard {
   /** Score à afficher (saisi, ou validé), `null` tant qu'il n'y en a pas. */
   firstScore: number | null
   secondScore: number | null
+  /** Tous les côtés, dans l'ordre du match (F-21 : un départage compte 3 côtés ou plus). */
+  sides: IMatchCardSide[]
+  /** 3 côtés ou plus : la carte liste les côtés au lieu du duel « A 5 – 1 B ». */
+  isMulti: boolean
   /** `null` : rien à faire (validé, résultat inconnu, édition archivée). */
   action: MATCH_ACTION | null
 }

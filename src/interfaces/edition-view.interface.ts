@@ -171,9 +171,15 @@ export interface IEditionMatchRow {
   poolRank: number | null
   isTiebreak: boolean
   first: TEditionPerson | null
-  second: TEditionPerson | null
+  /** Les autres côtés dans l'ordre du match : un seul pour un duel, deux ou plus pour un départage à 3 côtés ou plus (F-21). */
+  others: TEditionPerson[]
   firstScore: number | null
-  secondScore: number | null
+  /** Un score par entrée de `others`, `null` tant que le match n'a pas de vainqueur public. */
+  otherScores: Array<number | null>
+  /** 3 côtés ou plus : « Adversaire » est une liste ; à 2 côtés, un seul lien, comme avant F-21. */
+  hasManyOthers: boolean
+  /** Scores joints, vainqueur d'abord puis adversaires dans l'ordre de `others` ; `null` si un score manque. */
+  scoreText: string | null
   hasWinner: boolean
   /** B-21 : match d'archive sans score dont le vainqueur est connu (affiché « score non archivé »). */
   winnerWithoutScore: boolean

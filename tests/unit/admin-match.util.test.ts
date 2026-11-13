@@ -82,6 +82,18 @@ describe('file admin des matchs (F-08)', () => {
     expect(validated).toMatchObject({ firstScore: 5, secondScore: 1 })
   })
 
+  it('un départage à 3 ou 4 côtés porte tous ses côtés, dans l’ordre, avec leur score affiché (F-21)', () => {
+    const sideOf = (index: number, name: string, recorded: number | null) => ({ participationId: `p${index}`, competitorId: `c${index}`, displayName: name, score: null, recordedScore: recorded })
+    const three = toMatchCard(buildAdminMatch({ id: 't', status: MATCH_STATUS.RECORDED, sides: [sideOf(1, 'A', 3), sideOf(2, 'B', 1), sideOf(3, 'C', 0)] }), '2026', false)
+    expect(three.isMulti).toBe(true)
+    expect(three.sides).toEqual([{ name: 'A', score: 3 }, { name: 'B', score: 1 }, { name: 'C', score: 0 }])
+    const four = toMatchCard(buildAdminMatch({ id: 'u', sides: [sideOf(1, 'A', null), sideOf(2, 'B', null), sideOf(3, 'C', null), sideOf(4, 'D', null)] }), '2026', false)
+    expect(four.sides.map(side => side.score)).toEqual([null, null, null, null])
+    expect(four.sides).toHaveLength(4)
+    expect(toMatchCard(queue[2]!, '2026', false).isMulti).toBe(false)
+    expect(toMatchCard(queue[2]!, '2026', false).sides).toEqual([{ name: 'Clara Lambert', score: 5 }, { name: 'Paul Girard', score: 1 }])
+  })
+
   it('une édition archivée n’offre aucune action', () => {
     expect(queue.map(match => toMatchCard(match, '2012', true).action)).toEqual([null, null, null, null, null])
   })

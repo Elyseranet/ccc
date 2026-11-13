@@ -7,7 +7,7 @@ import { useAdminEditionStore } from '../../../src/composables/useAdminEditionSt
 import { ROUTES } from '../../../src/consts/routes.const'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
-import { MATCH_STATUS } from '../../../src/enums/match.enum'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../../../src/enums/match.enum'
 import { ROUND_KIND } from '../../../src/enums/round.enum'
 import type { IAdminMatch } from '../../../src/interfaces/admin-match.interface'
 import type { IEditionSummary } from '../../../src/interfaces/edition.interface'
@@ -47,6 +47,15 @@ registerEndpoint('/api/v1/matchs/m3/score', { method: 'PUT', handler: defineEven
 registerEndpoint('/api/v1/matchs/m3/validation', { method: 'POST', handler: defineEventHandler((event) => {
   validations(getHeader(event, 'if-match'))
   return { match: buildAdminMatch({ id: 'm3', sequence: 3, status: MATCH_STATUS.VALIDATED, version: 4 }), pool: null, round: {}, advancingParticipationIds: [] }
+}) })
+
+registerEndpoint('/api/v1/matchs/m4/score', { method: 'PUT', handler: defineEventHandler(async (event) => {
+  recordings(getHeader(event, 'if-match'), await readBody(event))
+  return buildAdminMatch({ id: 'm4', sequence: 4, status: MATCH_STATUS.RECORDED, version: 5 })
+}) })
+registerEndpoint('/api/v1/matchs/m4/validation', { method: 'POST', handler: defineEventHandler((event) => {
+  validations(getHeader(event, 'if-match'))
+  return { match: buildAdminMatch({ id: 'm4', sequence: 4, status: MATCH_STATUS.VALIDATED, version: 6 }), pool: null, round: {}, advancingParticipationIds: [] }
 }) })
 
 const withRouterLink = { global: { components: { RouterLink } } }
@@ -231,5 +240,86 @@ describe('saisie d’un score (F-08)', () => {
     await vi.waitFor(() => expect(recordings).toHaveBeenCalledTimes(1))
     await flushPromises()
     expect(validations).not.toHaveBeenCalled()
+  })
+})
+
+describe('départage à 3 côtés ou plus (F-21)', () => {
+  const sideOf = (index: number, name: string, recorded: number | null) => ({ participationId: `p${index}`, competitorId: `c${index}`, displayName: name, score: null, recordedScore: recorded })
+  const tiebreak = (id: string, sequence: number, status: MATCH_STATUS, scores: Array<number | null>, names: string[]) => buildAdminMatch({
+    id, sequence, status, purpose: MATCH_PURPOSE.TIEBREAK, poolRank: 5, targetScore: 3, version: 4,
+    sides: names.map((name, index) => sideOf(index + 1, name, scores[index] ?? null))
+  })
+  const three = ['Hugo Roux', 'Emma Petit', 'Noé Garnier']
+
+  beforeEach(() => {
+    matches = [
+      tiebreak('m4', 4, MATCH_STATUS.SCHEDULED, [null, null, null, null], [...three, 'Adam Morel']),
+      tiebreak('m5', 5, MATCH_STATUS.RECORDED, [3, 1, 0], three),
+      buildAdminMatch({ id: 'm3', sequence: 3, status: MATCH_STATUS.SCHEDULED, version: 2 })
+    ]
+  })
+
+  const mountQueue = async () => {
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-match-m4"]').exists()).toBe(true))
+    return wrapper
+  }
+
+  it('la carte liste les quatre côtés dans une liste native, « — » sans score, et le bouton nomme tous les joueurs', async () => {
+    const wrapper = await mountQueue()
+    const sides = wrapper.get('[data-cy="admin-match-sides-m4"]')
+    expect(sides.element.tagName).toBe('UL')
+    expect(sides.findAll('li').map(item => item.find('.match-queue__side-name').text())).toEqual([...three, 'Adam Morel'])
+    expect(sides.text()).not.toContain('–')
+    expect(sides.findAll('li').every(item => item.text().includes('Aucun score'))).toBe(true)
+    expect(wrapper.get('[data-cy="admin-match-enter-m4"]').attributes('aria-label')).toBe('Saisir le départage Hugo Roux, Emma Petit, Noé Garnier et Adam Morel')
+  })
+
+  it('une carte à trois côtés saisis montre un score par ligne, sans « – », et propose « Valider »', async () => {
+    const wrapper = await mountQueue()
+    const sides = wrapper.get('[data-cy="admin-match-sides-m5"]')
+    expect(sides.findAll('.match-queue__side-value').map(value => value.text())).toEqual(['3', '1', '0'])
+    expect(sides.text()).not.toContain('–')
+    expect(wrapper.get('[data-cy="admin-match-validate-m5"]').attributes('aria-label')).toBe('Valider le départage Hugo Roux, Emma Petit et Noé Garnier')
+  })
+
+  it('une carte à deux côtés garde le duel « A 5 – 1 B », sans liste', async () => {
+    const wrapper = await mountQueue()
+    expect(wrapper.find('[data-cy="admin-match-sides-m3"]').exists()).toBe(false)
+    expect(wrapper.get('[data-cy="admin-match-m3"]').text()).toContain('Clara Lambert')
+  })
+
+  it('le formulaire a un champ par joueur, sans « – », la cible 3 et « Valider 3–1–0 » une fois les scores saisis', async () => {
+    matches = [tiebreak('m4', 4, MATCH_STATUS.SCHEDULED, [null, null, null], three)]
+    const page = await mountPage()
+    await vi.waitFor(() => expect(page.find('[data-cy="admin-match-enter-m4"]').exists()).toBe(true))
+    await page.get('[data-cy="admin-match-enter-m4"]').trigger('click')
+    await vi.waitFor(() => expect(body().querySelector('[data-cy="admin-score-form"]')).not.toBeNull())
+    const form = body().querySelector('[data-cy="admin-score-form"]')!
+    expect(form.querySelectorAll('[data-cy^="admin-score-input-"] input')).toHaveLength(3)
+    expect(form.querySelector('.score-entry-form__vs')).toBeNull()
+    expect(form.querySelector('[data-cy="admin-score-rule"]')!.textContent).toContain('Cible 3')
+    expect(form.querySelector('[data-cy="admin-score-rule"]')!.textContent).toContain('Départage à 3 joueurs')
+    expect(form.querySelector('[data-cy="admin-score-validate"]')!.textContent).toBe('Valider')
+    const type = async (index: number, value: string) => {
+      const input = body().querySelector<HTMLInputElement>(`[data-cy="admin-score-input-${index}"] input`)!
+      input.value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      await flushPromises()
+    }
+    await type(0, '3')
+    await type(1, '1')
+    await type(2, '0')
+    expect(form.querySelector('[data-cy="admin-score-validate"]')!.textContent).toBe('Valider 3–1–0')
+    body().querySelector<HTMLButtonElement>('[data-cy="admin-score-validate"]')!.click()
+    await vi.waitFor(() => expect(validations).toHaveBeenCalledTimes(1))
+    expect(recordings.mock.calls[0]![1]).toEqual({ scores: [{ participationId: 'p1', score: 3 }, { participationId: 'p2', score: 1 }, { participationId: 'p3', score: 0 }] })
+  })
+
+  it('la confirmation de validation rappelle les trois noms et leur score', async () => {
+    const wrapper = await mountQueue()
+    await wrapper.get('[data-cy="admin-match-validate-m5"]').trigger('click')
+    await vi.waitFor(() => expect(body().querySelector('[data-cy="admin-validate-text"]')).not.toBeNull())
+    expect(body().querySelector('[data-cy="admin-validate-text"]')!.textContent).toContain('Hugo Roux 3, Emma Petit 1, Noé Garnier 0')
   })
 })

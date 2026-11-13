@@ -58,6 +58,7 @@ import { OrigamAlert, OrigamBtn, OrigamDialog } from 'origam/components'
 import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
+import { SIDES_MULTI_MIN } from '~/consts/domain-rules.const'
 import { DIALOG_SLOT, SCORE_CTA_HOVER, SCORE_CONFIRM_MAX_WIDTH, SCORE_FAILURE_TEXT } from '~/consts/score-entry.const'
 import type { IScoreValidationConfirmEmits, IScoreValidationConfirmProps } from '~/interfaces/score-entry.interface'
 
@@ -128,7 +129,12 @@ watch(() => props.open, async (open) => {
  ********************************************************/
 const title = computed(() => t('admin.matches.confirm_title', 'Valider ce score ?'))
 const text = computed(() => {
-  const [first, second] = props.match?.sides ?? []
+  const sides = props.match?.sides ?? []
+  if (sides.length >= SIDES_MULTI_MIN) {
+    const scores = sides.map(side => `${side.displayName} ${side.recordedScore ?? 0}`).join(', ')
+    return t('admin.matches.confirm_text_multi', '{scores}. Une fois validé, le score devient public et le classement est recalculé.', { scores })
+  }
+  const [first, second] = sides
   return t('admin.matches.confirm_text', '{first} {firstScore} – {secondScore} {second}. Une fois validé, le score devient public et le classement est recalculé.', {
     first: first?.displayName ?? '',
     firstScore: first?.recordedScore ?? 0,

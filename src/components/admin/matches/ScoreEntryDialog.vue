@@ -44,6 +44,7 @@ import { useBelowWidth } from '~/composables/useBelowWidth'
 import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useScoreEntry } from '~/composables/useScoreEntry'
 import { useT } from '~/composables/useT'
+import { SIDES_MULTI_MIN } from '~/consts/domain-rules.const'
 import { DIALOG_SLOT, SCORE_FAILURE_TEXT, SCORE_FIELD_ERROR_TEXT, SCORE_FORM_ERROR_TEXT, SCORE_SHEET_BREAKPOINT_PX } from '~/consts/score-entry.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { MATCH_PURPOSE, MATCH_STATUS } from '~/enums/match.enum'
@@ -131,6 +132,10 @@ const eyebrow = computed(() => {
 })
 const ruleTitle = computed(() => t('admin.matches.rule_title', 'Cible {target}', { target: entry.target.value }))
 const ruleText = computed(() => {
+  const count = props.match?.sides.length ?? 0
+  if (props.match?.purpose === MATCH_PURPOSE.TIEBREAK && count >= SIDES_MULTI_MIN) {
+    return t('admin.matches.rule_tiebreak_multi', 'Départage à {count} joueurs : le vainqueur marque exactement {target}, les autres 0, 1 ou 2 (RG19, RG20). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { count, target: entry.target.value })
+  }
   if (props.match?.purpose === MATCH_PURPOSE.TIEBREAK) {
     return t('admin.matches.rule_tiebreak', 'Départage : le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
   }
@@ -151,9 +156,9 @@ const failureMessage = computed(() => entry.failure.value
   ? t(SCORE_FAILURE_TEXT[entry.failure.value].key, SCORE_FAILURE_TEXT[entry.failure.value].label)
   : null)
 const validateLabel = computed(() => {
-  const [first, second] = entry.values.value
-  return first && second
-    ? t('admin.matches.validate_with_score', 'Valider {first}–{second}', { first, second })
+  const values = entry.values.value
+  return values.length > 0 && values.every(value => value !== '')
+    ? t('admin.matches.validate_with_scores', 'Valider {scores}', { scores: values.join('–') })
     : t('admin.matches.action_validate', 'Valider')
 })
 
