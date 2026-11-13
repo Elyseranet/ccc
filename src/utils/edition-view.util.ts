@@ -314,7 +314,7 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
   .map((match) => {
     const winner = match.sides.find(side => side.participationId === match.winnerParticipationId)
     const first = winner ?? match.sides[0]
-    const second = match.sides.find(side => side !== first)
+    const others = match.sides.filter(side => side !== first)
     const scored = (side: IEditionDetail['matches'][number]['sides'][number] | undefined): number | null => (match.winnerParticipationId !== null && side ? side.score : null)
     return {
       id: match.id,
@@ -324,9 +324,9 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
       poolRank: match.poolRank,
       isTiebreak: match.purpose === MATCH_PURPOSE.TIEBREAK,
       first: first ? { id: first.competitorId, displayName: first.displayName } : null,
-      second: second ? { id: second.competitorId, displayName: second.displayName } : null,
+      others: others.map(side => ({ id: side.competitorId, displayName: side.displayName })),
       firstScore: scored(first),
-      secondScore: scored(second),
+      otherScores: others.map(scored),
       hasWinner: winner !== undefined,
       winnerWithoutScore: isArchivedWinnerWithoutScore(match),
       status: match.status

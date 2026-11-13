@@ -5,6 +5,7 @@ import {
   ADMIN_MATCH_FILTER_STATUSES,
   ADMIN_MATCH_FILTERS
 } from '../consts/admin-match-filters.const.js'
+import { SIDES_MULTI_MIN } from '../consts/domain-rules.const.js'
 import { ADMIN_MATCH_QUEUE_ORDER, ADMIN_MATCH_STATUS_VIEW } from '../consts/admin-match-status.const.js'
 import { ROUND_LABELS } from '../consts/round-labels.const.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
@@ -124,6 +125,8 @@ export const toMatchCard = (match: IAdminMatch, editionCode: string, readonly: b
     secondName: match.sides[1]?.displayName ?? '',
     firstScore: shownSideScore(match, 0),
     secondScore: shownSideScore(match, 1),
+    sides: match.sides.map((side, index) => ({ name: side.displayName, score: shownSideScore(match, index) })),
+    isMulti: match.sides.length >= SIDES_MULTI_MIN,
     action: actionOf(match, readonly)
   }
 }

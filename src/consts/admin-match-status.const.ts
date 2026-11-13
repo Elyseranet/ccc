@@ -23,6 +23,8 @@ export const ADMIN_MATCH_QUEUE_ORDER: Record<MATCH_STATUS, number> = {
 export const MATCH_ACTION_VIEW: Record<MATCH_ACTION, {
   label: ITranslatableText
   aria: ITranslatableText
+  /** Départage à 3 côtés ou plus : le nom du bouton liste tous les joueurs. */
+  ariaMulti: ITranslatableText
   variant: 'flat' | 'outlined'
   bgColor?: string
   elevation?: string
@@ -32,6 +34,7 @@ export const MATCH_ACTION_VIEW: Record<MATCH_ACTION, {
   [MATCH_ACTION.VALIDATE]: {
     label: { key: 'admin.matches.action_validate', fallback: 'Valider' },
     aria: { key: 'admin.matches.action_validate_aria', fallback: 'Valider {first} contre {second}' },
+    ariaMulti: { key: 'admin.matches.action_validate_multi_aria', fallback: 'Valider le départage {players}' },
     variant: 'flat',
     bgColor: 'primary',
     elevation: 'lg',
@@ -41,6 +44,7 @@ export const MATCH_ACTION_VIEW: Record<MATCH_ACTION, {
   [MATCH_ACTION.ENTER]: {
     label: { key: 'admin.matches.action_enter', fallback: 'Saisir' },
     aria: { key: 'admin.matches.action_enter_aria', fallback: 'Saisir {first} contre {second}' },
+    ariaMulti: { key: 'admin.matches.action_enter_multi_aria', fallback: 'Saisir le départage {players}' },
     variant: 'outlined',
     dataCy: 'enter'
   }

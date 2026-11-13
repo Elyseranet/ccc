@@ -5,33 +5,37 @@
     data-cy="admin-score-form"
     @submit="handleSubmit"
   >
-    <div class="score-entry-form__duel">
+    <div
+      class="score-entry-form__duel"
+      :class="layoutClass"
+      data-cy="admin-score-sides"
+    >
       <template
-        v-for="(name, index) in names"
-        :key="index"
+        v-for="row in rows"
+        :key="row.index"
       >
         <span
-          v-if="index > 0"
+          v-if="row.hasSeparator"
           class="score-entry-form__vs font-display"
           aria-hidden="true"
         >–</span>
         <div
           class="score-entry-form__player"
-          :class="{ 'score-entry-form__player--second': index > 0 }"
+          :class="row.playerClass"
         >
           <origam-label
-            :for="fieldIds[index]"
+            :for="row.fieldId"
             class="score-entry-form__name"
-            :text="name"
+            :text="row.name"
           />
           <origam-text-field
-            :id="fieldIds[index]"
-            :model-value="values[index]"
-            :label="name"
+            :id="row.fieldId"
+            :model-value="values[row.index]"
+            :label="row.name"
             single-line
             hide-details="auto"
-            :error-messages="fieldMessages[index]"
-            :autofocus="focusOnMount && index === 0"
+            :error-messages="fieldMessages[row.index]"
+            :autofocus="focusOnMount && row.index === 0"
             :disabled="busy"
             inputmode="numeric"
             :maxlength="maxLength"
@@ -39,9 +43,9 @@
             rounded="lg"
             color="primary"
             class="score-entry-form__field font-display"
-            :data-cy="`admin-score-input-${index}`"
+            :data-cy="`admin-score-input-${row.index}`"
             :aria-describedby="ruleId"
-            @update:model-value="handleInput(index, $event)"
+            @update:model-value="handleInput(row.index, $event)"
           />
         </div>
       </template>
@@ -113,6 +117,7 @@
 import { computed, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamForm, OrigamLabel, OrigamTextField } from 'origam/components'
 import { useT } from '~/composables/useT'
+import { SIDES_MULTI_MIN } from '~/consts/domain-rules.const'
 import { SCORE_CTA_HOVER, SCORE_INPUT_MAX_LENGTH } from '~/consts/score-entry.const'
 import { SCORE_ENTRY_PHASE } from '~/enums/score-entry.enum'
 import type { IScoreEntryFormEmits, IScoreEntryFormProps } from '~/interfaces/score-entry.interface'
@@ -135,7 +140,26 @@ const emits = defineEmits<IScoreEntryFormEmits>()
 defineSlots<{}>()
 const ruleId = useId()
 const fieldBaseId = useId()
-const fieldIds = computed(() => props.names.map((_name, index) => `${fieldBaseId}-${index}`))
+
+/*********************************************************
+ * Côtés
+ *
+ * @description
+ * Deux côtés : le duel « A [ ] – [ ] B ». Trois côtés ou plus (départage, F-21) : une ligne par joueur, nom à gauche et score à droite,
+ * sans « – » (un séparateur entre trois champs ne veut rien dire). Une seule boucle, les classes viennent de la ligne.
+ ********************************************************/
+const isMulti = computed(() => props.names.length >= SIDES_MULTI_MIN)
+const layoutClass = computed(() => isMulti.value ? 'score-entry-form__duel--multi' : 'score-entry-form__duel--pair')
+const rows = computed(() => props.names.map((name, index) => {
+  const isSecond = !isMulti.value && index > 0
+  return {
+    index,
+    name,
+    fieldId: `${fieldBaseId}-${index}`,
+    hasSeparator: isSecond,
+    playerClass: isMulti.value ? 'score-entry-form__player--row' : { 'score-entry-form__player--second': isSecond }
+  }
+}))
 const maxLength = SCORE_INPUT_MAX_LENGTH
 const ctaHover = SCORE_CTA_HOVER
 
@@ -179,9 +203,12 @@ defineExpose({})
 
   &__duel {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: end;
     gap: var(--score-entry-form__duel---gap, var(--origam-space---3));
+
+    &--pair {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: end;
+    }
   }
 
   &__player {
@@ -190,6 +217,12 @@ defineExpose({})
 
     &--second {
       text-align: end;
+    }
+
+    &--row {
+      grid-template-columns: minmax(0, 1fr) var(--score-entry-form__score---width, 6.5rem);
+      align-items: center;
+      gap: var(--score-entry-form__row---gap, var(--origam-space---4));
     }
   }
 
@@ -230,6 +263,8 @@ defineExpose({})
   --score-entry-form---gap: var(--origam-space---5);
   --score-entry-form__duel---gap: var(--origam-space---3);
   --score-entry-form__player---gap: var(--origam-space---2);
+  --score-entry-form__row---gap: var(--origam-space---4);
+  --score-entry-form__score---width: 6.5rem;
   --score-entry-form__actions---gap: var(--origam-space---3);
 }
 </style>

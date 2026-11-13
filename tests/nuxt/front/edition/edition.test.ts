@@ -94,19 +94,28 @@ describe('EditionSelector', () => {
 describe('EditionMatches : match d’archive sans score (B-21, F-34)', () => {
   const row = (overrides: Record<string, unknown>) => ({
     id: 'm', sequence: 1, number: '2013-1', roundKind: ROUND_KIND.QUARTER, poolRank: null, isTiebreak: false,
-    first: person('c1', 'Simon Vaur'), second: person('c2', 'Kevin Mercurio'), firstScore: null, secondScore: null,
+    first: person('c1', 'Simon Vaur'), others: [person('c2', 'Kevin Mercurio')], firstScore: null, otherScores: [null],
     hasWinner: true, winnerWithoutScore: false, status: 'VALIDATED', ...overrides
   })
 
   it('affiche « score non archivé » pour un vainqueur sans score, le score ailleurs, « – » sans vainqueur', async () => {
     const rows = [
       row({ id: 'a', sequence: 3, winnerWithoutScore: true }),
-      row({ id: 'b', sequence: 2, firstScore: 10, secondScore: 6 }),
+      row({ id: 'b', sequence: 2, firstScore: 10, otherScores: [6] }),
       row({ id: 'c', sequence: 1, hasWinner: false, status: 'SCHEDULED' })
     ]
     const wrapper = await mountSuspended(EditionMatches, { ...withRouterLink, props: { rows: rows as never, counts: { all: 3, pools: 0, knockout: 3 }, code: '2013' } })
     const scores = wrapper.findAll('.edition-matches__score').map(node => node.text())
     expect(scores).toEqual(['score non archivé', '10 – 6', '–'])
+  })
+
+  it('un départage à 3 côtés liste les trois joueurs et joint les trois scores (F-21)', async () => {
+    const rows = [row({ id: 'd', firstScore: 3, others: [person('c2', 'Emma Petit'), person('c3', 'Noé Garnier')], otherScores: [1, 0], isTiebreak: true })]
+    const wrapper = await mountSuspended(EditionMatches, { ...withRouterLink, props: { rows: rows as never, counts: { all: 1, pools: 0, knockout: 1 }, code: '2013' } })
+    expect(wrapper.get('.edition-matches__score').text()).toBe('3 – 1 – 0')
+    const others = wrapper.get('.edition-matches__others')
+    expect(others.element.tagName).toBe('UL')
+    expect(others.findAll('li').map(item => item.text())).toEqual(['Emma Petit', 'Noé Garnier'])
   })
 })
 
