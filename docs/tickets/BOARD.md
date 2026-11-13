@@ -243,7 +243,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-35](F-35.md) | Onglet Tirages des éditions archivées : tirages reconstitués (DRAWS-ARCH) | — | — | **Fermé** (2026-11-13) @ `d3bd4c68` | à créer |
 | [F-36](F-36.md) | `EditionChip` environ 2 px plus large que la `.chip` des maquettes (trouvé en revue F-24) | — | — | Ouvert | existe (`hh.css` `.chip`) |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
-| [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | À faire |
+| [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | À faire |
 | [F-26](F-26.md) | Admin : clôture de l'édition | validée @ `6e09fd68` | B-14 | À faire |
 | [F-27](F-27.md) | Bouton d'appel « grand » 48 / 24 : une seule recette (surcharges locales de `--origam-btn---*-lg`) | — | F-19, F-26 | À faire (2026-11-05) | à créer |
@@ -384,7 +384,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
-- [T-QA-11](T-QA-11.md) : **À faire** (2026-11-13) — zone publique F-21 à 0,997 % à 390 : cause trouvée (tabular-nums du N°), corrigée, 0,000 % à 390 et 0,465 % max à 1440 ; en revue.
+- [T-QA-11](T-QA-11.md) : **Fermé** (2026-11-13) @ `10d0a42e` — zone publique F-21 : cause tabular-nums du N°, corrigée ; écart dû au mode de lancement expliqué (bordure basse à une fraction de pixel). 0,000 % à 390, 0,461 % max à 1440.
 - [T-QA-10](T-QA-10.md) : **À faire** (2026-11-13) — test e2e F-08 « 412 » instable, déjà présent sur develop ; piste : `watch` de `useScoreEntry`.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
