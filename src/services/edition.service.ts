@@ -36,7 +36,8 @@ import { toPublicDraw } from '../utils/draw-public.mapper.util.js'
 import { competitorNotFound, conflictWithCode, notFound } from '../utils/api-error.util.js'
 import { toAdminParticipantAccount } from '../utils/account-state.util.js'
 import { buildEditionCode } from '../utils/edition-code.util.js'
-import { toEditionParticipant } from '../utils/edition-assemble.util.js'
+import { buildBracket, buildPools, buildRounds, toEditionParticipant, toPublicMatches } from '../utils/edition-assemble.util.js'
+import { computeClosingPreview } from '../utils/edition-closing.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { toPublicMatch, toStoredMatchStatuses } from '../utils/match-public.mapper.util.js'
 import { isEditionUuid } from '../utils/edition-query.util.js'
@@ -124,22 +125,22 @@ export const findEditionOrThrow = async (dataSource: DataSource, idOrCode: strin
   return edition
 }
 
-export const loadParticipations = (dataSource: DataSource, editionId: string): Promise<ParticipationEntity[]> =>
+export const loadParticipations = (dataSource: DataSource | EntityManager, editionId: string): Promise<ParticipationEntity[]> =>
   dataSource.getRepository(ParticipationEntity).find({
     where: { editionId },
     relations: { competitor: true },
     order: { competitor: { displayName: 'ASC' }, id: 'ASC' }
   })
 
-export const loadPoolEntities = (dataSource: DataSource, editionId: string): Promise<PoolEntity[]> =>
+export const loadPoolEntities = (dataSource: DataSource | EntityManager, editionId: string): Promise<PoolEntity[]> =>
   dataSource.getRepository(PoolEntity).find({ where: { editionId }, order: { rank: 'ASC' } })
 
 /** Tours publics d'une édition (B-18) : un tour PENDING n'est pas encore tiré, il n'est pas publié. */
-export const loadRoundEntities = (dataSource: DataSource, editionId: string): Promise<RoundEntity[]> =>
+export const loadRoundEntities = (dataSource: DataSource | EntityManager, editionId: string): Promise<RoundEntity[]> =>
   dataSource.getRepository(RoundEntity).find({ where: { editionId, status: In(PUBLIC_ROUND_STATUSES) }, order: { sequence: 'ASC' } })
 
 /** Tous les matchs publics d'une édition (ceux des tours non PENDING, B-18), avec de quoi construire le DTO public. */
-export const loadEditionMatches = (dataSource: DataSource, editionId: string): Promise<MatchEntity[]> =>
+export const loadEditionMatches = (dataSource: DataSource | EntityManager, editionId: string): Promise<MatchEntity[]> =>
   dataSource.getRepository(MatchEntity).find({
     where: { editionId, round: { status: In(PUBLIC_ROUND_STATUSES) } },
     relations: MATCH_PUBLIC_RELATIONS,
@@ -642,3 +643,65 @@ export const loadAdminParticipants = async (dataSource: DataSource, idOrCode: st
 /** Codes de toutes les éditions, de la plus récente à la plus ancienne (sitemap, T-SEO-01). */
 export const listEditionCodes = async (dataSource: DataSource): Promise<string[]> =>
   (await dataSource.getRepository(EditionEntity).find({ select: { code: true }, order: { chronologicalRank: 'DESC' } })).map(({ code }) => code)
+
+/** Vue complète d'une édition (`GET /editions/{id}` et réponse de la clôture). */
+export const loadEditionDetail = async (dataSource: DataSource, edition: EditionEntity): Promise<IEditionDetail> => {
+  const [[summary], participations, poolEntities, roundEntities, matches, draws] = await Promise.all([
+    loadEditionSummaries(dataSource, [edition]),
+    loadParticipations(dataSource, edition.id),
+    loadPoolEntities(dataSource, edition.id),
+    loadRoundEntities(dataSource, edition.id),
+    loadEditionMatches(dataSource, edition.id),
+    loadValidatedDraws(dataSource, edition.id)
+  ])
+  const publicMatches = toPublicMatches(matches)
+  return {
+    ...summary!,
+    description: edition.description,
+    participants: participations.map(toEditionParticipant),
+    pools: buildPools(poolEntities, participations, matches),
+    rounds: buildRounds(roundEntities, matches),
+    matches: publicMatches,
+    draws,
+    bracket: buildBracket(roundEntities, publicMatches)
+  }
+}
+
+/**
+ * `POST /editions/{id}/cloture` (B-14) : fige `final_stage` et `points` de chaque participation, `participant_count` = N,
+ * passe l'édition à CLOSED et pose `closed_at`, en une transaction sous le verrou de l'édition. Le calcul est celui de
+ * l'aperçu (`computeClosingPreview`, CLOSE-PREVIEW), refait sur l'état en base. Idempotent : déjà CLOSED, rien n'est recalculé.
+ */
+export const closeEdition = (
+  dataSource: DataSource,
+  idOrCode: string,
+  now = new Date()
+): Promise<{ editionId: string, participantCount: number, replayed: boolean }> =>
+  dataSource.transaction(async (manager) => {
+    const edition = await findEditionLocked(manager, idOrCode)
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      return { editionId: edition.id, participantCount: edition.participantCount ?? 0, replayed: true }
+    }
+    const [participations, rounds, matches] = await Promise.all([
+      loadParticipations(manager, edition.id),
+      loadRoundEntities(manager, edition.id),
+      loadEditionMatches(manager, edition.id)
+    ])
+    const preview = computeClosingPreview({
+      participants: participations.map(toEditionParticipant),
+      rounds: buildRounds(rounds, matches),
+      matches: toPublicMatches(matches)
+    })
+    if (preview.blockedBy !== null) {
+      throw conflictWithCode(preview.blockedBy, API_ERROR_MESSAGE.FINAL_NOT_VALIDATED)
+    }
+    for (const result of preview.results) {
+      await manager.getRepository(ParticipationEntity).update({ id: result.participationId }, { finalStage: result.finalStage, points: result.points })
+    }
+    await manager.getRepository(EditionEntity).update({ id: edition.id }, {
+      status: EDITION_STATUS.CLOSED,
+      participantCount: preview.participantCount,
+      closedAt: now
+    })
+    return { editionId: edition.id, participantCount: preview.participantCount, replayed: false }
+  })
