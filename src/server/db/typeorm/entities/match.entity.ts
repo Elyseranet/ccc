@@ -1,4 +1,4 @@
-import { Check, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, type Relation, Unique, VersionColumn } from 'typeorm'
+import { Check, Column, Entity, ForeignKey, Index, JoinColumn, ManyToOne, OneToMany, type Relation, Unique, VersionColumn } from 'typeorm'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../../../../enums/match.enum.js'
 import { MATCH_TARGET_SCORES } from '../../../../consts/match.const.js'
 import { EditionEntity } from './edition.entity.js'
@@ -9,6 +9,7 @@ import { UserEntity } from './user.entity.js'
 import { UuidPrimaryEntity } from './uuid-primary.entity.js'
 
 @Entity({ name: 'matches' })
+@ForeignKey(() => MatchSideEntity, ['id', 'winnerParticipationId'], ['matchId', 'participationId'], { name: 'fk_matches_winner_side', deferrable: 'INITIALLY DEFERRED' })
 @Unique('uq_matches_edition_sequence', ['editionId', 'sequence'])
 @Unique('uq_matches_legacy_code', ['legacyCode'])
 @Check('ck_matches_winner_validated', `"winner_participation_id" IS NULL OR "status" = 'VALIDATED'`)
@@ -43,7 +44,7 @@ export class MatchEntity extends UuidPrimaryEntity {
 
   /**
    * Vainqueur importé du classeur pour un match d'archives sans score (B-21, R-5 bis) ; null sinon (le vainqueur se déduit alors des
-   * scores). Clé étrangère composite vers `match_sides (match_id, participation_id)` posée par la migration `AddMatchWinner`.
+   * scores). Le vainqueur est l'un des côtés : clé étrangère composite `fk_matches_winner_side` vers `match_sides (match_id, participation_id)`, différée (le dump insère les matchs avant leurs côtés), déclarée ci-dessus pour que `migration:generate` la connaisse.
    */
   @Column({ type: 'uuid', nullable: true })
   winnerParticipationId!: string | null
