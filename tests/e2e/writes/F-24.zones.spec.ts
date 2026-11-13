@@ -23,24 +23,29 @@ const VIEWPORTS = [
   { name: '390', width: 390, height: 844 }
 ]
 const PAGE = '/admin/phase-finale/qualification'
-/** Cale sur une ligne de pixels entière le haut de `anchor` en déplaçant `shift` : le texte démarre alors au même endroit des deux côtés, sans seuil d'arrondi à une fraction près. */
-const alignAnchorToPixel = async (page: Page, shift: string, anchor: string) => {
-  await page.evaluate(([shiftSelector, anchorSelector]) => {
+const DIALOG_TEXT_FRACTION = 0.4
+/**
+ * Cale le haut de `anchor` à `fraction` de pixel en déplaçant `shift` (moins d'un pixel, aucun gabarit touché). Le dialogue d'Origam est centré dans un calque composité, celui de la maquette
+ * est dans la page : à une position quelconque, une ligne de texte tombe parfois pile sur un seuil d'arrondi et bascule d'un pixel d'un côté seulement (hauteur de ligne 24,797 px). On pose
+ * donc les deux textes à la même fraction, choisie loin des seuils pour les quatre lignes.
+ */
+const alignAnchorTo = async (page: Page, shift: string, anchor: string, fraction: number) => {
+  await page.evaluate(([shiftSelector, anchorSelector, target]) => {
     const element = document.querySelector(shiftSelector as string) as HTMLElement
     const top = (document.querySelector(anchorSelector as string) as HTMLElement).getBoundingClientRect().top + window.scrollY
-    element.style.marginTop = `calc(${getComputedStyle(element).marginTop} + ${Math.ceil(top) - top}px)`
-  }, [shift, anchor])
+    const delta = ((((target as number) - (top % 1)) % 1) + 1) % 1
+    element.style.marginTop = `calc(${getComputedStyle(element).marginTop} + ${delta}px)`
+  }, [shift, anchor, fraction])
 }
 
-/** Cale la fraction de pixel du haut de `mockAnchor` sur celle de `appAnchor` en déplaçant `shift` de la maquette (moins d'un pixel, aucun gabarit touché). */
-const alignFractionTo = async (mockup: Page, shift: string, mockAnchor: string, page: Page, appAnchor: string) => {
-  const appTop = await page.locator(appAnchor).evaluate(element => element.getBoundingClientRect().top + window.scrollY)
-  await mockup.evaluate(([shiftSelector, anchorSelector, top]) => {
-    const element = document.querySelector(shiftSelector as string) as HTMLElement
-    const own = (document.querySelector(anchorSelector as string) as HTMLElement).getBoundingClientRect().top + window.scrollY
-    element.style.marginTop = `calc(${getComputedStyle(element).marginTop} + ${Math.round((((top as number) % 1) - (own % 1)) * 64) / 64}px)`
-  }, [shift, mockAnchor, appTop])
-}
+/** Boîte du haut d'un conteneur au bas de son premier élément `end`. */
+const boxTo = async (page: Page, container: string, end: string) => page.evaluate(([containerSelector, endSelector]) => {
+  const root = document.querySelector(containerSelector as string) as HTMLElement
+  const last = root.querySelector(endSelector as string) as HTMLElement
+  const a = root.getBoundingClientRect()
+  const b = last.getBoundingClientRect()
+  return { x: a.left + window.scrollX, y: a.top + window.scrollY, width: a.width, height: b.bottom - a.top }
+}, [container, end])
 
 const NO_MASKS: IDataMasks = { mockup: [], app: [] }
 const INK_RULE = '{ color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent !important; }'
@@ -73,11 +78,18 @@ for (const viewport of VIEWPORTS) {
   test.describe(`F-24 qualification, égalité entre poules @${viewport.name}`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } })
 
-    const ZONES = [
+    const ZONES: Array<{ name: string, mockup: string, app: string, upTo?: { mockup: string, app: string }, masks?: IDataMasks }> = [
       { name: 'qa-phase', mockup: '.ostep--phase', app: '[data-cy="phase-steps"]' },
       { name: 'qa-entete', mockup: '.adm-head', app: '.admin-qualification__head' },
       { name: 'qa-etapes', mockup: 'nav[aria-label="Étapes de la qualification"]', app: '[data-cy="draw-steps"]' },
-      { name: 'qa-parametres', mockup: 'section[aria-labelledby="h-par"]', app: '[data-cy="qualification-parameters"]' }
+      { name: 'qa-parametres', mockup: 'section[aria-labelledby="h-par"]', app: '[data-cy="qualification-parameters"]' },
+      // Parties de la liste des égalités, du classement et de l'aperçu qui ne dépendent pas des données (valeurs masquées ou recopiées) : titre de section, haut d'une carte d'égalité
+      // (aperçu, joueurs et description ; la suite diffère : la maquette est dans un état « matchs à valider », bouton inactif avec sa raison), en-tête du classement,
+      // état vide de l'aperçu des qualifiés.
+      { name: 'qa-egalites-titre', mockup: 'section[aria-labelledby="h-eg"] > header', app: '.qualification-ties__head' },
+      { name: 'qa-egalite-haut', mockup: '.q-ties > li:nth-child(2)', app: '[data-cy="qualification-tie-0"]', upTo: { mockup: 'p.muted', app: '.qualification-ties__muted' } },
+      { name: 'qa-classement-entete', mockup: '.q-rank .adm-card-h', app: '.qualification-ranking__head', masks: { mockup: [], app: [], values: { mockup: ['.q-rank__sel .input'], app: ['.qualification-ranking__select'] } } },
+      { name: 'qa-apercu-vide', mockup: '.q-empty p.muted', app: '[data-cy="qualification-qualified-empty"]' }
     ]
 
     for (const zone of ZONES) {
@@ -93,18 +105,28 @@ for (const viewport of VIEWPORTS) {
         await page.getByTestId('qualification-tie-0').waitFor()
         await settle(page)
         await hideBottomBars(mockup, page)
+        await mockup.addStyleTag({ content: '.q-rank .table-wrap { overflow: visible; }' })
         await alignMockupText(mockup, page, [
           { mockup: '.adm-head .eyebrow', app: '.admin-qualification__eyebrow' },
+          { mockup: 'section[aria-labelledby="h-eg"] > header [role="status"]', app: '[data-cy="qualification-ties-count"]' },
+          { mockup: '.q-ties > li:nth-child(2) .eyebrow', app: '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow' },
+          { mockup: '.q-ties > li:nth-child(2) .q-tie__who', app: '[data-cy="qualification-tie-0"] .qualification-ties__who' },
           { mockup: '.q-preview b', app: '[data-cy="qualification-preview"] strong' },
           { mockup: '.q-preview .muted', app: '[data-cy="qualification-preview"] span' }
         ])
-        await hideInk(mockup, ['.adm-head .eyebrow', '.q-preview', 'input.input'])
-        await hideInk(page, ['.admin-qualification__eyebrow', '[data-cy="qualification-preview"]', '[data-cy="qualification-parameters"] input'])
+        await hideInk(mockup, ['.adm-head .eyebrow', '.q-preview', 'input.input', '.q-ties > li:nth-child(2) .eyebrow', '.q-ties > li:nth-child(2) .q-tie__who', '.q-rank .table tbody', 'section[aria-labelledby="h-eg"] > header [role="status"]'])
+        await hideInk(page, ['.admin-qualification__eyebrow', '[data-cy="qualification-preview"]', '[data-cy="qualification-parameters"] input', '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow', '[data-cy="qualification-tie-0"] .qualification-ties__who', '[data-cy="qualification-ranking"] tbody', '[data-cy="qualification-ties-count"]'])
         await mockup.evaluate(() => window.scrollTo(0, 0))
         await page.evaluate(() => window.scrollTo(0, 0))
         await alignToPixel(mockup, zone.mockup)
         await alignToPixel(page, zone.app)
-        await compare(page, mockup, zone.name, viewport.name, await box(mockup, zone.mockup), await box(page, zone.app), NO_MASKS)
+        const mockBox = zone.upTo ? await boxTo(mockup, zone.mockup, zone.upTo.mockup) : await box(mockup, zone.mockup)
+        const appBox = zone.upTo ? await boxTo(page, zone.app, zone.upTo.app) : await box(page, zone.app)
+        if (zone.name === 'qa-apercu-vide') {
+          // La maquette montre cet état dans une carte dont le texte tient sa largeur propre ; dans l'application il est dans la carte « 4 · Arrêter la liste ». Seul le texte est comparé : même largeur de boîte.
+          appBox.width = mockBox.width
+        }
+        await compare(page, mockup, zone.name, viewport.name, mockBox, appBox, zone.masks ?? NO_MASKS)
         await mockContext.close()
       })
     }
@@ -165,16 +187,9 @@ for (const viewport of VIEWPORTS) {
       await mockup.addStyleTag({ content: `.odlg { margin-top: 0 !important; width: ${appWidth}px !important; }` })
       await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
       await page.evaluate(() => window.scrollTo(0, 0))
-      // Origam centre son dialogue (haut à une fraction de pixel, calque composité) ; celui de la maquette est dans la page. Selon la largeur, le texte bascule d'une ligne de pixels d'un côté
-      // seulement : à 1440 le calage sur la fraction de pixel de l'application donne 0,03 %, à 390 il laisse deux lignes sur un seuil d'arrondi (2,1 %), et le calage du texte sur une ligne
-      // entière donne 0,55 % (mais 1,8 % à 1440). Mêmes boîtes, mesurées à 0,001 px : on prend, par largeur, le calage qui évite le seuil.
       const textAnchor = '[data-cy="qualification-finalize-dialog"] .confirm-dialog__text'
-      if (viewport.width >= 1000) {
-        await alignFractionTo(mockup, '.odlg', '#dq-d', page, textAnchor)
-      } else {
-        await alignAnchorToPixel(mockup, '.odlg', '#dq-d')
-        await alignAnchorToPixel(page, '.origam-overlay__content', textAnchor)
-      }
+      await alignAnchorTo(mockup, '.odlg', '#dq-d', DIALOG_TEXT_FRACTION)
+      await alignAnchorTo(page, '.origam-overlay__content', textAnchor, DIALOG_TEXT_FRACTION)
       await compare(page, mockup, 'qa-dialogue', viewport.name, await box(mockup, '.odlg'), await box(page, card), NO_MASKS)
       await mockContext.close()
     })

@@ -43,6 +43,7 @@
       <p
         v-else
         class="qualification-finalize__empty"
+        role="status"
         data-cy="qualification-qualified-empty"
       >
         {{ emptyText }}
@@ -81,6 +82,7 @@
         cy-prefix="qualification-finalize"
         confirm-color="primary"
         confirm-elevation="lg"
+        :appearance="dialogAppearance"
         @cancel="handleCancel"
         @confirm="handleConfirm"
       />
@@ -98,6 +100,7 @@ import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
 import { QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
+import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { QUALIFIED_COLUMN } from '~/enums/qualification.enum'
 import { blockerText as describeBlocker } from '~/utils/qualification-text.util'
@@ -118,6 +121,7 @@ const emits = defineEmits<IQualificationFinalizeEmits>()
 defineSlots<{}>()
 const titleId = useId()
 const dialogOpen = ref(false)
+const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const title = computed(() => t('admin.qualification.finalize_title', '4 · Arrêter la liste des qualifiés'))
 const caption = computed(() => t('admin.qualification.finalize_caption', 'Aperçu des qualifiés'))
 const emptyText = computed(() => t('admin.qualification.finalize_empty', 'L’aperçu apparaît quand plus aucune égalité ne bloque.'))
@@ -197,6 +201,17 @@ defineExpose({})
   &__table :deep(th),
   &__table :deep(td) {
     white-space: normal;
+  }
+
+  @media (max-width: 760px) {
+    &__table :deep(th),
+    &__table :deep(td) {
+      padding-inline: var(--origam-space---2);
+    }
+
+    &__table :deep(.origam-chip) {
+      white-space: normal;
+    }
   }
 
   &__empty {

@@ -51,6 +51,12 @@
           hide-default-footer
           class="qualification-ranking__table"
         >
+          <template #header.wins>
+            <abbr :title="winsTitle">{{ winsLabel }}</abbr>
+          </template>
+          <template #header.difference>
+            <abbr :title="differenceTitle">{{ differenceLabel }}</abbr>
+          </template>
           <template #item.player="{ item }">
             <strong>{{ item.competitor.displayName }}</strong>
           </template>
@@ -105,11 +111,15 @@ const poolItems = computed(() => [
   { title: t('admin.qualification.ranking_all_pools', 'Toutes les poules'), value: ADMIN_MATCH_ALL_POOLS_VALUE },
   ...props.tables.map(table => ({ title: t('admin.qualification.ranking_pool_n', 'Poule {rank}', { rank: table.poolRank }), value: table.poolRank }))
 ])
+const winsLabel = computed(() => t('admin.qualification.ranking_col_wins', 'V'))
+const winsTitle = computed(() => t('admin.qualification.ranking_col_wins_title', 'Victoires'))
+const differenceLabel = computed(() => t('admin.qualification.ranking_col_difference', 'Diff.'))
+const differenceTitle = computed(() => t('admin.qualification.ranking_col_difference_title', 'Cap’s average'))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: QUALIFICATION_RANK_COLUMN.RANK, title: t('admin.qualification.ranking_col_rank', '#'), sortable: false },
   { key: QUALIFICATION_RANK_COLUMN.PLAYER, title: t('admin.qualification.ranking_col_player', 'Joueur'), sortable: false },
-  { key: QUALIFICATION_RANK_COLUMN.WINS, title: t('admin.qualification.ranking_col_wins', 'V'), sortable: false, align: ALIGN.END },
-  { key: QUALIFICATION_RANK_COLUMN.DIFFERENCE, title: t('admin.qualification.ranking_col_difference', 'Diff.'), sortable: false, align: ALIGN.END },
+  { key: QUALIFICATION_RANK_COLUMN.WINS, title: winsLabel.value, sortable: false, align: ALIGN.END },
+  { key: QUALIFICATION_RANK_COLUMN.DIFFERENCE, title: differenceLabel.value, sortable: false, align: ALIGN.END },
   { key: QUALIFICATION_RANK_COLUMN.STATUS, title: t('admin.qualification.ranking_col_status', 'Statut'), sortable: false }
 ])
 const shown = computed(() => selected.value === ADMIN_MATCH_ALL_POOLS_VALUE ? props.tables : props.tables.filter(table => table.poolRank === selected.value))
@@ -188,6 +198,17 @@ defineExpose({})
   &__table :deep(th),
   &__table :deep(td) {
     white-space: normal;
+  }
+
+  @media (max-width: 760px) {
+    &__table :deep(th),
+    &__table :deep(td) {
+      padding-inline: var(--origam-space---2);
+    }
+
+    &__table :deep(.origam-chip) {
+      white-space: normal;
+    }
   }
 
   &__note {

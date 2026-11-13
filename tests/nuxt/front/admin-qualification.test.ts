@@ -11,7 +11,8 @@ import { MATCH_STATUS } from '../../../src/enums/match.enum'
 import type { IEditionSummary } from '../../../src/interfaces/edition.interface'
 import type { IQualificationStatus } from '../../../src/interfaces/qualification.interface'
 import QualificationPage from '../../../src/pages/admin/phase-finale/qualification.vue'
-import { boundaryTie, buildQualificationStatus, pairTie, qualifiedEntry, tiebreakMatch } from '../../helpers/qualification'
+import { TIEBREAK_FORMAT } from '../../../src/enums/domain.enum'
+import { boundaryTie, buildQualificationStatus,member, pairTie, qualifiedEntry, tiebreakMatch } from '../../helpers/qualification'
 
 const edition = (status: EDITION_STATUS): IEditionSummary => ({
   id: 'e1', code: '2026', year: 2026, name: null, heldOn: null, location: null, status, origin: EDITION_ORIGIN.APP,
@@ -79,6 +80,33 @@ beforeEach(() => {
   document.body.innerHTML = ''
   clearNuxtData()
   useAdminEditionStore(useNuxtApp().$pinia).editionId = 'e1'
+})
+
+describe('texte d’une égalité entre poules selon le nombre de joueurs (RG20, A11, R-1)', () => {
+  it('2 joueurs : match 1 contre 1 à 5, sans mini-poule', async () => {
+    current = buildQualificationStatus({ ties: [{ ...boundaryTie(), format: TIEBREAK_FORMAT.ONE_VS_ONE, slots: 1, members: [member('d', 'Lisa Masson'), member('e', 'Paul Girard')] }] })
+    const wrapper = await load()
+    const card = wrapper.get('[data-cy="qualification-tie-0"]').text()
+    expect(card).toContain('Meilleur 3e entre poules · 2 joueurs')
+    expect(card).toContain('Match 1 contre 1, cible 5 points.')
+    expect(card).not.toContain('Mini-poule')
+    expect(card).not.toContain('côtés')
+  })
+
+  it('3 joueurs ou plus : un seul match à N côtés, premier à 3, sans mini-poule', async () => {
+    current = buildQualificationStatus({ ties: [boundaryTie()] })
+    const wrapper = await load()
+    const card = wrapper.get('[data-cy="qualification-tie-0"]').text()
+    expect(card).toContain('Un seul match à 3 côtés, premier à 3 points.')
+    expect(card).not.toContain('Mini-poule')
+    expect(card).not.toContain('1 contre 1')
+  })
+
+  it('égalité de poule à 3 joueurs ou plus : la mini-poule (R-6) précède le match à N côtés', async () => {
+    current = buildQualificationStatus({ ties: [{ ...pairTie(), format: TIEBREAK_FORMAT.MULTI_SIDES, members: [member('a', 'A'), member('b', 'B'), member('c', 'C')] }] })
+    const wrapper = await load()
+    expect(wrapper.get('[data-cy="qualification-tie-0"]').text()).toContain('Mini-poule d’abord')
+  })
 })
 
 describe('page « Qualification » (F-24)', () => {

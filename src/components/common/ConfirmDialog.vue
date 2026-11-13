@@ -4,8 +4,8 @@
     :persistent="busy"
     :max-width="560"
     scrim
-    padding="2"
-    class="confirm-dialog"
+    :padding="padding"
+    :class="dialogClass"
     :title="title"
     role="alertdialog"
     :aria-describedby="descriptionId"
@@ -47,8 +47,9 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamDialog } from 'origam/components'
+import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { IConfirmDialogEmits, IConfirmDialogProps } from '~/interfaces/common-components.interface'
 
 /*********************************************************
@@ -64,11 +65,15 @@ const props = withDefaults(defineProps<IConfirmDialogProps>(), {
   warning: '',
   confirmColor: 'danger',
   confirmSize: 'large',
-  confirmElevation: undefined
+  confirmElevation: undefined,
+  appearance: CONFIRM_DIALOG_APPEARANCE.DEFAULT
 })
 const emits = defineEmits<IConfirmDialogEmits>()
 defineSlots<{}>()
 const descriptionId = useId()
+const isMockup = computed(() => props.appearance === CONFIRM_DIALOG_APPEARANCE.MOCKUP)
+const padding = computed(() => isMockup.value ? '2' : '6')
+const dialogClass = computed(() => ({ 'confirm-dialog': true, 'confirm-dialog--mockup': isMockup.value }))
 // Contournement de typage : `<template #text>` et `<template #footer>` sur `origam-dialog` donnent, en 2.37.4,
 // « TS2339: Property 'text' does not exist on type '{}' » alors que les slots existent à l'exécution. Origam #1332 (composants à `forwardRefs`),
 // fiche docs/tickets/origam/dialog-slots-non-types.md.
@@ -100,24 +105,9 @@ defineExpose({})
 
 <style scoped lang="scss">
 .confirm-dialog {
-  // Gabarit de la maquette (`.odlg`, motif `.confirm` des tirages) : carte à 8 px, en-tête à 16 px, texte à 24 px, pied à 16 px, boutons de 44 px.
   &__text {
     margin: 0;
-    color: var(--origam-color__text---primary);
-    font-size: var(--origam-font__size---md);
-    line-height: var(--origam-font__lineHeight---normal);
-  }
-
-  :deep(.origam-card-header__title) {
-    font-size: var(--origam-font__size---xl);
-    font-weight: var(--origam-font__weight---bold);
-    line-height: var(--origam-font__lineHeight---tight);
-    letter-spacing: normal;
-    white-space: normal;
-  }
-
-  :deep(.origam-card__content) {
-    padding: 0 var(--origam-space---6) var(--origam-space---6);
+    color: var(--origam-color__text---secondary);
   }
 
   &__actions {
@@ -125,6 +115,28 @@ defineExpose({})
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: var(--origam-space---3);
+  }
+
+  // Apparence « maquette » (F-24, motif `.odlg` : carte à 8 px, en-tête à 16 px, texte à 24 px, pied à 16 px). Réservée à l'appel qui la demande : le dialogue de validation du tirage (F-11) garde son rendu tant que F-30 n'a pas tranché.
+  &--mockup &__text {
+    color: var(--origam-color__text---primary);
+    font-size: var(--origam-font__size---md);
+    line-height: var(--origam-font__lineHeight---normal);
+  }
+
+  &--mockup :deep(.origam-card-header__title) {
+    font-size: var(--origam-font__size---xl);
+    font-weight: var(--origam-font__weight---bold);
+    line-height: var(--origam-font__lineHeight---tight);
+    letter-spacing: normal;
+    white-space: normal;
+  }
+
+  &--mockup :deep(.origam-card__content) {
+    padding: 0 var(--origam-space---6) var(--origam-space---6);
+  }
+
+  &--mockup &__actions {
     margin: 0 var(--confirm-dialog__actions---margin-inline, var(--origam-space---4)) var(--confirm-dialog__actions---margin-bottom, var(--origam-space---4));
   }
 }

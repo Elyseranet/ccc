@@ -1,3 +1,4 @@
+import type { CONFIRM_DIALOG_APPEARANCE } from '../enums/confirm-dialog.enum.js'
 import type { GOLDEN_RULES_VARIANT } from '../enums/golden-rules-variant.enum.js'
 import type { ICompetitorPublic } from './competitor.interface.js'
 import type { TSize } from 'origam/types'
@@ -94,6 +95,8 @@ export interface IConfirmDialogProps {
   confirmColor?: string
   confirmSize?: string
   confirmElevation?: string
+  /** `MOCKUP` : gabarit de la maquette d'F-24 ; `DEFAULT` : rendu historique du dialogue de validation du tirage (F-11), inchangé jusqu'à F-30. */
+  appearance?: CONFIRM_DIALOG_APPEARANCE
 }
 
 export interface IConfirmDialogEmits {
