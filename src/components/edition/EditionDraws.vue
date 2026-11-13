@@ -507,7 +507,7 @@ defineExpose({})
   &__pairings {
     display: grid;
     // WCAG 2.5.8 (axe target-size) : des liens de 19,84 px de haut, espacés de 4 px, ont un pas de 23,84 px, sous les 24 px requis entre deux cibles trop petites.
-    gap: calc(var(--origam-space---1) * 1.25);
+    gap: calc(var(--origam-space---1) + 1px);
     margin: var(--origam-space---3) 0 0;
     padding: 0;
     list-style: none;
