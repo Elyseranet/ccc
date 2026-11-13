@@ -246,6 +246,7 @@
 /* États de la maquette (hors produit) et points ouverts (à confirmer par team-lead) */
 .mock-states { display: grid; gap: var(--origam-space---3); margin-top: var(--origam-space---10); padding-top: var(--origam-space---6); border-top: 1px dashed var(--origam-color__border---strong); }
 .open-pt { display: grid; gap: var(--origam-space---2); margin-top: var(--origam-space---3); padding: var(--origam-space---3); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---lg); }
+.c-preview { display: grid; gap: var(--origam-space---2); margin-top: var(--origam-space---3); }
 .open-pt__tag { font-family: var(--origam-font__family---mono); font-size: var(--origam-font__size---xs); color: var(--origam-color__feedback--warning---fgSubtle); }
 @media (max-width: 1000px) {
   .q-grid, .q-ties, .q-params { grid-template-columns: minmax(0, 1fr); }
@@ -262,7 +263,7 @@
 .r-vs { font-size: var(--origam-font__size---sm); }
 .r-viv { margin-top: var(--origam-space---3); }
 .sel-field--val .sel-field__input { color: var(--origam-color__text---primary); }
-.c-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+@media (min-width: 1001px) { .c-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); } } /* sous 1000 px : une colonne (.q-grid) ; déclarée hors media, cette règle l’écrasait */
 .c-pre { display: grid; gap: var(--origam-space---2); }
 .c-pre li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---3); min-height: var(--origam-space---11); padding-inline: var(--origam-space---3); border-radius: var(--origam-radius---lg); background: var(--origam-color__surface---sunken); }
 .c-ok { display: grid; place-items: center; width: var(--origam-space---6); aspect-ratio: 1; border-radius: var(--origam-radius---full); background: var(--origam-color__feedback--success---bgSubtle); color: var(--origam-color__feedback--success---fgSubtle); }
@@ -290,6 +291,12 @@
 .ostep--phase a.ostep__item { color: inherit; text-decoration: none; border-radius: var(--origam-radius---lg); }
 .ostep--phase a.ostep__item:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
 .q-rank .table th, .q-rank .table td { white-space: normal; } /* origam-table : retour à la ligne dans les cellules, pas de défilement horizontal (décision front-lead) */
+/* 390 : aucun défilement interne (décision front-lead) — en-têtes abrégés comme le tableau des poules public (#, V, Diff.), cellules et puces qui reviennent à la ligne, marge interne réduite */
+@media (max-width: 760px) {
+  .q-rank .table th, .q-rank .table td, .q-sec .table th, .q-sec .table td { white-space: normal; padding-inline: var(--origam-space---2); }
+  .q-rank .table .chip, .q-sec .table .chip { white-space: normal; }
+  .c-preview .table th, .c-preview .table td { white-space: normal; padding-inline: var(--origam-space---2); } /* clôture : aperçu des points */
+}
 .adm-dep { flex: 0 0 auto; }
 .mc[hidden] { display: none; }
 /* origam-dialog configuré (option a, front-lead) : carte 560 px, marge 8, rayon xl, ombre xl ; en-tête marge 16, titre xl gras ; texte md, marge 0 24 24 (marge latérale non thémable : décalée de 8 px sur le titre) ; pied = slot, marge 0 16 16, boutons d’Origam 44 px */
