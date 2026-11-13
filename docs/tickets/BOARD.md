@@ -242,7 +242,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | **Fermé** (2026-11-13) @ `c758f358` | — |
 | [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | **Fermé** (2026-11-13) @ `46654e4d` | — |
 | [F-35](F-35.md) | Onglet Tirages des éditions archivées : tirages reconstitués (DRAWS-ARCH) | — | — | **Fermé** (2026-11-13) @ `d3bd4c68` | à créer |
-| [F-36](F-36.md) | `EditionChip` environ 2 px plus large que la `.chip` des maquettes (trouvé en revue F-24) | — | — | Ouvert | existe (`hh.css` `.chip`) |
+| [F-36](F-36.md) | F-24 : en-tête du classement au-dessus de 1 %, cause à établir (pastille mesurée, non en cause) | — | — | Ouvert | existe (`hh.css` `.chip`) |
 | [F-37](F-37.md) | F-24 : bouton « Arrêter la liste » 44 px au lieu de 48, désactivé sans changement visuel (Origam) | validée @ `409c253b` | — | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-38](F-38.md) | Boutons primaires désactivables : appliquer `usePrimaryActionButton` (suite F-37) | — | F-25 | **Fermé** (2026-11-13) @ `350c9d17` |
 | [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | à faire | F-26 | Ouvert |
