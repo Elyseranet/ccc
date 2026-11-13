@@ -273,6 +273,7 @@
   "admin.closing.preview_col_points": "Points",
   "admin.closing.preview_col_result": "Result",
   "admin.closing.preview_formula": "{base} × {count} / {reference} = {points}",
+  "admin.closing.preview_note": "A round not played earns “/” (RG3).",
   "admin.closing.reason_blocked": "Closing unavailable: the final must be validated first.",
   "admin.closing.stage_champion": "Champion",
   "admin.closing.stage_finalist": "Runner-up",

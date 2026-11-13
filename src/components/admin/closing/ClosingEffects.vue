@@ -38,6 +38,12 @@
           hide-default-footer
           class="closing-effects__table"
         />
+        <p
+          class="closing-effects__note"
+          data-cy="closing-preview-note"
+        >
+          {{ note }}
+        </p>
       </div>
     </template>
   </origam-card>
@@ -76,6 +82,7 @@ const effects = computed(() => [
   { id: 'rankings', text: t('admin.closing.effect_rankings', 'Les classements ACP et All Time intègrent l’édition.') },
   { id: 'scale', text: t('admin.closing.effect_scale', 'Un changement de barème ultérieur ne réécrit pas le palmarès.') }
 ])
+const note = computed(() => t('admin.closing.preview_note', 'Un tour non disputé rapporte « / » (RG3).'))
 const caption = computed(() => t('admin.closing.preview_caption', 'Aperçu des points pour {count} participants', { count: props.participantCount }))
 const hasRows = computed(() => props.rows.length > 0)
 const formatPoints = (value: number): string => value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -135,6 +142,12 @@ defineExpose({})
     display: grid;
     gap: var(--origam-space---2);
     margin-top: var(--origam-space---3);
+  }
+
+  &__note {
+    margin: 0;
+    color: var(--origam-color__text---secondary);
+    font-size: var(--origam-font__size---sm);
   }
 
   &__table :deep(th),

@@ -273,6 +273,7 @@
   "admin.closing.preview_col_points": "Points",
   "admin.closing.preview_col_result": "Résultat",
   "admin.closing.preview_formula": "{base} × {count} / {reference} = {points}",
+  "admin.closing.preview_note": "Un tour non disputé rapporte « / » (RG3).",
   "admin.closing.reason_blocked": "Clôture indisponible : la finale doit d’abord être validée.",
   "admin.closing.stage_champion": "Champion·ne",
   "admin.closing.stage_finalist": "Finaliste",
