@@ -141,8 +141,15 @@ describe('edition closing and frozen points (B-14)', async () => {
     const before = await (await send('GET', `/api/v1/editions/${editionId}`)).json() as IEditionDetail
     const preview = computeClosingPreview(before)
     expect(preview).toMatchObject({ participantCount: PLAYERS, blockedBy: null })
-    expect((await close(editionId)).status).toBe(200)
+    expect(before.closedAt).toBeNull()
+    const closed = await close(editionId)
+    expect(closed.status).toBe(200)
+    const closedBody = await closed.json() as IEditionDetail
     const after = await (await send('GET', `/api/v1/editions/${editionId}`)).json() as IEditionDetail
+    const stored = await dataSource.getRepository(EditionEntity).findOneByOrFail({ id: editionId })
+    expect(after.closedAt).toBe(stored.closedAt!.toISOString())
+    expect(closedBody.closedAt).toBe(after.closedAt)
+    expect(after.closedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
     const byId = (rows: Array<{ participationId: string }>) => [...rows].sort((a, b) => a.participationId.localeCompare(b.participationId))
     expect(byId(after.participants.map(({ participationId, finalStage, points }) => ({ participationId, finalStage, points }))))
       .toEqual(byId(preview.results))
@@ -196,6 +203,7 @@ describe('edition closing and frozen points (B-14)', async () => {
     expect(again.status).toBe(200)
     expect(again.headers.get('cache-control')).toBe('no-store')
     const replayed = await again.json() as IEditionDetail
+    expect(replayed.closedAt).toBe(stored.closedAt!.toISOString())
     expect(pointsOf(replayed, 1)).toMatchObject({ points: 12.96, status: PARTICIPATION_STATUS.WINNER })
     expect(replayed.participants.filter((participant) => participant.status === PARTICIPATION_STATUS.ELIMINATED)).toHaveLength(PLAYERS - 1)
     expect(replayed.participants.some((participant) => [PARTICIPATION_STATUS.QUALIFIED, PARTICIPATION_STATUS.IN_POOL].includes(participant.status))).toBe(false)

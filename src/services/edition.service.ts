@@ -658,6 +658,7 @@ export const loadEditionDetail = async (dataSource: DataSource, edition: Edition
   return {
     ...summary!,
     description: edition.description,
+    closedAt: edition.closedAt?.toISOString() ?? null,
     participants: participations.map(toEditionParticipant),
     pools: buildPools(poolEntities, participations, matches),
     rounds: buildRounds(roundEntities, matches),

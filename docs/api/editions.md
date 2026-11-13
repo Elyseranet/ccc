@@ -55,6 +55,10 @@ Rangé dans `src/interfaces`, `src/enums` et `src/types` pour que le front avanc
 - B-11 (`src/interfaces/draw.interface.ts`) : `ICreatePoolDrawRequest { poolCount, seedCount, seeds: string[] }` ; `IUpdateDrawAssignmentsRequest { assignments: { participationId, poolNumber, drawnOrder }[] }` ; `IAdminDraw` (`IDraw` plus `createdBy` et `validatedBy`, `IAdminActor | null`) ; `ISeedProposal { seeds: { participationId, competitor, rank, acp }[], unresolvedTies }`, où `acp` est le score ACP qui a servi au classement (RG9, A8).
 - B-15 (`src/interfaces/admin-activity.interface.ts`, `src/types/admin-activity.type.ts`, `src/enums/admin-activity.enum.ts`) : `IAdminActivityItem { kind, at, actor, target }`, triée du plus récent au plus ancien, `?limit=` défaut 20, maximum 100. `target` est l'union discriminée `TAdminActivityTarget` sur `type` : `MATCH` (`matchSequence`, `roundKind`, `poolNumber`, `sides: [IMatchSide, IMatchSide]` dans l'ordre des positions, `score` = score validé ou corrigé) ou `DRAW` (`drawKind`, `roundKind`, `poolCount` et `seedCount` pour un tirage de poules, `null` pour un tirage de tour). Aucune chaîne n'est construite par le serveur.
 
+## Date de clôture (`closedAt`, B-22)
+
+`IEditionDetail.closedAt` : date ISO 8601 (UTC) de la clôture, `null` tant que l'édition n'est pas close. Les 16 éditions d'archives sont `CLOSED` avec un `closed_at` vide dans le dump (`archives.sql`) : elles renvoient `null`, la date n'est jamais inventée. Un client doit donc accepter `status: "CLOSED"` avec `closedAt: null`. Elle figure aussi dans la réponse de `POST /editions/{id}/cloture`.
+
 ## Règles de visibilité
 
 - Édition en cours visible (E-f). Un match saisi mais non validé est sérialisé `SCHEDULED`, avec `score = null` : `recordedScore` n'est jamais lu.
@@ -93,6 +97,7 @@ L'empreinte de l'ETag est calculée sur le contenu public : dernier `validated_a
   "champion": null,
   "final": null,
   "description": null,
+  "closedAt": null,
   "participants": [
     {
       "participationId": "0e1f...",
