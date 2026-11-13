@@ -363,11 +363,11 @@ defineExpose({})
 
   &__grid {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 20rem;
     align-items: start;
     gap: var(--origam-space---5);
 
-    @media (max-width: 1000px) {
+    @media (max-width: 1200px) {
       grid-template-columns: minmax(0, 1fr);
     }
   }

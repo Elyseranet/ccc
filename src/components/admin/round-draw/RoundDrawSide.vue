@@ -23,7 +23,7 @@
           role="status"
           class="round-draw-side__status"
         >
-          <b>{{ poolCount }}</b>, {{ pairingsToDraw }}
+          {{ poolCount }}, {{ pairingsToDraw }}
         </p>
         <app-data-table
           :headers="headers"
@@ -161,7 +161,7 @@ defineExpose({})
 <style scoped lang="scss">
 .round-draw-side {
   display: grid;
-  gap: var(--round-draw-side---gap, var(--origam-space---5));
+  gap: var(--round-draw-side---gap, var(--origam-space---4));
   align-content: start;
 
   &__card {
@@ -181,14 +181,10 @@ defineExpose({})
   }
 
   &__title {
-    margin: 0 0 var(--origam-space---2);
+    margin: 0;
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
     line-height: var(--origam-font__lineHeight---tight);
-  }
-
-  &__head &__title {
-    margin: 0;
   }
 
   &__status {
@@ -229,7 +225,7 @@ defineExpose({})
 
 <style>
 :root {
-  --round-draw-side---gap: var(--origam-space---5);
+  --round-draw-side---gap: var(--origam-space---4);
   --round-draw-side__card---padding: var(--origam-space---6);
 }
 </style>

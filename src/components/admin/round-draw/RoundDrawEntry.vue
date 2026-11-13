@@ -63,6 +63,7 @@
             rounded="xl"
             border
             elevation="md"
+            padding="0"
             class="round-draw-entry__card"
           >
             <template #default>
@@ -78,6 +79,7 @@
                 v-if="!readOnly"
                 variant="text"
                 size="small"
+                class="round-draw-entry__change"
                 :text="changeLabel"
                 :aria-label="item.changeAriaLabel"
                 :data-cy="item.changeDataCy"
@@ -90,7 +92,9 @@
           <origam-card
             rounded="xl"
             border
+            border-color="var(--origam-color__action--secondary---bg)"
             elevation="md"
+            padding="0"
             class="round-draw-entry__card round-draw-entry__card--next"
           >
             <template #default>
@@ -272,7 +276,7 @@ defineExpose({})
 
   &__list {
     display: grid;
-    gap: var(--origam-space---3);
+    gap: var(--origam-space---2);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -280,15 +284,38 @@ defineExpose({})
 
   &__card :deep(.origam-card__content) {
     display: grid;
-    gap: var(--origam-space---2);
-    padding: var(--origam-space---5);
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--origam-space---2) var(--origam-space---4);
+    padding: var(--round-draw-entry__card---padding-block, var(--origam-space---4)) var(--round-draw-entry__card---padding-inline, var(--origam-space---5));
   }
 
-  &__card--next {
-    border-color: var(--origam-color__border---strong);
+  &__card--next &__row {
+    grid-column: 1 / -1;
+  }
+
+  &__card--next &__row :deep(.origam-label) {
+  }
+
+  &__card--next &__row :deep(.origam-label) {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__card--next &__row :deep(.origam-select) {
+    --origam-field---opacity-disabled: 0.75;
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+
+  &__change {
+    --origam-btn---height: var(--origam-space---11);
+    --origam-btn---padding-sm: var(--origam-space---4);
+    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__eyebrow {
+    grid-column: 1 / -1;
     margin: 0;
     color: var(--origam-color__text---tertiary);
     font-size: var(--origam-font__size---xs);
@@ -302,23 +329,31 @@ defineExpose({})
     flex-wrap: wrap;
     align-items: center;
     gap: var(--origam-space---3);
+    min-width: 0;
   }
 
   &__vs {
     color: var(--origam-color__text---secondary);
+    font-size: var(--origam-font__size---sm);
   }
 
   &__item--free {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--origam-space---8) minmax(0, 1fr);
+    gap: var(--origam-space---2) var(--origam-space---4);
     align-items: center;
-    gap: var(--origam-space---3);
-    padding: var(--origam-space---3) var(--origam-space---5);
-    border: 1px dashed var(--origam-color__border---default);
-    border-radius: var(--origam-radius---xl);
+    min-height: var(--origam-space---11);
+    padding: 0 var(--origam-space---3);
+    border: 1px dashed var(--origam-color__border---strong);
+    border-radius: var(--origam-radius---lg);
+  }
+
+  &__free {
     color: var(--origam-color__text---tertiary);
   }
 
   &__slot-number {
+    color: var(--origam-color__text---tertiary);
     font-variant-numeric: tabular-nums;
     font-weight: var(--origam-font__weight---bold);
   }
@@ -334,5 +369,7 @@ defineExpose({})
 <style>
 :root {
   --round-draw-entry---gap: var(--origam-space---3);
+  --round-draw-entry__card---padding-block: var(--origam-space---4);
+  --round-draw-entry__card---padding-inline: var(--origam-space---5);
 }
 </style>

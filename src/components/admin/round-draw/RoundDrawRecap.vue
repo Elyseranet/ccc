@@ -46,11 +46,11 @@
       <div class="round-draw-recap__action">
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
-          size="large"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
+          size="x-large"
           aria-haspopup="dialog"
-          :disabled="blocker !== null || busy"
+          :disabled="isBlocked"
           :loading="busy"
           :text="buttonLabel"
           data-cy="round-draw-validate-open"
@@ -115,6 +115,10 @@ const title = computed(() => t('admin.round_draw.recap_title', 'Récapitulatif e
 const caption = computed(() => t('admin.round_draw.recap_caption', 'Affiches {round}', { round: of.value }))
 const emptyText = computed(() => t('admin.round_draw.recap_empty', 'Les affiches saisies apparaissent ici.'))
 const hasRows = computed(() => props.rows.length > 0)
+const isBlocked = computed(() => props.blocker !== null || props.busy)
+// Une couleur de fond posée en ligne l'emporte sur le rendu désactivé de la règle centrale (`main.css`, tokens `bgDisabled` non lus par Origam) : on ne la pose que quand le bouton est actif.
+const buttonElevation = computed(() => isBlocked.value ? undefined : 'lg')
+const buttonColor = computed(() => isBlocked.value ? undefined : 'primary')
 const buttonLabel = computed(() => t('admin.round_draw.validate_button', 'Valider le tirage {round}…', { round: of.value }))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: ROUND_DRAW_RECAP_COLUMN.NUMBER, title: t('admin.round_draw.recap_col_number', '#'), sortable: false, align: ALIGN.END },
