@@ -147,7 +147,7 @@
 .draws { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---3); margin-top: var(--origam-space---4); }
 .draw { padding: var(--origam-space---5); }
 .draw__head { display: flex; align-items: center; justify-content: space-between; gap: var(--origam-space---3); }
-.draw__list { display: grid; gap: var(--origam-space---1); margin-top: var(--origam-space---3); font-size: var(--origam-font__size---sm); }
+.draw__list { display: grid; gap: calc(var(--origam-space---1) + 1px); /* 5 px : cibles des liens ≥ 24 px d’entraxe (WCAG 2.5.8) */ margin-top: var(--origam-space---3); font-size: var(--origam-font__size---sm); }
 .draw__list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--origam-space---2); }
 .draw__list a { text-decoration: none; font-weight: var(--origam-font__weight---semibold); }
 .draw__list i { font-style: normal; color: var(--origam-color__action--secondary---fgSubtle); font-weight: var(--origam-font__weight---bold); font-size: var(--origam-font__size---xs); }
