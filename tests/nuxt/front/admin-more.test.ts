@@ -21,9 +21,9 @@ describe('page « Plus » de l’admin (F-12)', () => {
     expect(ADMIN_MORE_ITEMS.map(item => item.to)).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
   })
 
-  it('en production, les entrées des pages non livrées restent masquées (PAGE_DELIVERY, F-12b, F-13)', () => {
+  it('en production, les entrées des pages non livrées restent masquées (PAGE_DELIVERY, F-12b, F-13, F-24)', () => {
     const production = ADMIN_MORE_ITEMS.filter(item => isPageAccessible(item.to, false)).map(item => item.to)
-    expect(production).toEqual([ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
+    expect(production).toEqual([ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
   })
 
   it('rend un h1 unique, six entrées traduites en test (pages non livrées visibles hors production), le sélecteur d’édition et la déconnexion', async () => {

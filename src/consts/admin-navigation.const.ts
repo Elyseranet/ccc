@@ -1,5 +1,6 @@
 import IconDashboard from '~/components/icons/IconDashboard.vue'
 import IconCompetitors from '~/components/icons/IconCompetitors.vue'
+import IconFinalPhase from '~/components/icons/IconFinalPhase.vue'
 import IconEditions from '~/components/icons/IconEditions.vue'
 import IconDraws from '~/components/icons/IconDraws.vue'
 import IconMatches from '~/components/icons/IconMatches.vue'
@@ -17,7 +18,8 @@ export const ADMIN_NAVIGATION: INavigationGroup[] = filterDeliveredGroups([
       { key: 'layout.admin.nav_dashboard', label: 'Tableau de bord', to: ROUTES.ADMIN, icon: IconDashboard, exact: true },
       { key: 'layout.admin.nav_participants', label: 'Participants', to: ROUTES.ADMIN_PARTICIPANTS, icon: IconParticipants },
       { key: 'layout.admin.nav_draws', label: 'Tirages', to: ROUTES.ADMIN_DRAWS, icon: IconDraws },
-      { key: 'layout.admin.nav_matches', label: 'Poules et matchs', to: ROUTES.ADMIN_MATCHES, icon: IconMatches }
+      { key: 'layout.admin.nav_matches', label: 'Poules et matchs', to: ROUTES.ADMIN_MATCHES, icon: IconMatches },
+      { key: 'layout.admin.nav_final_phase', label: 'Phase finale', to: ROUTES.ADMIN_FINAL_PHASE, icon: IconFinalPhase }
     ]
   },
   {
