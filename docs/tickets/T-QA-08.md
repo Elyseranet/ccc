@@ -23,3 +23,5 @@
 3. Critère de fermeture : 10 passes de `test:run` complètes, sans exclusion, dont 5 sous une charge contrôlée (load ≥ 20), 0 échec.
 
 - **2026-11-13 — nouveau cas (F-35, dev-f13)** : deux lancements combinés (visuel F-35 + a11y F-03a, charge 4,8 à 7 au lancement, `--retries=0`) ont chacun eu un échec d'a11y F-03a, un `page.goto` interrompu à 35 s, sur deux tests différents (2012a, puis `/editions/1999`), hors de l'onglet Tirages. Les deux passent quand on les lance seuls. La charge est modérée, sous le seuil de 10 : le symptôme ne dépend donc pas seulement d'une forte charge. Cause : « Je ne sais pas » ; piste : serveur de dev saturé par les contextes parallèles.
+
+- **2026-11-13 (chef de projet)** : nouvelle occurrence au merge de T-A11Y-01 branche 1 (`da6123af`). Premier `test:run` lancé à une charge de 10,6 : 8 fichiers front en échec sur « Hook timed out in 60000ms » (`account`, `admin-competitors`, `admin-dashboard`, `admin-participants`, `competitor-composables`, `head-to-head`, `pool-draw`, `edition/edition`), 167 tests ignorés. Relancé à une charge de 5 : 1425 / 1 ignoré / 0. Même symptôme que les cas précédents, cause toujours non trouvée.
