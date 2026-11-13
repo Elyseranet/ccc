@@ -94,7 +94,7 @@ describe('EditionSelector', () => {
 describe('EditionMatches : match d’archive sans score (B-21, F-34)', () => {
   const row = (overrides: Record<string, unknown>) => ({
     id: 'm', sequence: 1, number: '2013-1', roundKind: ROUND_KIND.QUARTER, poolRank: null, isTiebreak: false,
-    first: person('c1', 'Simon Vaur'), others: [person('c2', 'Kevin Mercurio')], firstScore: null, otherScores: [null], scoreText: null,
+    first: person('c1', 'Simon Vaur'), others: [person('c2', 'Kevin Mercurio')], firstScore: null, otherScores: [null], hasManyOthers: false, scoreText: null,
     hasWinner: true, winnerWithoutScore: false, status: 'VALIDATED', ...overrides
   })
 
@@ -107,14 +107,16 @@ describe('EditionMatches : match d’archive sans score (B-21, F-34)', () => {
     const wrapper = await mountSuspended(EditionMatches, { ...withRouterLink, props: { rows: rows as never, counts: { all: 3, pools: 0, knockout: 3 }, code: '2013' } })
     const scores = wrapper.findAll('.edition-matches__score').map(node => node.text())
     expect(scores).toEqual(['score non archivé', '10 – 6', '–'])
+    expect(wrapper.find('.edition-matches__others').exists()).toBe(false)
   })
 
   it('un départage à 3 côtés liste les trois joueurs et joint les trois scores (F-21)', async () => {
-    const rows = [row({ id: 'd', firstScore: 3, others: [person('c2', 'Emma Petit'), person('c3', 'Noé Garnier')], otherScores: [1, 0], scoreText: '3 – 1 – 0', isTiebreak: true })]
+    const rows = [row({ id: 'd', firstScore: 3, others: [person('c2', 'Emma Petit'), person('c3', 'Noé Garnier')], otherScores: [1, 0], hasManyOthers: true, scoreText: '3 – 1 – 0', isTiebreak: true })]
     const wrapper = await mountSuspended(EditionMatches, { ...withRouterLink, props: { rows: rows as never, counts: { all: 1, pools: 0, knockout: 1 }, code: '2013' } })
     expect(wrapper.get('.edition-matches__score').text()).toBe('3 – 1 – 0')
     const others = wrapper.get('.edition-matches__others')
     expect(others.element.tagName).toBe('UL')
+    expect(wrapper.findAll('.edition-matches__others')).toHaveLength(1)
     expect(others.findAll('li').map(item => item.text())).toEqual(['Emma Petit', 'Noé Garnier'])
   })
 })

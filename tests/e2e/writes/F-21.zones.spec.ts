@@ -127,3 +127,51 @@ for (const viewport of VIEWPORTS) {
     })
   }
 }
+
+/*********************************************************
+ * Liste publique des matchs : un départage à 3 côtés (edition.html?matchs=departage)
+ *
+ * @description
+ * Le tableau de la maquette porte 16 lignes d'une édition illustrative, l'application celles de l'édition créée par le test : seule la ligne du
+ * départage est comparée. Les autres lignes sont masquées des deux côtés, N°, tour et noms de l'application sont recopiés dans la maquette
+ * (mêmes largeurs de colonnes), puis l'encre des valeurs est rendue transparente. Gabarit, colonnes, liste des adversaires et pastille restent comparés.
+ ********************************************************/
+const ROW = '[data-cy="edition-matches-table"] tbody tr:has(.edition-matches__others li + li)'
+for (const viewport of VIEWPORTS) {
+  test.describe(`F-21 liste publique des matchs, départage à 3 côtés @${viewport.name}`, () => {
+    test.use({ viewport: { width: viewport.width, height: viewport.height } })
+
+    test('matchs-public-departage', async ({ page, browser, context }) => {
+      await signIn(context, 'admin')
+      const { edition, tiebreak } = await createMultiTiebreakEdition(context.request, `f21p${viewport.name}`, 3)
+      const scores = { scores: tiebreak.sides.map((side, index) => ({ participationId: side.participationId, score: [3, 1, 0][index] })) }
+      const recorded = await (await context.request.put(`/api/v1/matchs/${tiebreak.id}/score`, { data: scores, headers: { 'If-Match': `"${tiebreak.version}"` } })).json() as { version: number }
+      await context.request.post(`/api/v1/matchs/${tiebreak.id}/validation`, { data: scores, headers: { 'If-Match': `"${recorded.version}"` } })
+      const mockContext = await browser.newContext({ viewport, reducedMotion: 'reduce' })
+      const mockup = await mockContext.newPage()
+      await mockup.goto(`file://${MOCKUP_DIR}/edition.html?matchs=departage`)
+      await settle(mockup)
+      await page.goto(`/editions/${edition.code}?onglet=matchs`)
+      await settle(page)
+      await mockup.addStyleTag({ content: '#ed-p-mat tbody tr:not(.m-tb) { display: none !important; } .stars { display: none !important; }' })
+      await page.addStyleTag({ content: `[data-cy="edition-matches-table"] tbody tr:not(:has(.edition-matches__others li + li)) { display: none !important; }` })
+      await alignMockupText(mockup, page, [
+        { mockup: '#ed-p-mat .m-tb td:nth-child(1)', app: `${ROW} td:nth-child(1)` },
+        { mockup: '#ed-p-mat .m-tb td:nth-child(2)', app: `${ROW} td:nth-child(2)` },
+        { mockup: '#ed-p-mat .m-tb td:nth-child(3) a', app: `${ROW} td:nth-child(3) .player-link__name` },
+        { mockup: '#ed-p-mat .m-tb .opp-list a', app: `${ROW} .edition-matches__others .player-link__name` }
+      ])
+      await hideInk(mockup, ['#ed-p-mat .m-tb td:nth-child(1)', '#ed-p-mat .m-tb td:nth-child(2)', '#ed-p-mat .m-tb a'])
+      await hideInk(page, ['[data-cy="edition-matches-table"] tbody td:nth-child(1)', '[data-cy="edition-matches-table"] tbody td:nth-child(2)', '[data-cy="edition-matches-table"] tbody .player-link__name'])
+      await mockup.evaluate(() => window.scrollTo(0, 0))
+      await page.evaluate(() => window.scrollTo(0, 0))
+      const columns = (target: Page, selector: string) => target.locator(selector).evaluateAll(cells => cells.map(cell => Number(cell.getBoundingClientRect().width.toFixed(1))))
+      console.log(`COLONNES ${viewport.name} maquette ${(await columns(mockup, '#ed-p-mat .m-tb td')).join(' / ')} | app ${(await columns(page, `${ROW} td`)).join(' / ')}`)
+      const mockBox = await box(mockup, '#ed-p-mat .table-wrap')
+      const appBox = await box(page, '[data-cy="edition-matches-scroll"]')
+      await compare(page, mockup, 'matchs-public-departage', viewport.name, mockBox, appBox, NO_MASKS)
+      await mockContext.close()
+    })
+  })
+}
+

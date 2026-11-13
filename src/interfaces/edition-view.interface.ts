@@ -176,6 +176,8 @@ export interface IEditionMatchRow {
   firstScore: number | null
   /** Un score par entrée de `others`, `null` tant que le match n'a pas de vainqueur public. */
   otherScores: Array<number | null>
+  /** 3 côtés ou plus : « Adversaire » est une liste ; à 2 côtés, un seul lien, comme avant F-21. */
+  hasManyOthers: boolean
   /** Scores joints, vainqueur d'abord puis adversaires dans l'ordre de `others` ; `null` si un score manque. */
   scoreText: string | null
   hasWinner: boolean

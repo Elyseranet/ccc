@@ -79,6 +79,7 @@
             </template>
             <template #item.second="{ item }">
               <ul
+                v-if="item.hasManyOthers"
                 class="edition-matches__others"
                 :class="{ 'edition-matches__side--lose': item.hasWinner }"
               >
@@ -92,6 +93,17 @@
                   />
                 </li>
               </ul>
+              <span
+                v-else
+                class="edition-matches__side"
+                :class="{ 'edition-matches__side--lose': item.hasWinner }"
+              >
+                <common-player-link
+                  v-if="item.others[0]"
+                  :competitor="item.others[0]"
+                  inline
+                />
+              </span>
             </template>
             <template #item.score="{ item }">
               <span class="edition-matches__score font-display">{{ item.score }}</span>

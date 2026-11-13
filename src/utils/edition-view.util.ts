@@ -329,6 +329,7 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
       others: others.map(side => ({ id: side.competitorId, displayName: side.displayName })),
       firstScore: scored(first),
       otherScores: others.map(scored),
+      hasManyOthers: others.length > 1,
       scoreText: scores.every(score => score !== null) ? scores.join(EDITION_MATCH_SCORE_SEPARATOR) : null,
       hasWinner: winner !== undefined,
       winnerWithoutScore: isArchivedWinnerWithoutScore(match),
