@@ -63,7 +63,7 @@ describe('computeClosingPreview (B-14, RG1 à RG3)', () => {
 
   it('bloque avec FINAL_NOT_VALIDATED tant que la finale est absente ou non validée, sans résultat', () => {
     const noFinal = computeClosingPreview(edition(knockout.slice(0, 6), [ROUND_KIND.QUARTER, ROUND_KIND.SEMI]))
-    expect(noFinal).toEqual({ participantCount: 36, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [] })
+    expect(noFinal).toEqual({ participantCount: 36, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [], playedStages: [] })
     const unplayed = computeClosingPreview(edition([...knockout.slice(0, 6), match(ROUND_KIND.FINAL, null, 'p2')], [ROUND_KIND.FINAL]))
     expect(unplayed.blockedBy).toBe(API_ERROR_CODE.FINAL_NOT_VALIDATED)
   })
