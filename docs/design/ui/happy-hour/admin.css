@@ -43,6 +43,12 @@
 .st__b { display: flex; flex-direction: column; }
 .st__b b { font-size: var(--origam-font__size---md); font-weight: var(--origam-font__weight---medium); line-height: var(--origam-font__lineHeight---normal); }
 .st__b small { color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); line-height: var(--origam-font__lineHeight---normal); }
+/* F-39 : étapes cliquables. Le lien porte la mise en page de l’étape (même flex et même gap) ; marge négative + padding identiques : rien ne bouge au repos */
+.st__a { display: flex; flex: 1 1 auto; align-items: flex-start; gap: var(--origam-space---4); margin: calc(-1 * var(--origam-space---1)); padding: var(--origam-space---1); border-radius: var(--origam-radius---lg); color: inherit; text-decoration: none; transition: background-color var(--origam-motion__duration---fast) var(--origam-motion__easing---standard); }
+a.st__a:hover, a.st__a.is-hover { background: var(--origam-color__action--ghost---bgHover); }
+a.st__a:hover b, a.st__a.is-hover b { text-decoration: underline; text-underline-offset: 3px; }
+a.st__a:focus-visible, a.st__a.is-focus { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
+.st-demo { padding-inline: 0; }
 
 .adm-todo .h-card { margin-bottom: var(--origam-space---1); }
 .adm-task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---4); padding: var(--origam-space---5); text-decoration: none; }
