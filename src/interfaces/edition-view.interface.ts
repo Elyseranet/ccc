@@ -66,6 +66,25 @@ export interface IEditionDrawView {
   pairings: IEditionDrawPairing[]
 }
 
+/** F-35 : composition d'une poule déduite des classements, joueurs par ordre alphabétique (l'ordre du tirage n'est pas connu). */
+export interface IEditionReconstitutedPool {
+  id: string
+  rank: number
+  players: TEditionPerson[]
+}
+
+/** F-35 : affiches d'un tour déduites des matchs du bracket, dans l'ordre de l'onglet Bracket. */
+export interface IEditionReconstitutedRound {
+  kind: ROUND_KIND
+  pairings: IEditionDrawPairing[]
+}
+
+/** F-35 : tirages d'une édition clôturée sans tirage enregistré (DRAWS-ARCH), reconstitués à partir des poules et des matchs. */
+export interface IEditionReconstitutedDraws {
+  pools: IEditionReconstitutedPool[]
+  rounds: IEditionReconstitutedRound[]
+}
+
 export interface IEditionHeroMeta {
   status: ITranslatableText
   family: EDITION_CHIP_FAMILY
@@ -102,6 +121,8 @@ export interface IEditionDrawsProps {
   seeds: IEditionSeedRow[]
   poolsStatus: DRAW_STATUS | null
   roundDraws: IEditionDrawView[]
+  /** F-35 : tirages reconstitués d'une édition clôturée sans tirage enregistré ; `null` sinon. */
+  reconstituted?: IEditionReconstitutedDraws | null
 }
 
 export interface IEditionPoolRow {

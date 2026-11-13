@@ -6,6 +6,7 @@ import type { IEditionDetail } from '../../src/interfaces/edition.interface'
 import {
   buildEditionBracket,
   buildEditionMatchRows,
+  buildEditionReconstitutedDraws,
   buildEditionPoolTables,
   editionMatchFilterCounts,
   filterEditionMatchRows,
@@ -136,3 +137,52 @@ describe('Match d’archive sans score : lignes et tableau (B-21, F-34)', () => 
     expect(buildEditionMatchRows(before).every(row => !row.winnerWithoutScore)).toBe(true)
   })
 })
+
+describe('Tirages reconstitués d’une édition sans tirage enregistré (F-35, DRAWS-ARCH)', () => {
+  const standingRow = (id: string, name: string) => ({ participationId: id, competitor: { id: `c-${id}`, displayName: name } })
+  const match = (id: string, a: string, b: string) => ({ id, winnerParticipationId: a, sides: [side(a, null), side(b, null)] })
+  const archived = {
+    code: '2024',
+    status: 'CLOSED',
+    draws: [],
+    pools: [
+      { id: 'p2', rank: 2, standing: [standingRow('d', 'Zoé Martin'), standingRow('c', 'Camille Morel')] },
+      { id: 'p1', rank: 1, standing: [standingRow('b', 'Lou Bernard'), standingRow('a', 'Éloïse Adam')] }
+    ],
+    bracket: [
+      { kind: ROUND_KIND.QUARTER, matches: [match('q1', 'a', 'b'), match('q2', 'c', 'd')] },
+      { kind: ROUND_KIND.PLAYOFF, matches: [match('b1', 'e', 'f')] },
+      { kind: ROUND_KIND.FINAL, matches: [match('f1', 'a', 'c')] }
+    ]
+  } as unknown as IEditionDetail
+
+  it('une édition clôturée sans tirage : poules par rang, joueurs par ordre alphabétique, sans rang', () => {
+    const result = buildEditionReconstitutedDraws(archived)
+    expect(result!.pools.map(pool => pool.rank)).toEqual([1, 2])
+    expect(result!.pools[0]!.players.map(player => player.displayName)).toEqual(['Éloïse Adam', 'Lou Bernard'])
+    expect(result!.pools[1]!.players.map(player => player.displayName)).toEqual(['Camille Morel', 'Zoé Martin'])
+  })
+
+  it('les affiches suivent l’ordre de l’onglet Bracket : barrages avant les quarts, matchs dans l’ordre de l’API', () => {
+    const result = buildEditionReconstitutedDraws(archived)
+    expect(result!.rounds.map(round => round.kind)).toEqual([ROUND_KIND.PLAYOFF, ROUND_KIND.QUARTER, ROUND_KIND.FINAL])
+    expect(result!.rounds[1]!.pairings.map(pairing => pairing.sides.map(entry => entry.id))).toEqual([['c-a', 'c-b'], ['c-c', 'c-d']])
+  })
+
+  it('sans barrages, aucun tour de barrages n’est inventé', () => {
+    const withoutPlayoff = { ...archived, bracket: (archived.bracket as unknown as Array<{ kind: ROUND_KIND }>).filter(round => round.kind !== ROUND_KIND.PLAYOFF) } as unknown as IEditionDetail
+    expect(buildEditionReconstitutedDraws(withoutPlayoff)!.rounds.map(round => round.kind)).toEqual([ROUND_KIND.QUARTER, ROUND_KIND.FINAL])
+  })
+
+  it('une édition sans poule garde les affiches et une composition vide', () => {
+    const result = buildEditionReconstitutedDraws({ ...archived, pools: [] } as unknown as IEditionDetail)
+    expect(result!.pools).toEqual([])
+    expect(result!.rounds).toHaveLength(3)
+  })
+
+  it('une édition en cours, ou qui a des tirages enregistrés, n’est jamais reconstituée', () => {
+    expect(buildEditionReconstitutedDraws({ ...archived, status: 'POOLS_PLAYING' } as unknown as IEditionDetail)).toBeNull()
+    expect(buildEditionReconstitutedDraws({ ...archived, draws: [{ id: 'd' }] } as unknown as IEditionDetail)).toBeNull()
+  })
+})
+

@@ -10,7 +10,161 @@
       class="sr-only"
       :text="title"
     />
-    <div class="edition-draws__layout">
+    <template v-if="reconstituted">
+      <origam-alert
+        status="info"
+        density="compact"
+        rounded="lg"
+        font-size="md"
+        font-weight="bold"
+        letter-spacing="normal"
+        line-height="normal"
+        class="edition-draws__alert"
+        :title="recAlertTitle"
+        :text="recAlertText"
+        data-cy="edition-draws-reconstituted"
+      />
+      <div
+        class="edition-draws__layout"
+        :class="recLayoutClass"
+      >
+        <origam-card
+          v-if="hasRecPools"
+          tag="article"
+          rounded="xl"
+          border
+          elevation="md"
+          padding="6"
+          aria-labelledby="edition-draws-rec-pools-title"
+          class="edition-draws__pools"
+          data-cy="edition-draws-rec-pools"
+        >
+          <header class="edition-draws__head">
+            <origam-title
+              id="edition-draws-rec-pools-title"
+              tag="h3"
+              class="edition-draws__title"
+              font-size="xl"
+              font-weight="bold"
+              line-height="tight"
+              letter-spacing="normal"
+              :text="recPoolsTitle"
+            />
+            <edition-chip
+              :family="recChipFamily"
+              :text="recChip"
+            />
+          </header>
+          <p class="edition-draws__note">
+            {{ recPoolsNote }}
+          </p>
+          <div class="edition-draws__rec-pools">
+            <section
+              v-for="pool in recPools"
+              :key="pool.id"
+              class="edition-draws__rec-pool"
+              :aria-labelledby="pool.titleId"
+              :data-cy="pool.dataCy"
+            >
+              <origam-title
+                :id="pool.titleId"
+                tag="h4"
+                class="edition-draws__rec-pool-title"
+                font-weight="bold"
+                letter-spacing="normal"
+                line-height="normal"
+              >
+                <template #default>
+                  <edition-chip
+                    :family="seedFamily"
+                    :text="pool.label"
+                  />
+                </template>
+              </origam-title>
+              <ul class="edition-draws__rec-pool-list">
+                <li
+                  v-for="player in pool.players"
+                  :key="player.id"
+                >
+                  <common-player-link
+                    :competitor="player"
+                    inline
+                  />
+                </li>
+              </ul>
+            </section>
+          </div>
+        </origam-card>
+        <div class="edition-draws__rounds">
+          <origam-title
+            tag="h3"
+            class="edition-draws__title"
+            font-size="xl"
+            font-weight="bold"
+            line-height="tight"
+            letter-spacing="normal"
+            :text="recRoundsTitle"
+          />
+          <p class="edition-draws__note">
+            {{ recRoundsNote }}
+          </p>
+          <div class="edition-draws__grid">
+            <origam-card
+              v-for="round in recRounds"
+              :key="round.kind"
+              tag="article"
+              rounded="xl"
+              border
+              elevation="md"
+              padding="5"
+              class="edition-draws__draw"
+              :data-cy="round.dataCy"
+            >
+              <header class="edition-draws__head">
+                <origam-title
+                  tag="h4"
+                  class="edition-draws__draw-title"
+                  font-size="xl"
+                  font-weight="bold"
+                  line-height="tight"
+                  letter-spacing="normal"
+                  :text="round.title"
+                />
+                <edition-chip
+                  :family="recChipFamily"
+                  :text="recChip"
+                />
+              </header>
+              <ol class="edition-draws__pairings">
+                <li
+                  v-for="pairing in round.pairings"
+                  :key="pairing.index"
+                  class="edition-draws__pairing"
+                >
+                  <template
+                    v-for="(person, position) in pairing.sides"
+                    :key="person.id"
+                  >
+                    <i
+                      v-if="position > 0"
+                      class="edition-draws__versus"
+                    >{{ versus }}</i>
+                    <common-player-link
+                      :competitor="person"
+                      inline
+                    />
+                  </template>
+                </li>
+              </ol>
+            </origam-card>
+          </div>
+        </div>
+      </div>
+    </template>
+    <div
+      v-else
+      class="edition-draws__layout"
+    >
       <origam-card
         tag="article"
         rounded="xl"
@@ -148,7 +302,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamCard, OrigamTitle } from 'origam/components'
+import { OrigamAlert, OrigamCard, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
@@ -164,11 +318,14 @@ import type { IEditionDrawsProps } from '~/interfaces/edition-view.interface'
  *
  * @description
  * Tirages : têtes de série et tirage des poules (RG9, RG11, RG12), puis un tirage par tour de la phase finale (RG13).
+ * Édition clôturée sans tirage enregistré (F-35, DRAWS-ARCH) : `reconstituted` porte la composition des poules et les affiches de
+ * chaque tour, déduites des poules et des matchs. Les listes de joueurs d'une poule sont des `ul` natifs (décision « listes statiques natives »
+ * : le mapping de la maquette dit `origam-list`, qui pose `tabindex="0"` sur une liste non sélectionnable).
  * Listes ordonnées natives (contenu de document). Les titres à date des joueurs ne sont pas exposés par le DTO des
  * tirages : aucune étoile n'est affichée ici.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IEditionDrawsProps>(), {})
+const props = withDefaults(defineProps<IEditionDrawsProps>(), { reconstituted: null })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const seedFamily = EDITION_CHIP_FAMILY.FULL_SECONDARY
@@ -196,6 +353,29 @@ const seedRows = computed(() => props.seeds.map(seed => ({
   dataCy: `edition-seed-${seed.poolRank}`,
   competitor: seed.competitor,
   pool: t('edition.draws_pool_label', 'Poule {rank}', { rank: seed.poolRank })
+})))
+const recChipFamily = EDITION_CHIP_FAMILY.NEUTRAL
+const hasRecPools = computed(() => (props.reconstituted?.pools.length ?? 0) > 0)
+const recLayoutClass = computed(() => (hasRecPools.value ? '' : 'edition-draws__layout--single'))
+const recAlertTitle = computed(() => t('edition.draws_rec_alert_title', 'Tirages reconstitués à partir des résultats'))
+const recAlertText = computed(() => t('edition.draws_rec_alert_text', 'Les tirages de cette édition n’ont pas été archivés. La composition des poules et les affiches de chaque tour sont déduites des poules et des matchs joués.'))
+const recPoolsTitle = computed(() => t('edition.draws_rec_pools_title', 'Composition des poules'))
+const recPoolsNote = computed(() => t('edition.draws_rec_pools_note', 'Têtes de série non archivées. Joueurs par ordre alphabétique : l’ordre du tirage n’est pas connu.'))
+const recRoundsTitle = computed(() => t('edition.draws_rec_rounds_title', 'Affiches de la phase finale'))
+const recRoundsNote = computed(() => t('edition.draws_rec_rounds_note', 'Déduites des matchs de chaque tour. Les scores sont dans les onglets Bracket et Matchs.'))
+const recChip = computed(() => t('edition.draws_rec_chip', 'Reconstitué'))
+const recPools = computed(() => (props.reconstituted?.pools ?? []).map(pool => ({
+  id: pool.id,
+  titleId: `edition-draws-rec-pool-${pool.rank}-title`,
+  dataCy: `edition-rec-pool-${pool.rank}`,
+  label: t('edition.draws_pool_label', 'Poule {rank}', { rank: pool.rank }),
+  players: pool.players
+})))
+const recRounds = computed(() => (props.reconstituted?.rounds ?? []).map(round => ({
+  kind: round.kind,
+  dataCy: `edition-rec-draw-${round.kind.toLowerCase().replaceAll('_', '-')}`,
+  title: t(ROUND_LABELS[round.kind].key, ROUND_LABELS[round.kind].label),
+  pairings: round.pairings
 })))
 const drawRows = computed(() => props.roundDraws.map((draw) => {
   const view = EDITION_DRAW_STATUS_VIEW[draw.status]
@@ -227,11 +407,57 @@ defineExpose({})
     align-items: start;
   }
 
+  &__layout--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   &__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--origam-space---3);
+
+    > .edition-chip {
+      flex: none;
+    }
+  }
+
+  &__alert {
+    margin-bottom: var(--origam-space---5);
+  }
+
+  &__rec-pools {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: var(--origam-space---4);
+    margin-top: var(--origam-space---5);
+  }
+
+  &__rec-pool {
+    display: grid;
+    align-content: start;
+    gap: var(--origam-space---2);
+    padding: var(--origam-space---3);
+    border-radius: var(--origam-radius---lg);
+    background: var(--origam-color__surface---sunken);
+  }
+
+  &__rec-pool-title {
+    margin: 0;
+    font-size: inherit;
+
+    :deep(.edition-chip) {
+      vertical-align: baseline;
+    }
+  }
+
+  &__rec-pool-list {
+    display: grid;
+    gap: var(--origam-space---1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--origam-font__size---sm);
   }
 
   &__title {
@@ -281,7 +507,8 @@ defineExpose({})
 
   &__pairings {
     display: grid;
-    gap: var(--origam-space---1);
+    // WCAG 2.5.8 (axe target-size) : des liens de 19,84 px de haut, espacés de 4 px, ont un pas de 23,84 px, sous les 24 px requis entre deux cibles trop petites.
+    gap: calc(var(--origam-space---1) + 1px);
     margin: var(--origam-space---3) 0 0;
     padding: 0;
     list-style: none;
