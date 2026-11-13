@@ -2,6 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import { RouterLink } from 'vue-router'
 import EditionDraws from '~/components/edition/EditionDraws.vue'
+import EditionMatches from '~/components/edition/EditionMatches.vue'
 import EditionParticipants from '~/components/edition/EditionParticipants.vue'
 import EditionSelector from '~/components/edition/EditionSelector.vue'
 import EditionSummary from '~/components/edition/EditionSummary.vue'
@@ -89,3 +90,23 @@ describe('EditionSelector', () => {
     expect(wrapper.text()).toContain('Changer d’édition')
   })
 })
+
+describe('EditionMatches : match d’archive sans score (B-21, F-34)', () => {
+  const row = (overrides: Record<string, unknown>) => ({
+    id: 'm', sequence: 1, number: '2013-1', roundKind: ROUND_KIND.QUARTER, poolRank: null, isTiebreak: false,
+    first: person('c1', 'Simon Vaur'), second: person('c2', 'Kevin Mercurio'), firstScore: null, secondScore: null,
+    hasWinner: true, winnerWithoutScore: false, status: 'VALIDATED', ...overrides
+  })
+
+  it('affiche « score non archivé » pour un vainqueur sans score, le score ailleurs, « – » sans vainqueur', async () => {
+    const rows = [
+      row({ id: 'a', sequence: 3, winnerWithoutScore: true }),
+      row({ id: 'b', sequence: 2, firstScore: 10, secondScore: 6 }),
+      row({ id: 'c', sequence: 1, hasWinner: false, status: 'SCHEDULED' })
+    ]
+    const wrapper = await mountSuspended(EditionMatches, { ...withRouterLink, props: { rows: rows as never, counts: { all: 3, pools: 0, knockout: 3 }, code: '2013' } })
+    const scores = wrapper.findAll('.edition-matches__score').map(node => node.text())
+    expect(scores).toEqual(['score non archivé', '10 – 6', '–'])
+  })
+})
+

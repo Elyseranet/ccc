@@ -133,6 +133,8 @@ export interface IEditionBracketSide {
 export interface IEditionBracketMatch {
   id: string
   sides: IEditionBracketSide[]
+  /** B-21 : match d'archive sans score dont le vainqueur est connu (affiché « score non archivé »). */
+  winnerWithoutScore: boolean
 }
 
 export interface IEditionBracketRound {
@@ -152,6 +154,8 @@ export interface IEditionMatchRow {
   firstScore: number | null
   secondScore: number | null
   hasWinner: boolean
+  /** B-21 : match d'archive sans score dont le vainqueur est connu (affiché « score non archivé »). */
+  winnerWithoutScore: boolean
   status: MATCH_STATUS
 }
 

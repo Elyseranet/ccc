@@ -42,7 +42,15 @@
                   class="sr-only"
                 >{{ winnerLabel }}</span>
               </span>
-              <b class="edition-bracket__score">{{ scoreOf(match, side) }}</b>
+              <b
+                v-if="isUnscored(match)"
+                class="edition-bracket__score"
+                :title="noScoreLabel"
+              >–<span class="sr-only">{{ noScoreLabel }}</span></b>
+              <b
+                v-else
+                class="edition-bracket__score"
+              >{{ scoreOf(match, side) }}</b>
             </div>
           </template>
         </origam-bracket>
@@ -135,6 +143,9 @@ const bracketRounds = computed(() => props.rounds.map(round => ({
     }
   })
 })))
+const unscoredIds = computed(() => new Set(props.rounds.flatMap(round => round.matches.filter(match => match.winnerWithoutScore).map(match => match.id))))
+const noScoreLabel = computed(() => t('edition.bracket_score_not_archived', 'score non archivé'))
+const isUnscored = (match: IBracketMatch): boolean => unscoredIds.value.has(String(match.id))
 const scoreOf = (match: IBracketMatch, side: 'A' | 'B'): number | string => (side === 'A' ? match.scoreA : match.scoreB) ?? ''
 const listRounds = computed(() => props.rounds.map(round => ({
   kind: round.kind,
@@ -142,7 +153,7 @@ const listRounds = computed(() => props.rounds.map(round => ({
   title: roundTitle(round.kind),
   matches: round.matches.map(match => ({
     id: match.id,
-    text: match.sides.map(side => side.score === null ? side.competitor.displayName : `${side.competitor.displayName} ${side.score}`).join(t('edition.bracket_versus', ' contre '))
+    text: match.sides.map(side => side.score === null ? side.competitor.displayName : `${side.competitor.displayName} ${side.score}`).join(t('edition.bracket_versus', ' contre ')) + (match.winnerWithoutScore ? ` (${noScoreLabel.value})` : '')
   }))
 })))
 

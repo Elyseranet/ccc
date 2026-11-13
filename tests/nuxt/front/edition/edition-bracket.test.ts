@@ -19,6 +19,7 @@ const rounds: IEditionBracketRound[] = [
     kind: ROUND_KIND.SEMI,
     matches: [{
       id: 'm1',
+      winnerWithoutScore: false,
       sides: [
         { participationId: 'p1', competitor: person('c1', 'Maya Legrand'), score: 10, isWinner: true },
         { participationId: 'p2', competitor: person('c2', 'Clara Lambert'), score: 4, isWinner: false }
@@ -29,6 +30,7 @@ const rounds: IEditionBracketRound[] = [
     kind: ROUND_KIND.FINAL,
     matches: [{
       id: 'm2',
+      winnerWithoutScore: false,
       sides: [
         { participationId: 'p1', competitor: person('c1', 'Maya Legrand'), score: null, isWinner: false },
         { participationId: 'p3', competitor: person('c3', 'Sam Dupont'), score: null, isWinner: false }
@@ -64,5 +66,30 @@ describe('EditionBracket (F-03-BRK)', () => {
     expect(region.attributes('aria-label')).toBeTruthy()
     expect(region.findAll('h3')).toHaveLength(2)
     expect(wrapper.find('[data-cy="edition-bracket-list"]').exists()).toBe(true)
+  })
+
+  it('F-34 : un match d’archive sans score montre le vainqueur et « score non archivé », jamais un score', async () => {
+    const archived: IEditionBracketRound[] = [{
+      kind: ROUND_KIND.QUARTER,
+      matches: [{
+        id: 'm9',
+        winnerWithoutScore: true,
+        sides: [
+          { participationId: 'p1', competitor: person('c1', 'Simon Vaur'), score: null, isWinner: true },
+          { participationId: 'p2', competitor: person('c2', 'Kevin Mercurio'), score: null, isWinner: false }
+        ]
+      }]
+    }]
+    const wrapper = await mountSuspended(EditionBracket, { ...withRouterLink, props: { rounds: archived } })
+    const sides = wrapper.get('[data-cy="edition-bracket-region"]').findAll('.edition-bracket__side')
+    expect(sides[0]!.classes()).toContain('edition-bracket__side--win')
+    expect(sides[0]!.text()).toContain('score non archivé')
+    expect(sides[1]!.text()).toContain('score non archivé')
+    expect(wrapper.get('[data-cy="edition-bracket-list"]').text()).toContain('Simon Vaur contre Kevin Mercurio (score non archivé)')
+  })
+
+  it('F-34 : un match sans vainqueur ni score garde l’affichage d’avant (aucune mention)', async () => {
+    const wrapper = await mountSuspended(EditionBracket, { ...withRouterLink, props: { rounds } })
+    expect(wrapper.text()).not.toContain('score non archivé')
   })
 })

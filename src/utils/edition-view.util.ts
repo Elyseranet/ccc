@@ -17,6 +17,7 @@ import type { EDITION_TAB } from '../enums/edition-tab.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
+import { isArchivedWinnerWithoutScore } from './match-archive.util.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import type { IEditionDetail, IEditionSummary } from '../interfaces/edition.interface.js'
 import type {
@@ -271,6 +272,7 @@ export const buildEditionBracket = (detail: IEditionDetail): IEditionBracketRoun
     kind: round.kind,
     matches: round.matches.map(match => ({
       id: match.id,
+      winnerWithoutScore: isArchivedWinnerWithoutScore(match),
       sides: match.sides.map(side => ({
         participationId: side.participationId,
         competitor: { id: side.competitorId, displayName: side.displayName },
@@ -300,6 +302,7 @@ export const buildEditionMatchRows = (detail: IEditionDetail): IEditionMatchRow[
       firstScore: scored(first),
       secondScore: scored(second),
       hasWinner: winner !== undefined,
+      winnerWithoutScore: isArchivedWinnerWithoutScore(match),
       status: match.status
     }
   })

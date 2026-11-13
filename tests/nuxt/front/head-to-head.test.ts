@@ -115,6 +115,17 @@ describe('HeadToHeadSummary', () => {
   })
 })
 
+describe('HeadToHeadHistory : rencontre d’archive sans score (B-21, F-34)', () => {
+  it('affiche « score non archivé » et le vainqueur, jamais « 0 – 0 »', async () => {
+    const archived = { ...samVsMaya, matches: [{ ...match('m9', '2013', ROUND_KIND.QUARTER, 0, 0, MAYA), competitorScore: null, opponentScore: null }] }
+    const wrapper = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: archived, detailA: samDetail, detailB: mayaDetail } })
+    const row = wrapper.get('tbody tr')
+    expect(row.text()).toContain('score non archivé')
+    expect(row.text()).toContain('Maya Legrand')
+    expect(row.text()).not.toContain('0 – 0')
+  })
+})
+
 describe('HeadToHeadHistory', () => {
   it('liste les rencontres du vainqueur au perdant, sans compteur de résultats inconnus par joueur', async () => {
     const wrapper = await mountSuspended(HeadToHeadHistory, { ...withRouterLink, props: { comparison: samVsMaya, detailA: { ...samDetail, stats: { ...samDetail.stats, unknownResults: 3 } }, detailB: mayaDetail } })
