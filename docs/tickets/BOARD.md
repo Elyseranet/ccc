@@ -110,7 +110,7 @@ Waiver npm audit (AUDIT-1, 2026-10-20) : chaque merge le mentionne ; remédiatio
 
 R-7 (2026-10-20) : un départage qui doit pourvoir plusieurs places se rejoue entre les perdants jusqu'à pourvoir toutes les places (B-13).
 
-Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), bloqué par le choix d'hébergement.
+Sécurité liée au déploiement (IP derrière proxy, SSL PostgreSQL) : [T-SEC-02](T-SEC-02.md), **Fermé** (2026-11-13) : 1 proxy mesuré sur la dev (`NUXT_TRUST_PROXY_HOPS=1`), SSL inutile (PROD-HOSTING).
 
 Durcissement du limiteur de débit et des erreurs 4xx (3 LOW de la re-review sur 57055e5) : [T-SEC-03](T-SEC-03.md), **fermé** — mergé dans `develop` @ `124c85a`.
 
