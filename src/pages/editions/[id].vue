@@ -72,6 +72,7 @@
                 :seeds="seeds"
                 :pools-status="poolsStatus"
                 :round-draws="roundDraws"
+                :reconstituted="reconstitutedDraws"
               />
             </origam-tab-panel>
             <origam-tab-panel :value="poolsTab">
@@ -139,7 +140,7 @@ useSeo({ page: SEO_PAGE.EDITION, params: () => ({ code: code.value }) })
  * @description
  * La page ne fait que brancher `useEditionView` (mise en forme testée en unitaire) sur les composants.
  ********************************************************/
-const { pending, pageError, refresh, heroMeta: meta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, poolTables, bracket, matchRows, matchCounts, options } = await useEditionView(code)
+const { pending, pageError, refresh, heroMeta: meta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, reconstitutedDraws, poolTables, bracket, matchRows, matchCounts, options } = await useEditionView(code)
 const { activeTab } = useEditionTabs()
 const poolsStatus = computed(() => poolsDraw.value?.status ?? null)
 const hasOptions = computed(() => options.value.length > 0)

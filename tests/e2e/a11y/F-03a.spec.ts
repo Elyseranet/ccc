@@ -27,6 +27,16 @@ test.describe('édition : accessibilité et comportement (F-03a)', () => {
     })
   }
 
+  test('F-35 : tirages reconstitués d’une édition avec barrages (2024) : 0 violation axe, une carte par tour', async ({ page }) => {
+    await page.goto('/editions/2024?onglet=tirages')
+    await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+    await expect(page.getByTestId('edition-draws-reconstituted')).toBeVisible()
+    await expect(page.getByTestId('edition-rec-draw-playoff')).toBeVisible()
+    await expect(page.getByTestId('edition-rec-pool-1')).toBeVisible()
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
+    expect(results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`)).toEqual([])
+  })
+
   test('recharger l’URL restaure l’onglet', async ({ page }) => {
     await page.goto(`${EDITION}?onglet=participants`)
     await expect(page.getByTestId('edition-tab-participants')).toHaveAttribute('aria-selected', 'true')

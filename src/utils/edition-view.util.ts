@@ -27,6 +27,7 @@ import type {
   IEditionHeroMeta,
   IEditionMatchFilterCounts,
   IEditionMatchRow,
+  IEditionReconstitutedDraws,
   IEditionOption,
   IEditionParticipantRow,
   IEditionPodium,
@@ -204,6 +205,31 @@ export const buildEditionRoundDraws = (detail: IEditionDetail): IEditionDrawView
       pairings: [...byPairing.entries()].sort((a, b) => a[0] - b[0]).map(([index, sides]) => ({ index, sides: sides.sort((a, b) => a.position - b.position).map(side => side.person) }))
     }
   })
+
+/**
+ * F-35 (DRAWS-ARCH) : une édition clôturée sans aucun tirage enregistré (importée) n'a ni têtes de série ni tirage de tour. Sa composition de poules
+ * est déduite des classements (joueurs par ordre alphabétique : l'ordre du tirage est inconnu) et les affiches de chaque tour des matchs du
+ * bracket, dans l'ordre de l'onglet Bracket. `null` pour une édition en cours ou qui a des tirages : « Tour non encore tiré » leur reste réservé.
+ * Une édition sans poule garde la liste vide : le composant n'affiche alors que les affiches.
+ */
+export const buildEditionReconstitutedDraws = (detail: IEditionDetail): IEditionReconstitutedDraws | null => {
+  if (detail.status !== EDITION_STATUS.CLOSED || detail.draws.length > 0) {
+    return null
+  }
+  return {
+    pools: [...detail.pools]
+      .sort((a, b) => a.rank - b.rank)
+      .map(pool => ({
+        id: pool.id,
+        rank: pool.rank,
+        players: pool.standing.map(row => toPerson(row.competitor)).sort((a, b) => a.displayName.localeCompare(b.displayName, 'fr'))
+      })),
+    rounds: buildEditionBracket(detail).map(round => ({
+      kind: round.kind,
+      pairings: round.matches.map((match, index) => ({ index, sides: match.sides.map(side => side.competitor) }))
+    }))
+  }
+}
 
 /** Statut du tirage des poules (RG9, RG11) : le tirage `POOLS` de l'édition, s'il existe. */
 export const findPoolsDraw = (detail: Pick<IEditionDetail, 'draws'>): IEditionDetail['draws'][number] | null => detail.draws.find(draw => draw.kind === DRAW_KIND.POOLS) ?? null

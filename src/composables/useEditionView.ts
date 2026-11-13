@@ -11,6 +11,7 @@ import {
   buildEditionParticipants,
   buildEditionPoolTables,
   buildEditionPodium,
+  buildEditionReconstitutedDraws,
   buildEditionRoundDraws,
   buildEditionSeeds,
   buildEditionSteps,
@@ -44,10 +45,11 @@ export const useEditionView = async (code: MaybeRefOrGetter<string>) => {
   const seeds = computed(() => (edition.value ? buildEditionSeeds(edition.value) : []))
   const poolsDraw = computed(() => (edition.value ? findPoolsDraw(edition.value) : null))
   const roundDraws = computed(() => (edition.value ? buildEditionRoundDraws(edition.value) : []))
+  const reconstitutedDraws = computed(() => (edition.value ? buildEditionReconstitutedDraws(edition.value) : null))
   const poolTables = computed(() => (edition.value ? buildEditionPoolTables(edition.value) : []))
   const bracket = computed(() => (edition.value ? buildEditionBracket(edition.value) : []))
   const matchRows = computed(() => (edition.value ? buildEditionMatchRows(edition.value) : []))
   const matchCounts = computed(() => editionMatchFilterCounts(matchRows.value))
   const options = computed(() => [...(editions.value ?? [])].sort((a, b) => b.year - a.year || b.code.localeCompare(a.code)).map(editionOption))
-  return { edition, pending, pageError, refresh, hasEdition, heroMeta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, poolTables, bracket, matchRows, matchCounts, options }
+  return { edition, pending, pageError, refresh, hasEdition, heroMeta, podium, facts, steps, participants, seeds, poolsDraw, roundDraws, reconstitutedDraws, poolTables, bracket, matchRows, matchCounts, options }
 }

@@ -110,3 +110,41 @@ describe('EditionMatches : match d’archive sans score (B-21, F-34)', () => {
   })
 })
 
+describe('EditionDraws : tirages reconstitués (F-35)', () => {
+  const reconstituted = {
+    pools: [{ id: 'p1', rank: 1, players: [person('c1', 'Éloïse Adam'), person('c2', 'Lou Bernard')] }],
+    rounds: [
+      { kind: ROUND_KIND.PLAYOFF, pairings: [{ index: 0, sides: [person('c3', 'Camille Morel'), person('c4', 'Manon Henry')] }] },
+      { kind: ROUND_KIND.QUARTER, pairings: [{ index: 0, sides: [person('c1', 'Éloïse Adam'), person('c3', 'Camille Morel')] }] }
+    ]
+  }
+
+  it('montre l’alerte, la composition des poules en liste native et une carte « Reconstitué » par tour, sans « Tour non encore tiré »', async () => {
+    const wrapper = await mountSuspended(EditionDraws, { ...withRouterLink, props: { seeds: [], poolsStatus: null, roundDraws: [], reconstituted } })
+    expect(wrapper.get('[data-cy="edition-draws-reconstituted"]').text()).toContain('Tirages reconstitués à partir des résultats')
+    const pool = wrapper.get('[data-cy="edition-rec-pool-1"]')
+    expect(pool.text()).toContain('Poule 1')
+    expect(pool.find('ul').exists()).toBe(true)
+    expect(pool.find('[tabindex]').exists()).toBe(false)
+    expect(pool.findAll('li').map(item => item.text())).toEqual(['Éloïse Adam', 'Lou Bernard'])
+    expect(wrapper.get('[data-cy="edition-rec-draw-playoff"]').text()).toContain('Barrages')
+    expect(wrapper.get('[data-cy="edition-rec-draw-playoff"]').text()).toContain('Reconstitué')
+    expect(wrapper.get('[data-cy="edition-rec-draw-quarter"]').findAll('li')[0]!.text()).toContain('Éloïse Adam')
+    expect(wrapper.text()).not.toContain('Tour non encore tiré')
+    expect(wrapper.text()).not.toContain('Aucune tête de série')
+  })
+
+  it('sans poule, la carte de composition n’est pas rendue et les affiches restent', async () => {
+    const wrapper = await mountSuspended(EditionDraws, { ...withRouterLink, props: { seeds: [], poolsStatus: null, roundDraws: [], reconstituted: { ...reconstituted, pools: [] } } })
+    expect(wrapper.find('[data-cy="edition-draws-rec-pools"]').exists()).toBe(false)
+    expect(wrapper.find('[data-cy="edition-rec-draw-quarter"]').exists()).toBe(true)
+  })
+
+  it('sans `reconstituted` (édition en cours), l’affichage d’avant est conservé', async () => {
+    const wrapper = await mountSuspended(EditionDraws, { ...withRouterLink, props: { seeds: [], poolsStatus: null, roundDraws: [] } })
+    expect(wrapper.find('[data-cy="edition-draws-reconstituted"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Aucune tête de série')
+    expect(wrapper.text()).toContain('Tour non encore tiré')
+  })
+})
+
