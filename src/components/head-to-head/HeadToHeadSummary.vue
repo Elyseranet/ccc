@@ -90,7 +90,7 @@
           :text="bilansTitle"
         />
         <p class="head-to-head-summary__hint">
-          {{ bilansHint }}
+          <abbr-text :text="bilansHint" />
         </p>
       </div>
       <div class="head-to-head-summary__players">
@@ -148,6 +148,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamAvatar, OrigamCard, OrigamDataList, OrigamProgress, OrigamTitle } from 'origam/components'
 import type { ICompetitorDetail, ICompetitorPublic } from '~/interfaces/competitor.interface'

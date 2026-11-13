@@ -51,7 +51,7 @@
               class="rules-tournament__text"
               :class="card.textClass"
             >
-              {{ card.text }}
+              <abbr-text :text="card.text" />
             </p>
           </div>
         </origam-card>
@@ -61,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamCard, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'

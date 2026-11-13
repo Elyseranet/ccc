@@ -18,8 +18,8 @@
           class="palmares-evolution__card"
         >
           <figcaption class="palmares-evolution__head">
-            <span class="palmares-evolution__title">{{ chartTitle }}</span>
-            <span class="palmares-evolution__note">{{ chartNote }}</span>
+            <span class="palmares-evolution__title"><abbr-text :text="chartTitle" /></span>
+            <span class="palmares-evolution__note"><abbr-text :text="chartNote" /></span>
           </figcaption>
           <origam-chart
             type="line"
@@ -88,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed, ref, useId } from 'vue'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'

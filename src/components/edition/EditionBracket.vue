@@ -55,7 +55,7 @@
           </template>
         </origam-bracket>
         <p class="edition-bracket__note">
-          {{ note }}
+          <abbr-text :text="note" />
         </p>
         <details
           class="edition-bracket__details"
@@ -92,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed, useId } from 'vue'
 import { OrigamBracket } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'

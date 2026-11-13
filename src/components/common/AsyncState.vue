@@ -40,7 +40,14 @@
       :title="emptyTitleText"
       :description="emptyDescriptionText"
       data-cy="async-state-empty"
-    />
+    >
+      <template
+        v-if="emptyDescriptionText"
+        #description
+      >
+        <abbr-text :text="emptyDescriptionText" />
+      </template>
+    </origam-empty-state>
     <slot
       v-else
       name="default"
@@ -49,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamEmptyState, OrigamSkeleton, OrigamSkeletonGroup } from 'origam/components'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'

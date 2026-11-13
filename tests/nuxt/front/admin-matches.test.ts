@@ -94,6 +94,15 @@ describe('page « Poules et matchs » (F-08)', () => {
     expect(wrapper.get('[data-cy="admin-match-m3"]').text()).toContain('Sans score')
   })
 
+  it('les quatre puces de filtre annoncent leur état (aria-pressed) et il suit la sélection (T-A11Y-01, M3)', async () => {
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-matches-queue"]').exists()).toBe(true))
+    const pressed = () => wrapper.get('[data-cy="admin-matches-filters"]').findAll('button').map(chip => chip.attributes('aria-pressed'))
+    expect(pressed()).toEqual(['true', 'false', 'false', 'false'])
+    await wrapper.get('[data-cy="admin-matches-filter-saisis"]').trigger('click')
+    await vi.waitFor(() => expect(pressed()).toEqual(['false', 'true', 'false', 'false']))
+  })
+
   it('la file charge tous les tours (aucun ?tour= envoyé à l’API)', async () => {
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-matches-queue"]').exists()).toBe(true))

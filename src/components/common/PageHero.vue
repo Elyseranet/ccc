@@ -23,7 +23,7 @@
         class="page-hero__lead"
         data-cy="page-hero-lead"
       >
-        {{ subtitleText }}
+        <abbr-text :text="subtitleText" />
       </p>
       <slot name="after-lead" />
     </div>
@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamBreadcrumb, OrigamTitle } from 'origam/components'
 import { useT } from '~/composables/useT'

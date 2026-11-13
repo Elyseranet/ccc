@@ -12,12 +12,33 @@
         v-bind="slotProps ?? {}"
       />
     </template>
+    <template
+      v-for="header in sortHeaders"
+      :key="`sort-${header.key}`"
+      #[`header.${header.key}`]="slotProps"
+    >
+      <button
+        type="button"
+        class="app-data-table__sort"
+        :data-cy="`sort-${header.key}`"
+      >
+        <span class="origam-data-table-header-cell__content">
+          <span><abbr-text :text="String(header.title ?? header.key)" /></span>
+          <origam-icon
+            :icon="slotProps.getSortIcon(slotProps.column)"
+            :class="{ 'origam-data-table-header-cell__sort-icon--active': slotProps.isSorted(slotProps.column) }"
+            class="origam-data-table-header-cell__sort-icon"
+          />
+        </span>
+      </button>
+    </template>
   </origam-data-table>
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed, getCurrentInstance, useSlots } from 'vue'
-import { OrigamDataTable } from 'origam/components'
+import { OrigamDataTable, OrigamIcon } from 'origam/components'
 import type { IDataTableProps } from 'origam/interfaces'
 import type { IAppDataTableEmits, IAppDataTableProps, IAppDataTableSlots } from '~/interfaces/app-data-table.interface'
 import { pickPassedListeners, pickPassedProps } from '~/utils/passed-props.util'
@@ -58,6 +79,20 @@ const forwardedProps = computed(() => ({
 }) as unknown as IDataTableProps)
 
 /*********************************************************
+ * Origam : tri des colonnes au clavier (T-A11Y-01, M2)
+ *
+ * @description
+ * Le `th` d'une colonne triable n'est ni focalisable ni activable au clavier (fiche `docs/tickets/origam/data-table-tri-colonnes-clavier.md`, à
+ * déposer) : mesuré, 25 Tab depuis le champ de recherche de `/joueurs` n'atteignent aucun en-tête. Pour chaque colonne triable sans slot
+ * `header.<clé>` fourni par l'écran, un `<button>` natif est rendu dans le `th` (même contenu et mêmes classes qu'Origam : titre et icône de tri) :
+ * Entrée et Espace produisent un clic qui remonte au `th`, dont le gestionnaire trie et met `aria-sort` à jour ; Origam n'est pas modifié.
+ * Condition de suppression : Origam rend ce bouton dans l'en-tête des colonnes triables.
+ ********************************************************/
+const sortHeaders = computed(() => props.disableSort
+  ? []
+  : (props.headers ?? []).filter(header => header.sortable === true && header.key !== undefined && header.children === undefined && !(`header.${String(header.key)}` in slots)))
+
+/*********************************************************
  * Expose
  *
  * @description
@@ -70,5 +105,20 @@ defineExpose({})
 // Défaut Origam (fiche docs/tickets/origam/data-table-th-align-end-sans-effet.md, à déposer) : `text-align: end` de `--align-end` n'atteint pas le `th` (calculé à `start`).
 :deep(th.origam-data-table-cell--align-end) {
   text-align: end;
+}
+
+.app-data-table__sort {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+  cursor: pointer;
 }
 </style>

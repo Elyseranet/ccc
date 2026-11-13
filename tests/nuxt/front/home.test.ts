@@ -97,6 +97,14 @@ describe('HomeCurrentEdition : états', () => {
     expect(rows[0]!.text()).toContain('Manon Faure')
     expect(rows[0]!.text()).toContain('Poule 4')
   })
+
+  it('le score est lu « 5 à 4 » : texte sr-only, chiffres et séparateur visibles masqués aux lecteurs d’écran (T-A11Y-01, M4)', async () => {
+    const matches = [match('m1', MATCH_STATUS.VALIDATED, [5, 4], 4)]
+    const wrapper = await mountSuspended(HomeCurrentEdition, { ...withRouterLink, props: { current: overviewOf([current2026], matches).current } })
+    const score = wrapper.get('[data-cy="home-current-score"] .home-current__score')
+    expect(score.get('.sr-only').text()).toBe('5 à 4')
+    expect(score.get('[aria-hidden="true"]').text()).toBe('5–4')
+  })
 })
 
 describe('HomeBento : tuile d’archive (A16)', () => {

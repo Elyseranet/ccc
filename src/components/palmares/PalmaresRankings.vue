@@ -15,7 +15,7 @@
         :text="title"
       />
       <p class="palmares-rankings__note">
-        {{ note }}
+        <abbr-text :text="note" />
       </p>
     </div>
     <origam-tabs
@@ -32,7 +32,11 @@
         :value="tab.value"
         :text="tab.text"
         :data-cy="tab.dataCy"
-      />
+      >
+        <template #default>
+          <abbr-text :text="tab.text" />
+        </template>
+      </origam-tab>
     </origam-tabs>
     <origam-tab-panels
       v-model="activeTab"
@@ -62,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamTab, OrigamTabPanel, OrigamTabPanels, OrigamTabs, OrigamTitle } from 'origam/components'
 import PalmaresEvolution from '~/components/palmares/PalmaresEvolution.vue'

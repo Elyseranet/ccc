@@ -15,7 +15,7 @@
         :text="title"
       />
       <p class="palmares-titles__note">
-        {{ note }}
+        <abbr-text :text="note" />
       </p>
     </div>
     <ol class="palmares-titles__list">
@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'

@@ -17,7 +17,7 @@
     >
       <template #default>
         <p class="edition-groups__note">
-          {{ note }}
+          <abbr-text :text="note" />
         </p>
         <div class="edition-groups__grid">
           <section
@@ -37,6 +37,18 @@
               hide-default-footer
               class="edition-groups__table"
             >
+              <template #header.played>
+                <abbr :title="playedTitle">{{ playedText }}</abbr>
+              </template>
+              <template #header.wins>
+                <abbr :title="winsTitle">{{ winsText }}</abbr>
+              </template>
+              <template #header.losses>
+                <abbr :title="lossesTitle">{{ lossesText }}</abbr>
+              </template>
+              <template #header.difference>
+                <abbr :title="differenceTitle">{{ differenceText }}</abbr>
+              </template>
               <template #item.player="{ item }">
                 <span class="edition-groups__player">
                   <common-player-link
@@ -47,7 +59,7 @@
                     v-if="item.qualified"
                     :family="qualifiedFamily"
                     :text="qualifiedText"
-                    :aria-label="qualifiedLabel"
+                    :sr-text="qualifiedLabel"
                   />
                 </span>
               </template>
@@ -64,6 +76,7 @@ import { OrigamTitle } from 'origam/components'
 import { computed } from 'vue'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'
+import AbbrText from '~/components/common/AbbrText.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
@@ -95,14 +108,22 @@ const qualifiedLabel = computed(() => t('edition.groups_qualified_label', 'Quali
 const isEmpty = computed(() => props.tables.length === 0)
 const emptyTitle: ITranslatableText = { key: 'edition.groups_empty_title', fallback: 'Aucune poule' }
 const emptyDescription: ITranslatableText = { key: 'edition.groups_empty_text', fallback: 'Les poules de cette édition ne sont pas encore tirées.' }
+const playedText = computed(() => t('edition.groups_col_played', 'J'))
+const winsText = computed(() => t('edition.groups_col_wins', 'V'))
+const lossesText = computed(() => t('edition.groups_col_losses', 'D'))
+const differenceText = computed(() => t('edition.groups_col_difference', 'Diff.'))
+const playedTitle = computed(() => t('edition.groups_col_played_title', 'Matchs joués'))
+const winsTitle = computed(() => t('edition.groups_col_wins_title', 'Victoires'))
+const lossesTitle = computed(() => t('edition.groups_col_losses_title', 'Défaites'))
+const differenceTitle = computed(() => t('edition.groups_col_difference_title', 'Différentiel de points'))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: EDITION_POOL_COLUMN.RANK, title: t('edition.groups_col_rank', '#'), sortable: false, nowrap: true },
   { key: EDITION_POOL_COLUMN.PLAYER, title: t('edition.groups_col_player', 'Joueur'), sortable: false, nowrap: true },
-  { key: EDITION_POOL_COLUMN.PLAYED, title: t('edition.groups_col_played', 'J'), sortable: false, nowrap: true, align: ALIGN.END },
-  { key: EDITION_POOL_COLUMN.WINS, title: t('edition.groups_col_wins', 'V'), sortable: false, nowrap: true, align: ALIGN.END },
-  { key: EDITION_POOL_COLUMN.LOSSES, title: t('edition.groups_col_losses', 'D'), sortable: false, nowrap: true, align: ALIGN.END },
+  { key: EDITION_POOL_COLUMN.PLAYED, title: playedText.value, sortable: false, nowrap: true, align: ALIGN.END },
+  { key: EDITION_POOL_COLUMN.WINS, title: winsText.value, sortable: false, nowrap: true, align: ALIGN.END },
+  { key: EDITION_POOL_COLUMN.LOSSES, title: lossesText.value, sortable: false, nowrap: true, align: ALIGN.END },
   { key: EDITION_POOL_COLUMN.POINTS, title: t('edition.groups_col_points', 'Points'), sortable: false, nowrap: true, align: ALIGN.END },
-  { key: EDITION_POOL_COLUMN.DIFFERENCE, title: t('edition.groups_col_difference', 'Diff.'), sortable: false, nowrap: true, align: ALIGN.END }
+  { key: EDITION_POOL_COLUMN.DIFFERENCE, title: differenceText.value, sortable: false, nowrap: true, align: ALIGN.END }
 ])
 const tableViews = computed(() => props.tables.map(table => ({
   id: table.id,

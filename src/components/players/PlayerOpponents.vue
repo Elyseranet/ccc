@@ -11,7 +11,7 @@
         class="player-opponents__title font-display neon--sm"
         :text="title"
       />
-      <p class="player-opponents__lead">{{ lead }}</p>
+      <p class="player-opponents__lead"><abbr-text :text="lead" /></p>
     </div>
     <ul
       class="player-opponents__list"
@@ -88,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import AbbrText from '~/components/common/AbbrText.vue'
 import { computed } from 'vue'
 import { OrigamBtn, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'
