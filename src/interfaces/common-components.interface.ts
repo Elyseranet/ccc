@@ -79,3 +79,25 @@ export interface IAppPaginationEmits {
   (event: 'update:page', value: number): void
 }
 
+export interface IConfirmDialogProps {
+  open: boolean
+  busy: boolean
+  title: string
+  /** Ce qui va se passer. */
+  text: string
+  /** Phrase d'avertissement en gras après le texte (« Cette action n'est pas annulable. »). */
+  warning?: string
+  cancelLabel: string
+  confirmLabel: string
+  /** Préfixe des `data-cy` : `{préfixe}-dialog`, `{préfixe}-cancel`, `{préfixe}-confirm`. */
+  cyPrefix: string
+  confirmColor?: string
+  confirmSize?: string
+  confirmElevation?: string
+}
+
+export interface IConfirmDialogEmits {
+  (event: 'cancel'): void
+  (event: 'confirm'): void
+}
+

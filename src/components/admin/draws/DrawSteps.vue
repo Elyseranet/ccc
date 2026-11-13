@@ -22,7 +22,7 @@ import type { IDrawStepsProps } from '~/interfaces/pool-draw.interface'
  * Global
  *
  * @description
- * Les cinq étapes du tirage (paramètres, têtes de série, saisie, récapitulatif, validation) : `origam-stepper` non cliquable,
+ * Les cinq étapes du tirage (paramètres, têtes de série, saisie, récapitulatif, validation) ; la qualification (F-24) le réutilise avec ses quatre étapes et son propre `label` : `origam-stepper` non cliquable,
  * toujours horizontal, comme la maquette (admin-tirages.html) à toutes les largeurs.
  * L'étape courante est portée par `modelValue`, l'état de chaque étape (faite, active, à venir) par son `status`.
  ********************************************************/
@@ -30,7 +30,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<IDrawStepsProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-const label = computed(() => t('admin.draws.steps_label', 'Étapes du tirage'))
+const label = computed(() => props.label ?? t('admin.draws.steps_label', 'Étapes du tirage'))
 const items = computed(() => props.steps.map(entry => ({ title: t(entry.label.key, entry.label.fallback), status: entry.state })))
 const activeIndex = computed(() => Math.max(0, props.steps.findIndex(entry => entry.state === POOL_DRAW_STEP_STATE.ACTIVE)))
 

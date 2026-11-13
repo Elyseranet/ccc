@@ -11,6 +11,7 @@ export const ROUTES = {
   ADMIN_DRAWS: '/admin/tirages',
   ADMIN_MATCHES: '/admin/matchs',
   ADMIN_FINAL_PHASE: '/admin/phase-finale',
+  ADMIN_FINAL_PHASE_QUALIFICATION: '/admin/phase-finale/qualification',
   ADMIN_MORE: '/admin/plus',
   ADMIN_EDITIONS: '/admin/editions',
   ADMIN_EDITION_NEW: '/admin/editions/nouvelle',

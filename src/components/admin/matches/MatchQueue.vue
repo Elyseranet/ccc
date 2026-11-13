@@ -96,7 +96,7 @@ import { computed } from 'vue'
 import { OrigamBtn, OrigamCard } from 'origam/components'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
-import { ADMIN_DATE_LOCALE } from '~/consts/admin-editions.const'
+import { formatNameList } from '~/utils/name-list.util'
 import { MATCH_ACTION_VIEW } from '~/consts/admin-match-status.const'
 import { MATCH_ACTION } from '~/enums/match-action.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
@@ -134,10 +134,9 @@ const eyebrowOf = (card: IMatchCard, round: string): string => {
     : t('admin.matches.eyebrow_tiebreak_pool', 'Poule {rank} · départage · {number}', { rank: card.poolRank, number: card.number })
 }
 const noScoreLabel = computed(() => t('admin.matches.no_score_label', 'Aucun score'))
-const namesList = new Intl.ListFormat(ADMIN_DATE_LOCALE, { style: 'long', type: 'conjunction' })
 const views = computed(() => props.cards.map((card) => {
   const action = card.action ? MATCH_ACTION_VIEW[card.action] : null
-  const players = { first: card.firstName, second: card.secondName, players: namesList.format(card.sides.map(side => side.name)) }
+  const players = { first: card.firstName, second: card.secondName, players: formatNameList(card.sides.map(side => side.name)) }
   const round = card.poolRank === null
     ? t(card.round.key, card.round.fallback)
     : t('admin.matches.pool_n', 'Poule {rank}', { rank: card.poolRank })
