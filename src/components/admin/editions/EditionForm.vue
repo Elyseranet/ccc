@@ -196,8 +196,8 @@
           type="submit"
           class="edition-form__submit"
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           size="x-large"
           font-size="md"
           :loading="pending"
@@ -223,6 +223,7 @@ import { computed, reactive, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamDatePickerField, OrigamForm, OrigamLabel, OrigamSnackbar, OrigamTextareaField, OrigamTextField, OrigamTitle } from 'origam/components'
 import EditionReadonlyFields from '~/components/admin/editions/EditionReadonlyFields.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { EDITION_READONLY_EDIT_FIELDS, EDITION_YEAR_LENGTH } from '~/consts/admin-editions.const'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
@@ -372,6 +373,9 @@ const handleSubmit = async (event: Event) => {
 const handleReset = () => {
   Object.assign(draft, props.values)
 }
+
+const isBlocked = computed(() => props.pending)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

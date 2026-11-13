@@ -33,9 +33,9 @@
         />
         <origam-btn
           variant="flat"
-          :bg-color="confirmColor"
+          :bg-color="buttonColor"
           :size="confirmSize"
-          :elevation="confirmElevation"
+          :elevation="buttonElevation"
           :loading="busy"
           :disabled="busy"
           :text="confirmLabel"
@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamDialog } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { IConfirmDialogEmits, IConfirmDialogProps } from '~/interfaces/common-components.interface'
 
@@ -72,6 +73,8 @@ const props = withDefaults(defineProps<IConfirmDialogProps>(), {
 const emits = defineEmits<IConfirmDialogEmits>()
 defineSlots<{ default?: () => unknown }>()
 const descriptionId = useId()
+const isBlocked = computed(() => props.busy)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked, { color: () => props.confirmColor, elevation: () => props.confirmElevation })
 const isMockup = computed(() => props.appearance === CONFIRM_DIALOG_APPEARANCE.MOCKUP)
 const padding = computed(() => isMockup.value ? '2' : '6')
 const dialogClass = computed(() => ({ 'confirm-dialog': true, 'confirm-dialog--mockup': isMockup.value }))

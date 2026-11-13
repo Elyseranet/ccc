@@ -138,14 +138,14 @@
           <origam-btn
             type="submit"
             variant="flat"
-            bg-color="primary"
-            elevation="lg"
+            :bg-color="buttonColor"
+            :elevation="buttonElevation"
             :hover="submitHover"
             size="x-large"
             font-size="md"
             class="invitation-form__submit"
             :loading="pending"
-            :disabled="pending"
+            :disabled="isBlocked"
             :text="submitLabel"
             data-cy="invitation-submit"
           />
@@ -164,6 +164,7 @@ import FormField from '~/components/common/FormField.vue'
 import { useAccountError } from '~/composables/useAccountError'
 import { useAccountRules } from '~/composables/useAccountRules'
 import { usePasswordRequirements } from '~/composables/usePasswordRequirements'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ACCOUNT_PASSWORD_FIELD_MIN_LENGTH, ACCOUNT_SUBMIT_HOVER } from '~/consts/account.const'
 import { PASSWORD_MAX_LENGTH } from '~/consts/auth.const'
@@ -243,6 +244,9 @@ const handleSubmit = async (event: IFormSubmitEvent) => {
     emits('submit', { password: password.value, phone: phone.value.trim() || null, avatar: avatar.value })
   }
 }
+
+const isBlocked = computed(() => props.pending)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

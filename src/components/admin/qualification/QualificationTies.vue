@@ -71,8 +71,10 @@
             </p>
             <origam-btn
               variant="flat"
-              bg-color="primary"
-              size="small"
+              :bg-color="tie.buttonColor"
+              :elevation="tie.buttonElevation"
+              font-size="sm"
+              class="qualification-ties__create"
               :disabled="tie.disabled"
               :loading="tie.busy"
               :text="tie.buttonLabel"
@@ -107,6 +109,7 @@ import { OrigamAlert, OrigamBtn, OrigamCard } from 'origam/components'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_TIEBREAK_ON_VALUE, ADMIN_MATCH_TIEBREAK_QUERY_PARAM } from '~/consts/admin-match-filters.const'
+import { PRIMARY_ACTION_BUTTON } from '~/consts/primary-action.const'
 import { ROUTES } from '~/consts/routes.const'
 import { TIEBREAK_FORMAT } from '~/enums/domain.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
@@ -179,6 +182,8 @@ const views = computed(() => props.ties.map((tie, index) => {
     hasOpenTiebreak: tie.hasOpenTiebreak,
     disabled: blocker !== null || props.busyTie !== null,
     busy: props.busyTie === tie.key,
+    buttonColor: blocker !== null || props.busyTie !== null ? undefined : PRIMARY_ACTION_BUTTON.color,
+    buttonElevation: blocker !== null || props.busyTie !== null ? undefined : PRIMARY_ACTION_BUTTON.elevation,
     buttonLabel: tie.isFollowUp ? t('admin.qualification.tie_create_next', 'Créer le départage suivant') : t('admin.qualification.tie_create', 'Créer le départage'),
     buttonDataCy: `qualification-create-tiebreak-${index}`,
     blockerText: blocker === null ? null : blockerText(t, blocker, props.pendingCount, props.ties.length),
@@ -275,6 +280,10 @@ defineExpose({})
     flex-wrap: wrap;
     gap: var(--origam-space---2);
     margin: 0;
+  }
+
+  &__create {
+    --origam-btn---padding-lg: var(--origam-space---4);
   }
 
   &__why {

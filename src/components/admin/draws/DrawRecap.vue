@@ -65,10 +65,10 @@
         />
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           size="large"
-          :disabled="!canValidate"
+          :disabled="isBlocked"
           :text="nextLabel"
           data-cy="draw-recap-next"
           @click="emits('next')"
@@ -81,6 +81,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { OrigamBtn, OrigamCard, OrigamChip } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import type { IDrawRecapProps } from '~/interfaces/pool-draw.interface'
 import { poolSlots } from '~/utils/pool-draw.util'
@@ -110,6 +111,9 @@ const poolViews = computed(() => props.pools.map(pool => ({
     ? [{ id: slot.member.participationId, place: slot.place, name: names.value.get(slot.member.participationId) ?? '', isSeed: slot.member.isSeed }]
     : []))
 })))
+
+const isBlocked = computed(() => !props.canValidate)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

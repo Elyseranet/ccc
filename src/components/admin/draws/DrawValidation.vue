@@ -24,10 +24,10 @@
       <origam-btn
         v-if="!validated"
         variant="flat"
-        bg-color="primary"
-        elevation="lg"
-        size="large"
-        :disabled="!canValidate || busy"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
+        size="x-large"
+        :disabled="isBlocked"
         :text="openLabel"
         data-cy="draw-validate-open"
         @click="confirming = true"
@@ -49,6 +49,7 @@
 import { computed, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamCard } from 'origam/components'
 import DrawValidateDialog from '~/components/admin/draws/DrawValidateDialog.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import type { IDrawValidationProps } from '~/interfaces/pool-draw.interface'
 
@@ -78,6 +79,9 @@ watch(() => props.validated, (done) => {
     confirming.value = false
   }
 })
+
+const isBlocked = computed(() => !props.canValidate || props.busy)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

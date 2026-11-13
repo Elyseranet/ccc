@@ -257,10 +257,10 @@
     <div class="draw-assignment__next">
       <origam-btn
         variant="flat"
-        bg-color="primary"
-        elevation="lg"
+        :bg-color="buttonColor"
+        :elevation="buttonElevation"
         size="large"
-        :disabled="!complete || saveState === POOL_DRAW_SAVE_STATE.FAILED || saveState === POOL_DRAW_SAVE_STATE.SAVING"
+        :disabled="isBlocked"
         :text="nextLabel"
         data-cy="draw-entry-next"
         @click="emits('next')"
@@ -273,6 +273,7 @@
 import { computed, ref, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamSelect } from 'origam/components'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
 import { EDITION_CHIP_PROPS } from '~/consts/edition-view.const'
@@ -371,6 +372,9 @@ const handleChange = (poolNumber: number, place: number, value: string | null) =
     emits('change', poolNumber, place, value)
   }
 }
+
+const isBlocked = computed(() => !props.complete || props.saveState === POOL_DRAW_SAVE_STATE.FAILED || props.saveState === POOL_DRAW_SAVE_STATE.SAVING)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose
