@@ -383,6 +383,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-REL-01](T-REL-01.md) : **Fermé** — par T-OPS-01 @ `a72f3ac` (garde par page livrée, OPS-3).
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
+- [T-QA-10](T-QA-10.md) : **À faire** (2026-11-13) — test e2e F-08 « 412 » instable, déjà présent sur develop ; piste : `watch` de `useScoreEntry`.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
