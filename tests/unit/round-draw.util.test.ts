@@ -44,6 +44,14 @@ describe('affiches saisies une à une (c9790abd (5))', () => {
     expect(currentPairingIndex(two)).toBe(2)
   })
 
+  it('place un joueur du côté demandé, le second côté pouvant être tiré en premier (brouillon partiel accepté)', () => {
+    const second = placePlayer(buildEmptyPairings(2), 1, 'part-p1', 2)
+    expect(second[0]).toMatchObject({ first: null, second: { participationId: 'part-p1' } })
+    expect(buildRoundAssignments(second)).toEqual([{ participationId: 'part-p1', pairingIndex: 1, sidePosition: 2, drawnOrder: 1 }])
+    expect(placePlayer(second, 1, 'part-p2', 2)).toBe(second)
+    expect(placePlayer(second, 1, 'part-p2')[0]).toMatchObject({ first: { participationId: 'part-p2' }, second: { participationId: 'part-p1' } })
+  })
+
   it('refuse un joueur déjà placé, une affiche pleine ou inconnue', () => {
     const two = place(buildEmptyPairings(2), 'p1', 'p2')
     expect(placePlayer(two, 1, 'part-p3')).toBe(two)

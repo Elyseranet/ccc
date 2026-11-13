@@ -48,7 +48,7 @@ const ZONES: Array<{ name: string, mockup: string, app: string, upTo?: { mockup:
   { name: 'ti-saisie-titre', mockup: '.tir-main > header', app: '.round-draw-entry__head' },
   { name: 'ti-tour', mockup: '.tir-main .r-round', app: '[data-cy="round-draw-round"]' },
   { name: 'ti-affiche-tiree', mockup: '.r-affs > li:nth-child(1)', app: '[data-cy="round-draw-pairing-1"]' },
-  { name: 'ti-affiche-en-cours', mockup: '.r-aff--next', app: '[data-cy="round-draw-pairing-2"]', masks: { mockup: ['.r-aff--next .r-aff__row > span:last-child'], app: ['[data-cy="round-draw-select-2-2"]'] } },
+  { name: 'ti-affiche-en-cours', mockup: '.r-aff--next', app: '[data-cy="round-draw-pairing-2"]' },
   { name: 'ti-affiche-libre', mockup: '.r-aff--free', app: '[data-cy="round-draw-pairing-3"]' },
   { name: 'ti-vivier-haut', mockup: '.tir-side > section:nth-child(1)', app: '[data-cy="round-draw-pool"]', upTo: { mockup: 'p[role="status"]', app: '.round-draw-side__status' } },
   { name: 'ti-a-placer-entete', mockup: '.tir-side > section:nth-child(2) .adm-card-h', app: '.round-draw-side__head' },
@@ -90,7 +90,8 @@ for (const viewport of VIEWPORTS) {
           { mockup: '.tir-side > section:nth-child(1) h2', app: '.round-draw-side__title' },
           { mockup: '.tir-side > section:nth-child(2) .chip', app: '.round-draw-side__head .origam-chip' },
           { mockup: '.r-aff--next .eyebrow', app: '[data-cy="round-draw-pairing-2"] .round-draw-entry__eyebrow' },
-          { mockup: '.r-aff--next .sel-field__label', app: '[data-cy="round-draw-pairing-2"] .origam-label' },
+          { mockup: '.r-aff--next .r-aff__row > span:first-child .sel-field__label', app: '[data-cy="round-draw-select-2-1"] .origam-label' },
+          { mockup: '.r-aff--next .r-aff__row > span:last-child .sel-field__label', app: '[data-cy="round-draw-select-2-2"] .origam-label' },
           { mockup: '.q-sec .q-act .btn', app: '[data-cy="round-draw-validate-open"]' },
           { mockup: '.q-sec .q-why', app: '[data-cy="round-draw-validate-why"]' }
         ])

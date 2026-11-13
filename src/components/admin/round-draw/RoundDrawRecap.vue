@@ -89,6 +89,7 @@ import type { IDataTableHeader } from 'origam/interfaces'
 import { OrigamBtn, OrigamCard } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
@@ -116,9 +117,7 @@ const caption = computed(() => t('admin.round_draw.recap_caption', 'Affiches {ro
 const emptyText = computed(() => t('admin.round_draw.recap_empty', 'Les affiches saisies apparaissent ici.'))
 const hasRows = computed(() => props.rows.length > 0)
 const isBlocked = computed(() => props.blocker !== null || props.busy)
-// Une couleur de fond posée en ligne l'emporte sur le rendu désactivé de la règle centrale (`main.css`, tokens `bgDisabled` non lus par Origam) : on ne la pose que quand le bouton est actif.
-const buttonElevation = computed(() => isBlocked.value ? undefined : 'lg')
-const buttonColor = computed(() => isBlocked.value ? undefined : 'primary')
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 const buttonLabel = computed(() => t('admin.round_draw.validate_button', 'Valider le tirage {round}…', { round: of.value }))
 const headers = computed<IDataTableHeader[]>(() => [
   { key: ROUND_DRAW_RECAP_COLUMN.NUMBER, title: t('admin.round_draw.recap_col_number', '#'), sortable: false, align: ALIGN.END },

@@ -127,9 +127,9 @@
                     rounded="full"
                     density="compact"
                     hide-details
-                    :disabled="side.disabled || readOnly"
+                    :disabled="readOnly"
                     :data-cy="side.dataCy"
-                    @update:model-value="handlePlace(item.index, $event)"
+                    @update:model-value="handlePlace(item.index, side.position, $event)"
                   />
                 </template>
               </div>
@@ -154,11 +154,12 @@ import { OrigamBtn, OrigamCard, OrigamProgress, OrigamSelect } from 'origam/comp
 import { useT } from '~/composables/useT'
 import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
 import { ROUND_KIND_BY_POOL_SIZE } from '~/consts/qualification.const'
-import { ROUND_DRAW_PLAYOFF_WAIT_TEXTS, ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS, ROUND_DRAW_WAIT_ROUND_TEXTS } from '~/consts/round-draw.const'
+import { ROUND_DRAW_PLAYOFF_WAIT_TEXTS, ROUND_DRAW_SIDES, ROUND_DRAW_TARGET_SCORE, ROUND_DRAW_TEXTS, ROUND_DRAW_WAIT_ROUND_TEXTS } from '~/consts/round-draw.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { ROUND_DRAW_PAIRING_STATE } from '~/enums/round-draw.enum'
 import type { IRoundDrawEntryEmits, IRoundDrawEntryProps } from '~/interfaces/round-draw.interface'
-import { currentPairingIndex, isPairingFull, nextSideOf, unplacedPlayers } from '~/utils/round-draw.util'
+import type { TSidePosition } from '~/types/draw.type'
+import { currentPairingIndex, isPairingFull, unplacedPlayers } from '~/utils/round-draw.util'
 
 /*********************************************************
  * Global
@@ -167,6 +168,9 @@ import { currentPairingIndex, isPairingFull, nextSideOf, unplacedPlayers } from 
  * Saisie du tirage affiche par affiche (c9790abd (5)) : les affiches tirées en cartes (« Changer »), UNE affiche en cours avec ses deux sélecteurs (le côté déjà tiré s'écrit en
  * clair), les suivantes en emplacements passifs « Affiche à tirer ». Un joueur placé disparaît de la liste ; l'ordre de saisie est l'ordre du tirage ; la cible du tour (10) est
  * affichée, non éditable. Le brouillon est enregistré à chaque joueur placé (le parent s'en charge).
+ * Les deux sélecteurs sont actifs : l'un ou l'autre côté peut être tiré en premier (le brouillon accepte une affiche partielle, `checkRoundDrawAssignments` avec `complete: false`).
+ * Contournements Origam : bordure de l'affiche en cours par la prop `border-color` en `var(...)` (`docs/tickets/origam/card-couleur-bordure-variable-sans-effet.md`) ; étiquette des sélecteurs
+ * sur une ligne (`docs/tickets/origam/field-etiquette-retour-ligne-max-width.md`).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IRoundDrawEntryProps>(), {})
@@ -213,7 +217,6 @@ const items = computed(() => {
   const current = currentPairingIndex(props.pairings)
   return props.pairings.map((pairing) => {
     const state = isPairingFull(pairing) ? ROUND_DRAW_PAIRING_STATE.FULL : (pairing.index === current ? ROUND_DRAW_PAIRING_STATE.CURRENT : ROUND_DRAW_PAIRING_STATE.FREE)
-    const next = nextSideOf(pairing)
     return {
       index: pairing.index,
       state,
@@ -226,21 +229,20 @@ const items = computed(() => {
       secondName: nameOf(pairing.second?.participationId),
       changeAriaLabel: t('admin.round_draw.change_aria', 'Changer l’affiche {index}', { index: pairing.index }),
       changeDataCy: `round-draw-change-${pairing.index}`,
-      sides: [1, 2].map(position => ({
+      sides: ROUND_DRAW_SIDES.map(position => ({
         position,
         name: nameOf((position === 1 ? pairing.first : pairing.second)?.participationId),
         label: position === 1
           ? t('admin.round_draw.select_first', 'Affiche {index} : premier joueur tiré', { index: pairing.index })
           : t('admin.round_draw.select_second', 'Affiche {index} : second joueur tiré', { index: pairing.index }),
-        disabled: next !== position,
         dataCy: `round-draw-select-${pairing.index}-${position}`
       }))
     }
   })
 })
-const handlePlace = (pairingIndex: number, value: string | null) => {
+const handlePlace = (pairingIndex: number, position: TSidePosition, value: string | null) => {
   if (value) {
-    emits('place', pairingIndex, value)
+    emits('place', pairingIndex, value, position)
   }
 }
 const handleChange = (pairingIndex: number) => {
@@ -324,7 +326,6 @@ defineExpose({})
   }
 
   &__card--next &__row :deep(.origam-select) {
-    --origam-field---opacity-disabled: 0.75;
     flex: 1 1 14rem;
     min-width: 0;
   }

@@ -2,6 +2,7 @@ import type { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { ROUND_DRAW_BLOCKER, ROUND_DRAW_MENTION, ROUND_DRAW_VIEW } from '../enums/round-draw.enum.js'
 import type { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
 import type { ROUND_KIND } from '../enums/round.enum.js'
+import type { TSidePosition } from '../types/draw.type.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 import type { ITranslatableText } from './common-components.interface.js'
 
@@ -83,7 +84,7 @@ export interface IRoundDrawEntryProps {
 }
 
 export interface IRoundDrawEntryEmits {
-  (event: 'place', pairingIndex: number, participationId: string): void
+  (event: 'place', pairingIndex: number, participationId: string, position: TSidePosition): void
   (event: 'change', pairingIndex: number): void
   (event: 'change-round'): void
 }

@@ -181,6 +181,7 @@ import { PHASE_STEP } from '~/enums/qualification.enum'
 import { ROUND_DRAW_MENTION, ROUND_DRAW_VIEW } from '~/enums/round-draw.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
+import type { TSidePosition } from '~/types/draw.type'
 import { formatDrawMoment } from '~/utils/round-draw.util'
 
 /*********************************************************
@@ -293,8 +294,8 @@ const handleRetry = () => {
 const handleStart = (kind: ROUND_KIND) => {
   draw.startRound(kind)
 }
-const handlePlace = (pairingIndex: number, participationId: string) => {
-  draw.place(pairingIndex, participationId)
+const handlePlace = (pairingIndex: number, participationId: string, position: TSidePosition) => {
+  draw.place(pairingIndex, participationId, position)
 }
 const handleChange = (pairingIndex: number) => {
   draw.change(pairingIndex)

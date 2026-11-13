@@ -73,6 +73,7 @@ for (const viewport of VIEWPORTS) {
       { name: 'qa-egalites-titre', mockup: 'section[aria-labelledby="h-eg"] > header', app: '.qualification-ties__head' },
       { name: 'qa-egalite-haut', mockup: '.q-ties > li:nth-child(2)', app: '[data-cy="qualification-tie-0"]', upTo: { mockup: 'p.muted', app: '.qualification-ties__muted' } },
       { name: 'qa-classement-entete', mockup: '.q-rank .adm-card-h', app: '.qualification-ranking__head', masks: { mockup: [], app: [], values: { mockup: ['.q-rank__sel .input'], app: ['.qualification-ranking__select'] } } },
+      { name: 'qa-arret', mockup: '.q-sec .q-act', app: '.qualification-finalize__action' },
       { name: 'qa-apercu-vide', mockup: '.q-empty p.muted', app: '[data-cy="qualification-qualified-empty"]' }
     ]
 
@@ -96,10 +97,12 @@ for (const viewport of VIEWPORTS) {
           { mockup: '.q-ties > li:nth-child(2) .eyebrow', app: '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow' },
           { mockup: '.q-ties > li:nth-child(2) .q-tie__who', app: '[data-cy="qualification-tie-0"] .qualification-ties__who' },
           { mockup: '.q-preview b', app: '[data-cy="qualification-preview"] strong' },
-          { mockup: '.q-preview .muted', app: '[data-cy="qualification-preview"] span' }
+          { mockup: '.q-preview .muted', app: '[data-cy="qualification-preview"] span' },
+          { mockup: '.q-act .btn', app: '[data-cy="qualification-finalize-open"]' },
+          { mockup: '.q-act .q-why', app: '[data-cy="qualification-finalize-why"]' }
         ])
-        await hideInk(mockup, ['.adm-head .eyebrow', '.q-preview', 'input.input', '.q-ties > li:nth-child(2) .eyebrow', '.q-ties > li:nth-child(2) .q-tie__who', '.q-rank .table tbody', 'section[aria-labelledby="h-eg"] > header [role="status"]'])
-        await hideInk(page, ['.admin-qualification__eyebrow', '[data-cy="qualification-preview"]', '[data-cy="qualification-parameters"] input', '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow', '[data-cy="qualification-tie-0"] .qualification-ties__who', '[data-cy="qualification-ranking"] tbody', '[data-cy="qualification-ties-count"]'])
+        await hideInk(mockup, ['.q-act .btn', '.adm-head .eyebrow', '.q-preview', 'input.input', '.q-ties > li:nth-child(2) .eyebrow', '.q-ties > li:nth-child(2) .q-tie__who', '.q-rank .table tbody', 'section[aria-labelledby="h-eg"] > header [role="status"]'])
+        await hideInk(page, ['[data-cy="qualification-finalize-open"]', '.admin-qualification__eyebrow', '[data-cy="qualification-preview"]', '[data-cy="qualification-parameters"] input', '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow', '[data-cy="qualification-tie-0"] .qualification-ties__who', '[data-cy="qualification-ranking"] tbody', '[data-cy="qualification-ties-count"]'])
         await mockup.evaluate(() => window.scrollTo(0, 0))
         await page.evaluate(() => window.scrollTo(0, 0))
         await alignToPixel(mockup, zone.mockup)

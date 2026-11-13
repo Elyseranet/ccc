@@ -20,6 +20,14 @@ Un thème ne peut pas styler l'état désactivé par ses tokens : les tokens exi
 
 Lire `bgDisabled` / `fgDisabled` dans l'état `--disabled` (avec repli sur l'opacité actuelle, rendu inchangé sans token).
 
+## Section : `bg-color` et `elevation` passés en ligne (F-37, F-25)
+
+Mesuré dans CCC (F-24 « Arrêter la liste », F-25 « Valider le tirage ») : un `origam-btn variant="flat" bg-color="primary" elevation="lg"` désactivé garde le fond primary et l'ombre de son élévation (relevé : fond `action.primary.bg`, ombre colorée sous le bouton), même avec la règle centrale ci-dessous, car ces valeurs sont posées en ligne sur l'élément et la règle de classe ne les écrase pas. Le bouton désactivé a l'air actif. Sans `bg-color` ni `elevation` en ligne, la règle s'applique (fond `bgDisabled`, sans ombre).
+
+Proposition : un état `--disabled` qui prime sur `bg-color` et `elevation` (les props ne s'appliquent qu'à l'état actif).
+
+Contournement CCC : `src/composables/usePrimaryActionButton.ts` ne passe `bg-color` et `elevation` que lorsque le bouton est actif.
+
 ## Contournement CCC
 
 Règle centrale dans `src/assets/css/main.css`, listée dans l'en-tête de `ccc.theme.ts` : bouton désactivé (hors pagination) à opacité 1, fond `action.primary.bgDisabled`, texte `text.tertiary` (la maquette `hh.css` : `.btn:disabled`), filet transparent, sans ombre.

@@ -12,6 +12,7 @@ import type { ITranslatableText } from '~/interfaces/common-components.interface
 import type { IAdminDraw } from '~/interfaces/draw.interface'
 import type { IRoundDrawFeedback, IRoundDrawPairing } from '~/interfaces/round-draw.interface'
 import type { IRoundDrawPreview } from '~/interfaces/qualification.interface'
+import type { TSidePosition } from '~/types/draw.type'
 import { fromAsyncDataError, toAsyncDataError } from '~/utils/async-data-error.util'
 import { DrawService } from '~/services/draw.service'
 import { EditionService } from '~/services/edition.service'
@@ -178,11 +179,11 @@ export const useRoundDraw = async () => {
     return queue
   }
 
-  const place = async (pairingIndex: number, participationId: string): Promise<void> => {
+  const place = async (pairingIndex: number, participationId: string, position?: TSidePosition): Promise<void> => {
     if (isReadOnly.value || view.value !== ROUND_DRAW_VIEW.ENTRY) {
       return
     }
-    const next = placePlayer(pairings.value, pairingIndex, participationId)
+    const next = placePlayer(pairings.value, pairingIndex, participationId, position)
     if (next === pairings.value) {
       return
     }

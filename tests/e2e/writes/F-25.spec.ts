@@ -69,9 +69,11 @@ test.describe('admin tirage du tour : écritures sur une édition créée par le
     await expect(page.getByTestId('round-draw-validate-why')).toHaveText('Indisponible : 4 affiches restent à saisir.')
     expect(await violationsOf(page)).toEqual([])
 
-    await placeNext(page, 1, 1)
-    await expect(page.getByTestId('round-draw-snackbar')).toContainText('Brouillon enregistré')
     await placeNext(page, 1, 2)
+    await expect(page.getByTestId('round-draw-snackbar')).toContainText('Brouillon enregistré')
+    const partial = await (await page.request.get(`/api/v1/admin/editions/${edition.id}/tirages`)).json() as Array<{ kind: string, status: string, assignments: Array<{ sidePosition: number }> }>
+    expect(partial.find(draft => draft.kind === 'ROUND' && draft.status === 'DRAFT')!.assignments.map(entry => entry.sidePosition)).toEqual([2])
+    await placeNext(page, 1, 1)
     await expect(page.getByTestId('round-draw-count')).toHaveText('1 / 4 affiches · 6 joueurs restants')
     await expect(page.getByTestId('round-draw-rest').getByTestId('round-draw-rest-item')).toHaveCount(6)
 

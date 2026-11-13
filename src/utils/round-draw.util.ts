@@ -93,11 +93,15 @@ export const placedIdsOf = (pairings: IRoundDrawPairing[]): Set<string> =>
 const nextOrder = (pairings: IRoundDrawPairing[]): number =>
   pairings.reduce((max, pairing) => Math.max(max, ...sidesOf(pairing).map(side => side?.order ?? 0)), 0) + 1
 
-/** Place un joueur non placé dans le prochain côté libre de l'affiche : il prend l'ordre de tirage suivant. */
-export const placePlayer = (pairings: IRoundDrawPairing[], pairingIndex: number, participationId: string): IRoundDrawPairing[] => {
+/**
+ * Place un joueur non placé dans l'affiche : il prend l'ordre de tirage suivant. Le côté est celui demandé (l'un ou l'autre peut être tiré en premier : le brouillon accepte
+ * une affiche partielle, `checkRoundDrawAssignments` avec `complete: false`), à défaut le premier côté libre.
+ */
+export const placePlayer = (pairings: IRoundDrawPairing[], pairingIndex: number, participationId: string, position?: TSidePosition): IRoundDrawPairing[] => {
   const target = pairings.find(pairing => pairing.index === pairingIndex)
-  const side = target ? nextSideOf(target) : null
-  if (!target || side === null || placedIdsOf(pairings).has(participationId)) {
+  const side = target ? (position ?? nextSideOf(target)) : null
+  const taken = target && side !== null && (side === 1 ? target.first : target.second) !== null
+  if (!target || side === null || taken || placedIdsOf(pairings).has(participationId)) {
     return pairings
   }
   const placed: IRoundDrawSide = { participationId, order: nextOrder(pairings) }
