@@ -36,7 +36,6 @@
       status="error"
       rounded="lg"
       :title="failureView.title"
-      :text="failureView.body"
       font-size="md"
       font-weight="bold"
       letter-spacing="normal"
@@ -44,7 +43,8 @@
       role="alert"
       data-cy="closing-failure"
     >
-      <template #close>
+      <template #text>
+        {{ failureView.body }}
         <origam-btn
           v-if="failureView.verifiable"
           variant="outlined"

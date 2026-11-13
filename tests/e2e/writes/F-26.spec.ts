@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
+import type { APIRequestContext, Page } from '@playwright/test'
 import { createFinalValidatedEdition, selectAdminEdition } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
 
@@ -21,6 +21,18 @@ const hydrated = async (page: Page) => {
 const violationsOf = async (page: Page) => {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
   return results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => `${node.target.join(' ')} :: ${node.html.slice(0, 260)}`).join(', ')}`)
+}
+
+/** Une archive du dump : clôturée, `closedAt` nul (les éditions clôturées par d'autres tests de la base ont une date). */
+const archiveWithoutDate = async (request: APIRequestContext) => {
+  const list = await (await request.get('/api/v1/editions')).json() as Array<{ id: string, code: string, year: number, status: string }>
+  for (const item of list.filter(entry => entry.status === 'CLOSED')) {
+    const detail = await (await request.get(`/api/v1/editions/${item.id}`)).json() as { closedAt: string | null }
+    if (detail.closedAt === null) {
+      return item
+    }
+  }
+  return undefined
 }
 
 const openClosing = async (page: Page) => {
@@ -102,11 +114,8 @@ test.describe('admin clôture : écritures sur une édition créée par le test'
   })
 
   test('archive clôturée sans date (closedAt nul, B-22) : « Date de clôture non archivée. Points figés. », aucun bouton', async ({ page, context }) => {
-    const list = await (await context.request.get('/api/v1/editions')).json() as Array<{ id: string, code: string, year: number, status: string }>
-    const archive = list.find(item => item.status === 'CLOSED')
+    const archive = await archiveWithoutDate(context.request)
     expect(archive).toBeDefined()
-    const detail = await (await context.request.get(`/api/v1/editions/${archive!.id}`)).json() as { closedAt: string | null }
-    expect(detail.closedAt).toBeNull()
     await selectAdminEdition(context, archive!)
     await openClosing(page)
     await expect(page.getByTestId('closing-state-closed')).toBeVisible()

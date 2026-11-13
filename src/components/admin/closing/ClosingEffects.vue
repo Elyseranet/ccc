@@ -22,7 +22,16 @@
           v-for="effect in effects"
           :key="effect.id"
         >
-          <abbr-text :text="effect.text" />
+          <template
+            v-for="(part, index) in effect.parts"
+            :key="index"
+          >
+            <b v-if="part.strong">{{ part.text }}</b>
+            <abbr-text
+              v-else
+              :text="part.text"
+            />
+          </template>
         </li>
       </ul>
       <div
@@ -77,10 +86,24 @@ defineSlots<{}>()
 const titleId = useId()
 const title = computed(() => t('admin.closing.effects_title', 'Ce que la clôture fait'))
 const effects = computed(() => [
-  { id: 'points', text: t('admin.closing.effect_points', 'Les points de chaque participation sont figés : barème × N / 50, N = nombre de participants (RG1, RG2).') },
-  { id: 'readonly', text: t('admin.closing.effect_readonly', 'L’édition passe en lecture seule partout : participants, tirages, scores, qualification.') },
-  { id: 'rankings', text: t('admin.closing.effect_rankings', 'Les classements ACP et All Time intègrent l’édition.') },
-  { id: 'scale', text: t('admin.closing.effect_scale', 'Un changement de barème ultérieur ne réécrit pas le palmarès.') }
+  {
+    id: 'points',
+    parts: [
+      { text: t('admin.closing.effect_points_lead', 'Les points de chaque participation sont '), strong: false },
+      { text: t('admin.closing.effect_points_strong', 'figés'), strong: true },
+      { text: t('admin.closing.effect_points_tail', ' : barème × N / 50, N = nombre de participants (RG1, RG2).'), strong: false }
+    ]
+  },
+  {
+    id: 'readonly',
+    parts: [
+      { text: t('admin.closing.effect_readonly_lead', 'L’édition passe en '), strong: false },
+      { text: t('admin.closing.effect_readonly_strong', 'lecture seule partout'), strong: true },
+      { text: t('admin.closing.effect_readonly_tail', ' : participants, tirages, scores, qualification.'), strong: false }
+    ]
+  },
+  { id: 'rankings', parts: [{ text: t('admin.closing.effect_rankings', 'Les classements ACP et All Time intègrent l’édition.'), strong: false }] },
+  { id: 'scale', parts: [{ text: t('admin.closing.effect_scale', 'Un changement de barème ultérieur ne réécrit pas le palmarès.'), strong: false }] }
 ])
 const note = computed(() => t('admin.closing.preview_note', 'Un tour non disputé rapporte « / » (RG3).'))
 const caption = computed(() => t('admin.closing.preview_caption', 'Aperçu des points pour {count} participants', { count: props.participantCount }))

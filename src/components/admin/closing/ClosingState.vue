@@ -3,7 +3,6 @@
     :status="status"
     rounded="lg"
     :title="title"
-    :text="text"
     font-size="md"
     font-weight="bold"
     letter-spacing="normal"
@@ -11,24 +10,23 @@
     role="status"
     :data-cy="`closing-state-${kind}`"
   >
-    <template
-      v-if="link"
-      #default
-    >
-      <origam-btn
-        variant="text"
-        size="small"
+    <template #text>
+      {{ text }}
+      <nuxt-link
+        v-if="link"
         :to="link.to"
-        :text="link.label"
+        class="closing-state__link"
         :data-cy="`closing-state-${kind}-link`"
-      />
+      >
+        {{ link.label }}
+      </nuxt-link>
     </template>
   </origam-alert>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamAlert, OrigamBtn } from 'origam/components'
+import { OrigamAlert } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_ROUND_QUERY_PARAM } from '~/consts/admin-match-filters.const'
 import { CLOSING_STATE_STATUS } from '~/consts/edition-closing-view.const'
@@ -94,3 +92,16 @@ const link = computed(() => {
  ********************************************************/
 defineExpose({})
 </script>
+
+<style scoped lang="scss">
+.closing-state__link {
+  color: inherit;
+  text-decoration: var(--closing-state__link---text-decoration, underline);
+}
+</style>
+
+<style>
+:root {
+  --closing-state__link---text-decoration: underline;
+}
+</style>

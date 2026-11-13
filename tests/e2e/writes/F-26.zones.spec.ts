@@ -60,7 +60,13 @@ const alignLeadText = async (mockup: Page, page: Page, mockupSelector: string, a
 
 const archiveClosed = async (context: BrowserContext) => {
   const list = await (await context.request.get('/api/v1/editions')).json() as Array<{ id: string, code: string, year: number, status: string }>
-  return list.find(item => item.status === 'CLOSED')!
+  for (const item of list.filter(entry => entry.status === 'CLOSED')) {
+    const detail = await (await context.request.get(`/api/v1/editions/${item.id}`)).json() as { closedAt: string | null }
+    if (detail.closedAt === null) {
+      return item
+    }
+  }
+  throw new Error('aucune archive sans date de clôture')
 }
 
 const prepare = async (state: STATE, page: Page, context: BrowserContext, label: string) => {

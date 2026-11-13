@@ -43,7 +43,8 @@
         :items="facts"
         :border="false"
         density="compact"
-        rounded="lg"
+        rounded="none"
+        bg-color="transparent"
         class="closing-prerequisites__facts"
         data-cy="closing-facts"
       />
@@ -169,9 +170,9 @@ defineExpose({})
 
   &__facts :deep(.origam-data-list__kv-row) {
     grid-template-columns: 1fr;
-    row-gap: var(--origam-space---1);
+    row-gap: 0;
     border-bottom: 0;
-    padding-inline: 0;
+    padding: 0;
   }
 
   &__facts :deep(.origam-data-list__kv-key) {
