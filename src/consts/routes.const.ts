@@ -12,6 +12,7 @@ export const ROUTES = {
   ADMIN_MATCHES: '/admin/matchs',
   ADMIN_FINAL_PHASE: '/admin/phase-finale',
   ADMIN_FINAL_PHASE_QUALIFICATION: '/admin/phase-finale/qualification',
+  ADMIN_FINAL_PHASE_ROUND_DRAW: '/admin/phase-finale/tirage',
   ADMIN_MORE: '/admin/plus',
   ADMIN_EDITIONS: '/admin/editions',
   ADMIN_EDITION_NEW: '/admin/editions/nouvelle',

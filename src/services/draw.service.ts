@@ -72,11 +72,21 @@ export class DrawService extends BaseService {
   }
 
   /** Enregistre le brouillon : la liste est remplacée à chaque appel (idempotent), elle peut être partielle. */
-  saveAssignments (drawId: string, body: IUpdateDrawAssignmentsRequest): Promise<IAdminDraw> {
+  saveAssignments (drawId: string, body: TUpdateDrawRequest): Promise<IAdminDraw> {
     return this.request<IAdminDraw>(`/tirages/${encodeURIComponent(drawId)}/affectations`, { method: 'PUT', body: { ...body } })
   }
 
   /** Fige le tirage : poules créées, round-robin généré, édition en `POOLS_DRAWN`. Pas de corps ; idempotent. */
+  /** `GET /admin/editions/{id}/tirages/tour` : le prochain tour, le vivier et ce qui bloque, sans rien écrire (B-13). */
+  roundPreview (editionId: string): Promise<IRoundDrawPreview> {
+    return this.request<IRoundDrawPreview>(`/admin/editions/${encodeURIComponent(editionId)}/tirages/tour`)
+  }
+
+  /** `POST /editions/{id}/tirages/tour` : ouvre le brouillon du tour (`roundKind` obligatoire quand il n'est pas déduit) ; un nouvel appel REMPLACE le brouillon. */
+  createRoundDraft (editionId: string, body: ICreateRoundDrawRequest = {}): Promise<IAdminDraw> {
+    return this.request<IAdminDraw>(`/editions/${encodeURIComponent(editionId)}/tirages/tour`, { method: 'POST', body: { ...body } })
+  }
+
   validate (drawId: string): Promise<IAdminDraw> {
     return this.request<IAdminDraw>(`/tirages/${encodeURIComponent(drawId)}/validation`, { method: 'POST' })
   }

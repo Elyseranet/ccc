@@ -1,4 +1,4 @@
-import { ROUND_DRAW_ERROR_MESSAGES, ROUND_DRAW_STALE_CODES } from '../consts/round-draw.const.js'
+import { ROUND_DRAW_ERROR_MESSAGES, ROUND_DRAW_SIDES, ROUND_DRAW_STALE_CODES } from '../consts/round-draw.const.js'
 import { POOL_DRAW_ERROR_OFFLINE, POOL_DRAW_ERROR_UNKNOWN } from '../consts/pool-draw.const.js'
 import { KNOCKOUT_ROUND_ORDER } from '../consts/qualification.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
@@ -14,6 +14,7 @@ import type { IRoundDrawPreview, IRoundDrawAssignmentInput } from '../interfaces
 import type { IQualificationMember } from '../interfaces/qualification.interface.js'
 import type { IRound } from '../interfaces/round.interface.js'
 import type { TSidePosition } from '../types/draw.type.js'
+import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
 import { ApiRequestError } from './api-request-error.util.js'
 import { getInitials } from './player.util.js'
 
@@ -26,8 +27,6 @@ import { getInitials } from './player.util.js'
  * aucun contrôle « puissance de 2 » (c9790abd (6)). Barrages (RG14, PLAYOFF-DRAW) : les premiers de poule attendent sans jouer, seuls les autres joueurs sont
  * tirés et le nombre d'affiches n'est pas fixé par une règle : on en propose la moitié des joueurs tirables, la validation accepte les affiches complètes saisies.
  ********************************************************/
-const SIDES: readonly TSidePosition[] = [1, 2]
-
 /** Premiers de leur poule : les participations au rang 1 d'un classement de poule (le serveur les écarte des barrages, RG14). */
 export const leaderIdsOf = (pools: IPool[]): Set<string> =>
   new Set(pools.flatMap(pool => pool.standing.filter(row => row.rank === 1).map(row => row.participationId)))
@@ -154,7 +153,7 @@ export const validationBlocker = (pairings: IRoundDrawPairing[], roundKind: ROUN
 
 /** Corps du `PUT /tirages/{id}/affectations` : la liste complète, remplacée à chaque appel ; l'ordre du tirage est renuméroté de 1 à N dans l'ordre de saisie. */
 export const buildRoundAssignments = (pairings: IRoundDrawPairing[]): IRoundDrawAssignmentInput[] => {
-  const placed = pairings.flatMap(pairing => SIDES.flatMap((position) => {
+  const placed = pairings.flatMap(pairing => ROUND_DRAW_SIDES.flatMap((position) => {
     const side = position === 1 ? pairing.first : pairing.second
     return side ? [{ participationId: side.participationId, pairingIndex: pairing.index, sidePosition: position, order: side.order }] : []
   }))
@@ -175,7 +174,7 @@ export const recapRows = (pairings: IRoundDrawPairing[], players: IRoundDrawPlay
 /*********************************************************
  * Ce que la page affiche
  ********************************************************/
-const KNOCKOUT_INDEX = (kind: ROUND_KIND): number => KNOCKOUT_ROUND_ORDER.indexOf(kind)
+const knockoutIndex = (kind: ROUND_KIND): number => KNOCKOUT_ROUND_ORDER.indexOf(kind)
 
 /** Dernier tirage de tour de l'édition (brouillon ou validé). */
 export const latestRoundDraw = (draws: IAdminDraw[]): IAdminDraw | null => draws.filter(draw => draw.kind === DRAW_KIND.ROUND).at(-1) ?? null
@@ -215,7 +214,7 @@ export const viewOf = (preview: IRoundDrawPreview, draw: IAdminDraw | null, roun
 export const roundSteps = (rounds: IRound[], current: ROUND_KIND | null): IRoundDrawRoundStep[] => {
   const drawn = rounds.filter(round => round.kind !== ROUND_KIND.POOLS)
   const kinds = new Set<ROUND_KIND>([...drawn.map(round => round.kind), ...(current ? [current] : [])])
-  const first = Math.min(...[...kinds].map(KNOCKOUT_INDEX))
+  const first = Math.min(...[...kinds].map(knockoutIndex))
   if (kinds.size === 0 || first < 0) {
     return []
   }
@@ -253,3 +252,7 @@ export const toRoundDrawError = (error: unknown): ITranslatableText => {
 
 export const isStaleRoundDrawError = (error: unknown): boolean =>
   error instanceof ApiRequestError && ROUND_DRAW_STALE_CODES.includes(error.error.code as API_ERROR_CODE)
+
+/** « 15/06/2026 21:10 » : le moment de validation d'un tirage, dans la langue de l'admin. */
+export const formatDrawMoment = (iso: string): string =>
+  new Date(iso).toLocaleString(ADMIN_DATE_LOCALE, { dateStyle: 'short', timeStyle: 'short' })

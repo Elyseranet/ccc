@@ -44,3 +44,10 @@ export enum ROUND_DRAW_MENTION {
   TO_DRAW = 'to-draw',
   IN_PROGRESS = 'in-progress'
 }
+
+/** État d'une affiche dans la saisie : tirée, en cours de saisie, ou à tirer (emplacement passif). */
+export enum ROUND_DRAW_PAIRING_STATE {
+  FULL = 'full',
+  CURRENT = 'current',
+  FREE = 'free'
+}

@@ -5,7 +5,7 @@
     orientation="horizontal"
     show-connectors
     :aria-label="label"
-    class="qualification-phase-steps"
+    class="phase-steps-nav"
     data-cy="phase-steps"
     @update:model-value="handleStep"
   />
@@ -17,7 +17,7 @@ import { OrigamStepper } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { ADMIN_PHASE_STEPS } from '~/consts/admin-phase.const'
 import { POOL_DRAW_STEP_STATE } from '~/enums/pool-draw.enum'
-import type { IQualificationPhaseStepsProps } from '~/interfaces/qualification-view.interface'
+import type { IPhaseStepsProps } from '~/interfaces/phase.interface'
 
 /*********************************************************
  * Global
@@ -28,7 +28,7 @@ import type { IQualificationPhaseStepsProps } from '~/interfaces/qualification-v
  * Les autres étapes mènent à leur page : une étape dont les conditions ne sont pas remplies reste atteignable, l'écran dit ce qui manque.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IQualificationPhaseStepsProps>(), {})
+const props = withDefaults(defineProps<IPhaseStepsProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const label = computed(() => t('admin.phase.steps_label', 'Phase finale'))
@@ -62,8 +62,8 @@ defineExpose({})
 </script>
 
 <style scoped lang="scss">
-.qualification-phase-steps {
-  margin-bottom: var(--qualification-phase-steps---margin-bottom, var(--origam-space---4));
+.phase-steps-nav {
+  margin-bottom: var(--phase-steps-nav---margin-bottom, var(--origam-space---4));
 
   :deep(.origam-stepper-item__title) {
     white-space: normal;
@@ -73,6 +73,6 @@ defineExpose({})
 
 <style>
 :root {
-  --qualification-phase-steps---margin-bottom: var(--origam-space---4);
+  --phase-steps-nav---margin-bottom: var(--origam-space---4);
 }
 </style>

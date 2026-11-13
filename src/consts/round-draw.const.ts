@@ -1,4 +1,7 @@
+import { ROUND_DRAW_VIEW } from '../enums/round-draw.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import type { TSidePosition } from '../types/draw.type.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import { POOL_DRAW_ERROR_MESSAGES } from './pool-draw.const.js'
 
@@ -34,3 +37,36 @@ export const ROUND_DRAW_STALE_CODES: readonly API_ERROR_CODE[] = [
   API_ERROR_CODE.ROUND_NOT_COMPLETED,
   API_ERROR_CODE.NOT_FOUND
 ]
+
+/**
+ * Formes d'un tour dans les phrases de la page : « des huitièmes » (« Saisir le tirage des huitièmes ») et « huitièmes » (« Vivier · huitièmes »). Les libellés
+ * capitalisés (« Huitièmes ») viennent de `ROUND_LABELS`. La langue décide de l'accord : une clé par forme.
+ */
+export const ROUND_DRAW_TEXTS: Record<ROUND_KIND, { of: ITranslatableText, bare: ITranslatableText }> = {
+  [ROUND_KIND.POOLS]: { of: { key: 'admin.round_draw.of_pools', fallback: 'des poules' }, bare: { key: 'admin.round_draw.bare_pools', fallback: 'poules' } },
+  [ROUND_KIND.PLAYOFF]: { of: { key: 'admin.round_draw.of_playoff', fallback: 'des barrages' }, bare: { key: 'admin.round_draw.bare_playoff', fallback: 'barrages' } },
+  [ROUND_KIND.ROUND_OF_16]: { of: { key: 'admin.round_draw.of_round_of_16', fallback: 'des huitièmes' }, bare: { key: 'admin.round_draw.bare_round_of_16', fallback: 'huitièmes' } },
+  [ROUND_KIND.QUARTER]: { of: { key: 'admin.round_draw.of_quarter', fallback: 'des quarts' }, bare: { key: 'admin.round_draw.bare_quarter', fallback: 'quarts' } },
+  [ROUND_KIND.SEMI]: { of: { key: 'admin.round_draw.of_semi', fallback: 'des demi-finales' }, bare: { key: 'admin.round_draw.bare_semi', fallback: 'demi-finales' } },
+  [ROUND_KIND.FINAL]: { of: { key: 'admin.round_draw.of_final', fallback: 'de la finale' }, bare: { key: 'admin.round_draw.bare_final', fallback: 'finale' } }
+}
+
+/**
+ * TODO(ui-plus) : phrase qui dit que les premiers de poule attendent les barrages sans les jouer (RG14). Le texte n'est pas dans la maquette : il est demandé à
+ * ui-plus (voir `docs/tickets/F-25.md`). Le repli ci-dessous est un marqueur, pas un texte de produit ; aucun test ne l'affirme.
+ */
+export const ROUND_DRAW_PLAYOFF_WAIT_TEXT: ITranslatableText = { key: 'admin.round_draw.playoff_leaders_wait', fallback: 'TODO : texte des premiers de poule en attente (ui-plus)' }
+
+/** Gravité de l'alerte de chaque état sans saisie (valeurs de `origam-alert`) : le vivier qui ne se tire pas est une erreur, la fin de la phase finale un succès, le reste une information. */
+export const ROUND_DRAW_STATE_STATUS: Record<ROUND_DRAW_VIEW, string> = {
+  [ROUND_DRAW_VIEW.QUALIFICATION_PENDING]: 'info',
+  [ROUND_DRAW_VIEW.PREVIOUS_INCOMPLETE]: 'info',
+  [ROUND_DRAW_VIEW.FINISHED]: 'success',
+  [ROUND_DRAW_VIEW.UNDRAWABLE]: 'error',
+  [ROUND_DRAW_VIEW.CHOICE]: 'info',
+  [ROUND_DRAW_VIEW.ENTRY]: 'info',
+  [ROUND_DRAW_VIEW.DRAWN]: 'info'
+}
+
+/** Les deux côtés d'une affiche, dans l'ordre de saisie. */
+export const ROUND_DRAW_SIDES: readonly TSidePosition[] = [1, 2]
