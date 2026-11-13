@@ -286,7 +286,7 @@
   "admin.closing.state_blocked_title": "Final not validated",
   "admin.closing.state_closed_link": "See the hall of fame",
   "admin.closing.state_closed_text_dated": "Closed on {date} at {time}. Points frozen.",
-  "admin.closing.state_closed_text_undated": "Points frozen.",
+  "admin.closing.state_closed_text_undated": "Closing date not archived. Points frozen.",
   "admin.closing.state_closed_title": "Edition closed",
   "admin.closing.state_success_text": "The rankings have been updated.",
   "admin.closing.state_success_title": "Edition {year} closed.",

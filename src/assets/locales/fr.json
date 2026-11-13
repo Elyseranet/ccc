@@ -286,7 +286,7 @@
   "admin.closing.state_blocked_title": "Finale non validée",
   "admin.closing.state_closed_link": "Voir le palmarès",
   "admin.closing.state_closed_text_dated": "Clôturée le {date} à {time}. Points figés.",
-  "admin.closing.state_closed_text_undated": "Points figés.",
+  "admin.closing.state_closed_text_undated": "Date de clôture non archivée. Points figés.",
   "admin.closing.state_closed_title": "Édition clôturée",
   "admin.closing.state_success_text": "Les classements ont été mis à jour.",
   "admin.closing.state_success_title": "Édition {year} clôturée.",

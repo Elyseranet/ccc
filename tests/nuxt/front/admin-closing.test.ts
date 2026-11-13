@@ -122,12 +122,12 @@ describe('page « Clôture » (F-26)', () => {
     expect(wrapper.get('[data-cy="closing-state-closed"]').text()).toMatch(/Clôturée le \d{2}\/\d{2} à \d{2}:\d{2}\. Points figés\./)
   })
 
-  it('édition clôturée sans date (closedAt nul, les 16 archives du dump) : « Points figés. » seulement', async () => {
+  it('édition clôturée sans date (closedAt nul, les 16 archives du dump) : « Date de clôture non archivée. Points figés. »', async () => {
     status = EDITION_STATUS.CLOSED
     closedAt = null
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.find('[data-cy="closing-state-closed"]').exists()).toBe(true))
-    expect(wrapper.get('[data-cy="closing-state-closed"]').text()).toContain('Points figés.')
+    expect(wrapper.get('[data-cy="closing-state-closed"]').text()).toContain('Date de clôture non archivée. Points figés.')
     expect(wrapper.get('[data-cy="closing-state-closed"]').text()).not.toContain('Clôturée le')
   })
 

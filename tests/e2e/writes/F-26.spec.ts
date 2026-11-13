@@ -99,7 +99,7 @@ test.describe('admin clôture : écritures sur une édition créée par le test'
     expect(await violationsOf(page)).toEqual([])
   })
 
-  test('archive clôturée sans date (closedAt nul, B-22) : « Points figés. » seulement, aucun bouton', async ({ page, context }) => {
+  test('archive clôturée sans date (closedAt nul, B-22) : « Date de clôture non archivée. Points figés. », aucun bouton', async ({ page, context }) => {
     const list = await (await context.request.get('/api/v1/editions')).json() as Array<{ id: string, code: string, year: number, status: string }>
     const archive = list.find(item => item.status === 'CLOSED')
     expect(archive).toBeDefined()
@@ -108,7 +108,7 @@ test.describe('admin clôture : écritures sur une édition créée par le test'
     await selectAdminEdition(context, archive!)
     await openClosing(page)
     await expect(page.getByTestId('closing-state-closed')).toBeVisible()
-    await expect(page.getByTestId('closing-state-closed')).toContainText('Points figés.')
+    await expect(page.getByTestId('closing-state-closed')).toContainText('Date de clôture non archivée. Points figés.')
     await expect(page.getByTestId('closing-state-closed')).not.toContainText('Clôturée le')
     await expect(page.getByTestId('closing-open')).toHaveCount(0)
   })

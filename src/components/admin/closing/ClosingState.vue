@@ -45,7 +45,7 @@ import { formatClosingMoment } from '~/utils/edition-closing-view.util'
  * Les trois messages d'état de la page, en `origam-alert` (maquette « États ») : finale non validée (lien vers les scores filtrés sur la finale,
  * `?tour=FINAL`, décision du chef de projet), édition clôturée (lien vers le palmarès) et clôture réussie. Le titre porte les quatre props de typographie
  * (même recette que les autres alertes, en attendant F-17). L'alerte « clôturée » dit le jour et l'heure quand `closedAt` est connu ; les 16 archives du dump n'en
- * ont pas (B-22) : texte sans date, dont la formulation attend ui-plus (clé `state_closed_text_undated`, provisoire).
+ * ont pas (B-22) : texte « Date de clôture non archivée. Points figés. » (maquette 441b451e).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IClosingStateProps>(), {})
@@ -70,7 +70,7 @@ const text = computed(() => {
     case CLOSING_NOTICE.CLOSED:
       return closedMoment.value
         ? t('admin.closing.state_closed_text_dated', 'Clôturée le {date} à {time}. Points figés.', closedMoment.value)
-        : t('admin.closing.state_closed_text_undated', 'Points figés.')
+        : t('admin.closing.state_closed_text_undated', 'Date de clôture non archivée. Points figés.')
     default:
       return t('admin.closing.state_success_text', 'Les classements ont été mis à jour.')
   }
