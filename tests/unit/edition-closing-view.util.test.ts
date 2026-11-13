@@ -67,6 +67,13 @@ describe('previewRowsOf', () => {
     expect(rows.find(row => row.stage === FINAL_STAGE.PLAYOFF)?.points).toBe(0.9)
   })
 
+  it('l’élimination en poule est toujours affichée (0), même absente de playedStages', () => {
+    const playedStages = played(FINAL_STAGE.FINALIST, FINAL_STAGE.CHAMPION)
+    expect(playedStages).not.toContain(FINAL_STAGE.POOL_ELIMINATED)
+    const rows = previewRowsOf({ participantCount: 45, blockedBy: null, results: [], playedStages })
+    expect(rows.find(row => row.stage === FINAL_STAGE.POOL_ELIMINATED)).toEqual({ stage: FINAL_STAGE.POOL_ELIMINATED, base: 0, points: 0 })
+  })
+
   it('aucune ligne quand la finale n’est pas validée', () => {
     expect(previewRowsOf({ participantCount: 4, blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED, results: [], playedStages: [] })).toEqual([])
   })
