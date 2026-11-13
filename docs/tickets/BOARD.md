@@ -238,7 +238,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-20](F-20.md) | Composant partagé de puces de filtre (doublon EditionMatches / MatchQueueFilters) | — | F-08 | À faire (2026-11-05) | à créer |
 | [F-21](F-21.md) | Départage à 3 côtés ou plus : cartes et formulaire de score (3e joueur non affiché) | à dessiner (`admin-matchs.html`) | F-08, dessin ui | À faire (2026-11-05) | à créer |
 | [F-22](F-22.md) | `useCompetitor` : clé de cache figée au premier id (fiche joueur, face-à-face, F-13) | — | — | **Fermé** (2026-11-12) @ `407b6534` : face-à-face, les deux côtés ne partagent plus la même fiche | — |
-| [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | À faire (2026-11-12) | — |
+| [F-33](F-33.md) | Clés de cache figées : `useCompetitorOpponents`, `useEdition`, `useHeadToHead`, `useRankings` (suite F-22) | — | — | **Fermé** (2026-11-13) @ `c758f358` | — |
 | [F-34](F-34.md) | Matchs d'archives sans score : vainqueur affiché (suite B-21, R-5 bis) | — | B-21 | **Fermé** (2026-11-13) @ `46654e4d` | — |
 | [F-35](F-35.md) | Onglet Tirages des éditions archivées : tirages reconstitués (DRAWS-ARCH) | — | — | À faire (2026-11-12) | à créer |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
