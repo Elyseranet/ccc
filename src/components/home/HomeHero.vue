@@ -222,6 +222,11 @@ defineExpose({})
     &__grid {
       grid-template-columns: minmax(0, 1fr);
     }
+
+    &__title,
+    &__title span {
+      hyphens: auto;
+    }
   }
 }
 

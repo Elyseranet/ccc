@@ -64,3 +64,40 @@ test('S12 : /editions/2025 à 390 px avec l’espacement du texte, la pastille d
   const chip = await page.locator('[data-cy="edition-meta"] .origam-chip__content').first().evaluate(el => (el as HTMLElement).scrollWidth - (el as HTMLElement).clientWidth)
   expect(chip).toBeLessThanOrEqual(1)
 })
+
+const titleLines = (page: Page) => page.evaluate(() => [...document.querySelectorAll('.home-hero__title span')].map((span) => {
+  const range = document.createRange()
+  range.selectNodeContents(span)
+  return new Set([...range.getClientRects()].map(rect => Math.round(rect.top))).size
+}))
+
+test('S5 : l’accueil à 320 x 256, rien ne dépasse et le titre se coupe aux syllabes', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 256 })
+  await page.goto('/')
+  await hydrated(page)
+  expect(await outsideViewport(page)).toEqual([])
+  const title = page.locator('.home-hero__title')
+  expect(await title.evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1)
+  expect(await title.evaluate(el => getComputedStyle(el).hyphens)).toBe('auto')
+})
+
+test('S12 : l’accueil à 390 px avec l’espacement du texte, rien ne dépasse ni n’est coupé', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await hydrated(page)
+  const before = await clippedTexts(page)
+  await page.addStyleTag({ content: SPACING })
+  await page.waitForTimeout(300)
+  expect(await outsideViewport(page)).toEqual([])
+  expect((await clippedTexts(page)).filter(item => !before.includes(item))).toEqual([])
+})
+
+for (const width of [1440, 1200, 1000]) {
+  test(`décision A11Y-S5-S12-HERO : le titre de l’accueil ne se coupe pas à ${width} px (césure limitée à 760 px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/')
+    await hydrated(page)
+    expect(await page.locator('.home-hero__title').evaluate(el => getComputedStyle(el).hyphens)).toBe('manual')
+    expect(await titleLines(page)).toEqual([1, 1])
+  })
+}
