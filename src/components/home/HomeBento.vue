@@ -84,23 +84,7 @@
               >{{ championStars }}</span>
               {{ championTitles }}
             </span>
-            <svg
-              class="home-bento__cap"
-              viewBox="0 0 100 100"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <polygon
-                class="home-bento__cap-body"
-                :points="capPoints"
-              />
-              <circle
-                class="home-bento__cap-inner"
-                cx="50"
-                cy="50"
-                r="31"
-              />
-            </svg>
+            <cap-badge class="home-bento__cap" />
           </div>
         </template>
       </origam-card>
@@ -232,7 +216,7 @@ import { OrigamBtn, OrigamCard, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import HomeCurrentEdition from '~/components/home/HomeCurrentEdition.vue'
 import { useT } from '~/composables/useT'
-import { BRAND_CAP_POINTS } from '~/consts/brand.const'
+import CapBadge from '~/components/common/CapBadge.vue'
 import { HOME_ACP_WINDOW_EDITIONS, HOME_ARROW_GLYPH, HOME_POINTS_DECIMALS } from '~/consts/home.const'
 import { ROUTES } from '~/consts/routes.const'
 import type { IHomeBentoProps } from '~/interfaces/home.interface'
@@ -252,7 +236,6 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const arrow = HOME_ARROW_GLYPH
 const headToHeadTo = ROUTES.HEAD_TO_HEAD
-const capPoints = BRAND_CAP_POINTS
 const archive = computed(() => props.overview.archive)
 const champion = computed(() => props.overview.champion)
 
@@ -462,14 +445,6 @@ defineExpose({})
     height: auto;
     rotate: 18deg;
     opacity: 0.9;
-  }
-
-  &__cap-body {
-    fill: var(--origam-color__bar---amber);
-  }
-
-  &__cap-inner {
-    fill: var(--origam-color__surface---default);
   }
 
   &__rank {
