@@ -32,6 +32,8 @@ export const API_ERROR_MESSAGE = {
   QUALIFICATION_ALREADY_DONE: 'The qualified list is already finalized',
   TIEBREAK_REQUIRED: 'A tie must be broken before the qualified list can be finalized',
   TIEBREAK_NOT_REQUIRED: 'No current tie concerns exactly these players',
+  TIEBREAK_ENGAGED: 'A tiebreak exists for this pool: delete it before correcting the score',
+  TIEBREAK_PLAYED: 'A played tiebreak cannot be deleted',
   ROUND_NOT_COMPLETED: 'Every match of the previous round must be validated before the next round is drawn',
   ROUND_DRAW_ALREADY_VALIDATED: 'This round is already drawn and validated',
   ROUND_DRAW_UNSUPPORTED_SIZE: 'No round can be drawn for this number of qualified players',

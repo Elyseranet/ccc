@@ -7,7 +7,7 @@ import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND } from '../enums/draw.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
-import { MATCH_STATUS } from '../enums/match.enum.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import type { IPool } from '../interfaces/pool.interface.js'
 import type { IMatchValidationResult, IScoreSubmission } from '../interfaces/score.interface.js'
@@ -132,6 +132,19 @@ const isNextRoundEngaged = async ({ match, edition }: ILockedMatch, manager: Ent
     .getExists()
 }
 
+/**
+ * CORRECTION-TIEBREAK : un match de poule (REGULAR) n'est plus corrigible dès qu'un départage existe, quel que soit son statut :
+ * un départage de la même poule, ou un départage de frontière (`pool_id` nul), qui concerne toutes les poules de l'édition.
+ */
+const isTiebreakEngaged = ({ match }: ILockedMatch, manager: EntityManager): Promise<boolean> =>
+  match.round.kind !== ROUND_KIND.POOLS || match.purpose !== MATCH_PURPOSE.REGULAR
+    ? Promise.resolve(false)
+    : manager.getRepository(MatchEntity).createQueryBuilder('t')
+      .where('t.editionId = :editionId', { editionId: match.editionId })
+      .andWhere('t.purpose = :purpose', { purpose: MATCH_PURPOSE.TIEBREAK })
+      .andWhere('(t.poolId IS NULL OR t.poolId = :poolId)', { poolId: match.poolId })
+      .getExists()
+
 const writeSides = async (
   manager: EntityManager,
   match: MatchEntity,
@@ -224,6 +237,9 @@ export const correctMatch = (dataSource: DataSource, command: IScoreCommand): Pr
       throw editionClosed()
     }
     assertVersion(match, command.expectedVersion)
+    if (await isTiebreakEngaged(locked, manager)) {
+      throw conflictWithCode(API_ERROR_CODE.TIEBREAK_ENGAGED, API_ERROR_MESSAGE.TIEBREAK_ENGAGED)
+    }
     if (await isNextRoundEngaged(locked, manager)) {
       throw nextRoundEngaged()
     }

@@ -14,6 +14,7 @@ import type { IApiError } from '../../src/interfaces/error.interface'
 import type { IMatchValidationResult } from '../../src/interfaces/score.interface'
 import type { IQualificationResult, IQualificationStatus, ITiebreakGroup } from '../../src/interfaces/qualification.interface'
 import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
+import { MatchSideEntity } from '../../src/server/db/typeorm/entities/match-side.entity'
 import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
 import { cookieHeaderOf, login, resetTestDatabase, seedUser } from './helpers/auth-fixtures'
 import { API_TEST_SETUP_TIMEOUT_MS } from './helpers/nuxt-setup'
@@ -41,6 +42,9 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
   const multi = await seedPoolStage(dataSource, { code: '2065', rank: 5, pools: [clearPool('g'), clearPool('h'), clearPool('i'), clearPool('j')] })
   // 2067 : trois poules identiques, deux places de meilleur 2e pour trois ex æquo : un départage à trois, puis un 1v1 entre ses deux perdants (R-7).
   const triple = await seedPoolStage(dataSource, { code: '2067', rank: 7, pools: [clearPool('k'), clearPool('l'), clearPool('m')] })
+  // 2171 : égalité parfaite à trois dans la poule 1 (départage de poule) et une poule nette (poule 2). 2172 : égalité de frontière.
+  const poolTie2 = await seedPoolStage(dataSource, { code: '2171', rank: 21, pools: [cyclePool('k'), clearPool('l')] })
+  const boundary2 = await seedPoolStage(dataSource, { code: '2172', rank: 22, pools: [clearPool('m'), clearPool('n')] })
   const unseeded = await dataSource.getRepository(EditionEntity).save({
     code: '2066', year: 2166, chronologicalRank: 6, status: EDITION_STATUS.REGISTRATION, origin: EDITION_ORIGIN.APP
   })
@@ -353,6 +357,101 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
       const result = await done.json() as IQualificationResult
       expect(result.qualified.filter((entry) => entry.route === QUALIFICATION_ROUTE.BEST_NEXT).map((entry) => entry.participationId).sort())
         .toEqual([firstWinner, secondWinner].sort())
+    })
+  })
+
+  describe('CORRECTION-TIEBREAK and DELETE /editions/{id}/departages/{matchId} (B-24)', () => {
+    const removeTiebreak = (fixture: IPoolStageFixture, matchId: string, cookie: string | undefined = adminCookie) =>
+      send('DELETE', `/api/v1/editions/${fixture.edition.id}/departages/${matchId}`, cookie)
+    /** Le match de poule (REGULAR) du joueur `name`, relu pour avoir sa version courante. */
+    const poolMatchOf = async (fixture: IPoolStageFixture, name: string): Promise<IAdminMatch> =>
+      (await adminMatches(fixture)).find((match) => match.purpose === MATCH_PURPOSE.REGULAR
+        && match.sides.some((side) => side.participationId === fixture.participationByName.get(name)!.id))!
+    /** Même score qu'à la validation (vainqueur 5, perdant 3) : la correction réussit sans changer le résultat. */
+    const correctPoolMatch = (match: IAdminMatch) =>
+      send('POST', `/api/v1/matchs/${match.id}/correction`, adminCookie, {
+        scores: match.sides.map((side) => ({ participationId: side.participationId, score: side.score })) }, { 'If-Match': `"${match.version}"` })
+    const tiedC = () => idsOf(poolTie2, 'k1', 'k2', 'k3')
+
+    it('answers 401 and 403 before reading anything, and 404 for an unknown match, a non-tiebreak match or another edition', async () => {
+      const path = `/api/v1/editions/${poolTie2.edition.id}/departages/${poolTie2.matches[0]!.id}`
+      expect((await send('DELETE', path)).status).toBe(401)
+      expect((await send('DELETE', path, participantCookie)).status).toBe(403)
+
+      expect((await removeTiebreak(poolTie2, '00000000-0000-4000-8000-000000000000')).status).toBe(404)
+      expect((await removeTiebreak(poolTie2, poolTie2.matches[0]!.id)).status).toBe(404) // un match de poule, pas un départage
+      const created = await (await createTiebreak(poolTie2, tiedC())).json() as IAdminMatch
+      expect((await removeTiebreak(clear, created.id)).status).toBe(404) // un départage d'une autre édition
+      expect((await send('DELETE', `/api/v1/editions/${poolTie2.edition.id}/departages/not-a-uuid`, adminCookie)).status).toBe(400)
+      expect((await removeTiebreak(poolTie2, created.id)).status).toBe(204) // remis à zéro pour la suite
+    })
+
+    it('refuses to correct a pool match of the pool of a tiebreak (TIEBREAK_ENGAGED), but accepts another pool', async () => {
+      const created = await (await createTiebreak(poolTie2, tiedC())).json() as IAdminMatch
+      const refused = await correctPoolMatch(await poolMatchOf(poolTie2, 'k1'))
+      expect(refused.status).toBe(409)
+      expect((await errorOf(refused)).code).toBe(API_ERROR_CODE.TIEBREAK_ENGAGED)
+
+      const other = await correctPoolMatch(await poolMatchOf(poolTie2, 'l1'))
+      expect(other.status).toBe(200)
+
+      // Un départage joué, même validé, engage toujours la poule.
+      await play(created, [3, 1, 0])
+      const afterPlay = await correctPoolMatch(await poolMatchOf(poolTie2, 'k1'))
+      expect(afterPlay.status).toBe(409)
+      expect((await errorOf(afterPlay)).code).toBe(API_ERROR_CODE.TIEBREAK_ENGAGED)
+    })
+
+    it('refuses to delete a played tiebreak with 409 TIEBREAK_PLAYED', async () => {
+      const [played] = (await adminMatches(poolTie2)).filter((match) => match.purpose === MATCH_PURPOSE.TIEBREAK)
+      const response = await removeTiebreak(poolTie2, played!.id)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.TIEBREAK_PLAYED)
+      expect((await adminMatches(poolTie2)).some((match) => match.id === played!.id)).toBe(true)
+    })
+
+    it('a boundary tiebreak (no pool) blocks the correction of every pool match of the edition', async () => {
+      const parameters = { topPerPool: 1, bestNextCount: 1 }
+      const tied = (await status(boundary2, '?topPerPool=1&bestNextCount=1')).ties[0]!.members.map((member) => member.participationId)
+      const created = await (await createTiebreak(boundary2, tied, parameters)).json() as IAdminMatch
+      expect(created.poolRank).toBeNull()
+      for (const name of ['m1', 'n1']) {
+        const refused = await correctPoolMatch(await poolMatchOf(boundary2, name))
+        expect(refused.status, name).toBe(409)
+        expect((await errorOf(refused)).code, name).toBe(API_ERROR_CODE.TIEBREAK_ENGAGED)
+      }
+      expect((await removeTiebreak(boundary2, created.id)).status).toBe(204)
+      expect((await correctPoolMatch(await poolMatchOf(boundary2, 'm1'))).status).toBe(200)
+    })
+
+    it('deletes an unplayed tiebreak (204): the tie comes back, the correction works again, and the tiebreak can be created again', async () => {
+      const fresh = await seedPoolStage(dataSource, { code: '2173', rank: 23, pools: [cyclePool('q'), clearPool('r')] })
+      const ids = idsOf(fresh, 'q1', 'q2', 'q3')
+      const created = await (await createTiebreak(fresh, ids)).json() as IAdminMatch
+      expect((await status(fresh, '?topPerPool=1&bestNextCount=0')).tiebreakMatches.map((match) => match.id)).toEqual([created.id])
+
+      const removed = await removeTiebreak(fresh, created.id)
+      expect(removed.status).toBe(204)
+      expect(removed.headers.get('cache-control')).toBe('no-store')
+      expect(await dataSource.getRepository(MatchSideEntity).countBy({ matchId: created.id })).toBe(0)
+      const state = await status(fresh, '?topPerPool=1&bestNextCount=0')
+      expect(state.tiebreakMatches).toEqual([])
+      expect(state.ties).toHaveLength(1)
+
+      expect((await correctPoolMatch(await poolMatchOf(fresh, 'q1'))).status).toBe(200)
+      const again = await createTiebreak(fresh, ids)
+      expect(again.status).toBe(201)
+      expect((await again.json() as IAdminMatch).id).not.toBe(created.id)
+      expect((await removeTiebreak(fresh, created.id)).status).toBe(404)
+    })
+
+    it('refuses with 409 EDITION_CLOSED on a closed edition', async () => {
+      const closed = await seedPoolStage(dataSource, { code: '2174', rank: 24, pools: [cyclePool('s'), clearPool('t')] })
+      const created = await (await createTiebreak(closed, idsOf(closed, 's1', 's2', 's3'))).json() as IAdminMatch
+      await dataSource.getRepository(EditionEntity).update({ id: closed.edition.id }, { status: EDITION_STATUS.CLOSED })
+      const response = await removeTiebreak(closed, created.id)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.EDITION_CLOSED)
     })
   })
 })
