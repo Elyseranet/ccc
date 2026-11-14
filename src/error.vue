@@ -29,8 +29,8 @@
                     bg-color="primary"
                     elevation="lg"
                     :hover="ctaHover"
-                    size="large"
-                    class="error-page__button"
+                    size="x-large"
+                    font-size="md"
                     data-cy="error-page-retry"
                     :text="retryLabel"
                     @click="handleRetry"
@@ -40,9 +40,9 @@
                     :bg-color="homeButton.bgColor"
                     :elevation="homeButton.elevation"
                     :hover="homeButton.hover"
-                    size="large"
+                    size="x-large"
+                    font-size="md"
                     :to="homeRoute"
-                    class="error-page__button"
                     data-cy="error-page-back"
                     @click="handleBack"
                   >
@@ -88,8 +88,7 @@ import type { IErrorPageProps } from '~/interfaces/error-page.interface'
  * décorative qui porte le code.
  *
  * @description
- * Taille des boutons (48 px, padding 24 px) : même mécanisme et mêmes valeurs que `HomeHero.vue` (`__button`,
- * `--origam-btn---height-lg` et `--origam-btn---padding-lg`). Deuxième usage ; un troisième le fera factoriser.
+ * Taille des boutons (48 px, padding 24 px) : `size="x-large" font-size="md"`, la recette de tous les boutons d'appel (hauteur du thème, padding d'Origam ; F-27).
  ********************************************************/
 const props = withDefaults(defineProps<IErrorPageProps>(), {})
 const emits = defineEmits<{}>()
@@ -171,11 +170,6 @@ defineExpose({})
     flex-wrap: wrap;
     gap: var(--origam-space---3);
     margin-top: var(--error-page__actions---margin-top, var(--origam-space---8));
-  }
-
-  &__button {
-    --origam-btn---height-lg: var(--origam-space---12);
-    --origam-btn---padding-lg: var(--origam-space---6);
   }
 
   &__arrow {

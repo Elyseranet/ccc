@@ -41,9 +41,9 @@
             bg-color="primary"
             elevation="lg"
             :hover="buttonHover"
-            size="large"
+            size="x-large"
+            font-size="md"
             :to="primaryTo"
-            class="home-hero__button"
             data-cy="home-cta-primary"
           >
             <template #default>
@@ -56,9 +56,9 @@
           <origam-btn
             v-if="hallOfFameTo"
             variant="outlined"
-            size="large"
+            size="x-large"
+            font-size="md"
             :to="hallOfFameTo"
-            class="home-hero__button"
             data-cy="home-cta-secondary"
             :text="secondaryText"
           />
@@ -203,11 +203,6 @@ defineExpose({})
     }
   }
 
-  &__button {
-    --origam-btn---height-lg: var(--home-hero---button-height, var(--origam-space---12));
-    --origam-btn---padding-lg: var(--home-hero---button-padding, var(--origam-space---6));
-  }
-
   &__cta {
     display: flex;
     flex-wrap: wrap;
@@ -241,7 +236,5 @@ defineExpose({})
 :root {
   --home-hero---padding-block: var(--origam-space---12) var(--origam-space---16);
   --home-hero---padding-block-mobile: var(--origam-space---8) var(--origam-space---10);
-  --home-hero---button-height: var(--origam-space---12);
-  --home-hero---button-padding: var(--origam-space---6);
 }
 </style>
