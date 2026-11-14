@@ -16,40 +16,13 @@
       :empty-description="emptyDescription"
     >
       <template #default>
-        <origam-chip-group
+        <filter-chips
           v-model="filter"
-          mandatory
-          filter
+          :items="filterViews"
           :aria-label="filtersLabel"
           class="edition-matches__filters"
           data-cy="edition-matches-filters"
-        >
-          <origam-chip
-            v-for="entry in filterViews"
-            :key="entry.value"
-            :value="entry.value"
-            size="large"
-            border
-            border-color="var(--origam-color__border---default)"
-            pill
-            filter-icon=""
-            :color="entry.color"
-            :bg-color="entry.bgColor"
-            :aria-pressed="entry.selected"
-            :data-cy="entry.dataCy"
-          >
-            <template #filter />
-            <template #default>
-              <span class="edition-matches__label">
-                {{ entry.label }}
-                <span
-                  class="edition-matches__count"
-                  :class="{ 'edition-matches__count--selected': entry.selected }"
-                >{{ entry.count }}</span>
-              </span>
-            </template>
-          </origam-chip>
-        </origam-chip-group>
+        />
         <section
           class="edition-matches__scroll"
           :aria-label="caption"
@@ -146,9 +119,10 @@
 import { computed, ref, watch } from 'vue'
 import { ALIGN } from 'origam/enums'
 import type { IDataTableHeader } from 'origam/interfaces'
-import { OrigamChip, OrigamChipGroup, OrigamPagination, OrigamTitle } from 'origam/components'
+import { OrigamPagination, OrigamTitle } from 'origam/components'
 import AppDataTable from '~/components/common/AppDataTable.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
+import FilterChips from '~/components/common/FilterChips.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
@@ -168,11 +142,6 @@ import { editionMatchFilterCounts, filterEditionMatchRows, pageSlice } from '~/u
  * publie tous ses matchs publics : filtre et pagination se font ici, sans nouvelle requête (« Phase finale » regroupe plusieurs
  * tours, ce que `?tour=` d'une seule valeur ne sait pas faire). N° = `{édition}-{rang}` (RG24). Aucun score non validé
  * n'est affiché : sans vainqueur, ni vainqueur ni score ne sont montrés, les deux joueurs restent dans l'ordre de l'API.
- *
- * Retour à la ligne des filtres : `origam-chip-group` repose sur `origam-slide-group`, un conteneur qui défile sur une seule ligne
- * (`OrigamSlideGroup.vue:463-468`, `flex-wrap` sans variable) dont le contenu est `white-space: nowrap` (`:456`). La prop `column`
- * ne fait qu'ajouter la classe `origam-chip-group--column` (`OrigamChipGroup.vue:158`), qu'aucune règle ne lit : elle est inerte.
- * D'où les `:deep` ci-dessous (Elyseranet/origam#1284, fiche `docs/tickets/origam/chip-group-retour-a-la-ligne-evolution.md`).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IEditionMatchesProps>(), {})
@@ -205,9 +174,6 @@ const filterViews = computed(() => {
   return EDITION_MATCH_FILTERS.map(entry => ({
     value: entry.value,
     dataCy: entry.dataCy,
-    color: filter.value === entry.value ? 'secondary' : 'var(--origam-color__text---secondary)',
-    bgColor: filter.value === entry.value ? 'secondary' : 'transparent',
-    selected: filter.value === entry.value,
     label: t(entry.label.key, entry.label.fallback),
     count: counts[entry.value === EDITION_MATCH_FILTER.ALL ? 'all' : entry.value]
   }))
@@ -272,51 +238,11 @@ defineExpose({})
 <style scoped lang="scss">
 .edition-matches {
   &__filters {
-    --origam-chip---height-lg: calc(var(--origam-space---11) - 2 * var(--origam-border__width---thin));
-    --origam-chip---padding-lg: var(--origam-space---4);
-    --origam-chip---font-size-lg: var(--origam-font__size---md);
-
     margin-bottom: var(--origam-space---4);
   }
 
   &__scroll {
     overflow-x: auto;
-  }
-
-  &__filters {
-    overflow: visible;
-  }
-
-  &__filters :deep(.origam-slide-group__container),
-  &__filters :deep(.origam-slide-group__content) {
-    flex-wrap: wrap;
-    overflow: visible;
-  }
-
-  &__filters :deep(.origam-slide-group__content) {
-    flex: 1 1 auto;
-    min-width: 0;
-    gap: var(--origam-space---2);
-  }
-
-  &__label {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--origam-space---2);
-  }
-
-  &__count {
-    padding-inline: var(--origam-space---2);
-    border-radius: var(--origam-radius---full);
-    background: var(--origam-color__surface---overlay);
-    font-size: var(--origam-font__size---xs);
-    line-height: var(--origam-font__lineHeight---normal);
-    font-variant-numeric: tabular-nums;
-
-    &--selected {
-      background: var(--origam-color__surface---default);
-      color: var(--origam-color__text---primary);
-    }
   }
 
   &__number {

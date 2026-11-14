@@ -62,7 +62,7 @@ const MATCH_PAIRS: ITextPair[] = [
   { mockup: '#ed-p-mat tbody tr td:nth-child(3) a', app: '[data-cy="edition-matches-table"] tbody tr td:nth-child(3) .player-link__name' },
   { mockup: '#ed-p-mat tbody tr td:nth-child(4)', app: '[data-cy="edition-matches-table"] tbody tr td:nth-child(4)' },
   { mockup: '#ed-p-mat tbody tr td:nth-child(5) a', app: '[data-cy="edition-matches-table"] tbody tr td:nth-child(5) .player-link__name' },
-  { mockup: '.fchip .num', app: '[data-cy^="edition-matches-filter-"] .edition-matches__count' },
+  { mockup: '.fchip .num', app: '[data-cy^="edition-matches-filter-"] .filter-chips__count' },
   { mockup: '#ed-p-mat .pager .num', app: '[data-cy="edition-matches-range"]' }
 ]
 const MOCKUP_INK = [

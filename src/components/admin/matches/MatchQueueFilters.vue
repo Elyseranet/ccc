@@ -1,40 +1,12 @@
 <template>
   <div class="match-queue-filters">
-    <origam-chip-group
+    <filter-chips
       :model-value="filter"
-      mandatory
-      filter
+      :items="views"
       :aria-label="filtersLabel"
-      class="match-queue-filters__chips"
       data-cy="admin-matches-filters"
       @update:model-value="handleFilter"
-    >
-      <origam-chip
-        v-for="entry in views"
-        :key="entry.value"
-        :value="entry.value"
-        size="large"
-        border
-        :border-color="entry.borderColor"
-        pill
-        filter-icon=""
-        :color="entry.color"
-        :bg-color="entry.bgColor"
-        :aria-pressed="entry.selected"
-        :data-cy="entry.dataCy"
-      >
-        <template #filter />
-        <template #default>
-          <span class="match-queue-filters__label">
-            {{ entry.label }}
-            <span
-              class="match-queue-filters__count"
-              :class="{ 'match-queue-filters__count--selected': entry.selected }"
-            >{{ entry.count }}</span>
-          </span>
-        </template>
-      </origam-chip>
-    </origam-chip-group>
+    />
     <div class="match-queue-filters__selects">
       <div class="match-queue-filters__field">
         <origam-label
@@ -103,7 +75,8 @@
 
 <script setup lang="ts">
 import { computed, useId } from 'vue'
-import { OrigamChip, OrigamChipGroup, OrigamLabel, OrigamSelect, OrigamSwitch } from 'origam/components'
+import { OrigamLabel, OrigamSelect, OrigamSwitch } from 'origam/components'
+import FilterChips from '~/components/common/FilterChips.vue'
 import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_ALL_POOLS_VALUE, ADMIN_MATCH_ALL_ROUNDS_VALUE } from '~/consts/admin-match-filters.const'
@@ -118,7 +91,6 @@ import type { IMatchQueueFiltersEmits, IMatchQueueFiltersProps } from '~/interfa
  * @description
  * Les quatre filtres de la file (À traiter, Saisis, Sans score, Validés ; A1) et le sélecteur de poule. Un seul filtre est
  * toujours actif (`mandatory`). Le parent porte l'état dans l'URL ; ce composant ne fait qu'afficher et émettre.
- * Retour à la ligne des chips : même recette que `EditionMatches` (`origam-chip-group` défile sur une ligne, Elyseranet/origam#1284).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IMatchQueueFiltersProps>(), {})
@@ -132,7 +104,7 @@ const tiebreakId = useId()
  * Filtres
  *
  * @description
- * Le chip actif prend la couleur secondaire ; le compteur porte aussi le sens (jamais la couleur seule).
+ * Les puces sont le composant commun `FilterChips` (F-20) ; ce composant lui donne ses libellés, compteurs et `data-cy`, et le libellé qui dit la portée des compteurs.
  ********************************************************/
 const filtersLabel = computed(() => {
   const round = props.round === ADMIN_MATCH_ALL_ROUNDS_VALUE
@@ -143,17 +115,7 @@ const filtersLabel = computed(() => {
     : round
   return t('admin.matches.filters_label', 'Filtrer les matchs · compteurs pour : {scope}', { scope })
 })
-const views = computed(() => props.filters.map(entry => {
-  const selected = entry.value === props.filter
-  return {
-    ...entry,
-    selected,
-    color: selected ? 'secondary' : 'var(--origam-color__text---secondary)',
-    bgColor: selected ? 'secondary' : 'transparent',
-    borderColor: selected ? 'transparent' : 'var(--origam-color__border---default)',
-    dataCy: `admin-matches-filter-${entry.value}`
-  }
-}))
+const views = computed(() => props.filters.map(entry => ({ ...entry, dataCy: `admin-matches-filter-${entry.value}` })))
 const handleFilter = (value: ADMIN_MATCH_FILTER) => {
   emits('update:filter', value)
 }
@@ -218,27 +180,6 @@ defineExpose({})
   gap: var(--match-queue-filters---gap, var(--origam-space---4));
   margin-bottom: var(--match-queue-filters---margin-bottom, var(--origam-space---5));
 
-  &__chips {
-    --origam-chip---height-lg: calc(var(--origam-space---11) - 2 * var(--origam-border__width---thin));
-    --origam-chip---padding-lg: var(--origam-space---4);
-    --origam-chip---font-size-lg: var(--origam-font__size---md);
-
-    overflow: visible;
-  }
-
-  &__chips :deep(.origam-slide-group__container),
-  &__chips :deep(.origam-slide-group__content) {
-    flex-wrap: wrap;
-    overflow: visible;
-    contain: none;
-  }
-
-  &__chips :deep(.origam-slide-group__content) {
-    flex: 1 1 auto;
-    min-width: 0;
-    gap: var(--origam-space---2);
-  }
-
   &__selects {
     display: flex;
     flex-wrap: wrap;
@@ -281,27 +222,6 @@ defineExpose({})
 
   &__switch {
     margin-inline-start: var(--match-queue-filters__switch---margin-start, var(--origam-space---1));
-  }
-
-  &__label {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--origam-space---2);
-    line-height: var(--origam-font__lineHeight---normal);
-  }
-
-  &__count {
-    padding-inline: var(--origam-space---2);
-    border-radius: var(--origam-radius---full);
-    background: var(--origam-color__surface---overlay);
-    font-size: var(--origam-font__size---xs);
-    line-height: var(--origam-font__lineHeight---normal);
-    font-variant-numeric: tabular-nums;
-
-    &--selected {
-      background: var(--origam-color__surface---default);
-      color: var(--origam-color__text---primary);
-    }
   }
 }
 </style>

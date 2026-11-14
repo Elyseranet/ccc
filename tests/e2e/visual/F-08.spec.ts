@@ -9,7 +9,7 @@ const VIEWPORTS = [
   { name: '1440', width: 1440, height: 900 }
 ]
 
-const COUNT_MASKS: IDataMasks = { mockup: ['.fchip .num'], app: ['.match-queue-filters__count'] }
+const COUNT_MASKS: IDataMasks = { mockup: ['.fchip .num'], app: ['.filter-chips__count'] }
 const SELECT_MASKS: IDataMasks = { mockup: [], app: [], values: { mockup: ['.adm-sel-row .input'], app: ['.match-queue-filters__select'] } }
 
 const ZONES = [
