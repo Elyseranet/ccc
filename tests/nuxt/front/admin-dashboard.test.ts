@@ -1,4 +1,4 @@
-import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineEventHandler, setResponseStatus } from 'h3'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RouterLink } from 'vue-router'
@@ -13,6 +13,9 @@ import { API_ROUTES } from '../../../src/consts/api-routes.const'
 import { API_ENDPOINT } from '../../../src/enums/api-endpoint.enum'
 import AdminDashboardPage from '../../../src/pages/admin/index.vue'
 
+const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
+mockNuxtImport('navigateTo', () => navigateToMock)
+
 const mountPage = () => mountSuspended(AdminDashboardPage, { route: '/admin', global: { components: { RouterLink } } })
 
 const adminMatch = (id: string, status: MATCH_STATUS) => ({
@@ -20,7 +23,7 @@ const adminMatch = (id: string, status: MATCH_STATUS) => ({
   sides: [], winnerParticipationId: null, comment: null, version: 1, recordedAt: null, validatedAt: null, validatedBy: null
 })
 const edition = (status: EDITION_STATUS, validated = 68) => ({
-  id: 'e1', year: 2026, status, participants: Array.from({ length: 45 }), pools: Array.from({ length: 8 }),
+  id: 'e1', code: '2026-1', year: 2026, status, participants: Array.from({ length: 45 }), pools: Array.from({ length: 8 }),
   rounds: [{ id: 'r1', kind: ROUND_KIND.POOLS, sequence: 1, status: ROUND_STATUS.PLAYING, matchCount: 105, validatedMatchCount: validated }]
 })
 const draw = { id: 'd1', kind: DRAW_KIND.POOLS, roundKind: null, status: DRAW_STATUS.VALIDATED, parameters: { poolCount: 8, seedCount: 8 }, createdAt: '2026-11-01T10:00:00Z', validatedAt: null, assignments: [], createdBy: null, validatedBy: null }
@@ -87,6 +90,25 @@ describe('page /admin, tableau de bord (F-07)', () => {
     expect(wrapper.get('[data-cy="admin-todo-draws"]').text()).toContain('0')
     expect(wrapper.get('[data-cy="admin-dashboard-cta"]').text()).toContain('Valider les scores saisis')
     expect(wrapper.get('[data-cy="admin-dashboard-cta"]').text()).toContain('7')
+  })
+
+  it('étapes cliquables (F39-STEPS) : un bouton par étape qui a une page, seule l’étape en cours reste inerte, le nom accessible est le texte visible, le clic navigue', async () => {
+    navigateToMock.mockReset()
+    const wrapper = await mountPage()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-control-center"]').exists()).toBe(true))
+    const steps = wrapper.findAll('[data-cy^="stepper-item-"]')
+    expect(steps.map(step => step.element.tagName)).toEqual(['BUTTON', 'BUTTON', 'BUTTON', 'DIV', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON'])
+    expect(steps[3]!.attributes('aria-current')).toBe('step')
+    expect(steps[1]!.attributes('aria-label')).toBe('ParticipantsFait · 45 participants inscrits')
+    expect(steps[4]!.attributes('aria-label')).toMatch(/^5Validation des qualifiés/)
+    await steps[0]!.trigger('click')
+    expect(navigateToMock).toHaveBeenLastCalledWith('/admin/editions/2026-1')
+    await steps[6]!.trigger('click')
+    expect(navigateToMock).toHaveBeenLastCalledWith('/admin/matchs')
+    await steps[7]!.trigger('click')
+    expect(navigateToMock).toHaveBeenLastCalledWith('/admin/matchs?tour=FINAL')
+    await steps[8]!.trigger('click')
+    expect(navigateToMock).toHaveBeenLastCalledWith('/admin/phase-finale/cloture')
   })
 
   it('route d’activité absente ou en erreur : le bloc affiche l’état d’erreur d’AsyncState et le reste de la page reste complet', async () => {

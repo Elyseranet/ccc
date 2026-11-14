@@ -1,4 +1,7 @@
 import { ADMIN_ACTIVITY_KIND } from '../enums/admin-activity.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
+import { ADMIN_MATCH_ROUND_QUERY_PARAM } from './admin-match-filters.const.js'
+import { ROUTES } from './routes.const.js'
 import { ADMIN_DASHBOARD_STEP, ADMIN_DASHBOARD_STEP_STATUS } from '../enums/admin-dashboard.enum.js'
 import type { IAdminDashboardStepDefinition } from '../interfaces/admin-dashboard.interface.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
@@ -23,6 +26,25 @@ export const ADMIN_DASHBOARD_STEPS: IAdminDashboardStepDefinition[] = [
 ]
 
 export const ADMIN_DASHBOARD_STEP_COUNT = ADMIN_DASHBOARD_STEPS.length
+
+/** Marque de `ROUTES.ADMIN_EDITION` remplacée par le code de l'édition active (étape « Création »). */
+export const ADMIN_DASHBOARD_EDITION_CODE_PLACEHOLDER = ':code'
+
+/**
+ * Page de chaque étape du centre de contrôle (décision F39-STEPS, table de `docs/tickets/F-39.md`). Une étape « À venir » reste atteignable (c9790abd (1)) ; `null` = pas de page
+ * (l'étape reste un bloc non cliquable ; aucune aujourd'hui, la clôture a sa page depuis F-26). Étape 7 sans `tour` : le tour en cours (un seul tour du bracket est ouvert à la fois, `round-draw.md`).
+ */
+export const ADMIN_DASHBOARD_STEP_ROUTES: Record<ADMIN_DASHBOARD_STEP, string | null> = {
+  [ADMIN_DASHBOARD_STEP.CREATION]: ROUTES.ADMIN_EDITION,
+  [ADMIN_DASHBOARD_STEP.PARTICIPANTS]: ROUTES.ADMIN_PARTICIPANTS,
+  [ADMIN_DASHBOARD_STEP.POOL_DRAW]: ROUTES.ADMIN_DRAWS,
+  [ADMIN_DASHBOARD_STEP.POOL_MATCHES]: `${ROUTES.ADMIN_MATCHES}?${ADMIN_MATCH_ROUND_QUERY_PARAM}=${ROUND_KIND.POOLS}`,
+  [ADMIN_DASHBOARD_STEP.QUALIFIED_VALIDATION]: ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION,
+  [ADMIN_DASHBOARD_STEP.BRACKET_DRAW]: ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW,
+  [ADMIN_DASHBOARD_STEP.BRACKET_MATCHES]: ROUTES.ADMIN_MATCHES,
+  [ADMIN_DASHBOARD_STEP.FINAL]: `${ROUTES.ADMIN_MATCHES}?${ADMIN_MATCH_ROUND_QUERY_PARAM}=${ROUND_KIND.FINAL}`,
+  [ADMIN_DASHBOARD_STEP.CLOSING]: ROUTES.ADMIN_FINAL_PHASE_CLOSING
+}
 
 export const ADMIN_DASHBOARD_STATUS_TEXTS: Record<ADMIN_DASHBOARD_STEP_STATUS, ITranslatableText> = {
   [ADMIN_DASHBOARD_STEP_STATUS.DONE]: { key: 'admin.dashboard.status_done', fallback: 'Fait' },

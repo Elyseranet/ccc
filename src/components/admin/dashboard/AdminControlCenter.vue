@@ -20,11 +20,11 @@
       </header>
       <origam-stepper
         orientation="vertical"
-        :clickable="false"
         show-connectors
         :model-value="activeIndex"
-        :items="items"
+        :items="stepperItems"
         data-cy="admin-control-center-steps"
+        @update:model-value="handleStep"
       />
     </template>
   </origam-card>
@@ -42,7 +42,9 @@ import type { IAdminControlCenterEmits, IAdminControlCenterProps, IAdminControlC
  *
  * @description
  * Centre de contrôle : les neuf étapes du workflow d'une édition, l'étape active étant déduite par `useAdminDashboard`.
- * Le stepper n'est pas cliquable : il informe, les actions sont dans « À traiter ».
+ * Chaque étape qui a une page y mène (décision F39-STEPS, comme la navigation de la phase finale) : boutons d'Origam et `navigateTo`, l'étape en cours est inerte.
+ * Le nom accessible d'une étape est son texte visible (numéro ou coche, titre, sous-titre) : `origam-stepper-item` pose sinon « Step 2: Titre » (anglais, sans le texte visible), refusé par axe
+ * (`label-content-name-mismatch`) ; fiche `docs/tickets/origam/stepper-item-cliquable-nom-accessible-anglais.md`.
  * Origam dessine indicateurs et connecteurs à partir de `items` (`title`, `subtitle`, `status`) : aucun CSS local sur ses parties.
  * `origam-stepper-item` n'a pas de slot, le statut en texte (Fait, En cours, À venir) est donc le début du sous-titre.
  ********************************************************/
@@ -64,6 +66,26 @@ const activeIndex = computed(() => {
   const index = props.items.findIndex(item => item.status === ADMIN_DASHBOARD_STEP_STATUS.ACTIVE)
   return index === -1 ? props.items.length : index
 })
+
+/*********************************************************
+ * Navigation
+ *
+ * @description
+ * Une étape est cliquable si elle a une page et n'est pas l'étape en cours ; Origam rend alors un bouton et émet son index, la route vient de la table des étapes.
+ ********************************************************/
+const stepperItems = computed(() => props.items.map((item, index) => ({
+  title: item.title,
+  subtitle: item.subtitle,
+  status: item.status,
+  'aria-label': `${item.status === ADMIN_DASHBOARD_STEP_STATUS.DONE ? '' : index + 1}${item.title}${item.subtitle}`,
+  clickable: item.to !== null && index !== activeIndex.value
+})))
+const handleStep = async (index: number) => {
+  const to = props.items[index]?.to
+  if (to) {
+    await navigateTo(to)
+  }
+}
 
 /*********************************************************
  * Expose

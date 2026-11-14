@@ -15,7 +15,7 @@ import type { TTranslate } from '../../src/types/translate.type.js'
 import { ADMIN_MATCH_FILTER_QUERY_PARAM } from '../../src/consts/admin-match-filters.const.js'
 import { ADMIN_MATCH_FILTER } from '../../src/enums/admin-match-filter.enum.js'
 import {
-  buildActivityRows, buildDashboardView, buildStepItems, buildTodoItems, classifyError, computeCounters, recordedQueueLink,
+  buildActivityRows, buildDashboardView, buildStepItems, stepRoute, buildTodoItems, classifyError, computeCounters, recordedQueueLink,
   resolveActiveStep, resolveStepStatus
 } from '../../src/utils/admin-dashboard.util.js'
 
@@ -106,7 +106,7 @@ const adminDraw = (status: DRAW_STATUS, kind = DRAW_KIND.POOLS): IAdminDraw => (
 })
 const data = (overrides: Partial<IAdminDashboardData> & { status?: EDITION_STATUS, rounds?: IRound[] } = {}): IAdminDashboardData => ({
   edition: {
-    id: 'e1', year: 2026, status: overrides.status ?? EDITION_STATUS.POOLS_PLAYING, rounds: overrides.rounds ?? [pools(68)],
+    id: 'e1', code: '2026-1', year: 2026, status: overrides.status ?? EDITION_STATUS.POOLS_PLAYING, rounds: overrides.rounds ?? [pools(68)],
     participants: Array.from({ length: 45 }), pools: Array.from({ length: 8 })
   } as unknown as IAdminDashboardData['edition'],
   adminMatches: overrides.adminMatches ?? [],
@@ -140,6 +140,16 @@ describe('étapes, cartes et vue', () => {
     expect(steps[0]).toMatchObject({ status: ADMIN_DASHBOARD_STEP_STATUS.DONE, subtitle: 'Fait' })
     expect(steps[1]).toMatchObject({ status: ADMIN_DASHBOARD_STEP_STATUS.DONE, subtitle: 'Fait · 45 participants inscrits' })
     expect(steps[8]).toMatchObject({ status: ADMIN_DASHBOARD_STEP_STATUS.PENDING, subtitle: 'À venir · calcul du barème et des classements' })
+  })
+
+  it('chaque étape mène à sa page (table F39-STEPS) : la création à la fiche de l’édition active, les matchs de poules au tour POOLS, la finale au tour FINAL, la clôture sans page', () => {
+    const source = data()
+    const steps = buildStepItems(source, computeCounters(source), ADMIN_DASHBOARD_STEP.POOL_MATCHES, t)
+    expect(steps.map(step => step.to)).toEqual([
+      '/admin/editions/2026-1', '/admin/participants', '/admin/tirages', '/admin/matchs?tour=POOLS', '/admin/phase-finale/qualification',
+      '/admin/phase-finale/tirage', '/admin/matchs', '/admin/matchs?tour=FINAL', '/admin/phase-finale/cloture'
+    ])
+    expect(stepRoute(ADMIN_DASHBOARD_STEP.CREATION, 'a b/c')).toBe('/admin/editions/a%20b%2Fc')
   })
 
   it('le tirage des poules est « brouillon » tant que l’édition est en inscription et que le tirage n’est pas validé', () => {

@@ -43,6 +43,12 @@
 .st__b { display: flex; flex-direction: column; }
 .st__b b { font-size: var(--origam-font__size---md); font-weight: var(--origam-font__weight---medium); line-height: var(--origam-font__lineHeight---normal); }
 .st__b small { color: var(--origam-color__text---secondary); font-size: var(--origam-font__size---sm); line-height: var(--origam-font__lineHeight---normal); }
+/* F-39 / F39-STEPS : étapes cliquables = boutons d’origam-stepper (pas de lien), largeur du contenu ; étape courante et étape sans page = div non cliquable. Le bouton porte la mise en page de l’étape (même flex, même gap), sans fond, sans bordure ni padding : rien ne bouge au repos */
+.st__a { display: flex; flex: 0 1 auto; align-items: flex-start; gap: var(--origam-space---4); margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; word-spacing: inherit; text-transform: inherit; text-indent: inherit; text-rendering: inherit; -webkit-font-smoothing: inherit; text-align: start; cursor: default; } /* reprend les réglages de texte de la page : le navigateur les remet à zéro sur un bouton */
+button.st__a:not(:disabled) { cursor: pointer; }
+button.st__a:not(:disabled):hover .st__i, button.st__a.is-hover .st__i { opacity: 0.85; } /* origam-stepper-item--clickable:hover */
+button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--origam-color__action--primary---bg); outline-offset: 2px; border-radius: var(--origam-radius---full); } /* origam-stepper-item--clickable:focus-visible */
+.st-demo { padding-inline: 0; }
 
 .adm-todo .h-card { margin-bottom: var(--origam-space---1); }
 .adm-task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--origam-space---4); padding: var(--origam-space---5); text-decoration: none; }

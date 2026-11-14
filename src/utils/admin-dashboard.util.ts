@@ -1,4 +1,4 @@
-import { ADMIN_DASHBOARD_STATIC_SUBTITLES, ADMIN_DASHBOARD_STATUS_TEXTS, ADMIN_DASHBOARD_STEPS, ADMIN_DASHBOARD_STEP_COUNT } from '../consts/admin-dashboard.const.js'
+import { ADMIN_DASHBOARD_EDITION_CODE_PLACEHOLDER, ADMIN_DASHBOARD_STATIC_SUBTITLES, ADMIN_DASHBOARD_STATUS_TEXTS, ADMIN_DASHBOARD_STEPS, ADMIN_DASHBOARD_STEP_COUNT, ADMIN_DASHBOARD_STEP_ROUTES } from '../consts/admin-dashboard.const.js'
 import { ADMIN_MATCH_FILTER_QUERY_PARAM } from '../consts/admin-match-filters.const.js'
 import { HTTP_STATUS_FORBIDDEN, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_UNAUTHORIZED } from '../consts/http-status.const.js'
 import { ROUND_LABELS } from '../consts/round-labels.const.js'
@@ -148,6 +148,10 @@ export const stepStatusText = (status: ADMIN_DASHBOARD_STEP_STATUS, t: TTranslat
  * (« En cours · 68 / 105 validés… »). `origam-stepper-item` n'a ni slot ni pastille : le statut passe par le sous-titre.
  * Une pastille à droite de l'étape (maquette) reviendra avec le slot demandé dans Origam #1338.
  */
+/** Page d'une étape : `null` sans page. L'étape « Création » mène à la fiche de l'édition active. */
+export const stepRoute = (step: ADMIN_DASHBOARD_STEP, editionCode: string): string | null =>
+  ADMIN_DASHBOARD_STEP_ROUTES[step]?.replace(ADMIN_DASHBOARD_EDITION_CODE_PLACEHOLDER, encodeURIComponent(editionCode)) ?? null
+
 export const buildStepItems = (data: IAdminDashboardData, counters: IAdminDashboardCounters, active: ADMIN_DASHBOARD_STEP | null, t: TTranslate): IAdminDashboardStepItem[] =>
   ADMIN_DASHBOARD_STEPS.map((definition) => {
     const status = resolveStepStatus(definition.step, active)
@@ -156,7 +160,8 @@ export const buildStepItems = (data: IAdminDashboardData, counters: IAdminDashbo
     return {
       title: t(definition.title.key, definition.title.fallback),
       subtitle: detail ? t('admin.dashboard.step_subtitle', '{status} · {detail}', { status: label, detail }) : label,
-      status
+      status,
+      to: stepRoute(definition.step, data.edition.code)
     }
   })
 
