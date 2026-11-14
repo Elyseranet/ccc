@@ -1,3 +1,4 @@
+import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import type { ICompetitorPublic } from '../interfaces/competitor.interface.js'
 import type { IHeadToHeadMatch } from '../interfaces/head-to-head.interface.js'
 import { HEAD_TO_HEAD_PERCENT, UUID_PATTERN } from '../consts/head-to-head.const.js'
@@ -52,3 +53,8 @@ export const initialsOf = (competitor: ICompetitorPublic): string => {
 }
 
 export const signed = (value: number): string => value > 0 ? `+${value}` : String(value)
+
+/** « 1 victoire de Lou » / « 2 victoires de Lou » : le texte partagé par le bilan affiché et l'annonce du résultat. */
+export const winsTextOf = (count: number, name: string): ITranslatableText => count === 1
+  ? { key: 'head_to_head.duel.wins_one', fallback: 'victoire de {name}', params: { name } }
+  : { key: 'head_to_head.duel.wins_other', fallback: 'victoires de {name}', params: { name } }

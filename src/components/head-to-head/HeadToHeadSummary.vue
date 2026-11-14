@@ -159,7 +159,7 @@ import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { HEAD_TO_HEAD_BAR_THICKNESS, HEAD_TO_HEAD_BAR_TRACK_COLOR, HEAD_TO_HEAD_EMPTY_GLYPH, HEAD_TO_HEAD_SCORE_SEPARATOR } from '~/consts/head-to-head.const'
 import { HEAD_TO_HEAD_SIDE } from '~/enums/head-to-head.enum'
 import type { IHeadToHeadBilanItem, IHeadToHeadSummaryProps } from '~/interfaces/head-to-head-page.interface'
-import { careerRatio, firstNameOf, initialsOf, lastMeeting, percentOf, signed } from '~/utils/head-to-head.util'
+import { careerRatio, firstNameOf, initialsOf, lastMeeting, percentOf, signed, winsTextOf } from '~/utils/head-to-head.util'
 
 /*********************************************************
  * Global
@@ -194,9 +194,10 @@ const ratioPercent = computed(() => percentOf(props.comparison.winRatio ?? 0))
 const nameA = computed(() => firstNameOf(props.comparison.competitor))
 const nameB = computed(() => firstNameOf(props.comparison.opponent))
 const duelTitle = computed(() => t('head_to_head.duel.title', 'Bilan des rencontres'))
-const winsLabel = (count: number, name: string): string => count === 1
-  ? t('head_to_head.duel.wins_one', 'victoire de {name}', { name })
-  : t('head_to_head.duel.wins_other', 'victoires de {name}', { name })
+const winsLabel = (count: number, name: string): string => {
+  const text = winsTextOf(count, name)
+  return t(text.key, text.fallback, text.params)
+}
 const winsLabelA = computed(() => winsLabel(winsA.value, nameA.value))
 const winsLabelB = computed(() => winsLabel(winsB.value, nameB.value))
 const barLabel = computed(() => t('head_to_head.duel.bar_label', '{first} victoires contre {second}', { first: winsA.value, second: winsB.value }))

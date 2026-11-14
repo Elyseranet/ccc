@@ -685,6 +685,8 @@
   "golden_rules.rule_31": "The bounce is allowed",
   "golden_rules.rule_32_detail": "Fair play: the winner finishes their beer.",
   "golden_rules.rule_32": "Fair play: the winner finishes their beer",
+  "head_to_head.announce.never_met": "Head-to-head: these two players have never met with a known score.",
+  "head_to_head.announce.result": "Head-to-head: {first}, {second}.",
   "head_to_head.bilans.differential": "Differential",
   "head_to_head.bilans.hint": "Across all editions (RG37)",
   "head_to_head.bilans.losses": "Losses",

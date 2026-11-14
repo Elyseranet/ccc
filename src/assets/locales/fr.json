@@ -685,6 +685,8 @@
   "golden_rules.rule_31": "Le rebond est homologué",
   "golden_rules.rule_32_detail": "Fair-play : le gagnant finit sa bière.",
   "golden_rules.rule_32": "Fair-play : le gagnant finit sa bière",
+  "head_to_head.announce.never_met": "Face-à-face : ces deux joueurs ne se sont jamais affrontés avec un score connu.",
+  "head_to_head.announce.result": "Face-à-face : {first}, {second}.",
   "head_to_head.bilans.differential": "Différentiel",
   "head_to_head.bilans.hint": "Sur toutes les éditions (RG37)",
   "head_to_head.bilans.losses": "Défaites",
