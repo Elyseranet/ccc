@@ -23,7 +23,9 @@ export const LEGAL_ACCESSIBILITY_CONTENT: ILegalPageContent = {
         items: [
           { key: 'legal.accessibility.done_axe', fallback: 'Tests automatisés (axe) sur les pages.' },
           { key: 'legal.accessibility.done_keyboard', fallback: 'Navigation au clavier ; lien d’évitement.' },
-          { key: 'legal.accessibility.done_motion', fallback: 'Réduction des animations pour les personnes qui le demandent (prefers-reduced-motion).' }
+          { key: 'legal.accessibility.done_motion', fallback: 'Réduction des animations pour les personnes qui le demandent (prefers-reduced-motion).' },
+          { key: 'legal.accessibility.done_pause', fallback: 'Bouton « Mettre en pause les animations » sur l’accueil et le palmarès ; le choix est mémorisé 12 mois.' },
+          { key: 'legal.accessibility.done_contrast', fallback: 'Bordures des champs de formulaire à un contraste d’au moins 3:1.' }
         ]
       }
       ]
@@ -48,11 +50,9 @@ export const LEGAL_ACCESSIBILITY_CONTENT: ILegalPageContent = {
         {
         kind: LEGAL_BLOCK.LIST,
         items: [
-          { key: 'legal.accessibility.known_contrast', fallback: 'Contraste des bordures des champs de formulaire inférieur à 3:1 : identifié par l’audit, mesure en cours.' },
           { key: 'legal.accessibility.known_sort', fallback: 'Le tri des colonnes de l’annuaire des joueurs (/joueurs) n’est pas utilisable au clavier (composant Origam, issue n° 1341) : identifié par l’audit, mesure en cours.' },
           { key: 'legal.accessibility.known_chips', fallback: 'Les puces-filtres des matchs d’une édition signalent leur état par la couleur seule : identifié par l’audit, mesure en cours.' },
           { key: 'legal.accessibility.known_score', fallback: 'Sur l’accueil, le score d’un match peut être lu sans son séparateur par un lecteur d’écran : identifié par l’audit, mesure en cours.' },
-          { key: 'legal.accessibility.known_motion', fallback: 'Les animations en boucle de l’accueil n’ont pas encore de bouton de mise en pause (il est prévu) : identifié par l’audit, mesure en cours.' },
           { key: 'legal.accessibility.known_abbreviations', fallback: 'Des abréviations (J, V, D, Diff., Q, ACP) ne sont pas expliquées : identifié par l’audit, mesure en cours.' },
           { key: 'legal.accessibility.known_suggestions', fallback: 'Dans l’administration (hors pages publiques), le menu de suggestions de la recherche de participant expose des rôles ARIA invalides (composant Origam, issue n° 1331).' }
         ]
