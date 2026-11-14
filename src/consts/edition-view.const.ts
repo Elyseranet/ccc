@@ -138,3 +138,6 @@ export const EDITION_MATCH_STATUS_VIEW: Record<MATCH_STATUS, { label: ITranslata
   [MATCH_STATUS.SCHEDULED]: { label: { key: 'edition.match_status_scheduled', fallback: 'À jouer' }, family: EDITION_CHIP_FAMILY.NEUTRAL },
   [MATCH_STATUS.RECORDED]: { label: { key: 'edition.match_status_scheduled', fallback: 'À jouer' }, family: EDITION_CHIP_FAMILY.NEUTRAL }
 }
+
+/** Taille du chiffre « 1 » de la capsule du podium de l'édition (unités du viewBox de la capsule). */
+export const EDITION_PODIUM_CAP_TEXT_SIZE = 36

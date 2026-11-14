@@ -75,6 +75,11 @@ export class EditionService extends BaseService {
     return this.request<IEditionDetail>(`/editions/${encodeURIComponent(id)}`)
   }
 
+  /** `POST /editions/{id}/cloture` (B-14, F-26) : fige les points et passe l'édition à CLOSED ; idempotent, sans corps ni `If-Match`. */
+  close (id: string): Promise<IEditionDetail> {
+    return this.request<IEditionDetail>(`/editions/${encodeURIComponent(id)}/cloture`, { method: 'POST' })
+  }
+
   /** Flux d'activité du tableau de bord (B-15) : validations de match et de tirage, du plus récent au plus ancien. */
   adminActivity (id: string, limit?: number): Promise<IAdminActivityItem[]> {
     return this.request<IAdminActivityItem[]>(`/admin/editions/${encodeURIComponent(id)}/activite`, { query: { limit } })

@@ -135,6 +135,8 @@ describe('états sans saisie (F-25)', () => {
     current = preview(2, { roundKind: null, allowedRoundKinds: [] })
     const finished = await mountPage()
     await vi.waitFor(() => expect(finished.find('[data-cy="round-draw-state-finished"]').exists()).toBe(true))
+    expect(finished.get('[data-cy="round-draw-state-finished-link"]').attributes('href')).toBe('/admin/phase-finale/cloture')
+    expect(finished.get('[data-cy="round-draw-state-finished-link"]').text()).toBe('Clôturer l’édition')
   })
 
   it('édition clôturée : message dédié', async () => {

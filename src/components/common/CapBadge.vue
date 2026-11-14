@@ -1,6 +1,7 @@
 <template>
   <svg
     class="cap-badge"
+    :style="toneStyle"
     viewBox="0 0 100 100"
     aria-hidden="true"
     focusable="false"
@@ -16,9 +17,11 @@
       r="31"
     />
     <text
+      v-if="text !== undefined"
       class="cap-badge__text"
       x="50"
       :y="textY"
+      :font-size="textSize"
       text-anchor="middle"
     >
       {{ text }}
@@ -27,24 +30,31 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { BRAND_CAP_POINTS } from '~/consts/brand.const'
+import { CAP_BADGE_DEFAULT_TEXT_SIZE, CAP_BADGE_DEFAULT_TEXT_Y, CAP_TONE_FILL } from '~/consts/cap-badge.const'
+import { CAP_TONE } from '~/enums/cap-tone.enum'
 import type { ICapBadgeProps } from '~/interfaces/common-components.interface'
 
 /*********************************************************
  * Global
  *
  * @description
- * Capsule décorative portant un court texte (le code d'une erreur, par exemple). Elle est `aria-hidden` : l'information
- * est déjà dans le texte de la page. Les capsules à chiffre de l'édition et de l'accueil dessinent chacune la leur ;
- * elles pourraient s'appuyer sur celle-ci : même polygone, même rond intérieur, texte à y = 58 par défaut (valeur de ces
- * capsules), taille, graisse et couleurs réglées par les variables `--cap-badge__*`.
+ * La capsule décorative, définie ici une seule fois (F-23) : polygone de la marque, rond intérieur, texte facultatif (le code d'une erreur, un nombre de
+ * titres, le nom de la marque). Elle est `aria-hidden` : l'information est déjà dans le texte de la page. Texte, position et taille du texte (unités
+ * du viewBox) et teinte de la coque se règlent par props ; la taille, la rotation, l'opacité, la position et l'animation sont celles du parent, qui
+ * pose sa classe sur le `svg` (les attributs retombent sur la racine).
  ********************************************************/
 const props = withDefaults(defineProps<ICapBadgeProps>(), {
-  textY: 58
+  text: undefined,
+  textY: CAP_BADGE_DEFAULT_TEXT_Y,
+  textSize: CAP_BADGE_DEFAULT_TEXT_SIZE,
+  tone: CAP_TONE.AMBER
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const capPoints = BRAND_CAP_POINTS
+const toneStyle = computed(() => ({ '--cap-badge__shape---fill': CAP_TONE_FILL[props.tone] }))
 
 /*********************************************************
  * Expose
@@ -70,7 +80,6 @@ defineExpose({})
   &__text {
     fill: var(--cap-badge__text---fill, var(--origam-color__bar---foam));
     font-family: var(--origam-font__family---display);
-    font-size: var(--cap-badge__text---font-size, 26px);
     font-weight: var(--cap-badge__text---font-weight, 400);
   }
 }
@@ -78,6 +87,7 @@ defineExpose({})
 
 <style>
 :root {
-  --cap-badge__text---font-size: 26px;
+  --cap-badge__inner---fill: var(--origam-color__surface---default);
+  --cap-badge__text---fill: var(--origam-color__bar---foam);
 }
 </style>

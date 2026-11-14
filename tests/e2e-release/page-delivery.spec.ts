@@ -19,8 +19,10 @@ const PLAYER_PAGE = '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca'
 const INVITATION_PAGE = '/invitation/jeton-de-test'
 /** Pages livrées, sauf l'admin et le profil : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5 ; un jeton d'invitation inconnu donne l'état « lien inconnu »). */
 const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE, ROUTES.HALL_OF_FAME]
+/** Phase finale livrée (F-24, F-25, F-26) : l'entrée du tiroir (qui ouvre la qualification), la qualification, le tirage du tour et la clôture. */
+const PHASE_FINALE_PAGES: string[] = [ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION, ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW, ROUTES.ADMIN_FINAL_PHASE_CLOSING]
 /** `/profil` est livré mais réservé à un compte : sans session il redirige vers `/connexion` (testé plus bas). */
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN, ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN, ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...PHASE_FINALE_PAGES, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
 const ADMIN_PARTICIPANTS_DATA_CY = 'admin-participants'
 const ADMIN_DASHBOARD_DATA_CY = 'admin-dashboard'
@@ -49,7 +51,7 @@ test.describe('pages non livrées', () => {
   })
 
   test('un cookie de session présenté ne rend pas visible une page non livrée', async ({ request }) => {
-    const response = await request.get(ROUTES.ADMIN_FINAL_PHASE, {
+    const response = await request.get(ROUTES.ADMIN_EDITIONS, {
       maxRedirects: 0,
       headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${'x'.repeat(43)}` }
     })
@@ -103,6 +105,16 @@ test.describe('page d’erreur CCC (F-19, décision 9639ca1)', () => {
 test('la sonde de santé reste publique', async ({ request }) => {
   const response = await request.get('/api/v1/health')
   expect([200, 503]).toContain(response.status())
+})
+
+test.describe('pages livrées de la phase finale (F-24, F-25, F-26)', () => {
+  for (const page of PHASE_FINALE_PAGES) {
+    test(`${page} : sans session, redirige vers /connexion (pas 404)`, async ({ request }) => {
+      const response = await request.get(page, { maxRedirects: 0 })
+      expect(response.status()).toBe(302)
+      expect(response.headers().location).toBe(ROUTES.LOGIN)
+    })
+  }
 })
 
 test.describe(`page livrée ${ROUTES.ADMIN_MORE} (T-LIVE-01)`, () => {

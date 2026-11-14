@@ -1,3 +1,4 @@
+import { CAP_TONE } from '../enums/cap-tone.enum.js'
 import { MATCH_SORT } from '../enums/match-sort.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 
@@ -29,9 +30,9 @@ export const HOME_PINT_BUBBLES = [
 ]
 
 export const HOME_PINT_CAPS = [
-  { modifier: 'one', colorClass: '', label: true },
-  { modifier: 'two', colorClass: 'home-pint__cap-body--amber', label: false },
-  { modifier: 'three', colorClass: 'home-pint__cap-body--ice', label: false }
+  { modifier: 'one', tone: CAP_TONE.NEON, label: true },
+  { modifier: 'two', tone: CAP_TONE.AMBER, label: false },
+  { modifier: 'three', tone: CAP_TONE.ICE, label: false }
 ]
 
 export const HOME_ACP_WINDOW_EDITIONS = 5
@@ -45,3 +46,6 @@ export const HOME_PROGRESS_THICKNESS = 8
 
 /** Fond de la piste de la barre d'avancement : surface « creusée » de la maquette. */
 export const HOME_PROGRESS_TRACK_COLOR = 'var(--origam-color__surface---sunken)'
+
+/** Taille du nom de la marque dans la capsule de la pinte de l'accueil (unités du viewBox de la capsule). */
+export const HOME_PINT_CAP_TEXT_SIZE = 22

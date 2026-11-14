@@ -42,3 +42,6 @@ export const PALMARES_COLUMNS: Array<{ key: PALMARES_COLUMN, align: 'start' | 'e
   { key: PALMARES_COLUMN.PARTICIPATIONS, align: 'end', sortable: true, titles: { [RANKING_KIND.ACP]: PARTICIPATIONS_TITLE, [RANKING_KIND.ALL_TIME]: PARTICIPATIONS_TITLE } },
   { key: PALMARES_COLUMN.AVERAGE, align: 'end', sortable: true, titles: { [RANKING_KIND.ACP]: AVERAGE_TITLE, [RANKING_KIND.ALL_TIME]: AVERAGE_TITLE } }
 ]
+
+/** Taille du nombre de titres dans la capsule du plus titré (unités du viewBox de la capsule). */
+export const PALMARES_CAP_TEXT_SIZE = 34

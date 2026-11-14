@@ -1,3 +1,4 @@
+import type { CAP_TONE } from '../enums/cap-tone.enum.js'
 import type { CONFIRM_DIALOG_APPEARANCE } from '../enums/confirm-dialog.enum.js'
 import type { GOLDEN_RULES_VARIANT } from '../enums/golden-rules-variant.enum.js'
 import type { ICompetitorPublic } from './competitor.interface.js'
@@ -27,8 +28,14 @@ export interface IPageHeroProps {
 }
 
 export interface ICapBadgeProps {
-  text: string
+  /** Texte dans la capsule (le code d'une erreur, un nombre de titres) ; absent, la capsule est seule. */
+  text?: string
+  /** Position verticale du texte, en unités du viewBox. */
   textY?: number
+  /** Taille du texte, en unités du viewBox. */
+  textSize?: number
+  /** Teinte de la coque ; l'ambre de la marque par défaut. */
+  tone?: CAP_TONE
 }
 
 export interface IPlayerLinkProps {
@@ -95,6 +102,10 @@ export interface IConfirmDialogProps {
   confirmColor?: string
   confirmSize?: string
   confirmElevation?: string
+  /** Bouton de confirmation inactif tant que la saisie demandée (F-26 : le code de l'édition) n'est pas faite. */
+  confirmDisabled?: boolean
+  /** `false` : le focus initial est laissé au contenu du dialogue (le champ de saisie), au lieu du bouton « Annuler ». */
+  focusCancel?: boolean
   /** `MOCKUP` : gabarit de la maquette d'F-24 ; `DEFAULT` : rendu historique du dialogue de validation du tirage (F-11), inchangé jusqu'à F-30. */
   appearance?: CONFIRM_DIALOG_APPEARANCE
 }

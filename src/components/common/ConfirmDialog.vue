@@ -37,7 +37,7 @@
           :size="confirmSize"
           :elevation="buttonElevation"
           :loading="busy"
-          :disabled="busy"
+          :disabled="busy || confirmDisabled"
           :text="confirmLabel"
           :data-cy="`${cyPrefix}-confirm`"
           @click="emits('confirm')"
@@ -68,6 +68,8 @@ const props = withDefaults(defineProps<IConfirmDialogProps>(), {
   confirmColor: 'danger',
   confirmSize: 'large',
   confirmElevation: undefined,
+  confirmDisabled: false,
+  focusCancel: true,
   appearance: CONFIRM_DIALOG_APPEARANCE.DEFAULT
 })
 const emits = defineEmits<IConfirmDialogEmits>()
@@ -90,7 +92,7 @@ const handleOpen = (value: boolean) => {
   }
 }
 watch(() => props.open, async (open) => {
-  if (open) {
+  if (open && props.focusCancel) {
     await nextTick()
     const element = cancelRef.value?.$el
     const target = element?.matches?.('button') ? element : element?.querySelector?.('button')

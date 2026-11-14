@@ -246,10 +246,11 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-37](F-37.md) | F-24 : bouton « Arrêter la liste » 44 px au lieu de 48, désactivé sans changement visuel (Origam) | validée @ `409c253b` | — | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-38](F-38.md) | Boutons primaires désactivables : appliquer `usePrimaryActionButton` (suite F-37) | — | F-25 | **Fermé** (2026-11-13) @ `350c9d17` |
 | [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | à faire | F-26 | Ouvert |
-| [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (3 copies en ligne : EditionSummary, HomeBento, HomePint) | — | F-19 | À faire (2026-11-05) | à créer |
+| [F-40](F-40.md) | Pages légales après T-A11Y-01 M5 : ligne cookie `ccc_motion` dans la maquette, déclaration d'accessibilité à jour | à mettre à jour | T-A11Y-01 | Ouvert |
+| [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
-| [F-26](F-26.md) | Admin : clôture de l'édition | validée @ `6e09fd68` | B-14 | À faire |
+| [F-26](F-26.md) | Admin : clôture de l'édition | validée @ `6e09fd68` | B-14 | **Fermé** (2026-11-14) @ `86d025da` |
 | [F-27](F-27.md) | Bouton d'appel « grand » 48 / 24 : une seule recette (surcharges locales de `--origam-btn---*-lg`) | — | F-19, F-26 | À faire (2026-11-05) | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
 | [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | **Ouvert, mergé** @ `75d95e59` : pages non livrées, 29 « À FOURNIR » (infos Elysera), relecture juridique, T-SEC-20 |
@@ -389,7 +390,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
 - [T-QA-11](T-QA-11.md) : **Fermé** (2026-11-13) @ `10d0a42e` — zone publique F-21 : cause tabular-nums du N°, corrigée ; écart dû au mode de lancement expliqué (bordure basse à une fraction de pixel). 0,000 % à 390, 0,461 % max à 1440.
-- [T-QA-10](T-QA-10.md) : **À faire** (2026-11-13) — test e2e F-08 « 412 » instable, déjà présent sur develop ; piste : `watch` de `useScoreEntry`.
+- [T-QA-10](T-QA-10.md) : **Fermé** (2026-11-13) @ `ac1bb3ec` — défaut de l'app (`watch` de `useScoreEntry`), corrigé ; « 412 » 8/8.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
 - [T-OPS-04](T-OPS-04.md) : **À faire** (2026-11-04) — environnement de dev sur Coolify, Mailpit, `develop` (backend-lead).
 - [T-REL-02](T-REL-02.md) : **Fermé** — mergé @ `ba92d1a` (2026-11-04) — livrer accueil, joueurs, fiche joueur, face-à-face (`delivered: true`), frontend-lead.
