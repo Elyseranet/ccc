@@ -43,6 +43,8 @@ import type { IPageHeroProps, IPageHeroSlots } from '~/interfaces/common-compone
  * @description
  * Titre de page display avec extrusion néon, sous-titre et fil d'Ariane optionnels.
  * Les textes sont des clés de traduction (avec repli et paramètres), jamais des chaînes finales.
+ * Le fil d'Ariane est posé au-dessus du titre dans la pile (`z-index: 1`, sous l'en-tête collant à 30) : la boîte de contenu du texte du titre (police display de 119 px, `line-height: none`)
+ * déborde de sa boîte d'environ 34 px et, quand l'intervalle est court (pages d'édition), coiffait le fil d'Ariane et recevait ses clics (F-42).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IPageHeroProps>(), {
@@ -82,6 +84,8 @@ defineExpose({})
   position: relative;
 
   &__breadcrumb {
+    position: relative;
+    z-index: 1;
     padding-top: var(--page-hero__breadcrumb---padding-top, var(--origam-space---8));
   }
 
