@@ -82,10 +82,10 @@
         />
         <origam-btn
           variant="flat"
-          bg-color="primary"
-          elevation="lg"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
           size="large"
-          :disabled="!canConfirm"
+          :disabled="isBlocked"
           :loading="busy"
           :text="confirmLabel"
           data-cy="draw-seeds-confirm"
@@ -99,6 +99,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamCheckbox } from 'origam/components'
+import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import type { IDrawSeedsProps, IPoolDrawTieGroup } from '~/interfaces/pool-draw.interface'
 
@@ -129,6 +130,9 @@ const tieTitle = (group: IPoolDrawTieGroup): string => t('admin.draws.seeds_tie_
 const formatAcp = (value: number): string => value.toFixed(2)
 const isSelected = (participationId: string): boolean => props.selectedIds.includes(participationId)
 const isChosen = (groupIndex: number, participationId: string): boolean => (props.choices[groupIndex] ?? []).includes(participationId)
+
+const isBlocked = computed(() => !props.canConfirm)
+const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 
 /*********************************************************
  * Expose

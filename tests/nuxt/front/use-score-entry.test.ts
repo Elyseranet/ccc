@@ -112,6 +112,23 @@ describe('useScoreEntry (F-08)', () => {
     expect(entry.phase.value).toBe(SCORE_ENTRY_PHASE.IDLE)
   })
 
+  it('412 : le message survit au rechargement de la file, qui change la version de la ligne (T-QA-10)', async () => {
+    const error = new ApiRequestError({ statusCode: 412, code: API_ERROR_CODE.VERSION_CONFLICT, message: 'stale', details: { currentVersion: 9 } })
+    const record = vi.fn(async () => { throw error })
+    const { entry, match, stale } = wire(buildAdminMatch({ status: MATCH_STATUS.SCHEDULED, version: 1 }), { record })
+    stale.mockImplementation(() => {
+      match.value = buildAdminMatch({ status: MATCH_STATUS.RECORDED, version: 9 })
+    })
+    entry.setValue(0, '5')
+    entry.setValue(1, '0')
+    expect(await entry.save()).toBe(false)
+    await flushPromises()
+    expect(match.value!.version).toBe(9)
+    expect(entry.failure.value).toBe(SCORE_FAILURE.VERSION_CONFLICT)
+    entry.setValue(0, '5')
+    expect(entry.failure.value).toBeNull()
+  })
+
   it('428 et 409 SCORE_MISMATCH sont des défauts du front : message générique, pas de rechargement', async () => {
     for (const [statusCode, code] of [[428, API_ERROR_CODE.PRECONDITION_REQUIRED], [409, API_ERROR_CODE.SCORE_MISMATCH]] as const) {
       const validate = vi.fn(async () => { throw new ApiRequestError({ statusCode, code, message: 'x' }) })

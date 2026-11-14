@@ -502,3 +502,15 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - **DIALOG-ZONES** : dérogation au pixel perfect. Les zones visuelles des dialogues comparent la carte, ses dimensions et les boutons sous 1 %, avec le texte masqué. La taille, la graisse et l'interligne du texte sont vérifiés par une mesure du style calculé.
   - Cause : Origam rend le dialogue sur un calque composité, ce qui décale les lignes de texte d'une fraction de pixel. L'image d'écart ne montre que les bords des glyphes. Mesuré par dev-f19 à tailles égales, sur maquette `8b144917` : F-11 4,44 / 9,49 %, F-24 4,54 / 7,19 %, F-25 2,96 / 7,62 %.
   - La dérogation vaut pour les dialogues seulement. Le seuil de 1 % reste inchangé partout ailleurs.
+
+## F39-STEPS — Étapes du centre de contrôle (décision utilisateur 2026-11-13, F-39)
+
+- Les étapes cliquables du centre de contrôle (F-07, F-39) suivent `origam-stepper` tel qu'il est, comme la barre « Phase finale » de F-24 et F-25 : boutons qui naviguent (`navigateTo`), étape courante inactive, survol et focus d'Origam.
+- Pas de vrais liens `<a>` pour l'instant, donc pas d'ouverture dans un nouvel onglet. ui-plus ajuste la maquette `6eeb2a5c` en conséquence.
+- Contrainte Origam (`OrigamStepperItem.vue` l.2-9, v2.37.4) consignée dans `docs/tickets/origam/stepper-item-sans-lien-et-etape-active-desactivee.md`, à déposer pour obtenir de vrais liens plus tard.
+
+## A11Y-S3, A11Y-S10, A11Y-S16 — SHOULD de l'audit d'accessibilité (décisions utilisateur 2026-11-14, T-A11Y-01)
+
+- **A11Y-S3** : le sélecteur d'édition, public et admin, ne navigue plus dès la sélection. On choisit une édition, puis un bouton « Afficher » valide (RGAA, changement de contexte). Deux écrans sont concernés ; maquettes ui-plus, puis visuels remesurés.
+- **A11Y-S10** : les liens vers les joueurs placés **dans un texte courant** sont soulignés. Ceux des tableaux et des cartes, identifiables par leur position, ne changent pas. ui-plus ajuste les maquettes concernées.
+- **A11Y-S16** : un **plan du site** simple, lié depuis le pied de page, sert de second moyen de navigation (RGAA 12.1). Pas de recherche globale.

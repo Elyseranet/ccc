@@ -30,11 +30,15 @@ export const useScoreEntry = (match: MaybeRefOrGetter<IAdminMatch | null>, optio
   const failure = ref<SCORE_FAILURE | null>(null)
   const submitted = ref(false)
 
-  watch(() => [toValue(match)?.id, toValue(match)?.version], () => {
+  // Un autre match remet tout à zéro. Une autre version du MÊME match (le rechargement que déclenche un 412 / 409) relit les scores mais garde l'échec affiché : sans cela le message
+  // « modifié, rechargez » disparaît dès que la file est rechargée, parfois avant qu'on ait pu le lire (T-QA-10). Une saisie ou un envoi suivant l'efface (`setValue`, `run`).
+  watch(() => [toValue(match)?.id, toValue(match)?.version], ([id], previous) => {
     const current = toValue(match)
     values.value = current ? initialScoreInputs(current) : []
-    failure.value = null
     submitted.value = false
+    if (id !== previous?.[0]) {
+      failure.value = null
+    }
   }, { immediate: true })
 
   const rules = computed<IScoreEntryRules | null>(() => {
