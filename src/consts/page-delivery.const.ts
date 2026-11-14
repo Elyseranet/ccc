@@ -154,7 +154,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     endpoints: []
   },
   [ROUTES.ADMIN_FINAL_PHASE_CLOSING]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_CLOSE]
   },
