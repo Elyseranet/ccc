@@ -54,6 +54,8 @@ export const API_ERROR_MESSAGE = {
   PRECONDITION_REQUIRED: 'The If-Match header is required',
   VERSION_CONFLICT: 'The resource was modified by another session',
   SCORE_MISMATCH: 'Les scores envoyés ne correspondent pas au score saisi',
+  MATCH_NOT_VALIDATED: 'Only a validated match can be corrected',
+  ARCHIVE_RESULT_READ_ONLY: 'The result of this match comes from the archives and cannot be changed',
   NEXT_ROUND_ENGAGED: 'The next round is engaged: the score can no longer be corrected',
   SCORE_INCONSISTENT: 'Scores are inconsistent with the match format',
   MATCH_NOT_FOUND: 'Match not found',
