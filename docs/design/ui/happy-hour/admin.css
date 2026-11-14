@@ -329,5 +329,5 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
 .rg[disabled] .rg__opt { opacity: .5; cursor: default; }
 /* F-44 · actions d’une carte d’égalité (lien de saisie + suppression) */
 .q-tie__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---3); }
-.snack--demo { position: static; translate: none; }
+.snack--demo { position: static; z-index: auto; translate: none; margin-block-end: var(--origam-space---4); } /* démo dans la section États : dans le flux, sans z-index, son ombre ne recouvre pas l’alerte suivante */
 
