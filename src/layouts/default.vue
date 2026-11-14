@@ -528,10 +528,17 @@ defineExpose({})
 
 <style>
 :root {
+  --public-header---offset: calc(var(--origam-space---3) + var(--origam-space---16) + var(--origam-space---4));
   --public-header---blur: 16px;
   --public-header---radius: var(--origam-radius---full);
   --public-main---reserved-height: 20rem;
   --public-footer__link--current---thickness: 3px;
   --public-footer__credit---underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --public-header---offset: calc(var(--origam-space---3) + 2 * var(--origam-space---1) + 2 * var(--origam-space---11) + var(--origam-space---4));
+  }
 }
 </style>
