@@ -359,13 +359,27 @@ describe('match scores (B-12)', async () => {
     const target = await adminMatchBySequence(engagedKnockout.edition.id, 3)
 
     await editionRepo.update({ id: engagedKnockout.edition.id }, { status: EDITION_STATUS.CLOSED })
-    expect((await putScore(target, [10, 3])).status).toBe(409)
+    for (const response of [await putScore(target, [10, 3]), await validate(target, [10, 3])]) {
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.EDITION_CLOSED)
+    }
     await editionRepo.update({ id: engagedKnockout.edition.id }, { status: EDITION_STATUS.PLAYOFFS })
 
+    // Résultat d'archive (RESULT_UNKNOWN) : ni saisie ni validation, avec leur code.
+    const matchRepo = dataSource.getRepository(MatchEntity)
+    await matchRepo.update({ id: target.id }, { status: MATCH_STATUS.RESULT_UNKNOWN })
+    for (const response of [await putScore(target, [10, 3]), await validate(target, [10, 3])]) {
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.ARCHIVE_RESULT_READ_ONLY)
+    }
+    await matchRepo.update({ id: target.id }, { status: target.status })
+
+    // Les mises à jour ci-dessus incrémentent la version du match : on relit avant d'écrire.
+    const current = await adminMatchBySequence(engagedKnockout.edition.id, 3)
     await roundRepo.update({ id: engagedKnockout.finalRound.id }, { status: ROUND_STATUS.PENDING })
-    expect((await putScore(target, [10, 3])).status).toBe(409)
+    expect((await putScore(current, [10, 3])).status).toBe(409)
     await roundRepo.update({ id: engagedKnockout.finalRound.id }, { status: ROUND_STATUS.DRAWN })
-    expect((await putScore(target, [10, 3])).status).toBe(200)
+    expect((await putScore(current, [10, 3])).status).toBe(200)
   })
 
   describe('correction (A15)', () => {
@@ -431,6 +445,26 @@ describe('match scores (B-12)', async () => {
       const recorded = await adminMatchBySequence(engagedKnockout.edition.id, 3)
       const response = await correct(recorded, [10, 2], { 'If-Match': `"${recorded.version}"` })
       expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.MATCH_NOT_VALIDATED)
+    })
+
+    it('refuses a correction on a closed edition with EDITION_CLOSED, and on an imported archive result with ARCHIVE_RESULT_READ_ONLY', async () => {
+      const editionRepo = dataSource.getRepository(EditionEntity)
+      const matchRepo = dataSource.getRepository(MatchEntity)
+      const validated = await adminMatchBySequence(engagedKnockout.edition.id, 1)
+      const headers = { 'If-Match': `"${validated.version}"` }
+
+      await matchRepo.update({ id: validated.id }, { winnerParticipationId: validated.sides[0]!.participationId })
+      const archive = await correct(validated, [10, 6], headers)
+      await matchRepo.update({ id: validated.id }, { winnerParticipationId: null })
+      expect(archive.status).toBe(409)
+      expect((await errorOf(archive)).code).toBe(API_ERROR_CODE.ARCHIVE_RESULT_READ_ONLY)
+
+      await editionRepo.update({ id: engagedKnockout.edition.id }, { status: EDITION_STATUS.CLOSED })
+      const closed = await correct(validated, [10, 6], headers)
+      await editionRepo.update({ id: engagedKnockout.edition.id }, { status: EDITION_STATUS.PLAYOFFS })
+      expect(closed.status).toBe(409)
+      expect((await errorOf(closed)).code).toBe(API_ERROR_CODE.EDITION_CLOSED)
     })
   })
 
