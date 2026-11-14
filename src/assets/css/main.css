@@ -60,3 +60,4 @@ button, input, select, textarea { font: inherit; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 :root { --ccc-lead---max-width: 40rem; }
+:focus-visible { scroll-margin-top: var(--public-header---offset, 0px); }
