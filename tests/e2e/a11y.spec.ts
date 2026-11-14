@@ -10,8 +10,7 @@ const VIEWPORTS = [{ name: '1440', width: 1440, height: 900 }, { name: '390', wi
 
 // Dérogations NOMMÉES : une règle connue sur une page, avec sa fiche. Toute autre violation fait échouer le test.
 // /admin/plus : `aria-allowed-role`, `<a role="listitem">` posé par `origam-list-item` en lien (Origam #1249). Levée par la liste native de liens
-// Ticket de levée : F-45 (docs/tickets/F-45.md).
-// de T-A11Y-01 S3 (lot 3) ; ticket de remédiation à ouvrir par le chef de projet.
+// de T-A11Y-01 S3 (lot 3) ; ticket de remédiation : F-45.
 const KNOWN_VIOLATIONS: Record<string, string[]> = { '/admin/plus': ['aria-allowed-role'] }
 
 const violationsOf = (path: string, results: Awaited<ReturnType<AxeBuilder['analyze']>>) => results.violations
