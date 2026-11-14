@@ -10,13 +10,13 @@
       :aria-label="breadcrumbLabel"
       data-cy="player-breadcrumb"
     />
-    <h1
-      v-if="!competitor"
+    <origam-title
+      v-if="showFallbackTitle"
+      tag="h1"
       class="sr-only"
+      :text="pageTitle"
       data-cy="player-page-title"
-    >
-      {{ pageTitle }}
-    </h1>
+    />
     <async-state
       :pending="pending"
       :error="displayedError"
@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamBreadcrumb } from 'origam/components'
+import { OrigamBreadcrumb, OrigamTitle } from 'origam/components'
 import AsyncState from '~/components/common/AsyncState.vue'
 import PlayerHeader from '~/components/players/PlayerHeader.vue'
 import PlayerJourney from '~/components/players/PlayerJourney.vue'
@@ -131,6 +131,7 @@ const breadcrumbItems = computed(() => [
   { title: t('player.breadcrumb.players', 'Joueurs'), to: ROUTES.PLAYERS, padding: 0 },
   { title: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur'), disabled: true, padding: 0 }
 ])
+const showFallbackTitle = computed(() => !competitor.value)
 const pageTitle = computed(() => t('pages.player.title', 'Fiche joueur'))
 const notFoundTitle: ITranslatableText = { key: 'player.not_found.title', fallback: 'Joueur introuvable' }
 const notFoundDescription: ITranslatableText = { key: 'player.not_found.description', fallback: 'Cette fiche n’existe pas. Retrouvez le joueur dans l’annuaire.' }
