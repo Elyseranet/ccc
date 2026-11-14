@@ -102,6 +102,3 @@ export const PLAYER_POINTS_DECIMALS = 2
 export const PLAYERS_DIACRITICS = /[\u0300-\u036f]/g
 
 export const PLAYERS_WORD_SEPARATOR = /[\s-]+/
-
-/** Largeur sous laquelle la ligne d'un adversaire passe en mobile (même seuil que les règles `@media` de `PlayerOpponents.vue`) : le lien « Face-à-face » n'y a plus de padding. */
-export const PLAYER_OPPONENTS_COMPACT_BREAKPOINT_PX = 760

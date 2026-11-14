@@ -57,8 +57,6 @@
             variant="text"
             color="primary"
             font-size="sm"
-            :padding-inline="linkPadding"
-            :min-width="linkMinWidth"
             :to="linkOf(summary)"
             data-cy="player-opponent-link"
           >
@@ -95,9 +93,8 @@ import { computed } from 'vue'
 import { OrigamBtn, OrigamTitle } from 'origam/components'
 import PlayerLink from '~/components/common/PlayerLink.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
-import { useBelowWidth } from '~/composables/useBelowWidth'
 import { useT } from '~/composables/useT'
-import { PERCENT, PLAYER_OPPONENTS_COMPACT_BREAKPOINT_PX } from '~/consts/players.const'
+import { PERCENT } from '~/consts/players.const'
 import type { IPlayerOpponent, IPlayerOpponentsProps } from '~/interfaces/players.interface'
 import { buildHeadToHeadLink } from '~/utils/player.util'
 
@@ -115,10 +112,6 @@ const props = withDefaults(defineProps<IPlayerOpponentsProps>(), {
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-/** Le padding du lien est une prop d'Origam (style en ligne, que la feuille de style ne peut pas surcharger) : sous le seuil mobile, il passe à 0 par la même prop, et la largeur minimale de `large` (78 px, qui recentre le texte) est levée. */
-const isCompact = useBelowWidth(PLAYER_OPPONENTS_COMPACT_BREAKPOINT_PX)
-const linkPadding = computed(() => isCompact.value ? '0' : '4')
-const linkMinWidth = computed(() => isCompact.value ? '0' : undefined)
 
 /*********************************************************
  * Textes
@@ -213,6 +206,10 @@ defineExpose({})
     justify-self: start;
   }
 
+  &__link {
+    --origam-btn---padding-lg: var(--origam-space---4);
+  }
+
   &__more {
     margin: var(--origam-space---3) 0 0;
   }
@@ -263,8 +260,13 @@ defineExpose({})
     }
 
     &__link {
+      --origam-btn---padding-lg: 0;
       grid-column: 2 / -1;
       justify-self: start;
+    }
+
+    &__link.origam-btn {
+      --origam-btn---min-width: 0;
     }
   }
 }
