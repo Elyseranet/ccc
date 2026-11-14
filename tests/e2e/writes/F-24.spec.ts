@@ -100,8 +100,10 @@ test.describe('admin qualification : écritures sur une édition créée par le 
     expect(await violationsOf(page)).toEqual([])
 
     await page.getByTestId('qualification-create-tiebreak-0').click()
-    await expect(page.getByTestId('qualification-tie-0')).toContainText('Départage créé, à jouer')
-    await expect(page.getByTestId('qualification-create-tiebreak-0')).toBeDisabled()
+    await expect(page.getByTestId('qualification-tie-0')).toContainText('Départage créé · ')
+    await expect(page.getByTestId('qualification-tie-0')).toContainText('À jouer')
+    await expect(page.getByTestId('qualification-create-tiebreak-0')).toHaveCount(0)
+    await expect(page.getByTestId('qualification-delete-tiebreak-0')).toBeEnabled()
     const link = page.getByTestId('qualification-tie-score-link-0')
     await expect(link).toHaveAttribute('href', '/admin/matchs?departages=1')
     const tiebreak = (await adminMatches(page, edition.id)).find(match => match.purpose === 'TIEBREAK')!

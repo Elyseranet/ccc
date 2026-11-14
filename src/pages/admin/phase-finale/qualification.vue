@@ -55,8 +55,8 @@
       v-if="failureView"
       status="error"
       rounded="lg"
+      :density="failureView.density"
       :title="failureView.title"
-      :text="failureView.body"
       font-size="md"
       font-weight="bold"
       letter-spacing="normal"
@@ -64,11 +64,13 @@
       role="alert"
       data-cy="qualification-failure"
     >
-      <template #close>
+      <template #text>
+        {{ failureView.body }}
         <origam-btn
           v-if="failureView.reloadable"
           variant="outlined"
-          size="small"
+          font-size="sm"
+          padding-inline="calc(var(--origam-space---4) - var(--origam-border__width---2))"
           :text="reloadLabel"
           data-cy="qualification-reload"
           @click="handleReload"
@@ -100,9 +102,11 @@
           v-if="showTies"
           :ties="ties"
           :busy-tie="busyTie"
+          :deleting-tie="deletingTie"
           :settled="isSettled"
           :pending-count="pendingCount"
           @create="handleCreate"
+          @delete="handleDelete"
         />
         <qualification-parameters
           :inputs="inputs"
@@ -132,6 +136,13 @@
       :text="snackbarText"
       :timeout="snackbarTimeout"
       data-cy="qualification-snackbar"
+    />
+    <origam-snackbar
+      v-model="deletedSnackbarOpen"
+      status="success"
+      :text="deletedSnackbarText"
+      :timeout="snackbarTimeout"
+      data-cy="qualification-deleted-snackbar"
     />
   </section>
 </template>
@@ -178,7 +189,7 @@ useSeo({ noindex: true })
 const qualification = await useQualification()
 const {
   status, edition, inputs, check, bounds, parameters, isClosed, isFinalized, isReadonly, prerequisites, rankTables, ties, qualifiedRows, steps,
-  pendingCount, finalizeBlocker, previewReady, pageError, pending, failure, busyTie, finalizing, justFinalized
+  pendingCount, finalizeBlocker, previewReady, pageError, pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted
 } = qualification
 const isEmpty = computed(() => status.value === null || status.value.pools.length === 0)
 const tieCount = computed(() => ties.value.length)
@@ -220,13 +231,15 @@ const emptyDescription = computed<ITranslatableText>(() => edition.value
 const reloadLabel = computed(() => t('admin.qualification.reload', 'Recharger'))
 const snackbarTimeout = QUALIFICATION_SNACKBAR_TIMEOUT_MS
 const snackbarText = computed(() => t('admin.qualification.snackbar_finalized', 'Liste des qualifiés arrêtée'))
+const deletedSnackbarText = computed(() => t('admin.qualification.snackbar_tiebreak_deleted', 'Départage supprimé : l’égalité est à départager'))
 const failureView = computed(() => {
   if (failure.value === null) {
     return null
   }
   const text = QUALIFICATION_FAILURE_TEXT[failure.value]
   return {
-    title: t(text.title.key, text.title.fallback),
+    title: text.title ? t(text.title.key, text.title.fallback) : undefined,
+    density: text.title ? 'default' as const : 'compact' as const,
     body: t(text.body.key, text.body.fallback),
     reloadable: QUALIFICATION_STALE_FAILURES.includes(failure.value)
   }
@@ -244,6 +257,15 @@ watch(justFinalized, (value) => {
     snackbarOpen.value = true
   }
 })
+const deletedSnackbarOpen = ref(false)
+watch(justDeleted, (value) => {
+  if (value) {
+    deletedSnackbarOpen.value = true
+  }
+})
+const handleDelete = (tie: IQualificationTieView) => {
+  qualification.deleteTiebreak(tie)
+}
 const handleReload = () => {
   qualification.reload()
 }

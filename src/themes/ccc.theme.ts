@@ -39,7 +39,8 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-field.origam-field.origam-field input` (retrait de 2 px de l'`<input>`, jamais remis à zéro) :
  *     Elyseranet/origam#1280 ;
  *   - `.origam-btn.origam-btn.origam-btn--disabled:not(.origam-pagination *)` (état désactivé : Origam n'applique qu'une opacité de
- *     0,5 et ignore `action.*.bgDisabled` ; la maquette peint un aplat `bgDisabled`, texte tertiaire, sans filet ; la pagination garde
+ *     0,5 et ignore `action.*.bgDisabled` ; la maquette peint un aplat `bgDisabled`, texte tertiaire, sans filet, y compris pour la variante outlined, dont
+ *     Origam impose `background-color: transparent !important` (règle `…--variant-outlined` en `!important`, F-44) ; la pagination garde
  *     sa règle) : fiche docs/tickets/origam/btn-etat-desactive-tokens-bgdisabled-non-lus.md (à déposer) ;
  *   - `.origam-alert { --origam-btn---color / ---border-color, --origam-color__border---focus : currentColor }` (le bouton outlined et l'anneau de focus d'une
  *     alerte gardent le filet et l'anneau crème / cyan de la page : 1,02 à 1,32:1 sur le fond de l'alerte, contre 6:1 avec la couleur de texte de l'alerte ; F-43) :

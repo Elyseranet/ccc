@@ -53,6 +53,15 @@ export interface IQualificationRankTable {
   rows: IQualificationRankRow[]
 }
 
+/** Le départage ouvert d'un groupe : de quoi le supprimer (identifiant du match, numéro affiché) et dire s'il est déjà joué. */
+export interface IOpenTiebreakView {
+  matchId: string
+  /** `{code de l'édition}-{séquence}`, comme dans « Poules et matchs ». */
+  number: string
+  /** Un score est saisi : le départage n'est plus supprimable (409 `TIEBREAK_PLAYED`). */
+  played: boolean
+}
+
 export interface IQualificationTieView {
   key: string
   scope: TIEBREAK_SCOPE
@@ -66,6 +75,8 @@ export interface IQualificationTieView {
   participationIds: string[]
   /** Un départage de ce groupe existe déjà et n'est pas joué : on le saisit dans « Poules et matchs ». */
   hasOpenTiebreak: boolean
+  /** Le départage ouvert de ce groupe (programmé ou saisi, pas encore validé), `null` s'il n'y en a pas. */
+  openTiebreak: IOpenTiebreakView | null
   /** Le groupe est ce qui reste après un départage déjà joué (R-7) : le bouton dit « suivant ». */
   isFollowUp: boolean
   blocker: QUALIFICATION_BLOCKER | null
@@ -103,6 +114,8 @@ export interface IQualificationRankingProps {
 export interface IQualificationTiesProps {
   ties: IQualificationTieView[]
   busyTie: string | null
+  /** Groupe dont le départage est en cours de suppression (la suppression est un envoi : un seul à la fois). */
+  deletingTie: string | null
   /** Aucune égalité et plus rien à valider : le message « Aucune égalité à départager ». */
   settled: boolean
   /** Matchs de poule à valider, pour la raison écrite sous un bouton inactif. */
@@ -111,6 +124,7 @@ export interface IQualificationTiesProps {
 
 export interface IQualificationTiesEmits {
   (event: 'create', tie: IQualificationTieView): void
+  (event: 'delete', tie: IQualificationTieView): void
 }
 
 export interface IQualificationParametersProps {
