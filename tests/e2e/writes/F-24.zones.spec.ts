@@ -90,10 +90,10 @@ for (const viewport of VIEWPORTS) {
       { name: 'qa-etapes', mockup: 'nav[aria-label="Étapes de la qualification"]', app: '[data-cy="draw-steps"]' },
       { name: 'qa-parametres', mockup: 'section[aria-labelledby="h-par"]', app: '[data-cy="qualification-parameters"]' },
       // Parties de la liste des égalités, du classement et de l'aperçu qui ne dépendent pas des données (valeurs masquées ou recopiées) : titre de section, haut d'une carte d'égalité
-      // (aperçu, joueurs et description ; la suite diffère : la maquette est dans un état « matchs à valider », bouton inactif avec sa raison), en-tête du classement,
+      // (aperçu, joueurs, description et places restantes ; la suite diffère : la maquette est dans un état « matchs à valider », bouton inactif avec sa raison), en-tête du classement,
       // état vide de l'aperçu des qualifiés.
       { name: 'qa-egalites-titre', mockup: 'section[aria-labelledby="h-eg"] > header', app: '.qualification-ties__head' },
-      { name: 'qa-egalite-haut', mockup: '.q-ties > li:nth-child(2)', app: '[data-cy="qualification-tie-0"]', upTo: { mockup: 'p.muted', app: '.qualification-ties__muted' } },
+      { name: 'qa-egalite-haut', mockup: '.q-ties > li:nth-child(2)', app: '[data-cy="qualification-tie-0"]', upTo: { mockup: 'p.muted + p.muted', app: '.qualification-ties__muted + .qualification-ties__muted' } },
       { name: 'qa-classement-thead', mockup: '.q-rank table thead', app: '[data-cy="qualification-ranking"] table thead' },
       { name: 'qa-classement-entete', mockup: '.q-rank .adm-card-h', app: '.qualification-ranking__head', masks: { mockup: [], app: [], values: { mockup: ['.q-rank__sel .input'], app: ['.qualification-ranking__select'] } } },
       { name: 'qa-arret', mockup: '.q-sec .q-act', app: '.qualification-finalize__action' },

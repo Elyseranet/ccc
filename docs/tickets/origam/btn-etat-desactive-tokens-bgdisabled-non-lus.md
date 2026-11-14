@@ -39,3 +39,7 @@ Un bouton désactivé a pour fond `action.<intent>.bgDisabled` et pour texte `fg
 ## Version
 
 2.37.4
+
+## Complément (F-44, 2026-11-14)
+
+La variante `outlined` impose `background-color: transparent !important` : la règle centrale de `main.css` ne peut pas y poser l'aplat `bgDisabled` sans `!important`. Une règle dédiée `.origam-btn.origam-btn.origam-btn--disabled.origam-btn--variant-outlined { background-color: var(--origam-color__action--primary---bgDisabled) !important }` la complète (maquette : « Supprimer le départage » inactif, `admin-qualification.html`).

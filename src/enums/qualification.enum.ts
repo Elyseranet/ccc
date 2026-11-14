@@ -36,6 +36,7 @@ export enum QUALIFICATION_FAILURE {
   ALREADY_DONE = 'already-done',
   INVALID = 'invalid',
   CLOSED = 'closed',
+  TIEBREAK_PLAYED = 'tiebreak-played',
   FORBIDDEN = 'forbidden',
   UNAUTHORIZED = 'unauthorized',
   OFFLINE = 'offline',

@@ -62,6 +62,7 @@ export const QUALIFICATION_FAILURE_BY_CODE: Partial<Record<API_ERROR_CODE, QUALI
   [API_ERROR_CODE.TIEBREAK_NOT_REQUIRED]: QUALIFICATION_FAILURE.TIEBREAK_NOT_REQUIRED,
   [API_ERROR_CODE.QUALIFICATION_ALREADY_DONE]: QUALIFICATION_FAILURE.ALREADY_DONE,
   [API_ERROR_CODE.EDITION_CLOSED]: QUALIFICATION_FAILURE.CLOSED,
+  [API_ERROR_CODE.TIEBREAK_PLAYED]: QUALIFICATION_FAILURE.TIEBREAK_PLAYED,
   [API_ERROR_CODE.VALIDATION_FAILED]: QUALIFICATION_FAILURE.INVALID
 }
 
@@ -76,10 +77,12 @@ export const QUALIFICATION_FAILURE_BY_STATUS: Record<number, QUALIFICATION_FAILU
 export const QUALIFICATION_STALE_FAILURES: readonly QUALIFICATION_FAILURE[] = [
   QUALIFICATION_FAILURE.NOT_READY,
   QUALIFICATION_FAILURE.TIEBREAK_NOT_REQUIRED,
-  QUALIFICATION_FAILURE.ALREADY_DONE
+  QUALIFICATION_FAILURE.ALREADY_DONE,
+  QUALIFICATION_FAILURE.TIEBREAK_PLAYED
 ]
 
-export const QUALIFICATION_FAILURE_TEXT: Record<QUALIFICATION_FAILURE, { title: ITranslatableText, body: ITranslatableText }> = {
+/** `title: null` : une alerte compacte à une seule phrase (le départage joué entre-temps, maquette F-44). */
+export const QUALIFICATION_FAILURE_TEXT: Record<QUALIFICATION_FAILURE, { title: ITranslatableText | null, body: ITranslatableText }> = {
   [QUALIFICATION_FAILURE.NOT_READY]: {
     title: { key: 'admin.qualification.failure_not_ready_title', fallback: 'La liste ne peut pas être arrêtée.' },
     body: { key: 'admin.qualification.failure_not_ready_body', fallback: 'Un match de poule ou un départage reste à valider. Rechargez pour voir l’état actuel.' }
@@ -99,6 +102,10 @@ export const QUALIFICATION_FAILURE_TEXT: Record<QUALIFICATION_FAILURE, { title: 
   [QUALIFICATION_FAILURE.CLOSED]: {
     title: { key: 'admin.qualification.failure_closed_title', fallback: 'L’édition est clôturée.' },
     body: { key: 'admin.qualification.failure_closed_body', fallback: 'Ses résultats sont figés : la qualification ne se modifie plus.' }
+  },
+  [QUALIFICATION_FAILURE.TIEBREAK_PLAYED]: {
+    title: null,
+    body: { key: 'admin.qualification.failure_tiebreak_played', fallback: 'Le départage a été joué entre-temps : il ne peut plus être supprimé.' }
   },
   [QUALIFICATION_FAILURE.FORBIDDEN]: {
     title: { key: 'admin.qualification.failure_forbidden_title', fallback: 'Vous n’avez pas le droit de faire cela.' },
