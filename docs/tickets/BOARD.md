@@ -252,7 +252,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-26](F-26.md) | Admin : clôture de l'édition | validée @ `6e09fd68` | B-14 | **Fermé** (2026-11-14) @ `86d025da` |
-| [F-27](F-27.md) | Bouton d'appel « grand » 48 / 24 : une seule recette (surcharges locales de `--origam-btn---*-lg`) | — | F-19, F-26 | À faire (2026-11-05) | à créer |
+| [F-27](F-27.md) | Bouton d'appel « grand » 48 / 24 : une seule recette (surcharges locales de `--origam-btn---*-lg`) | — | F-19, F-26 | **Fermé** (2026-11-14) @ `72396657` | à créer |
 | [F-18](F-18.md) | Admin : corriger un score déjà validé (sorti de F-08, décision 4743e48) | `admin-matchs.html` (à dessiner) | F-08, T-SEC-08 | À faire |
 | [F-19](F-19.md) | Pied de page et pages légales (mentions, confidentialité, CGU, accessibilité) | à dessiner | infos éditeur (utilisateur) | **Ouvert, mergé** @ `75d95e59` : pages non livrées, 29 « À FOURNIR » (infos Elysera), relecture juridique, T-SEC-20 |
 
