@@ -22,6 +22,14 @@
         @update:search-b="handleSearchB"
         @swap="swapPlayers"
       />
+      <p
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        data-cy="head-to-head-announcement"
+      >
+        {{ announcement }}
+      </p>
       <async-state
         v-if="showState"
         :pending="isPending"
@@ -57,6 +65,7 @@ import PageHero from '~/components/common/PageHero.vue'
 import HeadToHeadHistory from '~/components/head-to-head/HeadToHeadHistory.vue'
 import HeadToHeadPicker from '~/components/head-to-head/HeadToHeadPicker.vue'
 import HeadToHeadSummary from '~/components/head-to-head/HeadToHeadSummary.vue'
+import { useHeadToHeadAnnouncement } from '~/composables/useHeadToHeadAnnouncement'
 import { useHeadToHeadComparison } from '~/composables/useHeadToHeadComparison'
 import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
@@ -104,6 +113,7 @@ const {
   swapPlayers,
   retry
 } = useHeadToHeadComparison()
+const { announcement } = useHeadToHeadAnnouncement(comparison)
 const showState = computed(() => isIdle.value || isPending.value || pageError.value !== null || comparison.value !== null)
 const handleSearchA = (value: string) => {
   searchA.value = value
