@@ -49,7 +49,7 @@
           v-if="failureView.verifiable"
           variant="outlined"
           font-size="sm"
-          class="small-action-btn"
+          padding-inline="4"
           color="var(--origam-color__text---primary)"
           :text="verifyLabel"
           data-cy="closing-verify"
