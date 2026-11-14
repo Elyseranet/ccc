@@ -42,10 +42,10 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <origam-btn
-        class="editions-table__action"
         variant="text"
         color="primary"
-        size="small"
+        font-size="sm"
+        padding-inline="4"
         font-weight="semibold"
         :to="linkOf(item)"
         :text="actionOf(item)"
@@ -141,12 +141,6 @@ defineExpose({})
 .editions-table {
   &__num {
     font-variant-numeric: tabular-nums;
-  }
-
-  &__action {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__missing {

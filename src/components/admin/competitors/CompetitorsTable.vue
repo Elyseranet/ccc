@@ -33,10 +33,10 @@
       </template>
       <template #[`item.actions`]="{ item }">
         <origam-btn
-          class="competitors-table__action"
           variant="text"
           color="primary"
-          size="small"
+          font-size="sm"
+          padding-inline="4"
           font-weight="semibold"
           :to="linkOf(item)"
           :text="actionLabel"
@@ -151,12 +151,6 @@ defineExpose({})
     display: flex;
     align-items: center;
     gap: var(--competitors-table__cell---gap, var(--origam-space---3));
-  }
-
-  &__action {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__num {

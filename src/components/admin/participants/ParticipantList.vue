@@ -76,10 +76,10 @@
               <span class="participant-list__actions">
                 <origam-btn
                   v-if="canResend(item.accountState)"
-                  class="participant-list__action"
                   variant="text"
                   color="primary"
-                  size="small"
+                  font-size="sm"
+                  padding-inline="4"
                   :disabled="isBusy"
                   :text="resendLabel"
                   :aria-label="resendAria(item.displayName)"
@@ -88,9 +88,9 @@
                 />
                 <origam-btn
                   v-if="editable"
-                  class="participant-list__action"
                   variant="text"
-                  size="small"
+                  font-size="sm"
+                  padding-inline="4"
                   :loading="busyParticipationId === item.participationId"
                   :disabled="isBusy"
                   :text="removeLabel"
@@ -258,12 +258,6 @@ defineExpose({})
     display: inline-flex;
     align-items: center;
     gap: var(--origam-space---3);
-  }
-
-  &__action {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__muted {

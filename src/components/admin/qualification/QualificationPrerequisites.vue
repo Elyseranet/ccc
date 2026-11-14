@@ -38,8 +38,8 @@
       <origam-btn
         v-if="hasPending"
         variant="text"
-        size="small"
-        class="qualification-prerequisites__link"
+        font-size="sm"
+        padding-inline="4"
         :to="matchesRoute"
         :text="linkLabel"
         data-cy="qualification-matches-link"
@@ -118,12 +118,6 @@ defineExpose({})
   &__progress {
     --origam-progress-linear__background---opacity: 1;
     margin-bottom: var(--origam-space---5);
-  }
-
-  &__link {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__text {

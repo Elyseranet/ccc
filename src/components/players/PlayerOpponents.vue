@@ -56,7 +56,7 @@
             class="player-opponents__link"
             variant="text"
             color="primary"
-            size="small"
+            font-size="sm"
             :to="linkOf(summary)"
             data-cy="player-opponent-link"
           >
@@ -207,9 +207,7 @@ defineExpose({})
   }
 
   &__link {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
+    --origam-btn---padding-lg: var(--origam-space---4);
   }
 
   &__more {
@@ -262,9 +260,13 @@ defineExpose({})
     }
 
     &__link {
-      --origam-btn---padding-sm: 0;
+      --origam-btn---padding-lg: 0;
       grid-column: 2 / -1;
       justify-self: start;
+    }
+
+    &__link.origam-btn {
+      --origam-btn---min-width: 0;
     }
   }
 }

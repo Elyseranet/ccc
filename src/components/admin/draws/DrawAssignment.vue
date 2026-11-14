@@ -126,9 +126,9 @@
                   />
                   <origam-btn
                     v-else-if="!readOnly"
-                    class="draw-assignment__change"
                     variant="text"
-                    size="small"
+                    font-size="sm"
+                    padding-inline="4"
                     :text="changeLabel"
                     :aria-label="slot.changeLabel"
                     :data-cy="`draw-change-${pool.number}-${slot.place}`"
@@ -416,12 +416,6 @@ defineExpose({})
 
   &__unsaved {
     margin-bottom: var(--origam-space---4);
-  }
-
-  &__change {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__pool-head {

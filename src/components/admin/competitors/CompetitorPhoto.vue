@@ -52,8 +52,8 @@
         </p>
         <origam-btn
           variant="outlined"
-          size="small"
-          class="competitor-photo__remove"
+          font-size="sm"
+          padding-inline="4"
           :disabled="!canRemove"
           :text="removeLabel"
           data-cy="competitor-photo-remove"
@@ -216,12 +216,6 @@ defineExpose({})
     letter-spacing: var(--origam-font__letterSpacing---wide);
     text-transform: uppercase;
     color: var(--origam-color__text---tertiary);
-  }
-
-  &__remove {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__hint {

@@ -52,8 +52,8 @@
               <origam-btn
                 v-if="!readOnly"
                 variant="text"
-                size="small"
-                class="round-draw-entry__change"
+                font-size="sm"
+                padding-inline="4"
                 :text="changeLabel"
                 :aria-label="item.changeAriaLabel"
                 :data-cy="item.changeDataCy"
@@ -243,12 +243,6 @@ defineExpose({})
   &__card--next &__row :deep(.origam-select) {
     flex: 1 1 14rem;
     min-width: 0;
-  }
-
-  &__change {
-    --origam-btn---height: var(--origam-space---11);
-    --origam-btn---padding-sm: var(--origam-space---4);
-    --origam-btn---font-size: var(--origam-font__size---sm);
   }
 
   &__eyebrow {
