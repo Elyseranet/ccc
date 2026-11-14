@@ -22,6 +22,7 @@
           variant="flat"
           bg-color="danger"
           size="x-large"
+          font-size="md"
           aria-haspopup="dialog"
           :disabled="disabled || busy"
           :aria-busy="busy ? 'true' : undefined"

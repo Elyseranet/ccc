@@ -48,7 +48,8 @@
         <origam-btn
           v-if="failureView.verifiable"
           variant="outlined"
-          size="small"
+          size="large"
+          font-size="sm"
           :text="verifyLabel"
           data-cy="closing-verify"
           @click="handleVerify"

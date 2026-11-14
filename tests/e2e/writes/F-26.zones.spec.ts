@@ -50,9 +50,13 @@ const boxTo = async (page: Page, container: string, end: string): Promise<IClip>
   return { x: a.left + window.scrollX, y: a.top + window.scrollY, width: a.width, height: b.bottom - a.top }
 }, [container, end])
 
-/** Premier nœud texte d'un élément (le lien qui suit reste intact) : texte de l'application écrit dans la maquette. */
+/** Texte de l'alerte de l'application sans son lien, écrit dans le premier nœud texte de la maquette (le lien de la maquette reste intact). */
 const alignLeadText = async (mockup: Page, page: Page, mockupSelector: string, appSelector: string) => {
-  const text = await page.evaluate(selector => (document.querySelector(selector)!.firstChild as Text).nodeValue ?? '', appSelector)
+  const text = await page.evaluate((selector) => {
+    const body = document.querySelector(selector)!
+    const link = body.querySelector('a')?.textContent ?? ''
+    return (body.textContent ?? '').replace(link, '').replace(/\s+/g, ' ').trimStart()
+  }, appSelector)
   await mockup.evaluate(([selector, value]) => {
     (document.querySelector(selector as string)!.firstChild as Text).nodeValue = value as string
   }, [mockupSelector, text])
