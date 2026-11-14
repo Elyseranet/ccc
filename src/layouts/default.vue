@@ -379,6 +379,10 @@ defineExpose({})
     --origam-btn---min-width: 0;
   }
 
+  &__link.origam-btn:focus-visible {
+    outline-offset: calc(-1 * var(--origam-border__width---2));
+  }
+
   &__link--rest {
     color: var(--origam-color__text---secondary);
   }
