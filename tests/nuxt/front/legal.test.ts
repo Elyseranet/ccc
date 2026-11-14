@@ -63,6 +63,13 @@ describe('pages légales (F-19)', () => {
     const statement = LEGAL_ACCESSIBILITY_CONTENT.sections[0]!.blocks[0]!.text!.fallback
     expect(statement).toContain('pas déclaré')
   })
+
+  it('la déclaration reflète l’état livré (F-40) : le bouton de pause et le contraste des bordures sont dans « Ce qui est fait », plus dans « Défauts connus »', () => {
+    const keysOf = (id: string) => LEGAL_ACCESSIBILITY_CONTENT.sections.find(section => section.id === id)!.blocks.flatMap(block => block.items ?? []).map(item => item.key)
+    expect(keysOf('fait')).toEqual(expect.arrayContaining(['legal.accessibility.done_pause', 'legal.accessibility.done_contrast']))
+    expect(keysOf('connus')).not.toContain('legal.accessibility.known_motion')
+    expect(keysOf('connus')).not.toContain('legal.accessibility.known_contrast')
+  })
 })
 
 describe('liens légaux de l’invitation (décision 9639ca1)', () => {
