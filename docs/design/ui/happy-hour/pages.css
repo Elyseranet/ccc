@@ -6,7 +6,7 @@
 .home-hero__grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: var(--origam-space---10); }
 .home-hero__kicker { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---3); }
 .home-hero__kicker .chip { rotate: -3deg; font-size: var(--origam-font__size---sm); }
-.home-hero__title { margin-top: var(--origam-space---6); font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); hyphens: auto; -webkit-hyphens: auto; } /* A11Y-S5-S12-HERO : césure française (lang="fr"), à toutes les largeurs */
+.home-hero__title { margin-top: var(--origam-space---6); font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); }
 .home-hero__title span { display: inline-block; animation: rise var(--origam-motion__duration---slow) var(--origam-motion__easing---decelerate) both; }
 .home-hero__title span + span { animation-delay: 120ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(0.4em); } }
@@ -247,6 +247,7 @@
 @media (max-width: 760px) {
   .home-hero { padding-block: var(--origam-space---8) var(--origam-space---10); }
   .home-hero__grid { grid-template-columns: minmax(0, 1fr); } /* comme l’app : la colonne peut rétrécir sous la largeur du mot le plus long */
+  .home-hero__title { hyphens: auto; -webkit-hyphens: auto; } /* A11Y-S5-S12-HERO (décision e080d620) : césure française (lang="fr") jusqu’à 760 px seulement ; le bureau reste sur 2 lignes */
   .pint { width: min(70%, 15rem); }
   .bento { grid-template-columns: 1fr; grid-template-areas: 'now' 'ed' 'pl' 'champ' 'm' 'rank' 'rule'; }
   .result { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
