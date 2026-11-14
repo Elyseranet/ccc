@@ -58,6 +58,7 @@
             color="primary"
             font-size="sm"
             :padding-inline="linkPadding"
+            :min-width="linkMinWidth"
             :to="linkOf(summary)"
             data-cy="player-opponent-link"
           >
@@ -114,9 +115,10 @@ const props = withDefaults(defineProps<IPlayerOpponentsProps>(), {
 })
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-/** Le padding du lien est une prop d'Origam (style en ligne, que la feuille de style ne peut pas surcharger) : sous le seuil mobile, il passe à 0 par la même prop. */
+/** Le padding du lien est une prop d'Origam (style en ligne, que la feuille de style ne peut pas surcharger) : sous le seuil mobile, il passe à 0 par la même prop, et la largeur minimale de `large` (78 px, qui recentre le texte) est levée. */
 const isCompact = useBelowWidth(PLAYER_OPPONENTS_COMPACT_BREAKPOINT_PX)
 const linkPadding = computed(() => isCompact.value ? '0' : '4')
+const linkMinWidth = computed(() => isCompact.value ? '0' : undefined)
 
 /*********************************************************
  * Textes
