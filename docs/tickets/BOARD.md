@@ -245,7 +245,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-36](F-36.md) | F-24 : en-tête du classement au-dessus de 1 %, cause à établir (pastille mesurée, non en cause) | — | — | **Fermé** (2026-11-13) @ `b59cd9f1` |
 | [F-37](F-37.md) | F-24 : bouton « Arrêter la liste » 44 px au lieu de 48, désactivé sans changement visuel (Origam) | validée @ `409c253b` | — | **Fermé** (2026-11-13) @ `b05d1121` |
 | [F-38](F-38.md) | Boutons primaires désactivables : appliquer `usePrimaryActionButton` (suite F-37) | — | F-25 | **Fermé** (2026-11-13) @ `350c9d17` |
-| [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | à faire | F-26 | Ouvert |
+| [F-39](F-39.md) | F-07 : étapes du centre de contrôle cliquables (maquette + table étape → route) | validée @ `29b41572` | F-26 | **Fermé** (2026-11-14) @ `29be3aa4` |
 | [F-40](F-40.md) | Pages légales après T-A11Y-01 M5 : ligne cookie `ccc_motion` dans la maquette, déclaration d'accessibilité à jour | à mettre à jour | T-A11Y-01 | **Fermé** (2026-11-14) @ `39360433` |
 | [F-41](F-41.md) | Bouton « petit 44 px » : une seule recette (8 copies en CSS local) | — | F-38 | **Fermé** (2026-11-14) @ `04b2fe58` |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
@@ -409,7 +409,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-RGPD-01](T-RGPD-01.md) : **Fermé** (2026-11-12), réalisé par T-SEC-16.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **Fermé** (2026-11-12) — front @ `6b42e4be`, back @ `17df018a` ; dev non indexable vérifiée par curl (robots `Disallow: /`, sitemap 404, `X-Robots-Tag`).
-- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; restent les SHOULD.
+- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; SHOULD lot 1 mergé (`b794d94e`) ; restent S11, lots 2 et 3, S13, S5, S12, S18.
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
 ### Architecture (chef de projet, 2026-10-22)
