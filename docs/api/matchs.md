@@ -82,6 +82,8 @@ Un tour suivant est « engagé » (R-3) :
 
 Dans ce cas : `409 NEXT_ROUND_ENGAGED`.
 
+**Départage (CORRECTION-TIEBREAK, B-24)** : la correction d'un match de **poule** (`REGULAR`, tour `POOLS`) est refusée en `409 TIEBREAK_ENGAGED` dès qu'un match `TIEBREAK` existe dans l'édition, quel que soit son statut : un départage de la **même poule**, ou un départage de **frontière** (`pool_id` nul), qui bloque toute correction de poule de l'édition. Un départage d'une autre poule ne bloque pas. Ce contrôle passe avant `NEXT_ROUND_ENGAGED`. Un match de phase finale, et un match de départage lui-même, ne sont pas concernés. Pour corriger, l'administrateur supprime d'abord le départage non joué (`DELETE /editions/{id}/departages/{matchId}`, voir `qualification.md`).
+
 ```
 POST /api/v1/matchs/0b7c.../correction
 If-Match: "5"
@@ -112,6 +114,7 @@ Le serveur n'a pas de sémantique propre aux filtres de l'écran (« À traiter 
 | 403 | `FORBIDDEN` | session non administrateur |
 | 404 | `NOT_FOUND` | match ou édition inconnu |
 | 409 | `MATCH_ALREADY_VALIDATED` | `PUT` sur un match `VALIDATED` (passer par la correction), ou validation avec d'autres scores que ceux déjà validés |
+| 409 | `TIEBREAK_ENGAGED` | correction d'un match de poule refusée : un départage existe pour sa poule, ou pour la frontière de qualification (B-24) |
 | 409 | `NEXT_ROUND_ENGAGED` | correction refusée : un tour suivant est engagé (R-3) |
 | 409 | `ARCHIVE_RESULT_READ_ONLY` | saisie, validation ou correction d'un match `RESULT_UNKNOWN` ou au vainqueur importé (B-21) |
 | 409 | `EDITION_CLOSED` | saisie, validation ou correction dans une édition `CLOSED` |

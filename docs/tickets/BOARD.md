@@ -34,6 +34,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-19](B-19.md) | Titres à date du finaliste et des demi-finalistes dans le résumé d'édition (podium F-03a), contrat figé avec le front | 3 | vague 3a (B-17, G4) | **Fermé** (2026-10-28) : mergé @ `566525c` | À faire |
 | [B-22](B-22.md) | `closedAt` exposé dans `IEditionDetail` (suite de B-14, F-26) | — | B-14 | — | **Fermé** (2026-11-13) @ `5db72dd2` |
 | [B-23](B-23.md) | Codes d'erreur distincts sur la saisie, la validation et la correction d'un score (F-18) | — | B-12 | — | **Fermé** (2026-11-14) @ `3f1c2017` |
+| [B-24](B-24.md) | Correction d'un match de poule refusée après un départage, suppression d'un départage non joué (F-18, F-44) | — | B-13, B-23 | — | **En revue** |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
