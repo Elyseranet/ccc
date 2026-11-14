@@ -250,6 +250,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-41](F-41.md) | Bouton « petit 44 px » : une seule recette (8 copies en CSS local) | — | F-38 | **Fermé** (2026-11-14) @ `04b2fe58` |
 | [F-42](F-42.md) | Édition : la boîte du titre déborde sur le fil d'Ariane et intercepte le clic | — | — | **Fermé** (2026-11-14) @ `c7cecfe5` |
 | [F-43](F-43.md) | Bouton outlined dans une alerte d'erreur : contraste 2,27:1 (WCAG 1.4.3) | à corriger | — | Ouvert |
+| [F-44](F-44.md) | Qualification : supprimer un départage non joué (CORRECTION-TIEBREAK) | à dessiner | B-24, F-24 | Ouvert |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
