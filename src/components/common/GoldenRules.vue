@@ -32,6 +32,8 @@
     <ol
       v-else
       class="golden-rules__list"
+      :aria-label="listLabel"
+      tabindex="0"
     >
       <li
         v-for="rule in rules"
@@ -75,6 +77,7 @@ defineSlots<{}>()
  * La numérotation « Règle d'or N » suit l'ordre du bandeau (1 à 8) ; le numéro RG de la spec n'est pas affiché.
  ********************************************************/
 const title = computed(() => t('golden_rules.title', 'Les huit règles d’or'))
+const listLabel = computed(() => t('golden_rules.scroll_region', 'Les huit règles d’or, défilement horizontal'))
 const rules = computed(() => GOLDEN_RULES.map((rule, index) => ({
   number: rule.number,
   prefix: t('golden_rules.label', 'Règle d’or {n}', { n: index + 1 }),

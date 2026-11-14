@@ -70,23 +70,27 @@ test.describe('accueil : comportements sur les vraies données', () => {
     const opacity = () => tile.locator('.origam-card__overlay').evaluate(node => getComputedStyle(node).opacity)
     expect(await opacity()).toBe('0')
     await tile.hover()
-    expect(await opacity()).toBe('0.12')
+    await expect.poll(opacity).toBe('0.12')
   })
 
-  test('sous prefers-reduced-motion, le canvas ne dessine rien et le contenu reste complet', async ({ page }) => {
-    await hydrated(page)
-    await page.waitForTimeout(800)
-    const painted = await page.getByTestId('bubbles-backdrop').evaluate((node) => {
-      const canvas = node as HTMLCanvasElement
-      const context = canvas.getContext('2d')
-      if (!context || canvas.width === 0 || canvas.height === 0) {
-        return false
-      }
-      return context.getImageData(0, 0, canvas.width, canvas.height).data.some(value => value !== 0)
+  test.describe('sous prefers-reduced-motion', () => {
+    test.use({ reducedMotion: 'reduce' })
+
+    test('sous prefers-reduced-motion, le canvas ne dessine rien et le contenu reste complet', async ({ page }) => {
+      await hydrated(page)
+      await page.waitForTimeout(800)
+      const painted = await page.getByTestId('bubbles-backdrop').evaluate((node) => {
+        const canvas = node as HTMLCanvasElement
+        const context = canvas.getContext('2d')
+        if (!context || canvas.width === 0 || canvas.height === 0) {
+          return false
+        }
+        return context.getImageData(0, 0, canvas.width, canvas.height).data.some(value => value !== 0)
+      })
+      expect(painted).toBe(false)
+      await expect(page.getByTestId('page-title')).toBeVisible()
+      await expect(page.getByTestId('home-cta-primary')).toBeVisible()
     })
-    expect(painted).toBe(false)
-    await expect(page.getByTestId('page-title')).toBeVisible()
-    await expect(page.getByTestId('home-cta-primary')).toBeVisible()
   })
 
   test('la pastille « N éditions » est pleine, couleur primary du thème, texte primary.fg (recette chips)', async ({ page }) => {
