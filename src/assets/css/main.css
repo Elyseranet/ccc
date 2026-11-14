@@ -61,3 +61,4 @@ button, input, select, textarea { font: inherit; }
 }
 :root { --ccc-lead---max-width: 40rem; }
 :focus-visible { scroll-margin-top: var(--public-header---offset, 0px); }
+.origam-alert { --origam-btn---color: currentColor; --origam-btn---border-color: currentColor; --origam-color__border---focus: currentColor; }

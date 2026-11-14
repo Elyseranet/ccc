@@ -223,3 +223,8 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 /* Message d’erreur sous un champ (origam-messages), mesuré sur origam 2.37.4 : 12 px et interlettrage 0.0333em, valeurs internes d’Origam sans jeton */
 .field-msg { display: flex; align-items: flex-end; min-height: var(--origam-space---4); margin-top: calc(var(--origam-space---1) / 2); color: var(--origam-color__feedback--danger---fgSubtle); font-size: 0.75rem; line-height: 1; letter-spacing: 0.03552em; word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
 .field-msg__text { display: block; min-height: calc(var(--origam-space---3) + var(--origam-space---1) / 2); } /* Origam : zone de détails de 16 px au moins, message de 14 px au moins, calés en bas : une ligne tombe à 8 px du champ, plusieurs à 6 px */
+/* F-43 : action dans une alerte (fond plein clair) : le bouton et le contour de focus prennent la couleur de texte de l’alerte (feedback.*.fg, environ 7:1), au lieu du crème de la page (2,27:1 sur danger.bg) */
+.alert .btn--outlined { color: inherit; box-shadow: inset 0 0 0 2px currentColor; }
+.alert .btn--outlined:hover { color: inherit; box-shadow: inset 0 0 0 2px currentColor; background: color-mix(in srgb, currentColor 12%, transparent); }
+.alert :where(a, button):focus-visible { outline-color: currentColor; }
+
