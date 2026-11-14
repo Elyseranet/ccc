@@ -147,7 +147,7 @@ describe('étapes, cartes et vue', () => {
     const steps = buildStepItems(source, computeCounters(source), ADMIN_DASHBOARD_STEP.POOL_MATCHES, t)
     expect(steps.map(step => step.to)).toEqual([
       '/admin/editions/2026-1', '/admin/participants', '/admin/tirages', '/admin/matchs?tour=POOLS', '/admin/phase-finale/qualification',
-      '/admin/phase-finale/tirage', '/admin/matchs', '/admin/matchs?tour=FINAL', null
+      '/admin/phase-finale/tirage', '/admin/matchs', '/admin/matchs?tour=FINAL', '/admin/phase-finale/cloture'
     ])
     expect(stepRoute(ADMIN_DASHBOARD_STEP.CREATION, 'a b/c')).toBe('/admin/editions/a%20b%2Fc')
   })

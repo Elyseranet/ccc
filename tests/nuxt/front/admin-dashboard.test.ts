@@ -92,14 +92,13 @@ describe('page /admin, tableau de bord (F-07)', () => {
     expect(wrapper.get('[data-cy="admin-dashboard-cta"]').text()).toContain('7')
   })
 
-  it('étapes cliquables (F39-STEPS) : un bouton par étape qui a une page, l’étape en cours et la clôture restent inertes, le nom accessible est le texte visible, le clic navigue', async () => {
+  it('étapes cliquables (F39-STEPS) : un bouton par étape qui a une page, seule l’étape en cours reste inerte, le nom accessible est le texte visible, le clic navigue', async () => {
     navigateToMock.mockReset()
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.find('[data-cy="admin-control-center"]').exists()).toBe(true))
     const steps = wrapper.findAll('[data-cy^="stepper-item-"]')
-    expect(steps.map(step => step.element.tagName)).toEqual(['BUTTON', 'BUTTON', 'BUTTON', 'DIV', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'DIV'])
+    expect(steps.map(step => step.element.tagName)).toEqual(['BUTTON', 'BUTTON', 'BUTTON', 'DIV', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON'])
     expect(steps[3]!.attributes('aria-current')).toBe('step')
-    expect(steps[8]!.attributes('disabled')).toBeUndefined()
     expect(steps[1]!.attributes('aria-label')).toBe('ParticipantsFait · 45 participants inscrits')
     expect(steps[4]!.attributes('aria-label')).toMatch(/^5Validation des qualifiés/)
     await steps[0]!.trigger('click')
@@ -108,6 +107,8 @@ describe('page /admin, tableau de bord (F-07)', () => {
     expect(navigateToMock).toHaveBeenLastCalledWith('/admin/matchs')
     await steps[7]!.trigger('click')
     expect(navigateToMock).toHaveBeenLastCalledWith('/admin/matchs?tour=FINAL')
+    await steps[8]!.trigger('click')
+    expect(navigateToMock).toHaveBeenLastCalledWith('/admin/phase-finale/cloture')
   })
 
   it('route d’activité absente ou en erreur : le bloc affiche l’état d’erreur d’AsyncState et le reste de la page reste complet', async () => {

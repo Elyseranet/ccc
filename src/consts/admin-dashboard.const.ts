@@ -32,7 +32,7 @@ export const ADMIN_DASHBOARD_EDITION_CODE_PLACEHOLDER = ':code'
 
 /**
  * Page de chaque étape du centre de contrôle (décision F39-STEPS, table de `docs/tickets/F-39.md`). Une étape « À venir » reste atteignable (c9790abd (1)) ; `null` = pas de page
- * (la clôture, tant que F-26 n'est pas mergé) : l'étape reste un bloc non cliquable. Étape 7 sans `tour` : le tour en cours (un seul tour du bracket est ouvert à la fois, `round-draw.md`).
+ * (l'étape reste un bloc non cliquable ; aucune aujourd'hui, la clôture a sa page depuis F-26). Étape 7 sans `tour` : le tour en cours (un seul tour du bracket est ouvert à la fois, `round-draw.md`).
  */
 export const ADMIN_DASHBOARD_STEP_ROUTES: Record<ADMIN_DASHBOARD_STEP, string | null> = {
   [ADMIN_DASHBOARD_STEP.CREATION]: ROUTES.ADMIN_EDITION,
@@ -43,7 +43,7 @@ export const ADMIN_DASHBOARD_STEP_ROUTES: Record<ADMIN_DASHBOARD_STEP, string | 
   [ADMIN_DASHBOARD_STEP.BRACKET_DRAW]: ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW,
   [ADMIN_DASHBOARD_STEP.BRACKET_MATCHES]: ROUTES.ADMIN_MATCHES,
   [ADMIN_DASHBOARD_STEP.FINAL]: `${ROUTES.ADMIN_MATCHES}?${ADMIN_MATCH_ROUND_QUERY_PARAM}=${ROUND_KIND.FINAL}`,
-  [ADMIN_DASHBOARD_STEP.CLOSING]: null
+  [ADMIN_DASHBOARD_STEP.CLOSING]: ROUTES.ADMIN_FINAL_PHASE_CLOSING
 }
 
 export const ADMIN_DASHBOARD_STATUS_TEXTS: Record<ADMIN_DASHBOARD_STEP_STATUS, ITranslatableText> = {
