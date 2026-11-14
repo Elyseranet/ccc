@@ -129,7 +129,7 @@ const breadcrumbDivider = PLAYERS_BREADCRUMB_DIVIDER
 const breadcrumbItems = computed(() => [
   { title: t('player.breadcrumb.home', 'Accueil'), to: ROUTES.HOME, padding: 0 },
   { title: t('player.breadcrumb.players', 'Joueurs'), to: ROUTES.PLAYERS, padding: 0 },
-  { title: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur'), disabled: true, active: true, padding: 0 }
+  { title: competitor.value?.displayName ?? t('pages.player.title', 'Fiche joueur'), disabled: true, padding: 0 }
 ])
 const pageTitle = computed(() => t('pages.player.title', 'Fiche joueur'))
 const notFoundTitle: ITranslatableText = { key: 'player.not_found.title', fallback: 'Joueur introuvable' }
