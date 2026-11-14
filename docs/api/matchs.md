@@ -78,7 +78,7 @@ Corrige un match `VALIDATED` : réécrit `recorded_score` et `validated_score`, 
 
 Un tour suivant est « engagé » (R-3) :
 - pour un match de **poule**, quand la qualification est arrêtée (l'édition a dépassé `POOLS_PLAYING` : `QUALIFIED`, `PLAYOFFS` ou `CLOSED`) ;
-- pour un match de **phase finale**, quand un tirage existe pour un tour suivant, même en brouillon (`DRAFT`).
+- pour un match de **phase finale**, quand un tirage est rattaché à un tour suivant (`round_id` renseigné, donc tirage **validé** : le tour n'existe qu'à la validation du tirage, B-18). Un brouillon du tour suivant (`POST /editions/{id}/tirages/tour`, `round_id` nul) **ne bloque pas** la correction. Figé par `tests/api/match-scores.test.ts` (« does not block a knockout correction for a draft draw… » et « follows R-3 for knockout matches »).
 
 Dans ce cas : `409 NEXT_ROUND_ENGAGED`.
 

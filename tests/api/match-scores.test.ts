@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { EDITION_STATUS } from '../../src/enums/edition.enum'
 import { MATCH_STATUS } from '../../src/enums/match.enum'
+import { DRAW_KIND, DRAW_STATUS } from '../../src/enums/draw.enum'
 import { ROUND_KIND, ROUND_STATUS } from '../../src/enums/round.enum'
 import { USER_ROLE } from '../../src/enums/user.enum'
 import type { IAdminMatch } from '../../src/interfaces/admin-match.interface'
@@ -12,6 +13,7 @@ import type { IApiError } from '../../src/interfaces/error.interface'
 import type { IMatch } from '../../src/interfaces/match.interface'
 import type { IPaginated } from '../../src/interfaces/pagination.interface'
 import type { IMatchValidationResult } from '../../src/interfaces/score.interface'
+import { DrawEntity } from '../../src/server/db/typeorm/entities/draw.entity'
 import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
 import { MatchSideEntity } from '../../src/server/db/typeorm/entities/match-side.entity'
 import { MatchEntity } from '../../src/server/db/typeorm/entities/match.entity'
@@ -430,7 +432,7 @@ describe('match scores (B-12)', async () => {
       expect((await errorOf(response)).code).toBe(API_ERROR_CODE.NEXT_ROUND_ENGAGED)
     })
 
-    it('follows R-3 for knockout matches: a draft draw for the next round engages it', async () => {
+    it('follows R-3 for knockout matches: a draw attached to a later round engages it', async () => {
       const free = await adminMatchBySequence(knockout.edition.id, 1)
       const accepted = await correct(free, [10, 6], { 'If-Match': `"${free.version}"` })
       expect(accepted.status).toBe(200)
@@ -439,6 +441,18 @@ describe('match scores (B-12)', async () => {
       const refused = await correct(engaged, [10, 6], { 'If-Match': `"${engaged.version}"` })
       expect(refused.status).toBe(409)
       expect((await errorOf(refused)).code).toBe(API_ERROR_CODE.NEXT_ROUND_ENGAGED)
+    })
+
+    it('does not block a knockout correction for a draft draw of the next round: it has no round yet (R-3)', async () => {
+      // Tel que `POST /editions/{id}/tirages/tour` le crée : brouillon, `round_id` null, tour visé dans `round_kind`.
+      const draft = await dataSource.getRepository(DrawEntity).save({
+        editionId: knockout.edition.id, kind: DRAW_KIND.ROUND, roundId: null, roundKind: ROUND_KIND.FINAL,
+        status: DRAW_STATUS.DRAFT, parameters: { poolCount: 0, seedCount: 0 }
+      })
+      const match = await adminMatchBySequence(knockout.edition.id, 2)
+      const response = await correct(match, [10, 5], { 'If-Match': `"${match.version}"` })
+      await dataSource.getRepository(DrawEntity).delete({ id: draft.id })
+      expect(response.status).toBe(200)
     })
 
     it('refuses a correction on a match that is not validated', async () => {
