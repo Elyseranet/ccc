@@ -12,6 +12,7 @@
             data-cy="edition-meta"
           >
             <edition-chip
+              class="edition-page__chip"
               :family="metaView.family"
               :text="metaView.status"
             />
@@ -208,6 +209,10 @@ defineExpose({})
     align-items: center;
     gap: var(--origam-space---3);
     margin: 0;
+  }
+
+  &__chip {
+    flex: none;
   }
 
   &__summary {

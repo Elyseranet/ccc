@@ -131,6 +131,7 @@ defineExpose({})
 
   &__body {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--rules-page---gap, var(--origam-space---6));
     padding-bottom: var(--rules-page---padding-bottom, var(--origam-space---16));
   }

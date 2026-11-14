@@ -246,7 +246,8 @@
 }
 @media (max-width: 760px) {
   .home-hero { padding-block: var(--origam-space---8) var(--origam-space---10); }
-  .home-hero__grid { grid-template-columns: 1fr; }
+  .home-hero__grid { grid-template-columns: minmax(0, 1fr); } /* comme l’app : la colonne peut rétrécir sous la largeur du mot le plus long */
+  .home-hero__title { hyphens: auto; -webkit-hyphens: auto; } /* A11Y-S5-S12-HERO (décision e080d620) : césure française (lang="fr") jusqu’à 760 px seulement ; le bureau reste sur 2 lignes */
   .pint { width: min(70%, 15rem); }
   .bento { grid-template-columns: 1fr; grid-template-areas: 'now' 'ed' 'pl' 'champ' 'm' 'rank' 'rule'; }
   .result { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
