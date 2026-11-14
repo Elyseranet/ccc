@@ -21,6 +21,17 @@ describe('PageHero : slots eyebrow et after-lead', () => {
     expect(html.indexOf('APRES')).toBeGreaterThan(html.indexOf('data-cy="page-hero-lead"'))
   })
 
+  it('la page courante du fil d’Ariane porte aria-current="page", pas les liens (T-A11Y-01 S9)', async () => {
+    const wrapper = await mountSuspended(PageHero, {
+      ...withRouterLink,
+      props: { title, subtitle, breadcrumb: [{ text: { key: 'nav.home', fallback: 'Accueil' }, to: '/palmares' }, { text: { key: 'pages.rules.title', fallback: 'Règles' } }] }
+    })
+    const items = wrapper.findAll('[data-cy="page-hero-breadcrumb"] li > *:first-child')
+    expect(items).toHaveLength(2)
+    expect(items[0]!.attributes('aria-current')).toBeUndefined()
+    expect(items[1]!.attributes('aria-current')).toBe('page')
+  })
+
   it('reste identique sans slot fourni', async () => {
     const wrapper = await mountSuspended(PageHero, { props: { title, subtitle } })
     expect(wrapper.text()).toBe('ÉditionsRègles')

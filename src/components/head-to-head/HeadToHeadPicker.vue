@@ -9,7 +9,6 @@
   >
     <template #default>
       <origam-form
-        role="search"
         class="head-to-head-picker__form"
         @submit.prevent
       >

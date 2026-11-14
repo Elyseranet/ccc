@@ -90,6 +90,15 @@ describe('utilitaires du face-à-face', () => {
 })
 
 describe('HeadToHeadSummary', () => {
+  it('chaque carte joueur est un article nommé (T-A11Y-01 S8)', async () => {
+    const wrapper = await mountSuspended(HeadToHeadSummary, { ...withRouterLink, props: { comparison: samVsMaya, detailA: samDetail, detailB: mayaDetail } })
+    for (const side of ['a', 'b']) {
+      const card = wrapper.get(`[data-cy="head-to-head-player-card-${side}"]`)
+      expect(card.element.tagName).toBe('ARTICLE')
+      expect(card.attributes('aria-labelledby')).toBeTruthy()
+    }
+  })
+
   it('affiche le score en texte ET en barre, et le ratio de carrière de chaque joueur', async () => {
     const wrapper = await mountSuspended(HeadToHeadSummary, { ...withRouterLink, props: { comparison: samVsMaya, detailA: samDetail, detailB: mayaDetail } })
     expect(wrapper.get('[data-cy="head-to-head-score"]').text().replace(/\s+/g, '')).toBe('2–2')
@@ -175,6 +184,12 @@ describe('HeadToHeadPicker', () => {
     errorA: HEAD_TO_HEAD_FIELD_ERROR.SAME_PLAYER,
     errorB: HEAD_TO_HEAD_FIELD_ERROR.SAME_PLAYER
   }
+
+  it('le sélecteur n’est pas un repère de recherche sans nom : le fieldset et sa légende suffisent (T-A11Y-01 S7)', async () => {
+    const wrapper = await mountSuspended(HeadToHeadPicker, { ...withRouterLink, props })
+    expect(wrapper.find('[role="search"]').exists()).toBe(false)
+    expect(wrapper.find('fieldset legend').exists()).toBe(true)
+  })
 
   it('relie l’erreur « même joueur » à chaque champ par aria-describedby', async () => {
     const wrapper = await mountSuspended(HeadToHeadPicker, { ...withRouterLink, props })
