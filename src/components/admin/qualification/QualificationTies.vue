@@ -75,6 +75,7 @@
               :elevation="tie.buttonElevation"
               font-size="sm"
               class="qualification-ties__create"
+              padding-inline="4"
               :disabled="tie.disabled"
               :loading="tie.busy"
               :text="tie.buttonLabel"
@@ -280,10 +281,6 @@ defineExpose({})
     flex-wrap: wrap;
     gap: var(--origam-space---2);
     margin: 0;
-  }
-
-  &__create {
-    --origam-btn---padding-lg: var(--origam-space---4);
   }
 
   &__why {

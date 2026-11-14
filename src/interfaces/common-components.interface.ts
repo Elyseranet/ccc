@@ -95,6 +95,10 @@ export interface IConfirmDialogProps {
   confirmColor?: string
   confirmSize?: string
   confirmElevation?: string
+  /** Bouton de confirmation inactif tant que la saisie demandée (F-26 : le code de l'édition) n'est pas faite. */
+  confirmDisabled?: boolean
+  /** `false` : le focus initial est laissé au contenu du dialogue (le champ de saisie), au lieu du bouton « Annuler ». */
+  focusCancel?: boolean
   /** `MOCKUP` : gabarit de la maquette d'F-24 ; `DEFAULT` : rendu historique du dialogue de validation du tirage (F-11), inchangé jusqu'à F-30. */
   appearance?: CONFIRM_DIALOG_APPEARANCE
 }

@@ -291,3 +291,37 @@ export const createQualifiedEdition = async (request: APIRequestContext, label: 
   await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: poolSize, bestNextCount: 0, withPlayoff } }), 'POST qualification', STATUS_OK)
   return { ...edition, status: 'QUALIFIED' }
 }
+
+/*********************************************************
+ * Édition à finale jouée par l'API réelle (F-26)
+ *
+ * @description
+ * La plus courte chaîne qui mène à une finale, sans écrire en base à la main (ARCH-9) : 2 poules de 2 jouées (5-2), liste des qualifiés arrêtée
+ * avec 1 premier par poule (2 qualifiés, donc le tour à tirer est la finale), tirage du tour (création, affectations, validation) puis score de la finale.
+ * `validateFinal: false` s'arrête avant le score : la finale existe, jouable, non validée (clôture impossible, 409 `FINAL_NOT_VALIDATED`).
+ ********************************************************/
+interface IRoundDrawPreviewResponse { candidates: Array<{ participationId: string }> }
+
+const FINAL_SCORES = [10, 6]
+
+export const createFinalValidatedEdition = async (request: APIRequestContext, label: string, validateFinal = true): Promise<IWriteEdition> => {
+  const { edition } = await createTiedPoolsEdition(request, label, 2)
+  await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: 1, bestNextCount: 0, withPlayoff: false } }), 'POST qualification', STATUS_OK)
+  const preview = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/tirages/tour`), 'GET tirages/tour', STATUS_OK) as IRoundDrawPreviewResponse
+  const draft = await expectStatus(await request.post(`/api/v1/editions/${edition.id}/tirages/tour`, { data: {} }), 'POST tirages/tour', STATUS_CREATED) as IDrawResponse
+  const [first, second] = preview.candidates
+  await expectStatus(await request.put(`/api/v1/tirages/${draft.id}/affectations`, { data: { assignments: [
+    { participationId: first!.participationId, pairingIndex: 1, sidePosition: 1, drawnOrder: 1 },
+    { participationId: second!.participationId, pairingIndex: 1, sidePosition: 2, drawnOrder: 2 }
+  ] } }), 'PUT affectations du tour', STATUS_OK)
+  await expectStatus(await request.post(`/api/v1/tirages/${draft.id}/validation`), 'POST validation du tour', STATUS_OK)
+  if (validateFinal) {
+    const matches = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/matchs`), 'GET matchs admin', STATUS_OK) as Array<IAdminMatchView & { status: string }>
+    const final = matches.find(match => match.status === 'SCHEDULED')
+    if (!final) {
+      throw new Error('La finale tirée est introuvable parmi les matchs à jouer')
+    }
+    await playMatch(request, final, FINAL_SCORES)
+  }
+  return { ...edition, status: 'PLAYOFFS' }
+}

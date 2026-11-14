@@ -16,4 +16,6 @@ export interface IClosingPreview {
   participantCount: number
   blockedBy: API_ERROR_CODE.FINAL_NOT_VALIDATED | null
   results: IClosingResult[]
+  /** Stades dont le tour a été disputé (RG3), ceux que `computeParticipationPointsCents` accepte ; vide tant que la finale n'est pas validée. */
+  playedStages: FINAL_STAGE[]
 }
