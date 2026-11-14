@@ -17,8 +17,8 @@ import { toQualificationFailure } from '~/utils/qualification-failure.util'
  * useQualification
  *
  * @description
- * État de la qualification de l'édition active (`GET /admin/editions/{id}/qualification`, B-13) et ses deux écritures : créer un départage,
- * arrêter la liste. Le serveur est la source de vérité : égalités, départage suivant et qualifiés viennent de sa réponse, rien n'est recalculé ici.
+ * État de la qualification de l'édition active (`GET /admin/editions/{id}/qualification`, B-13) et ses trois écritures : créer un départage,
+ * supprimer un départage non joué (F-44), arrêter la liste. Le serveur est la source de vérité : égalités, départage suivant et qualifiés viennent de sa réponse, rien n'est recalculé ici.
  * Simulation : chaque changement valide des champs relance la lecture avec `?topPerPool=&bestNextCount=`, après `QUALIFICATION_SIMULATION_DELAY_MS`
  * (une requête par pause, pas par touche) ; un champ invalide n'envoie rien et garde l'état précédent. Une fois la liste arrêtée, la configuration
  * enregistrée prime et les champs sont en lecture seule. Clé de cache fixe (même raison que `useMatchQueue`) : le changement d'édition relance la requête.
@@ -102,7 +102,7 @@ export const useQualification = async () => {
 
   const prerequisites = computed(() => status.value ? prerequisitesOf(status.value) : null)
   const rankTables = computed(() => status.value ? rankTablesOf(status.value, parameters.value?.topPerPool ?? null) : [])
-  const ties = computed(() => status.value ? tieViewsOf(status.value, isClosed.value) : [])
+  const ties = computed(() => status.value ? tieViewsOf(status.value, isClosed.value, edition.value?.code ?? '') : [])
   const qualifiedRows = computed(() => status.value ? qualifiedRowsOf(status.value) : [])
   const steps = computed(() => status.value ? stepsOf(status.value, check.value) : [])
   const pendingCount = computed(() => status.value ? pendingRegularCount(status.value) : 0)
@@ -121,6 +121,8 @@ export const useQualification = async () => {
 
   const failure = ref<QUALIFICATION_FAILURE | null>(null)
   const busyTie = ref<string | null>(null)
+  const deletingTie = ref<string | null>(null)
+  const justDeleted = ref(false)
   const finalizing = ref(false)
   const justFinalized = ref(false)
 
@@ -150,6 +152,27 @@ export const useQualification = async () => {
     }
   }
 
+  /** Supprime le départage ouvert d'un groupe (jamais un joué : le bouton est inactif, et le serveur répond 409 `TIEBREAK_PLAYED` sinon), puis relit l'état : l'égalité revient. */
+  const deleteTiebreak = async (tie: IQualificationTieView): Promise<boolean> => {
+    if (!editionId.value || deletingTie.value !== null || busyTie.value !== null || tie.openTiebreak === null || tie.openTiebreak.played) {
+      return false
+    }
+    deletingTie.value = tie.key
+    failure.value = null
+    justDeleted.value = false
+    try {
+      await service.deleteTiebreak(editionId.value, tie.openTiebreak.matchId)
+      await request.refresh()
+      justDeleted.value = true
+      return true
+    } catch (cause) {
+      failure.value = toQualificationFailure(cause)
+      return false
+    } finally {
+      deletingTie.value = null
+    }
+  }
+
   const finalize = async (): Promise<boolean> => {
     if (!editionId.value || finalizing.value || finalizeBlocker.value !== null || !parameters.value) {
       return false
@@ -172,6 +195,6 @@ export const useQualification = async () => {
 
   return {
     status, edition, inputs, check, bounds, parameters, isClosed, isFinalized, isReadonly, prerequisites, rankTables, ties, qualifiedRows, steps,
-    pendingCount, finalizeBlocker, previewReady, pageError, pending: request.pending, failure, busyTie, finalizing, justFinalized, reload, createTiebreak, finalize
+    pendingCount, finalizeBlocker, previewReady, pageError, pending: request.pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted, reload, createTiebreak, deleteTiebreak, finalize
   }
 }

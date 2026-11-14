@@ -40,6 +40,9 @@
         <p class="sr-only">{{ chartNote }}</p>
         <app-data-table
           class="player-journey__table"
+          role="region"
+          tabindex="0"
+          :aria-label="tableScrollLabel"
           hide-default-footer
           :border="false"
           :caption="tableCaption"
@@ -103,6 +106,7 @@ const lead = computed(() => props.bestLabel
   : t('player.journey.lead', 'Tour atteint à chaque édition'))
 const chartNote = computed(() => t('player.journey.chart_note', 'Le tableau ci-dessous donne les mêmes données.'))
 const tableCaption = computed(() => t('player.journey.table_caption', 'Parcours par édition'))
+const tableScrollLabel = computed(() => t('a11y.table_scroll_region', '{caption}, défilement horizontal', { caption: tableCaption.value }))
 
 /*********************************************************
  * Graphique

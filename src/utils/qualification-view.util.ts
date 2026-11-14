@@ -128,14 +128,16 @@ export const blockerOf = (pending: number, ties: number, closed: boolean): QUALI
 }
 
 /** Une carte par égalité, dans l'ordre du serveur. Le départage « suivant » vient d'un départage déjà joué qui contenait ce groupe (R-7). */
-export const tieViewsOf = (status: IQualificationStatus, closed: boolean): IQualificationTieView[] => {
+export const tieViewsOf = (status: IQualificationStatus, closed: boolean, editionCode: string): IQualificationTieView[] => {
   const pending = pendingRegularCount(status)
   const poolRankById = new Map(status.pools.map(pool => [pool.id, pool.rank]))
   const rankOf = new Map(status.pools.flatMap(pool => pool.standing.map(row => [row.participationId, row.rank] as const)))
   return status.ties.map((tie, index) => {
     const participationIds = tie.members.map(member => member.participationId)
     const matchesOf = status.tiebreakMatches.map(match => ({ match, ids: match.sides.map(side => side.participationId) }))
-    const hasOpenTiebreak = matchesOf.some(entry => isOpenTiebreak(entry.match) && sameSet(entry.ids, participationIds))
+    const open = matchesOf.find(entry => isOpenTiebreak(entry.match) && sameSet(entry.ids, participationIds))?.match ?? null
+    const hasOpenTiebreak = open !== null
+    const openTiebreak = open === null ? null : { matchId: open.id, number: `${editionCode}-${open.sequence}`, played: open.status !== MATCH_STATUS.SCHEDULED || open.sides.some(side => side.recordedScore !== null) }
     const isFollowUp = matchesOf.some(entry => entry.match.status === MATCH_STATUS.VALIDATED
       && entry.ids.length > participationIds.length
       && participationIds.every(id => entry.ids.includes(id)))
@@ -157,6 +159,7 @@ export const tieViewsOf = (status: IQualificationStatus, closed: boolean): IQual
       members: tie.members.map(member => ({ id: member.competitor.id, displayName: member.competitor.displayName })),
       participationIds,
       hasOpenTiebreak,
+      openTiebreak,
       isFollowUp,
       blocker
     }

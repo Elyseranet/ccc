@@ -4,6 +4,7 @@
     :title="title"
     :text="text"
     title-id="invitation-state-title"
+    title-tag="h2"
   >
     <template #default>
       <p

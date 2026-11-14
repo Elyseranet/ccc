@@ -252,8 +252,9 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-41](F-41.md) | Bouton « petit 44 px » : une seule recette (8 copies en CSS local) | — | F-38 | **Fermé** (2026-11-14) @ `04b2fe58` |
 | [F-42](F-42.md) | Édition : la boîte du titre déborde sur le fil d'Ariane et intercepte le clic | — | — | **Fermé** (2026-11-14) @ `c7cecfe5` |
 | [F-43](F-43.md) | Bouton outlined dans une alerte d'erreur : contraste 2,27:1 (WCAG 1.4.3) | à corriger | — | **Fermé** (2026-11-14) @ `9b8ba324` |
-| [F-44](F-44.md) | Qualification : supprimer un départage non joué (CORRECTION-TIEBREAK) | à dessiner | B-24, F-24 | Ouvert |
+| [F-44](F-44.md) | Qualification : supprimer un départage non joué (CORRECTION-TIEBREAK) | à dessiner | B-24, F-24 | **Fermé** (2026-11-14) @ `ec6584c7` |
 | [F-45](F-45.md) | `/admin/plus` : liste native de liens à la place de la liste Origam (role=listitem sur des liens) | — | T-A11Y-01 lot 3 | Ouvert |
+| [F-46](F-46.md) | Dialogues admin : le focus s'échappe parfois du dialogue modal (6/20 F-30, 9/20 develop) | — | — | Ouvert |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
@@ -415,7 +416,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-RGPD-01](T-RGPD-01.md) : **Fermé** (2026-11-12), réalisé par T-SEC-16.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **Fermé** (2026-11-12) — front @ `6b42e4be`, back @ `17df018a` ; dev non indexable vérifiée par curl (robots `Disallow: /`, sitemap 404, `X-Robots-Tag`).
-- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; SHOULD lot 1 (`b794d94e`), S2 (`66eeaeea`), S4 (`e67eccc9`) et S11 (`688e0ae1`) mergés ; restent lot 3, S13, S5, S12, S18.
+- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; SHOULD lot 1 (`b794d94e`), S2 (`66eeaeea`), S4 (`e67eccc9`), S11 (`688e0ae1`) et S18 (`0ed2982f`, S6 rouvert et corrigé) mergés ; restent lot 3, S13, S5, S12.
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
 ### Architecture (chef de projet, 2026-10-22)

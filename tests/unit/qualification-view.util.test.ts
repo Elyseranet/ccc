@@ -66,24 +66,33 @@ describe('classement provisoire', () => {
 
 describe('égalités à départager (A11, R-1, R-7)', () => {
   it('rend une carte par égalité, dans l’ordre du serveur, avec le rang de la poule', () => {
-    const views = tieViewsOf(buildQualificationStatus({ ties: [pairTie('pool-2'), boundaryTie()] }), false)
+    const views = tieViewsOf(buildQualificationStatus({ ties: [pairTie('pool-2'), boundaryTie()] }), false, '2026')
     expect(views.map(view => [view.poolRank, view.placeRank, view.members.length, view.slots])).toEqual([[2, 2, 2, 0], [null, 3, 3, 2]])
     expect(views.every(view => view.blocker === null)).toBe(true)
   })
 
   it('bloque la création tant qu’un match de poule reste (sans compter les départages ouverts), si l’édition est clôturée, ou si le départage du groupe est ouvert', () => {
-    const pending = tieViewsOf(buildQualificationStatus({ pendingMatchCount: 2, ties: [pairTie()] }), false)
+    const pending = tieViewsOf(buildQualificationStatus({ pendingMatchCount: 2, ties: [pairTie()] }), false, '2026')
     expect(pending[0]!.blocker).toBe(QUALIFICATION_BLOCKER.PENDING_MATCHES)
-    const open = tieViewsOf(buildQualificationStatus({ pendingMatchCount: 1, ties: [pairTie()], tiebreakMatches: [tiebreakMatch(MATCH_STATUS.SCHEDULED, ['b', 'c'])] }), false)
+    const open = tieViewsOf(buildQualificationStatus({ pendingMatchCount: 1, ties: [pairTie()], tiebreakMatches: [tiebreakMatch(MATCH_STATUS.SCHEDULED, ['b', 'c'])] }), false, '2026')
     expect(open[0]).toMatchObject({ blocker: QUALIFICATION_BLOCKER.TIEBREAK_OPEN, hasOpenTiebreak: true })
-    expect(tieViewsOf(buildQualificationStatus({ ties: [pairTie()] }), true)[0]!.blocker).toBe(QUALIFICATION_BLOCKER.CLOSED)
+    expect(tieViewsOf(buildQualificationStatus({ ties: [pairTie()] }), true, '2026')[0]!.blocker).toBe(QUALIFICATION_BLOCKER.CLOSED)
+  })
+
+  it('le départage ouvert d’un groupe : identifiant du match, numéro « code-séquence », et « joué » dès qu’un score est saisi (F-44)', () => {
+    const scheduled = tiebreakMatch(MATCH_STATUS.SCHEDULED, ['b', 'c'])
+    const view = tieViewsOf(buildQualificationStatus({ ties: [pairTie()], tiebreakMatches: [scheduled] }), false, '2026')[0]!
+    expect(view.openTiebreak).toEqual({ matchId: scheduled.id, number: `2026-${scheduled.sequence}`, played: false })
+    const recorded = tiebreakMatch(MATCH_STATUS.RECORDED, ['b', 'c'])
+    expect(tieViewsOf(buildQualificationStatus({ ties: [pairTie()], tiebreakMatches: [recorded] }), false, '2026')[0]!.openTiebreak?.played).toBe(true)
+    expect(tieViewsOf(buildQualificationStatus({ ties: [pairTie()] }), false, '2026')[0]!.openTiebreak).toBeNull()
   })
 
   it('reconnaît le départage suivant : un départage validé contenait plus de joueurs que le groupe restant', () => {
     const rest = { ...boundaryTie(), members: [member('e', 'Paul Girard'), member('f', 'Eva Michel')], slots: 1 }
-    const views = tieViewsOf(buildQualificationStatus({ ties: [rest], tiebreakMatches: [tiebreakMatch(MATCH_STATUS.VALIDATED, ['d', 'e', 'f'])] }), false)
+    const views = tieViewsOf(buildQualificationStatus({ ties: [rest], tiebreakMatches: [tiebreakMatch(MATCH_STATUS.VALIDATED, ['d', 'e', 'f'])] }), false, '2026')
     expect(views[0]).toMatchObject({ isFollowUp: true, hasOpenTiebreak: false })
-    expect(tieViewsOf(buildQualificationStatus({ ties: [boundaryTie()] }), false)[0]!.isFollowUp).toBe(false)
+    expect(tieViewsOf(buildQualificationStatus({ ties: [boundaryTie()] }), false, '2026')[0]!.isFollowUp).toBe(false)
   })
 })
 

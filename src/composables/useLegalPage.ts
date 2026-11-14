@@ -38,6 +38,7 @@ export const useLegalPage = (content: Ref<ILegalPageContent> | (() => ILegalPage
     table: block.table
       ? {
           caption: text(block.table.caption),
+          scrollLabel: t('a11y.table_scroll_region', '{caption}, défilement horizontal', { caption: text(block.table.caption) }),
           columns: block.table.columns.map((column, columnIndex) => ({ id: columnIndex, text: text(column) })),
           rows: block.table.rows.map((row, rowIndex) => ({
             id: rowIndex,

@@ -66,6 +66,11 @@ export class QualificationService extends BaseService {
     return this.request<IAdminMatch>(`/editions/${encodeURIComponent(editionId)}/departages`, { method: 'POST', body: { ...body } })
   }
 
+  /** `DELETE /editions/{id}/departages/{matchId}` : supprime un départage non joué (204, sans corps) ; 409 `TIEBREAK_PLAYED` s'il est saisi ou validé. */
+  deleteTiebreak (editionId: string, matchId: string): Promise<void> {
+    return this.request<void>(`/editions/${encodeURIComponent(editionId)}/departages/${encodeURIComponent(matchId)}`, { method: 'DELETE' })
+  }
+
   /** `POST /editions/{id}/qualification` : arrête la liste des qualifiés, définitivement (409 si un match ou un départage reste à jouer). */
   finalize (editionId: string, parameters: IQualificationParameters): Promise<IQualificationResult> {
     return this.request<IQualificationResult>(`/editions/${encodeURIComponent(editionId)}/qualification`, { method: 'POST', body: { ...parameters } })

@@ -3,6 +3,7 @@ import type { IAccountMessage } from './account-message.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { IInvitationPreview } from './invitation.interface.js'
 import type { IMe } from './me.interface.js'
+import type { THeadingTag } from '../types/heading-tag.type.js'
 
 export type { IAccountMessage }
 
@@ -108,6 +109,8 @@ export interface IAccountStateProps {
   text: string
   /** `id` du titre, pour nommer la région. */
   titleId: string
+  /** Niveau du titre : `h3` sous un `h2` de page (profil), `h2` quand la carte suit directement le `h1` (invitation). */
+  titleTag?: THeadingTag
 }
 
 /** Évènement `submit` d'`origam-form` : un évènement natif qui est aussi une promesse du résultat de la validation. */
