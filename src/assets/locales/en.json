@@ -667,6 +667,8 @@
   "admin.more.public_site": "View the public site",
   "admin.more.public_site_description": "What visitors see",
   "golden_rules.title": "The eight golden rules",
+  "golden_rules.scroll_region": "The eight golden rules, horizontal scroll",
+  "a11y.table_scroll_region": "{caption}, horizontal scroll",
   "golden_rules.code": "RG{n}",
   "golden_rules.label": "Golden rule {n}",
   "golden_rules.rule_25_detail": "Beers are served full and cold.",

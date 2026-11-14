@@ -18,7 +18,7 @@
         >{{ glyph }}</span>
         <origam-title
           :id="titleId"
-          tag="h3"
+          :tag="titleTag"
           font-size="xl"
           font-weight="bold"
           line-height="tight"
@@ -49,7 +49,9 @@ import type { IAccountStateProps, IAccountStateSlots } from '~/interfaces/accoun
  * décoratif ; la teinte (rouge ou verte) ne porte jamais seule le sens, le titre et le texte le disent. Les actions de la carte
  * (retour, réessayer) arrivent par le slot.
  ********************************************************/
-const props = withDefaults(defineProps<IAccountStateProps>(), {})
+const props = withDefaults(defineProps<IAccountStateProps>(), {
+  titleTag: 'h3'
+})
 const emits = defineEmits<{}>()
 defineSlots<IAccountStateSlots>()
 const glyph = computed(() => ACCOUNT_STATE_GLYPHS[props.tone])

@@ -30,6 +30,8 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
+ *   - `.origam-table.origam-table[tabindex="0"]` et son `.origam-table__wrapper` (la racine focalisable devient le conteneur qui défile : le wrapper
+ *     défilant n'accepte aucun `tabindex`) : fiche `docs/tickets/origam/table-conteneur-defilant-non-focalisable.md` (à déposer) ;
  *   - `.origam-table .origam-table__wrapper.origam-table__wrapper td` (séparateur de ligne en haut) :
  *     Elyseranet/origam#1262 ;
  *   - `.origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items` (interligne du fil d'Ariane,

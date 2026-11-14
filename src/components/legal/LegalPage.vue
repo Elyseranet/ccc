@@ -100,6 +100,9 @@
               <origam-table
                 v-else-if="block.isTable"
                 class="legal-page__table"
+                role="region"
+                tabindex="0"
+                :aria-label="block.table?.scrollLabel"
                 :caption="block.table?.caption"
                 caption-visible
               >

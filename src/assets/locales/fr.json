@@ -667,6 +667,8 @@
   "admin.more.public_site": "Voir le site public",
   "admin.more.public_site_description": "Ce que voient les visiteurs",
   "golden_rules.title": "Les huit règles d’or",
+  "golden_rules.scroll_region": "Les huit règles d’or, défilement horizontal",
+  "a11y.table_scroll_region": "{caption}, défilement horizontal",
   "golden_rules.code": "RG{n}",
   "golden_rules.label": "Règle d’or {n}",
   "golden_rules.rule_25_detail": "Les bières sont servies pleines et fraîches.",
