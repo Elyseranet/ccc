@@ -220,7 +220,7 @@ defineExpose({})
     padding-block: var(--home-hero---padding-block-mobile, var(--origam-space---8) var(--origam-space---10));
 
     &__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 }
