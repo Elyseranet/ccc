@@ -508,3 +508,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 - Les étapes cliquables du centre de contrôle (F-07, F-39) suivent `origam-stepper` tel qu'il est, comme la barre « Phase finale » de F-24 et F-25 : boutons qui naviguent (`navigateTo`), étape courante inactive, survol et focus d'Origam.
 - Pas de vrais liens `<a>` pour l'instant, donc pas d'ouverture dans un nouvel onglet. ui-plus ajuste la maquette `6eeb2a5c` en conséquence.
 - Contrainte Origam (`OrigamStepperItem.vue` l.2-9, v2.37.4) consignée dans `docs/tickets/origam/stepper-item-sans-lien-et-etape-active-desactivee.md`, à déposer pour obtenir de vrais liens plus tard.
+
+## A11Y-S3, A11Y-S10, A11Y-S16 — SHOULD de l'audit d'accessibilité (décisions utilisateur 2026-11-14, T-A11Y-01)
+
+- **A11Y-S3** : le sélecteur d'édition, public et admin, ne navigue plus dès la sélection. On choisit une édition, puis un bouton « Afficher » valide (RGAA, changement de contexte). Deux écrans sont concernés ; maquettes ui-plus, puis visuels remesurés.
+- **A11Y-S10** : les liens vers les joueurs placés **dans un texte courant** sont soulignés. Ceux des tableaux et des cartes, identifiables par leur position, ne changent pas. ui-plus ajuste les maquettes concernées.
+- **A11Y-S16** : un **plan du site** simple, lié depuis le pied de page, sert de second moyen de navigation (RGAA 12.1). Pas de recherche globale.
