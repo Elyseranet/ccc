@@ -327,3 +327,7 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
 .rg__opt input:checked { background: radial-gradient(circle, currentColor 3.5px, transparent 3.5px 5px, currentColor 5px 7px, transparent 7px); color: var(--origam-color__action--secondary---bg); }
 .rg__opt input:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: -4px; border-radius: var(--origam-radius---full); }
 .rg[disabled] .rg__opt { opacity: .5; cursor: default; }
+/* F-44 · actions d’une carte d’égalité (lien de saisie + suppression) */
+.q-tie__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---3); }
+.snack--demo { position: static; translate: none; }
+
