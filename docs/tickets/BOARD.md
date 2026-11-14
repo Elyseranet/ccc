@@ -416,7 +416,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-RGPD-01](T-RGPD-01.md) : **Fermé** (2026-11-12), réalisé par T-SEC-16.
 - [T-REL-04](T-REL-04.md) : ouvert — gates complètes à la PR develop → main (GATE-DEV).
 - [T-SEO-01](T-SEO-01.md) : **Fermé** (2026-11-12) — front @ `6b42e4be`, back @ `17df018a` ; dev non indexable vérifiée par curl (robots `Disallow: /`, sitemap 404, `X-Robots-Tag`).
-- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; SHOULD lot 1 (`b794d94e`), S2 (`66eeaeea`), S4 (`e67eccc9`), S11 (`688e0ae1`) et S18 (`0ed2982f`, S6 rouvert et corrigé) mergés ; restent lot 3, S13, S5, S12.
+- [T-A11Y-01](T-A11Y-01.md) : **Partiel** (2026-11-13) — les 6 MUST mergés (`b3c5052e`, `da6123af`, `ed85b990`) ; SHOULD lot 1 (`b794d94e`), S2 (`66eeaeea`), S4 (`e67eccc9`), S11 (`688e0ae1`), S18 (`0ed2982f`, S6 rouvert et corrigé) et S5/S12 (`654a60a7`) mergés ; restent lot 3 et S13.
 - **Déploiement Coolify** : échec le 2026-10-21. Coolify interroge le dépôt privé `Elyseranet/ccc` en HTTPS sans identifiants (`fatal: could not read Username for 'https://github.com'`). La source doit être configurée en dépôt privé dans Coolify, ce qui est une action de l'utilisateur.
 
 ### Architecture (chef de projet, 2026-10-22)
