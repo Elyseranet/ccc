@@ -148,6 +148,7 @@ for (const viewport of VIEWPORTS) {
         if (zone.state === STATE.READY) {
           await alignMockupText(mockup, page, [
             { mockup: '.adm-head .eyebrow', app: '.admin-closing__eyebrow' },
+            { mockup: '.c-facts dd b', app: '.origam-data-list__kv-value' },
             { mockup: '.c-pre .chip', app: '[data-cy^="closing-prerequisite-"] .origam-chip' },
             { mockup: '.c-preview caption', app: '[data-cy="closing-preview"] caption' },
             { mockup: '.q-sec .q-act .btn', app: '[data-cy="closing-open"]' }

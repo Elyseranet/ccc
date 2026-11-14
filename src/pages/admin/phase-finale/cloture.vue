@@ -49,7 +49,8 @@
           v-if="failureView.verifiable"
           variant="outlined"
           font-size="sm"
-          class="admin-closing__verify"
+          class="small-action-btn"
+          color="var(--origam-color__text---primary)"
           :text="verifyLabel"
           data-cy="closing-verify"
           @click="handleVerify"
@@ -248,10 +249,6 @@ defineExpose({})
     @media (min-width: 1001px) {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
     }
-  }
-
-  &__verify {
-    --origam-btn---padding-lg: var(--origam-space---4);
   }
 }
 </style>
