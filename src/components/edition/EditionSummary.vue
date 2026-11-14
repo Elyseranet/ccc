@@ -29,30 +29,11 @@
       />
       <div class="edition-summary__podium-body">
         <div class="edition-summary__champ">
-          <svg
+          <cap-badge
             class="edition-summary__cap"
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-          >
-            <polygon
-              class="edition-summary__cap-shape"
-              :points="capPoints"
-            />
-            <circle
-              class="edition-summary__cap-inner"
-              cx="50"
-              cy="50"
-              r="31"
-            />
-            <text
-              class="edition-summary__cap-text"
-              x="50"
-              y="58"
-              text-anchor="middle"
-            >
-              1
-            </text>
-          </svg>
+            text="1"
+            :text-size="capTextSize"
+          />
           <p class="edition-summary__champ-text">
             <span class="edition-summary__eyebrow">{{ championLabel }}</span>
             <span
@@ -173,8 +154,8 @@ import { OrigamCard, OrigamTitle } from 'origam/components'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { useT } from '~/composables/useT'
-import { BRAND_CAP_POINTS } from '~/consts/brand.const'
-import { EDITION_STEP_FAMILIES, EDITION_STEP_STATE_LABELS } from '~/consts/edition-view.const'
+import CapBadge from '~/components/common/CapBadge.vue'
+import { EDITION_PODIUM_CAP_TEXT_SIZE, EDITION_STEP_FAMILIES, EDITION_STEP_STATE_LABELS } from '~/consts/edition-view.const'
 import type { IEditionSummaryProps } from '~/interfaces/edition-view.interface'
 
 /*********************************************************
@@ -188,7 +169,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<IEditionSummaryProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-const capPoints = BRAND_CAP_POINTS
+const capTextSize = EDITION_PODIUM_CAP_TEXT_SIZE
 
 /*********************************************************
  * Textes
@@ -278,19 +259,6 @@ defineExpose({})
     rotate: -10deg;
   }
 
-  &__cap-shape {
-    fill: var(--origam-color__bar---amber);
-  }
-
-  &__cap-inner {
-    fill: var(--origam-color__surface---default);
-  }
-
-  &__cap-text {
-    fill: var(--origam-color__bar---foam);
-    font-family: var(--origam-font__family---display);
-    font-size: 36px;
-  }
 
   &__eyebrow {
     margin: 0;

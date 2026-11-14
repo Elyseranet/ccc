@@ -84,7 +84,7 @@ const TEXT_PAIRS: ITextPair[] = [
   { mockup: '.palm-hero .page-hero__lead', app: '[data-cy="page-hero-lead"]' },
   { mockup: '.palm-podium__name', app: '[data-cy="palmares-most-titled-name"]' },
   { mockup: '.palm-podium .muted', app: '.palmares-most-titled__detail' },
-  { mockup: '.palm-podium .cap-txt', app: '.palmares-most-titled__cap-text' },
+  { mockup: '.palm-podium .cap-txt', app: '.palmares-most-titled .cap-badge__text' },
   { mockup: '.champ__ed', app: '.palmares-titles__edition' },
   { mockup: '.champ__who a', app: '.palmares-titles__who .player-link__name' },
   { mockup: '.champ__final a', app: '.palmares-titles__final .player-link__name' },
@@ -104,7 +104,7 @@ const MOCKUP_INK = [
   '#rk-p-acp tbody td', '#rk-p-acp tbody td a', '#rk-p-all tbody td', '#rk-p-all tbody td a', '.palm-hero .page-hero__lead', '#h-rk ~ p', '.table caption'
 ]
 const APP_INK = [
-  '[data-cy="palmares-most-titled-name"]', '.palmares-most-titled__detail', '.palmares-most-titled__cap-text', '.palmares-titles__edition',
+  '[data-cy="palmares-most-titled-name"]', '.palmares-most-titled__detail', '.palmares-most-titled .cap-badge__text', '.palmares-titles__edition',
   '.palmares-titles__who .player-link__name', '.palmares-titles__final .player-link__name', '.palmares-titles__final b', '.palmares-titles__count',
   '[data-cy="palmares-table-acp"] tbody td', '[data-cy="palmares-table-acp"] tbody td *', '[data-cy="palmares-table-all-time"] tbody td', '[data-cy="palmares-table-all-time"] tbody td *',
   '[data-cy="page-hero-lead"]', '.palmares-rankings__note', '.palmares-ranking-table caption'

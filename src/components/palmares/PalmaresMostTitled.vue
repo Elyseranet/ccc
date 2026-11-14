@@ -6,30 +6,11 @@
     :aria-label="label"
     data-cy="palmares-most-titled"
   >
-    <svg
+    <cap-badge
       class="palmares-most-titled__cap"
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-    >
-      <polygon
-        class="palmares-most-titled__cap-shape"
-        :points="capPoints"
-      />
-      <circle
-        class="palmares-most-titled__cap-inner"
-        cx="50"
-        cy="50"
-        r="31"
-      />
-      <text
-        class="palmares-most-titled__cap-text"
-        x="50"
-        y="58"
-        text-anchor="middle"
-      >
-        {{ first.titles }}
-      </text>
-    </svg>
+      :text="String(first.titles)"
+      :text-size="capTextSize"
+    />
     <div
       v-if="isTied"
       class="palmares-most-titled__text palmares-most-titled__text--tied"
@@ -69,7 +50,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useT } from '~/composables/useT'
-import { BRAND_CAP_POINTS } from '~/consts/brand.const'
+import CapBadge from '~/components/common/CapBadge.vue'
+import { PALMARES_CAP_TEXT_SIZE } from '~/consts/palmares.const'
 import type { IPalmaresMostTitled, IPalmaresMostTitledProps } from '~/interfaces/palmares.interface'
 import { buildMostTitledLabel } from '~/utils/palmares.util'
 
@@ -85,7 +67,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<IPalmaresMostTitledProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-const capPoints = BRAND_CAP_POINTS
+const capTextSize = PALMARES_CAP_TEXT_SIZE
 const first = computed(() => props.mostTitled[0] ?? null)
 const isTied = computed(() => props.mostTitled.length > 1)
 const labelText = computed(() => buildMostTitledLabel(props.mostTitled))
@@ -130,19 +112,6 @@ defineExpose({})
     rotate: -12deg;
   }
 
-  &__cap-shape {
-    fill: var(--origam-color__bar---amber);
-  }
-
-  &__cap-inner {
-    fill: var(--origam-color__surface---default);
-  }
-
-  &__cap-text {
-    fill: var(--origam-color__bar---foam);
-    font-family: var(--origam-font__family---display);
-    font-size: 34px;
-  }
 
   &__text {
     display: grid;

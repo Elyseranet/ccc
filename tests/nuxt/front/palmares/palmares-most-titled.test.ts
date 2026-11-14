@@ -26,7 +26,7 @@ describe('PalmaresMostTitled', () => {
     expect(wrapper.get('.palmares-most-titled__eyebrow').text()).toBe('Le plus titré')
     expect(wrapper.get('[data-cy="palmares-most-titled-name"]').text()).toBe('Lou Bernard')
     expect(wrapper.get('.palmares-most-titled__detail').text()).toBe('« La Mousse » · 4 titres · 10 participations')
-    expect(wrapper.get('.palmares-most-titled__cap-text').text()).toBe('4')
+    expect(wrapper.get('.palmares-most-titled .cap-badge__text').text()).toBe('4')
     expect(wrapper.find('ul').exists()).toBe(false)
   })
 
@@ -36,7 +36,7 @@ describe('PalmaresMostTitled', () => {
     const items = wrapper.findAll('ul.palmares-most-titled__ties > li')
     expect(items.map(item => item.get('[data-cy="palmares-most-titled-name"]').text())).toEqual(['Lou Bernard', 'Nina Perrin', 'Inès Perrin'])
     expect(items.map(item => item.get('.palmares-most-titled__detail').text())).toEqual(['« La Mousse » · 10 participations', '5 participations', '8 participations'])
-    expect(wrapper.get('.palmares-most-titled__cap-text').text()).toBe('4')
+    expect(wrapper.get('.palmares-most-titled .cap-badge__text').text()).toBe('4')
   })
 
   it('ex aequo à un titre : l’étiquette est au singulier', async () => {
@@ -48,6 +48,6 @@ describe('PalmaresMostTitled', () => {
   it('personne sans titre : le bloc est absent', async () => {
     const wrapper = await mount([])
     expect(wrapper.find('[data-cy="palmares-most-titled"]').exists()).toBe(false)
-    expect(wrapper.find('.palmares-most-titled__cap-text').exists()).toBe(false)
+    expect(wrapper.find('.palmares-most-titled .cap-badge__text').exists()).toBe(false)
   })
 })

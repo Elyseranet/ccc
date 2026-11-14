@@ -47,41 +47,23 @@
         d="M160 76 Q158 122 168 126 Q176 118 172 76 Z"
       />
     </svg>
-    <svg
+    <cap-badge
       v-for="cap in caps"
       :key="cap.modifier"
       class="home-pint__cap"
       :class="`home-pint__cap--${cap.modifier}`"
-      viewBox="0 0 100 100"
-      focusable="false"
-    >
-      <polygon
-        class="home-pint__cap-body"
-        :class="cap.colorClass"
-        :points="capPoints"
-      />
-      <circle
-        class="home-pint__cap-inner"
-        cx="50"
-        cy="50"
-        r="31"
-      />
-      <text
-        v-if="cap.label"
-        class="home-pint__cap-label"
-        x="50"
-        y="58"
-        text-anchor="middle"
-      >{{ brandName }}</text>
-    </svg>
+      :tone="cap.tone"
+      :text="cap.label ? brandName : undefined"
+      :text-size="capTextSize"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useT } from '~/composables/useT'
-import { BRAND_CAP_POINTS } from '~/consts/brand.const'
-import { HOME_PINT_BUBBLES, HOME_PINT_CAPS } from '~/consts/home.const'
+import CapBadge from '~/components/common/CapBadge.vue'
+import { HOME_PINT_BUBBLES, HOME_PINT_CAP_TEXT_SIZE, HOME_PINT_CAPS } from '~/consts/home.const'
 
 /*********************************************************
  * Global
@@ -94,7 +76,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
-const capPoints = BRAND_CAP_POINTS
+const capTextSize = HOME_PINT_CAP_TEXT_SIZE
 const bubbles = HOME_PINT_BUBBLES
 const caps = HOME_PINT_CAPS
 const brandName = computed(() => t('layout.brand_name', 'CCC'))
@@ -197,27 +179,6 @@ defineExpose({})
       width: 2.75rem;
       animation-delay: -4s;
     }
-  }
-
-  &__cap-body {
-    fill: var(--origam-color__bar---neon);
-
-    &--amber {
-      fill: var(--origam-color__bar---amber);
-    }
-
-    &--ice {
-      fill: var(--origam-color__bar---ice);
-    }
-  }
-
-  &__cap-inner {
-    fill: var(--origam-color__surface---default);
-  }
-
-  &__cap-label {
-    fill: var(--origam-color__bar---foam);
-    font: 400 22px var(--origam-font__family---display);
   }
 }
 
