@@ -41,6 +41,9 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-btn.origam-btn.origam-btn--disabled:not(.origam-pagination *)` (état désactivé : Origam n'applique qu'une opacité de
  *     0,5 et ignore `action.*.bgDisabled` ; la maquette peint un aplat `bgDisabled`, texte tertiaire, sans filet ; la pagination garde
  *     sa règle) : fiche docs/tickets/origam/btn-etat-desactive-tokens-bgdisabled-non-lus.md (à déposer) ;
+ *   - `.origam-alert { --origam-btn---color / ---border-color, --origam-color__border---focus : currentColor }` (le bouton outlined et l'anneau de focus d'une
+ *     alerte gardent le filet et l'anneau crème / cyan de la page : 1,02 à 1,32:1 sur le fond de l'alerte, contre 6:1 avec la couleur de texte de l'alerte ; F-43) :
+ *     fiche docs/tickets/origam/btn-dans-alerte-couleur-non-heritee.md (à déposer) ;
  *   - `.origam-card > .origam-card__overlay.origam-card__overlay` (overlay des cartes cliquables écrasé par la règle
  *     `> *` d'Origam, carte noire au repos) : Elyseranet/origam#1276 ;
  *   - les 6 règles `.origam-pagination.origam-pagination.origam-pagination …` (pagination de l'annuaire : flèches
