@@ -31,7 +31,7 @@ import { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
 import { ParticipationEntity } from '../server/db/typeorm/entities/participation.entity.js'
 import { PoolEntity } from '../server/db/typeorm/entities/pool.entity.js'
 import { RoundEntity } from '../server/db/typeorm/entities/round.entity.js'
-import { conflict, conflictWithCode, validationFailed } from '../utils/api-error.util.js'
+import { conflict, conflictWithCode, matchNotFound, validationFailed } from '../utils/api-error.util.js'
 import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { buildPools } from '../utils/edition-assemble.util.js'
 import { toAdminMatch } from '../utils/match-admin.mapper.util.js'
@@ -331,4 +331,36 @@ export const createTiebreak = (
       matchId: matchId!, position: index + 1, participationId
     })))
     return { match: await loadAdminMatchIn(manager, matchId!), editionId: edition.id, replayed: false }
+  })
+
+/**
+ * `DELETE /editions/{id}/departages/{matchId}` : supprime un départage NON JOUÉ (décision CORRECTION-TIEBREAK), pour que la
+ * correction d'un match de poule redevienne possible. Sous le verrou de l'édition, comme les autres écritures de qualification.
+ * Les côtés partent avec le match (FK `fk_match_sides_match`, ON DELETE CASCADE). 404 si le match n'est pas un départage de
+ * cette édition, 409 EDITION_CLOSED, 409 TIEBREAK_PLAYED si le match est saisi, validé, ou si un côté porte un score.
+ */
+export const deleteTiebreak = (
+  dataSource: DataSource,
+  idOrCode: string,
+  matchId: string
+): Promise<{ editionId: string, poolId: string | null, sideCount: number }> =>
+  dataSource.transaction(async (manager) => {
+    const edition = await findEditionLocked(manager, idOrCode)
+    const match = await manager.getRepository(MatchEntity).findOne({
+      where: { id: matchId, editionId: edition.id, purpose: MATCH_PURPOSE.TIEBREAK },
+      relations: { sides: true }
+    })
+    if (!match) {
+      throw matchNotFound()
+    }
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      throw editionClosed()
+    }
+    const played = match.status !== MATCH_STATUS.SCHEDULED
+      || match.sides.some((side) => side.recordedScore !== null || side.validatedScore !== null)
+    if (played) {
+      throw conflictWithCode(API_ERROR_CODE.TIEBREAK_PLAYED, API_ERROR_MESSAGE.TIEBREAK_PLAYED)
+    }
+    await manager.getRepository(MatchEntity).delete({ id: match.id })
+    return { editionId: edition.id, poolId: match.poolId, sideCount: match.sides.length }
   })

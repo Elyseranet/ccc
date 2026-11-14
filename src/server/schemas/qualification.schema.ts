@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { DRAW_ASSIGNMENTS_MAX } from '../../consts/draw.const.js'
 import { QUALIFICATION_BEST_NEXT_MAX, QUALIFICATION_TOP_PER_POOL_MAX, TIEBREAK_PLAYERS_MAX } from '../../consts/qualification.const.js'
 import { ROUND_KIND } from '../../enums/round.enum.js'
+import { editionParamsSchema } from './edition.schema.js'
 
 const topPerPoolSchema = z.number().int().min(1).max(QUALIFICATION_TOP_PER_POOL_MAX)
 const bestNextCountSchema = z.number().int().min(0).max(QUALIFICATION_BEST_NEXT_MAX)
@@ -23,6 +24,8 @@ export const qualificationQuerySchema = z.object({
   (value) => (value.topPerPool === undefined) === (value.bestNextCount === undefined),
   'topPerPool and bestNextCount go together'
 )
+
+export const tiebreakParamsSchema = editionParamsSchema.extend({ matchId: z.uuid() })
 
 export const createTiebreakSchema = z.object({
   participationIds: z.array(z.uuid()).min(2).max(TIEBREAK_PLAYERS_MAX),

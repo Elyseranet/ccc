@@ -3,9 +3,11 @@ import type { IAdminMatchesQuery, IBaseServiceOptions } from '../interfaces/api-
 import { BaseService } from './base.service.js'
 import { In } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
+import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND } from '../enums/draw.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
-import { MATCH_STATUS } from '../enums/match.enum.js'
+import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import type { IPool } from '../interfaces/pool.interface.js'
 import type { IMatchValidationResult, IScoreSubmission } from '../interfaces/score.interface.js'
@@ -22,6 +24,7 @@ import type { IAdminMatchListQuery, ILockedMatch, IScoreCommand, IScoreWriteOutc
 import { buildPools, buildRounds } from '../utils/edition-assemble.util.js'
 import {
   conflict,
+  conflictWithCode,
   matchAlreadyValidated,
   matchNotFound,
   nextRoundEngaged,
@@ -35,7 +38,7 @@ import { toAdminMatch } from '../utils/match-admin.mapper.util.js'
 import { toPublicMatch } from '../utils/match-public.mapper.util.js'
 import { alignScores, hasSameScores, sidesInOrder } from '../utils/match-score.util.js'
 import { validateScore } from '../utils/score-rules.util.js'
-import { loadParticipations } from './edition.service.js'
+import { editionClosed, loadParticipations } from './edition.service.js'
 
 /*********************************************************
  * MatchService
@@ -84,13 +87,18 @@ const lockMatch = async (manager: EntityManager, matchId: string): Promise<ILock
   return { match, edition }
 }
 
+/** Résultat importé des archives (vainqueur importé, ou résultat inconnu) : jamais modifiable. */
+const assertNotArchiveResult = (match: MatchEntity): void => {
+  if (match.status === MATCH_STATUS.RESULT_UNKNOWN || match.winnerParticipationId !== null) {
+    throw conflictWithCode(API_ERROR_CODE.ARCHIVE_RESULT_READ_ONLY, API_ERROR_MESSAGE.ARCHIVE_RESULT_READ_ONLY)
+  }
+}
+
 /** Écriture d'un score : ni archive sans résultat, ni édition close, ni tour fermé. */
 const assertWritable = ({ match, edition }: ILockedMatch): void => {
-  if (match.status === MATCH_STATUS.RESULT_UNKNOWN || match.winnerParticipationId !== null) {
-    throw conflict('The result of this match is unknown and cannot be scored')
-  }
+  assertNotArchiveResult(match)
   if (edition.status === EDITION_STATUS.CLOSED) {
-    throw conflict('The edition is closed')
+    throw editionClosed()
   }
   if (!OPEN_ROUND_STATUSES.includes(match.round.status)) {
     throw conflict('The round of this match is not open')
@@ -123,6 +131,19 @@ const isNextRoundEngaged = async ({ match, edition }: ILockedMatch, manager: Ent
     .andWhere('r.sequence > :sequence', { sequence: match.round.sequence })
     .getExists()
 }
+
+/**
+ * CORRECTION-TIEBREAK : un match de poule (REGULAR) n'est plus corrigible dès qu'un départage existe, quel que soit son statut :
+ * un départage de la même poule, ou un départage de frontière (`pool_id` nul), qui concerne toutes les poules de l'édition.
+ */
+const isTiebreakEngaged = ({ match }: ILockedMatch, manager: EntityManager): Promise<boolean> =>
+  match.round.kind !== ROUND_KIND.POOLS || match.purpose !== MATCH_PURPOSE.REGULAR
+    ? Promise.resolve(false)
+    : manager.getRepository(MatchEntity).createQueryBuilder('t')
+      .where('t.editionId = :editionId', { editionId: match.editionId })
+      .andWhere('t.purpose = :purpose', { purpose: MATCH_PURPOSE.TIEBREAK })
+      .andWhere('(t.poolId IS NULL OR t.poolId = :poolId)', { poolId: match.poolId })
+      .getExists()
 
 const writeSides = async (
   manager: EntityManager,
@@ -208,16 +229,17 @@ export const correctMatch = (dataSource: DataSource, command: IScoreCommand): Pr
     const locked = await lockMatch(manager, command.matchId)
     const { match, edition } = locked
     const scores = alignScores(match, command.scores)
+    assertNotArchiveResult(match)
     if (match.status !== MATCH_STATUS.VALIDATED) {
-      throw conflict('Only a validated match can be corrected')
-    }
-    if (match.winnerParticipationId !== null) {
-      throw conflict('The result of this match is imported from the archives and cannot be corrected')
+      throw conflictWithCode(API_ERROR_CODE.MATCH_NOT_VALIDATED, API_ERROR_MESSAGE.MATCH_NOT_VALIDATED)
     }
     if (edition.status === EDITION_STATUS.CLOSED) {
-      throw conflict('The edition is closed')
+      throw editionClosed()
     }
     assertVersion(match, command.expectedVersion)
+    if (await isTiebreakEngaged(locked, manager)) {
+      throw conflictWithCode(API_ERROR_CODE.TIEBREAK_ENGAGED, API_ERROR_MESSAGE.TIEBREAK_ENGAGED)
+    }
     if (await isNextRoundEngaged(locked, manager)) {
       throw nextRoundEngaged()
     }

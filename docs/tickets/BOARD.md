@@ -33,6 +33,8 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-17](B-17.md) | Compléments du contrat public (G2, G3, G4, G6) et contrat anticipé de B-11 et B-15 (G7) | 3a | develop (B-05, B-06, B-07) | **Fermé** (2026-10-28) : vague 3a mergée @ `640842b` | En cours : validé sur l'ancienne arborescence (`feature/B-17` @ `27ee5cd`, G11 compris) ; réappliqué par dev-b12 (`feature/B-17-r` @ `8517bc5`, légers verts), test:db et test:api sur `archives.sql` en cours |
 | [B-19](B-19.md) | Titres à date du finaliste et des demi-finalistes dans le résumé d'édition (podium F-03a), contrat figé avec le front | 3 | vague 3a (B-17, G4) | **Fermé** (2026-10-28) : mergé @ `566525c` | À faire |
 | [B-22](B-22.md) | `closedAt` exposé dans `IEditionDetail` (suite de B-14, F-26) | — | B-14 | — | **Fermé** (2026-11-13) @ `5db72dd2` |
+| [B-23](B-23.md) | Codes d'erreur distincts sur la saisie, la validation et la correction d'un score (F-18) | — | B-12 | — | **Fermé** (2026-11-14) @ `3f1c2017` |
+| [B-24](B-24.md) | Correction d'un match de poule refusée après un départage, suppression d'un départage non joué (F-18, F-44) | — | B-13, B-23 | — | **Fermé** (2026-11-14) @ `c044f472` |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -249,6 +251,9 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-40](F-40.md) | Pages légales après T-A11Y-01 M5 : ligne cookie `ccc_motion` dans la maquette, déclaration d'accessibilité à jour | à mettre à jour | T-A11Y-01 | **Fermé** (2026-11-14) @ `39360433` |
 | [F-41](F-41.md) | Bouton « petit 44 px » : une seule recette (8 copies en CSS local) | — | F-38 | **Fermé** (2026-11-14) @ `04b2fe58` |
 | [F-42](F-42.md) | Édition : la boîte du titre déborde sur le fil d'Ariane et intercepte le clic | — | — | **Fermé** (2026-11-14) @ `c7cecfe5` |
+| [F-43](F-43.md) | Bouton outlined dans une alerte d'erreur : contraste 2,27:1 (WCAG 1.4.3) | à corriger | — | **Fermé** (2026-11-14) @ `9b8ba324` |
+| [F-44](F-44.md) | Qualification : supprimer un départage non joué (CORRECTION-TIEBREAK) | à dessiner | B-24, F-24 | Ouvert |
+| [F-45](F-45.md) | `/admin/plus` : liste native de liens à la place de la liste Origam (role=listitem sur des liens) | — | T-A11Y-01 lot 3 | Ouvert |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |

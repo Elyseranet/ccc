@@ -19,6 +19,7 @@ export const LOG_EVENT = {
   AVATAR_DELETED: 'avatar_deleted',
   QUALIFICATION_FINALIZED: 'qualification_finalized',
   TIEBREAK_CREATED: 'tiebreak_created',
+  TIEBREAK_DELETED: 'tiebreak_deleted',
   MATCH_RECORDED: 'match_recorded',
   MATCH_VALIDATED: 'match_validated',
   MATCH_CORRECTED: 'match_corrected',

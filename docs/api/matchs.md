@@ -19,8 +19,8 @@ Quatre routes sous `/api/v1`, **toutes réservées à l'administrateur** (`USER_
 - **Corps** `IScoreSubmission` : `{ "scores": [{ "participationId": "<uuid>", "score": 5 }, ...] }`. Un score par côté du match, une fois chacun ; `score` est un entier entre 0 et 99. Les champs inconnus sont refusés. Corps JSON de 16 Kio au plus.
 - **`If-Match` obligatoire** (contrôle de version, décision SEC-Q) sur `PUT`, `POST validation` et `POST correction` : la `version` du match (`IAdminMatch.version`, lue dans `GET /admin/editions/{id}/matchs`), de préférence en ETag fort entre guillemets (`If-Match: "4"`) ; le serveur lit aussi `4` et `W/"4"`. Sans en-tête : **`428 PRECONDITION_REQUIRED`**. Valeur mal formée : `400 BAD_REQUEST`. Version périmée : **`412 VERSION_CONFLICT`**, avec `details: { currentVersion }` (la version courante ; le front recharge, le corps ne contient pas l'état). **La nouvelle version revient dans le corps de chaque écriture réussie** (`IAdminMatch.version`, `IMatchValidationResult.match.version`) : l'enchaînement saisie puis validation utilise la version renvoyée par la saisie.
 - **Rejeu et version** : un rejeu à l'identique (mêmes scores que ceux déjà enregistrés par `PUT`, ou déjà validés par la validation) répond `200` sans effet même avec une version périmée, conformément à l'idempotence ; avec une version périmée et des scores différents, la réponse est `412 VERSION_CONFLICT`.
-- **Match d'archives au vainqueur importé** (B-21) : `VALIDATED` avec des `score` à `null` et `winnerParticipationId` renseigné (le champ existait déjà, il est désormais aussi lu dans `matches.winner_participation_id` quand les scores manquent). Il n'est jamais modifiable : `409 CONFLICT`.
-- **Écriture possible** si le match n'est pas `RESULT_UNKNOWN`, n'a pas de vainqueur importé, si l'édition n'est pas `CLOSED` et si le tour du match est ouvert (`DRAWN` ou `PLAYING`). Sinon `409 CONFLICT`.
+- **Match d'archives au vainqueur importé** (B-21) : `VALIDATED` avec des `score` à `null` et `winnerParticipationId` renseigné (le champ existait déjà, il est désormais aussi lu dans `matches.winner_participation_id` quand les scores manquent). Il n'est jamais modifiable : `409 ARCHIVE_RESULT_READ_ONLY`.
+- **Écriture possible** si le match n'est pas `RESULT_UNKNOWN`, n'a pas de vainqueur importé, si l'édition n'est pas `CLOSED` et si le tour du match est ouvert (`DRAWN` ou `PLAYING`). Sinon `409` avec un code distinct : `ARCHIVE_RESULT_READ_ONLY` (match `RESULT_UNKNOWN` ou au vainqueur importé), `EDITION_CLOSED` (édition `CLOSED`), `CONFLICT` (tour non ouvert).
 - Chaque écriture est une transaction avec verrou de ligne : deux requêtes simultanées se sérialisent.
 
 ## `PUT /matchs/{id}/score`
@@ -78,9 +78,11 @@ Corrige un match `VALIDATED` : réécrit `recorded_score` et `validated_score`, 
 
 Un tour suivant est « engagé » (R-3) :
 - pour un match de **poule**, quand la qualification est arrêtée (l'édition a dépassé `POOLS_PLAYING` : `QUALIFIED`, `PLAYOFFS` ou `CLOSED`) ;
-- pour un match de **phase finale**, quand un tirage existe pour un tour suivant, même en brouillon (`DRAFT`).
+- pour un match de **phase finale**, quand un tirage est rattaché à un tour suivant (`round_id` renseigné, donc tirage **validé** : le tour n'existe qu'à la validation du tirage, B-18). Un brouillon du tour suivant (`POST /editions/{id}/tirages/tour`, `round_id` nul) **ne bloque pas** la correction. Figé par `tests/api/match-scores.test.ts` (« does not block a knockout correction for a draft draw… » et « follows R-3 for knockout matches »).
 
 Dans ce cas : `409 NEXT_ROUND_ENGAGED`.
+
+**Départage (CORRECTION-TIEBREAK, B-24)** : la correction d'un match de **poule** (`REGULAR`, tour `POOLS`) est refusée en `409 TIEBREAK_ENGAGED` dès qu'un match `TIEBREAK` existe dans l'édition, quel que soit son statut : un départage de la **même poule**, ou un départage de **frontière** (`pool_id` nul), qui bloque toute correction de poule de l'édition. Un départage d'une autre poule ne bloque pas. Ce contrôle passe avant `NEXT_ROUND_ENGAGED`. Un match de phase finale, et un match de départage lui-même, ne sont pas concernés. Pour corriger, l'administrateur supprime d'abord le départage non joué (`DELETE /editions/{id}/departages/{matchId}`, voir `qualification.md`).
 
 ```
 POST /api/v1/matchs/0b7c.../correction
@@ -112,8 +114,12 @@ Le serveur n'a pas de sémantique propre aux filtres de l'écran (« À traiter 
 | 403 | `FORBIDDEN` | session non administrateur |
 | 404 | `NOT_FOUND` | match ou édition inconnu |
 | 409 | `MATCH_ALREADY_VALIDATED` | `PUT` sur un match `VALIDATED` (passer par la correction), ou validation avec d'autres scores que ceux déjà validés |
+| 409 | `TIEBREAK_ENGAGED` | correction d'un match de poule refusée : un départage existe pour sa poule, ou pour la frontière de qualification (B-24) |
 | 409 | `NEXT_ROUND_ENGAGED` | correction refusée : un tour suivant est engagé (R-3) |
-| 409 | `CONFLICT` | match `RESULT_UNKNOWN` ou au vainqueur importé (B-21), édition `CLOSED`, tour non ouvert, validation sans score saisi, correction d'un match non `VALIDATED` |
+| 409 | `ARCHIVE_RESULT_READ_ONLY` | saisie, validation ou correction d'un match `RESULT_UNKNOWN` ou au vainqueur importé (B-21) |
+| 409 | `EDITION_CLOSED` | saisie, validation ou correction dans une édition `CLOSED` |
+| 409 | `MATCH_NOT_VALIDATED` | correction d'un match qui n'est pas `VALIDATED` |
+| 409 | `CONFLICT` | tour du match non ouvert, validation sans score saisi |
 | 409 | `SCORE_MISMATCH` | validation : version à jour mais scores du corps différents du score saisi (pas de `details`) |
 | 412 | `VERSION_CONFLICT` | `If-Match` périmé ; `details: { currentVersion }` |
 | 413 | `PAYLOAD_TOO_LARGE` | corps de plus de 16 Kio |
