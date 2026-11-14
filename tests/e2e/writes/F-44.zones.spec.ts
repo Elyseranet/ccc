@@ -11,7 +11,6 @@ import type { IDataMasks } from '../visual.util'
  * F-44 : zones visuelles de la suppression d'un départage (admin-qualification.html, états « Départage créé / joué / 409 »)
  *
  * @description
- * Ligne « Places restantes » : propre à l’égalité entre poules du test (la maquette montre une égalité de poule) : masquée côté application.
  * Pourquoi `writes/` : l’écran se mesure sur une édition créée par le test (QA-3), dans un état que la base de test n'a pas : une égalité entre poules à 2 joueurs (2 poules de 2, chaque
  * match 5-2, n = 1 et m = 1), un départage créé par l'API, puis (état « joué ») un score saisi sans validation, ou (état « 409 ») un score saisi pendant que le dialogue est ouvert.
  * La maquette montre l'égalité d'une poule (« Poule 3 · 2e place »), l'application celle d'une frontière : les VALEURS (noms, numéro du match, rang, texte de raison) sont recopiées de l'application
@@ -92,7 +91,6 @@ for (const viewport of VIEWPORTS) {
           const width = (await box(page, state.app)).width
           await mockup.addStyleTag({ content: `.mock-states .q-tie { width: ${width}px; justify-self: start; }` })
           const card = '.mock-states .q-tie:has(button.btn--outlined' + (state.name === 'dt-joue' ? '[disabled]' : ':not([disabled])') + ')'
-          await page.addStyleTag({ content: '[data-cy="qualification-tie-0"] .qualification-ties__muted + .qualification-ties__muted { display: none !important; }' })
           await alignMockupText(mockup, page, [
             { mockup: `${card} .eyebrow`, app: '[data-cy="qualification-tie-0"] .qualification-ties__eyebrow' },
             { mockup: `${card} .q-tie__who`, app: '[data-cy="qualification-tie-0"] .qualification-ties__who' },
