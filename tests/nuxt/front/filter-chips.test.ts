@@ -7,7 +7,7 @@ const items = [
   { value: 'pools', label: 'Poules', count: 8, dataCy: 'chip-pools' },
   { value: 'knockout', label: 'Phase finale', count: 4, dataCy: 'chip-knockout' }
 ]
-const mountChips = (modelValue: string) => mountSuspended(FilterChips, { props: { items, modelValue, ariaLabel: 'Filtrer les matchs' } })
+const mountChips = (modelValue: string) => mountSuspended(FilterChips, { props: { items, modelValue, label: 'Filtrer les matchs' } })
 
 describe('FilterChips (F-20)', () => {
   it('une puce par item avec son libellé, son compteur et son data-cy ; le groupe porte l’aria-label', async () => {

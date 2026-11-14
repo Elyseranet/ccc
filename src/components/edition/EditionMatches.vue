@@ -17,11 +17,12 @@
     >
       <template #default>
         <filter-chips
-          v-model="filter"
+          :model-value="filter"
           :items="filterViews"
-          :aria-label="filtersLabel"
+          :label="filtersLabel"
           class="edition-matches__filters"
           data-cy="edition-matches-filters"
+          @update:model-value="handleFilter"
         />
         <section
           class="edition-matches__scroll"
@@ -222,6 +223,12 @@ const pageRows = computed(() => slice.value.items.map((row) => {
 const from = computed(() => (slice.value.page - 1) * pageSize + 1)
 const to = computed(() => Math.min(slice.value.page * pageSize, total.value))
 const rangeText = computed(() => t('edition.matches_range', '{from}–{to} sur {total}', { from: from.value, to: to.value, total: total.value }))
+const handleFilter = (value: string) => {
+  const entry = EDITION_MATCH_FILTERS.find(candidate => candidate.value === value)
+  if (entry) {
+    filter.value = entry.value
+  }
+}
 const handlePage = (value: number) => {
   page.value = value
 }

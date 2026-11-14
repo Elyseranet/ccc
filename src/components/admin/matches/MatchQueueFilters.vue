@@ -3,7 +3,7 @@
     <filter-chips
       :model-value="filter"
       :items="views"
-      :aria-label="filtersLabel"
+      :label="filtersLabel"
       data-cy="admin-matches-filters"
       @update:model-value="handleFilter"
     />
@@ -81,7 +81,6 @@ import CaretDown from '~/components/icons/CaretDown.vue'
 import { useT } from '~/composables/useT'
 import { ADMIN_MATCH_ALL_POOLS_VALUE, ADMIN_MATCH_ALL_ROUNDS_VALUE } from '~/consts/admin-match-filters.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
-import type { ADMIN_MATCH_FILTER } from '~/enums/admin-match-filter.enum'
 import type { TAdminMatchRound } from '~/types/admin-match-round.type'
 import type { IMatchQueueFiltersEmits, IMatchQueueFiltersProps } from '~/interfaces/admin-match-queue.interface'
 
@@ -116,8 +115,11 @@ const filtersLabel = computed(() => {
   return t('admin.matches.filters_label', 'Filtrer les matchs · compteurs pour : {scope}', { scope })
 })
 const views = computed(() => props.filters.map(entry => ({ ...entry, dataCy: `admin-matches-filter-${entry.value}` })))
-const handleFilter = (value: ADMIN_MATCH_FILTER) => {
-  emits('update:filter', value)
+const handleFilter = (value: string) => {
+  const entry = props.filters.find(candidate => candidate.value === value)
+  if (entry) {
+    emits('update:filter', entry.value)
+  }
 }
 
 /*********************************************************

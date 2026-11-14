@@ -3,7 +3,7 @@
     :model-value="modelValue"
     mandatory
     filter
-    :aria-label="ariaLabel"
+    :aria-label="label"
     class="filter-chips"
     @update:model-value="handleUpdate"
   >
@@ -35,7 +35,7 @@
   </origam-chip-group>
 </template>
 
-<script setup lang="ts" generic="T extends string">
+<script setup lang="ts">
 import { computed } from 'vue'
 import { OrigamChip, OrigamChipGroup } from 'origam/components'
 import type { IFilterChipsEmits, IFilterChipsProps, IFilterChipsSlots } from '~/interfaces/filter-chips.interface'
@@ -44,15 +44,16 @@ import type { IFilterChipsEmits, IFilterChipsProps, IFilterChipsSlots } from '~/
  * Global
  *
  * @description
- * Groupe de puces de filtre : une seule puce active (`mandatory`), l'état est porté par le parent (`modelValue`, `update:modelValue`).
+ * Groupe de puces de filtre : une seule puce active (`mandatory`), l'état est porté par le parent (`modelValue`, `update:modelValue`). La valeur est une chaîne : le parent
+ * retrouve l'entrée de ses propres filtres (typée) à partir de la valeur émise.
  * La puce active prend la couleur secondaire et un filet transparent, les autres le texte secondaire et le filet par défaut (maquette `.fchip`) ;
  * le compteur porte aussi le sens (jamais la couleur seule) et `aria-pressed` dit l'état aux lecteurs d'écran.
  * Retour à la ligne : `origam-chip-group` repose sur `origam-slide-group`, un conteneur qui défile sur une seule ligne (`flex-wrap` sans variable, contenu
  * `white-space: nowrap`) ; sa prop `column` ne fait qu'ajouter une classe qu'aucune règle ne lit. D'où les `:deep` ci-dessous (Elyseranet/origam#1284,
  * fiche `docs/tickets/origam/chip-group-retour-a-la-ligne-evolution.md`). Seule définition de cette recette (F-20).
  ********************************************************/
-const props = withDefaults(defineProps<IFilterChipsProps<T>>(), {})
-const emits = defineEmits<IFilterChipsEmits<T>>()
+const props = defineProps<IFilterChipsProps>()
+const emits = defineEmits<IFilterChipsEmits>()
 defineSlots<IFilterChipsSlots>()
 const views = computed(() => props.items.map((item) => {
   const selected = item.value === props.modelValue
@@ -64,7 +65,7 @@ const views = computed(() => props.items.map((item) => {
     borderColor: selected ? 'transparent' : 'var(--origam-color__border---default)'
   }
 }))
-const handleUpdate = (value: T) => {
+const handleUpdate = (value: string) => {
   emits('update:modelValue', value)
 }
 
