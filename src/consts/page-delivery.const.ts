@@ -14,7 +14,7 @@ import type { IPageDelivery } from '../interfaces/page-delivery.interface.js'
  *
  * `endpoints` ne liste que les endpoints propres à la page (composables et services compris). Ceux du layout
  * (`LAYOUT_ENDPOINTS` : `ME`, et `EDITIONS` pour l'admin) s'y ajoutent. Elle est confirmée sur les appels réels de la page
- * (composables et services) quand l'écran est livré (T-REL-02 pour l'accueil, les joueurs, la fiche joueur et le face-à-face).
+ * (composables et services) quand l'écran est livré (T-REL-02 pour l'accueil, les joueurs, la fiche joueur et le face-à-face ; T-REL-05 pour les écrans de F-13).
  ********************************************************/
 export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.HOME]: {
@@ -181,27 +181,27 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.ADMIN_EDITIONS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
-    endpoints: [API_ENDPOINT.EDITIONS, API_ENDPOINT.ADMIN_EDITIONS]
+    endpoints: [API_ENDPOINT.EDITIONS]
   },
   [ROUTES.ADMIN_EDITION_NEW]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [API_ENDPOINT.EDITION_CREATE]
   },
   [ROUTES.ADMIN_EDITION]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_UPDATE]
   },
   [ROUTES.ADMIN_COMPETITORS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
-    endpoints: [API_ENDPOINT.COMPETITORS, API_ENDPOINT.COMPETITOR]
+    endpoints: [API_ENDPOINT.COMPETITORS]
   },
   [ROUTES.ADMIN_COMPETITOR]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.ADMIN,
     endpoints: [
       API_ENDPOINT.COMPETITORS,
