@@ -136,7 +136,7 @@ Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 :
 ### 1. Ressources à créer dans un même projet Coolify
 
 1. **PostgreSQL 16** : ressource « Database » de Coolify. Noter l'hôte interne, le port, l'utilisateur, le mot de passe et la base qu'elle affiche.
-2. **Mailpit** : **ne pas en créer**. CCC utilise le Mailpit partagé du projet Coolify **TOOLS** (décision utilisateur du 2026-11-16 : les outils communs vivent dans TOOLS, jamais une copie par projet). Il est joignable sur le réseau Docker `coolify` par l'alias à point `mailpit.tools.internal` (variable serveur `{{server.MAIL_DEV_HOST}}`) ou par son nom de conteneur (`{{server.MAIL_DEV_ID}}`, accepté par la garde une fois T-SEC-22 mergé). Son interface web : `http://mail.dev.elysera.net:8025`, protégée par mot de passe.
+2. **Mailpit** : **ne pas en créer**. CCC utilise le Mailpit partagé du projet Coolify **TOOLS** (décision utilisateur du 2026-11-16 : les outils communs vivent dans TOOLS, jamais une copie par projet). Il est joignable sur le réseau Docker `coolify` par l'alias à point `mailpit.tools.internal` (variable serveur `{{server.MAIL_DEV_HOST}}`) ou par son nom de conteneur (`{{server.MAIL_DEV_ID}}`, accepté par la garde depuis T-SEC-22). Son interface web : `http://mail.dev.elysera.net:8025`, protégée par mot de passe.
 3. **Application** : source « Dépôt Git » `https://github.com/Elyseranet/ccc`, branche **`develop`**, build par **`Dockerfile`**, port **3000**, domaine `https://<domaine-dev>`, **redéploiement automatique** à chaque push sur `develop`.
 
 ### 2. Variables de l'application
@@ -171,7 +171,7 @@ Dans Coolify, healthcheck HTTP sur le chemin `/api/v1/health`, port 3000 (ou lai
    getent hosts mailpit.tools.internal
    ```
 
-   Une ligne `<adresse> mailpit.tools.internal` doit s'afficher. **Si rien ne s'affiche**, l'application ne joint pas Mailpit : prévenir l'équipe, qui posera la suite à l'utilisateur. Repli, une fois T-SEC-22 mergé : `{{server.MAIL_DEV_ID}}` (nom du conteneur, sans point).
+   Une ligne `<adresse> mailpit.tools.internal` doit s'afficher. **Si rien ne s'affiche**, l'application ne joint pas Mailpit : prévenir l'équipe, qui posera la suite à l'utilisateur. Repli : `{{server.MAIL_DEV_ID}}` (nom du conteneur, sans point).
 4. Charger les archives 2012-2026 (une seule fois, base vide) :
 
    ```sh

@@ -140,7 +140,7 @@ Purge planifiée des sessions expirées (durée maximale garantie pour la politi
 
 `npm audit` : 2 critical et 3 high dans l'arbre de dev (simple-git, node-forge, undici sous nuxt 4.6.1), gate rouge sur develop @ `226e94a4` : [T-SEC-21](T-SEC-21.md), **Fermé** — mergé dans `develop` @ `3dd0ca0c` (2026-11-11), mise à jour ciblée des dépendances (nuxt reste en 4.6.1) sur `feature/T-SEC-21`.
 
-Garde-fou PROD-1 : accepter un nom de service sans point comme hôte SMTP (Mailpit partagé TOOLS, décision utilisateur 2026-11-16) : [T-SEC-22](T-SEC-22.md), **En revue** — branche `feature/T-SEC-22-smtp-bare-host`.
+Garde-fou PROD-1 : accepter un nom de service sans point comme hôte SMTP (Mailpit partagé TOOLS, décision utilisateur 2026-11-16) : [T-SEC-22](T-SEC-22.md), **Fermé** (2026-11-16) @ `cc046cf4`.
 
 Montée de nuxt 4.6.1 vers 4.6.3 : trois avis moderate dans le runtime embarqué en production (remesure de T-SEC-01 du 2026-11-04) : [T-SEC-18](T-SEC-18.md), **À faire**, après la vague T-SEC-08/10 et T-OPS-03.
 
