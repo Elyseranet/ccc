@@ -27,6 +27,3 @@ const assignmentSchema = z.object({
 export const updateDrawAssignmentsSchema = z.object({
   assignments: z.array(assignmentSchema).max(DRAW_ASSIGNMENTS_MAX)
 }).strict()
-
-/** Corps facultatif de `POST /tirages/{id}/tirage-au-sort`. */
-export const randomDrawSchema = z.object({ replace: z.boolean().optional() }).strict().optional()

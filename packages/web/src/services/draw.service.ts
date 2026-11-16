@@ -5,11 +5,11 @@ import type {
   ICreatePoolDrawRequest,
   IDrawAssignmentInput,
   IDrawWriteOutcome,
-  IRandomDrawRequest,
   ISeedProposal,
   ISeedRankingContext,
   IUpdateDrawAssignmentsRequest
 } from '../interfaces/draw.interface.js'
+import type { IRandomDrawOutcome, IRandomDrawResult } from '../interfaces/random-draw.interface.js'
 import type { IRoundDrawContext } from '../interfaces/qualification-plan.interface.js'
 import type { ICreateRoundDrawRequest, IRoundDrawAssignmentInput, IRoundDrawPreview, IUpdateRoundDrawRequest } from '../interfaces/qualification.interface.js'
 import type { TUpdateDrawRequest } from '../types/draw.type.js'
@@ -43,6 +43,7 @@ import { BaseService } from './base.service.js'
 import { generateUuids } from '../utils/uuid.util.js'
 import { editionClosed, findEditionLocked, findEditionOrThrow, registrationClosed } from './edition.service.js'
 import { toQualificationMember } from './qualification.service.js'
+import { poolSizes } from '../utils/pool-size.util.js'
 
 /*********************************************************
  * DrawService
@@ -88,9 +89,9 @@ export class DrawService extends BaseService {
     return this.request<IAdminDraw>(`/editions/${encodeURIComponent(editionId)}/tirages/tour`, { method: 'POST', body: { ...body } })
   }
 
-  /** `POST /tirages/{id}/tirage-au-sort` : le serveur tire le brouillon (poules ou tour) sans le valider ; 409 DRAW_DRAFT_STARTED si le brouillon est déjà tiré, sauf `replace`. */
-  randomDraw (drawId: string, body: IRandomDrawRequest = {}): Promise<IAdminDraw> {
-    return this.request<IAdminDraw>(`/tirages/${encodeURIComponent(drawId)}/tirage-au-sort`, { method: 'POST', body: { ...body } })
+  /** `POST /tirages/{id}/tirage-au-sort` : tire la PROCHAINE étape du brouillon (un joueur en poules, une affiche en tour), sans valider ; 409 DRAW_DRAFT_COMPLETE quand tout est tiré. */
+  randomDraw (drawId: string): Promise<IRandomDrawResult> {
+    return this.request<IRandomDrawResult>(`/tirages/${encodeURIComponent(drawId)}/tirage-au-sort`, { method: 'POST' })
   }
 
   validate (drawId: string): Promise<IAdminDraw> {
@@ -585,6 +586,23 @@ export const saveRoundDrawAssignments = (
     return writeRoundAssignments(manager, draw, context, roundKind, request.assignments, false)
   })
 
+/** L'erreur 409 du premier défaut des affiches (`complete` : tout le tour, sinon un brouillon partiel), ou null : un seul contrôle pour la saisie et le tirage. */
+const roundDrawProblem = (
+  context: IRoundDrawContext,
+  roundKind: ROUND_KIND,
+  assignments: readonly IRoundDrawAssignmentInput[],
+  complete: boolean
+) => {
+  const invalid = checkRoundDrawAssignments({
+    assignments,
+    candidateIds: context.candidates.map((candidate) => candidate.id),
+    roundKind,
+    poolWinnerIds: context.poolWinnerIds,
+    complete
+  })
+  return invalid === null ? null : conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, `${API_ERROR_MESSAGE.ROUND_DRAW_INVALID}: ${invalid}`)
+}
+
 /** Contrôle les affiches (`complete` : tout le tour, sinon un brouillon partiel) puis remplace le brouillon : saisie manuelle et tirage du serveur passent par ici. */
 const writeRoundAssignments = async (
   manager: EntityManager,
@@ -594,15 +612,9 @@ const writeRoundAssignments = async (
   assignments: readonly IRoundDrawAssignmentInput[],
   complete: boolean
 ): Promise<IDrawWriteOutcome> => {
-  const invalid = checkRoundDrawAssignments({
-    assignments,
-    candidateIds: context.candidates.map((candidate) => candidate.id),
-    roundKind,
-    poolWinnerIds: context.poolWinnerIds,
-    complete
-  })
-  if (invalid !== null) {
-    throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, `${API_ERROR_MESSAGE.ROUND_DRAW_INVALID}: ${invalid}`)
+  const problem = roundDrawProblem(context, roundKind, assignments, complete)
+  if (problem !== null) {
+    throw problem
   }
   await manager.getRepository(DrawAssignmentEntity).delete({ drawId: draw.id })
   if (assignments.length > 0) {
@@ -731,40 +743,62 @@ export const saveDrawAssignments = async (
   return savePoolDrawAssignments(dataSource, drawId, request as IUpdateDrawAssignmentsRequest)
 }
 
-const draftStarted = () => conflictWithCode(API_ERROR_CODE.DRAW_DRAFT_STARTED, API_ERROR_MESSAGE.DRAW_DRAFT_STARTED)
+const draftComplete = () => conflictWithCode(API_ERROR_CODE.DRAW_DRAFT_COMPLETE, API_ERROR_MESSAGE.DRAW_DRAFT_COMPLETE)
+
+/** Les affectations qui viennent d'être écrites, relues dans le brouillon renvoyé (avec noms) : ce que l'écran révèle. */
+const toStep = (outcome: IDrawWriteOutcome, drawnIds: readonly string[], remaining: number): IRandomDrawOutcome => ({
+  ...outcome,
+  step: { assignments: outcome.draw.assignments.filter((assignment) => drawnIds.includes(assignment.participationId)), remaining }
+})
 
 /**
- * `POST /tirages/{id}/tirage-au-sort` d'un tirage de POULES (B-26) : les têtes de série fixées à la création sont placées une par
- * poule, les autres inscrits répartis poule après poule (RG11, RG16). Écrit dans le brouillon par `writePoolAssignments`, donc avec les
- * contrôles de la saisie manuelle ; ne valide rien. Brouillon déjà tiré (une affectation avec `poolNumber`) : 409 sans `replace`.
+ * `POST /tirages/{id}/tirage-au-sort` d'un tirage de POULES (B-26) : tire le PROCHAIN joueur non tête de série et sa poule, poule après
+ * poule (RG11, tailles RG16), à partir de l'état courant du brouillon (saisi à la main ou déjà tiré). Les têtes de série sont placées à
+ * la main au préalable. Écrit par `writePoolAssignments` (mêmes contrôles qu'une saisie) ; ne valide rien. Les verrous (édition, tirage)
+ * sérialisent deux clics rapprochés : le second lit le brouillon que le premier vient d'écrire.
  */
-const randomPoolDraw = (dataSource: DataSource, drawId: string, replace: boolean): Promise<IDrawWriteOutcome> =>
+const randomPoolStep = (dataSource: DataSource, drawId: string): Promise<IRandomDrawOutcome> =>
   dataSource.transaction(async (manager) => {
     const { draw } = await lockOpenPoolDraft(manager, drawId)
     const { seedCount, poolCount } = draw.parameters
     const existing = await manager.getRepository(DrawAssignmentEntity).find({ where: { drawId }, order: { drawnOrder: 'ASC' } })
-    const seedIds = existing.filter((assignment) => assignment.drawnOrder <= seedCount).map((assignment) => assignment.participationId)
     // Un retrait de tête de série (B-10) : le brouillon est à recommencer.
-    if (seedIds.length < seedCount) {
+    if (existing.filter((assignment) => assignment.drawnOrder <= seedCount).length < seedCount) {
       throw seedWithdrawn()
     }
-    if (!replace && existing.some((assignment) => assignment.poolNumber !== null)) {
-      throw draftStarted()
+    if (existing.some((assignment) => assignment.poolNumber === null)) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, API_ERROR_MESSAGE.DRAW_SEEDS_NOT_PLACED)
     }
-    const seeds = new Set(seedIds)
     const participations = await manager.getRepository(ParticipationEntity).find({ where: { editionId: draw.editionId }, select: { id: true }, order: { id: 'ASC' } })
-    const otherIds = participations.map((participation) => participation.id).filter((id) => !seeds.has(id))
+    const assigned = new Set(existing.map((assignment) => assignment.participationId))
+    const remainingIds = participations.map((participation) => participation.id).filter((id) => !assigned.has(id))
+    if (remainingIds.length === 0) {
+      throw draftComplete()
+    }
+    const sizes = poolSizes(participations.length, poolCount)
+    const filled = sizes.map((_size, index) => existing.filter((assignment) => assignment.poolNumber === index + 1).length)
     // Import dynamique : un import statique ferait entrer `node:crypto` dans le graphe navigateur, ce qui casse `nuxt dev`.
-    const { drawPoolAssignments } = await import('../utils/random-draw.util.js')
-    return writePoolAssignments(manager, draw, drawPoolAssignments({ seedIds, otherIds, poolCount }))
+    const { drawPoolStep } = await import('../utils/random-draw.util.js')
+    const step = drawPoolStep({ sizes, filled, remainingIds })
+    // Une saisie à la main a rempli les poules au-delà de leur taille : plus de place pour le joueur suivant.
+    if (step === null) {
+      throw drawInconsistent()
+    }
+    const inputs = existing.map((assignment): IDrawAssignmentInput => ({
+      participationId: assignment.participationId, poolNumber: assignment.poolNumber!, drawnOrder: assignment.drawnOrder
+    }))
+    const drawnOrder = Math.max(seedCount, ...existing.map((assignment) => assignment.drawnOrder)) + 1
+    const outcome = await writePoolAssignments(manager, draw, [...inputs, { participationId: step.participationId, poolNumber: step.poolNumber, drawnOrder }])
+    return toStep(outcome, [step.participationId], remainingIds.length - 1)
   })
 
 /**
- * `POST /tirages/{id}/tirage-au-sort` d'un tirage de TOUR (B-26) : tirage global sur le vivier du tour (RG13, RG14), les barrages
- * ne tirant que les non-premiers de poule. Les affiches complètes sont contrôlées comme à la validation (`complete`) avant toute
- * écriture : un vivier qui ne forme pas des affiches de deux joueurs (impair…) donne 409 DRAW_INCONSISTENT et le brouillon reste intact.
+ * `POST /tirages/{id}/tirage-au-sort` d'un tirage de TOUR (B-26) : tire la PROCHAINE affiche (deux joueurs, hasard pur, RG13, RG14)
+ * parmi les joueurs restants du vivier (barrages : sans les premiers de poule), à partir de l'état courant du brouillon ; une affiche
+ * saisie à moitié est complétée par un seul joueur. Avant tout tirage, le tour entier est contrôlé comme à la validation : un vivier qui
+ * ne forme pas des affiches de deux joueurs (impair…) ou une taille imposée non tenue donne 409 DRAW_INCONSISTENT.
  */
-const randomRoundDraw = (dataSource: DataSource, drawId: string, replace: boolean): Promise<IDrawWriteOutcome> =>
+const randomRoundStep = (dataSource: DataSource, drawId: string): Promise<IRandomDrawOutcome> =>
   dataSource.transaction(async (manager) => {
     const { draw, edition } = await lockEditionThenDraw(manager, drawId, DRAW_KIND.ROUND)
     if (draw.status === DRAW_STATUS.VALIDATED) {
@@ -773,21 +807,51 @@ const randomRoundDraw = (dataSource: DataSource, drawId: string, replace: boolea
     if (edition.status === EDITION_STATUS.CLOSED) {
       throw editionClosed()
     }
-    if (!replace && await manager.getRepository(DrawAssignmentEntity).existsBy({ drawId })) {
-      throw draftStarted()
-    }
     const context = await loadRoundDrawContext(manager, edition)
     const roundKind = resolveRoundKind(context, draw.roundKind)
-    const playing = context.candidates.filter((candidate) => roundKind !== ROUND_KIND.PLAYOFF || !context.poolWinnerIds.includes(candidate.id))
-    const { drawRoundAssignments } = await import('../utils/random-draw.util.js')
-    return writeRoundAssignments(manager, draw, context, roundKind, drawRoundAssignments(playing.map((candidate) => candidate.id)), true)
+    const eligibleIds = context.candidates.map((candidate) => candidate.id)
+      .filter((id) => roundKind !== ROUND_KIND.PLAYOFF || !context.poolWinnerIds.includes(id))
+    const existing = await manager.getRepository(DrawAssignmentEntity).find({ where: { drawId }, order: { drawnOrder: 'ASC' } })
+    if (existing.some((assignment) => assignment.pairingIndex === null || assignment.sidePosition === null)) {
+      throw conflictWithCode(API_ERROR_CODE.DRAW_INCONSISTENT, `${API_ERROR_MESSAGE.ROUND_DRAW_INVALID}: missing pairing`)
+    }
+    const wholeRound = eligibleIds.map((participationId, index): IRoundDrawAssignmentInput =>
+      ({ participationId, pairingIndex: Math.floor(index / 2) + 1, sidePosition: index % 2 === 0 ? 1 : 2, drawnOrder: index + 1 }))
+    const unfit = roundDrawProblem(context, roundKind, wholeRound, true)
+    if (unfit !== null) {
+      throw unfit
+    }
+    const assigned = new Set(existing.map((assignment) => assignment.participationId))
+    const remainingIds = eligibleIds.filter((id) => !assigned.has(id))
+    if (remainingIds.length === 0) {
+      throw draftComplete()
+    }
+    const placed = existing.map((assignment): IRoundDrawAssignmentInput => ({
+      participationId: assignment.participationId,
+      pairingIndex: assignment.pairingIndex!,
+      sidePosition: assignment.sidePosition === 2 ? 2 : 1,
+      drawnOrder: assignment.drawnOrder
+    }))
+    const half = placed.find((assignment) => placed.filter((other) => other.pairingIndex === assignment.pairingIndex).length === 1)
+    const freeIndex = Array.from({ length: placed.length + 1 }, (_, index) => index + 1).find((index) => !placed.some((assignment) => assignment.pairingIndex === index))!
+    const { drawRoundStep } = await import('../utils/random-draw.util.js')
+    const drawn = drawRoundStep(remainingIds, half ? 1 : 2)
+    const firstOrder = Math.max(0, ...placed.map((assignment) => assignment.drawnOrder)) + 1
+    const added = drawn.map((participationId, index): IRoundDrawAssignmentInput => ({
+      participationId,
+      pairingIndex: half ? half.pairingIndex : freeIndex,
+      sidePosition: half ? (half.sidePosition === 1 ? 2 : 1) : index === 0 ? 1 : 2,
+      drawnOrder: firstOrder + index
+    }))
+    const outcome = await writeRoundAssignments(manager, draw, context, roundKind, [...placed, ...added], remainingIds.length === drawn.length)
+    return toStep(outcome, drawn, remainingIds.length - drawn.length)
   })
 
-/** `POST /tirages/{id}/tirage-au-sort` : le serveur tire un brouillon de poules ou de tour. */
-export const randomDrawAssignments = async (dataSource: DataSource, drawId: string, replace: boolean): Promise<IDrawWriteOutcome> =>
+/** `POST /tirages/{id}/tirage-au-sort` : tire la prochaine étape d'un brouillon de poules ou de tour. */
+export const randomDrawStep = async (dataSource: DataSource, drawId: string): Promise<IRandomDrawOutcome> =>
   (await peekDrawKind(dataSource, drawId)) === DRAW_KIND.ROUND
-    ? randomRoundDraw(dataSource, drawId, replace)
-    : randomPoolDraw(dataSource, drawId, replace)
+    ? randomRoundStep(dataSource, drawId)
+    : randomPoolStep(dataSource, drawId)
 
 /** `POST /tirages/{id}/validation` : tirage de poules ou de tour. */
 export const validateDraw = async (dataSource: DataSource, drawId: string, userId: string): Promise<IDrawWriteOutcome> =>

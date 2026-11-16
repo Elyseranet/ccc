@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { ROUND_KIND_BY_POOL_SIZE } from '../../src/consts/qualification.const'
-import { ROUND_KIND } from '../../src/enums/round.enum'
-import { checkRoundDrawAssignments } from '../../src/utils/qualification-plan.util'
-import { drawPoolAssignments, drawRoundAssignments, secureRandomInt, shuffle } from '../../src/utils/random-draw.util'
 import type { TRandomInt } from '../../src/types/random-draw.type'
+import { poolSizes } from '../../src/utils/pool-size.util'
+import { checkRoundDrawAssignments } from '../../src/utils/qualification-plan.util'
+import { drawPoolStep, drawRoundStep, pickRandom, secureRandomInt } from '../../src/utils/random-draw.util'
 
 /** Générateur déterministe (mulberry32) : les tests ne dépendent pas du hasard. */
 const seeded = (seed: number): TRandomInt => {
@@ -18,32 +18,38 @@ const seeded = (seed: number): TRandomInt => {
 
 const ids = (count: number, prefix = 'p') => Array.from({ length: count }, (_, index) => `${prefix}${index + 1}`)
 
-describe('shuffle (Fisher-Yates)', () => {
-  it('returns a permutation and leaves its input untouched', () => {
-    const input = ids(20)
-    const copy = [...input]
-    const result = shuffle(input, seeded(1))
-    expect(input).toEqual(copy)
-    expect([...result].sort()).toEqual([...input].sort())
+/** Rejoue tous les clics d'un tirage de poules : têtes de série déjà placées (une par poule), puis une étape par joueur. */
+const playPools = (poolCount: number, total: number, random: TRandomInt) => {
+  const sizes = poolSizes(total, poolCount)
+  const filled = Array.from({ length: poolCount }, () => 1)
+  const placed = ids(poolCount, 's').map((participationId, index) => ({ participationId, poolNumber: index + 1 }))
+  let remainingIds = ids(total - poolCount, 'o')
+  while (remainingIds.length > 0) {
+    const step = drawPoolStep({ sizes, filled, remainingIds }, random)!
+    placed.push(step)
+    filled[step.poolNumber - 1]! += 1
+    remainingIds = remainingIds.filter((id) => id !== step.participationId)
+  }
+  return { placed, sizes }
+}
+
+describe('pickRandom', () => {
+  it('uses the injected generator only', () => {
+    expect(pickRandom(ids(10), seeded(7))).toBe(pickRandom(ids(10), seeded(7)))
   })
 
-  it('is driven by the injected generator only (fixed generator, fixed result)', () => {
-    expect(shuffle(ids(10), seeded(7))).toEqual(shuffle(ids(10), seeded(7)))
-    expect(shuffle(ids(10), seeded(7))).not.toEqual(shuffle(ids(10), seeded(8)))
-  })
-
-  it('is unbiased: each of the 6 orderings of 3 items appears about 1/6 of the time', () => {
-    const runs = 60000
+  it('is unbiased: each of 5 items is picked about 1/5 of the time', () => {
+    const runs = 50000
     const random = seeded(42)
     const counts = new Map<string, number>()
     for (let run = 0; run < runs; run += 1) {
-      const key = shuffle(['a', 'b', 'c'], random).join('')
-      counts.set(key, (counts.get(key) ?? 0) + 1)
+      const picked = pickRandom(ids(5), random)
+      counts.set(picked, (counts.get(picked) ?? 0) + 1)
     }
-    expect(counts.size).toBe(6)
+    expect(counts.size).toBe(5)
     for (const count of counts.values()) {
-      // attendu 10000 par ordre ; écart-type ~91 : la tolérance de 5 % est à plus de 5 sigmas.
-      expect(Math.abs(count - runs / 6)).toBeLessThan(500)
+      // attendu 10000 ; écart-type ~90 : la tolérance est à plus de 5 sigmas.
+      expect(Math.abs(count - runs / 5)).toBeLessThan(500)
     }
   })
 
@@ -55,56 +61,37 @@ describe('shuffle (Fisher-Yates)', () => {
   })
 })
 
-describe('drawPoolAssignments (RG11, RG16)', () => {
-  const cases = [
+describe('drawPoolStep (RG11, RG16)', () => {
+  it.each([
     { poolCount: 2, total: 6 },
     { poolCount: 4, total: 23 },
     { poolCount: 10, total: 65 },
     { poolCount: 5, total: 5 }
-  ]
-
-  it.each(cases)('keeps RG11 and RG16 over 500 draws ($poolCount pools, $total players)', ({ poolCount, total }) => {
+  ])('keeps RG11 and RG16 over 300 full draws ($poolCount pools, $total players)', ({ poolCount, total }) => {
     const random = seeded(poolCount * 100 + total)
-    const seedIds = ids(poolCount, 's')
-    const otherIds = ids(total - poolCount, 'o')
-    for (let run = 0; run < 500; run += 1) {
-      const drawn = drawPoolAssignments({ seedIds, otherIds, poolCount }, random)
-      expect(drawn.map((a) => a.participationId).sort()).toEqual([...seedIds, ...otherIds].sort())
-      expect(new Set(drawn.map((a) => a.drawnOrder)).size).toBe(total)
-      // RG11 : les têtes de série (drawnOrder <= poolCount) sont dans des poules deux à deux différentes.
-      const seeds = drawn.filter((a) => a.drawnOrder <= poolCount)
-      expect(seeds.map((a) => a.participationId).sort()).toEqual([...seedIds].sort())
-      expect(new Set(seeds.map((a) => a.poolNumber)).size).toBe(poolCount)
-      // RG16 : au plus un joueur d'écart, les plus grandes poules d'abord.
-      const sizes = Array.from({ length: poolCount }, (_, index) => drawn.filter((a) => a.poolNumber === index + 1).length)
-      expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1)
-      expect([...sizes].sort((a, b) => b - a)).toEqual(sizes)
-      // « poule après poule » : le drawnOrder des autres croît avec le numéro de poule.
-      const others = drawn.filter((a) => a.drawnOrder > poolCount).sort((a, b) => a.drawnOrder - b.drawnOrder)
-      expect(others.map((a) => a.poolNumber)).toEqual([...others.map((a) => a.poolNumber)].sort((a, b) => a - b))
+    for (let run = 0; run < 300; run += 1) {
+      const { placed, sizes } = playPools(poolCount, total, random)
+      expect(placed.map((entry) => entry.participationId).sort()).toEqual([...ids(poolCount, 's'), ...ids(total - poolCount, 'o')].sort())
+      // RG16 : tailles exactes, plus grandes poules d'abord ; RG11 : une tête de série par poule.
+      expect(Array.from({ length: poolCount }, (_, index) => placed.filter((entry) => entry.poolNumber === index + 1).length)).toEqual(sizes)
+      expect(placed.filter((entry) => entry.participationId.startsWith('s')).map((entry) => entry.poolNumber).sort((a, b) => a - b)).toEqual(ids(poolCount).map((_id, index) => index + 1))
+      // « poule après poule » : l'ordre de tirage des autres suit le numéro de poule.
+      const others = placed.filter((entry) => entry.participationId.startsWith('o')).map((entry) => entry.poolNumber)
+      expect(others).toEqual([...others].sort((a, b) => a - b))
     }
   })
 
-  it('places each seed in every pool about equally often', () => {
-    const random = seeded(5)
-    const runs = 20000
-    const counts = [0, 0, 0, 0]
-    for (let run = 0; run < runs; run += 1) {
-      const drawn = drawPoolAssignments({ seedIds: ids(4, 's'), otherIds: ids(8, 'o'), poolCount: 4 }, random)
-      counts[drawn.find((a) => a.participationId === 's1')!.poolNumber - 1]! += 1
-    }
-    for (const count of counts) {
-      expect(Math.abs(count - runs / 4)).toBeLessThan(400)
-    }
+  it('returns null when every pool is full', () => {
+    expect(drawPoolStep({ sizes: [2, 2], filled: [2, 2], remainingIds: ['a'] }, seeded(1))).toBeNull()
   })
 
-  it('places a non-seed in every pool about equally often when sizes are equal', () => {
+  it('puts a given player in each pool of the same size about equally often', () => {
     const random = seeded(6)
     const runs = 20000
     const counts = [0, 0, 0, 0]
     for (let run = 0; run < runs; run += 1) {
-      const drawn = drawPoolAssignments({ seedIds: ids(4, 's'), otherIds: ids(8, 'o'), poolCount: 4 }, random)
-      counts[drawn.find((a) => a.participationId === 'o1')!.poolNumber - 1]! += 1
+      const { placed } = playPools(4, 12, random)
+      counts[placed.find((entry) => entry.participationId === 'o1')!.poolNumber - 1]! += 1
     }
     for (const count of counts) {
       expect(Math.abs(count - runs / 4)).toBeLessThan(400)
@@ -112,36 +99,50 @@ describe('drawPoolAssignments (RG11, RG16)', () => {
   })
 })
 
-describe('drawRoundAssignments (RG13, RG14)', () => {
-  it.each([2, 4, 8, 16])('forms %i complete pairings that pass the manual-entry check, over 200 draws', (size) => {
+describe('drawRoundStep (RG13, RG14)', () => {
+  it.each([2, 4, 8, 16])('plays a whole round of %i players affiche by affiche and passes the manual-entry check', (size) => {
     const random = seeded(size)
     const pool = ids(size)
     for (let run = 0; run < 200; run += 1) {
-      const drawn = drawRoundAssignments(pool, random)
+      let remaining = pool
+      const assignments: Array<{ participationId: string, pairingIndex: number, sidePosition: 1 | 2, drawnOrder: number }> = []
+      while (remaining.length > 0) {
+        const [first, second] = drawRoundStep(remaining, 2, random)
+        const pairingIndex = assignments.length / 2 + 1
+        assignments.push({ participationId: first!, pairingIndex, sidePosition: 1, drawnOrder: assignments.length + 1 })
+        assignments.push({ participationId: second!, pairingIndex, sidePosition: 2, drawnOrder: assignments.length + 1 })
+        expect(first).not.toBe(second)
+        remaining = remaining.filter((id) => id !== first && id !== second)
+      }
       expect(checkRoundDrawAssignments({
-        assignments: drawn, candidateIds: pool, roundKind: ROUND_KIND_BY_POOL_SIZE[size]!, poolWinnerIds: [], complete: true
+        assignments, candidateIds: pool, roundKind: ROUND_KIND_BY_POOL_SIZE[size]!, poolWinnerIds: [], complete: true
       })).toBeNull()
     }
   })
 
-  it('mixes direct qualifiers and playoff winners: every one of them can meet every other (RG14)', () => {
+  it('draws one player to complete a half affiche', () => {
+    expect(drawRoundStep(['a', 'b', 'c'], 1, seeded(2))).toHaveLength(1)
+  })
+
+  it('is pure chance: every one of 8 players meets every other (28 distinct affiches)', () => {
     const random = seeded(3)
-    const pool = ids(8)
     const met = new Set<string>()
-    for (let run = 0; run < 2000; run += 1) {
-      const drawn = drawRoundAssignments(pool, random)
-      for (let pairing = 1; pairing <= 4; pairing += 1) {
-        const pair = drawn.filter((a) => a.pairingIndex === pairing).map((a) => a.participationId).sort()
-        met.add(pair.join('-'))
-      }
+    for (let run = 0; run < 3000; run += 1) {
+      met.add(drawRoundStep(ids(8), 2, random).sort().join('-'))
     }
     expect(met.size).toBe(28)
   })
 
-  it('leaves an odd pool with an incomplete pairing, which the complete check refuses', () => {
-    const pool = ids(5)
-    const drawn = drawRoundAssignments(pool, seeded(9))
-    expect(checkRoundDrawAssignments({ assignments: drawn, candidateIds: pool, roundKind: ROUND_KIND.PLAYOFF, poolWinnerIds: [], complete: true }))
-      .toBe('Every pairing must have two players, numbered from 1')
+  it('is unbiased on the first slot of an affiche', () => {
+    const random = seeded(11)
+    const runs = 40000
+    const counts = new Map<string, number>()
+    for (let run = 0; run < runs; run += 1) {
+      const [first] = drawRoundStep(ids(4), 2, random)
+      counts.set(first!, (counts.get(first!) ?? 0) + 1)
+    }
+    for (const count of counts.values()) {
+      expect(Math.abs(count - runs / 4)).toBeLessThan(500)
+    }
   })
 })
