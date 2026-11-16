@@ -483,6 +483,7 @@
   "edition.bracket_match_score_not_archived": "{match} (score non archivé)",
   "edition.bracket_score_not_archived": "score non archivé",
   "edition.bracket_winner": "Vainqueur",
+  "edition.bracket_winner_list": "Vainqueur : {name}",
   "edition.groups_caption": "Poule {rank}",
   "edition.groups_col_difference": "Diff.",
   "edition.groups_col_difference_title": "Différentiel de points",
