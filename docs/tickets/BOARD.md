@@ -272,7 +272,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-53](F-53.md) | Boîtes de confirmation : focus non rendu au déclencheur après Échap | — | F-24, F-51 | Ouvert (2026-11-16) | — |
 | [F-54](F-54.md) | e2e F-09-draw instable (« Les inscriptions sont closes ») | — | F-09, F-50 | Ouvert (2026-11-16) | — |
 | [F-55](F-55.md) | « Phase finale » ouvre l'étape en cours | — | F-24, F-25 | **Fermé** (2026-11-16) @ `ad227c31`, vérifié sur dev | — |
-| [F-56](F-56.md) | Finale : « Lancer la finale » avec VS, sans tirage ; espace sous « À placer » | maquette F-25/F-52 | F-52, B-27 | Ouvert (2026-11-16) | — |
+| [F-56](F-56.md) | Finale : « Lancer la finale » avec VS, sans tirage ; espace sous « À placer » | maquette F-25/F-52 | F-52, B-27 | **Fermé** (2026-11-16) @ `0a3390b4`, vérifié sur dev | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
