@@ -36,7 +36,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-23](B-23.md) | Codes d'erreur distincts sur la saisie, la validation et la correction d'un score (F-18) | — | B-12 | — | **Fermé** (2026-11-14) @ `3f1c2017` |
 | [B-24](B-24.md) | Correction d'un match de poule refusée après un départage, suppression d'un départage non joué (F-18, F-44) | — | B-13, B-23 | — | **Fermé** (2026-11-14) @ `c044f472` |
 | [B-25](B-25.md) | Rouvrir les qualifications tant que le tirage du premier tour n'est pas validé (F-51) | — | B-13 | — | **Fermé** (2026-11-16) @ `279a681b`, vérifié sur dev |
-| [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | Ouvert (2026-11-16) |
+| [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | **Fermé** (2026-11-16) @ `ca1795d0`, vérifié sur dev |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -267,7 +267,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-49](F-49.md) | Formulaire d'édition : espaces entre blocs et année en select (année courante ± 5) | maquette F-13 mise à jour | F-13 | **Fermé** (2026-11-16) @ `e0167a60`, vérifié sur dev | — |
 | [F-50](F-50.md) | Participants : espaces de la carte « Ajouter », champ masqué hors inscriptions, bascule sur l'édition créée | maquette F-09 | F-09, F-13 | **Fermé** (2026-11-16) @ `e6b74b28`, vérifié sur dev | — |
 | [F-51](F-51.md) | Bouton « Rouvrir les qualifications » | maquette F-24 à compléter | B-25, F-24 | Ouvert (2026-11-16) | — |
-| [F-52](F-52.md) | Bouton « Tirer au sort » et révélation animée du tirage | maquette à produire | B-26 | Ouvert (2026-11-16) | — |
+| [F-52](F-52.md) | Bouton « Tirer au sort » et écran projecteur (VS), pas à pas | maquette validée 2026-11-16 (`9e492a6c`) | B-26 | Ouvert (2026-11-16) | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
