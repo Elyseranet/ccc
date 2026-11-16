@@ -331,3 +331,84 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
 .q-tie__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---3); }
 .snack--demo { position: static; z-index: auto; translate: none; margin-block-end: var(--origam-space---4); } /* démo dans la section États : dans le flux, sans z-index, son ombre ne recouvre pas l’alerte suivante */
 
+/* ═══ F-52 · TIRAGE AU SORT ET RÉVÉLATION (CSS seul : keyframes + animation-delay en cascade, aucun timer JS) ═══
+   Enchaînement piloté par des variables d’instance : --i (rang de l’affiche), ou --p (rang de la poule) et --s (place dans la poule) ; --n = nombre d’étapes.
+   Les styles de base sont l’état FINAL : sous reduced-motion, hh.css coupe toutes les animations et le résultat s’affiche directement. */
+.dr { --dr-step: var(--origam-motion__duration---slow); --dr-dur: var(--origam-motion__duration---xslow); --dr-ease: var(--origam-motion__easing---decelerate); }
+.dr-st { display: none; }
+.dr[data-draw="empty"] [data-st="empty"], .dr[data-draw="started"] [data-st="started"], .dr[data-draw="reveal"] [data-st="reveal"], .dr[data-draw="done"] [data-st="reveal"] { display: block; }
+.dr[data-draw="done"] [data-st="reveal"] *, .dr[data-draw="done"] [data-st="reveal"] *::before, .dr[data-draw="done"] [data-st="reveal"] *::after { animation: none !important; } /* « Passer l’animation » : même rendu que reduced-motion */
+/* Choix : tirage par l’application ou saisie physique */
+.dr-mode { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---3) var(--origam-space---5); margin-bottom: var(--origam-space---4); padding: var(--origam-space---4) var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---xl); background: radial-gradient(30rem 12rem at 100% 0%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%), var(--origam-color__surface---raised); }
+.dr-mode__txt { display: grid; gap: var(--origam-space---1); flex: 1 1 18rem; min-width: 0; }
+.dr-mode__txt .muted { font-size: var(--origam-font__size---sm); }
+.dr-go { gap: var(--origam-space---2); }
+.dr-go svg { width: var(--origam-space---6); height: var(--origam-space---6); flex: none; transition: rotate var(--origam-motion__duration---medium) var(--origam-motion__easing---standard); }
+.dr-go .cap-fill { fill: currentColor; } .dr-go .cap-inner { fill: var(--origam-color__action--primary---bg); }
+.dr-go:hover .cap-inner { fill: var(--origam-color__action--primary---bgHover); }
+.dr-go:hover svg { rotate: 90deg; }
+.dr-go:disabled .cap-inner { fill: var(--origam-color__surface---sunken); }
+.dr-or { display: flex; align-items: center; gap: var(--origam-space---3); margin-block: var(--origam-space---2) var(--origam-space---3); font-size: var(--origam-font__size---sm); }
+.dr-or::before, .dr-or::after { content: ''; flex: 1; height: 1px; background: var(--origam-color__border---default); }
+.dr-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---2) var(--origam-space---3); margin-bottom: var(--origam-space---3); }
+.dr-run { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---2) var(--origam-space---4); margin-bottom: var(--origam-space---3); animation: dr-gone 1ms linear calc((var(--n) - 1) * var(--dr-step) + var(--dr-dur)) forwards; } /* disparaît seul à la fin de la cascade : visibility animée, donc retiré du focus */
+.dr-run__t { display: inline-flex; align-items: center; gap: var(--origam-space---2); font-weight: var(--origam-font__weight---bold); color: var(--origam-color__bar---amber); }
+.dr-run__t svg { width: var(--origam-space---5); height: var(--origam-space---5); animation: dr-spin var(--dr-dur) linear infinite; }
+.dr-run__t .cap-fill { fill: currentColor; } .dr-run__t .cap-inner { fill: var(--origam-color__surface---default); }
+.dr[data-draw="done"] .dr-run { display: none; }
+.dr-top { display: grid; align-items: center; margin-bottom: var(--origam-space---3); } /* barre « en cours » et alerte finale dans la même cellule : l’une remplace l’autre sans trou */
+.dr-top > * { grid-area: 1 / 1; margin: 0; }
+.dr-live .alert { animation: dr-in var(--dr-dur) var(--dr-ease) calc((var(--n) - 1) * var(--dr-step) + var(--dr-dur) * .6) both; }
+.dr-next { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---4); margin-top: var(--origam-space---4); }
+
+/* Phase finale : une affiche après l’autre. Une capsule tombe en tournoyant, se pose, saute dans un éclat de mousse, l’affiche apparaît. */
+.r-aff--drawn { overflow: hidden; animation: dr-slot var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
+.r-aff--drawn .r-aff__row b { font-size: var(--origam-font__size---lg); }
+.r-aff--drawn .r-vs { color: var(--origam-color__bar---amber); font-weight: var(--origam-font__weight---bold); }
+.r-aff--drawn > :not(.r-cap) { animation: dr-in var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
+.r-aff--drawn::before { content: '?'; position: absolute; inset: 0; display: grid; place-items: center; font: var(--origam-font__size---3xl) var(--origam-font__family---display); color: var(--origam-color__text---tertiary); opacity: 0; pointer-events: none; animation: dr-wait var(--dr-dur) linear calc(var(--i) * var(--dr-step)) both; }
+.r-aff--drawn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--origam-color__bar---foam) 55%, transparent), color-mix(in srgb, var(--origam-color__bar---amber) 30%, transparent) 35%, transparent 65%); opacity: 0; pointer-events: none; animation: dr-foam var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
+.r-cap { position: absolute; z-index: 1; left: 50%; top: 50%; width: var(--origam-space---16); aspect-ratio: 1; margin: calc(var(--origam-space---16) / -2) 0 0 calc(var(--origam-space---16) / -2); opacity: 0; pointer-events: none; animation: dr-cap var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
+.r-cap svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 0 var(--origam-color__bar---neon)); }
+.r-cap__n { fill: var(--origam-color__bar---foam); font: 34px var(--origam-font__family---display); text-anchor: middle; dominant-baseline: central; }
+
+/* Poules : poule après poule ; dans une poule, les joueurs tombent l’un après l’autre (décalage court) et la poule s’illumine pendant son tirage. */
+.tp--drawn { animation: dr-pool calc(var(--dr-dur) + 4 * var(--origam-motion__duration---fast)) var(--dr-ease) calc(var(--p) * var(--dr-step)) both; }
+.slot--drawn { animation: dr-pop var(--dr-dur) var(--dr-ease) calc(var(--p) * var(--dr-step) + var(--s) * var(--origam-motion__duration---fast)) both; }
+.tp--drawn .tp__h .chip { animation: dr-in var(--dr-dur) var(--dr-ease) calc(var(--p) * var(--dr-step) + 4 * var(--origam-motion__duration---fast)) both; }
+
+@keyframes dr-slot {
+  0% { background: var(--origam-color__surface---sunken); border-color: var(--origam-color__border---strong); box-shadow: none; transform: scale(.97); }
+  50% { border-color: var(--origam-color__bar---amber); box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---10) color-mix(in srgb, var(--origam-color__bar---neon) 70%, transparent); transform: scale(1.03); }
+}
+@keyframes dr-in { 0%, 52% { opacity: 0; visibility: hidden; translate: 0 var(--origam-space---2); } }
+@keyframes dr-wait { 0%, 30% { opacity: .5; } 45%, 100% { opacity: 0; } }
+@keyframes dr-foam { 0%, 40% { opacity: 0; transform: scale(.2); } 58% { opacity: 1; } 90%, 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes dr-cap {
+  0% { opacity: 0; transform: translateY(-160%) rotate(-540deg) scale(.5); }
+  12% { opacity: 1; }
+  40% { opacity: 1; transform: translateY(0) rotate(0) scale(1.12); }
+  50% { opacity: 1; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.8) rotate(20deg); }
+}
+@keyframes dr-pool { 15%, 75% { border-color: var(--origam-color__bar---amber); box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---12) color-mix(in srgb, var(--origam-color__bar---neon) 60%, transparent); } }
+@keyframes dr-pop {
+  0% { opacity: 0; visibility: hidden; transform: translateX(var(--origam-space---6)) scale(.6); }
+  45% { opacity: 1; transform: scale(1.06); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); }
+}
+@keyframes dr-gone { to { visibility: hidden; opacity: 0; } }
+@keyframes dr-spin { to { rotate: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .dr-run { display: none; } .dr-go:hover svg { rotate: none; } }
+
+.dr-hc { flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
+.dr[data-draw="reveal"] .dr-hc, .dr[data-draw="done"] .dr-hc { display: inline-flex; }
+/* Maquette : la colonne « À placer » et la snackbar suivent l’état de la section (le front les dérive du brouillon) */
+.adm-content:not(:has(.dr[data-draw="reveal"], .dr[data-draw="done"])) .dr-alt { display: none; }
+.adm-content:has(.dr[data-draw="reveal"], .dr[data-draw="done"]) .dr-alt-hide, .adm-content:has(.dr[data-draw="empty"]) .snack.dr-alt-hide { display: none; }
+p.dr-alt { margin-top: var(--origam-space---3); }
+
+/* Démo de la maquette (hors produit) : changer d’état, rejouer la révélation */
+.mock-demo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); margin-bottom: var(--origam-space---4); padding: var(--origam-space---2) var(--origam-space---3); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---lg); }
+.mock-demo .eyebrow { margin-inline-end: var(--origam-space---2); color: var(--origam-color__feedback--warning---fgSubtle); }
+.mock-demo [aria-pressed="true"] { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); box-shadow: none; }
+
