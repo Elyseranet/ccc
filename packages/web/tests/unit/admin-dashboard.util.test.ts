@@ -12,11 +12,12 @@ import type { IAdminDashboardData } from '../../src/interfaces/admin-dashboard.i
 import type { IAdminDraw } from '../../src/interfaces/draw.interface.js'
 import type { IRound } from '../../src/interfaces/round.interface.js'
 import type { TTranslate } from '../../src/types/translate.type.js'
+import { ROUTES } from '../../src/consts/routes.const.js'
 import { ADMIN_MATCH_FILTER_QUERY_PARAM } from '../../src/consts/admin-match-filters.const.js'
 import { ADMIN_MATCH_FILTER } from '../../src/enums/admin-match-filter.enum.js'
 import {
   buildActivityRows, buildDashboardView, buildStepItems, stepRoute, buildTodoItems, classifyError, computeCounters, recordedQueueLink,
-  resolveActiveStep, resolveStepStatus
+  resolveActiveStep, resolveFinalPhaseEntry, resolveStepStatus
 } from '../../src/utils/admin-dashboard.util.js'
 
 const t: TTranslate = (_key, fallback, params = {}) =>
@@ -245,5 +246,25 @@ describe('classement des erreurs', () => {
     expect(classifyError(error(500))).toBe(ADMIN_DASHBOARD_ERROR.OTHER)
     expect(classifyError(error(0))).toBe(ADMIN_DASHBOARD_ERROR.OTHER)
     expect(classifyError(null)).toBeNull()
+  })
+})
+
+describe('entrée « Phase finale » (F-55)', () => {
+  const entry = (status: EDITION_STATUS, rounds: IRound[] = []) => resolveFinalPhaseEntry(resolveActiveStep(status, rounds))
+
+  it('avant la liste arrêtée : qualification', () => {
+    expect(entry(EDITION_STATUS.POOLS_PLAYING, [pools(105)])).toBe(ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION)
+    expect(entry(EDITION_STATUS.REGISTRATION)).toBe(ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION)
+  })
+
+  it('QUALIFIED et PLAYOFFS (tour non terminé) : tirage de tour', () => {
+    expect(entry(EDITION_STATUS.QUALIFIED)).toBe(ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW)
+    expect(entry(EDITION_STATUS.PLAYOFFS, [pools(105), completed(ROUND_KIND.QUARTER, 2), round(ROUND_KIND.SEMI, 3, ROUND_STATUS.PENDING)])).toBe(ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW)
+    expect(entry(EDITION_STATUS.PLAYOFFS, [pools(105), round(ROUND_KIND.FINAL, 4, ROUND_STATUS.PLAYING)])).toBe(ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW)
+  })
+
+  it('finale jouée, ou édition clôturée : clôture', () => {
+    expect(entry(EDITION_STATUS.PLAYOFFS, [pools(105), completed(ROUND_KIND.FINAL, 4)])).toBe(ROUTES.ADMIN_FINAL_PHASE_CLOSING)
+    expect(entry(EDITION_STATUS.CLOSED)).toBe(ROUTES.ADMIN_FINAL_PHASE_CLOSING)
   })
 })
