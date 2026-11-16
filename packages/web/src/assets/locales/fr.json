@@ -16,7 +16,7 @@
   "admin.qualification.count_ties_other": "{count} égalités restantes",
   "admin.qualification.dialog_cancel": "Annuler",
   "admin.qualification.dialog_confirm": "Arrêter la liste",
-  "admin.qualification.dialog_text": "{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Cette action est définitive : il n’est pas possible de revenir en arrière.",
+  "admin.qualification.dialog_text": "{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Vous pourrez rouvrir la liste tant que le tirage {round} n’est pas validé.",
   "admin.qualification.dialog_title": "Arrêter la liste des qualifiés ?",
   "admin.qualification.empty_text": "Les poules de cette édition ne sont pas encore tirées.",
   "admin.qualification.empty_text_none": "Choisissez une édition dans le sélecteur de la barre haute.",

@@ -203,12 +203,11 @@ export const stepsOf = (status: IQualificationStatus, check: IQualificationInput
 }
 
 /** Premier tour de phase finale d'une liste arrêtée : les barrages avec `withPlayoff`, sinon le tour déduit de la taille du vivier (RG13) ; `null` quand il se choisit au tirage. */
-export const firstRoundKindOf = (status: IQualificationStatus): ROUND_KIND | null => {
-  if (status.parameters?.withPlayoff) {
-    return ROUND_KIND.PLAYOFF
-  }
-  return ROUND_KIND_BY_POOL_SIZE[status.qualified?.length ?? 0] ?? null
-}
+export const firstRoundKind = (withPlayoff: boolean, qualifiedCount: number): ROUND_KIND | null =>
+  withPlayoff ? ROUND_KIND.PLAYOFF : ROUND_KIND_BY_POOL_SIZE[qualifiedCount] ?? null
+
+export const firstRoundKindOf = (status: IQualificationStatus): ROUND_KIND | null =>
+  firstRoundKind(status.parameters?.withPlayoff === true, status.qualified?.length ?? 0)
 
 /** Pourquoi « Rouvrir les qualifications » est inactif : le tirage du premier tour est validé (l'édition passe à `PLAYOFFS`, B-25) ou l'édition est clôturée ; sinon `null`. */
 export const reopenBlockerOf = (editionStatus: EDITION_STATUS | null): QUALIFICATION_REOPEN_BLOCKER | null => {

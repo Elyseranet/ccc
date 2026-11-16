@@ -152,6 +152,8 @@ export interface IQualificationFinalizeProps {
   /** La liste est déjà arrêtée : l'aperçu reste, le bouton disparaît (le slot `finalized-action` porte « Rouvrir »). */
   finalized: boolean
   qualifiedCount: number
+  /** Premier tour de phase finale (barrages avec `withPlayoff`, sinon déduit de la taille de la liste), `null` quand il se choisit au tirage : nommé dans la confirmation. */
+  roundKind: ROUND_KIND | null
   /** Configuration enregistrée, pour la phrase « n premiers par poule… » de la liste arrêtée. */
   parameters: IQualificationParameters | null
 }

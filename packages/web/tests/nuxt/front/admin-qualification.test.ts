@@ -271,7 +271,7 @@ describe('page « Qualification » (F-24)', () => {
     await wrapper.get('[data-cy="qualification-finalize-open"]').trigger('click')
     await vi.waitFor(() => expect(body().querySelector('[data-cy="qualification-finalize-dialog"]')).not.toBeNull())
     const dialog = body().querySelector('[data-cy="qualification-finalize-dialog"]')!
-    expect(dialog.textContent).toContain('il n’est pas possible de revenir en arrière')
+    expect(dialog.textContent).toContain('Vous pourrez rouvrir la liste tant que le tirage')
     body().querySelector<HTMLButtonElement>('[data-cy="qualification-finalize-confirm"]')!.click()
     await vi.waitFor(() => expect(finalizations).toHaveBeenCalledTimes(1))
     expect(finalizations.mock.calls[0]![0]).toEqual({ topPerPool: 2, bestNextCount: 0, withPlayoff: false })

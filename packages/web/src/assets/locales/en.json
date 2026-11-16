@@ -16,7 +16,7 @@
   "admin.qualification.count_ties_other": "{count} ties left",
   "admin.qualification.dialog_cancel": "Cancel",
   "admin.qualification.dialog_confirm": "Close the list",
-  "admin.qualification.dialog_text": "{count} players will qualify for the final phase. The edition moves to the “Qualified validated” state. Correcting a pool score will no longer be possible. This action is final: there is no way back.",
+  "admin.qualification.dialog_text": "{count} players will qualify for the final phase. The edition moves to the “Qualified validated” state. Correcting a pool score will no longer be possible. You can reopen the list until the draw {round} is validated.",
   "admin.qualification.dialog_title": "Close the qualified list?",
   "admin.qualification.empty_text": "The pools of this edition are not drawn yet.",
   "admin.qualification.empty_text_none": "Pick an edition in the top bar selector.",

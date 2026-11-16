@@ -122,7 +122,7 @@ import { QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { QUALIFIED_COLUMN } from '~/enums/qualification.enum'
-import { blockerText as describeBlocker } from '~/utils/qualification-text.util'
+import { blockerText as describeBlocker, firstRoundText } from '~/utils/qualification-text.util'
 import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~/interfaces/qualification-view.interface'
 
 /*********************************************************
@@ -130,7 +130,7 @@ import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~
  *
  * @description
  * « Arrêter la liste des qualifiés » : l'aperçu (poule, rang, joueur, voie), puis le bouton « Arrêter la liste… » qui ouvre une confirmation. Définitif, et
- * le dialogue le dit (« il n'est pas possible de revenir en arrière », décision c9790abd (3)). Inactif avec sa raison écrite dessous tant qu'un match de poule
+ * le dialogue dit qu'on peut la rouvrir tant que le tirage du premier tour n'est pas validé (F-51, B-25). Inactif avec sa raison écrite dessous tant qu'un match de poule
  * ou une égalité reste. Le dialogue n'est pas `persistent` hors envoi : Échap et le clic extérieur annulent (ux 0ea5092e). L'aperçu est vide tant qu'une égalité
  * bloque (le serveur ne calcule pas de qualifiés alors). Une fois la liste arrêtée, l'aperçu reste et le bouton disparaît.
  ********************************************************/
@@ -185,7 +185,7 @@ const rowViews = computed(() => props.rows.map((row) => {
  * Il reste ouvert pendant l'envoi (bouton en chargement) et se ferme à la fin, succès ou échec ; le message d'échec est celui de la page.
  ********************************************************/
 const dialogTitle = computed(() => t('admin.qualification.dialog_title', 'Arrêter la liste des qualifiés ?'))
-const dialogText = computed(() => t('admin.qualification.dialog_text', '{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Cette action est définitive : il n’est pas possible de revenir en arrière.', { count: props.qualifiedCount }))
+const dialogText = computed(() => t('admin.qualification.dialog_text', '{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Vous pourrez rouvrir la liste tant que le tirage {round} n’est pas validé.', { count: props.qualifiedCount, round: firstRoundText(t, props.roundKind) }))
 const cancelLabel = computed(() => t('admin.qualification.dialog_cancel', 'Annuler'))
 const confirmLabel = computed(() => t('admin.qualification.dialog_confirm', 'Arrêter la liste'))
 const handleOpen = () => {

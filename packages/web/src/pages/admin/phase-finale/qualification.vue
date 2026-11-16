@@ -127,6 +127,7 @@
           :finalized="isReadonly"
           :qualified-count="qualifiedCount"
           :parameters="status?.parameters ?? null"
+          :round-kind="finalizeRoundKind"
           @finalize="handleFinalize"
         >
           <template #finalized-action>
@@ -192,7 +193,7 @@ import { PHASE_STEP } from '~/enums/qualification.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import type { IQualificationTieView } from '~/interfaces/qualification-view.interface'
 import { firstRoundText } from '~/utils/qualification-text.util'
-import { previewCount } from '~/utils/qualification-view.util'
+import { firstRoundKind as deduceFirstRound, previewCount } from '~/utils/qualification-view.util'
 
 /*********************************************************
  * Page
@@ -200,7 +201,7 @@ import { previewCount } from '~/utils/qualification-view.util'
  * @description
  * Première page de la « Phase finale » (F-24) : arrêter la liste des qualifiés à l'issue des poules, après avoir réglé les égalités (B-13). La page assemble :
  * l'état, la simulation et les deux écritures viennent de `useQualification`, les quatre blocs sont des composants, l'état dégradé (chargement, erreur, vide)
- * est celui d'`AsyncState`. L'arrêt de la liste se défait par « Rouvrir les qualifications » (F-51, B-25) tant que le tirage du premier tour n'est pas validé ; le dialogue d'arrêt le dit encore définitif (c9790abd (3)), texte à revoir.
+ * est celui d'`AsyncState`. L'arrêt de la liste se défait par « Rouvrir les qualifications » (F-51, B-25) tant que le tirage du premier tour n'est pas validé ; le dialogue d'arrêt le dit.
  ********************************************************/
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { t } = useT()
@@ -219,6 +220,7 @@ const {
 const isEmpty = computed(() => status.value === null || status.value.pools.length === 0)
 const tieCount = computed(() => ties.value.length)
 const qualifiedCount = computed(() => qualifiedRows.value.length)
+const finalizeRoundKind = computed(() => deduceFirstRound(inputs.value.withPlayoff, qualifiedCount.value))
 const showTies = computed(() => !isReadonly.value)
 const isSettled = computed(() => !isReadonly.value && tieCount.value === 0 && pendingCount.value === 0)
 const preview = computed(() => previewReady.value && parameters.value ? previewCount(parameters.value, bounds.value.poolCount) : null)
