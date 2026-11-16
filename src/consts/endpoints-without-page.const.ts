@@ -9,7 +9,6 @@ import { API_ENDPOINT } from '../enums/api-endpoint.enum.js'
  * doit contenir que des endpoints réellement sans page.
  ********************************************************/
 export const ENDPOINTS_WITHOUT_PAGE: Partial<Record<API_ENDPOINT, string>> = {
-  [API_ENDPOINT.ADMIN_EDITIONS]: 'B-20 : la liste admin (`/admin/editions`, avec le nombre d\'inscrits) n\'est pas appelée ; `/admin/editions` (F-13) lit `GET /editions` (`useAdminEditions`)',
   [API_ENDPOINT.EDITION_POOLS]: 'données redondantes avec GET /editions/{code}, API publique prévue par la Spec API',
   [API_ENDPOINT.EDITION_DRAWS]: 'données redondantes avec GET /editions/{code}, API publique prévue par la Spec API',
   [API_ENDPOINT.EDITION_ROUNDS]: 'données redondantes avec GET /editions/{code} (`rounds`), API publique prévue par la Spec API ; l\'accueil n\'appelle que le détail et les matchs'

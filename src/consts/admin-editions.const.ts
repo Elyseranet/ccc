@@ -19,6 +19,9 @@ export const ISO_DATE_PATTERN = /^(\d{4}-\d{2}-\d{2})/
 /** Clé de cache de la liste des éditions, la même que celle du sélecteur d'édition de la coque admin. */
 export const ADMIN_EDITIONS_CACHE_KEY = 'editions'
 
+/** Clé de cache de la liste admin (`GET /admin/editions`, B-20), distincte de `editions` (forme publique, sélecteur de la coque). */
+export const ADMIN_EDITIONS_LIST_CACHE_KEY = 'admin-editions'
+
 
 export const ADMIN_EDITION_COLUMNS: IAdminEditionColumn[] = [
   { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: false, width: '7.77%', minWidth: '68px' },
