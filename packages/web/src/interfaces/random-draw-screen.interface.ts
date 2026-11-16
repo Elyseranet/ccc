@@ -47,7 +47,7 @@ export interface IDrawRandomBandProps {
   kind: DRAW_KIND
   /** Brouillon complet : plus de tirage, la validation existante est proposée. */
   complete: boolean
-  /** « Recommencer le tirage… » est proposé : brouillon complet ou élément tiré par l'appli depuis l'ouverture de l'écran (maquette F-52 : pas pour une saisie purement manuelle). */
+  /** « Recommencer le tirage… » est proposé : dès qu'un joueur hors têtes de série (poules) ou une affiche (tour) est placé, tiré ou saisi (décision utilisateur 2026-11-16, rechargement compris). */
   restartable: boolean
   /** Nombre d'éléments du tirage (joueurs à placer ou affiches), pour le titre de l'état complet. */
   total: number

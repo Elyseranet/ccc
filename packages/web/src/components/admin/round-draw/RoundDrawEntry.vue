@@ -19,7 +19,7 @@
       v-if="showBand"
       :kind="kind"
       :complete="complete"
-      :restartable="complete || arrival !== null"
+      :restartable="progress.placed > 0"
       :total="progress.total"
       :drawing="drawing"
       :started="started"

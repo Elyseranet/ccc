@@ -110,6 +110,10 @@ test.describe('admin tirage au sort et écran projecteur : parcours d’écritur
     await drawAndContinue(page)
     await expect(page.getByTestId('draw-progress-text')).toContainText(`${POOLS + 2} / ${PLAYER_COUNT}`)
 
+    // Décision utilisateur 2026-11-16 : proposé dès qu'un joueur hors têtes de série est placé, rechargement compris.
+    await page.reload()
+    await hydrated(page)
+    await expect(page.getByTestId('draw-restart-open')).toBeVisible()
     await page.getByTestId('draw-restart-open').click()
     const dialog = page.getByTestId('draw-restart-dialog')
     await expect(dialog).toContainText('2 joueurs placés')

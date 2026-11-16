@@ -34,7 +34,7 @@
         v-if="showBand"
         :kind="kind"
         :complete="complete"
-        :restartable="complete || arrival !== null"
+        :restartable="progress.placed > poolCount"
         :total="progress.total"
         :drawing="drawing"
         :started="started"
