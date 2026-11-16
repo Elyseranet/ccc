@@ -318,6 +318,9 @@ defineExpose({})
 
 // Le bloc n'est à droite que si le bracket ENTIER (jamais tronqué) et 16 rem de bloc tiennent dans la section. Largeur du bracket Origam
 // d'après le thème CCC, mesurée : marges 2 × 1,25 rem, cartes de 15 rem, écart de 3 rem entre tours (`--origam-bracket---round-gap`).
+// F-58 : sous cette largeur de section, les tours s'empilent (aucun défilement horizontal). Entre ce seuil et la largeur du bracket entier,
+// il défile comme avant (1024 inchangé).
+$stack-below: 48rem;
 $bracket-padding: 2.5rem;
 $round-width: 15rem;
 $round-gap: 3rem;
@@ -329,6 +332,19 @@ $champion-min: 16rem;
     .edition-bracket__layout[data-rounds='#{$rounds}'] {
       grid-template-columns: minmax(0, max-content) minmax($champion-min, 1fr);
     }
+  }
+}
+
+// shortcut: surcharge de la direction de l'arbre et des styles inline des tours (min-height, width) d'origam-bracket, à retirer si Origam expose min-height/width des tours ou un empilement.
+@container (width < #{$stack-below}) {
+  .edition-bracket__region :deep(.origam-bracket__tree) {
+    flex-direction: column;
+    width: auto;
+  }
+
+  .edition-bracket__region :deep(.origam-bracket__round) {
+    width: auto !important;
+    min-height: 0 !important;
   }
 }
 </style>
