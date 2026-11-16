@@ -88,6 +88,8 @@ export interface IRoundDrawEntryProps {
   drawing?: boolean
   started?: boolean
   arrival?: IDrawArrival | null
+  /** Finale lancée d'un clic (F-56) : ni saisie manuelle, ni séparateur, ni liste des affiches. */
+  launchable?: boolean
 }
 
 export interface IRoundDrawHeadProps {

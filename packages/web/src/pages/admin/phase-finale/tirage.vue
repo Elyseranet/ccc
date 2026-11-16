@@ -138,6 +138,7 @@
               :drawing="drawing"
               :started="drawStarted"
               :arrival="arrival"
+              :launchable="launchable"
               @place="handlePlace"
               @change="handleChange"
               @change-round="handleChangeRound"
@@ -153,6 +154,7 @@
             />
           </div>
           <round-draw-recap
+            v-if="!launchable"
             :round-kind="roundKind"
             :rows="recap"
             :blocker="blocker"
@@ -255,13 +257,15 @@ useSeo({ noindex: true })
 const draw = await useRoundDraw()
 const {
   edition, view, preview, rounds, roundKind, players, drawable, steps, pairings, unplaced, progress, blocker, recap, saveState, feedback, busy, stale, isClosed, isReadOnly,
-  pageError, pending, drawnRound, validatedDraw, drawStarted
+  pageError, pending, drawnRound, validatedDraw, drawStarted, launchable
 } = draw
 const { drawing, view: projectorView, arrival, drawnCount, restartOpen, restarting } = draw.random
 const drawKind = DRAW_KIND.ROUND
 const isRoundComplete = computed(() => progress.value.total > 0 && progress.value.pairings >= progress.value.total)
 const restartRoundText = computed(() => (roundKind.value ? t(ROUND_DRAW_TEXTS[roundKind.value].of.key, ROUND_DRAW_TEXTS[roundKind.value].of.fallback) : ''))
-const projectorTitle = computed(() => t('admin.random_draw.projector_title_round', 'Tirage {round}', { round: restartRoundText.value }))
+const projectorTitle = computed(() => projectorView.value?.final
+  ? t('admin.random_draw.projector_title_final', 'La finale')
+  : t('admin.random_draw.projector_title_round', 'Tirage {round}', { round: restartRoundText.value }))
 const brand = computed(() => t('admin.random_draw.projector_brand', 'CCC {year}', { year: edition.value?.year ?? '' }))
 const isEmpty = computed(() => preview.value === null)
 const allowedRoundKinds = computed(() => preview.value?.allowedRoundKinds ?? [])
@@ -341,7 +345,11 @@ watch(saveState, (value) => {
 })
 const changeOpen = ref(false)
 const handleDraw = () => {
-  draw.random.draw()
+  if (launchable.value) {
+    draw.launchFinal()
+  } else {
+    draw.random.draw()
+  }
 }
 const handleContinue = () => {
   draw.random.close()
@@ -444,7 +452,9 @@ defineExpose({})
     }
   }
 
+  // Entre la grille et le récapitulatif (maquette `admin-tirage-tour.html`, `.q-sec`) : l'enveloppe d'`async-state` n'a pas de gap.
   &__grid {
+    margin-bottom: var(--origam-space---6);
     display: grid;
     grid-template-columns: minmax(0, 1fr) 20rem;
     align-items: start;

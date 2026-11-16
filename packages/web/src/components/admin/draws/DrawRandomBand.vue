@@ -36,7 +36,7 @@
           @click="handleRestart"
         />
         <origam-btn
-          v-if="!complete"
+          v-if="showDraw"
           variant="flat"
           :bg-color="buttonColor"
           :elevation="buttonElevation"
@@ -80,8 +80,12 @@ const capsuleIcon = IconCapsule
 const isBlocked = computed(() => props.disabled)
 const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked)
 const isPool = computed(() => props.kind === DRAW_KIND.POOLS)
-const canRestart = computed(() => props.restartable && !props.disabled)
+const canRestart = computed(() => props.restartable && !props.disabled && !props.final)
+const showDraw = computed(() => props.final || !props.complete)
 const title = computed(() => {
+  if (props.final) {
+    return t('admin.random_draw.final_title', 'La finale')
+  }
   if (!props.complete) {
     return t('admin.random_draw.band_title', 'Tirer au sort avec l’application')
   }
@@ -90,6 +94,9 @@ const title = computed(() => {
     : t('admin.random_draw.complete_title_round', 'Les {count} affiches sont tirées', { count: props.total })
 })
 const lead = computed(() => {
+  if (props.final) {
+    return t('admin.random_draw.final_lead', 'Un clic présente les deux finalistes à la salle et crée le match de la finale.')
+  }
   if (props.complete) {
     return isPool.value
       ? t('admin.random_draw.complete_lead_pools', 'Relisez les poules, corrigez un joueur avec « Changer » si besoin, puis validez le tirage. Rien n’est définitif avant la validation.')
@@ -102,6 +109,9 @@ const lead = computed(() => {
 const drawLabel = computed(() => {
   if (props.drawing) {
     return t('admin.random_draw.drawing', 'Tirage en cours…')
+  }
+  if (props.final) {
+    return t('admin.random_draw.launch_final', 'Lancer la finale')
   }
   if (isPool.value) {
     return props.started
