@@ -262,7 +262,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-46](F-46.md) | Dialogues admin : le focus s'échappe parfois du dialogue modal (6/20 F-30, 9/20 develop) | — | — | Ouvert |
 | [F-47](F-47.md) | Tableau de bord admin : bandeau « Édition clôturée » collé à la grille | — | — | **Fermé** (2026-11-16) @ `dd205caa`, vérifié sur dev |
 | [F-48](F-48.md) | Admin : la liste des éditions lit `GET /admin/editions` (B-20) et affiche les inscrits en direct (variante A) | validée 2026-11-16 | B-20, F-13 | **Fermé** (2026-11-16) @ `1f9be52a` | — |
-| [F-49](F-49.md) | Formulaire d'édition : espaces entre blocs et année en select (année courante ± 5) | maquette F-13 mise à jour | F-13 | En revue |
+| [F-49](F-49.md) | Formulaire d'édition : espaces entre blocs et année en select (année courante ± 5) | maquette F-13 mise à jour | **Fermé** (2026-11-16) @ `e0167a60`, vérifié sur dev | En revue |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
