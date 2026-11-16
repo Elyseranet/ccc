@@ -43,10 +43,10 @@
         :data-cy="`editions-count-${item.code}`"
       >
         {{ countOf(item) }}
-        <template v-if="isLive(item)">
-          <br>
-          <small class="editions-table__unit">{{ registeredLabel }}</small>
-        </template>
+        <small
+          v-if="isLive(item)"
+          class="editions-table__unit"
+        >{{ registeredLabel }}</small>
       </span>
     </template>
     <template #[`item.actions`]="{ item }">
@@ -156,6 +156,7 @@ defineExpose({})
   }
 
   &__unit {
+    display: var(--editions-table__unit---display, block);
     font-size: var(--editions-table__unit---font-size, var(--origam-font__size---sm));
     color: var(--editions-table__unit---color, var(--origam-color__text---secondary));
   }
@@ -169,6 +170,7 @@ defineExpose({})
 <style>
 :root {
   --editions-table__missing---color: var(--origam-color__text---secondary);
+  --editions-table__unit---display: block;
   --editions-table__unit---font-size: var(--origam-font__size---sm);
   --editions-table__unit---color: var(--origam-color__text---secondary);
 }
