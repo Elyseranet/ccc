@@ -255,7 +255,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-44](F-44.md) | Qualification : supprimer un départage non joué (CORRECTION-TIEBREAK) | à dessiner | B-24, F-24 | **Fermé** (2026-11-14) @ `ec6584c7` |
 | [F-45](F-45.md) | `/admin/plus` : liste native de liens à la place de la liste Origam (role=listitem sur des liens) | — | T-A11Y-01 lot 3 | Ouvert |
 | [F-46](F-46.md) | Dialogues admin : le focus s'échappe parfois du dialogue modal (6/20 F-30, 9/20 develop) | — | — | Ouvert |
-| [F-47](F-47.md) | Tableau de bord admin : bandeau « Édition clôturée » collé à la grille | — | — | En revue : mergé @ `dd205caa`, contrôle visuel sur dev en attente |
+| [F-47](F-47.md) | Tableau de bord admin : bandeau « Édition clôturée » collé à la grille | — | — | **Fermé** (2026-11-16) @ `dd205caa`, vérifié sur dev |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
