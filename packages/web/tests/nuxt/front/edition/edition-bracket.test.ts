@@ -92,4 +92,33 @@ describe('EditionBracket (F-03-BRK)', () => {
     const wrapper = await mountSuspended(EditionBracket, { ...withRouterLink, props: { rounds } })
     expect(wrapper.text()).not.toContain('score non archivé')
   })
+
+  it('F-57 : la finale a un vainqueur, la colonne « Vainqueur » existe (titre, logo décoratif, lien, liste)', async () => {
+    const finished: IEditionBracketRound[] = [rounds[0]!, {
+      kind: ROUND_KIND.FINAL,
+      matches: [{
+        id: 'm2',
+        winnerWithoutScore: false,
+        sides: [
+          { participationId: 'p1', competitor: person('c1', 'Maya Legrand'), score: 10, isWinner: true },
+          { participationId: 'p3', competitor: person('c3', 'Sam Dupont'), score: 7, isWinner: false }
+        ]
+      }]
+    }]
+    const wrapper = await mountSuspended(EditionBracket, { ...withRouterLink, props: { rounds: finished } })
+    const region = wrapper.get('[data-cy="edition-bracket-region"]')
+    expect(region.findAll('h3').map(h => h.text())).toEqual(['Demi-finales', 'Finale'])
+    expect(region.find('[data-cy="edition-bracket-winner"]').exists()).toBe(false)
+    const champion = wrapper.get('[data-cy="edition-bracket-winner"]')
+    expect(champion.get('h3').text()).toBe('Vainqueur')
+    expect(champion.get('[data-cy="player-link"]').text()).toBe('Maya Legrand')
+    expect(champion.get('svg').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.get('[data-cy="edition-bracket-list"]').text()).toContain('Vainqueur : Maya Legrand')
+  })
+
+  it('F-57 : finale sans vainqueur, aucune colonne « Vainqueur »', async () => {
+    const wrapper = await mountSuspended(EditionBracket, { ...withRouterLink, props: { rounds } })
+    expect(wrapper.find('[data-cy="edition-bracket-winner"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Vainqueur :')
+  })
 })

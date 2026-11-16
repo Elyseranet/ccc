@@ -16,8 +16,13 @@
       :empty-description="emptyDescription"
     >
       <template #default>
+        <div
+          class="edition-bracket__layout"
+          :data-rounds="rounds.length"
+        >
         <origam-bracket
           class="edition-bracket__region"
+          :class="{ 'edition-bracket__region--champion': champion }"
           :rounds="bracketRounds"
           :aria-label="regionLabel"
           tabindex="0"
@@ -54,6 +59,27 @@
             </div>
           </template>
         </origam-bracket>
+        <aside
+          v-if="champion"
+          class="edition-bracket__champion"
+          :aria-labelledby="championTitleId"
+          data-cy="edition-bracket-winner"
+        >
+          <h3
+            :id="championTitleId"
+            class="edition-bracket__champion-title"
+          >
+            {{ winnerLabel }}
+          </h3>
+          <brand-mark class="edition-bracket__logo" />
+          <common-player-link
+            size="x-large"
+            wrap
+            :competitor="{ id: String(champion.id), displayName: champion.displayName }"
+            inline
+          />
+        </aside>
+        </div>
         <p class="edition-bracket__note">
           <abbr-text :text="note" />
         </p>
@@ -85,6 +111,12 @@
               </li>
             </ol>
           </section>
+          <p
+            v-if="champion"
+            class="edition-bracket__round-title"
+          >
+            {{ winnerListText }}
+          </p>
         </details>
       </template>
     </async-state>
@@ -95,6 +127,7 @@
 import AbbrText from '~/components/common/AbbrText.vue'
 import { computed, useId } from 'vue'
 import { OrigamBracket } from 'origam/components'
+import BrandMark from '~/components/common/BrandMark.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import CommonPlayerLink from '~/components/common/PlayerLink.vue'
 import { useT } from '~/composables/useT'
@@ -120,6 +153,7 @@ const props = withDefaults(defineProps<IEditionBracketProps>(), {})
 const emits = defineEmits<{}>()
 defineSlots<{}>()
 const baseId = useId()
+const championTitleId = `${baseId}-champion`
 const title = computed(() => t('edition.bracket_title', 'Tableau'))
 const regionLabel = computed(() => t('edition.bracket_region', 'Tableau à élimination directe, défilement horizontal'))
 const note = computed(() => t('edition.bracket_note', 'Phase finale en deux bières : le vainqueur marque 10 (RG21-RG22). Les affiches sont tirées au début de chaque tour (RG13).'))
@@ -129,6 +163,10 @@ const isEmpty = computed(() => props.rounds.length === 0)
 const emptyTitle: ITranslatableText = { key: 'edition.bracket_empty_title', fallback: 'Aucun tour tiré' }
 const emptyDescription: ITranslatableText = { key: 'edition.bracket_empty_text', fallback: 'Les affiches de chaque tour sont tirées au début du tour (RG13) : le tableau s’affiche tour après tour.' }
 const roundTitle = (kind: IEditionBracketProps['rounds'][number]['kind']): string => t(ROUND_LABELS[kind].key, ROUND_LABELS[kind].label)
+// Champion : vainqueur de la finale ; la colonne « Vainqueur » n'existe que s'il y en a un (F-57).
+const champion = computed(() => props.rounds
+  .find(round => round.kind === ROUND_KIND.FINAL)?.matches[0]?.sides.find(side => side.isWinner)?.competitor ?? null)
+const winnerListText = computed(() => t('edition.bracket_winner_list', 'Vainqueur : {name}', { name: champion.value?.displayName ?? '' }))
 const bracketRounds = computed(() => props.rounds.map(round => ({
   id: round.kind,
   title: roundTitle(round.kind),
@@ -203,6 +241,47 @@ defineExpose({})
     white-space: nowrap;
   }
 
+  // Bloc « Vainqueur » (F-57), à part du bracket : à droite et étiré sur grand écran, sous le bracket sinon (container query sur la section).
+  container-type: inline-size;
+
+  // Ambre sur le champion seul : avec un vainqueur, la finale reprend l'aspect des autres cartes (sans vainqueur, elle garde son ambre).
+  &__region--champion {
+    --origam-bracket-match--final---border-color: var(--origam-color__border---default);
+    --origam-bracket-match--final---box-shadow: none;
+  }
+
+  &__layout {
+    display: grid;
+    gap: var(--origam-space---5);
+  }
+
+  &__champion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--origam-space---4);
+    padding: var(--origam-space---8) var(--origam-space---5);
+    text-align: center;
+    border: 1px solid var(--origam-color__bar---amber);
+    border-radius: var(--origam-radius---xl);
+    background: var(--origam-color__action--primary---bgSubtle);
+    box-shadow: var(--origam-shadow---lg);
+  }
+
+  &__champion-title {
+    margin: 0;
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wider);
+    text-transform: uppercase;
+    color: var(--origam-color__text---tertiary);
+  }
+
+  &__logo {
+    --brand-mark---size: var(--origam-space---20);
+  }
+
   &__score {
     font-variant-numeric: tabular-nums;
   }
@@ -234,6 +313,22 @@ defineExpose({})
   &__matches {
     margin: 0;
     padding-left: var(--origam-space---5);
+  }
+}
+
+// Le bloc n'est à droite que si le bracket ENTIER (jamais tronqué) et 16 rem de bloc tiennent dans la section. Largeur du bracket Origam
+// d'après le thème CCC, mesurée : marges 2 × 1,25 rem, cartes de 15 rem, écart de 3 rem entre tours (`--origam-bracket---round-gap`).
+$bracket-padding: 2.5rem;
+$round-width: 15rem;
+$round-gap: 3rem;
+$layout-gap: 1.25rem;
+$champion-min: 16rem;
+
+@for $rounds from 1 through 6 {
+  @container (min-width: #{$bracket-padding + $round-width * $rounds + $round-gap * ($rounds - 1) + $layout-gap + $champion-min}) {
+    .edition-bracket__layout[data-rounds='#{$rounds}'] {
+      grid-template-columns: minmax(0, max-content) minmax($champion-min, 1fr);
+    }
   }
 }
 </style>

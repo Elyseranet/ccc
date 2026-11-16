@@ -131,3 +131,42 @@ for (const viewport of VIEWPORTS) {
     })
   })
 }
+
+/**
+ * F-57 : bloc « Vainqueur », à part du bracket. Il n'est à droite que si le bracket ENTIER (jamais tronqué) et 16 rem de bloc tiennent : édition à
+ * quarts (3 tours, 2014) à 1440 ; édition à huitièmes (4 tours, 2025) : dessous à 1440, 1024 et 390. Référence Playwright de la section entière.
+ * Aucun défilement horizontal de la page.
+ */
+const WINNER_CASES = [
+  { code: '2014', width: 1440, right: true, name: 'quarts-1440' },
+  { code: EDITION_CODE, width: 1440, right: false, name: '1440' },
+  { code: EDITION_CODE, width: 1024, right: false, name: '1024' },
+  { code: EDITION_CODE, width: 390, right: false, name: '390' }
+]
+for (const { code, width, right, name } of WINNER_CASES) {
+  test(`bracket, bloc Vainqueur ${name} (édition ${code})`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width, height: 900 } })
+    const page = await context.newPage()
+    await page.goto(`/editions/${code}`)
+    await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
+    await page.getByTestId('edition-tab-bracket').click()
+    const winner = page.getByTestId('edition-bracket-winner')
+    await expect(winner).toBeVisible()
+    await page.addStyleTag({ content: '.public-shell__header, .edition-page__tabs { position: static !important; } .public-shell::before { display: none !important; }' })
+    await page.mouse.move(0, 0)
+    await settle(page)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+    const region = page.getByTestId('edition-bracket-region')
+    const [bracket, block] = await Promise.all([region.boundingBox(), winner.boundingBox()])
+    if (right) {
+      expect(block!.x).toBeGreaterThanOrEqual(bracket!.x + bracket!.width)
+      expect(block!.width).toBeGreaterThanOrEqual(256)
+      // Le bracket n'est jamais tronqué par le bloc : sa région ne défile pas.
+      expect(await region.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
+    } else {
+      expect(block!.y).toBeGreaterThanOrEqual(bracket!.y + bracket!.height - 1)
+    }
+    await expect(page.getByTestId('edition-bracket')).toHaveScreenshot(`bracket-winner-${name}.png`, { animations: 'disabled' })
+    await context.close()
+  })
+}
