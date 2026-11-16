@@ -25,7 +25,11 @@
         <origam-btn
           v-if="canRestart"
           variant="text"
+          color="primary"
           size="small"
+          font-size="sm"
+          padding-inline="4"
+          class="draw-random-band__restart"
           aria-haspopup="dialog"
           :text="restartLabel"
           data-cy="draw-restart-open"
@@ -168,6 +172,10 @@ defineExpose({})
   }
 
   // Gabarit de la maquette (`.btn` : 24 px de chaque côté, 8 px entre la capsule et le libellé) ; doublé pour passer devant le calcul de rembourrage d'origam-btn.
+  &__restart#{&}__restart {
+    min-height: var(--origam-space---11);
+  }
+
   &__draw#{&}__draw {
     min-height: var(--origam-space---12);
     padding-inline: var(--origam-space---6);
