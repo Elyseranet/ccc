@@ -244,6 +244,10 @@ defineExpose({})
     justify-self: start;
   }
 
+  &__archived {
+    margin-block-end: var(--dashboard__archived---margin-end, var(--origam-space---5));
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -285,5 +289,6 @@ defineExpose({})
 <style>
 :root {
   --dashboard__badge---margin-start: calc(var(--origam-space---1) + var(--origam-space---2));
+  --dashboard__archived---margin-end: var(--origam-space---5);
 }
 </style>
