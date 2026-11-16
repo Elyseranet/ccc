@@ -1626,7 +1626,7 @@
   "admin.random_draw.projector_brand": "CCC {year}",
   "admin.random_draw.projector_title_round": "Draw {round}",
   "admin.random_draw.final_title": "The final",
-  "admin.random_draw.final_lead": "One click draws the pairing between the two finalists, creates the final match and shows it full screen, for the room.",
+  "admin.random_draw.final_lead": "One click presents both finalists to the room and creates the final match.",
   "admin.random_draw.launch_final": "Launch the final",
   "admin.random_draw.projector_step_final": "Final",
   "admin.random_draw.projector_announce_final": "Final: {first} against {second}.",

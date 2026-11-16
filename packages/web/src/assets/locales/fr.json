@@ -1626,7 +1626,7 @@
   "admin.random_draw.projector_brand": "CCC {year}",
   "admin.random_draw.projector_title_round": "Tirage {round}",
   "admin.random_draw.final_title": "La finale",
-  "admin.random_draw.final_lead": "Un clic tire l’affiche entre les deux finalistes, crée le match de finale et l’affiche en grand, pour la salle.",
+  "admin.random_draw.final_lead": "Un clic présente les deux finalistes à la salle et crée le match de la finale.",
   "admin.random_draw.launch_final": "Lancer la finale",
   "admin.random_draw.projector_step_final": "Finale",
   "admin.random_draw.projector_announce_final": "Finale : {first} contre {second}.",

@@ -95,7 +95,7 @@ const title = computed(() => {
 })
 const lead = computed(() => {
   if (props.final) {
-    return t('admin.random_draw.final_lead', 'Un clic tire l’affiche entre les deux finalistes, crée le match de finale et l’affiche en grand, pour la salle.')
+    return t('admin.random_draw.final_lead', 'Un clic présente les deux finalistes à la salle et crée le match de la finale.')
   }
   if (props.complete) {
     return isPool.value
