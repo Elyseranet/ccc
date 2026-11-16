@@ -37,6 +37,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-24](B-24.md) | Correction d'un match de poule refusée après un départage, suppression d'un départage non joué (F-18, F-44) | — | B-13, B-23 | — | **Fermé** (2026-11-14) @ `c044f472` |
 | [B-25](B-25.md) | Rouvrir les qualifications tant que le tirage du premier tour n'est pas validé (F-51) | — | B-13 | — | **Fermé** (2026-11-16) @ `279a681b`, vérifié sur dev |
 | [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | **Fermé** (2026-11-16) @ `ca1795d0`, vérifié sur dev |
+| [B-27](B-27.md) | Tour suivant impossible à tirer après des quarts validés (bloquant) | — | B-26 | — | Ouvert (2026-11-16) |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -270,6 +271,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-52](F-52.md) | Bouton « Tirer au sort » et écran projecteur (VS), pas à pas | maquette validée 2026-11-16 (`9e492a6c`) | B-26 | **Fermé** (2026-11-16) @ `07641649`, vérifié sur dev | — |
 | [F-53](F-53.md) | Boîtes de confirmation : focus non rendu au déclencheur après Échap | — | F-24, F-51 | Ouvert (2026-11-16) | — |
 | [F-54](F-54.md) | e2e F-09-draw instable (« Les inscriptions sont closes ») | — | F-09, F-50 | Ouvert (2026-11-16) | — |
+| [F-55](F-55.md) | « Phase finale » ouvre l'étape en cours | — | F-24, F-25 | Ouvert (2026-11-16) | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
