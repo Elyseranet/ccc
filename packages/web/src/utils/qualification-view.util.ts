@@ -1,9 +1,13 @@
-import { QUALIFICATION_BEST_NEXT_MAX, QUALIFICATION_TOP_PER_POOL_MAX } from '../consts/qualification.const.js'
+import { QUALIFICATION_BEST_NEXT_MAX, QUALIFICATION_TOP_PER_POOL_MAX, ROUND_KIND_BY_POOL_SIZE } from '../consts/qualification.const.js'
 import { OPEN_TIEBREAK_STATUSES, QUALIFICATION_INTEGER_PATTERN, QUALIFICATION_PERCENT_BASE } from '../consts/qualification-view.const.js'
+import { DRAW_STATUS } from '../enums/draw.enum.js'
+import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import { POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
 import { TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
-import { QUALIFICATION_BLOCKER, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_STEP } from '../enums/qualification.enum.js'
+import { QUALIFICATION_BLOCKER, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_REOPEN_BLOCKER, QUALIFICATION_STEP } from '../enums/qualification.enum.js'
+import { ROUND_KIND } from '../enums/round.enum.js'
+import type { IAdminDraw } from '../interfaces/draw.interface.js'
 import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
 import type {
   IQualificationBounds,
@@ -11,11 +15,13 @@ import type {
   IQualificationInputs,
   IQualificationPrerequisites,
   IQualificationRankTable,
+  IQualificationReopenDraft,
   IQualificationStepView,
   IQualificationTieView,
   IQualifiedRow
 } from '../interfaces/qualification-view.interface.js'
 import type { IQualificationParameters, IQualificationStatus } from '../interfaces/qualification.interface.js'
+import { latestRoundDraw } from './round-draw.util.js'
 
 /*********************************************************
  * Qualification : ce que la page affiche (F-24)
@@ -194,4 +200,29 @@ export const stepsOf = (status: IQualificationStatus, check: IQualificationInput
     step,
     state: done[index] ? POOL_DRAW_STEP_STATE.DONE : index === activeIndex ? POOL_DRAW_STEP_STATE.ACTIVE : POOL_DRAW_STEP_STATE.PENDING
   }))
+}
+
+/** Premier tour de phase finale d'une liste arrêtée : les barrages avec `withPlayoff`, sinon le tour déduit de la taille du vivier (RG13) ; `null` quand il se choisit au tirage. */
+export const firstRoundKindOf = (status: IQualificationStatus): ROUND_KIND | null => {
+  if (status.parameters?.withPlayoff) {
+    return ROUND_KIND.PLAYOFF
+  }
+  return ROUND_KIND_BY_POOL_SIZE[status.qualified?.length ?? 0] ?? null
+}
+
+/** Pourquoi « Rouvrir les qualifications » est inactif : le tirage du premier tour est validé (l'édition passe à `PLAYOFFS`, B-25) ou l'édition est clôturée ; sinon `null`. */
+export const reopenBlockerOf = (editionStatus: EDITION_STATUS | null): QUALIFICATION_REOPEN_BLOCKER | null => {
+  if (editionStatus === EDITION_STATUS.PLAYOFFS) {
+    return QUALIFICATION_REOPEN_BLOCKER.LOCKED
+  }
+  return editionStatus === EDITION_STATUS.CLOSED ? QUALIFICATION_REOPEN_BLOCKER.CLOSED : null
+}
+
+/** Le brouillon de tirage de tour que la réouverture effacerait : celui du dernier tirage de tour, s'il est encore un brouillon ; son nombre d'affiches compte les numéros d'affiche distincts. */
+export const reopenDraftOf = (draws: IAdminDraw[]): IQualificationReopenDraft | null => {
+  const draw = latestRoundDraw(draws)
+  if (draw === null || draw.status !== DRAW_STATUS.DRAFT) {
+    return null
+  }
+  return { roundKind: draw.roundKind, pairingCount: new Set(draw.assignments.map(assignment => assignment.pairingIndex)).size }
 }

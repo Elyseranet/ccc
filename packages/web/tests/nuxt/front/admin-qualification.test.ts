@@ -8,11 +8,14 @@ import { ROUTES } from '../../../src/consts/routes.const'
 import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { MATCH_STATUS } from '../../../src/enums/match.enum'
+import { ROUND_KIND } from '../../../src/enums/round.enum'
 import type { IEditionSummary } from '../../../src/interfaces/edition.interface'
+import type { IAdminDraw } from '../../../src/interfaces/draw.interface'
 import type { IQualificationStatus } from '../../../src/interfaces/qualification.interface'
 import QualificationPage from '../../../src/pages/admin/phase-finale/qualification.vue'
 import { TIEBREAK_FORMAT } from '../../../src/enums/domain.enum'
 import { boundaryTie, buildQualificationStatus,member, pairTie, qualifiedEntry, tiebreakMatch } from '../../helpers/qualification'
+import { draftOf } from '../../helpers/round-draw'
 
 const edition = (status: EDITION_STATUS): IEditionSummary => ({
   id: 'e1', code: '2026', year: 2026, name: null, heldOn: null, location: null, status, origin: EDITION_ORIGIN.APP,
@@ -23,10 +26,14 @@ let editions: IEditionSummary[] = [edition(EDITION_STATUS.POOLS_PLAYING)]
 let current: IQualificationStatus = buildQualificationStatus()
 let finalizeFailure: { statusCode: number, code: API_ERROR_CODE } | null = null
 let deleteFailure: { statusCode: number, code: API_ERROR_CODE } | null = null
+let reopenFailure: { statusCode: number, code: API_ERROR_CODE } | null = null
+let drafts: IAdminDraw[] = []
 const reads = vi.fn()
 const finalizations = vi.fn()
 const tiebreaks = vi.fn()
 const deletions = vi.fn()
+const reopens = vi.fn()
+const draftReads = vi.fn()
 
 registerEndpoint('/api/v1/editions', defineEventHandler(() => editions))
 registerEndpoint('/api/v1/admin/editions/e1/qualification', defineEventHandler((event) => {
@@ -42,6 +49,20 @@ registerEndpoint('/api/v1/editions/e1/qualification', { method: 'POST', handler:
   current = buildQualificationStatus({ listFinalized: true, parameters: { topPerPool: 2, bestNextCount: 0, withPlayoff: false }, qualified: [] })
   return { parameters: current.parameters, editionStatus: EDITION_STATUS.QUALIFIED, qualified: [], eliminatedCount: 0, replayed: false }
 }) })
+registerEndpoint('/api/v1/editions/e1/qualification', { method: 'DELETE', handler: defineEventHandler((event) => {
+  reopens()
+  if (reopenFailure) {
+    setResponseStatus(event, reopenFailure.statusCode)
+    return { statusCode: reopenFailure.statusCode, code: reopenFailure.code, message: 'x' }
+  }
+  current = buildQualificationStatus()
+  editions = [edition(EDITION_STATUS.POOLS_DRAWN)]
+  return current
+}) })
+registerEndpoint('/api/v1/admin/editions/e1/tirages', defineEventHandler(() => {
+  draftReads()
+  return drafts
+}))
 registerEndpoint('/api/v1/editions/e1/departages', { method: 'POST', handler: defineEventHandler(async (event) => {
   tiebreaks(await readBody(event))
   setResponseStatus(event, 201)
@@ -88,6 +109,10 @@ beforeEach(() => {
   current = buildQualificationStatus()
   finalizeFailure = null
   deleteFailure = null
+  reopenFailure = null
+  drafts = []
+  reopens.mockClear()
+  draftReads.mockClear()
   deletions.mockClear()
   reads.mockClear()
   finalizations.mockClear()
@@ -305,5 +330,111 @@ describe('page « Qualification » (F-24)', () => {
     current = buildQualificationStatus({ pools: [] })
     const wrapper = await mountPage()
     await vi.waitFor(() => expect(wrapper.text()).toContain('Aucune poule à qualifier'))
+  })
+})
+
+describe('« Rouvrir les qualifications » (F-51, B-25)', () => {
+  const finalizedEight = () => buildQualificationStatus({
+    listFinalized: true,
+    parameters: { topPerPool: 2, bestNextCount: 0, withPlayoff: false },
+    qualified: Array.from({ length: 8 }, (_, index) => qualifiedEntry(`q${index}`, `Joueur ${index}`, 'pool-1', 1))
+  })
+  const openDialog = async (wrapper: Awaited<ReturnType<typeof load>>) => {
+    await wrapper.get('[data-cy="qualification-reopen-open"]').trigger('click')
+    await vi.waitFor(() => expect(body().querySelector('[data-cy="qualification-reopen-dialog"]')).not.toBeNull())
+    return body().querySelector('[data-cy="qualification-reopen-dialog"]')!
+  }
+
+  beforeEach(() => {
+    editions = [edition(EDITION_STATUS.QUALIFIED)]
+    current = finalizedEight()
+  })
+
+  it('liste arrêtée (QUALIFIED) : bouton actif, raison « possible tant que le tirage des quarts n’est pas validé », liste et chip conservés', async () => {
+    const wrapper = await load()
+    expect(wrapper.get('[data-cy="qualification-reopen-open"]').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('[data-cy="qualification-reopen-open"]').attributes('aria-haspopup')).toBe('dialog')
+    expect(wrapper.get('[data-cy="qualification-reopen-why"]').text()).toBe('Possible tant que le tirage des quarts n’est pas validé.')
+    expect(wrapper.get('[data-cy="qualification-finalize-count"]').text()).toBe('8 qualifiés')
+    expect(wrapper.get('[data-cy="qualification-finalize-summary"]').text()).toBe('2 premiers par poule, 0 meilleurs (n+1)es, sans barrages.')
+    expect(wrapper.find('[data-cy="qualification-finalize-open"]').exists()).toBe(false)
+  })
+
+  it('pas de bouton tant que la liste n’est pas arrêtée', async () => {
+    current = buildQualificationStatus()
+    editions = [edition(EDITION_STATUS.POOLS_PLAYING)]
+    const wrapper = await load()
+    expect(wrapper.find('[data-cy="qualification-reopen"]').exists()).toBe(false)
+  })
+
+  it('tirage du premier tour validé (PLAYOFFS) : bouton inactif avec sa raison', async () => {
+    editions = [edition(EDITION_STATUS.PLAYOFFS)]
+    const wrapper = await load()
+    expect(wrapper.get('[data-cy="qualification-reopen-open"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-cy="qualification-reopen-why"]').text()).toBe('Indisponible : le tirage des quarts est validé.')
+  })
+
+  it('édition clôturée : bouton inactif, raison « clôturée »', async () => {
+    editions = [edition(EDITION_STATUS.CLOSED)]
+    const wrapper = await load()
+    expect(wrapper.get('[data-cy="qualification-reopen-open"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-cy="qualification-reopen-why"]').text()).toBe('Indisponible : l’édition est clôturée.')
+  })
+
+  it('sans brouillon : confirmation « il faudra arrêter la liste à nouveau », une seule lecture des tirages ; Annuler n’écrit rien', async () => {
+    const wrapper = await load()
+    const dialog = await openDialog(wrapper)
+    expect(draftReads).toHaveBeenCalledTimes(1)
+    expect(dialog.textContent).toContain('La liste des 8 qualifiés est annulée')
+    expect(dialog.textContent).toContain('Il faudra arrêter la liste à nouveau avant le tirage des quarts.')
+    expect(dialog.textContent).not.toContain('brouillon')
+    expect(body().querySelector('[data-cy="qualification-reopen-confirm"]')!.textContent).toContain('Rouvrir les qualifications')
+    body().querySelector<HTMLButtonElement>('[data-cy="qualification-reopen-cancel"]')!.click()
+    await flushPromises()
+    expect(reopens).not.toHaveBeenCalled()
+  })
+
+  it('confirmer : DELETE, retour à la saisie des paramètres (champs actifs, plus de bouton « Rouvrir »), snackbar de succès', async () => {
+    const wrapper = await load()
+    await openDialog(wrapper)
+    body().querySelector<HTMLButtonElement>('[data-cy="qualification-reopen-confirm"]')!.click()
+    await vi.waitFor(() => expect(reopens).toHaveBeenCalledTimes(1))
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="qualification-finalized"]').exists()).toBe(false))
+    expect(wrapper.find('[data-cy="qualification-reopen"]').exists()).toBe(false)
+    expect(wrapper.get('[data-cy="qualification-top-per-pool"] input').attributes('disabled')).toBeUndefined()
+    await vi.waitFor(() => expect(body().querySelector('[data-cy="qualification-reopened-snackbar"]')?.textContent).toContain('Qualifications rouvertes : ajustez les paramètres puis arrêtez la liste'))
+  })
+
+  it('avec un brouillon de tirage : tour réel du brouillon et nombre d’affiches en gras, bouton danger « Rouvrir et effacer le brouillon »', async () => {
+    drafts = [draftOf([['a', 1, 1, 1], ['b', 1, 2, 2], ['c', 2, 1, 3], ['d', 2, 2, 4]], { roundKind: ROUND_KIND.SEMI })]
+    const wrapper = await load()
+    const dialog = await openDialog(wrapper)
+    expect(dialog.querySelector('[data-cy="qualification-reopen-draft"] strong')!.textContent).toBe('Le brouillon du tirage des demi-finales sera effacé')
+    expect(dialog.querySelector('[data-cy="qualification-reopen-draft"]')!.textContent).toContain('(2 affiches saisies) et ne pourra pas être récupéré.')
+    expect(dialog.textContent).not.toContain('Il faudra arrêter la liste à nouveau')
+    expect(body().querySelector('[data-cy="qualification-reopen-confirm"]')!.textContent).toContain('Rouvrir et effacer le brouillon')
+  })
+
+  it('409 QUALIFICATION_LOCKED (tirage validé entre-temps) : message avec le tour, « Recharger », la liste reste arrêtée (la fermeture de la boîte se vérifie en e2e)', async () => {
+    reopenFailure = { statusCode: 409, code: API_ERROR_CODE.QUALIFICATION_LOCKED }
+    const wrapper = await load()
+    await openDialog(wrapper)
+    body().querySelector<HTMLButtonElement>('[data-cy="qualification-reopen-confirm"]')!.click()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="qualification-failure"]').exists()).toBe(true))
+    expect(wrapper.get('[data-cy="qualification-failure"]').text()).toContain('Le tirage des quarts a été validé entre-temps : les qualifications ne peuvent plus être rouvertes.')
+    expect(wrapper.find('[data-cy="qualification-reload"]').exists()).toBe(true)
+    expect(wrapper.find('[data-cy="qualification-finalized"]').exists()).toBe(true)
+  })
+
+  it('« Recharger » relit aussi les éditions : après un tirage validé, le bouton devient inactif avec sa raison', async () => {
+    reopenFailure = { statusCode: 409, code: API_ERROR_CODE.QUALIFICATION_LOCKED }
+    const wrapper = await load()
+    await openDialog(wrapper)
+    body().querySelector<HTMLButtonElement>('[data-cy="qualification-reopen-confirm"]')!.click()
+    await vi.waitFor(() => expect(wrapper.find('[data-cy="qualification-reload"]').exists()).toBe(true))
+    editions = [edition(EDITION_STATUS.PLAYOFFS)]
+    await wrapper.get('[data-cy="qualification-reload"]').trigger('click')
+    await vi.waitFor(() => expect(wrapper.get('[data-cy="qualification-reopen-open"]').attributes('disabled')).toBeDefined())
+    expect(wrapper.find('[data-cy="qualification-failure"]').exists()).toBe(false)
   })
 })

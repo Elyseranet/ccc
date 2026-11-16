@@ -16,7 +16,21 @@
         >
           {{ title }}
         </h2>
+        <edition-chip
+          v-if="finalized"
+          :family="chipFamily"
+          :text="chipText"
+          class="qualification-finalize__count"
+          data-cy="qualification-finalize-count"
+        />
       </header>
+      <p
+        v-if="finalized && summary"
+        class="qualification-finalize__summary"
+        data-cy="qualification-finalize-summary"
+      >
+        {{ summary }}
+      </p>
       <div
         v-if="hasRows"
         class="qualification-finalize__scroll"
@@ -48,8 +62,12 @@
       >
         {{ emptyText }}
       </p>
+      <slot
+        v-if="finalized"
+        name="finalized-action"
+      />
       <div
-        v-if="!finalized"
+        v-else
         class="qualification-finalize__action"
       >
         <origam-btn
@@ -119,11 +137,26 @@ import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~
 const { t } = useT()
 const props = withDefaults(defineProps<IQualificationFinalizeProps>(), {})
 const emits = defineEmits<IQualificationFinalizeEmits>()
-defineSlots<{}>()
+defineSlots<{ 'finalized-action'?: () => unknown }>()
 const titleId = useId()
 const dialogOpen = ref(false)
 const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
-const title = computed(() => t('admin.qualification.finalize_title', '4 · Arrêter la liste des qualifiés'))
+const title = computed(() => props.finalized
+  ? t('admin.qualification.finalized_card_title', '4 · Liste des qualifiés arrêtée')
+  : t('admin.qualification.finalize_title', '4 · Arrêter la liste des qualifiés'))
+const chipFamily = EDITION_CHIP_FAMILY.TINTED_SUCCESS
+const chipText = computed(() => props.qualifiedCount === 1
+  ? t('admin.qualification.finalized_count_one', '1 qualifié')
+  : t('admin.qualification.finalized_count_other', '{count} qualifiés', { count: props.qualifiedCount }))
+const summary = computed(() => {
+  if (!props.parameters) {
+    return ''
+  }
+  const params = { top: props.parameters.topPerPool, best: props.parameters.bestNextCount }
+  return props.parameters.withPlayoff
+    ? t('admin.qualification.finalized_card_summary_playoff', '{top} premiers par poule, {best} meilleurs (n+1)es, avec barrages.', params)
+    : t('admin.qualification.finalized_card_summary', '{top} premiers par poule, {best} meilleurs (n+1)es, sans barrages.', params)
+})
 const caption = computed(() => t('admin.qualification.finalize_caption', 'Aperçu des qualifiés'))
 const emptyText = computed(() => t('admin.qualification.finalize_empty', 'L’aperçu apparaît quand plus aucune égalité ne bloque.'))
 const buttonLabel = computed(() => t('admin.qualification.finalize_button', 'Arrêter la liste…'))
@@ -190,7 +223,20 @@ defineExpose({})
   margin-top: var(--qualification-finalize---margin-top, var(--origam-space---6));
 
   &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---3);
     margin-bottom: var(--origam-space---4);
+  }
+
+  &__count {
+    flex: none;
+  }
+
+  &__summary {
+    margin: 0 0 var(--origam-space---4);
+    color: var(--origam-color__text---secondary);
   }
 
   &__title {
