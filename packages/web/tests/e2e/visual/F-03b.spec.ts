@@ -138,12 +138,13 @@ for (const viewport of VIEWPORTS) {
  * Aucun défilement horizontal de la page.
  */
 const WINNER_CASES = [
-  { code: '2014', width: 1440, right: true, name: 'quarts-1440' },
-  { code: EDITION_CODE, width: 1440, right: false, name: '1440' },
-  { code: EDITION_CODE, width: 1024, right: false, name: '1024' },
-  { code: EDITION_CODE, width: 390, right: false, name: '390' }
+  { code: '2014', width: 1440, right: true, name: 'quarts-1440', stacked: false },
+  { code: EDITION_CODE, width: 1440, right: false, name: '1440', stacked: false },
+  { code: EDITION_CODE, width: 1024, right: false, name: '1024', stacked: false },
+  { code: EDITION_CODE, width: 760, right: false, name: '760', stacked: true },
+  { code: EDITION_CODE, width: 390, right: false, name: '390', stacked: true }
 ]
-for (const { code, width, right, name } of WINNER_CASES) {
+for (const { code, width, right, name, stacked } of WINNER_CASES) {
   test(`bracket, bloc Vainqueur ${name} (édition ${code})`, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width, height: 900 } })
     const page = await context.newPage()
@@ -165,6 +166,15 @@ for (const { code, width, right, name } of WINNER_CASES) {
       expect(await region.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
     } else {
       expect(block!.y).toBeGreaterThanOrEqual(bracket!.y + bracket!.height - 1)
+    }
+    // F-58 : sous le seuil, les tours sont empilés (aucun défilement de la région, tour suivant sous le précédent) ; au-dessus, côte à côte comme avant.
+    const rounds = await region.locator('h3').evaluateAll(titles => titles.map(title => title.getBoundingClientRect()))
+    expect(rounds.length).toBeGreaterThan(1)
+    if (stacked) {
+      expect(await region.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
+      expect(rounds[1]!.y).toBeGreaterThan(rounds[0]!.y)
+    } else {
+      expect(rounds[1]!.y).toBe(rounds[0]!.y)
     }
     await expect(page.getByTestId('edition-bracket')).toHaveScreenshot(`bracket-winner-${name}.png`, { animations: 'disabled' })
     await context.close()

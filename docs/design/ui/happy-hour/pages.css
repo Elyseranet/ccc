@@ -176,6 +176,8 @@
 .bk__cols { display: grid; grid-template-columns: repeat(4, minmax(13rem, 1fr)); gap: var(--origam-space---8); min-width: 60rem; }
 .bk__col { display: grid; grid-template-rows: auto 1fr; gap: var(--origam-space---3); }
 .bk__list { display: flex; flex-direction: column; justify-content: space-around; gap: var(--origam-space---3); }
+/* F-58 : sous 48 rem, les tours s'empilent (sections titrées, affiches en liste verticale), sans défilement ; le bloc Vainqueur reste dessous. */
+@container (width < 48rem) { .bk-lay .bk { overflow-x: visible; } .bk__cols { grid-template-columns: minmax(0, 1fr); min-width: 0; } .bk__list { justify-content: flex-start; } }
 .bm { position: relative; border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---md); background: var(--origam-color__surface---sunken); }
 /* Pas de traits de liaison : les affiches sont re-tirées à chaque tour (RG13), il n'y a pas d'arbre fixe. */
 .bm__p { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--origam-space---2); align-items: center; min-height: var(--origam-space---10); padding-inline: var(--origam-space---3); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---secondary); }
