@@ -18,10 +18,10 @@ Le dépôt est un monorepo npm workspaces : la racine (`ccc`) ne porte que des s
 
 ```sh
 npm ci
-cp .env.example packages/web/.env
+cp .env.example .env
 ```
 
-Renseigner `NUXT_DATABASE_PASSWORD` dans `packages/web/.env`. Ne jamais committer ce fichier.
+Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`, à la racine du dépôt. Ne jamais committer ce fichier. Les scripts du package qui en ont besoin le chargent explicitement : `npm run dev` (`nuxt dev --dotenv ../../.env`) et les scripts `db:migration:*`, `user:*`, `db:seed:archives` (`DOTENV_CONFIG_PATH=../../.env`). Un `.env` absent ne fait échouer aucun script (CI, image Docker).
 
 ## Docker
 
