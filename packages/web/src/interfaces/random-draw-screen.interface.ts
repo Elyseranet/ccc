@@ -13,6 +13,8 @@ export interface IDrawProjectorView {
   /** Rang de l'étape (joueur tiré ou affiche) et nombre d'étapes du tirage, pour le compteur « Affiche 4 / 8 ». */
   position: number
   total: number
+  /** Finale lancée d'un clic (F-56) : le compteur dit « Finale » au lieu de « Affiche 1 / 1 ». */
+  final?: boolean
 }
 
 /** Ce que le brouillon rend à l'élément qui vient d'être tiré (surbrillance au retour de la projection). */
@@ -41,6 +43,8 @@ export interface IRandomDrawOptions {
   notifyError: (message: ITranslatableText) => void
   randomDraw: (drawId: string) => Promise<IRandomDrawResult>
   saveAssignments: (drawId: string, body: { assignments: IDrawAssignmentInput[] }) => Promise<IAdminDraw>
+  /** Validation existante du tirage (F-56) : « Lancer la finale » la suit sans passer par le récapitulatif. Rend `false` si elle échoue (le message est déjà posé). */
+  validate?: () => Promise<boolean>
 }
 
 export interface IDrawRandomBandProps {
@@ -56,6 +60,8 @@ export interface IDrawRandomBandProps {
   started: boolean
   /** Écran en lecture seule : pas de tirage. */
   disabled: boolean
+  /** Finale (F-56) : un seul bouton « Lancer la finale », ni « Recommencer » ni état complet. */
+  final?: boolean
 }
 
 export interface IDrawProjectorProps {

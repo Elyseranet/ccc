@@ -27,6 +27,14 @@ export const toProjectorView = (kind: DRAW_KIND, result: IRandomDrawResult, tota
   return { kind, names: sides.map(side => side.displayName), poolNumber: null, pairingIndex, position: pairingIndex ?? 0, total }
 }
 
+/** Écran projecteur de la finale (F-56) : l'affiche unique du brouillon validé, côté 1 puis côté 2. */
+export const toFinalProjectorView = (draw: IAdminDraw): IDrawProjectorView => {
+  const sides = draw.assignments
+    .filter(assignment => assignment.pairingIndex === 1)
+    .sort((a, b) => (a.sidePosition ?? 0) - (b.sidePosition ?? 0))
+  return { kind: DRAW_KIND.ROUND, names: sides.map(side => side.displayName), poolNumber: null, pairingIndex: 1, position: 1, total: 1, final: true }
+}
+
 export const toArrival = (result: IRandomDrawResult): IDrawArrival => ({
   participationIds: result.step.assignments.map(assignment => assignment.participationId),
   poolNumber: result.step.assignments[0]?.poolNumber ?? null,

@@ -325,3 +325,27 @@ export const createFinalValidatedEdition = async (request: APIRequestContext, la
   }
   return { ...edition, status: 'PLAYOFFS' }
 }
+
+/*********************************************************
+ * Édition dont les demi-finales sont jouées (F-56)
+ *
+ * @description
+ * 2 poules de 2 jouées, 4 qualifiés (le tour déduit est les demies), tirage des demies par l'API réelle (affectations puis validation), les deux demies jouées 10-6 :
+ * le tour à tirer est alors la finale entre les deux vainqueurs, non tirée, prête pour « Lancer la finale ».
+ */
+export const createSemisPlayedEdition = async (request: APIRequestContext, label: string): Promise<IWriteEdition> => {
+  const { edition } = await createTiedPoolsEdition(request, label, 2)
+  await expectStatus(await request.post(`/api/v1/editions/${edition.id}/qualification`, { data: { topPerPool: 2, bestNextCount: 0, withPlayoff: false } }), 'POST qualification', STATUS_OK)
+  const preview = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/tirages/tour`), 'GET tirages/tour', STATUS_OK) as IRoundDrawPreviewResponse
+  const draft = await expectStatus(await request.post(`/api/v1/editions/${edition.id}/tirages/tour`, { data: {} }), 'POST tirages/tour', STATUS_CREATED) as IDrawResponse
+  const ids = preview.candidates.map(candidate => candidate.participationId)
+  await expectStatus(await request.put(`/api/v1/tirages/${draft.id}/affectations`, { data: { assignments: ids.map((participationId, index) => ({
+    participationId, pairingIndex: Math.floor(index / 2) + 1, sidePosition: (index % 2) + 1, drawnOrder: index + 1
+  })) } }), 'PUT affectations du tour', STATUS_OK)
+  await expectStatus(await request.post(`/api/v1/tirages/${draft.id}/validation`), 'POST validation du tour', STATUS_OK)
+  const matches = await expectStatus(await request.get(`/api/v1/admin/editions/${edition.id}/matchs`), 'GET matchs admin', STATUS_OK) as Array<IAdminMatchView & { status: string }>
+  for (const semi of matches.filter(match => match.status === 'SCHEDULED')) {
+    await playMatch(request, semi, FINAL_SCORES)
+  }
+  return { ...edition, status: 'PLAYOFFS' }
+}

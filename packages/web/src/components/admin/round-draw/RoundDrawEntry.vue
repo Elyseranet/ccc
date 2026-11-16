@@ -24,16 +24,18 @@
       :drawing="drawing"
       :started="started"
       :disabled="false"
+      :final="launchable"
       @draw="emits('draw')"
       @restart="emits('restart')"
     />
     <p
-      v-if="showBand && !complete"
+      v-if="showBand && !complete && !launchable"
       class="round-draw-entry__or"
     >
       {{ orLabel }}
     </p>
     <origam-progress
+      v-if="!launchable"
       :model-value="progress.percent"
       color="primary"
       :bg-color="trackColor"
@@ -43,7 +45,10 @@
       :aria-label="progressLabel"
       data-cy="round-draw-progress"
     />
-    <ol class="round-draw-entry__list">
+    <ol
+      v-if="!launchable"
+      class="round-draw-entry__list"
+    >
       <li
         v-for="item in items"
         :key="item.index"
@@ -145,7 +150,7 @@
       </li>
     </ol>
     <div
-      v-if="showBand && complete"
+      v-if="showBand && complete && !launchable"
       class="round-draw-entry__next"
     >
       <origam-btn
@@ -156,7 +161,10 @@
         data-cy="round-draw-recap-link"
       />
     </div>
-    <p class="round-draw-entry__note">
+    <p
+      v-if="!launchable"
+      class="round-draw-entry__note"
+    >
       {{ note }}
     </p>
   </section>
@@ -192,7 +200,8 @@ const { t } = useT()
 const props = withDefaults(defineProps<IRoundDrawEntryProps>(), {
   drawing: false,
   started: false,
-  arrival: null
+  arrival: null,
+  launchable: false
 })
 const emits = defineEmits<IRoundDrawEntryEmits>()
 defineSlots<{}>()

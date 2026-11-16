@@ -103,4 +103,54 @@ describe('useRandomDraw', () => {
     random.askRestart()
     expect(random.restartOpen.value).toBe(false)
   })
+
+  describe('launchFinal (F-56)', () => {
+    const finalists = (): IAdminDraw => draftOf(DRAW_KIND.ROUND, [
+      assignment({ participationId: 'b', displayName: 'Bob', pairingIndex: 1, sidePosition: 2, drawnOrder: 2 }),
+      assignment({ participationId: 'a', displayName: 'Alice', pairingIndex: 1, sidePosition: 1, drawnOrder: 1 })
+    ])
+
+    it('draws the single pairing, validates, then opens the projector on the two finalists in the order draw -> validate -> view', async () => {
+      const calls: string[] = []
+      const draw = finalists()
+      const { random, options } = setup(DRAW_KIND.ROUND, {
+        randomDraw: vi.fn(async () => { calls.push('randomDraw'); return { draw, step: { assignments: draw.assignments, remaining: 0 } } as IRandomDrawResult }),
+        validate: vi.fn(async () => { calls.push('validate'); return true })
+      })
+      expect(await random.launchFinal()).toBe(true)
+      expect(calls).toEqual(['randomDraw', 'validate'])
+      expect(options.apply).toHaveBeenCalledWith(draw)
+      expect(random.view.value).toMatchObject({ names: ['Alice', 'Bob'], final: true, position: 1, total: 1 })
+      expect(random.drawing.value).toBe(false)
+    })
+
+    it('skips the random draw when the draft already holds both finalists', async () => {
+      const complete = finalists()
+      const { random, options } = setup(DRAW_KIND.ROUND, { validate: vi.fn(async () => true) })
+      options.draft.value = complete
+      expect(await random.launchFinal()).toBe(true)
+      expect(options.randomDraw).not.toHaveBeenCalled()
+      expect(random.view.value?.names).toEqual(['Alice', 'Bob'])
+    })
+
+    it('keeps the projector closed and reports false when the validation fails, the draft staying applied', async () => {
+      const draw = finalists()
+      const { random, options } = setup(DRAW_KIND.ROUND, {
+        randomDraw: vi.fn(async () => ({ draw, step: { assignments: draw.assignments, remaining: 0 } }) as IRandomDrawResult),
+        validate: vi.fn(async () => false)
+      })
+      expect(await random.launchFinal()).toBe(false)
+      expect(options.apply).toHaveBeenCalledWith(draw)
+      expect(random.projectorOpen.value).toBe(false)
+      expect(random.drawing.value).toBe(false)
+    })
+
+    it('reports a random-draw failure without validating', async () => {
+      const validate = vi.fn(async () => true)
+      const { random, options } = setup(DRAW_KIND.ROUND, { randomDraw: vi.fn(async () => { throw apiError(API_ERROR_CODE.DRAW_INCONSISTENT) }), validate })
+      expect(await random.launchFinal()).toBe(false)
+      expect(validate).not.toHaveBeenCalled()
+      expect(options.notifyError).toHaveBeenCalledWith(expect.objectContaining({ key: 'admin.random_draw.errors.round_inconsistent' }))
+    })
+  })
 })

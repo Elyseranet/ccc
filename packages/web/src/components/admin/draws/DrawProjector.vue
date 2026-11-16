@@ -185,15 +185,21 @@ const rootClasses = computed(() => ({
 }))
 const firstName = computed(() => props.view.names[0] ?? '')
 const secondName = computed(() => props.view.names[1] ?? '')
-const counter = computed(() => (isPairing.value
-  ? t('admin.random_draw.projector_step_pairing', 'Affiche {position} / {total}', { position: props.view.position, total: props.view.total })
-  : t('admin.random_draw.projector_step_pool', 'Joueur {position} / {total}', { position: props.view.position, total: props.view.total })))
-const stageLabel = computed(() => (isPairing.value
-  ? t('admin.random_draw.projector_stage_pairing', 'Affiche {position}', { position: props.view.position })
-  : t('admin.random_draw.projector_stage_pool', 'Joueur {position}', { position: props.view.position })))
-const announcement = computed(() => (isPairing.value
-  ? t('admin.random_draw.projector_announce_pairing', 'Affiche {position} : {first} contre {second}.', { position: props.view.position, first: firstName.value, second: secondName.value })
-  : t('admin.random_draw.projector_announce_pool', '{name} rejoint la poule {pool}.', { name: firstName.value, pool: props.view.poolNumber ?? '' })))
+const counter = computed(() => (props.view.final
+  ? t('admin.random_draw.projector_step_final', 'Finale')
+  : isPairing.value
+    ? t('admin.random_draw.projector_step_pairing', 'Affiche {position} / {total}', { position: props.view.position, total: props.view.total })
+    : t('admin.random_draw.projector_step_pool', 'Joueur {position} / {total}', { position: props.view.position, total: props.view.total })))
+const stageLabel = computed(() => (props.view.final
+  ? t('admin.random_draw.projector_step_final', 'Finale')
+  : isPairing.value
+    ? t('admin.random_draw.projector_stage_pairing', 'Affiche {position}', { position: props.view.position })
+    : t('admin.random_draw.projector_stage_pool', 'Joueur {position}', { position: props.view.position })))
+const announcement = computed(() => (props.view.final
+  ? t('admin.random_draw.projector_announce_final', 'Finale : {first} contre {second}.', { first: firstName.value, second: secondName.value })
+  : isPairing.value
+    ? t('admin.random_draw.projector_announce_pairing', 'Affiche {position} : {first} contre {second}.', { position: props.view.position, first: firstName.value, second: secondName.value })
+    : t('admin.random_draw.projector_announce_pool', '{name} rejoint la poule {pool}.', { name: firstName.value, pool: props.view.poolNumber ?? '' })))
 const versusMark = computed(() => t('admin.random_draw.projector_versus_mark', 'VS'))
 const versusLabel = computed(() => t('admin.random_draw.projector_versus_label', 'contre'))
 const intoLabel = computed(() => t('admin.random_draw.projector_into', 'rejoint la'))

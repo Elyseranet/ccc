@@ -8,7 +8,7 @@ import { EDITION_STATUS } from '~/enums/edition.enum'
 import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
 import { ROUND_DRAW_VIEW } from '~/enums/round-draw.enum'
-import type { ROUND_KIND } from '~/enums/round.enum'
+import { ROUND_KIND } from '~/enums/round.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import type { IAdminDraw } from '~/interfaces/draw.interface'
 import type { IRoundDrawFeedback, IRoundDrawPairing } from '~/interfaces/round-draw.interface'
@@ -97,6 +97,7 @@ export const useRoundDraw = async () => {
   const feedback = ref<IRoundDrawFeedback | null>(null)
   const busy = ref(false)
   const stale = ref(false)
+  const finalFailed = ref(false)
 
   const notify = (status: FEEDBACK_STATUS, message: ITranslatableText) => {
     feedback.value = { status, message }
@@ -236,6 +237,7 @@ export const useRoundDraw = async () => {
 
   const reload = async () => {
     stale.value = false
+    finalFailed.value = false
     dismissFeedback()
     await refreshAll()
   }
@@ -274,9 +276,28 @@ export const useRoundDraw = async () => {
     fail,
     notifyError: message => notify(FEEDBACK_STATUS.ERROR, message),
     randomDraw: drawId => drawService.randomDraw(drawId),
-    saveAssignments: (drawId, body) => drawService.saveAssignments(drawId, body)
+    saveAssignments: (drawId, body) => drawService.saveAssignments(drawId, body),
+    validate
   })
   const drawStarted = computed(() => progress.value.placed > 0)
+
+  /*********************************************************
+   * Lancer la finale (F-56)
+   *
+   * @description
+   * Deux finalistes, une seule affiche : le bouton enchaîne le tirage au sort et la validation, sans récapitulatif. Un échec (tirage ou validation) rend l'écran de saisie complet
+   * avec le brouillon corrigeable ; « Recharger » ou un nouveau tour rend le bouton.
+   ********************************************************/
+  const launchable = computed(() => roundKind.value === ROUND_KIND.FINAL && !finalFailed.value && !isReadOnly.value)
+  const launchFinal = async (): Promise<boolean> => {
+    if (random.drawing.value) {
+      return false
+    }
+    finalFailed.value = false
+    const launched = await random.launchFinal()
+    finalFailed.value = !launched
+    return launched
+  }
 
   /*********************************************************
    * Lecture seule
@@ -287,7 +308,7 @@ export const useRoundDraw = async () => {
 
   return {
     edition, view, preview, rounds, roundKind, players, drawable, total, steps, draft, pairings, unplaced, progress, blocker, canValidate, recap, saveState,
-    feedback, busy, stale, isClosed, isReadOnly, pageError, pending, drawnRound, validatedDraw, random, drawStarted,
-    startRound, changeRound, place, change, retrySave, validate, reload, dismissFeedback
+    feedback, busy, stale, isClosed, isReadOnly, pageError, pending, drawnRound, validatedDraw, random, drawStarted, launchable,
+    startRound, changeRound, place, change, retrySave, validate, launchFinal, reload, dismissFeedback
   }
 }
