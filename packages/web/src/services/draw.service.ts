@@ -1,3 +1,4 @@
+import { Not } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
 import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import type {
@@ -16,7 +17,7 @@ import type { TUpdateDrawRequest } from '../types/draw.type.js'
 import type { IRankingEdition, IScoredParticipation, IStagedParticipation } from '../interfaces/ranking.interface.js'
 import { API_ERROR_MESSAGE } from '../consts/api-error.const.js'
 import { ADMIN_DRAW_RELATIONS, ASSIGNMENT_RELATIONS } from '../consts/draw.const.js'
-import { PARTICIPANT_EDITABLE_STATUSES } from '../consts/edition.const.js'
+import { MATCH_PUBLIC_RELATIONS, PARTICIPANT_EDITABLE_STATUSES } from '../consts/edition.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
@@ -43,6 +44,7 @@ import { BaseService } from './base.service.js'
 import { generateUuids } from '../utils/uuid.util.js'
 import { editionClosed, findEditionLocked, findEditionOrThrow, registrationClosed } from './edition.service.js'
 import { toQualificationMember } from './qualification.service.js'
+import { toPublicMatch } from '../utils/match-public.mapper.util.js'
 import { poolSizes } from '../utils/pool-size.util.js'
 
 /*********************************************************
@@ -460,12 +462,21 @@ const loadRoundDrawContext = async (manager: EntityManager, edition: EditionEnti
     relations: { competitor: true },
     order: { id: 'ASC' }
   })
-  const candidates = participations.filter((participation) => participation.status === PARTICIPATION_STATUS.QUALIFIED)
   const rounds = await manager.getRepository(RoundEntity).find({ where: { editionId: edition.id }, order: { sequence: 'ASC' } })
   const knockout = rounds.filter((round) => round.kind !== ROUND_KIND.POOLS)
   const matches = knockout.length === 0
     ? []
-    : await manager.getRepository(MatchEntity).find({ where: { editionId: edition.id }, select: { id: true, roundId: true, status: true } })
+    : await manager.getRepository(MatchEntity).find({
+      where: { editionId: edition.id, round: { kind: Not(ROUND_KIND.POOLS) } },
+      relations: MATCH_PUBLIC_RELATIONS
+    })
+  // Un perdant de phase finale ne revient pas au vivier : rien ne change son statut avant la clôture, il faut donc le déduire des matchs (B-27).
+  const eliminatedIds = new Set(matches.flatMap((match) => {
+    const { winnerParticipationId, sides } = toPublicMatch(match)
+    return winnerParticipationId === null ? [] : sides.filter((side) => side.participationId !== winnerParticipationId).map((side) => side.participationId)
+  }))
+  const candidates = participations.filter((participation) =>
+    participation.status === PARTICIPATION_STATUS.QUALIFIED && !eliminatedIds.has(participation.id))
   const plan = planRoundDraw({
     editionStatus: edition.status,
     qualification: edition.qualification,
