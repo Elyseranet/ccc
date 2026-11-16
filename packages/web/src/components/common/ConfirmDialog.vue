@@ -8,12 +8,13 @@
     :class="dialogClass"
     :title="title"
     role="alertdialog"
-    :aria-describedby="descriptionId"
+    :aria-describedby="hasText ? descriptionId : undefined"
     :data-cy="`${cyPrefix}-dialog`"
     @update:model-value="handleOpen"
   >
     <template #[textSlot]>
       <p
+        v-if="hasText"
         :id="descriptionId"
         class="confirm-dialog__text"
       >
@@ -75,6 +76,7 @@ const props = withDefaults(defineProps<IConfirmDialogProps>(), {
 const emits = defineEmits<IConfirmDialogEmits>()
 defineSlots<{ default?: () => unknown }>()
 const descriptionId = useId()
+const hasText = computed(() => Boolean(props.text || props.warning))
 const isBlocked = computed(() => props.busy)
 const { buttonColor, buttonElevation } = usePrimaryActionButton(isBlocked, { color: () => props.confirmColor, elevation: () => props.confirmElevation })
 const isMockup = computed(() => props.appearance === CONFIRM_DIALOG_APPEARANCE.MOCKUP)

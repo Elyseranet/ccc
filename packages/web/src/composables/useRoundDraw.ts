@@ -1,8 +1,9 @@
 import { computed, ref, watch } from 'vue'
 import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 import { useEditions } from '~/composables/useEditions'
+import { useRandomDraw } from '~/composables/useRandomDraw'
 import { ROUND_DRAW_DETAIL_CACHE_KEY, ROUND_DRAW_DRAFTS_CACHE_KEY, ROUND_DRAW_PREVIEW_CACHE_KEY } from '~/consts/round-draw.const'
-import { DRAW_STATUS } from '~/enums/draw.enum'
+import { DRAW_KIND, DRAW_STATUS } from '~/enums/draw.enum'
 import { EDITION_STATUS } from '~/enums/edition.enum'
 import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
@@ -240,6 +241,44 @@ export const useRoundDraw = async () => {
   }
 
   /*********************************************************
+   * Tirage au sort pas à pas (F-52, B-26)
+   *
+   * @description
+   * Le serveur tire UNE affiche (deux joueurs, ou le second d'une affiche saisie à moitié) parmi les joueurs restants ; l'écran projecteur la révèle. Le brouillon rendu remplace
+   * les affiches locales : la saisie manuelle et le tirage se mélangent. Un tour déduit n'a pas de brouillon avant le premier tirage : il est créé ici, comme à la première saisie.
+   ********************************************************/
+  const random = useRandomDraw({
+    kind: DRAW_KIND.ROUND,
+    draft,
+    total,
+    readOnly: isReadOnly,
+    ensureDraft: async () => {
+      if (!draft.value && editionId.value) {
+        draft.value = await drawService.createRoundDraft(editionId.value, {})
+      }
+      return draft.value
+    },
+    flush: async () => {
+      await queue
+    },
+    apply: (draw) => {
+      draft.value = draw
+      pairings.value = buildPairingsFromDraft(draw, total.value)
+      // Pas de « Brouillon enregistré » à l'arrivée d'un tirage (maquette F-52) : seul un échec précédent est levé, le brouillon du serveur fait foi.
+      if (saveState.value === POOL_DRAW_SAVE_STATE.FAILED) {
+        saveState.value = POOL_DRAW_SAVE_STATE.IDLE
+      }
+      stale.value = false
+    },
+    refresh: refreshAll,
+    fail,
+    notifyError: message => notify(FEEDBACK_STATUS.ERROR, message),
+    randomDraw: drawId => drawService.randomDraw(drawId),
+    saveAssignments: (drawId, body) => drawService.saveAssignments(drawId, body)
+  })
+  const drawStarted = computed(() => progress.value.placed > 0)
+
+  /*********************************************************
    * Lecture seule
    ********************************************************/
   const drawnRound = computed(() => inProgressRound(rounds.value))
@@ -248,7 +287,7 @@ export const useRoundDraw = async () => {
 
   return {
     edition, view, preview, rounds, roundKind, players, drawable, total, steps, draft, pairings, unplaced, progress, blocker, canValidate, recap, saveState,
-    feedback, busy, stale, isClosed, isReadOnly, pageError, pending, drawnRound, validatedDraw,
+    feedback, busy, stale, isClosed, isReadOnly, pageError, pending, drawnRound, validatedDraw, random, drawStarted,
     startRound, changeRound, place, change, retrySave, validate, reload, dismissFeedback
   }
 }

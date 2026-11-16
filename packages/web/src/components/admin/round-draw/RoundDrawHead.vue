@@ -7,10 +7,21 @@
     >
       {{ title }}
     </h2>
-    <span
-      class="round-draw-head__count"
-      data-cy="round-draw-count"
-    >{{ countText }}</span>
+    <span class="round-draw-head__counts">
+      <span
+        class="round-draw-head__count"
+        data-cy="round-draw-count"
+      >{{ countText }}</span>
+      <origam-chip
+        v-if="complete && !readOnly"
+        color="primary"
+        bg-color="primary"
+        size="small"
+        pill
+        :text="completeChip"
+        data-cy="round-draw-complete-chip"
+      />
+    </span>
   </header>
   <p
     v-if="changeable"
@@ -48,7 +59,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { OrigamBtn } from 'origam/components'
+import { OrigamBtn, OrigamChip } from 'origam/components'
 import { useT } from '~/composables/useT'
 import { ROUND_KIND_BY_POOL_SIZE } from '~/consts/qualification.const'
 import { ROUND_DRAW_PLAYOFF_WAIT_TEXTS, ROUND_DRAW_TEXTS, ROUND_DRAW_TITLE_ID, ROUND_DRAW_WAIT_ROUND_TEXTS } from '~/consts/round-draw.const'
@@ -80,6 +91,7 @@ const roundPrefix = computed(() => t('admin.round_draw.round_prefix', 'Tour :'))
 const roundDetail = computed(() => t('admin.round_draw.round_detail', '{players} joueurs · {pairings} affiches', { players: playerTotal.value, pairings: props.progress.total }))
 const roundToDrawPrefix = computed(() => t('admin.round_draw.round_to_draw_prefix', 'Tour à tirer :'))
 const roundToDrawDetail = computed(() => t('admin.round_draw.round_to_draw_detail', '{players} joueurs.', { players: playerTotal.value }))
+const completeChip = computed(() => t('admin.random_draw.complete_chip', 'Brouillon complet'))
 const changeRoundLabel = computed(() => t('admin.round_draw.change_round', 'Changer de tour'))
 const waitText = computed(() => {
   const next = ROUND_DRAW_WAIT_ROUND_TEXTS[ROUND_KIND_BY_POOL_SIZE[props.waitingLeaders + props.drawableCount / 2]!]
@@ -117,6 +129,13 @@ defineExpose({})
     font-size: var(--origam-font__size---xl);
     font-weight: var(--origam-font__weight---bold);
     line-height: var(--origam-font__lineHeight---tight);
+  }
+
+  &__counts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--origam-space---2);
   }
 
   &__count {

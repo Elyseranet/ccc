@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 import { useEditions } from '~/composables/useEditions'
+import { useRandomDraw } from '~/composables/useRandomDraw'
 import { PARTICIPANT_EDITABLE_STATUSES } from '~/consts/edition.const'
 import { POOL_DRAW_DRAFTS_CACHE_KEY, POOL_DRAW_PROPOSAL_CACHE_KEY, POOL_DRAW_RESTART_CODES } from '~/consts/pool-draw.const'
 import { DRAW_KIND, DRAW_STATUS } from '~/enums/draw.enum'
@@ -226,6 +227,49 @@ export const usePoolDraw = async () => {
 
   const progressNow = () => drawProgress(pools.value, total.value)
 
+  /*********************************************************
+   * Tirage au sort pas à pas (F-52, B-26)
+   *
+   * @description
+   * Le serveur tire UN joueur parmi les restants, dans la première poule qui n'est pas à sa taille ; l'écran projecteur le révèle. Le brouillon rendu remplace l'état local
+   * (poules relues du brouillon) : la saisie manuelle et le tirage se mélangent. Les enregistrements manuels en file partent avant le tirage.
+   ********************************************************/
+  const random = useRandomDraw({
+    kind: DRAW_KIND.POOLS,
+    draft,
+    total,
+    readOnly: isReadOnly,
+    // Les têtes de série sont créées sans poule avec le brouillon : le serveur veut qu'elles soient placées avant de tirer (409 DRAW_INCONSISTENT), la saisie les a déjà placées une par poule.
+    ensureDraft: async () => {
+      if (draft.value?.assignments.some(assignment => assignment.poolNumber === null)) {
+        draft.value = await drawService.saveAssignments(draft.value.id, { assignments: buildAssignments(pools.value) })
+      }
+      return draft.value
+    },
+    flush: async () => {
+      await queue
+    },
+    apply: (draw) => {
+      draft.value = draw
+      pools.value = buildPoolsFromDraft(draw, total.value)
+      // Pas de « Brouillon enregistré » à l'arrivée d'un tirage (maquette F-52) : seul un échec précédent est levé, le brouillon du serveur fait foi.
+      if (saveState.value === POOL_DRAW_SAVE_STATE.FAILED) {
+        saveState.value = POOL_DRAW_SAVE_STATE.IDLE
+      }
+      needsRestart.value = false
+    },
+    refresh: async () => {
+      await draftsRequest.refresh()
+      hydrate()
+    },
+    fail,
+    notifyError: message => notify(FEEDBACK_STATUS.ERROR, message),
+    randomDraw: drawId => drawService.randomDraw(drawId),
+    saveAssignments: (drawId, body) => drawService.saveAssignments(drawId, body)
+  })
+  const drawStarted = computed(() => progressNow().placed > (draft.value?.parameters.seedCount ?? 0))
+
+
   const assign = async (poolNumber: number, participationId: string): Promise<void> => {
     if (isReadOnly.value || step.value !== POOL_DRAW_STEP.ENTRY) {
       return
@@ -325,7 +369,7 @@ export const usePoolDraw = async () => {
   return {
     edition, step, steps, players, total, poolCount, proposal, tieGroups, tieChoices, seedIds, parametersIssue, seedsIssue, canConfirmSeeds,
     draft, pools, unplaced, progress, isComplete, canValidate, saveState, lastSaved, feedback, busy, needsRestart,
-    isValidated, isClosed, isReadOnly, loadError,
+    isValidated, isClosed, isReadOnly, loadError, random, drawStarted,
     loadSeeds, toggleTieChoice, confirmSeeds, assign, change, retrySave, goToRecap, goToValidation, backToEntry, validate, restart, reload, dismissFeedback
   }
 }

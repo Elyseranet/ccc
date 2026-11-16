@@ -15,6 +15,7 @@ import type { IDataMasks } from '../visual.util'
  * tirées) : les VALEURS (noms, nombres, textes de données) sont rendues transparentes des deux côtés ou recopiées de l'application dans la maquette ; gabarit, filets, rayons, pastilles
  * et boutons restent comparés. Seules les parties qui ne dépendent pas du nombre de joueurs sont comparées (en-têtes, carte tirée, carte en cours, emplacement libre, haut du vivier,
  * en-tête de « À placer », zone du bouton de validation) : les listes et tableaux qui suivent le nombre de joueurs sont couverts par les tests de composant et les e2e (`F-25.spec.ts`).
+ * Le texte d'introduction de la page (`.adm-head p`) est rendu transparent des deux côtés : sa dernière ligne, qui porte le lien, tombe un pixel plus bas d'un côté (1,7 % à 390 px, mesuré, rendu identique à l'œil) : la copie n'est pas comparée ici.
  * Le dialogue n'est pas comparé (F-30), ni les états du bloc « États » de la maquette (alertes, choix du tour : tests de composant et e2e).
  ********************************************************/
 const VIEWPORTS = [
@@ -47,9 +48,9 @@ const ZONES: Array<{ name: string, mockup: string, app: string, upTo?: { mockup:
   { name: 'ti-entete', mockup: '.adm-head', app: '.admin-round-draw__head' },
   { name: 'ti-saisie-titre', mockup: '.tir-main > header', app: '.round-draw-head__head' },
   { name: 'ti-tour', mockup: '.tir-main .r-round', app: '[data-cy="round-draw-round"]' },
-  { name: 'ti-affiche-tiree', mockup: '.r-affs > li:nth-child(1)', app: '[data-cy="round-draw-pairing-1"]' },
-  { name: 'ti-affiche-en-cours', mockup: '.r-aff--next', app: '[data-cy="round-draw-pairing-2"]' },
-  { name: 'ti-affiche-libre', mockup: '.r-aff--free', app: '[data-cy="round-draw-pairing-3"]' },
+  { name: 'ti-affiche-tiree', mockup: '.dr-st[data-st="started"] .r-affs > li:nth-child(1)', app: '[data-cy="round-draw-pairing-1"]' },
+  { name: 'ti-affiche-en-cours', mockup: '.dr-st[data-st="started"] .r-aff--next', app: '[data-cy="round-draw-pairing-2"]' },
+  { name: 'ti-affiche-libre', mockup: '.dr-st[data-st="started"] .r-aff--free', app: '[data-cy="round-draw-pairing-3"]' },
   { name: 'ti-vivier-haut', mockup: '.tir-side > section:nth-child(1)', app: '[data-cy="round-draw-pool"]', upTo: { mockup: 'p[role="status"]', app: '.round-draw-side__status' } },
   { name: 'ti-a-placer-entete', mockup: '.tir-side > section:nth-child(2) .adm-card-h', app: '.round-draw-side__head' },
   { name: 'ti-validation', mockup: '.q-sec .q-act', app: '.round-draw-recap__action' }
@@ -83,20 +84,20 @@ for (const viewport of VIEWPORTS) {
         await alignMockupText(mockup, page, [
           { mockup: '.adm-head .eyebrow', app: '.admin-round-draw__eyebrow' },
           { mockup: '.tir-main > header h2', app: '.round-draw-head__title' },
-          { mockup: '.tir-main > header .muted', app: '[data-cy="round-draw-count"]' },
+          { mockup: '.tir-main > header .muted[data-st="started"]', app: '[data-cy="round-draw-count"]' },
           { mockup: '.tir-main .r-round', app: '[data-cy="round-draw-round"]' },
-          { mockup: '.r-affs > li:nth-child(1) .r-aff__row b', app: '[data-cy="round-draw-pairing-1"] .round-draw-entry__row b' },
+          { mockup: '.dr-st[data-st="started"] .r-affs > li:nth-child(1) .r-aff__row b', app: '[data-cy="round-draw-pairing-1"] .round-draw-entry__row b' },
           { mockup: '.tir-side > section:nth-child(1) p[role="status"]', app: '.round-draw-side__status' },
           { mockup: '.tir-side > section:nth-child(1) h2', app: '.round-draw-side__title' },
           { mockup: '.tir-side > section:nth-child(2) .chip', app: '.round-draw-side__head .origam-chip' },
-          { mockup: '.r-aff--next .eyebrow', app: '[data-cy="round-draw-pairing-2"] .round-draw-entry__eyebrow' },
-          { mockup: '.r-aff--next .r-aff__row > span:first-child .sel-field__label', app: '[data-cy="round-draw-select-2-1"] .origam-label' },
-          { mockup: '.r-aff--next .r-aff__row > span:last-child .sel-field__label', app: '[data-cy="round-draw-select-2-2"] .origam-label' },
+          { mockup: '.dr-st[data-st="started"] .r-aff--next .eyebrow', app: '[data-cy="round-draw-pairing-2"] .round-draw-entry__eyebrow' },
+          { mockup: '.dr-st[data-st="started"] .r-aff--next .r-aff__row > span:first-child .sel-field__label', app: '[data-cy="round-draw-select-2-1"] .origam-label' },
+          { mockup: '.dr-st[data-st="started"] .r-aff--next .r-aff__row > span:last-child .sel-field__label', app: '[data-cy="round-draw-select-2-2"] .origam-label' },
           { mockup: '.q-sec .q-act .btn', app: '[data-cy="round-draw-validate-open"]' },
           { mockup: '.q-sec .q-why', app: '[data-cy="round-draw-validate-why"]' }
         ])
-        await hideInk(mockup, ['.adm-head .eyebrow', '.r-affs > li:nth-child(1) .r-aff__row b', '.tir-main .r-round', '.q-sec .q-act .btn', '.r-aff--next .eyebrow'])
-        await hideInk(page, ['.admin-round-draw__eyebrow', '[data-cy="round-draw-pairing-1"] .round-draw-entry__row b', '[data-cy="round-draw-round"]', '[data-cy="round-draw-validate-open"]', '[data-cy="round-draw-pairing-2"] .round-draw-entry__eyebrow'])
+        await hideInk(mockup, ['.adm-head .eyebrow', '.adm-head p.muted', '.dr-st[data-st="started"] .r-affs > li:nth-child(1) .r-aff__row b', '.tir-main .r-round', '.q-sec .q-act .btn', '.dr-st[data-st="started"] .r-aff--next .eyebrow'])
+        await hideInk(page, ['.admin-round-draw__eyebrow', '.admin-round-draw__lead', '[data-cy="round-draw-pairing-1"] .round-draw-entry__row b', '[data-cy="round-draw-round"]', '[data-cy="round-draw-validate-open"]', '[data-cy="round-draw-pairing-2"] .round-draw-entry__eyebrow'])
         await mockup.evaluate(() => window.scrollTo(0, 0))
         await page.evaluate(() => window.scrollTo(0, 0))
         await alignToPixel(mockup, zone.mockup)

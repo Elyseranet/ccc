@@ -53,6 +53,7 @@ export const POOL_DRAW_ERROR_UNKNOWN: ITranslatableText = { key: 'admin.draws.er
 export const POOL_DRAW_ERROR_MESSAGES: Partial<Record<API_ERROR_CODE, ITranslatableText>> = {
   [API_ERROR_CODE.DRAW_SEEDS_INVALID]: { key: 'admin.draws.errors.draw_seeds_invalid', fallback: 'Les têtes de série ne sont pas celles que le classement impose : recalculez-les.' },
   [API_ERROR_CODE.DRAW_INCONSISTENT]: { key: 'admin.draws.errors.draw_inconsistent', fallback: 'Les affectations sont incohérentes : une poule ne peut avoir qu’une tête de série, et un joueur n’est placé qu’une fois.' },
+  [API_ERROR_CODE.DRAW_DRAFT_COMPLETE]: { key: 'admin.draws.errors.draw_draft_complete', fallback: 'Tous les joueurs sont déjà tirés : il n’y a plus rien à tirer, validez le tirage.' },
   [API_ERROR_CODE.DRAW_INCOMPLETE]: { key: 'admin.draws.errors.draw_incomplete', fallback: 'Tous les inscrits doivent être placés avant la validation.' },
   [API_ERROR_CODE.DRAW_ALREADY_VALIDATED]: { key: 'admin.draws.errors.draw_already_validated', fallback: 'Le tirage est déjà validé : il ne peut plus changer.' },
   [API_ERROR_CODE.DRAW_SEED_WITHDRAWN]: { key: 'admin.draws.errors.draw_seed_withdrawn', fallback: 'Une tête de série s’est retirée : recommencez le tirage.' },

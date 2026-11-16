@@ -120,10 +120,15 @@
         :save-state="saveState"
         :read-only="isReadOnly"
         :complete="isComplete"
+        :drawing="drawing"
+        :started="drawStarted"
+        :arrival="arrival"
         @assign="handleAssign"
         @change="handleChange"
         @retry="handleRetry"
         @next="handleGoToRecap"
+        @draw="handleDraw"
+        @restart="handleRestartDraw"
       />
       <template v-else-if="step === POOL_DRAW_STEP.RECAP || step === POOL_DRAW_STEP.VALIDATION">
         <draw-recap
@@ -156,6 +161,22 @@
         />
       </template>
     </template>
+    <draw-projector
+      v-if="projectorView"
+      :view="projectorView"
+      :brand="brand"
+      :title="projectorTitle"
+      @continue="handleContinue"
+    />
+    <draw-restart-dialog
+      :open="restartOpen"
+      :busy="restarting"
+      :kind="drawKind"
+      :count="drawnCount"
+      round-text=""
+      @cancel="handleRestartCancel"
+      @confirm="handleRestartConfirm"
+    />
     <origam-snackbar
       :model-value="savedOpen"
       :text="savedText"
@@ -181,6 +202,8 @@
 import { computed, ref, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamSnackbar, OrigamTitle } from 'origam/components'
 import DrawAssignment from '~/components/admin/draws/DrawAssignment.vue'
+import DrawProjector from '~/components/admin/draws/DrawProjector.vue'
+import DrawRestartDialog from '~/components/admin/draws/DrawRestartDialog.vue'
 import DrawParameters from '~/components/admin/draws/DrawParameters.vue'
 import DrawRecap from '~/components/admin/draws/DrawRecap.vue'
 import DrawSeeds from '~/components/admin/draws/DrawSeeds.vue'
@@ -192,6 +215,7 @@ import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { EDITION_STATUS_LABELS } from '~/consts/edition-status.const'
 import { POOL_DRAW_SNACKBAR_TIMEOUT_MS } from '~/consts/pool-draw.const'
+import { DRAW_KIND } from '~/enums/draw.enum'
 import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP } from '~/enums/pool-draw.enum'
 import { poolMatchCount, toSeedRows } from '~/utils/pool-draw.util'
@@ -218,8 +242,12 @@ await useAdminEdition()
 const {
   edition, step, steps, players, total, poolCount, proposal, tieGroups, tieChoices, seedIds, parametersIssue, seedsIssue, canConfirmSeeds,
   pools, unplaced, progress, isComplete, canValidate, saveState, lastSaved, feedback, busy, needsRestart, isValidated, isClosed, isReadOnly, loadError,
-  loadSeeds, toggleTieChoice, confirmSeeds, assign, change, retrySave, goToRecap, goToValidation, backToEntry, validate, restart, reload, dismissFeedback
+  random, drawStarted, loadSeeds, toggleTieChoice, confirmSeeds, assign, change, retrySave, goToRecap, goToValidation, backToEntry, validate, restart, reload, dismissFeedback
 } = await usePoolDraw()
+const { drawing, view: projectorView, arrival, drawnCount, restartOpen, restarting } = random
+const drawKind = DRAW_KIND.POOLS
+const projectorTitle = computed(() => t('admin.random_draw.projector_title_pools', 'Tirage des poules'))
+const brand = computed(() => t('admin.random_draw.projector_brand', 'CCC {year}', { year: edition.value?.year ?? '' }))
 
 /*********************************************************
  * Libellés
@@ -227,7 +255,7 @@ const {
 const eyebrow = computed(() => (edition.value
   ? t('admin.draws.eyebrow', 'Édition {year} · tirage physique', { year: edition.value.year })
   : t('admin.draws.eyebrow_none', 'Aucune édition')))
-const lead = computed(() => t('admin.draws.lead', 'Le tirage se fait à la main, par une main innocente ; l’application l’enregistre au fur et à mesure.'))
+const lead = computed(() => t('admin.draws.lead', 'L’application tire au sort joueur par joueur, ou vous enregistrez le tirage fait à la main, par une main innocente, au fur et à mesure.'))
 const loadErrorText = computed(() => t('admin.draws.load_error', 'Le tirage n’a pas pu être chargé.'))
 const retryLabel = computed(() => t('components.async_state.retry', 'Réessayer'))
 const noEditionText = computed(() => t('admin.draws.no_edition', 'Aucune édition active : choisissez une édition dans le sélecteur.'))
@@ -316,6 +344,21 @@ const handleValidate = () => {
 }
 const handleRestart = () => {
   restart()
+}
+const handleDraw = () => {
+  random.draw()
+}
+const handleContinue = () => {
+  random.close()
+}
+const handleRestartDraw = () => {
+  random.askRestart()
+}
+const handleRestartCancel = () => {
+  random.cancelRestart()
+}
+const handleRestartConfirm = () => {
+  random.restart()
 }
 const handleReload = () => {
   reload()

@@ -52,6 +52,7 @@ const ZONES: Array<{ name: string, mockup: string, app: string }> = [
   { name: 'ti-entete', mockup: '.adm-head', app: '.admin-draws__head' },
   { name: 'ti-etapes', mockup: '.ostep', app: '[data-cy="draw-steps"]' },
   { name: 'ti-saisie', mockup: '.tir-main', app: '.draw-assignment__main' },
+  { name: 'ti-bande', mockup: '.dr-st[data-st="started"] .dr-mode', app: '[data-cy="draw-random-band"]' },
   { name: 'ti-parametres', mockup: '.tir-side > section:nth-child(1)', app: '[data-cy="draw-side-params"]' },
   { name: 'ti-a-placer', mockup: '.tir-side > section:nth-child(2)', app: '[data-cy="draw-rest"]' },
   { name: 'ti-tetes', mockup: '.tir-seeds', app: '[data-cy="draw-seeds-list"]' }
