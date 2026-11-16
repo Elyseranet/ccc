@@ -67,6 +67,17 @@ export const resolveActiveStep = (status: EDITION_STATUS, rounds: IRound[]): ADM
   }
 }
 
+/**
+ * Page d'entrée de la « Phase finale » : celle de l'étape active (qualification avant le tirage du bracket, tirage de tour du bracket jusqu'à la finale,
+ * clôture ensuite ou édition clôturée). Pas de seconde règle : la page se déduit de `resolveActiveStep`.
+ */
+export const resolveFinalPhaseEntry = (active: ADMIN_DASHBOARD_STEP | null): string => {
+  if (active === null || active === ADMIN_DASHBOARD_STEP.CLOSING) {
+    return ROUTES.ADMIN_FINAL_PHASE_CLOSING
+  }
+  return active >= ADMIN_DASHBOARD_STEP.BRACKET_DRAW ? ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW : ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION
+}
+
 export const resolveStepStatus = (step: ADMIN_DASHBOARD_STEP, active: ADMIN_DASHBOARD_STEP | null): ADMIN_DASHBOARD_STEP_STATUS => {
   if (active === null || step < active) {
     return ADMIN_DASHBOARD_STEP_STATUS.DONE
