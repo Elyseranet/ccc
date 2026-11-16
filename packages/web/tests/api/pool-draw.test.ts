@@ -10,6 +10,7 @@ import { FINAL_STAGE } from '../../src/enums/participation.enum'
 import { ROUND_STATUS } from '../../src/enums/round.enum'
 import { USER_ROLE } from '../../src/enums/user.enum'
 import type { IAdminDraw, IDraw, ISeedProposal } from '../../src/interfaces/draw.interface'
+import type { IRandomDrawResult } from '../../src/interfaces/random-draw.interface'
 import type { IEditionParticipant, IEditionSummary } from '../../src/interfaces/edition.interface'
 import type { IApiError } from '../../src/interfaces/error.interface'
 import type { IMatch } from '../../src/interfaces/match.interface'
@@ -574,6 +575,105 @@ describe('pools draw (B-11)', async () => {
       await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
       const after = await fetch(`/api/v1/editions/${edition.id}/tirages`, { headers: { 'If-None-Match': etag } })
       expect(after.status).toBe(200)
+    })
+  })
+
+  describe('POST /tirages/{id}/tirage-au-sort (B-26, une étape par appel)', () => {
+    const randomDraw = (drawId: string, cookie: string | null = adminCookie) => send('POST', `/api/v1/tirages/${drawId}/tirage-au-sort`, undefined, cookie ?? undefined)
+    const stepOf = async (response: Response) => await response.json() as IRandomDrawResult
+
+    /** 6 inscrits, 2 poules de 3, les deux têtes de série (A et B) placées à la main dans les poules 1 et 2. */
+    const seededDraft = async () => {
+      const players = await sixPlayers()
+      const draft = await openDraft(players.edition.id, [players.ids.a, players.ids.b])
+      expect((await putAssignments(draft.id, [
+        { participationId: players.ids.a, poolNumber: 1, drawnOrder: 1 },
+        { participationId: players.ids.b, poolNumber: 2, drawnOrder: 2 }
+      ])).status).toBe(200)
+      return { ...players, draft }
+    }
+
+    it('answers 401 to an anonymous caller, 403 to a participant, 404 to an unknown draw and 400 to a malformed id', async () => {
+      const { draft } = await seededDraft()
+      expect((await randomDraw(draft.id, null)).status).toBe(401)
+      expect((await randomDraw(draft.id, participantCookie)).status).toBe(403)
+      expect((await randomDraw(UNKNOWN_UUID)).status).toBe(404)
+      expect((await randomDraw('not-a-uuid')).status).toBe(400)
+    })
+
+    it('draws one player and his pool per call, pool after pool, then answers 409 DRAW_DRAFT_COMPLETE', async () => {
+      const { draft, edition, poolOne, poolTwo, ids } = await seededDraft()
+      const others = new Set([...poolOne, ...poolTwo].filter((id) => id !== ids.a && id !== ids.b))
+      const pools: number[] = []
+      let result: IRandomDrawResult | undefined
+      for (let click = 1; click <= 4; click += 1) {
+        const response = await randomDraw(draft.id)
+        expect(response.status).toBe(200)
+        expect(response.headers.get('cache-control')).toBe('no-store')
+        result = await stepOf(response)
+        expect(result.step.assignments).toHaveLength(1)
+        expect(result.step.remaining).toBe(4 - click)
+        expect(result.draw.status).toBe(DRAW_STATUS.DRAFT)
+        expect(result.draw.assignments).toHaveLength(2 + click)
+        const drawn = result.step.assignments[0]!
+        expect(others.delete(drawn.participationId)).toBe(true)
+        expect(drawn.drawnOrder).toBe(2 + click)
+        pools.push(drawn.poolNumber!)
+      }
+      // RG11, RG16 : poule après poule, 3 joueurs par poule.
+      expect(pools).toEqual([1, 1, 2, 2])
+      expect(others.size).toBe(0)
+      const done = await randomDraw(draft.id)
+      expect(done.status).toBe(409)
+      expect((await errorOf(done)).code).toBe(API_ERROR_CODE.DRAW_DRAFT_COMPLETE)
+      expect((await fetch(`/api/v1/editions/${edition.id}/tours`).then((r) => r.json()) as IRound[])).toEqual([])
+      expect((await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)).status).toBe(200)
+    })
+
+    it('continues from a hand-entered draft, and answers 409 DRAW_INCONSISTENT while a seed is not placed', async () => {
+      const { edition, ids } = await sixPlayers()
+      const draft = await openDraft(edition.id, [ids.a, ids.b])
+      const unplaced = await randomDraw(draft.id)
+      expect(unplaced.status).toBe(409)
+      expect((await errorOf(unplaced)).code).toBe(API_ERROR_CODE.DRAW_INCONSISTENT)
+
+      expect((await putAssignments(draft.id, [
+        { participationId: ids.a, poolNumber: 1, drawnOrder: 1 },
+        { participationId: ids.b, poolNumber: 2, drawnOrder: 2 },
+        { participationId: ids.c, poolNumber: 1, drawnOrder: 3 }
+      ])).status).toBe(200)
+      const next = await stepOf(await randomDraw(draft.id))
+      expect(next.step.assignments[0]).toMatchObject({ poolNumber: 1, drawnOrder: 4 })
+      expect([ids.d, ids.e, ids.f]).toContain(next.step.assignments[0]!.participationId)
+      expect(next.step.remaining).toBe(2)
+    })
+
+    it('never draws the same place twice under two simultaneous clicks', async () => {
+      const { draft } = await seededDraft()
+      const [first, second] = await Promise.all([randomDraw(draft.id), randomDraw(draft.id)])
+      expect([first!.status, second!.status]).toEqual([200, 200])
+      const drawn = [(await stepOf(first!)).step.assignments[0]!, (await stepOf(second!)).step.assignments[0]!]
+      expect(new Set(drawn.map((assignment) => assignment.participationId)).size).toBe(2)
+      expect(drawn.map((assignment) => assignment.drawnOrder).sort()).toEqual([3, 4])
+    })
+
+    it('refuses once validated (409 DRAW_ALREADY_VALIDATED)', async () => {
+      const { draft } = await seededDraft()
+      for (let click = 0; click < 4; click += 1) {
+        await randomDraw(draft.id)
+      }
+      expect((await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)).status).toBe(200)
+      const locked = await randomDraw(draft.id)
+      expect(locked.status).toBe(409)
+      expect((await errorOf(locked)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
+    })
+
+    it('answers 409 DRAW_SEED_WITHDRAWN when a seed withdrew during the draft', async () => {
+      const { edition, draft, ids } = await seededDraft()
+      expect((await asAdmin('DELETE', `/api/v1/editions/${edition.id}/participants/${ids.a}`)).status).toBe(204)
+      const response = await randomDraw(draft.id)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.DRAW_SEED_WITHDRAWN)
     })
   })
 })

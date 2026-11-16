@@ -27,6 +27,8 @@ export const API_ERROR_MESSAGE = {
   DRAW_INCOMPLETE: 'Every registered participant must be assigned before validation',
   DRAW_INCONSISTENT: 'The draw assignments are inconsistent',
   DRAW_SEED_WITHDRAWN: 'A seed has withdrawn: restart the draw',
+  DRAW_DRAFT_COMPLETE: 'Every player is already drawn: nothing is left to draw',
+  DRAW_SEEDS_NOT_PLACED: 'Place every seed in a pool before drawing the other players',
   QUALIFICATION_NOT_READY: 'Every pool match must be validated before the qualified list can be finalized',
   QUALIFICATION_NOT_DONE: 'The qualified list must be finalized before the next round can be drawn',
   QUALIFICATION_ALREADY_DONE: 'The qualified list is already finalized',

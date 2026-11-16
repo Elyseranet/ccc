@@ -108,9 +108,9 @@ describe('draw mappers', () => {
   })
 })
 
-describe('A1, RG12 : aucune source d\'aléa dans le tirage', () => {
+describe('A1 amendé (B-26) : le hasard ne vit que dans random-draw.util', () => {
   it.each(['src/services/draw.service.ts', 'src/utils/seeding.util.ts', 'src/utils/round-robin.util.ts', 'src/utils/draw-public.mapper.util.ts'])(
-    '%s ne tire rien au sort', (file) => {
+    '%s ne contient aucune source d\'aléa', (file) => {
       expect(readFileSync(file, 'utf8')).not.toMatch(/Math\.random|randomInt|randomBytes|randomUUID|getRandomValues|crypto\.random|ORDER BY random|shuffle/i)
     }
   )

@@ -24,6 +24,9 @@ import type {
 } from '../interfaces/pool-draw.interface.js'
 import { ApiRequestError } from './api-request-error.util.js'
 import { getInitials } from './player.util.js'
+import { poolSizes } from './pool-size.util.js'
+
+export { poolSizes }
 
 /*********************************************************
  * Tirage des poules de l'admin (F-11)
@@ -41,16 +44,6 @@ export const toPlayers = (participants: IEditionParticipant[]): IPoolDrawPlayer[
   competitor: { id: participant.competitor.id, displayName: participant.competitor.displayName },
   initials: getInitials(participant.competitor.displayName)
 }))
-
-/** Tailles des poules (RG16) : les `total` joueurs se répartissent au plus à un joueur d'écart, les plus grandes poules d'abord. */
-export const poolSizes = (total: number, poolCount: number): number[] => {
-  if (poolCount < 1 || total < 0) {
-    return []
-  }
-  const base = Math.floor(total / poolCount)
-  const larger = total % poolCount
-  return Array.from({ length: poolCount }, (_, index) => (index < larger ? base + 1 : base))
-}
 
 /**
  * Nombre de poules proposé au départ : celui de la table « Config poules » du classeur (RG16). 0 quand le nombre d'inscrits n'y

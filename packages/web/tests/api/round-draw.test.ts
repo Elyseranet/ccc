@@ -9,6 +9,7 @@ import { MATCH_PURPOSE } from '../../src/enums/match.enum'
 import { ROUND_KIND, ROUND_STATUS } from '../../src/enums/round.enum'
 import { USER_ROLE } from '../../src/enums/user.enum'
 import type { IAdminDraw } from '../../src/interfaces/draw.interface'
+import type { IRandomDrawResult } from '../../src/interfaces/random-draw.interface'
 import type { IApiError } from '../../src/interfaces/error.interface'
 import type { IRoundDrawPreview } from '../../src/interfaces/qualification.interface'
 import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
@@ -33,6 +34,12 @@ describe('round draw (B-13)', async () => {
   const semis = await seedPoolStage(dataSource, { code: '2072', rank: 12, pools: [clearPool('c'), clearPool('d')] })
   const playoff = await seedPoolStage(dataSource, { code: '2073', rank: 13, pools: [clearPool('e'), clearPool('f')] })
   const chosen = await seedPoolStage(dataSource, { code: '2074', rank: 14, pools: [clearPool('g'), clearPool('h'), clearPool('i')] })
+  // 2075 et 2076 : tirage au sort par le serveur (B-26), demies et barrages.
+  const randomSemis = await seedPoolStage(dataSource, { code: '2075', rank: 15, pools: [clearPool('j'), clearPool('k')] })
+  const randomPlayoff = await seedPoolStage(dataSource, { code: '2076', rank: 16, pools: [clearPool('l'), clearPool('m')] })
+  // 2077 : 3 poules, barrages avec 3 non-premiers (impair). 2078 : 6 qualifiés, tour au choix.
+  const oddPlayoff = await seedPoolStage(dataSource, { code: '2077', rank: 17, pools: [clearPool('q'), clearPool('r'), clearPool('t')] })
+  const halfSix = await seedPoolStage(dataSource, { code: '2078', rank: 18, pools: [clearPool('n'), clearPool('o'), clearPool('u')] })
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
@@ -49,7 +56,11 @@ describe('round draw (B-13)', async () => {
     for (const [fixture, body] of [
       [semis, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
       [playoff, { topPerPool: 2, bestNextCount: 0, withPlayoff: true }],
-      [chosen, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }]
+      [chosen, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
+      [randomSemis, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
+      [randomPlayoff, { topPerPool: 2, bestNextCount: 0, withPlayoff: true }],
+      [oddPlayoff, { topPerPool: 2, bestNextCount: 0, withPlayoff: true }],
+      [halfSix, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }]
     ] as const) {
       expect((await send('POST', `/api/v1/editions/${fixture.edition.id}/qualification`, adminCookie, body)).status).toBe(200)
     }
@@ -235,6 +246,81 @@ describe('round draw (B-13)', async () => {
       expect(locked.status).toBe(409)
       const again = await openDraw(chosen, { roundKind: ROUND_KIND.QUARTER })
       expect(again.status).toBe(409)
+    })
+  })
+
+  describe('random draw by the server, one affiche per call (B-26)', () => {
+    const randomDraw = (drawId: string, cookie: string | null = adminCookie) =>
+      send('POST', `/api/v1/tirages/${drawId}/tirage-au-sort`, cookie ?? undefined)
+    const stepOf = async (response: Response) => await response.json() as IRandomDrawResult
+
+    it('answers 401 to an anonymous caller, 403 to a participant, 404 to an unknown draw and 400 to a malformed id', async () => {
+      const draw = await (await openDraw(randomSemis)).json() as IAdminDraw
+      expect((await randomDraw(draw.id, null)).status).toBe(401)
+      expect((await randomDraw(draw.id, participantCookie)).status).toBe(403)
+      expect((await randomDraw('00000000-0000-4000-8000-000000000000')).status).toBe(404)
+      expect((await randomDraw('not-a-uuid')).status).toBe(400)
+    })
+
+    it('never draws the same affiche twice under two simultaneous clicks, then answers 409 DRAW_DRAFT_COMPLETE', async () => {
+      const draw = await (await openDraw(randomSemis)).json() as IAdminDraw
+      const responses = await Promise.all([randomDraw(draw.id), randomDraw(draw.id)])
+      expect(responses.map((response) => response.status)).toEqual([200, 200])
+      const steps = await Promise.all(responses.map(stepOf))
+      const assignments = steps.flatMap((result) => result.step.assignments)
+      expect(assignments.map((assignment) => assignment.pairingIndex).sort()).toEqual([1, 1, 2, 2])
+      expect(assignments.map((assignment) => assignment.participationId).sort()).toEqual(ids(randomSemis, 'j1', 'j2', 'k1', 'k2').sort())
+      expect(steps.map((result) => result.step.remaining).sort()).toEqual([0, 2])
+
+      const done = await randomDraw(draw.id)
+      expect(done.status).toBe(409)
+      expect((await errorOf(done)).code).toBe(API_ERROR_CODE.DRAW_DRAFT_COMPLETE)
+    })
+
+    it('draws the next affiche from the current draft, leaves it validatable, and refuses once validated', async () => {
+      const [draw] = (await (await send('GET', `/api/v1/admin/editions/${randomSemis.edition.id}/tirages`, adminCookie)).json() as IAdminDraw[])
+        .filter((candidate) => candidate.kind === DRAW_KIND.ROUND)
+      expect(draw!.status).toBe(DRAW_STATUS.DRAFT)
+      expect((await roundsOf(randomSemis)).map((round) => round.kind)).toEqual([ROUND_KIND.POOLS])
+      expect((await send('POST', `/api/v1/tirages/${draw!.id}/validation`, adminCookie)).status).toBe(200)
+      const round = (await roundsOf(randomSemis)).find((candidate) => candidate.kind === ROUND_KIND.SEMI)!
+      expect(await dataSource.getRepository(MatchEntity).countBy({ roundId: round.id })).toBe(2)
+      const locked = await randomDraw(draw!.id)
+      expect(locked.status).toBe(409)
+      expect((await errorOf(locked)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
+    })
+
+    it('draws the playoff among the non-winners only (the pool winners wait in the pool)', async () => {
+      const draw = await (await openDraw(randomPlayoff)).json() as IAdminDraw
+      const result = await stepOf(await randomDraw(draw.id))
+      expect(result.draw.roundKind).toBe(ROUND_KIND.PLAYOFF)
+      expect(result.step.remaining).toBe(0)
+      expect(result.step.assignments.map((assignment) => [assignment.pairingIndex, assignment.sidePosition]).sort()).toEqual([[1, 1], [1, 2]])
+      expect(result.step.assignments.map((assignment) => assignment.participationId).sort()).toEqual(ids(randomPlayoff, 'l2', 'm2').sort())
+      expect((await send('POST', `/api/v1/tirages/${draw.id}/validation`, adminCookie)).status).toBe(200)
+    })
+
+    it('completes a half affiche entered by hand with a single player', async () => {
+      const draw = await (await openDraw(halfSix, { roundKind: ROUND_KIND.QUARTER })).json() as IAdminDraw
+      const [g1] = ids(halfSix, 'n1')
+      expect((await send('PUT', `/api/v1/tirages/${draw.id}/affectations`, adminCookie, { assignments: [{ participationId: g1, pairingIndex: 1, sidePosition: 2, drawnOrder: 1 }] })).status).toBe(200)
+      const result = await stepOf(await randomDraw(draw.id))
+      expect(result.step.assignments).toHaveLength(1)
+      expect(result.step.assignments[0]).toMatchObject({ pairingIndex: 1, sidePosition: 1, drawnOrder: 2 })
+      expect(result.step.remaining).toBe(4)
+      const next = await stepOf(await randomDraw(draw.id))
+      expect(next.step.assignments.map((assignment) => assignment.pairingIndex)).toEqual([2, 2])
+    })
+
+    it('refuses an odd pool with 409 DRAW_INCONSISTENT before drawing anything', async () => {
+      const draw = await (await openDraw(oddPlayoff)).json() as IAdminDraw
+      expect(draw.roundKind).toBe(ROUND_KIND.PLAYOFF)
+      const refused = await randomDraw(draw.id)
+      expect(refused.status).toBe(409)
+      expect((await errorOf(refused)).code).toBe(API_ERROR_CODE.DRAW_INCONSISTENT)
+      const after = (await (await send('GET', `/api/v1/admin/editions/${oddPlayoff.edition.id}/tirages`, adminCookie)).json() as IAdminDraw[])
+        .find((candidate) => candidate.id === draw.id)!
+      expect(after.assignments).toEqual([])
     })
   })
 })

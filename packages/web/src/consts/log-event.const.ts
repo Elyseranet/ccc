@@ -34,6 +34,7 @@ export const LOG_EVENT = {
   HEALTH_MIGRATIONS_UNKNOWN: 'health_migrations_unknown',
   DRAW_CREATED: 'draw_created',
   DRAW_ASSIGNMENTS_SAVED: 'draw_assignments_saved',
+  DRAW_STEP_DRAWN: 'draw_step_drawn',
   DRAW_VALIDATED: 'draw_validated',
   COMPETITOR_ACCOUNT_CREATED: 'competitor_account_created',
   INVITATION_ISSUED: 'invitation_issued',
