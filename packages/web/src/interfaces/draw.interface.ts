@@ -63,6 +63,11 @@ export interface IDrawAssignmentInput {
 }
 
 /** `PUT /tirages/{id}/affectations` (brouillon) : enregistre le tirage physique (A1). */
+/** Corps (facultatif) de `POST /tirages/{id}/tirage-au-sort` : `replace` autorise à écraser un brouillon déjà commencé. */
+export interface IRandomDrawRequest {
+  replace?: boolean
+}
+
 export interface IUpdateDrawAssignmentsRequest {
   assignments: IDrawAssignmentInput[]
 }

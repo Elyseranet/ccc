@@ -33,6 +33,9 @@ describe('round draw (B-13)', async () => {
   const semis = await seedPoolStage(dataSource, { code: '2072', rank: 12, pools: [clearPool('c'), clearPool('d')] })
   const playoff = await seedPoolStage(dataSource, { code: '2073', rank: 13, pools: [clearPool('e'), clearPool('f')] })
   const chosen = await seedPoolStage(dataSource, { code: '2074', rank: 14, pools: [clearPool('g'), clearPool('h'), clearPool('i')] })
+  // 2075 et 2076 : tirage au sort par le serveur (B-26), demies et barrages.
+  const randomSemis = await seedPoolStage(dataSource, { code: '2075', rank: 15, pools: [clearPool('j'), clearPool('k')] })
+  const randomPlayoff = await seedPoolStage(dataSource, { code: '2076', rank: 16, pools: [clearPool('l'), clearPool('m')] })
 
   await setup({
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
@@ -49,7 +52,9 @@ describe('round draw (B-13)', async () => {
     for (const [fixture, body] of [
       [semis, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
       [playoff, { topPerPool: 2, bestNextCount: 0, withPlayoff: true }],
-      [chosen, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }]
+      [chosen, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
+      [randomSemis, { topPerPool: 2, bestNextCount: 0, withPlayoff: false }],
+      [randomPlayoff, { topPerPool: 2, bestNextCount: 0, withPlayoff: true }]
     ] as const) {
       expect((await send('POST', `/api/v1/editions/${fixture.edition.id}/qualification`, adminCookie, body)).status).toBe(200)
     }
@@ -235,6 +240,66 @@ describe('round draw (B-13)', async () => {
       expect(locked.status).toBe(409)
       const again = await openDraw(chosen, { roundKind: ROUND_KIND.QUARTER })
       expect(again.status).toBe(409)
+    })
+  })
+
+  describe('random draw by the server (B-26)', () => {
+    const randomDraw = (drawId: string, body?: unknown, cookie: string | null = adminCookie) =>
+      send('POST', `/api/v1/tirages/${drawId}/tirage-au-sort`, cookie ?? undefined, body)
+
+    it('answers 401 to an anonymous caller, 403 to a participant, 404 to an unknown draw and 400 to a bad body', async () => {
+      const draw = await (await openDraw(randomSemis)).json() as IAdminDraw
+      expect((await randomDraw(draw.id, {}, null)).status).toBe(401)
+      expect((await randomDraw(draw.id, {}, participantCookie)).status).toBe(403)
+      expect((await randomDraw('00000000-0000-4000-8000-000000000000')).status).toBe(404)
+      expect((await randomDraw('not-a-uuid')).status).toBe(400)
+      for (const body of [{ replace: 'yes' }, { extra: true }]) {
+        const response = await randomDraw(draw.id, body)
+        expect(response.status).toBe(400)
+        expect((await errorOf(response)).code).toBe(API_ERROR_CODE.VALIDATION_FAILED)
+      }
+    })
+
+    it('draws a complete round into the draft without validating it, then refuses to overwrite it without replace', async () => {
+      const draw = await (await openDraw(randomSemis)).json() as IAdminDraw
+      const response = await randomDraw(draw.id)
+      expect(response.status).toBe(200)
+      expect(response.headers.get('cache-control')).toBe('no-store')
+      const drawn = await response.json() as IAdminDraw
+      expect(drawn).toMatchObject({ id: draw.id, status: DRAW_STATUS.DRAFT, roundKind: ROUND_KIND.SEMI })
+      expect(drawn.assignments.map((assignment) => assignment.participationId).sort()).toEqual(ids(randomSemis, 'j1', 'j2', 'k1', 'k2').sort())
+      expect(drawn.assignments.map((assignment) => [assignment.pairingIndex, assignment.sidePosition]).sort())
+        .toEqual([[1, 1], [1, 2], [2, 1], [2, 2]])
+      expect((await roundsOf(randomSemis)).map((round) => round.kind)).toEqual([ROUND_KIND.POOLS])
+
+      const refused = await randomDraw(draw.id)
+      expect(refused.status).toBe(409)
+      expect((await errorOf(refused)).code).toBe(API_ERROR_CODE.DRAW_DRAFT_STARTED)
+      expect((await randomDraw(draw.id, { replace: false })).status).toBe(409)
+      const redrawn = await randomDraw(draw.id, { replace: true })
+      expect(redrawn.status).toBe(200)
+      expect((await redrawn.json() as IAdminDraw).assignments).toHaveLength(4)
+    })
+
+    it('leaves a draft that the existing validation accepts, and refuses a new draw once validated', async () => {
+      const [draw] = (await (await send('GET', `/api/v1/admin/editions/${randomSemis.edition.id}/tirages`, adminCookie)).json() as IAdminDraw[])
+        .filter((candidate) => candidate.kind === DRAW_KIND.ROUND)
+      expect((await send('POST', `/api/v1/tirages/${draw!.id}/validation`, adminCookie)).status).toBe(200)
+      const round = (await roundsOf(randomSemis)).find((candidate) => candidate.kind === ROUND_KIND.SEMI)!
+      expect(await dataSource.getRepository(MatchEntity).countBy({ roundId: round.id })).toBe(2)
+      for (const body of [undefined, { replace: true }]) {
+        const locked = await randomDraw(draw!.id, body)
+        expect(locked.status).toBe(409)
+        expect((await errorOf(locked)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
+      }
+    })
+
+    it('draws the playoff among the non-winners only (the pool winners wait in the pool)', async () => {
+      const draw = await (await openDraw(randomPlayoff)).json() as IAdminDraw
+      const drawn = await (await randomDraw(draw.id)).json() as IAdminDraw
+      expect(drawn.roundKind).toBe(ROUND_KIND.PLAYOFF)
+      expect(drawn.assignments.map((assignment) => assignment.participationId).sort()).toEqual(ids(randomPlayoff, 'l2', 'm2').sort())
+      expect((await send('POST', `/api/v1/tirages/${draw.id}/validation`, adminCookie)).status).toBe(200)
     })
   })
 })

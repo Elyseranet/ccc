@@ -576,4 +576,76 @@ describe('pools draw (B-11)', async () => {
       expect(after.status).toBe(200)
     })
   })
+
+  describe('POST /tirages/{id}/tirage-au-sort (B-26)', () => {
+    const randomDraw = (drawId: string, body?: unknown, cookie: string | null = adminCookie) => send('POST', `/api/v1/tirages/${drawId}/tirage-au-sort`, body, cookie ?? undefined)
+
+    it('answers 401 to an anonymous caller, 403 to a participant, 404 to an unknown draw and 400 to a bad body', async () => {
+      const { draft } = await sixPlayers().then(async (players) => ({ draft: await openDraft(players.edition.id, [players.ids.a, players.ids.b]) }))
+      expect((await randomDraw(draft.id, {}, null)).status).toBe(401)
+      expect((await randomDraw(draft.id, {}, participantCookie)).status).toBe(403)
+      expect((await randomDraw(UNKNOWN_UUID)).status).toBe(404)
+      expect((await randomDraw('not-a-uuid')).status).toBe(400)
+      for (const body of [{ replace: 'yes' }, { extra: true }]) {
+        const response = await randomDraw(draft.id, body)
+        expect(response.status).toBe(400)
+        expect((await errorOf(response)).code).toBe(API_ERROR_CODE.VALIDATION_FAILED)
+      }
+    })
+
+    it('fills the draft from the seeds alone: one seed per pool, 3 players per pool, nothing validated', async () => {
+      const { edition, ids } = await sixPlayers()
+      const draft = await openDraft(edition.id, [ids.a, ids.b])
+      const response = await randomDraw(draft.id)
+      expect(response.status).toBe(200)
+      expect(response.headers.get('cache-control')).toBe('no-store')
+      const drawn = await response.json() as IAdminDraw
+      expect(drawn.status).toBe(DRAW_STATUS.DRAFT)
+      expect(drawn.assignments).toHaveLength(6)
+      expect(drawn.assignments.every((assignment) => assignment.poolId === null)).toBe(true)
+      const poolOf = (id: string) => drawn.assignments.find((assignment) => assignment.participationId === id)!.poolNumber
+      expect(new Set([poolOf(ids.a), poolOf(ids.b)])).toEqual(new Set([1, 2]))
+      expect([1, 2].map((pool) => drawn.assignments.filter((assignment) => assignment.poolNumber === pool).length)).toEqual([3, 3])
+      expect(drawn.assignments.map((assignment) => assignment.drawnOrder)).toEqual([1, 2, 3, 4, 5, 6])
+      expect((await fetch(`/api/v1/editions/${edition.id}/tours`).then((r) => r.json()) as IRound[])).toEqual([])
+    })
+
+    it('answers 409 DRAW_DRAFT_STARTED once the draft holds a draw, and replaces it with replace: true', async () => {
+      const { edition, ids } = await sixPlayers()
+      const draft = await openDraft(edition.id, [ids.a, ids.b])
+      expect((await randomDraw(draft.id)).status).toBe(200)
+      const refused = await randomDraw(draft.id)
+      expect(refused.status).toBe(409)
+      expect((await errorOf(refused)).code).toBe(API_ERROR_CODE.DRAW_DRAFT_STARTED)
+      const replaced = await randomDraw(draft.id, { replace: true })
+      expect(replaced.status).toBe(200)
+      expect((await replaced.json() as IAdminDraw).assignments).toHaveLength(6)
+      // Un brouillon saisi à la main compte aussi comme commencé.
+      const manual = await readyDraft()
+      expect((await randomDraw(manual.draft.id)).status).toBe(409)
+    })
+
+    it('leaves a draft the existing validation accepts, with the same checks as a manual entry (RG11, RG15)', async () => {
+      const { edition, ids } = await sixPlayers()
+      const draft = await openDraft(edition.id, [ids.a, ids.b])
+      await randomDraw(draft.id)
+      const validated = await asAdmin('POST', `/api/v1/tirages/${draft.id}/validation`)
+      expect(validated.status).toBe(200)
+      const pools = await (await fetch(`/api/v1/editions/${edition.id}/poules`)).json() as IPool[]
+      expect(pools.map((pool) => pool.standing.length)).toEqual([3, 3])
+      expect((await fetch(`/api/v1/editions/${edition.id}/matchs`).then((r) => r.json()) as IPaginated<IMatch>).total).toBe(6)
+      const locked = await randomDraw(draft.id, { replace: true })
+      expect(locked.status).toBe(409)
+      expect((await errorOf(locked)).code).toBe(API_ERROR_CODE.DRAW_ALREADY_VALIDATED)
+    })
+
+    it('answers 409 DRAW_SEED_WITHDRAWN when a seed withdrew during the draft', async () => {
+      const { edition, ids } = await sixPlayers()
+      const draft = await openDraft(edition.id, [ids.a, ids.b])
+      expect((await asAdmin('DELETE', `/api/v1/editions/${edition.id}/participants/${ids.a}`)).status).toBe(204)
+      const response = await randomDraw(draft.id)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.DRAW_SEED_WITHDRAWN)
+    })
+  })
 })
