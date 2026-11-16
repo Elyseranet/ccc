@@ -15,7 +15,8 @@ import type { IAdminFailure } from '../../../src/interfaces/admin-failure.interf
 import type { IEditionDetail, IEditionSummary } from '../../../src/interfaces/edition.interface'
 import { EditionService } from '../../../src/services/edition.service'
 import { ROUTES } from '../../../src/consts/routes.const'
-import { emptyEditionFormValues } from '../../../src/utils/admin-editions.util'
+import { buildEditionYearOptions, emptyEditionFormValues } from '../../../src/utils/admin-editions.util'
+import { OrigamSelect } from 'origam/components'
 import EditionClosed from '~/components/admin/editions/EditionClosed.vue'
 import EditionForm from '~/components/admin/editions/EditionForm.vue'
 import EditionsPage from '~/pages/admin/editions/index.vue'
@@ -81,6 +82,10 @@ const VALID: IEditionFormValues = { year: '2027', name: 'Championnat de Caps 202
 
 const savedSnackbar = (wrapper: Pick<VueWrapper, 'findComponent'>) => wrapper.findComponent({ name: 'OrigamSnackbar' })
 
+const chooseYear = (wrapper: VueWrapper, year: string) => {
+  wrapper.getComponent(OrigamSelect).vm.$emit('update:modelValue', year)
+}
+
 const mountForm = (props: Record<string, unknown> = {}) => mountSuspended(EditionForm, {
   props: { mode: EDITION_FORM_MODE.CREATE, values: emptyEditionFormValues(), pending: false, failure: null, ...props },
   global: { components: { RouterLink } }
@@ -117,12 +122,12 @@ describe('service des éditions : verbes et corps', () => {
 })
 
 describe('formulaire de création', () => {
-  it('champ Année : texte au clavier numérique, 4 caractères, pas de champ numérique (87eea8e)', async () => {
+  it('champ Année : un select Origam, 11 années autour de l’année courante, pas de saisie libre (F-49)', async () => {
     const wrapper = await mountForm()
-    const input = wrapper.get('[data-cy="edition-form-year"] input')
-    expect(input.attributes('inputmode')).toBe('numeric')
-    expect(input.attributes('maxlength')).toBe('4')
-    expect(input.attributes('type')).not.toBe('number')
+    expect(wrapper.find('[data-cy="edition-form-year"] input[inputmode="numeric"]').exists()).toBe(false)
+    expect(wrapper.getComponent(OrigamSelect).props('items')).toEqual(buildEditionYearOptions(new Date().getFullYear()))
+    expect(wrapper.getComponent(OrigamSelect).props('items')).toHaveLength(11)
+    expect(wrapper.get('[data-cy="edition-form-year"] input').attributes('type')).not.toBe('number')
   })
 
   it('annonce que le code est généré par le serveur, dans une alerte info, et ne propose aucun champ Code', async () => {
@@ -133,35 +138,18 @@ describe('formulaire de création', () => {
     expect(wrapper.find('[data-cy="edition-form-code"]').exists()).toBe(false)
   })
 
-  it('une année vide ou à 2 chiffres bloque l’envoi, avec le message sous le champ ; « 27 » reste « 27 »', async () => {
+  it('une année non choisie bloque l’envoi, avec le message sous le champ', async () => {
     const wrapper = await mountForm()
     await wrapper.get('[data-cy="edition-form-name"] input').setValue('Championnat')
     await wrapper.get('form').trigger('submit')
     await flushPromises()
     expect(wrapper.emitted('submit')).toBeUndefined()
-    expect(wrapper.get('[data-cy="edition-form-year"]').text()).toContain('année sur 4 chiffres')
-
-    await wrapper.get('[data-cy="edition-form-year"] input').setValue('27')
-    await wrapper.get('form').trigger('submit')
-    await flushPromises()
-    expect(wrapper.emitted('submit')).toBeUndefined()
-    expect((wrapper.get('[data-cy="edition-form-year"] input').element as HTMLInputElement).value).toBe('27')
-    expect(wrapper.get('[data-cy="edition-form-year"]').text()).toContain('année sur 4 chiffres')
-  })
-
-  it('une année hors bornes (1999) est refusée avec son message', async () => {
-    const wrapper = await mountForm()
-    await wrapper.get('[data-cy="edition-form-year"] input').setValue('1999')
-    await wrapper.get('[data-cy="edition-form-name"] input').setValue('x')
-    await wrapper.get('form').trigger('submit')
-    await flushPromises()
-    expect(wrapper.emitted('submit')).toBeUndefined()
-    expect(wrapper.get('[data-cy="edition-form-year"]').text()).toContain('entre 2000 et 2100')
+    expect(wrapper.get('[data-cy="edition-form-year"]').text()).toContain('Choisissez une année')
   })
 
   it('le nom est obligatoire à la création (le serveur le refuse vide)', async () => {
     const wrapper = await mountForm()
-    await wrapper.get('[data-cy="edition-form-year"] input').setValue('2027')
+    chooseYear(wrapper, '2027')
     await wrapper.get('form').trigger('submit')
     await flushPromises()
     expect(wrapper.emitted('submit')).toBeUndefined()
@@ -170,7 +158,7 @@ describe('formulaire de création', () => {
 
   it('des valeurs valides sont émises', async () => {
     const wrapper = await mountForm()
-    await wrapper.get('[data-cy="edition-form-year"] input').setValue(VALID.year)
+    chooseYear(wrapper, VALID.year)
     await wrapper.get('[data-cy="edition-form-name"] input').setValue(VALID.name)
     await wrapper.get('form').trigger('submit')
     await flushPromises()
@@ -367,8 +355,10 @@ describe('page liste des éditions', () => {
 describe('page de création', () => {
   const mountNew = () => mountSuspended(EditionNewPage, { route: ROUTES.ADMIN_EDITION_NEW, global: { components: { RouterLink } } })
 
+  const YEAR = String(new Date().getFullYear())
+
   const fill = async (wrapper: Awaited<ReturnType<typeof mountNew>>) => {
-    await wrapper.get('[data-cy="edition-form-year"] input').setValue('2027')
+    chooseYear(wrapper, YEAR)
     await wrapper.get('[data-cy="edition-form-name"] input').setValue('Championnat de Caps 2027')
     await wrapper.get('form').trigger('submit')
     await settle(wrapper)
@@ -386,7 +376,7 @@ describe('page de création', () => {
     }))
     const wrapper = await mountNew()
     await fill(wrapper)
-    expect(seen).toHaveBeenCalledWith({ year: 2027, name: 'Championnat de Caps 2027' })
+    expect(seen).toHaveBeenCalledWith({ year: Number(YEAR), name: 'Championnat de Caps 2027' })
     expect(wrapper.find('[data-cy="edition-form"]').exists()).toBe(false)
     expect(wrapper.get('[data-cy="edition-created-title"]').text()).toContain('2027b')
     expect(wrapper.get('[data-cy="edition-created-address"]').text()).toBe('/editions/2027b')
@@ -404,7 +394,7 @@ describe('page de création', () => {
     const wrapper = await mountNew()
     await fill(wrapper)
     expect(wrapper.get('[data-cy="edition-form-error"]').text()).toContain('Plus aucun code disponible pour cette année.')
-    expect((wrapper.get('[data-cy="edition-form-year"] input').element as HTMLInputElement).value).toBe('2027')
+    expect(wrapper.getComponent(OrigamSelect).props('modelValue')).toBe(YEAR)
   })
 
   it('400 de validation : alerte d’erreur', async () => {

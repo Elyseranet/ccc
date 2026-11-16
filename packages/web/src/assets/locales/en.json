@@ -1361,7 +1361,7 @@
   "admin.editions.form_cancel": "Cancel",
   "admin.editions.form_submit_edit": "Save",
   "admin.editions.form_submit_create": "Create the edition",
-  "admin.editions.rule_year_required": "Enter a 4-digit year, for example 2027.",
+  "admin.editions.rule_year_required": "Choose a year.",
   "admin.editions.rule_year_format": "Enter a 4-digit year, for example 2027.",
   "admin.editions.rule_year_range": "The year must be between 2000 and 2100.",
   "admin.editions.rule_required": "Required field",

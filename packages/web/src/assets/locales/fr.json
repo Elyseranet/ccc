@@ -1361,7 +1361,7 @@
   "admin.editions.form_cancel": "Annuler",
   "admin.editions.form_submit_edit": "Enregistrer",
   "admin.editions.form_submit_create": "Créer l’édition",
-  "admin.editions.rule_year_required": "Indiquez une année sur 4 chiffres, par exemple 2027.",
+  "admin.editions.rule_year_required": "Choisissez une année.",
   "admin.editions.rule_year_format": "Indiquez une année sur 4 chiffres, par exemple 2027.",
   "admin.editions.rule_year_range": "L’année doit être comprise entre 2000 et 2100.",
   "admin.editions.rule_required": "Champ obligatoire",

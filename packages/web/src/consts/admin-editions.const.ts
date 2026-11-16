@@ -6,9 +6,11 @@ import type { IAdminFailureMessages, IAdminFailureText } from '../interfaces/adm
 import type { IAdminEditionColumn, IEditionReadonlyEntry } from '../interfaces/admin-editions.interface.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 
-/** Quatre chiffres, ni signe ni espace : l'`<input>` reste un champ texte au clavier numérique (décision 87eea8e). */
+/** Quatre chiffres, ni signe ni espace : forme d'une année valide pour `checkEditionYear`. */
 export const EDITION_YEAR_PATTERN = /^\d{4}$/
-export const EDITION_YEAR_LENGTH = 4
+
+/** Le sélecteur d'année propose l'année courante, cinq années avant et cinq années après (F-49, décision utilisateur 2026-11-16) : 11 options. */
+export const EDITION_YEAR_OPTIONS_SPAN = 5
 
 /** Locale de l'affichage des dates : l'application n'a qu'une langue. */
 export const ADMIN_DATE_LOCALE = 'fr-FR'
