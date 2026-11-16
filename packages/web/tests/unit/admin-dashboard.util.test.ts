@@ -263,6 +263,12 @@ describe('entrée « Phase finale » (F-55)', () => {
     expect(entry(EDITION_STATUS.PLAYOFFS, [pools(105), round(ROUND_KIND.FINAL, 4, ROUND_STATUS.PLAYING)])).toBe(ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW)
   })
 
+  it('quarts et demies terminés, finale non tirée : tirage de tour, pas clôture', () => {
+    const rounds = [pools(105), completed(ROUND_KIND.QUARTER, 2), completed(ROUND_KIND.SEMI, 3)]
+    expect(resolveActiveStep(EDITION_STATUS.PLAYOFFS, rounds)).toBe(ADMIN_DASHBOARD_STEP.BRACKET_DRAW)
+    expect(entry(EDITION_STATUS.PLAYOFFS, rounds)).toBe(ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW)
+  })
+
   it('finale jouée, ou édition clôturée : clôture', () => {
     expect(entry(EDITION_STATUS.PLAYOFFS, [pools(105), completed(ROUND_KIND.FINAL, 4)])).toBe(ROUTES.ADMIN_FINAL_PHASE_CLOSING)
     expect(entry(EDITION_STATUS.CLOSED)).toBe(ROUTES.ADMIN_FINAL_PHASE_CLOSING)
