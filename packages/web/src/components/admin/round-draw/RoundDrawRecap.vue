@@ -5,6 +5,7 @@
     border
     elevation="md"
     :aria-labelledby="titleId"
+    id="round-draw-recap"
     class="round-draw-recap"
     data-cy="round-draw-recap"
   >

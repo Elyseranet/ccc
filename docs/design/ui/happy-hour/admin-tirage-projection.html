@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tirage au sort · Projection CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="pj-body">
+<!-- F-52 · Écran de projection (décisions utilisateur 2026-11-16) : ouvert par « Tirer l’affiche suivante » / « Tirer le joueur suivant » après le POST B-26 (une étape tirée au clic).
+     Plein écran, sans tiroir ni barre d’admin : lu de loin au projecteur (typo Bagel ≥ 13 vh à 1080, texte crème sur nuit, contraste très élevé).
+     Animations CSS seules (admin) : animation-delay en unités de motion.duration.xslow ; sous reduced-motion, le résultat s’affiche directement et « Continuer » est là tout de suite. -->
+<div class="mock-demo pj-demo" role="group" aria-label="Démo de la maquette (hors produit)"><span class="eyebrow">Démo maquette · F-52</span><button class="btn btn--outlined btn--sm" type="button" data-v="tour" aria-pressed="true">Affiche (VS)</button><button class="btn btn--outlined btn--sm" type="button" data-v="poule" aria-pressed="false">Joueur et poule</button><button class="btn btn--outlined btn--sm" type="button" data-replay>Rejouer</button><button class="btn btn--outlined btn--sm" type="button" data-skip>Résultat</button></div>
+<main id="pj" class="pj" data-v="tour" data-st="draw" aria-labelledby="pj-t">
+  <div class="pj-rays" aria-hidden="true"></div><div class="pj-flash" aria-hidden="true"></div>
+  <header class="pj-top">
+    <span class="hh-brand font-display"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC 2026</span></span>
+    <h1 id="pj-t" class="pj-t"><span data-for="tour">Tirage des huitièmes</span><span data-for="poule">Tirage des poules</span></h1>
+    <p class="pj-step num"><span data-for="tour">Affiche 4 / 8</span><span data-for="poule">Joueur 30 / 37</span></p>
+  </header>
+  <!-- Phase finale : nom A (0 s), nom B (+1,26 s), « VS » qui s’écrase (+2,52 s) avec éclair, éclat de capsules et rayons qui s’intensifient ; « Continuer » à 3,24 s -->
+  <section class="pj-stage" data-for="tour" aria-label="Affiche 4">
+    <div class="pj-name pj-name--a"><span class="pj-cap" aria-hidden="true"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg></span><span class="pj-n font-display">Lina Mercier</span></div>
+    <p class="pj-vs font-display neon"><span aria-hidden="true">VS</span><span class="sr-only">contre</span></p>
+    <div class="pj-name pj-name--b"><span class="pj-cap" aria-hidden="true"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg></span><span class="pj-n font-display">Maya Bonnet</span></div>
+    <div class="pj-burst" aria-hidden="true"><i style="--a:0deg;--r:40vmin"></i><i style="--a:26deg;--r:30vmin"></i><i style="--a:52deg;--r:44vmin"></i><i style="--a:78deg;--r:34vmin"></i><i style="--a:104deg;--r:38vmin"></i><i style="--a:130deg;--r:28vmin"></i><i style="--a:156deg;--r:46vmin"></i><i style="--a:182deg;--r:32vmin"></i><i style="--a:208deg;--r:42vmin"></i><i style="--a:234deg;--r:36vmin"></i><i style="--a:260deg;--r:30vmin"></i><i style="--a:286deg;--r:44vmin"></i><i style="--a:312deg;--r:34vmin"></i><i style="--a:338deg;--r:40vmin"></i></div>
+  </section>
+  <!-- Poules : le nom (0 s), puis « rejoint la » et la poule dans une grande capsule qui s’écrase (+1,26 s) ; « Continuer » à 2,34 s -->
+  <section class="pj-stage" data-for="poule" aria-label="Joueur 30">
+    <div class="pj-name pj-name--a"><span class="pj-cap" aria-hidden="true"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg></span><span class="pj-n font-display">Clara David</span></div>
+    <p class="pj-into">rejoint la</p>
+    <p class="pj-pool"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span class="pj-pool__t"><span class="pj-pool__l">Poule</span><span class="pj-pool__n font-display">7</span></span></p>
+    <div class="pj-burst" aria-hidden="true"><i style="--a:0deg;--r:40vmin"></i><i style="--a:26deg;--r:30vmin"></i><i style="--a:52deg;--r:44vmin"></i><i style="--a:78deg;--r:34vmin"></i><i style="--a:104deg;--r:38vmin"></i><i style="--a:130deg;--r:28vmin"></i><i style="--a:156deg;--r:46vmin"></i><i style="--a:182deg;--r:32vmin"></i><i style="--a:208deg;--r:42vmin"></i><i style="--a:234deg;--r:36vmin"></i><i style="--a:260deg;--r:30vmin"></i><i style="--a:286deg;--r:44vmin"></i><i style="--a:312deg;--r:34vmin"></i><i style="--a:338deg;--r:40vmin"></i></div>
+  </section>
+  <!-- Région live : présente au chargement, texte inséré à la réponse du serveur (annonce immédiate, sans attendre l’animation) -->
+  <div class="sr-only" aria-live="polite"><span data-for="tour">Affiche 4 : Lina Mercier contre Maya Bonnet.</span><span data-for="poule">Clara David rejoint la poule 7.</span></div>
+  <footer class="pj-act">
+    <!-- origam-btn variant="flat" bg-color="primary" size="x-large" : retour à la liste, où l’élément vient de s’ajouter ; apparaît à la fin (visibility animée) ; Échap = Continuer ; focus posé dessus à animationend (événement, pas de timer) -->
+    <a class="btn btn--primary" data-for="tour" href="admin-tirage-tour.html?etat=arrived">Continuer</a><a class="btn btn--primary" data-for="poule" href="admin-tirages.html?etat=arrived">Continuer</a>
+    <!-- origam-btn variant="text" : coupe l’animation (même rendu que reduced-motion), disparaît seul à la fin -->
+    <button class="btn btn--text btn--sm pj-skip" type="button" data-skip>Passer l’animation</button>
+  </footer>
+</main>
+<script>
+/* Démo de la maquette uniquement (hors produit) : choix de variante, rejouer (élément recloné), résultat. Aucun timer, aucune animation pilotée en JS. */
+(() => {
+  const pj = document.getElementById('pj'), bar = document.querySelector('.pj-demo');
+  let cur = pj;
+  const setV = (v) => { cur = (() => { const c = cur.cloneNode(true); c.dataset.v = v; c.dataset.st = 'draw'; cur.replaceWith(c); return c; })(); bar.querySelectorAll('[data-v]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === v))); };
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.v) setV(t.dataset.v);
+    else if ('replay' in t.dataset) setV(cur.dataset.v);
+    else if ('skip' in t.dataset) cur.dataset.st = 'done';
+  });
+  const q = new URLSearchParams(location.search);
+  if (q.get('v')) setV(q.get('v'));
+  if (q.get('etat') === 'done') cur.dataset.st = 'done';
+  if (q.get('demo') === '0') bar.hidden = true;
+})();
+</script>
+</body>
+</html>

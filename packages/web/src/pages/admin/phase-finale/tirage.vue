@@ -22,9 +22,7 @@
         />
       </div>
       <p class="admin-round-draw__lead">
-        {{ lead }} <nuxt-link :to="matchesRoute">
-          {{ leadLink }}
-        </nuxt-link>{{ leadEnd }}
+        {{ lead }} <nuxt-link :to="matchesRoute">{{ leadLink }}</nuxt-link>{{ leadEnd }}
       </p>
     </header>
     <origam-alert
@@ -121,6 +119,7 @@
                 :changeable="isChosen"
                 :waiting-leaders="waitingLeaders"
                 :drawable-count="drawable.length"
+                :complete="isRoundComplete"
                 @change-round="handleChangeRound"
               />
             </template>
@@ -136,9 +135,14 @@
               :save-state="saveState"
               :waiting-leaders="waitingLeaders"
               :headless="isPlayoff"
+              :drawing="drawing"
+              :started="drawStarted"
+              :arrival="arrival"
               @place="handlePlace"
               @change="handleChange"
               @change-round="handleChangeRound"
+              @draw="handleDraw"
+              @restart="handleRestartDraw"
             />
             <round-draw-side
               :round-kind="roundKind"
@@ -168,6 +172,22 @@
         </template>
       </template>
     </async-state>
+    <draw-projector
+      v-if="projectorView"
+      :view="projectorView"
+      :brand="brand"
+      :title="projectorTitle"
+      @continue="handleContinue"
+    />
+    <draw-restart-dialog
+      :open="restartOpen"
+      :busy="restarting"
+      :kind="drawKind"
+      :count="drawnCount"
+      :round-text="restartRoundText"
+      @cancel="handleRestartCancel"
+      @confirm="handleRestartConfirm"
+    />
     <origam-snackbar
       v-model="snackbarOpen"
       status="success"
@@ -181,6 +201,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamSnackbar, OrigamTitle } from 'origam/components'
+import DrawProjector from '~/components/admin/draws/DrawProjector.vue'
+import DrawRestartDialog from '~/components/admin/draws/DrawRestartDialog.vue'
 import DrawSteps from '~/components/admin/draws/DrawSteps.vue'
 import PhaseSteps from '~/components/admin/phase/PhaseSteps.vue'
 import RoundDrawChangeDialog from '~/components/admin/round-draw/RoundDrawChangeDialog.vue'
@@ -196,6 +218,7 @@ import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
 import { ADMIN_DASHBOARD_STEP_COUNT, ADMIN_DASHBOARD_STEPS } from '~/consts/admin-dashboard.const'
 import { POOL_DRAW_SNACKBAR_TIMEOUT_MS } from '~/consts/pool-draw.const'
+import { ROUND_DRAW_TEXTS } from '~/consts/round-draw.const'
 import { ROUND_LABELS } from '~/consts/round-labels.const'
 import { ROUTES } from '~/consts/routes.const'
 import { ADMIN_DASHBOARD_STEP } from '~/enums/admin-dashboard.enum'
@@ -203,6 +226,7 @@ import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
 import { PHASE_STEP } from '~/enums/qualification.enum'
 import { ROUND_DRAW_MENTION, ROUND_DRAW_VIEW } from '~/enums/round-draw.enum'
+import { DRAW_KIND } from '~/enums/draw.enum'
 import { ROUND_KIND } from '~/enums/round.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import type { TSidePosition } from '~/types/draw.type'
@@ -231,8 +255,14 @@ useSeo({ noindex: true })
 const draw = await useRoundDraw()
 const {
   edition, view, preview, rounds, roundKind, players, drawable, steps, pairings, unplaced, progress, blocker, recap, saveState, feedback, busy, stale, isClosed, isReadOnly,
-  pageError, pending, drawnRound, validatedDraw
+  pageError, pending, drawnRound, validatedDraw, drawStarted
 } = draw
+const { drawing, view: projectorView, arrival, drawnCount, restartOpen, restarting } = draw.random
+const drawKind = DRAW_KIND.ROUND
+const isRoundComplete = computed(() => progress.value.total > 0 && progress.value.pairings >= progress.value.total)
+const restartRoundText = computed(() => (roundKind.value ? t(ROUND_DRAW_TEXTS[roundKind.value].of.key, ROUND_DRAW_TEXTS[roundKind.value].of.fallback) : ''))
+const projectorTitle = computed(() => t('admin.random_draw.projector_title_round', 'Tirage {round}', { round: restartRoundText.value }))
+const brand = computed(() => t('admin.random_draw.projector_brand', 'CCC {year}', { year: edition.value?.year ?? '' }))
 const isEmpty = computed(() => preview.value === null)
 const allowedRoundKinds = computed(() => preview.value?.allowedRoundKinds ?? [])
 const showState = computed(() => view.value !== null && view.value !== ROUND_DRAW_VIEW.ENTRY && view.value !== ROUND_DRAW_VIEW.CHOICE)
@@ -258,7 +288,7 @@ const workflowStep = ADMIN_DASHBOARD_STEPS.findIndex(entry => entry.step === ADM
 const eyebrow = computed(() => edition.value
   ? t('admin.round_draw.eyebrow_page', 'Édition {year} · étape {step} sur {total}', { year: edition.value.year, step: workflowStep, total: ADMIN_DASHBOARD_STEP_COUNT })
   : t('admin.round_draw.eyebrow_none', 'Aucune édition'))
-const lead = computed(() => t('admin.round_draw.lead', 'Enregistrer le tirage physique de chaque tour de la phase finale. Les scores se saisissent dans'))
+const lead = computed(() => t('admin.round_draw.lead', 'Tirer au sort chaque tour de la phase finale, affiche par affiche, ou enregistrer le tirage physique. Les scores se saisissent dans'))
 const leadLink = computed(() => t('admin.round_draw.lead_link', 'Poules et matchs'))
 const leadEnd = computed(() => t('admin.round_draw.lead_end', ', filtre par tour.'))
 const stepsLabel = computed(() => t('admin.round_draw.steps_label', 'Tours de la phase finale'))
@@ -310,6 +340,21 @@ watch(saveState, (value) => {
   }
 })
 const changeOpen = ref(false)
+const handleDraw = () => {
+  draw.random.draw()
+}
+const handleContinue = () => {
+  draw.random.close()
+}
+const handleRestartDraw = () => {
+  draw.random.askRestart()
+}
+const handleRestartCancel = () => {
+  draw.random.cancelRestart()
+}
+const handleRestartConfirm = () => {
+  draw.random.restart()
+}
 const handleReload = () => {
   draw.reload()
 }

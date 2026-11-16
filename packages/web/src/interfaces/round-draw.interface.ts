@@ -5,6 +5,7 @@ import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { TSidePosition } from '../types/draw.type.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 import type { ITranslatableText } from './common-components.interface.js'
+import type { IDrawArrival } from './random-draw-screen.interface.js'
 
 /** Un joueur du vivier, prêt à proposer dans une liste : ses initiales servent à la pastille de la liste « À placer ». */
 export interface IRoundDrawPlayer {
@@ -83,6 +84,10 @@ export interface IRoundDrawEntryProps {
   waitingLeaders: number
   /** L'en-tête est posé par la page (carte des barrages). */
   headless?: boolean
+  /** Tirage au sort (F-52) : affiches commencées, envoi en cours, premier tirage fait, affiche arrivée au retour de la projection. */
+  drawing?: boolean
+  started?: boolean
+  arrival?: IDrawArrival | null
 }
 
 export interface IRoundDrawHeadProps {
@@ -93,6 +98,8 @@ export interface IRoundDrawHeadProps {
   waitingLeaders: number
   /** Joueurs à tirer : avec les premiers qui attendent, ils donnent le tour d'après les barrages. */
   drawableCount: number
+  /** Brouillon complet (F-52) : la pastille « Brouillon complet » accompagne le compteur. */
+  complete?: boolean
 }
 
 export interface IRoundDrawHeadEmits {
@@ -103,6 +110,8 @@ export interface IRoundDrawEntryEmits {
   (event: 'place', pairingIndex: number, participationId: string, position: TSidePosition): void
   (event: 'change', pairingIndex: number): void
   (event: 'change-round'): void
+  (event: 'draw'): void
+  (event: 'restart'): void
 }
 
 export interface IRoundDrawSideProps {

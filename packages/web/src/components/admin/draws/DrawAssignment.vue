@@ -14,11 +14,40 @@
         >
           {{ title }}
         </h2>
-        <span
-          class="draw-assignment__count"
-          data-cy="draw-progress-text"
-        >{{ progressText }}</span>
+        <span class="draw-assignment__counts">
+          <span
+            class="draw-assignment__count"
+            data-cy="draw-progress-text"
+          >{{ progressText }}</span>
+          <origam-chip
+            v-if="showBand && complete"
+            color="primary"
+            bg-color="primary"
+            size="small"
+            pill
+            :text="completeChip"
+            data-cy="draw-complete-chip"
+          />
+        </span>
       </header>
+      <draw-random-band
+        v-if="showBand"
+        :kind="kind"
+        :complete="complete"
+        :restartable="progress.placed > poolCount"
+        :total="progress.total"
+        :drawing="drawing"
+        :started="started"
+        :disabled="saveState === POOL_DRAW_SAVE_STATE.SAVING"
+        @draw="emits('draw')"
+        @restart="emits('restart')"
+      />
+      <p
+        v-if="showBand && !complete"
+        class="draw-assignment__or"
+      >
+        {{ orLabel }}
+      </p>
       <origam-progress
         :model-value="progress.percent"
         color="primary"
@@ -57,6 +86,7 @@
           elevation="md"
           padding="5"
           class="draw-assignment__pool"
+          :class="{ 'draw-assignment__pool--new': pool.arrived }"
           :data-cy="`draw-pool-${pool.number}`"
         >
           <div class="draw-assignment__pool-content">
@@ -78,7 +108,7 @@
                 v-for="slot in pool.slots"
                 :key="slot.place"
                 class="draw-assignment__slot"
-                :class="{ 'draw-assignment__slot--seed': slot.isSeed, 'draw-assignment__slot--empty': slot.empty }"
+                :class="{ 'draw-assignment__slot--seed': slot.isSeed, 'draw-assignment__slot--empty': slot.empty, 'draw-assignment__slot--new': slot.arrived }"
                 :data-cy="`draw-slot-${pool.number}-${slot.place}`"
               >
                 <span class="draw-assignment__place">{{ slot.place }}</span>
@@ -116,6 +146,10 @@
                 </template>
                 <template v-else>
                   <b class="draw-assignment__name">{{ slot.name }}</b>
+                  <span
+                    v-if="slot.arrived"
+                    class="sr-only"
+                  >{{ arrivedLabel }}</span>
                   <origam-chip
                     v-if="slot.isSeed"
                     color="secondary"
@@ -272,12 +306,14 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamProgress, OrigamSelect } from 'origam/components'
+import DrawRandomBand from '~/components/admin/draws/DrawRandomBand.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { HOME_PROGRESS_THICKNESS, HOME_PROGRESS_TRACK_COLOR } from '~/consts/home.const'
 import { EDITION_CHIP_PROPS } from '~/consts/edition-view.const'
 import { POOL_DRAW_CHIP_CURRENT } from '~/consts/pool-draw.const'
+import { DRAW_KIND } from '~/enums/draw.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { POOL_DRAW_SAVE_STATE } from '~/enums/pool-draw.enum'
 import type { IDrawAssignmentProps, IPoolDrawPool } from '~/interfaces/pool-draw.interface'
@@ -293,15 +329,22 @@ import { currentPoolNumber, poolSlots } from '~/utils/pool-draw.util'
  * l'ordre du tirage). Chaque affectation est enregistrée aussitôt dans le brouillon ; un échec est signalé et se renvoie.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IDrawAssignmentProps>(), {})
+const props = withDefaults(defineProps<IDrawAssignmentProps>(), {
+  drawing: false,
+  started: false,
+  arrival: null
+})
 const emits = defineEmits<{
   (event: 'assign', poolNumber: number, participationId: string): void
   (event: 'change', poolNumber: number, place: number, participationId: string): void
   (event: 'retry'): void
   (event: 'next'): void
+  (event: 'draw'): void
+  (event: 'restart'): void
 }>()
 defineSlots<{}>()
 const titleId = useId()
+const kind = DRAW_KIND.POOLS
 const thickness = HOME_PROGRESS_THICKNESS
 const trackColor = HOME_PROGRESS_TRACK_COLOR
 const editing = ref<string | null>(null)
@@ -309,6 +352,10 @@ const title = computed(() => t('admin.draws.entry_title', '3 · Saisie du tirage
 const progressText = computed(() => t('admin.draws.progress', '{placed} / {total} joueurs placés', { placed: props.progress.placed, total: props.progress.total }))
 const progressLabel = computed(() => t('admin.draws.progress_label', '{placed} joueurs placés sur {total}', { placed: props.progress.placed, total: props.progress.total }))
 const unsavedText = computed(() => t('admin.draws.unsaved', 'La dernière affectation n’est pas enregistrée : le brouillon du serveur n’est pas à jour.'))
+const completeChip = computed(() => t('admin.random_draw.complete_chip', 'Brouillon complet'))
+const orLabel = computed(() => t('admin.random_draw.or_manual_pools', 'ou saisir le tirage physique, joueur par joueur'))
+const arrivedLabel = computed(() => t('admin.random_draw.arrived', 'vient d’être tiré'))
+const showBand = computed(() => !props.readOnly)
 const retryLabel = computed(() => t('admin.draws.retry_save', 'Réessayer'))
 const seedLabel = computed(() => t('admin.draws.seed_chip', 'Tête de série'))
 const changeLabel = computed(() => t('admin.draws.change', 'Changer'))
@@ -345,6 +392,7 @@ const poolChip = (pool: IPoolDrawPool): { color?: string, bgColor?: string } => 
 const poolViews = computed(() => props.pools.map(pool => ({
   number: pool.number,
   current: pool.number === currentPool.value,
+  arrived: props.arrival?.poolNumber === pool.number,
   chip: poolChip(pool),
   title: t('admin.draws.pool_title', 'Poule {number}', { number: pool.number }),
   fill: poolFill(pool),
@@ -356,6 +404,7 @@ const poolViews = computed(() => props.pools.map(pool => ({
     // Un seul choix actif : la première place libre de la poule en cours (RG11), les autres places libres restent passives.
     active: slot.member === null && pool.number === currentPool.value && slot.place === pool.members.length + 1,
     isSeed: slot.member?.isSeed ?? false,
+    arrived: slot.member !== null && (props.arrival?.participationIds.includes(slot.member.participationId) ?? false),
     name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '',
     label: t('admin.draws.slot_label', 'Poule {pool} : joueur tiré', { pool: pool.number }),
     changeLabel: t('admin.draws.change_label', 'Changer {name}, poule {pool}', { name: slot.member ? (names.value.get(slot.member.participationId) ?? '') : '', pool: pool.number })
@@ -412,6 +461,41 @@ defineExpose({})
   &__progress {
     --origam-progress-linear__background---opacity: 1;
     margin-bottom: var(--origam-space---5);
+  }
+
+  &__counts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--origam-space---2);
+  }
+
+  &__or {
+    display: flex;
+    align-items: center;
+    gap: var(--origam-space---3);
+    margin: 0 0 var(--origam-space---3);
+    color: var(--origam-color__text---secondary);
+    font-size: var(--origam-font__size---sm);
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--origam-color__border---default);
+    }
+  }
+
+  &__pool--new {
+    border-color: var(--origam-color__bar---amber);
+    animation: draw-assignment-pool calc(var(--origam-motion__duration---xslow) * 1.5) var(--origam-motion__easing---decelerate) both;
+  }
+
+  &__slot--new {
+    outline: 2px solid var(--origam-color__bar---amber);
+    outline-offset: -2px;
+    animation: draw-assignment-pop var(--origam-motion__duration---xslow) var(--origam-motion__easing---decelerate) both;
   }
 
   &__unsaved {
@@ -585,6 +669,15 @@ defineExpose({})
     grid-column: 1 / -1;
     justify-content: flex-end;
   }
+}
+
+@keyframes draw-assignment-pool {
+  15%, 60% { box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---12) color-mix(in srgb, var(--origam-color__bar---neon) 60%, transparent); }
+}
+
+@keyframes draw-assignment-pop {
+  0% { opacity: 0; visibility: hidden; transform: translateX(var(--origam-space---6)) scale(0.6); }
+  45% { opacity: 1; transform: scale(1.06); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); }
 }
 
 @media (max-width: 1200px) {

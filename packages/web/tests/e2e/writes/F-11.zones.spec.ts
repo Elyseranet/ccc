@@ -52,6 +52,7 @@ const ZONES: Array<{ name: string, mockup: string, app: string }> = [
   { name: 'ti-entete', mockup: '.adm-head', app: '.admin-draws__head' },
   { name: 'ti-etapes', mockup: '.ostep', app: '[data-cy="draw-steps"]' },
   { name: 'ti-saisie', mockup: '.tir-main', app: '.draw-assignment__main' },
+  { name: 'ti-bande', mockup: '.dr-st[data-st="started"] .dr-mode', app: '[data-cy="draw-random-band"]' },
   { name: 'ti-parametres', mockup: '.tir-side > section:nth-child(1)', app: '[data-cy="draw-side-params"]' },
   { name: 'ti-a-placer', mockup: '.tir-side > section:nth-child(2)', app: '[data-cy="draw-rest"]' },
   { name: 'ti-tetes', mockup: '.tir-seeds', app: '[data-cy="draw-seeds-list"]' }
@@ -135,6 +136,11 @@ for (const viewport of VIEWPORTS) {
       await settle(mockup)
       await mockup.addStyleTag({ content: '.adm-bottom, .snack { display: none !important; }' })
       await page.addStyleTag({ content: '.admin-bottom, [data-cy="draw-saved"], [data-cy="draw-feedback"] { display: none !important; }' })
+      // Décision utilisateur 2026-11-16 : « Recommencer le tirage… » est proposé dès qu'un joueur hors têtes de série est placé ; la maquette ne le montre que dans l'état « Retour après un tirage », on le recopie dans l'état commencé.
+      await mockup.evaluate(() => {
+        const link = document.querySelector('.dr-st[data-st="arrived"] .dr-mode__act button')!.cloneNode(true)
+        document.querySelector('.dr-st[data-st="started"] .dr-mode__act')!.prepend(link)
+      })
       await alignMockupText(mockup, page, TEXT_PAIRS)
       await hideInk(mockup, MOCKUP_INK)
       await hideInk(page, APP_INK)

@@ -2,6 +2,7 @@ import type { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { POOL_DRAW_SAVE_STATE, POOL_DRAW_STEP, POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { IAdminDraw, ISeedProposal } from './draw.interface.js'
+import type { IDrawArrival } from './random-draw-screen.interface.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 
 /** Un inscrit de l'édition, prêt à proposer dans une liste de places. */
@@ -119,6 +120,10 @@ export interface IDrawAssignmentProps {
   saveState: POOL_DRAW_SAVE_STATE
   readOnly: boolean
   complete: boolean
+  /** Tirage au sort (F-52) : joueurs tirés hors têtes de série, envoi en cours, premier tirage fait, élément arrivé au retour de la projection. */
+  drawing?: boolean
+  started?: boolean
+  arrival?: IDrawArrival | null
 }
 
 export interface IDrawRecapProps {
