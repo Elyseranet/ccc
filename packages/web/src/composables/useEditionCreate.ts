@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
 import { ADMIN_EDITIONS_CACHE_KEY } from '~/consts/admin-editions.const'
 import type { IEditionFormValues } from '~/interfaces/admin-editions.interface'
 import type { IAdminFailure } from '~/interfaces/admin-failure.interface'
@@ -11,9 +12,11 @@ import { toCreateEditionRequest, toEditionFailure } from '~/utils/admin-editions
  *
  * @description
  * Création d'une édition (`POST /editions`). Le code est généré par le serveur (CE-1) et rendu dans `created`. Un envoi à
- * la fois. La liste des éditions (et le sélecteur de la coque) est rechargée après la création.
+ * la fois. La liste des éditions (et le sélecteur de la coque) est rechargée après la création, puis l'édition créée devient l'édition
+ * active de l'admin (F-50).
  ********************************************************/
 export const useEditionCreate = () => {
+  const adminEdition = useAdminEditionStore()
   const service = new EditionService({ fetcher: useRequestFetch() })
   const pending = ref(false)
   const failure = ref<IAdminFailure | null>(null)
@@ -28,6 +31,7 @@ export const useEditionCreate = () => {
     try {
       created.value = await service.create(toCreateEditionRequest(values))
       await refreshNuxtData(ADMIN_EDITIONS_CACHE_KEY)
+      adminEdition.editionId = created.value.id
       return true
     } catch (cause) {
       failure.value = toEditionFailure(cause)

@@ -62,11 +62,11 @@ test.describe('admin participants : lecture, états et refus sur les vraies donn
     expect(await violationsOf(page)).toEqual([])
   })
 
-  test('édition 2026 (au-delà de l’inscription) : lecture seule, aucun bouton Retirer, recherche désactivée, 0 violation axe', async ({ page }) => {
+  test('édition 2026 (au-delà de l’inscription) : lecture seule, aucun bouton Retirer, aucun champ de recherche, 0 violation axe', async ({ page }) => {
     await openParticipants(page)
     await expect(page.getByTestId('participant-read-only')).toContainText('Les inscriptions sont closes')
     await expect(page.getByTestId('participant-remove')).toHaveCount(0)
-    await expect(page.getByTestId('participant-search').locator('input')).toBeDisabled()
+    await expect(page.getByTestId('participant-search')).toHaveCount(0)
     await expect(page.getByTestId('participant-summary')).toContainText('inscriptions closes')
     expect(await violationsOf(page)).toEqual([])
   })
@@ -88,13 +88,13 @@ test.describe('admin participants : lecture, états et refus sur les vraies donn
     expect(await registered(page, edition.id)).toHaveLength(before.length)
   })
 
-  test('édition clôturée : lecture seule, aucun bouton Retirer, recherche désactivée', async ({ page, context }) => {
+  test('édition clôturée : lecture seule, aucun bouton Retirer, aucun champ de recherche', async ({ page, context }) => {
     const edition = await editionOf(page, '2025')
     await selectAdminEdition(context, { id: edition.id, code: edition.code, year: 2025, status: edition.status })
     await openParticipants(page)
     await expect(page.getByTestId('participant-read-only')).toBeVisible()
     await expect(page.getByTestId('participant-remove')).toHaveCount(0)
-    await expect(page.getByTestId('participant-search').locator('input')).toBeDisabled()
+    await expect(page.getByTestId('participant-search')).toHaveCount(0)
     await expect(page.getByTestId('participant-summary')).toContainText('lecture seule')
     expect(await violationsOf(page)).toEqual([])
   })

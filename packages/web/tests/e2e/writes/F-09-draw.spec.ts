@@ -44,11 +44,11 @@ test.describe('admin participants : refus après la validation du tirage', () =>
     await expect(page.getByRole('status').filter({ hasText: 'Les inscriptions sont closes' })).toBeVisible()
     await expect(page.getByTestId('participant-read-only')).toBeVisible()
     await expect(page.getByTestId('participant-remove')).toHaveCount(0)
-    await expect(page.getByTestId('participant-search').locator('input')).toBeDisabled()
+    await expect(page.getByTestId('participant-search')).toHaveCount(0)
     expect(await participantsOf(page, edition)).toHaveLength(before.length)
   })
 
-  test('ajout refusé (409 REGISTRATION_CLOSED) : message traduit, puis état connu, recherche désactivée, aucun inscrit de plus', async ({ page, context }) => {
+  test('ajout refusé (409 REGISTRATION_CLOSED) : message traduit, puis état connu, aucun champ de recherche, aucun inscrit de plus', async ({ page, context }) => {
     const { edition } = await createRegistrationEdition(context.request, 'tirage ajout')
     await attachNewParticipants(context.request, edition, 3, 'tirage ajout')
     const latecomer = await createCompetitor(context.request, 'tirage ajout retardataire', { lastName: 'Retardataire Unique' })
@@ -64,7 +64,7 @@ test.describe('admin participants : refus après la validation du tirage', () =>
 
     await expect(page.getByRole('status').filter({ hasText: 'Les inscriptions sont closes' })).toBeVisible()
     await expect(page.getByTestId('participant-read-only')).toBeVisible()
-    await expect(searchField(page)).toBeDisabled()
+    await expect(page.getByTestId('participant-search')).toHaveCount(0)
     const after = await participantsOf(page, edition)
     expect(after).toHaveLength(before.length)
     expect(after.some(row => row.competitor.id === latecomer.id)).toBe(false)
@@ -79,7 +79,7 @@ test.describe('admin participants : refus après la validation du tirage', () =>
 
     await expect(page.getByTestId('participant-read-only')).toBeVisible()
     await expect(page.getByTestId('participant-remove')).toHaveCount(0)
-    await expect(searchField(page)).toBeDisabled()
+    await expect(page.getByTestId('participant-search')).toHaveCount(0)
     await expect(page.getByTestId('participant-summary')).toContainText('inscriptions closes')
     await expect(page.getByTestId('participant-table')).toBeVisible()
   })

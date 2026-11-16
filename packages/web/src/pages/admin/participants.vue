@@ -48,58 +48,62 @@
         data-cy="participant-add"
       >
         <template #default>
-          <origam-title
-            :id="addTitleId"
-            tag="h2"
-            class="admin-participants__card-title"
-            :text="addTitle"
-          />
-          <p class="admin-participants__lead">
-            {{ addLead }}
-          </p>
-          <origam-alert
-            v-if="isReadOnly"
-            status="info"
-            rounded="lg"
-            :text="readOnlyText"
-            data-cy="participant-read-only"
-          />
-          <participant-search
-            :query="query"
-            :suggestions="suggestions"
-            :loading="searching"
-            :disabled="isReadOnly || busy"
-            @update:query="handleQuery"
-            @attach="handleAttach"
-            @create="handleCreate"
-          />
-          <participant-create-form
-            v-if="creating"
-            :initial-last-name="createName"
-            :pending="busy"
-            :email-taken="emailTaken"
-            @submit="handleSubmit"
-            @cancel="handleCancel"
-            @update:email="handleEmailEdited"
-          />
-          <origam-alert
-            v-if="pendingAvatar"
-            status="warning"
-            rounded="lg"
-            :text="avatarPendingText"
-            data-cy="participant-avatar-pending"
-          >
-            <template #close>
-              <origam-btn
-                variant="outlined"
-                size="small"
-                :loading="busy"
-                :text="avatarRetryLabel"
-                data-cy="participant-avatar-retry"
-                @click="handleRetryAvatar"
+          <div class="admin-participants__add-body">
+            <origam-title
+              :id="addTitleId"
+              tag="h2"
+              class="admin-participants__card-title"
+              :text="addTitle"
+            />
+            <p class="admin-participants__lead">
+              {{ addLead }}
+            </p>
+            <origam-alert
+              v-if="isReadOnly"
+              status="info"
+              rounded="lg"
+              :text="readOnlyText"
+              data-cy="participant-read-only"
+            />
+            <template v-else>
+              <participant-search
+                :query="query"
+                :suggestions="suggestions"
+                :loading="searching"
+                :disabled="busy"
+                @update:query="handleQuery"
+                @attach="handleAttach"
+                @create="handleCreate"
+              />
+              <participant-create-form
+                v-if="creating"
+                :initial-last-name="createName"
+                :pending="busy"
+                :email-taken="emailTaken"
+                @submit="handleSubmit"
+                @cancel="handleCancel"
+                @update:email="handleEmailEdited"
               />
             </template>
-          </origam-alert>
+            <origam-alert
+              v-if="pendingAvatar"
+              status="warning"
+              rounded="lg"
+              :text="avatarPendingText"
+              data-cy="participant-avatar-pending"
+            >
+              <template #close>
+                <origam-btn
+                  variant="outlined"
+                  size="small"
+                  :loading="busy"
+                  :text="avatarRetryLabel"
+                  data-cy="participant-avatar-retry"
+                  @click="handleRetryAvatar"
+                />
+              </template>
+            </origam-alert>
+          </div>
         </template>
       </origam-card>
       <participant-list
@@ -335,13 +339,16 @@ defineExpose({})
   }
 
   &__add {
-    display: grid;
-    gap: var(--origam-space---4);
     padding: var(--origam-space---6);
 
     @media (max-width: 760px) {
       padding: var(--origam-space---5);
     }
+  }
+
+  &__add-body {
+    display: grid;
+    gap: var(--admin-participants__add-body---gap, var(--origam-space---4));
   }
 
   &__card-title {
@@ -361,5 +368,6 @@ defineExpose({})
 :root {
   --admin-participants---gap: var(--origam-space---6);
   --admin-participants__grid---gap: var(--origam-space---5);
+  --admin-participants__add-body---gap: var(--origam-space---4);
 }
 </style>
