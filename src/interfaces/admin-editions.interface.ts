@@ -3,7 +3,7 @@ import type { EDITION_FORM_MODE,EDITION_READONLY_FIELD } from '../enums/admin-ed
 import type { EDITION_CHIP_FAMILY } from '../enums/edition-tab.enum.js'
 import type { IAdminFailure } from './admin-failure.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
-import type { IEditionDetail, IEditionSummary } from './edition.interface.js'
+import type { IAdminEditionSummary, IEditionDetail, IEditionSummary } from './edition.interface.js'
 
 /** Valeurs saisies du formulaire d'édition ; l'année est du texte (champ au clavier numérique, décision 87eea8e). */
 export interface IEditionFormValues {
@@ -43,7 +43,7 @@ export interface IEditionFormEmits {
 }
 
 export interface IEditionsTableProps {
-  editions: IEditionSummary[]
+  editions: IAdminEditionSummary[]
 }
 
 export interface IEditionsToolbarProps {

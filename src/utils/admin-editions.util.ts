@@ -104,7 +104,7 @@ export const toUpdateEditionRequest = (values: IEditionFormValues): IUpdateEditi
 export const isEditionClosed = (edition: Pick<IEditionSummary, 'status'>): boolean => edition.status === EDITION_STATUS.CLOSED
 
 /** Recherche par code ou par année, sans accent ni casse. */
-export const filterEditions = (editions: IEditionSummary[], query: string): IEditionSummary[] => {
+export const filterEditions = <T extends IEditionSummary>(editions: T[], query: string): T[] => {
   const needle = normalizeSearchText(query)
   if (needle === '') {
     return editions

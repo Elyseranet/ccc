@@ -75,7 +75,3 @@
 }
 .err { flex-wrap: nowrap; align-items: start; } .err > span:last-child { flex: 1; }
 .ed-alert[role="alert"] .chip--danger { background: var(--origam-color__feedback--danger---bg); color: var(--origam-color__feedback--danger---fg); }
-
-/* F-48 : variantes du compteur en direct */
-.ed-var { margin-top: var(--origam-space---6); display: grid; gap: var(--origam-space---3); }
-.ed-var__g { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--origam-space---5); }

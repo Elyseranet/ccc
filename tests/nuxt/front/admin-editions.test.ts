@@ -316,6 +316,21 @@ describe('page liste des éditions', () => {
     expect(wrapper.get('[data-cy="editions-table"]').text()).toContain('45')
   })
 
+  it('Participants : édition en cours = inscrits en direct avec « inscrits » dessous ; archivée = N figé seul (F-48)', async () => {
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => [
+      { ...summary({ participantCount: null }), registeredCount: 3 },
+      { ...summary({ id: 'c', code: '2025', year: 2025, status: EDITION_STATUS.CLOSED, origin: EDITION_ORIGIN.LEGACY_IMPORT, participantCount: 45 }), registeredCount: 44 }
+    ]))
+    const wrapper = await mountList()
+    await flushPromises()
+    const live = wrapper.get('[data-cy="editions-count-2026"]')
+    expect(live.text()).toContain('3')
+    expect(live.get('small').text()).toBe('inscrits')
+    const archived = wrapper.get('[data-cy="editions-count-2025"]')
+    expect(archived.text()).toBe('45')
+    expect(archived.find('small').exists()).toBe(false)
+  })
+
   it('la recherche filtre par code ou année et annonce l’absence de résultat', async () => {
     registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => [{ ...summary(), registeredCount: 0 }, { ...summary({ id: 'c', code: '2025', year: 2025 }), registeredCount: 0 }]))
     const wrapper = await mountList()

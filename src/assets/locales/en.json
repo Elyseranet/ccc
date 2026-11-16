@@ -1378,6 +1378,7 @@
   "admin.editions.column_date": "Date",
   "admin.editions.column_status": "Status",
   "admin.editions.column_origin": "Origin",
+  "admin.editions.registered_label": "registered",
   "admin.editions.column_participants": "Participants",
   "admin.editions.column_action": "Action",
   "admin.editions.error_validation_title": "The form contains an error.",
