@@ -18,6 +18,7 @@ export const LOG_EVENT = {
   AVATAR_UPLOADED: 'avatar_uploaded',
   AVATAR_DELETED: 'avatar_deleted',
   QUALIFICATION_FINALIZED: 'qualification_finalized',
+  QUALIFICATION_REOPENED: 'qualification_reopened',
   TIEBREAK_CREATED: 'tiebreak_created',
   TIEBREAK_DELETED: 'tiebreak_deleted',
   MATCH_RECORDED: 'match_recorded',

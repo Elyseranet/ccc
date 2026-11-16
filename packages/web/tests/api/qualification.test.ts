@@ -13,6 +13,9 @@ import type { IAdminMatch } from '../../src/interfaces/admin-match.interface'
 import type { IApiError } from '../../src/interfaces/error.interface'
 import type { IMatchValidationResult } from '../../src/interfaces/score.interface'
 import type { IQualificationResult, IQualificationStatus, ITiebreakGroup } from '../../src/interfaces/qualification.interface'
+import { DRAW_KIND, DRAW_STATUS } from '../../src/enums/draw.enum'
+import type { IAdminDraw } from '../../src/interfaces/draw.interface'
+import { DrawEntity } from '../../src/server/db/typeorm/entities/draw.entity'
 import { EditionEntity } from '../../src/server/db/typeorm/entities/edition.entity'
 import { MatchSideEntity } from '../../src/server/db/typeorm/entities/match-side.entity'
 import { ParticipationEntity } from '../../src/server/db/typeorm/entities/participation.entity'
@@ -45,6 +48,9 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
   // 2171 : égalité parfaite à trois dans la poule 1 (départage de poule) et une poule nette (poule 2). 2172 : égalité de frontière.
   const poolTie2 = await seedPoolStage(dataSource, { code: '2171', rank: 21, pools: [cyclePool('k'), clearPool('l')] })
   const boundary2 = await seedPoolStage(dataSource, { code: '2172', rank: 22, pools: [clearPool('m'), clearPool('n')] })
+  // 2068 : rouverture (B-25) ; 2069 : rouverture refusée une fois le tirage du premier tour validé.
+  const reopenable = await seedPoolStage(dataSource, { code: '2068', rank: 8, pools: [clearPool('r'), clearPool('s')] })
+  const locked = await seedPoolStage(dataSource, { code: '2069', rank: 9, pools: [clearPool('t'), clearPool('u')] })
   const unseeded = await dataSource.getRepository(EditionEntity).save({
     code: '2066', year: 2166, chronologicalRank: 6, status: EDITION_STATUS.REGISTRATION, origin: EDITION_ORIGIN.APP
   })
@@ -81,6 +87,7 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
   }
   const finalize = (fixture: IPoolStageFixture, body: unknown) =>
     send('POST', `/api/v1/editions/${fixture.edition.id}/qualification`, adminCookie, body)
+  const reopen = (fixture: IPoolStageFixture) => send('DELETE', `/api/v1/editions/${fixture.edition.id}/qualification`, adminCookie)
   const idsOf = (fixture: IPoolStageFixture, ...names: string[]): string[] => names.map((name) => fixture.participationByName.get(name)!.id)
   const errorOf = async (response: Response): Promise<IApiError> => await response.json() as IApiError
   const adminMatches = async (fixture: IPoolStageFixture, query = ''): Promise<IAdminMatch[]> => {
@@ -105,6 +112,7 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
     const routes: Array<[string, string, unknown]> = [
       ['GET', `/api/v1/admin/editions/${clear.edition.id}/qualification`, undefined],
       ['POST', `/api/v1/editions/${clear.edition.id}/qualification`, { topPerPool: 1, bestNextCount: 0, withPlayoff: false }],
+      ['DELETE', `/api/v1/editions/${clear.edition.id}/qualification`, undefined],
       ['POST', `/api/v1/editions/${clear.edition.id}/departages`, { participationIds: idsOf(clear, 'a1', 'a2') }]
     ]
     for (const [method, path, body] of routes) {
@@ -450,6 +458,75 @@ describe('qualification, tiebreaks and the qualified list (B-13)', async () => {
       const created = await (await createTiebreak(closed, idsOf(closed, 's1', 's2', 's3'))).json() as IAdminMatch
       await dataSource.getRepository(EditionEntity).update({ id: closed.edition.id }, { status: EDITION_STATUS.CLOSED })
       const response = await removeTiebreak(closed, created.id)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.EDITION_CLOSED)
+    })
+  })
+
+  describe('DELETE /editions/{id}/qualification (B-25)', () => {
+    const participationsOf = (fixture: IPoolStageFixture) =>
+      dataSource.getRepository(ParticipationEntity).findBy({ editionId: fixture.edition.id })
+    const editionOf = (fixture: IPoolStageFixture) => dataSource.getRepository(EditionEntity).findOneByOrFail({ id: fixture.edition.id })
+    const openDraft = (fixture: IPoolStageFixture) => send('POST', `/api/v1/editions/${fixture.edition.id}/tirages/tour`, adminCookie, {})
+
+    it('reopens the list: configuration and ranks erased, players back IN_POOL, edition back to POOLS_DRAWN, the round draft deleted', async () => {
+      expect((await finalize(reopenable, { topPerPool: 2, bestNextCount: 0, withPlayoff: false })).status).toBe(200)
+      const draft = await openDraft(reopenable)
+      expect(draft.status).toBe(201)
+      expect(await dataSource.getRepository(DrawEntity).countBy({ editionId: reopenable.edition.id, kind: DRAW_KIND.ROUND })).toBe(1)
+
+      const response = await reopen(reopenable)
+      expect(response.status).toBe(200)
+      expect(response.headers.get('cache-control')).toBe('no-store')
+      const state = await response.json() as IQualificationStatus
+      expect(state).toMatchObject({ listFinalized: false, parameters: null, qualified: null })
+
+      expect(await dataSource.getRepository(DrawEntity).countBy({ editionId: reopenable.edition.id, kind: DRAW_KIND.ROUND })).toBe(0)
+      const edition = await editionOf(reopenable)
+      expect(edition.status).toBe(EDITION_STATUS.POOLS_DRAWN)
+      expect(edition.qualification).toBeNull()
+      for (const participation of await participationsOf(reopenable)) {
+        expect(participation).toMatchObject({ status: PARTICIPATION_STATUS.IN_POOL, poolRank: null, finalStage: null })
+      }
+    })
+
+    it('is idempotent: replayed on a reopened edition it answers 200 and changes nothing, and the list can be finalized again', async () => {
+      const replay = await reopen(reopenable)
+      expect(replay.status).toBe(200)
+      expect((await editionOf(reopenable)).status).toBe(EDITION_STATUS.POOLS_DRAWN)
+      const again = await finalize(reopenable, { topPerPool: 1, bestNextCount: 0, withPlayoff: false })
+      expect(again.status).toBe(200)
+      expect(((await again.json()) as IQualificationResult).qualified).toHaveLength(2)
+    })
+
+    it('refuses with 409 QUALIFICATION_NOT_DONE before the pools are drawn', async () => {
+      const response = await send('DELETE', `/api/v1/editions/${unseeded.id}/qualification`, adminCookie)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.QUALIFICATION_NOT_DONE)
+    })
+
+    it('refuses with 409 QUALIFICATION_LOCKED once the first round draw is validated, and changes nothing', async () => {
+      expect((await finalize(locked, { topPerPool: 2, bestNextCount: 0, withPlayoff: false })).status).toBe(200)
+      const draw = await (await openDraft(locked)).json() as IAdminDraw
+      const [t1, t2, u1, u2] = idsOf(locked, 't1', 't2', 'u1', 'u2')
+      const pairs = [[t1!, u2!], [u1!, t2!]]
+      const assignments = pairs.flatMap((pair, pairIndex) => pair.map((participationId, side) => ({
+        participationId, pairingIndex: pairIndex + 1, sidePosition: side + 1, drawnOrder: pairIndex * 2 + side + 1
+      })))
+      expect((await send('PUT', `/api/v1/tirages/${draw.id}/affectations`, adminCookie, { assignments })).status).toBe(200)
+      expect((await send('POST', `/api/v1/tirages/${draw.id}/validation`, adminCookie)).status).toBe(200)
+
+      const response = await reopen(locked)
+      expect(response.status).toBe(409)
+      expect((await errorOf(response)).code).toBe(API_ERROR_CODE.QUALIFICATION_LOCKED)
+      expect((await editionOf(locked)).status).toBe(EDITION_STATUS.PLAYOFFS)
+      expect((await editionOf(locked)).qualification).not.toBeNull()
+      expect(await dataSource.getRepository(DrawEntity).countBy({ editionId: locked.edition.id, status: DRAW_STATUS.VALIDATED })).toBe(1)
+    })
+
+    it('refuses with 409 EDITION_CLOSED on a closed edition', async () => {
+      await dataSource.getRepository(EditionEntity).update({ id: reopenable.edition.id }, { status: EDITION_STATUS.CLOSED })
+      const response = await reopen(reopenable)
       expect(response.status).toBe(409)
       expect((await errorOf(response)).code).toBe(API_ERROR_CODE.EDITION_CLOSED)
     })

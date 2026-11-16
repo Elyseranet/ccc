@@ -1,3 +1,4 @@
+import { IsNull, Not } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
 import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
 import { BaseService } from './base.service.js'
@@ -9,6 +10,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { MATCH_PURPOSE, MATCH_STATUS } from '../enums/match.enum.js'
 import { PARTICIPATION_STATUS, FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_RECORD_KEY } from '../enums/match-record-key.enum.js'
+import { DRAW_KIND, DRAW_STATUS } from '../enums/draw.enum.js'
 import { ROUND_KIND } from '../enums/round.enum.js'
 import type {
   IPoolContext,
@@ -25,6 +27,7 @@ import type {
   ITiebreakGroup
 } from '../interfaces/qualification.interface.js'
 import type { IAdminMatch } from '../interfaces/admin-match.interface.js'
+import { DrawEntity } from '../server/db/typeorm/entities/draw.entity.js'
 import { EditionEntity } from '../server/db/typeorm/entities/edition.entity.js'
 import { MatchSideEntity } from '../server/db/typeorm/entities/match-side.entity.js'
 import { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
@@ -74,6 +77,11 @@ export class QualificationService extends BaseService {
   /** `POST /editions/{id}/qualification` : arrête la liste des qualifiés, définitivement (409 si un match ou un départage reste à jouer). */
   finalize (editionId: string, parameters: IQualificationParameters): Promise<IQualificationResult> {
     return this.request<IQualificationResult>(`/editions/${encodeURIComponent(editionId)}/qualification`, { method: 'POST', body: { ...parameters } })
+  }
+
+  /** `DELETE /editions/{id}/qualification` : rouvre la liste tant que le tirage du premier tour n'est pas validé (409 `QUALIFICATION_LOCKED` ensuite) ; rend l'état comme le GET. */
+  reopen (editionId: string): Promise<IQualificationStatus> {
+    return this.request<IQualificationStatus>(`/editions/${encodeURIComponent(editionId)}/qualification`, { method: 'DELETE' })
   }
 }
 
@@ -264,6 +272,40 @@ export const finalizeQualification = (
 
     const refreshed = await loadPoolContext(manager, edition.id)
     return { ...buildResult(parameters, EDITION_STATUS.QUALIFIED, computation, refreshed, false), editionId: edition.id }
+  })
+
+/**
+ * `DELETE /editions/{id}/qualification` (B-25) : rouvre la liste des qualifiés tant que le tirage du premier tour de phase finale
+ * n'est pas validé (la validation passe l'édition à PLAYOFFS). Une transaction sous le verrou de l'édition : les inscrits en poule
+ * redeviennent IN_POOL (place et stade effacés), la configuration est supprimée, le brouillon du tirage de tour est effacé
+ * (ses affectations partent en cascade) et l'édition revient à POOLS_DRAWN, le seul statut que la phase de poules écrive.
+ * Idempotent : liste déjà rouverte, 200 sans effet. 409 QUALIFICATION_LOCKED après le tirage, QUALIFICATION_NOT_DONE avant les poules.
+ */
+export const reopenQualification = (
+  dataSource: DataSource,
+  idOrCode: string
+): Promise<{ editionId: string, replayed: boolean, draftCleared: boolean }> =>
+  dataSource.transaction(async (manager) => {
+    const edition = await findEditionLocked(manager, idOrCode)
+    if (edition.status === EDITION_STATUS.CLOSED) {
+      throw editionClosed()
+    }
+    if (PRE_POOLS_STATUSES.includes(edition.status)) {
+      throw conflictWithCode(API_ERROR_CODE.QUALIFICATION_NOT_DONE, API_ERROR_MESSAGE.QUALIFICATION_NOT_DONE)
+    }
+    if (edition.status === EDITION_STATUS.PLAYOFFS) {
+      throw conflictWithCode(API_ERROR_CODE.QUALIFICATION_LOCKED, API_ERROR_MESSAGE.QUALIFICATION_LOCKED)
+    }
+    if (edition.status !== EDITION_STATUS.QUALIFIED) {
+      return { editionId: edition.id, replayed: true, draftCleared: false }
+    }
+    const cleared = await manager.getRepository(DrawEntity).delete({ editionId: edition.id, kind: DRAW_KIND.ROUND, status: DRAW_STATUS.DRAFT })
+    await manager.getRepository(ParticipationEntity).update(
+      { editionId: edition.id, poolId: Not(IsNull()) },
+      { status: PARTICIPATION_STATUS.IN_POOL, poolRank: null, finalStage: null }
+    )
+    await manager.getRepository(EditionEntity).update({ id: edition.id }, { qualification: null, status: EDITION_STATUS.POOLS_DRAWN })
+    return { editionId: edition.id, replayed: false, draftCleared: (cleared.affected ?? 0) > 0 }
   })
 
 /** Lecture d'un match admin dans la transaction en cours (l'écriture n'est pas encore visible d'une autre connexion). */
