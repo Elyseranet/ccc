@@ -30,6 +30,7 @@ export const API_ERROR_MESSAGE = {
   QUALIFICATION_NOT_READY: 'Every pool match must be validated before the qualified list can be finalized',
   QUALIFICATION_NOT_DONE: 'The qualified list must be finalized before the next round can be drawn',
   QUALIFICATION_ALREADY_DONE: 'The qualified list is already finalized',
+  QUALIFICATION_LOCKED: 'The first round draw is validated: the qualified list can no longer be reopened',
   TIEBREAK_REQUIRED: 'A tie must be broken before the qualified list can be finalized',
   TIEBREAK_NOT_REQUIRED: 'No current tie concerns exactly these players',
   TIEBREAK_ENGAGED: 'A tiebreak exists for this pool: delete it before correcting the score',

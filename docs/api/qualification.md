@@ -12,6 +12,7 @@ Contrat des routes sous `/api/v1`, publié avant le code pour F-24 et F-25. Les 
 | `GET /admin/editions/{id}/tirages/tour` | aucun | `200` `IRoundDrawPreview` | Prochain tirage de tour sans rien écrire : `roundKind` qui serait tiré, `candidates` (vivier), `blockedBy` (`QUALIFICATION_NOT_DONE`, `ROUND_NOT_COMPLETED` ou null). Même fonction que `POST …/tirages/tour` |
 | `POST /editions/{id}/qualification` | `IQualificationParameters` | `200` `IQualificationResult` | Fige la liste des qualifiés (RG18) et passe l'édition à `QUALIFIED` |
 | `POST /editions/{id}/departages` | `ICreateTiebreakRequest` | `201` `IAdminMatch` | Crée un match `TIEBREAK` pour exactement un groupe de `ties` (A10, A11, R-1, R-2, R-6, R-7) |
+| `DELETE /editions/{id}/qualification` | aucun | `200` `IQualificationStatus` | Rouvre la liste des qualifiés (B-25), tant que le tirage du premier tour n'est pas validé ; rend le même état que le `GET` |
 | `DELETE /editions/{id}/departages/{matchId}` | aucun | `204` | Supprime un départage **non joué** (CORRECTION-TIEBREAK, B-24) ; ses côtés partent avec lui |
 | `POST /editions/{id}/tirages/tour` | `ICreateRoundDrawRequest` | `201` `IAdminDraw` | Ouvre le brouillon du tirage du tour suivant (RG13) ; barrages si la qualification a `withPlayoff` |
 | `PUT /tirages/{id}/affectations` | `IUpdateRoundDrawRequest` (tirage de tour) | `200` `IAdminDraw` | Enregistre les affiches tirées physiquement (route existante de B-11, étendue aux tirages de tour) |
@@ -25,7 +26,8 @@ Contrat des routes sous `/api/v1`, publié avant le code pour F-24 et F-25. Les 
 | `TIEBREAK_REQUIRED` | une égalité exige un départage non joué (RG19, RG20) ; `details` porte les groupes (`ITiebreakGroup[]`) |
 | `TIEBREAK_NOT_REQUIRED` | aucune égalité courante ne concerne exactement ces joueurs |
 | `QUALIFICATION_ALREADY_DONE` | la liste est déjà arrêtée avec d'autres paramètres, ou un départage est demandé après l'arrêt de la liste |
-| `QUALIFICATION_NOT_DONE` | un tirage de tour est demandé avant l'arrêt de la liste des qualifiés |
+| `QUALIFICATION_NOT_DONE` | un tirage de tour est demandé avant l'arrêt de la liste des qualifiés ; ou `DELETE …/qualification` avant le tirage des poules |
+| `QUALIFICATION_LOCKED` | `DELETE …/qualification` : le tirage du premier tour de phase finale est validé (édition `PLAYOFFS`), la liste ne se rouvre plus |
 | `TIEBREAK_PLAYED` | `DELETE …/departages/{matchId}` : le départage est saisi ou validé, ou un côté porte un score |
 | `ROUND_NOT_COMPLETED` | le dernier tour de phase finale n'est pas entièrement validé (RG13) |
 
@@ -52,7 +54,7 @@ La saisie et la validation passent par `PUT /matchs/{id}/score` et `POST /matchs
 ## Décisions utilisateur (c9790abd)
 
 - **Pas de refus « puissance de 2 » à la qualification** : on ne bloque pas une configuration documentée (RG18, par exemple « 4 premiers + 8 meilleurs cinquièmes » à 70 joueurs). Les contrôles se font au tirage : chaque affiche a deux côtés, tout le vivier est tiré (hors barrages), un vivier impair est refusé. Le type du tour se déduit de la taille du vivier (2, 4, 8, 16) ; une autre taille sans barrages donne `roundKind: null` dans l'aperçu (décision en attente).
-- **Aucun retour arrière** : aucune route ne rouvre une liste arrêtée ni un tirage de tour validé. Les rejeux à l'identique sont idempotents (200, sans effet).
+- **Retour arrière limité (B-25)** : `DELETE /editions/{id}/qualification` rouvre la liste arrêtée tant que le tirage du premier tour n'est pas validé : inscrits en poule remis `IN_POOL` (place et stade effacés), configuration supprimée, brouillon du tirage de tour effacé, édition remise à `POOLS_DRAWN`, en une transaction sous le verrou de l'édition ; rejouée sur une liste déjà rouverte, 200 sans effet. Aucune route ne défait un tirage de tour validé. Les rejeux à l'identique sont idempotents (200, sans effet).
 - **Tirage saisi affiche par affiche** : `PUT /tirages/{id}/affectations` remplace tout le brouillon ; une saisie partielle est permise en brouillon, la complétude n'est exigée qu'à la validation.
 - **Départages saisis dans F-08** : ils figurent dans `GET /admin/editions/{id}/matchs` (tour `POOLS`, `purpose: TIEBREAK`).
 
