@@ -15,8 +15,9 @@ import { signIn } from '../helpers/session'
 const PNG_1X1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64')
 const STATUS_PRECONDITION_FAILED = 412
 const STATUS_OK = 200
-const YEAR_FIRST_UI = 2090
-const YEAR_SPAN_UI = 10
+// Le sélecteur d'année propose l'année courante ± 5 (F-49) : un test par worker prend une des cinq années à venir.
+const YEAR_FIRST_UI = new Date().getFullYear() + 1
+const YEAR_SPAN_UI = 5
 
 interface IEditionRow { id: string, code: string, year: number, name: string | null, location: string | null, description: string | null }
 interface ICompetitorRow { id: string, displayName: string, firstName: string | null, lastName: string | null, nickname: string | null, avatarUrl: string | null, version: number }
@@ -43,7 +44,8 @@ test.describe('admin éditions : écritures sur une édition créée par le test
     await expect(page.getByTestId('edition-form-code')).toHaveCount(0)
     await expect(page.getByTestId('edition-form-code-info')).toContainText('le serveur le génère')
 
-    await field(page, 'edition-form-year').fill(String(year))
+    await page.getByTestId('edition-form-year').click()
+    await page.getByRole('option', { name: String(year), exact: true }).click()
     await field(page, 'edition-form-name').fill(`E2E création ${year}`)
     await field(page, 'edition-form-location').fill('Bar des tests')
     await page.getByTestId('edition-form-submit').click()
@@ -57,18 +59,16 @@ test.describe('admin éditions : écritures sur une édition créée par le test
     await expect(page.getByTestId('edition-created-address')).toHaveText(`/editions/${shown}`)
   })
 
-  test('année « 27 » : refus sur place, message sous le champ, rien n’est créé', async ({ page }) => {
+  test('année non choisie : refus sur place, message sous le champ, rien n’est créé', async ({ page }) => {
     await page.goto('/admin/editions/nouvelle')
     await hydrated(page)
-    await field(page, 'edition-form-year').fill('27')
-    await field(page, 'edition-form-name').fill('Année trop courte')
+    await field(page, 'edition-form-name').fill('Année non choisie')
     await page.getByTestId('edition-form-submit').click()
 
-    await expect(page.getByTestId('edition-form-year')).toContainText('année sur 4 chiffres')
-    await expect(field(page, 'edition-form-year')).toHaveValue('27')
+    await expect(page.getByTestId('edition-form-year')).toContainText('Choisissez une année')
     await expect(page.getByTestId('edition-created')).toHaveCount(0)
     // Les autres tests créent des éditions en parallèle : on cherche le nom de celle-ci plutôt que de compter.
-    expect((await editions(page)).filter(edition => edition.name === 'Année trop courte')).toHaveLength(0)
+    expect((await editions(page)).filter(edition => edition.name === 'Année non choisie')).toHaveLength(0)
   })
 
   test('modifier une édition : snackbar de confirmation qui disparaît, valeurs enregistrées, code et année inchangés', async ({ page, context }) => {

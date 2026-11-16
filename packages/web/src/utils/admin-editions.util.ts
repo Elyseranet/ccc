@@ -1,6 +1,7 @@
 import {
   ADMIN_DATE_LOCALE,
   ADMIN_EDITION_FAILURE_MESSAGES,
+  EDITION_YEAR_OPTIONS_SPAN,
   EDITION_YEAR_PATTERN,
   ISO_DATE_PATTERN
 } from '../consts/admin-editions.const.js'
@@ -69,6 +70,13 @@ export const checkEditionYear = (value: string | null | undefined): EDITION_YEAR
   }
   const numeric = Number(year)
   return numeric < EDITION_YEAR_MIN || numeric > EDITION_YEAR_MAX ? EDITION_YEAR_ISSUE.RANGE : null
+}
+
+/** Années proposées à la création : `currentYear` ± `EDITION_YEAR_OPTIONS_SPAN`, jamais hors des bornes du serveur (`EDITION_YEAR_MIN`..`EDITION_YEAR_MAX`). */
+export const buildEditionYearOptions = (currentYear: number): string[] => {
+  const first = Math.max(currentYear - EDITION_YEAR_OPTIONS_SPAN, EDITION_YEAR_MIN)
+  const last = Math.min(currentYear + EDITION_YEAR_OPTIONS_SPAN, EDITION_YEAR_MAX)
+  return Array.from({ length: Math.max(last - first + 1, 0) }, (_, index) => String(first + index))
 }
 
 const blankToUndefined = (value: string): string | undefined => value.trim() === '' ? undefined : value.trim()

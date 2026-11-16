@@ -6,6 +6,7 @@ import type { IEditionSummary } from '../../src/interfaces/edition.interface'
 import { ApiRequestError } from '../../src/utils/api-request-error.util'
 import {
   buildAdminEditionLink,
+  buildEditionYearOptions,
   checkEditionYear,
   emptyEditionFormValues,
   filterEditions,
@@ -149,5 +150,17 @@ describe('erreurs de l’API traduites', () => {
     expect(toEditionFailure(failure(0, API_ERROR_CODE.INTERNAL_ERROR, true)).title.key).toBe('admin.editions.error_offline_title')
     expect(toEditionFailure(failure(500, API_ERROR_CODE.INTERNAL_ERROR)).title.key).toBe('admin.editions.error_unknown_title')
     expect(toEditionFailure(new Error('boom')).title.key).toBe('admin.editions.error_unknown_title')
+  })
+})
+
+describe('buildEditionYearOptions (F-49)', () => {
+  it('propose l’année courante, cinq années avant et cinq après : 11 options', () => {
+    expect(buildEditionYearOptions(2026)).toEqual(['2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031'])
+  })
+
+  it('n’affiche aucune option hors des bornes du serveur (2000 à 2100)', () => {
+    expect(buildEditionYearOptions(2002)[0]).toBe('2000')
+    expect(buildEditionYearOptions(2098).at(-1)).toBe('2100')
+    expect(buildEditionYearOptions(1990)).toEqual([])
   })
 })

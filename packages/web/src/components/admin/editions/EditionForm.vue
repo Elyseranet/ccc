@@ -8,204 +8,206 @@
     :aria-labelledby="titleId"
     data-cy="edition-form-card"
   >
-    <header class="edition-form__head">
-      <div class="edition-form__heading">
-        <p class="edition-form__eyebrow">
-          {{ eyebrow }}
-        </p>
-        <origam-title
-          :id="titleId"
-          tag="h2"
-          class="edition-form__title"
-          font-size="xl"
-          font-weight="bold"
-          line-height="tight"
-          letter-spacing="normal"
-          :text="title"
+    <div class="edition-form__body">
+      <header class="edition-form__head">
+        <div class="edition-form__heading">
+          <p class="edition-form__eyebrow">
+            {{ eyebrow }}
+          </p>
+          <origam-title
+            :id="titleId"
+            tag="h2"
+            class="edition-form__title"
+            font-size="xl"
+            font-weight="bold"
+            line-height="tight"
+            letter-spacing="normal"
+            :text="title"
+          />
+        </div>
+        <edition-chip
+          v-if="statusChip"
+          :text="statusChip.text"
+          :family="statusChip.family"
+          data-cy="edition-form-status"
         />
-      </div>
-      <edition-chip
-        v-if="statusChip"
-        :text="statusChip.text"
-        :family="statusChip.family"
-        data-cy="edition-form-status"
+        <origam-chip
+          v-else
+          size="small"
+          pill
+          :text="codeChipText"
+          data-cy="edition-form-code-chip"
+        />
+      </header>
+      <edition-readonly-fields
+        v-if="isEdit && edition"
+        :edition="edition"
+        :fields="readonlyFields"
       />
-      <origam-chip
-        v-else
-        size="small"
-        pill
-        :text="codeChipText"
-        data-cy="edition-form-code-chip"
-      />
-    </header>
-    <edition-readonly-fields
-      v-if="isEdit && edition"
-      :edition="edition"
-      :fields="readonlyFields"
-    />
-    <origam-form
-      class="edition-form__form"
-      validate-on="submit"
-      :aria-labelledby="titleId"
-      data-cy="edition-form"
-      @submit="handleSubmit"
-      @reset="handleReset"
-    >
-      <div class="edition-form__grid">
-        <div
-          v-if="!isEdit"
-          class="edition-form__field"
-        >
-          <origam-label
-            :for="yearId"
-            class="edition-form__label"
-          >
-            <template #default>
-              {{ yearLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
-            </template>
-          </origam-label>
-          <origam-text-field
-            :id="yearId"
-            v-model="draft.year"
-            single-line
-            required
-            rounded="full"
-            inputmode="numeric"
-            :maxlength="yearLength"
-            autocomplete="off"
-            hide-details="auto"
-            :rules="yearRules"
-            data-cy="edition-form-year"
-          />
-        </div>
-        <div class="edition-form__field">
-          <origam-label
-            :for="nameId"
-            class="edition-form__label"
-          >
-            <template #default>
-              {{ nameLabel }} <span
-                v-if="!isEdit"
-                aria-hidden="true"
-              >{{ requiredMark }}</span>
-            </template>
-          </origam-label>
-          <origam-text-field
-            :id="nameId"
-            v-model="draft.name"
-            single-line
-            rounded="full"
-            autocomplete="off"
-            hide-details="auto"
-            :required="!isEdit"
-            :rules="nameRules"
-            :placeholder="namePlaceholder"
-            data-cy="edition-form-name"
-          />
-        </div>
-        <div class="edition-form__field">
-          <origam-label
-            :for="dateId"
-            class="edition-form__label"
-            :text="dateLabel"
-          />
-          <origam-date-picker-field
-            :id="dateId"
-            v-model="heldOn"
-            single-line
-            clearable
-            rounded="full"
-            hide-details="auto"
-            data-cy="edition-form-date"
-          />
-        </div>
-        <div class="edition-form__field">
-          <origam-label
-            :for="locationId"
-            class="edition-form__label"
-            :text="locationLabel"
-          />
-          <origam-text-field
-            :id="locationId"
-            v-model="draft.location"
-            single-line
-            rounded="full"
-            autocomplete="off"
-            hide-details="auto"
-            :rules="locationRules"
-            :placeholder="locationPlaceholder"
-            data-cy="edition-form-location"
-          />
-        </div>
-        <div class="edition-form__field edition-form__field--full">
-          <origam-label
-            :for="descriptionId"
-            class="edition-form__label"
-            :text="descriptionLabel"
-          />
-          <origam-textarea-field
-            :id="descriptionId"
-            v-model="draft.description"
-            single-line
-            auto-grow
+      <origam-form
+        validate-on="submit"
+        :aria-labelledby="titleId"
+        data-cy="edition-form"
+        @submit="handleSubmit"
+        @reset="handleReset"
+      >
+        <div class="edition-form__fields">
+          <div class="edition-form__grid">
+            <div
+              v-if="!isEdit"
+              class="edition-form__field"
+            >
+              <origam-label
+                :for="yearId"
+                class="edition-form__label"
+              >
+                <template #default>
+                  {{ yearLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
+                </template>
+              </origam-label>
+              <origam-select
+                :id="yearId"
+                v-model="draft.year"
+                single-line
+                required
+                rounded="full"
+                hide-details="auto"
+                :items="yearOptions"
+                :menu-icon="CaretDown"
+                :rules="yearRules"
+                data-cy="edition-form-year"
+              />
+            </div>
+            <div class="edition-form__field">
+              <origam-label
+                :for="nameId"
+                class="edition-form__label"
+              >
+                <template #default>
+                  {{ nameLabel }} <span
+                    v-if="!isEdit"
+                    aria-hidden="true"
+                  >{{ requiredMark }}</span>
+                </template>
+              </origam-label>
+              <origam-text-field
+                :id="nameId"
+                v-model="draft.name"
+                single-line
+                rounded="full"
+                autocomplete="off"
+                hide-details="auto"
+                :required="!isEdit"
+                :rules="nameRules"
+                :placeholder="namePlaceholder"
+                data-cy="edition-form-name"
+              />
+            </div>
+            <div class="edition-form__field">
+              <origam-label
+                :for="dateId"
+                class="edition-form__label"
+                :text="dateLabel"
+              />
+              <origam-date-picker-field
+                :id="dateId"
+                v-model="heldOn"
+                single-line
+                clearable
+                rounded="full"
+                hide-details="auto"
+                data-cy="edition-form-date"
+              />
+            </div>
+            <div class="edition-form__field">
+              <origam-label
+                :for="locationId"
+                class="edition-form__label"
+                :text="locationLabel"
+              />
+              <origam-text-field
+                :id="locationId"
+                v-model="draft.location"
+                single-line
+                rounded="full"
+                autocomplete="off"
+                hide-details="auto"
+                :rules="locationRules"
+                :placeholder="locationPlaceholder"
+                data-cy="edition-form-location"
+              />
+            </div>
+            <div class="edition-form__field edition-form__field--full">
+              <origam-label
+                :for="descriptionId"
+                class="edition-form__label"
+                :text="descriptionLabel"
+              />
+              <origam-textarea-field
+                :id="descriptionId"
+                v-model="draft.description"
+                single-line
+                auto-grow
+                rounded="lg"
+                :rows="3"
+                hide-details="auto"
+                :rules="descriptionRules"
+                :placeholder="isEdit ? undefined : descriptionPlaceholder"
+                data-cy="edition-form-description"
+              />
+            </div>
+          </div>
+          <origam-alert
+            v-if="!isEdit"
+            status="info"
+            density="compact"
             rounded="lg"
-            :rows="3"
-            hide-details="auto"
-            :rules="descriptionRules"
-            :placeholder="isEdit ? undefined : descriptionPlaceholder"
-            data-cy="edition-form-description"
+            font-size="md"
+            font-weight="bold"
+            letter-spacing="normal"
+            line-height="normal"
+            :title="codeAlertTitle"
+            :text="codeAlertText"
+            data-cy="edition-form-code-info"
           />
+          <origam-alert
+            v-if="failure"
+            status="error"
+            rounded="lg"
+            font-size="md"
+            font-weight="bold"
+            letter-spacing="normal"
+            line-height="normal"
+            :title="failureTitle"
+            :text="failureText"
+            data-cy="edition-form-error"
+          />
+          <div class="edition-form__cta">
+            <origam-btn
+              type="reset"
+              variant="outlined"
+              size="x-large"
+              font-size="md"
+              :disabled="pending"
+              :text="cancelLabel"
+              data-cy="edition-form-cancel"
+            />
+            <origam-btn
+              type="submit"
+              class="edition-form__submit"
+              variant="flat"
+              :bg-color="buttonColor"
+              :elevation="buttonElevation"
+              size="x-large"
+              font-size="md"
+              :loading="pending"
+              :text="submitLabel"
+              data-cy="edition-form-submit"
+            />
+          </div>
         </div>
-      </div>
-      <origam-alert
-        v-if="!isEdit"
-        status="info"
-        density="compact"
-        rounded="lg"
-        font-size="md"
-        font-weight="bold"
-        letter-spacing="normal"
-        line-height="normal"
-        :title="codeAlertTitle"
-        :text="codeAlertText"
-        data-cy="edition-form-code-info"
-      />
-      <origam-alert
-        v-if="failure"
-        status="error"
-        rounded="lg"
-        font-size="md"
-        font-weight="bold"
-        letter-spacing="normal"
-        line-height="normal"
-        :title="failureTitle"
-        :text="failureText"
-        data-cy="edition-form-error"
-      />
-      <div class="edition-form__cta">
-        <origam-btn
-          type="reset"
-          variant="outlined"
-          size="x-large"
-          font-size="md"
-          :disabled="pending"
-          :text="cancelLabel"
-          data-cy="edition-form-cancel"
-        />
-        <origam-btn
-          type="submit"
-          class="edition-form__submit"
-          variant="flat"
-          :bg-color="buttonColor"
-          :elevation="buttonElevation"
-          size="x-large"
-          font-size="md"
-          :loading="pending"
-          :text="submitLabel"
-          data-cy="edition-form-submit"
-        />
-      </div>
-    </origam-form>
+      </origam-form>
+    </div>
     <origam-snackbar
       :model-value="savedOpen"
       status="success"
@@ -220,19 +222,20 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, useId, watch } from 'vue'
-import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamDatePickerField, OrigamForm, OrigamLabel, OrigamSnackbar, OrigamTextareaField, OrigamTextField, OrigamTitle } from 'origam/components'
+import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamDatePickerField, OrigamForm, OrigamLabel, OrigamSelect, OrigamSnackbar, OrigamTextareaField, OrigamTextField, OrigamTitle } from 'origam/components'
+import CaretDown from '~/components/icons/CaretDown.vue'
 import EditionReadonlyFields from '~/components/admin/editions/EditionReadonlyFields.vue'
 import EditionChip from '~/components/edition/EditionChip.vue'
 import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
-import { EDITION_READONLY_EDIT_FIELDS, EDITION_YEAR_LENGTH } from '~/consts/admin-editions.const'
+import { EDITION_READONLY_EDIT_FIELDS } from '~/consts/admin-editions.const'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
 import { ADMIN_REQUIRED_MARK } from '~/consts/admin-form.const'
 import { EDITION_HERO_STATUS } from '~/consts/edition-view.const'
 import { EDITION_DESCRIPTION_MAX_LENGTH, EDITION_LOCATION_MAX_LENGTH, EDITION_NAME_MAX_LENGTH } from '~/consts/edition.const'
 import { EDITION_FORM_MODE, EDITION_YEAR_ISSUE } from '~/enums/admin-editions.enum'
 import type { IEditionFormEmits, IEditionFormProps, IEditionFormValues } from '~/interfaces/admin-editions.interface'
-import { checkEditionYear, toIsoDate } from '~/utils/admin-editions.util'
+import { buildEditionYearOptions, checkEditionYear, toIsoDate } from '~/utils/admin-editions.util'
 
 /*********************************************************
  * Global
@@ -240,7 +243,7 @@ import { checkEditionYear, toIsoDate } from '~/utils/admin-editions.util'
  * @description
  * Formulaire d'une édition, en création (année, nom, date, lieu, description) ou en modification (nom, date, lieu,
  * description ; code, année et statut en lecture seule, R-9). Le code n'est jamais saisi (CE-1). La validation se fait à
- * l'envoi ; le serveur reste l'autorité. L'année est un champ texte au clavier numérique (décision 87eea8e).
+ * l'envoi ; le serveur reste l'autorité. L'année se choisit dans une liste : l'année courante, cinq années avant et cinq après (F-49).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IEditionFormProps>(), { pending: false, failure: null, edition: null, saved: false })
@@ -252,11 +255,11 @@ const nameId = useId()
 const dateId = useId()
 const locationId = useId()
 const descriptionId = useId()
-const yearLength = EDITION_YEAR_LENGTH
 const readonlyFields = EDITION_READONLY_EDIT_FIELDS
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
 const requiredMark = ADMIN_REQUIRED_MARK
 const isEdit = computed(() => props.mode === EDITION_FORM_MODE.EDIT)
+const yearOptions = buildEditionYearOptions(new Date().getFullYear())
 
 /*********************************************************
  * Saisie
@@ -333,7 +336,7 @@ const submitLabel = computed(() => isEdit.value
  * immédiat, mais c'est le serveur qui décide.
  ********************************************************/
 const yearMessages = computed<Record<EDITION_YEAR_ISSUE, string>>(() => ({
-  [EDITION_YEAR_ISSUE.REQUIRED]: t('admin.editions.rule_year_required', 'Indiquez une année sur 4 chiffres, par exemple 2027.'),
+  [EDITION_YEAR_ISSUE.REQUIRED]: t('admin.editions.rule_year_required', 'Choisissez une année.'),
   [EDITION_YEAR_ISSUE.FORMAT]: t('admin.editions.rule_year_format', 'Indiquez une année sur 4 chiffres, par exemple 2027.'),
   [EDITION_YEAR_ISSUE.RANGE]: t('admin.editions.rule_year_range', 'L’année doit être comprise entre 2000 et 2100.')
 }))
@@ -388,9 +391,13 @@ defineExpose({})
 
 <style scoped lang="scss">
 .edition-form {
-  display: grid;
-  gap: var(--edition-form---gap, var(--origam-space---5));
   padding: var(--edition-form---padding, var(--origam-space---6));
+
+  // origam-card et origam-form enveloppent leur contenu (`.origam-card__content`, `.origam-form__content`) : un `gap` posé sur leur racine ne touche que ces enveloppes. Il faut le poser sur un conteneur qui porte directement les blocs à espacer (F-49).
+  &__body {
+    display: grid;
+    gap: var(--edition-form---gap, var(--origam-space---5));
+  }
 
   &__head {
     display: flex;
@@ -421,9 +428,9 @@ defineExpose({})
     line-height: var(--origam-font__lineHeight---tight);
   }
 
-  &__form {
+  &__fields {
     display: grid;
-    gap: var(--edition-form---gap, var(--origam-space---5));
+    gap: var(--edition-form__grid---gap, var(--origam-space---4));
   }
 
   &__grid {

@@ -99,6 +99,13 @@ const compareAll = async (page: Page, mockup: Page, viewport: string, entries: I
 
 const field = (testId: string) => `[data-cy="${testId}"]`
 
+/** Espace vertical entre le bas d'un bloc et le haut du suivant (F-49 : les blocs frères de la grille se touchaient). */
+const verticalGap = async (target: Page, above: string, below: string) => {
+  const upper = await box(target, above)
+  const lower = await box(target, below)
+  return Math.round((lower.y - (upper.y + upper.height)) * 10) / 10
+}
+
 /** L'origine d'une édition (archive ou application) est une donnée : la pastille est masquée des deux côtés, sa colonne reste comparée. */
 const ORIGIN_HIDDEN = '#ed-p-list tbody td:nth-child(6) > * { visibility: hidden !important; }'
 const hideOrigin = (target: Page) => target.addStyleTag({ content: `${field('editions-table')} tbody td:nth-child(6) .origam-chip { visibility: hidden !important; }` })
@@ -134,10 +141,9 @@ for (const viewport of VIEWPORTS) {
       const { mockup, mockContext } = await open(page, browser, viewport, 'admin-editions.html', '/admin/editions/nouvelle')
       await hydrated(page)
       await showScreen(mockup, 'ed-p-new', '#ed-p-new .ed-done, #ed-p-new .alert--error { display: none !important; }')
-      await page.locator('input[inputmode="numeric"]').fill('27')
       await page.getByTestId('edition-form-name').locator('input').fill('Championnat de Caps 2027')
       await page.getByTestId('edition-form-submit').click()
-      await expect(page.getByTestId('edition-form-year')).toContainText('année sur 4 chiffres')
+      await expect(page.getByTestId('edition-form-year')).toContainText('Choisissez une année')
       await compareAll(page, mockup, viewport.name, [
         { zone: 'creation-entete', mockup: '#ed-p-new .ed-form__h', app: '.edition-form__head' },
         { zone: 'creation-annee', mockup: '#ed-p-new .ed-grid > .field:nth-child(1)', app: '.edition-form__field:nth-child(1)' },
@@ -148,6 +154,15 @@ for (const viewport of VIEWPORTS) {
         { zone: 'creation-code', mockup: '#ed-p-new .alert--info', app: field('edition-form-code-info') },
         { zone: 'creation-actions', mockup: '#ed-p-new .ed-cta', app: '.edition-form__cta' }
       ])
+      const spacing = [
+        { mockup: ['#ed-p-new .ed-form__h', '#ed-p-new .ed-grid > .field:nth-child(1)'], app: ['.edition-form__head', '.edition-form__field:nth-child(1)'] },
+        { mockup: ['#ed-p-new .ed-grid > .field:nth-child(5)', '#ed-p-new .alert--info'], app: ['.edition-form__field--full', field('edition-form-code-info')] },
+        { mockup: ['#ed-p-new .alert--info', '#ed-p-new .ed-cta'], app: [field('edition-form-code-info'), '.edition-form__cta'] }
+      ]
+      for (const gap of spacing) {
+        expect(await verticalGap(page, gap.app[0]!, gap.app[1]!), `${gap.app.join(' -> ')}`).toBe(await verticalGap(mockup, gap.mockup[0]!, gap.mockup[1]!))
+        expect(await verticalGap(page, gap.app[0]!, gap.app[1]!)).toBeGreaterThan(0)
+      }
       await mockContext.close()
     })
 
@@ -162,7 +177,8 @@ for (const viewport of VIEWPORTS) {
         }
         await route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ statusCode: 409, code: 'EDITION_CODE_EXHAUSTED', message: 'x' }) })
       })
-      await page.locator('input[inputmode="numeric"]').fill('2027')
+      await page.getByTestId('edition-form-year').click()
+      await page.getByRole('option', { name: '2027', exact: true }).click()
       await page.getByTestId('edition-form-name').locator('input').fill('Championnat de Caps 2027')
       await page.getByTestId('edition-form-submit').click()
       await expect(page.getByTestId('edition-form-error')).toBeVisible()
