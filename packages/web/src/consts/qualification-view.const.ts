@@ -1,6 +1,6 @@
 import { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_FORBIDDEN, HTTP_STATUS_UNAUTHORIZED, HTTP_STATUS_UNPROCESSABLE } from './http-status.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
-import { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_ROUTE, QUALIFICATION_STEP } from '../enums/qualification.enum.js'
+import { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_REOPEN_BLOCKER, QUALIFICATION_ROUTE, QUALIFICATION_STEP } from '../enums/qualification.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
 import { EDITION_CHIP_FAMILY } from '../enums/edition-tab.enum.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
@@ -50,6 +50,12 @@ export const QUALIFICATION_BLOCKER_TEXT: Partial<Record<QUALIFICATION_BLOCKER, I
   [QUALIFICATION_BLOCKER.CLOSED]: { key: 'admin.qualification.blocker_closed', fallback: 'Indisponible : l’édition est clôturée.' }
 }
 
+/** Raison écrite sous « Rouvrir les qualifications » quand il est inactif ; `{round}` = « des huitièmes », ou « du premier tour » quand le tour n'est pas déductible. */
+export const QUALIFICATION_REOPEN_BLOCKER_TEXT: Record<QUALIFICATION_REOPEN_BLOCKER, ITranslatableText> = {
+  [QUALIFICATION_REOPEN_BLOCKER.LOCKED]: { key: 'admin.qualification.reopen_blocker_locked', fallback: 'Indisponible : le tirage {round} est validé.' },
+  [QUALIFICATION_REOPEN_BLOCKER.CLOSED]: { key: 'admin.qualification.reopen_blocker_closed', fallback: 'Indisponible : l’édition est clôturée.' }
+}
+
 export const QUALIFICATION_PARAMETER_ERROR_TEXT: Record<QUALIFICATION_PARAMETER_ERROR, ITranslatableText> = {
   [QUALIFICATION_PARAMETER_ERROR.NOT_INTEGER]: { key: 'admin.qualification.error_not_integer', fallback: 'Saisissez un nombre entier.' },
   [QUALIFICATION_PARAMETER_ERROR.TOO_LOW]: { key: 'admin.qualification.error_too_low', fallback: 'Valeur trop basse : minimum {min}.' },
@@ -63,6 +69,7 @@ export const QUALIFICATION_FAILURE_BY_CODE: Partial<Record<API_ERROR_CODE, QUALI
   [API_ERROR_CODE.QUALIFICATION_ALREADY_DONE]: QUALIFICATION_FAILURE.ALREADY_DONE,
   [API_ERROR_CODE.EDITION_CLOSED]: QUALIFICATION_FAILURE.CLOSED,
   [API_ERROR_CODE.TIEBREAK_PLAYED]: QUALIFICATION_FAILURE.TIEBREAK_PLAYED,
+  [API_ERROR_CODE.QUALIFICATION_LOCKED]: QUALIFICATION_FAILURE.LOCKED,
   [API_ERROR_CODE.VALIDATION_FAILED]: QUALIFICATION_FAILURE.INVALID
 }
 
@@ -78,7 +85,8 @@ export const QUALIFICATION_STALE_FAILURES: readonly QUALIFICATION_FAILURE[] = [
   QUALIFICATION_FAILURE.NOT_READY,
   QUALIFICATION_FAILURE.TIEBREAK_NOT_REQUIRED,
   QUALIFICATION_FAILURE.ALREADY_DONE,
-  QUALIFICATION_FAILURE.TIEBREAK_PLAYED
+  QUALIFICATION_FAILURE.TIEBREAK_PLAYED,
+  QUALIFICATION_FAILURE.LOCKED
 ]
 
 /** `title: null` : une alerte compacte à une seule phrase (le départage joué entre-temps, maquette F-44). */
@@ -106,6 +114,10 @@ export const QUALIFICATION_FAILURE_TEXT: Record<QUALIFICATION_FAILURE, { title: 
   [QUALIFICATION_FAILURE.TIEBREAK_PLAYED]: {
     title: null,
     body: { key: 'admin.qualification.failure_tiebreak_played', fallback: 'Le départage a été joué entre-temps : il ne peut plus être supprimé.' }
+  },
+  [QUALIFICATION_FAILURE.LOCKED]: {
+    title: null,
+    body: { key: 'admin.qualification.failure_locked', fallback: 'Le tirage {round} a été validé entre-temps : les qualifications ne peuvent plus être rouvertes.' }
   },
   [QUALIFICATION_FAILURE.FORBIDDEN]: {
     title: { key: 'admin.qualification.failure_forbidden_title', fallback: 'Vous n’avez pas le droit de faire cela.' },

@@ -1,6 +1,7 @@
 import type { TIEBREAK_FORMAT } from '../enums/domain.enum.js'
 import type { POOL_DRAW_STEP_STATE } from '../enums/pool-draw.enum.js'
-import type { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_ROUTE, QUALIFICATION_STEP, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
+import type { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_REOPEN_BLOCKER, QUALIFICATION_ROUTE, QUALIFICATION_STEP, TIEBREAK_SCOPE } from '../enums/qualification.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { TEditionPerson } from '../types/edition-person.type.js'
 import type { IQualificationParameters, IQualificationStatus } from './qualification.interface.js'
 
@@ -148,11 +149,42 @@ export interface IQualificationFinalizeProps {
   pendingCount: number
   tieCount: number
   busy: boolean
-  /** La liste est déjà arrêtée : l'aperçu reste, le bouton disparaît. */
+  /** La liste est déjà arrêtée : l'aperçu reste, le bouton disparaît (le slot `finalized-action` porte « Rouvrir »). */
   finalized: boolean
   qualifiedCount: number
+  /** Premier tour de phase finale (barrages avec `withPlayoff`, sinon déduit de la taille de la liste), `null` quand il se choisit au tirage : nommé dans la confirmation. */
+  roundKind: ROUND_KIND | null
+  /** Configuration enregistrée, pour la phrase « n premiers par poule… » de la liste arrêtée. */
+  parameters: IQualificationParameters | null
 }
 
 export interface IQualificationFinalizeEmits {
   (event: 'finalize'): void
+}
+
+/** Le brouillon du tirage du premier tour que « Rouvrir les qualifications » efface (B-25) : son tour et le nombre d'affiches déjà saisies. */
+export interface IQualificationReopenDraft {
+  roundKind: ROUND_KIND | null
+  pairingCount: number
+}
+
+export interface IQualificationReopenProps {
+  /** `null` : le bouton est actif ; sinon inactif, la raison est écrite dessous. */
+  blocker: QUALIFICATION_REOPEN_BLOCKER | null
+  /** Premier tour de phase finale déduit de la liste arrêtée, `null` quand il se choisit au tirage. */
+  roundKind: ROUND_KIND | null
+  /** Brouillon du tirage du premier tour, `null` quand il n'y en a pas. */
+  draft: IQualificationReopenDraft | null
+  open: boolean
+  /** Lecture du brouillon en cours (avant l'ouverture de la boîte). */
+  preparing: boolean
+  /** Écriture en cours (la boîte reste ouverte, bouton en chargement). */
+  busy: boolean
+  qualifiedCount: number
+}
+
+export interface IQualificationReopenEmits {
+  (event: 'open'): void
+  (event: 'cancel'): void
+  (event: 'confirm'): void
 }

@@ -37,6 +37,8 @@ export enum QUALIFICATION_FAILURE {
   INVALID = 'invalid',
   CLOSED = 'closed',
   TIEBREAK_PLAYED = 'tiebreak-played',
+  /** Rouvrir : le tirage du premier tour est validé entre-temps (409 `QUALIFICATION_LOCKED`, B-25). */
+  LOCKED = 'locked',
   FORBIDDEN = 'forbidden',
   UNAUTHORIZED = 'unauthorized',
   OFFLINE = 'offline',
@@ -57,6 +59,12 @@ export enum QUALIFICATION_BLOCKER {
   PENDING_AND_TIES = 'pending-and-ties',
   TIEBREAK_OPEN = 'tiebreak-open',
   INVALID_PARAMETERS = 'invalid-parameters',
+  CLOSED = 'closed'
+}
+
+/** Pourquoi « Rouvrir les qualifications » est inactif (F-51) : le tirage du premier tour est validé (édition `PLAYOFFS`), ou l'édition est clôturée. */
+export enum QUALIFICATION_REOPEN_BLOCKER {
+  LOCKED = 'locked',
   CLOSED = 'closed'
 }
 

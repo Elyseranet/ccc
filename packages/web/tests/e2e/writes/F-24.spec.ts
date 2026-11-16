@@ -125,7 +125,7 @@ test.describe('admin qualification : écritures sur une édition créée par le 
     await page.getByTestId('qualification-finalize-open').click()
     const dialog = page.getByTestId('qualification-finalize-dialog')
     await expect(dialog).toBeVisible()
-    await expect(dialog).toContainText('il n’est pas possible de revenir en arrière')
+    await expect(dialog).toContainText('Vous pourrez rouvrir la liste tant que le tirage')
     await expect(page.getByTestId('qualification-finalize-cancel')).toBeFocused()
     expect(await violationsOf(page)).toEqual([])
     await page.keyboard.press('Escape')

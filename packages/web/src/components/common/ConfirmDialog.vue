@@ -141,6 +141,8 @@ defineExpose({})
   }
 
   &--mockup :deep(.origam-card__content) {
+    display: grid;
+    gap: var(--origam-space---3);
     padding: 0 var(--origam-space---6) var(--origam-space---6);
   }
 

@@ -126,8 +126,25 @@
           :busy="finalizing"
           :finalized="isReadonly"
           :qualified-count="qualifiedCount"
+          :parameters="status?.parameters ?? null"
+          :round-kind="finalizeRoundKind"
           @finalize="handleFinalize"
-        />
+        >
+          <template #finalized-action>
+            <qualification-reopen
+              :blocker="reopenBlocker"
+              :round-kind="firstRoundKind"
+              :draft="reopenDraft"
+              :open="reopenDialogOpen"
+              :preparing="preparingReopen"
+              :busy="reopening"
+              :qualified-count="qualifiedCount"
+              @open="handleOpenReopen"
+              @cancel="handleCancelReopen"
+              @confirm="handleConfirmReopen"
+            />
+          </template>
+        </qualification-finalize>
       </template>
     </async-state>
     <origam-snackbar
@@ -144,6 +161,13 @@
       :timeout="snackbarTimeout"
       data-cy="qualification-deleted-snackbar"
     />
+    <origam-snackbar
+      v-model="reopenedSnackbarOpen"
+      status="success"
+      :text="reopenedSnackbarText"
+      :timeout="snackbarTimeout"
+      data-cy="qualification-reopened-snackbar"
+    />
   </section>
 </template>
 
@@ -155,6 +179,7 @@ import QualificationFinalize from '~/components/admin/qualification/Qualificatio
 import QualificationParameters from '~/components/admin/qualification/QualificationParameters.vue'
 import PhaseSteps from '~/components/admin/phase/PhaseSteps.vue'
 import QualificationPrerequisites from '~/components/admin/qualification/QualificationPrerequisites.vue'
+import QualificationReopen from '~/components/admin/qualification/QualificationReopen.vue'
 import QualificationRanking from '~/components/admin/qualification/QualificationRanking.vue'
 import QualificationTies from '~/components/admin/qualification/QualificationTies.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
@@ -167,7 +192,8 @@ import { ADMIN_DASHBOARD_STEP } from '~/enums/admin-dashboard.enum'
 import { PHASE_STEP } from '~/enums/qualification.enum'
 import type { ITranslatableText } from '~/interfaces/common-components.interface'
 import type { IQualificationTieView } from '~/interfaces/qualification-view.interface'
-import { previewCount } from '~/utils/qualification-view.util'
+import { firstRoundText } from '~/utils/qualification-text.util'
+import { firstRoundKind as deduceFirstRound, previewCount } from '~/utils/qualification-view.util'
 
 /*********************************************************
  * Page
@@ -175,7 +201,7 @@ import { previewCount } from '~/utils/qualification-view.util'
  * @description
  * Première page de la « Phase finale » (F-24) : arrêter la liste des qualifiés à l'issue des poules, après avoir réglé les égalités (B-13). La page assemble :
  * l'état, la simulation et les deux écritures viennent de `useQualification`, les quatre blocs sont des composants, l'état dégradé (chargement, erreur, vide)
- * est celui d'`AsyncState`. Aucun retour arrière : l'arrêt de la liste est définitif et le dialogue le dit (c9790abd (3)).
+ * est celui d'`AsyncState`. L'arrêt de la liste se défait par « Rouvrir les qualifications » (F-51, B-25) tant que le tirage du premier tour n'est pas validé ; le dialogue d'arrêt le dit.
  ********************************************************/
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { t } = useT()
@@ -189,11 +215,12 @@ useSeo({ noindex: true })
 const qualification = await useQualification()
 const {
   status, edition, inputs, check, bounds, parameters, isClosed, isFinalized, isReadonly, prerequisites, rankTables, ties, qualifiedRows, steps,
-  pendingCount, finalizeBlocker, previewReady, pageError, pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted
+  pendingCount, finalizeBlocker, previewReady, pageError, pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted, reopenDialogOpen, reopenDraft, preparingReopen, reopening, justReopened, reopenBlocker, firstRoundKind
 } = qualification
 const isEmpty = computed(() => status.value === null || status.value.pools.length === 0)
 const tieCount = computed(() => ties.value.length)
 const qualifiedCount = computed(() => qualifiedRows.value.length)
+const finalizeRoundKind = computed(() => deduceFirstRound(inputs.value.withPlayoff, qualifiedCount.value))
 const showTies = computed(() => !isReadonly.value)
 const isSettled = computed(() => !isReadonly.value && tieCount.value === 0 && pendingCount.value === 0)
 const preview = computed(() => previewReady.value && parameters.value ? previewCount(parameters.value, bounds.value.poolCount) : null)
@@ -232,6 +259,7 @@ const reloadLabel = computed(() => t('admin.qualification.reload', 'Recharger'))
 const snackbarTimeout = QUALIFICATION_SNACKBAR_TIMEOUT_MS
 const snackbarText = computed(() => t('admin.qualification.snackbar_finalized', 'Liste des qualifiés arrêtée'))
 const deletedSnackbarText = computed(() => t('admin.qualification.snackbar_tiebreak_deleted', 'Départage supprimé : l’égalité est à départager'))
+const reopenedSnackbarText = computed(() => t('admin.qualification.snackbar_reopened', 'Qualifications rouvertes : ajustez les paramètres puis arrêtez la liste'))
 const failureView = computed(() => {
   if (failure.value === null) {
     return null
@@ -240,7 +268,7 @@ const failureView = computed(() => {
   return {
     title: text.title ? t(text.title.key, text.title.fallback) : undefined,
     density: text.title ? 'default' as const : 'compact' as const,
-    body: t(text.body.key, text.body.fallback),
+    body: t(text.body.key, text.body.fallback, { round: firstRoundText(t, firstRoundKind.value) }),
     reloadable: QUALIFICATION_STALE_FAILURES.includes(failure.value)
   }
 })
@@ -249,7 +277,7 @@ const failureView = computed(() => {
  * Actions
  *
  * @description
- * Les champs vivent dans le composable : chaque saisie relance la simulation après une pause. « Arrêter la liste » confirme d'abord (dialogue), puis écrit.
+ * Les champs vivent dans le composable : chaque saisie relance la simulation après une pause. « Arrêter la liste » confirme d'abord (dialogue), puis écrit ; « Rouvrir les qualifications » (F-51) aussi, et ramène la page à la saisie des paramètres.
  ********************************************************/
 const snackbarOpen = ref(false)
 watch(justFinalized, (value) => {
@@ -263,6 +291,21 @@ watch(justDeleted, (value) => {
     deletedSnackbarOpen.value = true
   }
 })
+const reopenedSnackbarOpen = ref(false)
+watch(justReopened, (value) => {
+  if (value) {
+    reopenedSnackbarOpen.value = true
+  }
+})
+const handleOpenReopen = () => {
+  qualification.openReopen()
+}
+const handleCancelReopen = () => {
+  qualification.cancelReopen()
+}
+const handleConfirmReopen = () => {
+  qualification.reopen()
+}
 const handleDelete = (tie: IQualificationTieView) => {
   qualification.deleteTiebreak(tie)
 }
