@@ -3,7 +3,7 @@ import type { ParticipationEntity } from '../server/db/typeorm/entities/particip
 import type { PoolEntity } from '../server/db/typeorm/entities/pool.entity.js'
 import type { RoundEntity } from '../server/db/typeorm/entities/round.entity.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
-import { ROUND_KIND } from '../enums/round.enum.js'
+import { ROUND_KIND, ROUND_STATUS } from '../enums/round.enum.js'
 import type { IEditionParticipant } from '../interfaces/edition.interface.js'
 import type { IMatch } from '../interfaces/match.interface.js'
 import type { IPool, IPoolStandingRow } from '../interfaces/pool.interface.js'
@@ -72,11 +72,14 @@ export const buildPools = (
 export const buildRounds = (rounds: RoundEntity[], matches: MatchEntity[]): IRound[] =>
   [...rounds].sort((a, b) => a.sequence - b.sequence).map((round) => {
     const roundMatches = matches.filter((match) => match.roundId === round.id)
+    // Aucun code n'écrit COMPLETED : un tour tiré dont tous les matchs sont décidés est terminé (B-27), dérivé comme le reste.
+    const completed = round.status !== ROUND_STATUS.PENDING && roundMatches.length > 0
+      && roundMatches.every((match) => match.status === MATCH_STATUS.VALIDATED || match.status === MATCH_STATUS.RESULT_UNKNOWN)
     return {
       id: round.id,
       kind: round.kind,
       sequence: round.sequence,
-      status: round.status,
+      status: completed ? ROUND_STATUS.COMPLETED : round.status,
       matchCount: roundMatches.length,
       validatedMatchCount: roundMatches.filter((match) => match.status === MATCH_STATUS.VALIDATED).length
     }
