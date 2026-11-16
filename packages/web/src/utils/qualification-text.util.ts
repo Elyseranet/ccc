@@ -1,5 +1,7 @@
+import { ROUND_DRAW_TEXTS } from '../consts/round-draw.const.js'
 import { QUALIFICATION_BLOCKER_TEXT } from '../consts/qualification-view.const.js'
 import { QUALIFICATION_BLOCKER } from '../enums/qualification.enum.js'
+import type { ROUND_KIND } from '../enums/round.enum.js'
 import type { TTranslate } from '../types/translate.type.js'
 
 /*********************************************************
@@ -32,3 +34,8 @@ export const blockerText = (t: TTranslate, blocker: QUALIFICATION_BLOCKER, pendi
   const text = QUALIFICATION_BLOCKER_TEXT[blocker]
   return text ? t(text.key, text.fallback) : ''
 }
+
+/** « des huitièmes » (forme « de » du tour, comme dans la page de tirage), ou « du premier tour » quand le tour n'est pas connu : le gabarit dit « le tirage {round} ». */
+export const firstRoundText = (t: TTranslate, kind: ROUND_KIND | null): string => kind === null
+  ? t('admin.qualification.first_round_of', 'du premier tour')
+  : t(ROUND_DRAW_TEXTS[kind].of.key, ROUND_DRAW_TEXTS[kind].of.fallback)

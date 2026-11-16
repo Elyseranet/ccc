@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { QUALIFICATION_BLOCKER, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_ROUTE, QUALIFICATION_STEP } from '../../src/enums/qualification.enum'
+import { QUALIFICATION_BLOCKER, QUALIFICATION_PARAMETER_ERROR, QUALIFICATION_RANK_STATUS, QUALIFICATION_REOPEN_BLOCKER, QUALIFICATION_ROUTE, QUALIFICATION_STEP } from '../../src/enums/qualification.enum'
 import { MATCH_STATUS } from '../../src/enums/match.enum'
 import { POOL_DRAW_STEP_STATE } from '../../src/enums/pool-draw.enum'
 import { ApiRequestError } from '../../src/utils/api-request-error.util'
 import { API_ERROR_CODE } from '../../src/enums/api-error-code.enum'
 import { toQualificationFailure } from '../../src/utils/qualification-failure.util'
 import { QUALIFICATION_FAILURE } from '../../src/enums/qualification.enum'
-import { blockerText, countPending, countTies } from '../../src/utils/qualification-text.util'
-import { blockerOf, boundsOf, checkInputs, initialInputs, pendingRegularCount, previewCount, prerequisitesOf, qualifiedRowsOf, rankTablesOf, stepsOf, tieViewsOf } from '../../src/utils/qualification-view.util'
+import { DRAW_STATUS } from '../../src/enums/draw.enum'
+import { EDITION_STATUS } from '../../src/enums/edition.enum'
+import { ROUND_KIND } from '../../src/enums/round.enum'
+import { blockerText, countPending, countTies, firstRoundText } from '../../src/utils/qualification-text.util'
+import { blockerOf, boundsOf, checkInputs, firstRoundKindOf, initialInputs, pendingRegularCount, previewCount, prerequisitesOf, qualifiedRowsOf, rankTablesOf, reopenBlockerOf, reopenDraftOf, stepsOf, tieViewsOf } from '../../src/utils/qualification-view.util'
 import { boundaryTie, buildQualificationStatus, member, pairTie, qualifiedEntry, tiebreakMatch } from '../helpers/qualification'
+import { draftOf } from '../helpers/round-draw'
 
 const status = buildQualificationStatus()
 const bounds = boundsOf(status)
@@ -150,5 +154,47 @@ describe('textes accordés en nombre', () => {
     expect(blockerText(t, QUALIFICATION_BLOCKER.TIES_LEFT, 0, 1)).toBe('Indisponible : 1 égalité restante.')
     expect(blockerText(t, QUALIFICATION_BLOCKER.PENDING_AND_TIES, 3, 2)).toBe('Indisponible : 2 égalités restantes et 3 matchs de poule à valider.')
     expect(blockerText(t, QUALIFICATION_BLOCKER.CLOSED, 0, 0)).toBe('Indisponible : l’édition est clôturée.')
+  })
+})
+
+describe('rouvrir les qualifications (F-51, B-25)', () => {
+  const finalized = (count: number, withPlayoff = false) => buildQualificationStatus({
+    listFinalized: true,
+    parameters: { topPerPool: 2, bestNextCount: 0, withPlayoff },
+    qualified: Array.from({ length: count }, (_, index) => qualifiedEntry(`q${index}`, `Joueur ${index}`, 'pool-1', 1))
+  })
+
+  it('le premier tour se déduit de la liste arrêtée : barrages avec `withPlayoff`, sinon 2, 4, 8 ou 16 qualifiés ; autre taille : null (il se choisit au tirage)', () => {
+    expect(firstRoundKindOf(finalized(16))).toBe(ROUND_KIND.ROUND_OF_16)
+    expect(firstRoundKindOf(finalized(8))).toBe(ROUND_KIND.QUARTER)
+    expect(firstRoundKindOf(finalized(12))).toBeNull()
+    expect(firstRoundKindOf(finalized(12, true))).toBe(ROUND_KIND.PLAYOFF)
+    expect(firstRoundKindOf(buildQualificationStatus())).toBeNull()
+  })
+
+  it('le bouton est inactif quand le tirage du premier tour est validé (PLAYOFFS) ou l’édition clôturée, actif sinon', () => {
+    expect(reopenBlockerOf(EDITION_STATUS.QUALIFIED)).toBeNull()
+    expect(reopenBlockerOf(null)).toBeNull()
+    expect(reopenBlockerOf(EDITION_STATUS.PLAYOFFS)).toBe(QUALIFICATION_REOPEN_BLOCKER.LOCKED)
+    expect(reopenBlockerOf(EDITION_STATUS.CLOSED)).toBe(QUALIFICATION_REOPEN_BLOCKER.CLOSED)
+  })
+
+  it('le brouillon effacé est celui du dernier tirage de tour s’il est encore un brouillon ; ses affiches comptent les numéros distincts', () => {
+    expect(reopenDraftOf([])).toBeNull()
+    expect(reopenDraftOf([draftOf([], { status: DRAW_STATUS.VALIDATED })])).toBeNull()
+    expect(reopenDraftOf([draftOf([['a', 1, 1, 1], ['b', 1, 2, 2], ['c', 2, 1, 3]])])).toEqual({ roundKind: ROUND_KIND.QUARTER, pairingCount: 2 })
+    expect(reopenDraftOf([draftOf([])])).toEqual({ roundKind: ROUND_KIND.QUARTER, pairingCount: 0 })
+  })
+
+  it('le tour s’écrit « des huitièmes », ou « du premier tour » quand il n’est pas connu', () => {
+    const t = (_key: string, fallback: string) => fallback
+    expect(firstRoundText(t, ROUND_KIND.ROUND_OF_16)).toBe('des huitièmes')
+    expect(firstRoundText(t, null)).toBe('du premier tour')
+  })
+
+  it('409 QUALIFICATION_LOCKED : refus « tirage validé », qui invite à recharger ; EDITION_CLOSED reste « clôturée »', () => {
+    const failure = (code: API_ERROR_CODE) => toQualificationFailure(new ApiRequestError({ statusCode: 409, code, message: 'x' }))
+    expect(failure(API_ERROR_CODE.QUALIFICATION_LOCKED)).toBe(QUALIFICATION_FAILURE.LOCKED)
+    expect(failure(API_ERROR_CODE.EDITION_CLOSED)).toBe(QUALIFICATION_FAILURE.CLOSED)
   })
 })

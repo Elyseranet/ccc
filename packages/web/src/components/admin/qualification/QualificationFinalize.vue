@@ -16,7 +16,21 @@
         >
           {{ title }}
         </h2>
+        <edition-chip
+          v-if="finalized"
+          :family="chipFamily"
+          :text="chipText"
+          class="qualification-finalize__count"
+          data-cy="qualification-finalize-count"
+        />
       </header>
+      <p
+        v-if="finalized && summary"
+        class="qualification-finalize__summary"
+        data-cy="qualification-finalize-summary"
+      >
+        {{ summary }}
+      </p>
       <div
         v-if="hasRows"
         class="qualification-finalize__scroll"
@@ -48,8 +62,12 @@
       >
         {{ emptyText }}
       </p>
+      <slot
+        v-if="finalized"
+        name="finalized-action"
+      />
       <div
-        v-if="!finalized"
+        v-else
         class="qualification-finalize__action"
       >
         <origam-btn
@@ -104,7 +122,7 @@ import { QUALIFICATION_ROUTE_VIEW } from '~/consts/qualification-view.const'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import { EDITION_CHIP_FAMILY } from '~/enums/edition-tab.enum'
 import { QUALIFIED_COLUMN } from '~/enums/qualification.enum'
-import { blockerText as describeBlocker } from '~/utils/qualification-text.util'
+import { blockerText as describeBlocker, firstRoundText } from '~/utils/qualification-text.util'
 import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~/interfaces/qualification-view.interface'
 
 /*********************************************************
@@ -112,18 +130,33 @@ import type { IQualificationFinalizeEmits, IQualificationFinalizeProps } from '~
  *
  * @description
  * « Arrêter la liste des qualifiés » : l'aperçu (poule, rang, joueur, voie), puis le bouton « Arrêter la liste… » qui ouvre une confirmation. Définitif, et
- * le dialogue le dit (« il n'est pas possible de revenir en arrière », décision c9790abd (3)). Inactif avec sa raison écrite dessous tant qu'un match de poule
+ * le dialogue dit qu'on peut la rouvrir tant que le tirage du premier tour n'est pas validé (F-51, B-25). Inactif avec sa raison écrite dessous tant qu'un match de poule
  * ou une égalité reste. Le dialogue n'est pas `persistent` hors envoi : Échap et le clic extérieur annulent (ux 0ea5092e). L'aperçu est vide tant qu'une égalité
  * bloque (le serveur ne calcule pas de qualifiés alors). Une fois la liste arrêtée, l'aperçu reste et le bouton disparaît.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IQualificationFinalizeProps>(), {})
 const emits = defineEmits<IQualificationFinalizeEmits>()
-defineSlots<{}>()
+defineSlots<{ 'finalized-action'?: () => unknown }>()
 const titleId = useId()
 const dialogOpen = ref(false)
 const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
-const title = computed(() => t('admin.qualification.finalize_title', '4 · Arrêter la liste des qualifiés'))
+const title = computed(() => props.finalized
+  ? t('admin.qualification.finalized_card_title', '4 · Liste des qualifiés arrêtée')
+  : t('admin.qualification.finalize_title', '4 · Arrêter la liste des qualifiés'))
+const chipFamily = EDITION_CHIP_FAMILY.TINTED_SUCCESS
+const chipText = computed(() => props.qualifiedCount === 1
+  ? t('admin.qualification.finalized_count_one', '1 qualifié')
+  : t('admin.qualification.finalized_count_other', '{count} qualifiés', { count: props.qualifiedCount }))
+const summary = computed(() => {
+  if (!props.parameters) {
+    return ''
+  }
+  const params = { top: props.parameters.topPerPool, best: props.parameters.bestNextCount }
+  return props.parameters.withPlayoff
+    ? t('admin.qualification.finalized_card_summary_playoff', '{top} premiers par poule, {best} meilleurs (n+1)es, avec barrages.', params)
+    : t('admin.qualification.finalized_card_summary', '{top} premiers par poule, {best} meilleurs (n+1)es, sans barrages.', params)
+})
 const caption = computed(() => t('admin.qualification.finalize_caption', 'Aperçu des qualifiés'))
 const emptyText = computed(() => t('admin.qualification.finalize_empty', 'L’aperçu apparaît quand plus aucune égalité ne bloque.'))
 const buttonLabel = computed(() => t('admin.qualification.finalize_button', 'Arrêter la liste…'))
@@ -152,7 +185,7 @@ const rowViews = computed(() => props.rows.map((row) => {
  * Il reste ouvert pendant l'envoi (bouton en chargement) et se ferme à la fin, succès ou échec ; le message d'échec est celui de la page.
  ********************************************************/
 const dialogTitle = computed(() => t('admin.qualification.dialog_title', 'Arrêter la liste des qualifiés ?'))
-const dialogText = computed(() => t('admin.qualification.dialog_text', '{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Cette action est définitive : il n’est pas possible de revenir en arrière.', { count: props.qualifiedCount }))
+const dialogText = computed(() => t('admin.qualification.dialog_text', '{count} joueurs seront qualifiés pour la phase finale. L’édition passe à l’état « Qualifiés validés ». La correction d’un score de poule ne sera plus possible. Vous pourrez rouvrir la liste tant que le tirage {round} n’est pas validé.', { count: props.qualifiedCount, round: firstRoundText(t, props.roundKind) }))
 const cancelLabel = computed(() => t('admin.qualification.dialog_cancel', 'Annuler'))
 const confirmLabel = computed(() => t('admin.qualification.dialog_confirm', 'Arrêter la liste'))
 const handleOpen = () => {
@@ -190,7 +223,20 @@ defineExpose({})
   margin-top: var(--qualification-finalize---margin-top, var(--origam-space---6));
 
   &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--origam-space---3);
     margin-bottom: var(--origam-space---4);
+  }
+
+  &__count {
+    flex: none;
+  }
+
+  &__summary {
+    margin: 0 0 var(--origam-space---4);
+    color: var(--origam-color__text---secondary);
   }
 
   &__title {

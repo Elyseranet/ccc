@@ -6,11 +6,12 @@ import { useEditions } from '~/composables/useEditions'
 import { ADMIN_QUALIFICATION_ASYNC_KEY, QUALIFICATION_SIMULATION_DELAY_MS } from '~/consts/qualification-view.const'
 import { EDITION_STATUS } from '~/enums/edition.enum'
 import { QUALIFICATION_BLOCKER, QUALIFICATION_FAILURE } from '~/enums/qualification.enum'
-import type { IQualificationInputs, IQualificationTieView } from '~/interfaces/qualification-view.interface'
+import type { IQualificationInputs, IQualificationReopenDraft, IQualificationTieView } from '~/interfaces/qualification-view.interface'
 import type { IQualificationParameters, IQualificationStatus } from '~/interfaces/qualification.interface'
+import { DrawService } from '~/services/draw.service'
 import { QualificationService } from '~/services/qualification.service'
 import { fromAsyncDataError, toAsyncDataError } from '~/utils/async-data-error.util'
-import { blockerOf, boundsOf, checkInputs, initialInputs, pendingRegularCount, prerequisitesOf, qualifiedRowsOf, rankTablesOf, stepsOf, tieViewsOf } from '~/utils/qualification-view.util'
+import { blockerOf, boundsOf, checkInputs, firstRoundKindOf, initialInputs, pendingRegularCount, prerequisitesOf, qualifiedRowsOf, rankTablesOf, reopenBlockerOf, reopenDraftOf, stepsOf, tieViewsOf } from '~/utils/qualification-view.util'
 import { toQualificationFailure } from '~/utils/qualification-failure.util'
 
 /*********************************************************
@@ -18,14 +19,17 @@ import { toQualificationFailure } from '~/utils/qualification-failure.util'
  *
  * @description
  * État de la qualification de l'édition active (`GET /admin/editions/{id}/qualification`, B-13) et ses trois écritures : créer un départage,
- * supprimer un départage non joué (F-44), arrêter la liste. Le serveur est la source de vérité : égalités, départage suivant et qualifiés viennent de sa réponse, rien n'est recalculé ici.
+ * supprimer un départage non joué (F-44), arrêter la liste, et la rouvrir (F-51, B-25). Le serveur est la source de vérité : égalités, départage suivant et qualifiés viennent de sa réponse, rien n'est recalculé ici.
  * Simulation : chaque changement valide des champs relance la lecture avec `?topPerPool=&bestNextCount=`, après `QUALIFICATION_SIMULATION_DELAY_MS`
  * (une requête par pause, pas par touche) ; un champ invalide n'envoie rien et garde l'état précédent. Une fois la liste arrêtée, la configuration
  * enregistrée prime et les champs sont en lecture seule. Clé de cache fixe (même raison que `useMatchQueue`) : le changement d'édition relance la requête.
- * Contexte Nuxt : `useRequestFetch` et `useAsyncData` avant le premier `await`.
+ * Rouvrir : le bouton est inactif quand l'édition est `PLAYOFFS` (tirage du premier tour validé) ou clôturée ; avant d'ouvrir la boîte de confirmation, on lit les tirages (`GET /admin/editions/{id}/tirages`,
+ * une seule fois, à ce moment) pour savoir si un brouillon de tirage de tour sera effacé. Contexte Nuxt : `useRequestFetch` et `useAsyncData` avant le premier `await`.
  ********************************************************/
 export const useQualification = async () => {
-  const service = new QualificationService({ fetcher: useRequestFetch() })
+  const fetcher = useRequestFetch()
+  const service = new QualificationService({ fetcher })
+  const drawService = new DrawService({ fetcher })
   const store = useAdminEditionStore()
   const adminEdition = useAdminEdition()
   const editionsRequest = useEditions()
@@ -126,9 +130,18 @@ export const useQualification = async () => {
   const finalizing = ref(false)
   const justFinalized = ref(false)
 
+  const reopenDialogOpen = ref(false)
+  const reopenDraft = ref<IQualificationReopenDraft | null>(null)
+  const preparingReopen = ref(false)
+  const reopening = ref(false)
+  const justReopened = ref(false)
+  const reopenBlocker = computed(() => reopenBlockerOf(edition.value?.status ?? null))
+  const firstRoundKind = computed(() => status.value ? firstRoundKindOf(status.value) : null)
+
+  /** Le statut de l'édition (`PLAYOFFS` ou non) décide de « Rouvrir » : on relit aussi la liste des éditions. */
   const reload = async () => {
     failure.value = null
-    await request.refresh()
+    await Promise.all([request.refresh(), editionsRequest.refresh()])
   }
 
   const createTiebreak = async (tie: IQualificationTieView): Promise<boolean> => {
@@ -193,8 +206,57 @@ export const useQualification = async () => {
     }
   }
 
+  /** Lit le brouillon du tirage du premier tour, puis ouvre la boîte de confirmation (qui dit ce qui sera effacé). Rien n'est ouvert si la lecture échoue : l'échec s'affiche. */
+  const openReopen = async (): Promise<boolean> => {
+    if (!editionId.value || preparingReopen.value || reopening.value || reopenBlocker.value !== null || !isFinalized.value) {
+      return false
+    }
+    preparingReopen.value = true
+    failure.value = null
+    try {
+      reopenDraft.value = reopenDraftOf(await drawService.adminList(editionId.value))
+      reopenDialogOpen.value = true
+      return true
+    } catch (cause) {
+      failure.value = toQualificationFailure(cause)
+      return false
+    } finally {
+      preparingReopen.value = false
+    }
+  }
+
+  const cancelReopen = () => {
+    if (!reopening.value) {
+      reopenDialogOpen.value = false
+    }
+  }
+
+  /** `DELETE …/qualification` : la page repasse en saisie des paramètres (la liste relue n'est plus arrêtée). La boîte se ferme, succès ou échec ; le message d'échec est celui de la page (409 `QUALIFICATION_LOCKED` : « Recharger »). */
+  const reopen = async (): Promise<boolean> => {
+    if (!editionId.value || reopening.value || reopenBlocker.value !== null) {
+      return false
+    }
+    reopening.value = true
+    failure.value = null
+    justReopened.value = false
+    try {
+      await service.reopen(editionId.value)
+      simulated.value = null
+      await Promise.all([request.refresh(), editionsRequest.refresh()])
+      justReopened.value = true
+      return true
+    } catch (cause) {
+      failure.value = toQualificationFailure(cause)
+      return false
+    } finally {
+      reopening.value = false
+      reopenDialogOpen.value = false
+    }
+  }
+
   return {
     status, edition, inputs, check, bounds, parameters, isClosed, isFinalized, isReadonly, prerequisites, rankTables, ties, qualifiedRows, steps,
-    pendingCount, finalizeBlocker, previewReady, pageError, pending: request.pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted, reload, createTiebreak, deleteTiebreak, finalize
+    pendingCount, finalizeBlocker, previewReady, pageError, pending: request.pending, failure, busyTie, deletingTie, finalizing, justFinalized, justDeleted, reopenDialogOpen, reopenDraft, preparingReopen, reopening, justReopened, reopenBlocker, firstRoundKind,
+    reload, createTiebreak, deleteTiebreak, finalize, openReopen, cancelReopen, reopen
   }
 }
