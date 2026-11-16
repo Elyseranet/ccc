@@ -18,6 +18,7 @@ export const API_ERROR_MESSAGE = {
   FINAL_NOT_VALIDATED: 'The final must be validated before the edition can be closed',
   EDITION_CODE_EXHAUSTED: 'No edition code left for this year',
   EDITION_CONFLICT: 'The edition could not be created, please retry',
+  EDITION_LEGACY_PROTECTED: 'An imported archive edition cannot be deleted',
   PARTICIPANT_ALREADY_REGISTERED: 'The competitor is already registered in this edition',
   REGISTRATION_CLOSED: 'Registrations are closed: the pools draw is validated',
   PARTICIPATION_NOT_FOUND: 'Participation not found',

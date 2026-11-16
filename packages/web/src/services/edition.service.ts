@@ -118,6 +118,11 @@ export class EditionService extends BaseService {
   update (id: string, body: IUpdateEditionRequest): Promise<IEditionSummary> {
     return this.request<IEditionSummary>(`/editions/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...body } })
   }
+
+  /** `DELETE /editions/{id}` (B-28) : 204 ; 409 `EDITION_LEGACY_PROTECTED` pour une archive, 404 si inconnue. */
+  async remove (id: string): Promise<void> {
+    await this.request<void>(`/editions/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  }
 }
 
 /** Accepte l'UUID ou le code (`2012a`). 404 si inconnue. */
@@ -527,6 +532,24 @@ export const updateEdition = (dataSource: DataSource, idOrCode: string, patch: I
     if (patch.description !== undefined) changes.description = patch.description
     if (patch.location !== undefined) changes.location = patch.location
     return manager.getRepository(EditionEntity).save(Object.assign(edition, changes))
+  })
+
+/**
+ * Supprime une édition d'origine APP (clôturée comprise), en une transaction sous verrou (B-28). Les classements ACP / All Time
+ * sont calculés à la lecture à partir des participations : ils perdent ses points d'eux-mêmes. Compétiteurs, comptes et
+ * invitations ne sont jamais touchés. 409 `EDITION_LEGACY_PROTECTED` pour une archive importée.
+ */
+export const deleteEdition = (dataSource: DataSource, idOrCode: string): Promise<{ editionId: string, status: EDITION_STATUS }> =>
+  dataSource.transaction(async (manager) => {
+    const edition = await findEditionLocked(manager, idOrCode)
+    if (edition.origin !== EDITION_ORIGIN.APP) {
+      throw conflictWithCode(API_ERROR_CODE.EDITION_LEGACY_PROTECTED, API_ERROR_MESSAGE.EDITION_LEGACY_PROTECTED)
+    }
+    // Matchs d'abord (leurs côtés partent en cascade) : match_sides -> participations est en RESTRICT, l'ordre des cascades de la
+    // suppression de l'édition ne doit pas en dépendre. Poules, tours, tirages, affectations et participations suivent en CASCADE.
+    await manager.getRepository(MatchEntity).delete({ editionId: edition.id })
+    await manager.getRepository(EditionEntity).delete({ id: edition.id })
+    return { editionId: edition.id, status: edition.status }
   })
 
 const hasPoolsDraw = (manager: EntityManager, editionId: string, status?: DRAW_STATUS): Promise<boolean> =>
