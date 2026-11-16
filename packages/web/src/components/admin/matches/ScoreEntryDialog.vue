@@ -29,7 +29,6 @@
         :can-validate="entry.canValidate.value"
         focus-on-mount
         @update:value="handleValue"
-        @save="handleSave"
         @validate="handleValidate"
       />
     </template>
@@ -90,11 +89,6 @@ const handleOpen = (value: boolean) => {
 const handleValue = (index: number, value: string) => {
   entry.setValue(index, value)
 }
-const handleSave = async () => {
-  if (await entry.save()) {
-    emits('update:open', false)
-  }
-}
 const handleValidate = async () => {
   if (await entry.validate()) {
     emits('update:open', false)
@@ -134,14 +128,14 @@ const ruleTitle = computed(() => t('admin.matches.rule_title', 'Cible {target}',
 const ruleText = computed(() => {
   const count = props.match?.sides.length ?? 0
   if (props.match?.purpose === MATCH_PURPOSE.TIEBREAK && count >= SIDES_MULTI_MIN) {
-    return t('admin.matches.rule_tiebreak_multi', 'Départage à {count} joueurs : le vainqueur marque exactement {target}, les autres 0, 1 ou 2 (RG19, RG20). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { count, target: entry.target.value })
+    return t('admin.matches.rule_tiebreak_multi', 'Départage à {count} joueurs : le vainqueur marque exactement {target}, les autres 0, 1 ou 2 (RG19, RG20). Valider rend le score public et recalcule le classement.', { count, target: entry.target.value })
   }
   if (props.match?.purpose === MATCH_PURPOSE.TIEBREAK) {
-    return t('admin.matches.rule_tiebreak', 'Départage : le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
+    return t('admin.matches.rule_tiebreak', 'Départage : le vainqueur marque exactement {target} (RG22). Valider rend le score public et recalcule le classement.', { target: entry.target.value })
   }
   return isPool.value
-    ? t('admin.matches.rule_pool', 'En poule, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.', { target: entry.target.value })
-    : t('admin.matches.rule_knockout', 'En phase finale, le vainqueur marque exactement {target} (RG22). Saisir n’est pas valider : le tableau ne bouge qu’à la validation.', { target: entry.target.value })
+    ? t('admin.matches.rule_pool', 'En poule, le vainqueur marque exactement {target} (RG22). Valider rend le score public et recalcule le classement.', { target: entry.target.value })
+    : t('admin.matches.rule_knockout', 'En phase finale, le vainqueur marque exactement {target} (RG22). Valider rend le score public et met le tableau à jour.', { target: entry.target.value })
 })
 const meta = computed(() => props.match?.status === MATCH_STATUS.RECORDED
   ? t('admin.matches.meta_recorded', 'Score saisi · en attente de validation')

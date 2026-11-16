@@ -49,8 +49,8 @@ test.describe('admin matchs : écritures sur une édition créée par le test', 
     await signIn(context, 'admin')
   })
 
-  test('RG22 : un score qui n’atteint pas 5 est refusé avant envoi, puis enregistré sans devenir public', async ({ page, context }) => {
-    const { edition } = await createDrawnEdition(context.request, 'f08 enregistrer')
+  test('F-61 RG22 : un score qui n’atteint pas 5 est refusé avant envoi, puis « Valider » enregistre et valide en un clic', async ({ page, context }) => {
+    const { edition } = await createDrawnEdition(context.request, 'f08 valider seul')
     await selectAdminEdition(context, edition)
     const sent = writes(page)
     await openMatches(page)
@@ -65,32 +65,32 @@ test.describe('admin matchs : écritures sur une édition créée par le test', 
 
     await typeScore(page, 0, '5')
     await typeScore(page, 1, '1')
-    await page.getByTestId('admin-score-save').click()
+    await expect(page.getByTestId('admin-score-save')).toHaveCount(0)
+    await page.getByTestId('admin-score-validate').click()
     await expect(page.getByTestId('admin-score-dialog')).toHaveCount(0)
-    await expect(page.getByTestId(`admin-match-${first!.id}`)).toContainText('Saisi · à valider')
-    expect(sent).toHaveLength(1)
-    expect(sent[0]!.method()).toBe('PUT')
+    await expect(page.getByTestId(`admin-match-${first!.id}`)).toHaveCount(0)
+    expect(sent.map(request => request.method())).toEqual(['PUT', 'POST'])
     expect(sent[0]!.headers()['if-match']).toBe(`"${first!.version}"`)
     expect(sent[0]!.headers()['content-type']).toMatch(/^application\/json/)
 
-    const saved = (await adminMatches(page, edition)).find(match => match.id === first!.id)!
-    expect(saved.status).toBe('RECORDED')
-    expect(saved.sides.map(side => side.recordedScore)).toEqual([5, 1])
-    const published = (await publicScores(page, edition)).find(match => match.id === first!.id)
-    expect(published?.sides.every(side => side.score === null)).toBe(true)
+    const done = (await adminMatches(page, edition)).find(match => match.id === first!.id)!
+    expect(done.status).toBe('VALIDATED')
+    const published = (await publicScores(page, edition)).find(match => match.id === first!.id)!
+    expect(published.sides.map(side => side.score)).toEqual([5, 1])
   })
 
   test('double clic sur « Valider » : une seule validation, avec la version renvoyée par la saisie, score alors public', async ({ page, context }) => {
     const { edition } = await createDrawnEdition(context.request, 'f08 valider')
     await selectAdminEdition(context, edition)
     const sent = writes(page)
-    await openMatches(page)
     const [first] = await adminMatches(page, edition)
-
-    await page.getByTestId(`admin-match-enter-${first!.id}`).click()
-    await typeScore(page, 0, '2')
-    await typeScore(page, 1, '5')
-    await page.getByTestId('admin-score-save').click()
+    // Un score saisi mais pas validé (état intermédiaire, ex. validation échouée) : il est posé par l'API, l'écran ne propose plus « Enregistrer ».
+    const recorded = await page.request.put(`/api/v1/matchs/${first!.id}/score`, {
+      headers: { 'if-match': `"${first!.version}"` },
+      data: { scores: first!.sides.map((side, index) => ({ participationId: side.participationId, score: index === 0 ? 2 : 5 })) }
+    })
+    expect(recorded.status()).toBe(200)
+    await openMatches(page)
     await expect(page.getByTestId(`admin-match-${first!.id}`)).toContainText('Saisi · à valider')
 
     const trigger = page.getByTestId(`admin-match-validate-${first!.id}`)
@@ -131,6 +131,32 @@ test.describe('admin matchs : écritures sur une édition créée par le test', 
     expect((await adminMatches(page, edition)).find(match => match.id === first!.id)!.status).toBe('VALIDATED')
   })
 
+  test('F-61 : la validation échoue après l’enregistrement, message et saisie conservés ; « Valider » relancé ne réenregistre pas', async ({ page, context }) => {
+    const { edition } = await createDrawnEdition(context.request, 'f61 echec')
+    await selectAdminEdition(context, edition)
+    const sent = writes(page)
+    await openMatches(page)
+    const [first] = await adminMatches(page, edition)
+
+    await page.getByTestId(`admin-match-enter-${first!.id}`).click()
+    await typeScore(page, 0, '5')
+    await typeScore(page, 1, '3')
+    // Seule la route de validation est coupée (réponse 500 simulée) : la saisie, elle, part pour de vrai.
+    await page.route('**/api/v1/matchs/*/validation', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }))
+    await page.getByTestId('admin-score-validate').click()
+    await expect(page.getByTestId('admin-score-failure')).toBeVisible()
+    await expect(page.getByTestId('admin-score-dialog')).toBeVisible()
+    await expect(page.getByTestId('admin-score-input-0').locator('input')).toHaveValue('5')
+    await expect(page.getByTestId('admin-score-input-1').locator('input')).toHaveValue('3')
+    expect((await adminMatches(page, edition)).find(match => match.id === first!.id)!.status).toBe('RECORDED')
+
+    await page.unroute('**/api/v1/matchs/*/validation')
+    await page.getByTestId('admin-score-validate').click()
+    await expect(page.getByTestId('admin-score-dialog')).toHaveCount(0)
+    expect(sent.map(request => request.method())).toEqual(['PUT', 'POST', 'POST'])
+    expect((await adminMatches(page, edition)).find(match => match.id === first!.id)!.status).toBe('VALIDATED')
+  })
+
   test('412 : le match a changé entre-temps, message « modifié, rechargez » et la ligne est rechargée', async ({ page, context }) => {
     const { edition } = await createDrawnEdition(context.request, 'f08 conflit')
     await selectAdminEdition(context, edition)
@@ -145,7 +171,7 @@ test.describe('admin matchs : écritures sur une édition créée par le test', 
     expect(other.status()).toBe(200)
     await typeScore(page, 0, '1')
     await typeScore(page, 1, '5')
-    await page.getByTestId('admin-score-save').click()
+    await page.getByTestId('admin-score-validate').click()
     await expect(page.getByTestId('admin-score-failure')).toContainText('modifié')
     await expect(page.getByTestId('admin-score-dialog')).toBeVisible()
     const stored = (await adminMatches(page, edition)).find(match => match.id === first!.id)!
@@ -197,10 +223,8 @@ test.describe('admin matchs : écritures sur une édition créée par le test', 
     expect(Math.round(dialog.x)).toBe(0)
     expect(Math.round(dialog.width)).toBe(390)
     expect(Math.round(dialog.y + dialog.height)).toBe(844)
-    for (const testId of ['admin-score-save', 'admin-score-validate']) {
-      const box = (await page.getByTestId(testId).boundingBox())!
-      expect(box.height).toBeGreaterThanOrEqual(44)
-    }
+    const box = (await page.getByTestId('admin-score-validate').boundingBox())!
+    expect(box.height).toBeGreaterThanOrEqual(44)
     const inputs = await page.locator('[role=dialog] input').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().height))
     for (const height of inputs) {
       expect(height).toBeGreaterThanOrEqual(44)

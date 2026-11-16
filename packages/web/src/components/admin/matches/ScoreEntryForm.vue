@@ -89,15 +89,6 @@
     />
     <div class="score-entry-form__actions">
       <origam-btn
-        variant="outlined"
-        size="x-large"
-        :disabled="busy"
-        :loading="saving"
-        :text="saveLabel"
-        data-cy="admin-score-save"
-        @click="handleSave"
-      />
-      <origam-btn
         type="submit"
         variant="flat"
         size="x-large"
@@ -128,7 +119,7 @@ import type { IScoreEntryFormEmits, IScoreEntryFormProps } from '~/interfaces/sc
  *
  * @description
  * Formulaire de saisie d'un score : un champ par joueur (le nom du joueur est le libellé), le rappel de règle, puis deux actions
- * distinctes, « Enregistrer » (n'a aucun effet public) et « Valider » (rend le score opposable). Composant sans état métier :
+ * un seul bouton, « Valider » (F-61 : enregistre puis rend le score opposable). Composant sans état métier :
  * tout vient des props (déjà traduites) et part en événements ; `useScoreEntry` porte les règles et les appels.
  * Les champs sont des `origam-text-field` en `inputmode="numeric"` et non des `origam-number-field` : ce dernier borne en
  * silence une valeur hors bornes (« 7 » deviendrait « 5 »), ce qui enverrait un score faux au serveur (Origam #1327, décision 87eea8e).
@@ -168,18 +159,13 @@ const ctaHover = SCORE_CTA_HOVER
  * Actions
  *
  * @description
- * Seul le bouton de la phase en cours (enregistrement ou validation) affiche le chargement ; les deux sont désactivés pendant l'appel (double envoi).
+ * Pendant l'appel, « Valider » affiche le chargement et les champs sont désactivés (double envoi).
  * « Valider » est le bouton de soumission du formulaire (touche Entrée dans un champ).
  ********************************************************/
-const saveLabel = computed(() => t('admin.matches.save', 'Enregistrer'))
 const busy = computed(() => props.phase !== SCORE_ENTRY_PHASE.IDLE)
-const saving = computed(() => props.phase === SCORE_ENTRY_PHASE.SAVING)
 const validating = computed(() => props.phase === SCORE_ENTRY_PHASE.VALIDATING)
 const handleInput = (index: number, value: string | null) => {
   emits('update:value', index, value ?? '')
-}
-const handleSave = () => {
-  emits('save')
 }
 const handleSubmit = (event: Event) => {
   event.preventDefault()
@@ -256,8 +242,6 @@ defineExpose({})
 
   &__actions {
     display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: var(--score-entry-form__actions---gap, var(--origam-space---3));
   }
 }
 </style>
@@ -269,6 +253,5 @@ defineExpose({})
   --score-entry-form__player---gap: var(--origam-space---2);
   --score-entry-form__row---gap: var(--origam-space---4);
   --score-entry-form__score---width: 6.5rem;
-  --score-entry-form__actions---gap: var(--origam-space---3);
 }
 </style>

@@ -54,7 +54,6 @@ export interface IScoreEntryFormProps {
 
 export interface IScoreEntryFormEmits {
   (event: 'update:value', index: number, value: string): void
-  (event: 'save'): void
   (event: 'validate'): void
 }
 

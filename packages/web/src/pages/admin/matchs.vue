@@ -208,18 +208,16 @@ const handleStale = () => {
  * Confirmation
  *
  * @description
- * Le message dit ce qui vient de se passer : score enregistré (sans effet public) ou validé (classement recalculé).
+ * Seule la validation affiche un message (classement recalculé) ; l'enregistrement intermédiaire de « Valider » met juste la ligne à jour.
  ********************************************************/
 const snackbarOpen = ref(false)
-const snackbarOutcome = ref<SCORE_ENTRY_SUCCESS>(SCORE_ENTRY_SUCCESS.SAVED)
 const snackbarTimeout = SCORE_SNACKBAR_TIMEOUT_MS
-const snackbarText = computed(() => snackbarOutcome.value === SCORE_ENTRY_SUCCESS.VALIDATED
-  ? t('admin.matches.snackbar_validated', 'Score validé, classement recalculé')
-  : t('admin.matches.snackbar_saved', 'Score enregistré'))
+const snackbarText = computed(() => t('admin.matches.snackbar_validated', 'Score validé, classement recalculé'))
 const handleWritten = (match: IAdminMatch, outcome: SCORE_ENTRY_SUCCESS) => {
   queue.replaceMatch(match)
-  snackbarOutcome.value = outcome
-  snackbarOpen.value = true
+  if (outcome === SCORE_ENTRY_SUCCESS.VALIDATED) {
+    snackbarOpen.value = true
+  }
 }
 
 /*********************************************************

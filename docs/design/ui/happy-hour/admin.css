@@ -111,7 +111,7 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
 .score-in:focus-visible { outline: 3px solid var(--origam-color__border---focus); outline-offset: 2px; }
 .rule { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); padding: var(--origam-space---3) var(--origam-space---4); border-radius: var(--origam-radius---lg); background: var(--origam-color__feedback--info---bgSubtle); font-size: var(--origam-font__size---sm); }
 .sheet__meta { font-size: var(--origam-font__size---sm); }
-.sheet__cta { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--origam-space---3); }
+.sheet__cta { display: grid; gap: var(--origam-space---3); }
 
 /* origam-bottom-nav (mobile) */
 .adm-bottom { display: none; }

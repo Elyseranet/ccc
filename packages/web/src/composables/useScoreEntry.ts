@@ -15,12 +15,13 @@ import { validateScoreEntry } from '~/utils/score-entry.util'
  * useScoreEntry
  *
  * @description
- * Saisie du score d'un match : à jouer -> saisi (« Enregistrer ») -> validé (« Valider »). RG22 est contrôlé avant tout envoi
+ * Saisie du score d'un match : un seul bouton, « Valider » (F-61), qui enchaîne l'enregistrement puis la validation (la route de validation exige un match saisi, RECORDED). RG22 est contrôlé avant tout envoi
  * (cible portée par le match). Les erreurs de champ n'apparaissent qu'après une première tentative (`validate-on="submit"`).
  * Double envoi bloqué : la phase quitte IDLE de façon synchrone, avant le premier `await`, donc un second clic rapide est
  * ignoré et un seul appel part.
  * Contrôle de version (SEC-Q) : chaque écriture envoie la version du match lu ; la version de la réponse remplace celle-ci,
- * ce qui permet d'enchaîner saisie puis validation sans relire. « Valider » enregistre d'abord un score nouveau ou modifié.
+ * ce qui permet d'enchaîner saisie puis validation sans relire. « Valider » enregistre d'abord un score nouveau ou modifié ; si la validation échoue ensuite, le score reste saisi
+ * (la ligne est déjà remplacée) et la saisie est conservée : un nouveau clic valide sans réenregistrer.
  * 412 / 409 : la ligne est périmée, `onStale` la fait recharger. 428 et 409 `SCORE_MISMATCH` sont des défauts du front.
  ********************************************************/
 export const useScoreEntry = (match: MaybeRefOrGetter<IAdminMatch | null>, options: IUseScoreEntryOptions) => {
@@ -96,11 +97,6 @@ export const useScoreEntry = (match: MaybeRefOrGetter<IAdminMatch | null>, optio
     }
   }
 
-  const save = () => run(SCORE_ENTRY_PHASE.SAVING, async (current, scores) => {
-    const updated = await service.record(current.id, submissionOf(current, scores), current.version)
-    options.onWritten(updated, SCORE_ENTRY_SUCCESS.SAVED)
-  })
-
   const validate = () => run(SCORE_ENTRY_PHASE.VALIDATING, async (current, scores) => {
     let version = current.version
     if (!isRecordedAs(current, scores)) {
@@ -112,5 +108,5 @@ export const useScoreEntry = (match: MaybeRefOrGetter<IAdminMatch | null>, optio
     options.onWritten(result.match, SCORE_ENTRY_SUCCESS.VALIDATED)
   })
 
-  return { values, phase, failure, target, fieldErrors, formError, isBusy, isWritable, canValidate, setValue, save, validate }
+  return { values, phase, failure, target, fieldErrors, formError, isBusy, isWritable, canValidate, setValue, validate }
 }
