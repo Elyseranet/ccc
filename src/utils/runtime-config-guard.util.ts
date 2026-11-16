@@ -113,15 +113,13 @@ const siteUrlViolation = (value: unknown): boolean => {
 }
 
 /**
- * Un hôte SMTP vide, non analysable, local (même normalisation que le site : `localhost.`, `[::ffff:127.0.0.1]`, `127.0.0.2`…)
- * ou un nom sans point (nom de service comme `mailpit`) n'est pas un serveur réel. Une adresse IP publique reste acceptée.
+ * Un hôte SMTP vide, non analysable ou local (même normalisation que le site : `localhost.`, `[::ffff:127.0.0.1]`, `127.0.0.2`…)
+ * n'est pas un serveur réel. Un nom sans point (nom de service Docker comme `mailpit-rge5j512cvbevgm9qvtf5emw`, T-SEC-22)
+ * et une adresse IP, publique ou privée, sont acceptés.
  */
 const smtpHostViolation = (value: unknown): boolean => {
   const host = normalizeHostname(asText(value))
-  if (host === '' || isLocalHostname(host)) {
-    return true
-  }
-  return isIP(host) === 0 && !host.includes('.')
+  return host === '' || isLocalHostname(host)
 }
 
 /**
@@ -151,7 +149,7 @@ const mailFromViolation = (value: unknown): boolean => {
  * - Dans l'image de production (`productionImage`, marqueur du Dockerfile), le mode strict ne peut pas être éteint :
  *   `NUXT_STRICT_RUNTIME_CONFIG` éteint ou absent fait échouer le démarrage. Hors image, il reste faux par défaut.
  * - En mode strict, l'erreur nomme chaque variable fautive, JAMAIS sa valeur : site (`NUXT_PUBLIC_SITE_URL`) pas en
- *   https ou sur une machine locale ; transport d'email différent de `smtp` ; hôte SMTP vide, local ou sans point ;
+ *   https ou sur une machine locale ; transport d'email différent de `smtp` ; hôte SMTP vide ou local ;
  *   expéditeur vide ou resté à la valeur par défaut ; cookies sans `Secure` ; secret du cookie d'appareil absent ou
  *   trop court.
  * - Les identifiants SMTP (`NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD`) ne sont pas exigés : le fournisseur n'est pas choisi
@@ -173,7 +171,7 @@ export const assertStrictRuntimeConfig = (config: IStrictRuntimeConfigInput): vo
     problems.push(`${STRICT_CONFIG_VARIABLE.MAIL_TRANSPORT} must be "smtp"`)
   }
   if (smtpHostViolation(config.mail?.host)) {
-    problems.push(`${STRICT_CONFIG_VARIABLE.MAIL_HOST} must name a real SMTP server (a fully qualified name), not localhost or a bare service name`)
+    problems.push(`${STRICT_CONFIG_VARIABLE.MAIL_HOST} must name a real SMTP server (a host name, a service name or an IP address), not empty or localhost`)
   }
   if (mailFromViolation(config.mail?.from)) {
     problems.push(`${STRICT_CONFIG_VARIABLE.MAIL_FROM} must be set to a real sender, not the default`)
