@@ -331,58 +331,47 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
 .q-tie__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---3); }
 .snack--demo { position: static; z-index: auto; translate: none; margin-block-end: var(--origam-space---4); } /* démo dans la section États : dans le flux, sans z-index, son ombre ne recouvre pas l’alerte suivante */
 
-/* ═══ F-52 · TIRAGE AU SORT ET RÉVÉLATION (CSS seul : keyframes + animation-delay en cascade, aucun timer JS) ═══
-   Enchaînement piloté par des variables d’instance : --i (rang de l’affiche), ou --p (rang de la poule) et --s (place dans la poule) ; --n = nombre d’étapes.
-   Les styles de base sont l’état FINAL : sous reduced-motion, hh.css coupe toutes les animations et le résultat s’affiche directement. */
-.dr { --dr-step: var(--origam-motion__duration---slow); --dr-dur: var(--origam-motion__duration---xslow); --dr-ease: var(--origam-motion__easing---decelerate); }
+/* ═══ F-52 · TIRAGE AU SORT PAS À PAS (CSS seul : keyframes + animation-delay, aucun timer JS) ═══
+   Liste (admin-tirages, admin-tirage-tour) : un clic tire UNE étape et ouvre l’écran de projection ; au retour, l’élément arrivé
+   s’allume (capsule + halo). Les styles de base sont l’état FINAL : sous reduced-motion, hh.css coupe tout et le résultat s’affiche directement. */
+.dr { --dr-dur: var(--origam-motion__duration---xslow); --dr-ease: var(--origam-motion__easing---decelerate); }
 .dr-st { display: none; }
-.dr[data-draw="empty"] [data-st="empty"], .dr[data-draw="started"] [data-st="started"], .dr[data-draw="reveal"] [data-st="reveal"], .dr[data-draw="done"] [data-st="reveal"] { display: block; }
-.dr[data-draw="done"] [data-st="reveal"] *, .dr[data-draw="done"] [data-st="reveal"] *::before, .dr[data-draw="done"] [data-st="reveal"] *::after { animation: none !important; } /* « Passer l’animation » : même rendu que reduced-motion */
-/* Choix : tirage par l’application ou saisie physique */
+.dr[data-draw="empty"] [data-st="empty"], .dr[data-draw="started"] [data-st="started"], .dr[data-draw="arrived"] [data-st="arrived"], .dr[data-draw="complete"] [data-st="complete"] { display: block; }
+.dr[data-draw="arrived"] .dr-hc[data-st="arrived"], .dr[data-draw="complete"] .dr-hc[data-st="complete"] { display: inline-flex; }
+.dr-hc { flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
+/* Bande « tirer au sort » au-dessus de la saisie physique */
 .dr-mode { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---3) var(--origam-space---5); margin-bottom: var(--origam-space---4); padding: var(--origam-space---4) var(--origam-space---5); border: 1px solid var(--origam-color__border---default); border-radius: var(--origam-radius---xl); background: radial-gradient(30rem 12rem at 100% 0%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%), var(--origam-color__surface---raised); }
 .dr-mode__txt { display: grid; gap: var(--origam-space---1); flex: 1 1 18rem; min-width: 0; }
 .dr-mode__txt .muted { font-size: var(--origam-font__size---sm); }
+.dr-mode__act { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
 .dr-go { gap: var(--origam-space---2); }
 .dr-go svg { width: var(--origam-space---6); height: var(--origam-space---6); flex: none; transition: rotate var(--origam-motion__duration---medium) var(--origam-motion__easing---standard); }
 .dr-go .cap-fill { fill: currentColor; } .dr-go .cap-inner { fill: var(--origam-color__action--primary---bg); }
 .dr-go:hover .cap-inner { fill: var(--origam-color__action--primary---bgHover); }
 .dr-go:hover svg { rotate: 90deg; }
-.dr-go:disabled .cap-inner { fill: var(--origam-color__surface---sunken); }
 .dr-or { display: flex; align-items: center; gap: var(--origam-space---3); margin-block: var(--origam-space---2) var(--origam-space---3); font-size: var(--origam-font__size---sm); }
 .dr-or::before, .dr-or::after { content: ''; flex: 1; height: 1px; background: var(--origam-color__border---default); }
 .dr-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---2) var(--origam-space---3); margin-bottom: var(--origam-space---3); }
-.dr-run { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---2) var(--origam-space---4); margin-bottom: var(--origam-space---3); animation: dr-gone 1ms linear calc((var(--n) - 1) * var(--dr-step) + var(--dr-dur)) forwards; } /* disparaît seul à la fin de la cascade : visibility animée, donc retiré du focus */
-.dr-run__t { display: inline-flex; align-items: center; gap: var(--origam-space---2); font-weight: var(--origam-font__weight---bold); color: var(--origam-color__bar---amber); }
-.dr-run__t svg { width: var(--origam-space---5); height: var(--origam-space---5); animation: dr-spin var(--dr-dur) linear infinite; }
-.dr-run__t .cap-fill { fill: currentColor; } .dr-run__t .cap-inner { fill: var(--origam-color__surface---default); }
-.dr[data-draw="done"] .dr-run { display: none; }
-.dr-top { display: grid; align-items: center; margin-bottom: var(--origam-space---3); } /* barre « en cours » et alerte finale dans la même cellule : l’une remplace l’autre sans trou */
-.dr-top > * { grid-area: 1 / 1; margin: 0; }
-.dr-live .alert { animation: dr-in var(--dr-dur) var(--dr-ease) calc((var(--n) - 1) * var(--dr-step) + var(--dr-dur) * .6) both; }
 .dr-next { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---4); margin-top: var(--origam-space---4); }
 
-/* Phase finale : une affiche après l’autre. Une capsule tombe en tournoyant, se pose, saute dans un éclat de mousse, l’affiche apparaît. */
-.r-aff--drawn { overflow: hidden; animation: dr-slot var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
-.r-aff--drawn .r-aff__row b { font-size: var(--origam-font__size---lg); }
-.r-aff--drawn .r-vs { color: var(--origam-color__bar---amber); font-weight: var(--origam-font__weight---bold); }
-.r-aff--drawn > :not(.r-cap) { animation: dr-in var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
-.r-aff--drawn::before { content: '?'; position: absolute; inset: 0; display: grid; place-items: center; font: var(--origam-font__size---3xl) var(--origam-font__family---display); color: var(--origam-color__text---tertiary); opacity: 0; pointer-events: none; animation: dr-wait var(--dr-dur) linear calc(var(--i) * var(--dr-step)) both; }
-.r-aff--drawn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--origam-color__bar---foam) 55%, transparent), color-mix(in srgb, var(--origam-color__bar---amber) 30%, transparent) 35%, transparent 65%); opacity: 0; pointer-events: none; animation: dr-foam var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
-.r-cap { position: absolute; z-index: 1; left: 50%; top: 50%; width: var(--origam-space---16); aspect-ratio: 1; margin: calc(var(--origam-space---16) / -2) 0 0 calc(var(--origam-space---16) / -2); opacity: 0; pointer-events: none; animation: dr-cap var(--dr-dur) var(--dr-ease) calc(var(--i) * var(--dr-step)) both; }
+/* Élément qui vient d’arriver (une seule fois, au retour de la projection) : capsule qui tombe, éclat de mousse, halo ambre qui reste en bordure */
+.r-aff--new { overflow: hidden; border-color: var(--origam-color__bar---amber); animation: dr-slot var(--dr-dur) var(--dr-ease) both; }
+.r-aff--new .r-aff__row b { font-size: var(--origam-font__size---lg); }
+.r-aff--new .r-vs { color: var(--origam-color__bar---amber); font-weight: var(--origam-font__weight---bold); }
+.r-aff--new > :not(.r-cap) { animation: dr-in var(--dr-dur) var(--dr-ease) both; }
+.r-aff--new::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--origam-color__bar---foam) 55%, transparent), color-mix(in srgb, var(--origam-color__bar---amber) 30%, transparent) 35%, transparent 65%); opacity: 0; pointer-events: none; animation: dr-foam var(--dr-dur) var(--dr-ease) both; }
+.r-aff--new .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
+.r-cap { position: absolute; z-index: 1; left: 50%; top: 50%; width: var(--origam-space---16); aspect-ratio: 1; margin: calc(var(--origam-space---16) / -2) 0 0 calc(var(--origam-space---16) / -2); opacity: 0; pointer-events: none; animation: dr-cap var(--dr-dur) var(--dr-ease) both; }
 .r-cap svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 0 var(--origam-color__bar---neon)); }
 .r-cap__n { fill: var(--origam-color__bar---foam); font: 34px var(--origam-font__family---display); text-anchor: middle; dominant-baseline: central; }
-
-/* Poules : poule après poule ; dans une poule, les joueurs tombent l’un après l’autre (décalage court) et la poule s’illumine pendant son tirage. */
-.tp--drawn { animation: dr-pool calc(var(--dr-dur) + 4 * var(--origam-motion__duration---fast)) var(--dr-ease) calc(var(--p) * var(--dr-step)) both; }
-.slot--drawn { animation: dr-pop var(--dr-dur) var(--dr-ease) calc(var(--p) * var(--dr-step) + var(--s) * var(--origam-motion__duration---fast)) both; }
-.tp--drawn .tp__h .chip { animation: dr-in var(--dr-dur) var(--dr-ease) calc(var(--p) * var(--dr-step) + 4 * var(--origam-motion__duration---fast)) both; }
+.slot--new { outline: 2px solid var(--origam-color__bar---amber); outline-offset: -2px; animation: dr-pop var(--dr-dur) var(--dr-ease) both; }
+.tp--new { border-color: var(--origam-color__bar---amber); animation: dr-pool calc(var(--dr-dur) * 1.5) var(--dr-ease) both; }
 
 @keyframes dr-slot {
-  0% { background: var(--origam-color__surface---sunken); border-color: var(--origam-color__border---strong); box-shadow: none; transform: scale(.97); }
-  50% { border-color: var(--origam-color__bar---amber); box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---10) color-mix(in srgb, var(--origam-color__bar---neon) 70%, transparent); transform: scale(1.03); }
+  0% { background: var(--origam-color__surface---sunken); box-shadow: none; transform: scale(.97); }
+  50% { box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---10) color-mix(in srgb, var(--origam-color__bar---neon) 70%, transparent); transform: scale(1.03); }
 }
 @keyframes dr-in { 0%, 52% { opacity: 0; visibility: hidden; translate: 0 var(--origam-space---2); } }
-@keyframes dr-wait { 0%, 30% { opacity: .5; } 45%, 100% { opacity: 0; } }
 @keyframes dr-foam { 0%, 40% { opacity: 0; transform: scale(.2); } 58% { opacity: 1; } 90%, 100% { opacity: 0; transform: scale(1.6); } }
 @keyframes dr-cap {
   0% { opacity: 0; transform: translateY(-160%) rotate(-540deg) scale(.5); }
@@ -391,24 +380,87 @@ button.st__a:focus-visible, button.st__a.is-focus { outline: 2px solid var(--ori
   50% { opacity: 1; transform: scale(1); }
   70%, 100% { opacity: 0; transform: scale(1.8) rotate(20deg); }
 }
-@keyframes dr-pool { 15%, 75% { border-color: var(--origam-color__bar---amber); box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---12) color-mix(in srgb, var(--origam-color__bar---neon) 60%, transparent); } }
+@keyframes dr-pool { 15%, 60% { box-shadow: 0 0 0 2px var(--origam-color__bar---amber), 0 0 var(--origam-space---12) color-mix(in srgb, var(--origam-color__bar---neon) 60%, transparent); } }
 @keyframes dr-pop {
   0% { opacity: 0; visibility: hidden; transform: translateX(var(--origam-space---6)) scale(.6); }
   45% { opacity: 1; transform: scale(1.06); background: var(--origam-color__action--primary---bg); color: var(--origam-color__action--primary---fg); }
 }
 @keyframes dr-gone { to { visibility: hidden; opacity: 0; } }
-@keyframes dr-spin { to { rotate: 360deg; } }
-@media (prefers-reduced-motion: reduce) { .dr-run { display: none; } .dr-go:hover svg { rotate: none; } }
-
-.dr-hc { flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
-.dr[data-draw="reveal"] .dr-hc, .dr[data-draw="done"] .dr-hc { display: inline-flex; }
+@media (prefers-reduced-motion: reduce) { .dr-go:hover svg { rotate: none; } }
 /* Maquette : la colonne « À placer » et la snackbar suivent l’état de la section (le front les dérive du brouillon) */
-.adm-content:not(:has(.dr[data-draw="reveal"], .dr[data-draw="done"])) .dr-alt { display: none; }
-.adm-content:has(.dr[data-draw="reveal"], .dr[data-draw="done"]) .dr-alt-hide, .adm-content:has(.dr[data-draw="empty"]) .snack.dr-alt-hide { display: none; }
-p.dr-alt { margin-top: var(--origam-space---3); }
+.adm-content:not(:has(.dr[data-draw="arrived"])) .dr-on-arrived,
+.adm-content:not(:has(.dr[data-draw="complete"])) .dr-on-complete,
+.adm-content:has(.dr[data-draw="arrived"]) .dr-off-arrived,
+.adm-content:has(.dr[data-draw="complete"]) .dr-off-complete,
+.adm-content:has(.dr[data-draw="empty"]) .snack.dr-off-complete { display: none; }
+p.dr-on-complete { margin-top: var(--origam-space---3); }
 
-/* Démo de la maquette (hors produit) : changer d’état, rejouer la révélation */
+/* ═══ F-52 · ÉCRAN DE PROJECTION (admin-tirage-projection.html) : plein écran, lu de loin au projecteur ═══
+   Une étape par écran. Phase finale : nom A, nom B, puis « VS ». Poules : le nom, puis sa poule. Enchaînement par animation-delay
+   (unité --u = motion.duration.xslow) ; « Continuer » apparaît à la fin, « Passer l’animation » disparaît à la fin. */
+.pj-body { margin: 0; min-height: 100vh; overflow-x: hidden; background: var(--origam-color__bar---night); color: var(--origam-color__bar---foam); }
+.pj { --u: var(--origam-motion__duration---xslow); --pj-name: calc(var(--u) * 1.2); --d-b: calc(var(--u) * 1.4); --d-vs: calc(var(--u) * 2.8); --d-end: calc(var(--u) * 3.6);
+  position: relative; isolation: isolate; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 100vh; overflow: hidden; padding: clamp(var(--origam-space---4), 3vh, var(--origam-space---10)) clamp(var(--origam-space---4), 4vw, var(--origam-space---16));
+  background: radial-gradient(ellipse 70% 60% at 50% 55%, color-mix(in srgb, var(--origam-color__bar---glow) 70%, transparent), transparent 70%), var(--origam-color__bar---night); }
+.pj[data-v="poule"] { --d-b: calc(var(--u) * 1.4); --d-vs: calc(var(--u) * 1.4); --d-end: calc(var(--u) * 2.6); }
+.pj [data-for] { display: none; }
+.pj[data-v="tour"] [data-for="tour"], .pj[data-v="poule"] [data-for="poule"] { display: revert; }
+.pj[data-v="tour"] .pj-stage[data-for="tour"], .pj[data-v="poule"] .pj-stage[data-for="poule"] { display: grid; }
+.pj[data-v="tour"] .pj-act a[data-for="tour"], .pj[data-v="poule"] .pj-act a[data-for="poule"] { display: inline-flex; }
+/* Rayons de lumière qui tournent lentement et s’intensifient au moment fort */
+.pj-rays { position: absolute; z-index: -1; inset: -50%; background: repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in srgb, var(--origam-color__bar---amber) 9%, transparent) 0deg 6deg, transparent 6deg 18deg); mask-image: radial-gradient(circle at 50% 50%, black 0, transparent 45%); opacity: .7; animation: pj-spin calc(var(--u) * 60) linear infinite, pj-rays var(--u) var(--origam-motion__easing---decelerate) var(--d-vs) both; }
+.pj-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---3) var(--origam-space---6); }
+.pj-top .hh-brand { font-size: clamp(var(--origam-font__size---lg), 2.2vw, var(--origam-font__size---3xl)); }
+.pj-t { font-size: clamp(var(--origam-font__size---lg), 2.4vw, var(--origam-font__size---3xl)); font-weight: var(--origam-font__weight---extrabold); letter-spacing: var(--origam-font__letterSpacing---wide); text-transform: uppercase; color: var(--origam-color__bar---ice); }
+.pj-step { font-size: clamp(var(--origam-font__size---md), 2vw, var(--origam-font__size---2xl)); font-weight: var(--origam-font__weight---bold); }
+.pj-stage { position: relative; align-content: center; justify-items: center; gap: clamp(var(--origam-space---2), 2vh, var(--origam-space---6)); text-align: center; }
+.pj-name { position: relative; display: grid; place-items: center; min-width: 0; max-width: 100%; }
+.pj-n { display: block; font-size: clamp(2.5rem, min(8.5vw, 13vh), 10rem); line-height: var(--origam-font__lineHeight---none); color: var(--origam-color__bar---foam); overflow-wrap: anywhere; animation: pj-name var(--pj-name) var(--origam-motion__easing---decelerate) var(--d, 0s) both; }
+.pj-name--b { --d: var(--d-b); }
+.pj-cap { position: absolute; left: 50%; top: 50%; width: clamp(5rem, 16vh, 11rem); aspect-ratio: 1; translate: -50% -50%; opacity: 0; pointer-events: none; animation: pj-cap var(--pj-name) var(--origam-motion__easing---decelerate) var(--d, 0s) both; }
+.pj-cap svg { width: 100%; height: 100%; filter: drop-shadow(0 8px 0 var(--origam-color__bar---neon)); }
+.pj-cap .cap-inner { fill: var(--origam-color__bar---night); }
+.pj-vs { position: relative; margin: 0; font-size: clamp(4rem, min(15vw, 24vh), 17rem); line-height: var(--origam-font__lineHeight---none); color: var(--origam-color__bar---amber); rotate: -6deg; animation: pj-vs calc(var(--u) * .8) var(--origam-motion__easing---sharp) var(--d-vs) both; }
+.pj-into { margin: 0; font-size: clamp(var(--origam-font__size---lg), 3vw, var(--origam-font__size---3xl)); font-weight: var(--origam-font__weight---bold); color: var(--origam-color__bar---ice); animation: pj-name calc(var(--u) * .6) var(--origam-motion__easing---decelerate) var(--d-vs) both; }
+.pj-pool { position: relative; display: grid; place-items: center; width: clamp(9rem, 36vh, 24rem); aspect-ratio: 1; animation: pj-vs calc(var(--u) * .8) var(--origam-motion__easing---sharp) var(--d-vs) both; }
+.pj-pool svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 10px 0 var(--origam-color__bar---neon)); }
+.pj-pool .cap-inner { fill: var(--origam-color__bar---night); }
+.pj-pool__t { position: relative; display: grid; justify-items: center; line-height: var(--origam-font__lineHeight---none); }
+.pj-pool__l { font-size: clamp(var(--origam-font__size---md), 3.4vh, var(--origam-font__size---2xl)); font-weight: var(--origam-font__weight---extrabold); letter-spacing: var(--origam-font__letterSpacing---widest); text-transform: uppercase; color: var(--origam-color__bar---ice); }
+.pj-pool__n { font-size: clamp(3.5rem, 15vh, 10rem); color: var(--origam-color__bar---foam); }
+/* Éclat de capsules au moment fort : 14 éclats projetés selon --a */
+.pj-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.pj[data-v="poule"] .pj-burst { top: 66%; }
+.pj-burst i { position: absolute; width: clamp(.75rem, 2vh, 1.5rem); aspect-ratio: 1; margin: -.5rem; border-radius: var(--origam-radius---full); background: var(--origam-color__bar---amber); opacity: 0; animation: pj-burst calc(var(--u) * 1.3) var(--origam-motion__easing---decelerate) calc(var(--d-vs) + var(--u) * .3) both; }
+.pj-burst i:nth-child(3n) { background: var(--origam-color__bar---foam); } .pj-burst i:nth-child(3n + 1) { background: var(--origam-color__bar---ice); width: clamp(.5rem, 1.4vh, 1rem); }
+.pj-flash { position: absolute; z-index: -1; inset: 0; background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--origam-color__bar---foam) 45%, transparent), transparent 55%); opacity: 0; pointer-events: none; animation: pj-flash var(--u) var(--origam-motion__easing---decelerate) calc(var(--d-vs) + var(--u) * .3) both; }
+.pj-act { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--origam-space---4); min-height: var(--origam-space---16); }
+.pj-act .btn--primary { min-height: var(--origam-space---16); padding-inline: var(--origam-space---10); font-size: clamp(var(--origam-font__size---lg), 2vw, var(--origam-font__size---2xl)); animation: pj-show calc(var(--u) * .6) var(--origam-motion__easing---decelerate) var(--d-end) both; }
+.pj-skip { position: absolute; right: clamp(var(--origam-space---4), 4vw, var(--origam-space---16)); bottom: clamp(var(--origam-space---4), 3vh, var(--origam-space---10)); color: var(--origam-color__bar---ice); animation: dr-gone 1ms linear var(--d-end) forwards; }
+.pj[data-st="done"] *, .pj[data-st="done"] *::before, .pj[data-st="done"] *::after { animation: none !important; }
+.pj[data-st="done"] .pj-rays { animation: pj-spin calc(var(--u) * 60) linear infinite !important; }
+.pj[data-st="done"] .pj-skip { display: none; }
+@keyframes pj-spin { to { rotate: 360deg; } }
+@keyframes pj-rays { from { opacity: .25; } 40% { opacity: 1; } }
+@keyframes pj-name { 0%, 40% { opacity: 0; visibility: hidden; transform: scale(.55); filter: blur(12px); letter-spacing: .2em; } 70% { opacity: 1; transform: scale(1.08); filter: blur(0); } }
+@keyframes pj-cap {
+  0% { opacity: 0; transform: translateY(-70vh) rotate(-900deg) scale(.4); }
+  10% { opacity: 1; }
+  32% { opacity: 1; transform: translateY(0) rotate(0) scale(1.15); }
+  40% { opacity: 1; transform: scale(1) rotateY(0); }
+  55%, 100% { opacity: 0; transform: scale(1.6) rotateY(90deg); }
+}
+@keyframes pj-vs { 0% { opacity: 0; transform: scale(5); filter: blur(8px); } 55% { opacity: 1; transform: scale(.88); filter: blur(0); } 72% { transform: scale(1.12); } 86% { transform: scale(.97); } }
+@keyframes pj-burst { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0) scale(.4); } 6%, 70% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(-1 * var(--r, 38vmin))) scale(1); } }
+@keyframes pj-flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes pj-show { 0% { opacity: 0; visibility: hidden; translate: 0 var(--origam-space---4); } }
+@media (prefers-reduced-motion: reduce) { .pj-skip { display: none; } }
+@media (max-width: 760px) { .pj-skip { position: static; } .pj-act { flex-direction: column-reverse; } }
+
+/* Démo de la maquette (hors produit) : changer d’état, rejouer l’animation */
 .mock-demo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); margin-bottom: var(--origam-space---4); padding: var(--origam-space---2) var(--origam-space---3); border: 1px dashed var(--origam-color__feedback--warning---border); border-radius: var(--origam-radius---lg); }
 .mock-demo .eyebrow { margin-inline-end: var(--origam-space---2); color: var(--origam-color__feedback--warning---fgSubtle); }
 .mock-demo [aria-pressed="true"] { background: var(--origam-color__action--secondary---bg); color: var(--origam-color__action--secondary---fg); box-shadow: none; }
 
+.mock-demo[hidden] { display: none; }
+.pj-demo { position: fixed; z-index: 50; top: var(--origam-space---2); left: 50%; translate: -50% 0; width: max-content; max-width: calc(100vw - 2 * var(--origam-space---4)); background: var(--origam-color__surface---raised); }
