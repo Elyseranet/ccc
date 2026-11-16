@@ -38,7 +38,16 @@
       />
     </template>
     <template #[`item.participantCount`]="{ item }">
-      <span class="editions-table__num">{{ item.participantCount ?? noValue }}</span>
+      <span
+        class="editions-table__num"
+        :data-cy="`editions-count-${item.code}`"
+      >
+        {{ countOf(item) }}
+        <small
+          v-if="isLive(item)"
+          class="editions-table__unit"
+        >{{ registeredLabel }}</small>
+      </span>
     </template>
     <template #[`item.actions`]="{ item }">
       <origam-btn
@@ -65,7 +74,7 @@ import { useT } from '~/composables/useT'
 import { ADMIN_EDITION_COLUMNS, ADMIN_EDITIONS_DEFAULT_SORT, EDITION_ORIGIN_CHIPS } from '~/consts/admin-editions.const'
 import { EDITION_HERO_STATUS } from '~/consts/edition-view.const'
 import type { IEditionsTableProps } from '~/interfaces/admin-editions.interface'
-import type { IEditionSummary } from '~/interfaces/edition.interface'
+import type { IAdminEditionSummary } from '~/interfaces/edition.interface'
 import { buildAdminEditionLink, formatEditionDate, isEditionClosed } from '~/utils/admin-editions.util'
 
 /*********************************************************
@@ -73,7 +82,7 @@ import { buildAdminEditionLink, formatEditionDate, isEditionClosed } from '~/uti
  *
  * @description
  * Liste des éditions (code, année, nom, date, statut, origine, participants, action). Une édition de l'archive n'a ni nom ni date :
- * « Non renseigné ». Le N n'est connu qu'à la clôture : « — » avant. L'action est « Consulter » pour une édition
+ * « Non renseigné ». Participants : une édition en cours montre les inscrits en direct (`registeredCount`) avec « inscrits » dessous ; une édition clôturée, le N figé (`participantCount`), « — » s'il manque (F-48). L'action est « Consulter » pour une édition
  * clôturée (lecture seule), « Modifier » sinon. La table n'est pas paginée : toutes les éditions tiennent sur une page.
  ********************************************************/
 const { t } = useT()
@@ -82,6 +91,7 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const missingText = computed(() => t('admin.editions.not_provided', 'Non renseigné'))
 const noValue = computed(() => t('admin.editions.no_value', '—'))
+const registeredLabel = computed(() => t('admin.editions.registered_label', 'inscrits'))
 const caption = computed(() => t('admin.editions.table_caption', 'Éditions du championnat'))
 const pageSize = computed(() => Math.max(1, props.editions.length))
 
@@ -111,20 +121,22 @@ const handleSortBy = (value: Array<{ key: string, order?: boolean | 'asc' | 'des
  * @description
  * Les pastilles suivent la recette des chips (mapping.md) ; chaque action nomme l'édition pour les lecteurs d'écran.
  ********************************************************/
-const dateOf = (edition: IEditionSummary): string => formatEditionDate(edition.heldOn) ?? missingText.value
-const statusOf = (edition: IEditionSummary) => {
+const dateOf = (edition: IAdminEditionSummary): string => formatEditionDate(edition.heldOn) ?? missingText.value
+const statusOf = (edition: IAdminEditionSummary) => {
   const status = EDITION_HERO_STATUS[edition.status]
   return { text: t(status.label.key, status.label.fallback), family: status.family }
 }
-const originOf = (edition: IEditionSummary) => {
+const originOf = (edition: IAdminEditionSummary) => {
   const origin = EDITION_ORIGIN_CHIPS[edition.origin]
   return { text: t(origin.label.key, origin.label.fallback), props: origin.props }
 }
-const linkOf = (edition: IEditionSummary): string => buildAdminEditionLink(edition.code)
-const actionOf = (edition: IEditionSummary): string => isEditionClosed(edition)
+const isLive = (edition: IAdminEditionSummary): boolean => !isEditionClosed(edition)
+const countOf = (edition: IAdminEditionSummary): string | number => isLive(edition) ? edition.registeredCount : edition.participantCount ?? noValue.value
+const linkOf = (edition: IAdminEditionSummary): string => buildAdminEditionLink(edition.code)
+const actionOf = (edition: IAdminEditionSummary): string => isEditionClosed(edition)
   ? t('admin.editions.action_view', 'Consulter')
   : t('admin.editions.action_edit', 'Modifier')
-const actionLabelOf = (edition: IEditionSummary): string => isEditionClosed(edition)
+const actionLabelOf = (edition: IAdminEditionSummary): string => isEditionClosed(edition)
   ? t('admin.editions.action_view_label', 'Consulter l’édition {code}', { code: edition.code })
   : t('admin.editions.action_edit_label', 'Modifier l’édition {code}', { code: edition.code })
 
@@ -143,6 +155,12 @@ defineExpose({})
     font-variant-numeric: tabular-nums;
   }
 
+  &__unit {
+    display: var(--editions-table__unit---display, block);
+    font-size: var(--editions-table__unit---font-size, var(--origam-font__size---sm));
+    color: var(--editions-table__unit---color, var(--origam-color__text---secondary));
+  }
+
   &__missing {
     color: var(--editions-table__missing---color, var(--origam-color__text---secondary));
   }
@@ -152,5 +170,8 @@ defineExpose({})
 <style>
 :root {
   --editions-table__missing---color: var(--origam-color__text---secondary);
+  --editions-table__unit---display: block;
+  --editions-table__unit---font-size: var(--origam-font__size---sm);
+  --editions-table__unit---color: var(--origam-color__text---secondary);
 }
 </style>

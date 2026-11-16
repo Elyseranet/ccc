@@ -280,10 +280,28 @@ describe('édition clôturée', () => {
 describe('page liste des éditions', () => {
   const mountList = () => mountSuspended(EditionsPage, { route: ROUTES.ADMIN_EDITIONS, global: { components: { RouterLink } } })
 
+  it('lit GET /admin/editions (B-20), sans appeler GET /editions', async () => {
+    const publicCalls = vi.fn()
+    const adminCalls = vi.fn()
+    registerEndpoint('/api/v1/editions', defineEventHandler(() => {
+      publicCalls()
+      return []
+    }))
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => {
+      adminCalls()
+      return [{ ...summary(), registeredCount: 7 }]
+    }))
+    const wrapper = await mountList()
+    await flushPromises()
+    expect(wrapper.find('[data-cy="editions-action-2026"]').exists()).toBe(true)
+    expect(adminCalls).toHaveBeenCalled()
+    expect(publicCalls).not.toHaveBeenCalled()
+  })
+
   it('liste les éditions, « Non renseigné » pour l’archive, Consulter pour une clôturée et Modifier sinon', async () => {
-    registerEndpoint('/api/v1/editions', defineEventHandler(() => [
-      summary({ participantCount: null }),
-      summary({ id: 'c', code: '2025', year: 2025, status: EDITION_STATUS.CLOSED, origin: EDITION_ORIGIN.LEGACY_IMPORT, participantCount: 45 })
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => [
+      { ...summary({ participantCount: null }), registeredCount: 3 },
+      { ...summary({ id: 'c', code: '2025', year: 2025, status: EDITION_STATUS.CLOSED, origin: EDITION_ORIGIN.LEGACY_IMPORT, participantCount: 45 }), registeredCount: 45 }
     ]))
     const wrapper = await mountList()
     await flushPromises()
@@ -298,8 +316,23 @@ describe('page liste des éditions', () => {
     expect(wrapper.get('[data-cy="editions-table"]').text()).toContain('45')
   })
 
+  it('Participants : édition en cours = inscrits en direct avec « inscrits » dessous ; archivée = N figé seul (F-48)', async () => {
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => [
+      { ...summary({ participantCount: null }), registeredCount: 3 },
+      { ...summary({ id: 'c', code: '2025', year: 2025, status: EDITION_STATUS.CLOSED, origin: EDITION_ORIGIN.LEGACY_IMPORT, participantCount: 45 }), registeredCount: 44 }
+    ]))
+    const wrapper = await mountList()
+    await flushPromises()
+    const live = wrapper.get('[data-cy="editions-count-2026"]')
+    expect(live.text()).toContain('3')
+    expect(live.get('small').text()).toBe('inscrits')
+    const archived = wrapper.get('[data-cy="editions-count-2025"]')
+    expect(archived.text()).toBe('45')
+    expect(archived.find('small').exists()).toBe(false)
+  })
+
   it('la recherche filtre par code ou année et annonce l’absence de résultat', async () => {
-    registerEndpoint('/api/v1/editions', defineEventHandler(() => [summary(), summary({ id: 'c', code: '2025', year: 2025 })]))
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => [{ ...summary(), registeredCount: 0 }, { ...summary({ id: 'c', code: '2025', year: 2025 }), registeredCount: 0 }]))
     const wrapper = await mountList()
     await flushPromises()
     await wrapper.get('[data-cy="editions-search"] input').setValue('2025')
@@ -312,7 +345,7 @@ describe('page liste des éditions', () => {
   })
 
   it('liste vide : état vide, sans tableau', async () => {
-    registerEndpoint('/api/v1/editions', defineEventHandler(() => []))
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler(() => []))
     const wrapper = await mountList()
     await flushPromises()
     expect(wrapper.find('[data-cy="async-state-empty"]').exists()).toBe(true)
@@ -320,7 +353,7 @@ describe('page liste des éditions', () => {
   })
 
   it('erreur serveur : alerte d’erreur avec nouvelle tentative', async () => {
-    registerEndpoint('/api/v1/editions', defineEventHandler((event) => {
+    registerEndpoint('/api/v1/admin/editions', defineEventHandler((event) => {
       setResponseStatus(event, 500)
       return apiError(500, API_ERROR_CODE.INTERNAL_ERROR)
     }))
