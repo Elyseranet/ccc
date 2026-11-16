@@ -267,7 +267,7 @@
   "admin.closing.confirm_title": "Confirmer la clôture",
   "admin.closing.dialog_cancel": "Annuler",
   "admin.closing.dialog_confirm": "Clôturer définitivement",
-  "admin.closing.dialog_field": "Pour confirmer, saisissez le code de l’édition : {code}",
+  "admin.closing.dialog_field": "Pour confirmer, saisissez le code de l’édition :",
   "admin.closing.dialog_text": "Les points seront figés et l’édition passera en lecture seule.",
   "admin.closing.dialog_title": "Clôturer l’édition {year} ?",
   "admin.closing.dialog_warning": "Cette action est définitive : il n’est pas possible de revenir en arrière, l’édition ne pourra pas être rouverte.",
