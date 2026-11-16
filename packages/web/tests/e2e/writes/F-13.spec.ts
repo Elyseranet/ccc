@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { E2E_ADMIN_EDITION_COOKIE } from '../helpers/e2e.const'
 import { createCompetitor, createEdition } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
 
@@ -37,7 +38,7 @@ test.describe('admin éditions : écritures sur une édition créée par le test
     await signIn(context, 'admin')
   })
 
-  test('créer une édition : le code est généré par le serveur, affiché, et jamais saisi', async ({ page }) => {
+  test('créer une édition : le code est généré par le serveur, affiché, jamais saisi, et l’édition créée devient l’édition active', async ({ page, context }) => {
     const year = YEAR_FIRST_UI + (test.info().workerIndex % YEAR_SPAN_UI)
     await page.goto('/admin/editions/nouvelle')
     await hydrated(page)
@@ -56,6 +57,8 @@ test.describe('admin éditions : écritures sur une édition créée par le test
     const created = (await editions(page)).find(edition => edition.code === shown)
     expect(created?.year).toBe(year)
     expect(created?.name).toBe(`E2E création ${year}`)
+    // F-50 : l'édition créée devient l'édition active de l'admin (cookie du sélecteur).
+    expect((await context.cookies()).find(cookie => cookie.name === E2E_ADMIN_EDITION_COOKIE)?.value).toBe(created?.id)
     await expect(page.getByTestId('edition-created-address')).toHaveText(`/editions/${shown}`)
   })
 

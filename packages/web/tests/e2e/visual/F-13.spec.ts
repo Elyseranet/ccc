@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { signIn } from '../helpers/session'
-import { box, compare, open } from '../visual.util'
+import { box, compare, open, verticalGap } from '../visual.util'
 import type { IDataMasks } from '../visual.util'
 
 /*********************************************************
@@ -98,13 +98,6 @@ const compareAll = async (page: Page, mockup: Page, viewport: string, entries: I
 }
 
 const field = (testId: string) => `[data-cy="${testId}"]`
-
-/** Espace vertical entre le bas d'un bloc et le haut du suivant (F-49 : les blocs frères de la grille se touchaient). */
-const verticalGap = async (target: Page, above: string, below: string) => {
-  const upper = await box(target, above)
-  const lower = await box(target, below)
-  return Math.round((lower.y - (upper.y + upper.height)) * 10) / 10
-}
 
 /** L'origine d'une édition (archive ou application) est une donnée : la pastille est masquée des deux côtés, sa colonne reste comparée. */
 const ORIGIN_HIDDEN = '#ed-p-list tbody td:nth-child(6) > * { visibility: hidden !important; }'

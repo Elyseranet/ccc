@@ -190,6 +190,13 @@ export const compare = async (page: Page, mockup: Page, name: string, viewport: 
   expect.soft(ratio, `${name} @${viewport}`).toBeLessThanOrEqual(MAX_DIFF_RATIO)
 }
 
+/** Espace vertical entre le bas d'un bloc et le haut du suivant (F-49, F-50 : les blocs frères d'une carte Origam se touchaient). */
+export const verticalGap = async (page: Page, above: string, below: string) => {
+  const upper = await box(page, above)
+  const lower = await box(page, below)
+  return Math.round((lower.y - (upper.y + upper.height)) * 10) / 10
+}
+
 export const open = async (page: Page, browser: Browser, viewport: { width: number, height: number }, mockupFile: string, route: string) => {
   const mockContext = await browser.newContext({ viewport, reducedMotion: 'reduce' })
   const mockup = await mockContext.newPage()

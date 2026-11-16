@@ -8,6 +8,7 @@ import { API_ERROR_CODE } from '../../../src/enums/api-error-code.enum'
 import { EDITION_FORM_MODE } from '../../../src/enums/admin-editions.enum'
 import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { USER_ROLE } from '../../../src/enums/user.enum'
+import { useAdminEditionStore } from '../../../src/composables/useAdminEditionStore'
 import { useAuthStore } from '../../../src/composables/useAuthStore'
 import { buildMe } from '../../helpers/me'
 import type { IEditionFormValues } from '../../../src/interfaces/admin-editions.interface'
@@ -374,9 +375,12 @@ describe('page de création', () => {
       }
       return []
     }))
+    const adminEdition = useAdminEditionStore()
+    adminEdition.editionId = 'previous'
     const wrapper = await mountNew()
     await fill(wrapper)
     expect(seen).toHaveBeenCalledWith({ year: Number(YEAR), name: 'Championnat de Caps 2027' })
+    expect(adminEdition.editionId).toBe('n')
     expect(wrapper.find('[data-cy="edition-form"]').exists()).toBe(false)
     expect(wrapper.get('[data-cy="edition-created-title"]').text()).toContain('2027b')
     expect(wrapper.get('[data-cy="edition-created-address"]').text()).toBe('/editions/2027b')
@@ -391,8 +395,11 @@ describe('page de création', () => {
       }
       return []
     }))
+    const adminEdition = useAdminEditionStore()
+    adminEdition.editionId = 'previous'
     const wrapper = await mountNew()
     await fill(wrapper)
+    expect(adminEdition.editionId).toBe('previous')
     expect(wrapper.get('[data-cy="edition-form-error"]').text()).toContain('Plus aucun code disponible pour cette année.')
     expect(wrapper.getComponent(OrigamSelect).props('modelValue')).toBe(YEAR)
   })

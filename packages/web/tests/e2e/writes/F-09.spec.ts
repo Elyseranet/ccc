@@ -4,6 +4,7 @@ import type { Page } from '@playwright/test'
 import { attachParticipant, createCompetitor, createRegistrationEdition, readCapturedMails, selectAdminEdition, uniqueEmail } from '../helpers/edition-write'
 import type { IWriteEdition } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
+import { open, verticalGap } from '../visual.util'
 
 /*********************************************************
  * F-09 : admin, participants, parcours d'ÉCRITURE (QA-3)
@@ -40,6 +41,27 @@ test.describe('admin participants : écritures sur une édition créée par le t
   test.beforeEach(async ({ context }) => {
     await signIn(context, 'admin')
   })
+
+  for (const viewport of [{ name: '1440', width: 1440, height: 900 }, { name: '390', width: 390, height: 844 }]) {
+    test(`carte « Ajouter » (inscriptions ouvertes, ${viewport.name}) : champ de recherche rendu et saisissable, espaces égaux à la maquette (F-50)`, async ({ page, browser, context }) => {
+      const { edition } = await createRegistrationEdition(context.request, `espaces ${viewport.name}`)
+      await selectAdminEdition(context, edition)
+      const { mockup, mockContext } = await open(page, browser, viewport, 'admin-participants.html', '/admin/participants')
+      await expect(page.getByTestId('participant-read-only')).toHaveCount(0)
+      await searchField(page).fill('Abc')
+      await expect(searchField(page)).toHaveValue('Abc')
+
+      const card = '[data-cy="participant-add"]'
+      const lead = `${card} .admin-participants__lead`
+      const title = `${card} .admin-participants__card-title`
+      const titleToLead = await verticalGap(page, title, lead)
+      const leadToSearch = await verticalGap(page, lead, '[data-cy="participant-search"]')
+      expect(titleToLead).toBe(await verticalGap(mockup, '.pa-add .h-card', '.pa-add > p.muted'))
+      expect(leadToSearch).toBe(await verticalGap(mockup, '.pa-add > p.muted', '.pa-add .combo'))
+      expect(leadToSearch).toBeGreaterThan(0)
+      await mockContext.close()
+    })
+  }
 
   test('rattacher un profil existant : aucun compte recréé, aucune invitation (invitationSent null)', async ({ page, context }) => {
     const { edition } = await createRegistrationEdition(context.request, 'rattacher')
