@@ -45,7 +45,7 @@ L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) *
 |---|---|
 | `NUXT_PUBLIC_SITE_URL` | URL publique en `https:` : ni `localhost` ni `*.localhost`, ni une adresse locale (`127.0.0.0/8`, `0.0.0.0/8`, `::`, `::1`, IPv4 mappées, NAT64 `64:ff9b::/96`, 6to4 `2002::/16` et IPv4-compatibles `::/96` dont l'IPv4 embarquée est locale), ni une adresse privée ou link-local (`10/8`, `172.16/12`, `192.168/16`, `169.254/16`, `fc00::/7`, `fe80::/10`) ; base des liens d'invitation |
 | `NUXT_MAIL_TRANSPORT` | `smtp` (`capture` est réservé aux tests d'API) |
-| `NUXT_MAIL_HOST` | serveur SMTP réel, nom complet avec un point ou adresse IP : ni vide, ni local (`localhost`, `*.localhost`, `127.0.0.0/8`, `0.0.0.0/8`, `::`, `::1`, mêmes formes IPv6 embarquant une IPv4 locale), ni un nom de service sans point (`mailpit`). Les adresses privées et link-local sont **acceptées** pour le SMTP (relais interne de Coolify, décision du 2026-11-02) |
+| `NUXT_MAIL_HOST` | serveur SMTP réel, nom d'hôte, nom de service sans point (`mailpit-rge5j512cvbevgm9qvtf5emw`) ou adresse IP : ni vide, ni local (`localhost`, `*.localhost`, `127.0.0.0/8`, `0.0.0.0/8`, `::`, `::1`, mêmes formes IPv6 embarquant une IPv4 locale). Les adresses privées et link-local sont **acceptées** pour le SMTP (relais interne de Coolify, décision du 2026-11-02) |
 | `NUXT_MAIL_FROM` | expéditeur réel sous l'une des deux formes `adresse` ou `Nom <adresse>`, par ex. `CCC <no-reply@votre-domaine>` : ni vide, ni une autre forme (commentaire, point-virgule, texte après les chevrons), ni le domaine par défaut `ccc.local` |
 | `NUXT_AUTH_SECURE_COOKIE` | ne doit pas être éteint (`false` ou `0`) |
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | 32 caractères au moins (T-SEC-12, L12) |
