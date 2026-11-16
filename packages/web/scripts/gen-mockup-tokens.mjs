@@ -19,9 +19,9 @@ const require = createRequire(resolve(here, 'package.json'))
 const origamVersion = require('origam/package.json').version
 
 // Import par chemin direct (le fichier dist n'est pas exposé par la carte `exports` du paquet).
-const { themeToCss } = await import(resolve(here, '../node_modules/origam/dist/src/utils/Commons/apply-theme.util.js'))
-const { origamTheme } = await import(resolve(here, '../node_modules/origam/dist/src/themes/origam.theme.js'))
-const { CCC_HH_BASE, CCC_HH_DARK } = await import(resolve(here, '../docs/design/ui/happy-hour/theme.ts'))
+const { themeToCss } = await import(resolve(here, '../../../node_modules/origam/dist/src/utils/Commons/apply-theme.util.js'))
+const { origamTheme } = await import(resolve(here, '../../../node_modules/origam/dist/src/themes/origam.theme.js'))
+const { CCC_HH_BASE, CCC_HH_DARK } = await import(resolve(here, '../../../docs/design/ui/happy-hour/theme.ts'))
 
 const blocks = [...origamTheme, CCC_HH_BASE, CCC_HH_DARK].map(themeToCss).join('\n')
 const out = `/* GÉNÉRÉ depuis theme.ts par resolveThemeVars/themeSelector d'origam ${origamVersion} (packages/ds/src).
@@ -29,6 +29,6 @@ const out = `/* GÉNÉRÉ depuis theme.ts par resolveThemeVars/themeSelector d'o
 
 ${blocks}`
 
-const target = resolve(here, '../docs/design/ui/happy-hour/tokens.css')
+const target = resolve(here, '../../../docs/design/ui/happy-hour/tokens.css')
 writeFileSync(target, out)
-console.log(`tokens.css régénéré (origam ${origamVersion}) → docs/design/ui/happy-hour/tokens.css`)
+console.log(`tokens.css régénéré (origam ${origamVersion}) → ../../docs/design/ui/happy-hour/tokens.css`)

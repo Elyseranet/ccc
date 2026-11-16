@@ -20,7 +20,7 @@ import { VALUE_MASK_INSETS } from './helpers/e2e.const'
  * sont masquées des deux côtés par un aplat de même couleur (`DATA_MASK_COLOR`) : le pixel perfect ne porte que sur
  * les zones fixes (structure, gabarits, en-tête, pied, typographie). Seuil inchangé : 1 % par zone.
  ********************************************************/
-export const MOCKUP_DIR = resolve('docs/design/ui/happy-hour')
+export const MOCKUP_DIR = resolve('../../docs/design/ui/happy-hour')
 export const OUTPUT_DIR = resolve('visual-results')
 const PIXELMATCH_THRESHOLD = 0.1
 const DEFAULT_MAX_DIFF_RATIO = 0.01

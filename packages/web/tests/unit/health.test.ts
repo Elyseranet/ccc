@@ -138,7 +138,7 @@ describe('resolveMigrationsHealth (the shipped list has its own failure path)', 
 })
 
 describe('Dockerfile and configuration (T-OPS-03)', () => {
-  const dockerfile = readFileSync('Dockerfile', 'utf8')
+  const dockerfile = readFileSync('../../Dockerfile', 'utf8')
 
   it('declares the build arguments in the runner stage and maps them to NUXT_APP_VERSION', () => {
     const runner = dockerfile.slice(dockerfile.indexOf('AS runner'))
