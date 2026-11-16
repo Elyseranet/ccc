@@ -268,6 +268,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-50](F-50.md) | Participants : espaces de la carte « Ajouter », champ masqué hors inscriptions, bascule sur l'édition créée | maquette F-09 | F-09, F-13 | **Fermé** (2026-11-16) @ `e6b74b28`, vérifié sur dev | — |
 | [F-51](F-51.md) | Bouton « Rouvrir les qualifications » | maquette F-24 à compléter | B-25, F-24 | Ouvert (2026-11-16) | — |
 | [F-52](F-52.md) | Bouton « Tirer au sort » et écran projecteur (VS), pas à pas | maquette validée 2026-11-16 (`9e492a6c`) | B-26 | Ouvert (2026-11-16) | — |
+| [F-53](F-53.md) | Boîtes de confirmation : focus non rendu au déclencheur après Échap | — | F-24, F-51 | Ouvert (2026-11-16) | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
