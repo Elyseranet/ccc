@@ -118,6 +118,11 @@ export class EditionService extends BaseService {
   update (id: string, body: IUpdateEditionRequest): Promise<IEditionSummary> {
     return this.request<IEditionSummary>(`/editions/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...body } })
   }
+
+  /** Supprime une édition créée dans l'appli (B-28) : 204 sans corps ; 409 `EDITION_LEGACY_PROTECTED` pour une archive, 404 si inconnue. */
+  async remove (id: string): Promise<void> {
+    await this.request<void>(`/editions/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  }
 }
 
 /** Accepte l'UUID ou le code (`2012a`). 404 si inconnue. */
