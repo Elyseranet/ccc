@@ -9,6 +9,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY packages/web/package.json packages/web/
 # `npm ci` suit package-lock.json (déterministe). Cache BuildKit persistant + retries +
 # boucle de 3 essais : un timeout CDN ponctuel ne fait pas échouer tout le build.
 # `--ignore-scripts` : le postinstall (`nuxt prepare`) tournerait sans nuxt.config.ts ni sources ;
@@ -16,20 +17,20 @@ COPY package.json package-lock.json ./
 # d'installation des seules dépendances natives utiles au build.
 RUN --mount=type=cache,target=/root/.npm \
     printf 'fetch-retries=5\nfetch-retry-mintimeout=20000\nfetch-retry-maxtimeout=120000\nfetch-timeout=600000\n' > /root/.npmrc && \
-    ( npm ci --ignore-scripts \
-      || (echo 'npm ci retry 1/3' && sleep 15 && npm ci --ignore-scripts) \
-      || (echo 'npm ci retry 2/3' && sleep 30 && npm ci --ignore-scripts) ) && \
+    ( npm ci --workspaces --include-workspace-root --ignore-scripts \
+      || (echo 'npm ci retry 1/3' && sleep 15 && npm ci --workspaces --include-workspace-root --ignore-scripts) \
+      || (echo 'npm ci retry 2/3' && sleep 30 && npm ci --workspaces --include-workspace-root --ignore-scripts) ) && \
     npm rebuild esbuild
 
 COPY . .
 
 # T-REL-01 : un build de production échoue tant qu'un endpoint reste en fixture.
 # Pas de contournement : retirer cette étape revient à livrer de fausses données.
-RUN npm run test:release
+RUN npm run test:release --workspace=packages/web
 
-RUN npm run build
+RUN npm run build --workspace=packages/web
 # CLI TypeORM et scripts d'exploitation (migrations, user:*, db:seed:archives), compilés en JS.
-RUN npm run db:typeorm:build
+RUN npm run db:typeorm:build --workspace=packages/web
 
 # ── Stage 2 : dépendances de production ───────────────────────────────────────
 # Uniquement ce que les migrations et scripts d'exploitation chargent à l'exécution
@@ -39,11 +40,12 @@ FROM node:22-alpine AS prod-deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY packages/web/package.json packages/web/
 RUN --mount=type=cache,target=/root/.npm \
     printf 'fetch-retries=5\nfetch-retry-mintimeout=20000\nfetch-retry-maxtimeout=120000\nfetch-timeout=600000\n' > /root/.npmrc && \
-    ( npm ci --omit=dev --ignore-scripts \
-      || (echo 'npm ci retry 1/3' && sleep 15 && npm ci --omit=dev --ignore-scripts) \
-      || (echo 'npm ci retry 2/3' && sleep 30 && npm ci --omit=dev --ignore-scripts) )
+    ( npm ci --omit=dev --workspaces --include-workspace-root --ignore-scripts \
+      || (echo 'npm ci retry 1/3' && sleep 15 && npm ci --omit=dev --workspaces --include-workspace-root --ignore-scripts) \
+      || (echo 'npm ci retry 2/3' && sleep 30 && npm ci --omit=dev --workspaces --include-workspace-root --ignore-scripts) )
 
 # ── Stage 3 : runner ──────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
@@ -53,13 +55,14 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# `type: module` est lu depuis /app/package.json pour .typeorm-dist.
-COPY --from=builder --chown=node:node /app/package.json ./package.json
+# Monorepo (T-ARCH-04) : l'image garde une arborescence à plat. Le package.json de `@ccc/web` devient /app/package.json
+# (`type: module` pour .typeorm-dist) et les chemins d'exploitation de `ccc-ops` restent relatifs à /app.
+COPY --from=builder --chown=node:node /app/packages/web/package.json ./package.json
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
-COPY --from=builder --chown=node:node /app/.output ./.output
-COPY --from=builder --chown=node:node /app/.typeorm-dist ./.typeorm-dist
+COPY --from=builder --chown=node:node /app/packages/web/.output ./.output
+COPY --from=builder --chown=node:node /app/packages/web/.typeorm-dist ./.typeorm-dist
 # Dump SQL figé des archives, lu par db:seed:archives (chemin relatif au répertoire courant, ARCH-5).
-COPY --from=builder --chown=node:node /app/src/assets/seeds/archives.sql ./src/assets/seeds/archives.sql
+COPY --from=builder --chown=node:node /app/packages/web/src/assets/seeds/archives.sql ./src/assets/seeds/archives.sql
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/ccc-ops.sh /usr/local/bin/ccc-ops
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/ccc-ops
