@@ -16,10 +16,12 @@ Les specs font foi et vivent dans Obsidian : `~/Library/Mobile Documents/iCloud~
 
 Détail et justification : `docs/design/ux/decisions.md`. L'exception FA-02 (`shared/`, alias `#shared`) est **abandonnée** (ARCH-4).
 
-**La section « Project Structure » de `~/CLAUDE.md` (monorepo `packages/…`, `src/server/utils/`, `server/db/index.ts`) ne s'applique pas à CCC** : pour ce projet, seule l'arborescence ci-dessous fait foi (décision utilisateur 2026-10-22).
+**Monorepo npm workspaces (T-ARCH-04, décision utilisateur 2026-11-16).** La racine (`ccc`, privée) ne porte que `docs/`, `README.md`, `CLAUDE.md`, `docker-compose.yml`, `.env.example`, `.nvmrc`, `Dockerfile`, `docker/` et un `package.json` dont les scripts délèguent (`npm run <x> --workspace=packages/web`). L'application Nuxt est le package `packages/web` (nom npm `@ccc/web`) : son `src/` suit l'arborescence ARCH ci-dessous, et il porte `public/`, `tests/`, `scripts/`, `nuxt.config.ts`, `tsconfig*.json`, les configs vitest et playwright. Un seul `package-lock.json`, à la racine. Tous les chemins ci-dessous sont relatifs à `packages/web/`.
+
+**Le modèle « Project Structure » de `~/CLAUDE.md` (monorepo `packages/webapp` + `packages/frontend`, `src/server/utils/`, `server/db/index.ts`) ne s'applique pas à CCC** : seuls la racine ci-dessus et l'arborescence suivante font foi (décision utilisateur 2026-10-22, complétée le 2026-11-16).
 
 ```
-src/
+packages/web/src/
   assets/        css/, locales/, seeds/archives.sql (dump SQL figé des archives, ARCH-5)
   components/    PascalCase.vue (admin/, common/, icons/, rules/)
   composables/   useCamelCase.ts, stores Pinia compris (useAuthStore.ts, useAdminEditionStore.ts : un store est un composable, ARCH-14)
@@ -47,4 +49,4 @@ src/
 
 ## Worktrees d'agents (T-ARCH-02, 2026-10-22)
 
-- Chaque worktree a **son propre `node_modules`**, installé par `npm ci`. **Pas de lien symbolique** vers celui de la copie principale : les caches partagés entre branches ont provoqué de faux échecs Vitest (« SyntaxError: Invalid or unexpected token » sur les entités TypeORM).
+- Chaque worktree a **son propre `node_modules`**, installé par `npm ci` lancé à la racine du worktree (workspaces, T-ARCH-04) ; les commandes `npm run` se lancent aussi depuis la racine. **Pas de lien symbolique** vers celui de la copie principale : les caches partagés entre branches ont provoqué de faux échecs Vitest (« SyntaxError: Invalid or unexpected token » sur les entités TypeORM).
