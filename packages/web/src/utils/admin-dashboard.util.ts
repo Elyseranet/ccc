@@ -40,7 +40,8 @@ const resolvePlayoffStep = (rounds: IRound[]): ADMIN_DASHBOARD_STEP => {
     .sort((a, b) => a.sequence - b.sequence)
     .find(round => round.status !== ROUND_STATUS.COMPLETED)
   if (!current) {
-    return ADMIN_DASHBOARD_STEP.CLOSING
+    // Clôture seulement une fois la finale jouée : quarts et demies terminés, finale pas encore tirée = il reste son tirage.
+    return rounds.some(round => round.kind === ROUND_KIND.FINAL) ? ADMIN_DASHBOARD_STEP.CLOSING : ADMIN_DASHBOARD_STEP.BRACKET_DRAW
   }
   if (current.status === ROUND_STATUS.PENDING) {
     return ADMIN_DASHBOARD_STEP.BRACKET_DRAW
