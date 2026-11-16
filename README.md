@@ -131,28 +131,12 @@ Chaque `ccc-ops` lit les `NUXT_DATABASE_*` du conteneur ; aucun fichier `.env` n
 
 ## Environnement de dev sur Coolify (T-OPS-04)
 
-Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 : Coolify, domaine de dev, Mailpit sur Coolify, branche `develop` telle quelle). L'équipe n'a pas accès à Coolify : chaque étape est à faire dans l'interface Coolify. Les valeurs entre chevrons (`<…>`) sont à fournir ; aucune valeur de ce guide n'est un secret réel.
+Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 : Coolify, domaine de dev, Mailpit de TOOLS depuis le 2026-11-16, branche `develop` telle quelle). L'équipe n'a pas accès à Coolify : chaque étape est à faire dans l'interface Coolify. Les valeurs entre chevrons (`<…>`) sont à fournir ; aucune valeur de ce guide n'est un secret réel.
 
 ### 1. Ressources à créer dans un même projet Coolify
 
 1. **PostgreSQL 16** : ressource « Database » de Coolify. Noter l'hôte interne, le port, l'utilisateur, le mot de passe et la base qu'elle affiche.
-2. **Mailpit** : ressource « Docker Compose », avec ce contenu (version d'image à figer au montage, par exemple la dernière publiée) :
-
-   ```yaml
-   services:
-     mailpit:
-       image: axllent/mailpit:<version-figée>
-       environment:
-         MP_UI_AUTH: "<utilisateur>:<mot-de-passe-ui>"
-       networks:
-         default:
-           aliases:
-             - mailpit.ccc.internal
-   ```
-
-   - L'**alias à point** `mailpit.ccc.internal` est indispensable : dès le merge de T-SEC-06, la garde PROD-1 refuse un hôte SMTP sans point (nom de service nu). Le SMTP (port 1025) n'est jamais publié ; seule l'interface web (port 8025) reçoit un domaine Coolify, par exemple `mail.<domaine-dev>`.
-   - **L'interface web montre les liens d'invitation, qui sont des secrets** : la protéger par un mot de passe (`MP_UI_AUTH` ; nom de variable à vérifier dans la documentation de Mailpit pour la version figée).
-   - L'application doit **partager un réseau Docker** avec Mailpit pour résoudre l'alias (option Coolify de connexion au réseau commun du projet). Le réglage exact de Coolify n'est pas connu de l'équipe : il se vérifie à l'étape 4.
+2. **Mailpit** : **ne pas en créer**. CCC utilise le Mailpit partagé du projet Coolify **TOOLS** (décision utilisateur du 2026-11-16 : les outils communs vivent dans TOOLS, jamais une copie par projet). Il est joignable sur le réseau Docker `coolify` par l'alias à point `mailpit.tools.internal` (variable serveur `{{server.MAIL_DEV_HOST}}`) ou par son nom de conteneur (`{{server.MAIL_DEV_ID}}`, accepté par la garde une fois T-SEC-22 mergé). Son interface web : `http://mail.dev.elysera.net:8025`, protégée par mot de passe.
 3. **Application** : source « Dépôt Git » `https://github.com/Elyseranet/ccc`, branche **`develop`**, build par **`Dockerfile`**, port **3000**, domaine `https://<domaine-dev>`, **redéploiement automatique** à chaque push sur `develop`.
 
 ### 2. Variables de l'application
@@ -162,10 +146,10 @@ Guide pour monter l'instance de dev de l'utilisateur (décisions du 2026-11-04 :
 | `NUXT_DATABASE_HOST`, `NUXT_DATABASE_PORT`, `NUXT_DATABASE_USERNAME`, `NUXT_DATABASE_PASSWORD`, `NUXT_DATABASE_DATABASE` | les valeurs de la ressource PostgreSQL |
 | `NUXT_PUBLIC_SITE_URL` | `https://<domaine-dev>` : base des liens d'invitation ; https, jamais localhost (garde PROD-1), et jamais une IP privée dès le merge de T-SEC-06 |
 | `NUXT_MAIL_TRANSPORT` | `smtp` |
-| `NUXT_MAIL_HOST` | `mailpit.ccc.internal` (l'alias à point) |
+| `NUXT_MAIL_HOST` | `{{server.MAIL_DEV_HOST}}` (alias à point du Mailpit de TOOLS) |
 | `NUXT_PUBLIC_SITE_INDEXABLE` | ne pas la définir, ou `false` : la dev n'est jamais indexée (T-SEO-01) |
 | `NUXT_MAIL_PORT` | `1025` |
-| `NUXT_MAIL_SECURE` | `false` (Mailpit, réseau interne) |
+| `NUXT_MAIL_SECURE` | `false` (Mailpit de TOOLS, réseau interne) |
 | `NUXT_MAIL_FROM` | `CCC <no-reply@<domaine-dev>>` : un vrai domaine, jamais `ccc.local` (refusé) |
 | `NUXT_AUTH_DEVICE_COOKIE_SECRET` | 32 caractères au moins, générés une fois (`openssl rand -hex 32`), propres à cette instance |
 | `NUXT_TRUST_PROXY_HOPS` | `1` par défaut : le proxy de Coolify seul. Ajouter 1 par CDN ou proxy placé devant Coolify. |
@@ -184,10 +168,10 @@ Dans Coolify, healthcheck HTTP sur le chemin `/api/v1/health`, port 3000 (ou lai
 3. Dans le terminal du conteneur de l'application, vérifier que l'alias de Mailpit est résolu :
 
    ```sh
-   getent hosts mailpit.ccc.internal
+   getent hosts mailpit.tools.internal
    ```
 
-   Une ligne `<adresse> mailpit.ccc.internal` doit s'afficher. **Si rien ne s'affiche**, l'application ne joint pas Mailpit : prévenir l'équipe, qui posera la suite à l'utilisateur. Dépannage temporaire seulement : mettre dans `NUXT_MAIL_HOST` l'adresse IP privée du conteneur Mailpit (acceptée par la garde pour le SMTP). Elle change à chaque redéploiement de Mailpit, d'où la fragilité.
+   Une ligne `<adresse> mailpit.tools.internal` doit s'afficher. **Si rien ne s'affiche**, l'application ne joint pas Mailpit : prévenir l'équipe, qui posera la suite à l'utilisateur. Repli, une fois T-SEC-22 mergé : `{{server.MAIL_DEV_ID}}` (nom du conteneur, sans point).
 4. Charger les archives 2012-2026 (une seule fois, base vide) :
 
    ```sh
@@ -210,7 +194,7 @@ Une page non livrée répond **404** en production (garde OPS-3). Il n'y a pas d
 **Après le merge de F-10** (connexion et invitation) :
 - se connecter par `/connexion` ;
 - ouvrir le lien du premier administrateur, affiché par `ccc-ops user:create-admin`, sur `/invitation/<jeton>`, et choisir le mot de passe ;
-- lire dans Mailpit (`https://mail.<domaine-dev>`, protégé par mot de passe) les invitations des joueurs, puis les ouvrir de la même façon. Une invitation de joueur part quand un administrateur crée un compétiteur avec un email. Par l'interface, cela suppose aussi que l'écran d'administration des participants soit livré, ce qui ne dépend pas de F-10.
+- lire dans le Mailpit de TOOLS (`http://mail.dev.elysera.net:8025`, protégé par mot de passe) les invitations des joueurs, puis les ouvrir de la même façon. Une invitation de joueur part quand un administrateur crée un compétiteur avec un email. Par l'interface, cela suppose aussi que l'écran d'administration des participants soit livré, ce qui ne dépend pas de F-10.
 Avant ce merge, ces liens ouvrent un 404. L'instance redéploie `develop` à chaque merge : ces parcours s'ouvrent d'eux-mêmes à la livraison, sans rien changer dans Coolify.
 
 ## Développement
