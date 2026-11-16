@@ -18,7 +18,7 @@ import { pairUrl } from '../helpers/head-to-head'
 const POOL_PAIR = { a: '09f94f14-e46c-4280-8772-567398d8f1b2', b: 'e5836fbc-7b09-46b4-8ea2-f334e4aa76fc' }
 const PLURAL_PAIR = { a: '0c1bf0d4-443d-46e2-b6f9-2eab5fd41cb5', b: '720a2ba5-bdf4-4609-953a-48c40470bc74' }
 const SINGULAR_PAIR = { a: '09f94f14-e46c-4280-8772-567398d8f1b2', b: '504abe67-a3c4-401f-b5d8-2ea7506c4bef' }
-const MOCKUP_FILE = resolve('docs/design/ui/happy-hour/face-a-face.html')
+const MOCKUP_FILE = resolve('../../docs/design/ui/happy-hour/face-a-face.html')
 const MOCKUP_NOTE = /<p class="muted pool-note ff-note">([^<]+)<\/p>/.exec(readFileSync(MOCKUP_FILE, 'utf8'))?.[1]?.trim() ?? ''
 const STATIC_NOTE = MOCKUP_NOTE
 

@@ -1,6 +1,6 @@
 # T-ARCH-04 — Passer CCC en monorepo npm workspaces (`packages/web`)
 
-- **Statut** : À faire (2026-11-16). Branches soldées le 2026-11-16 : 97 worktrees et 118 branches locales retirés (déjà mergés, intégrés ou remplacés, tri en lecture seule puis accord de l'utilisateur) ; aucune branche distante touchée. Démarre après le merge de F-48. Chantiers gelés, à rebaser après la migration (décision utilisateur) : lot 3 d'accessibilité (`feature/T-A11Y-01-should-3-v2`, F-45) et F-30 (`feature/F-30-draws-remainder`, F-46) ; maquette F-18 (`feature/F-18-correction-mockup`).
+- **Statut** : En revue (2026-11-16, branche `feature/T-ARCH-04-monorepo`, découpages 1 à 3 faits ; 4 et 5 restent après merge). Branches soldées le 2026-11-16 : 97 worktrees et 118 branches locales retirés (déjà mergés, intégrés ou remplacés, tri en lecture seule puis accord de l'utilisateur) ; aucune branche distante touchée. Démarre après le merge de F-48. Chantiers gelés, à rebaser après la migration (décision utilisateur) : lot 3 d'accessibilité (`feature/T-A11Y-01-should-3-v2`, F-45) et F-30 (`feature/F-30-draws-remainder`, F-46) ; maquette F-18 (`feature/F-18-correction-mockup`).
 - **Demande** (utilisateur, 2026-11-16) : mettre CCC au même format que Elysera, origam et i18n-dashboard (monorepo), en gardant l'arborescence interne `src/` (ARCH-1 à ARCH-15).
 - **Étude** : rapport de l'architect du 2026-11-16 (comparatif des trois projets, plan fichier par fichier, impact Coolify).
 - **Décisions utilisateur (2026-11-16)** :

@@ -8,18 +8,20 @@ Les archives 2012-2026 (le classeur brut et sa reprise vers les entités métier
 
 ## Prérequis
 
-- Node.js `22.22.3` ou une version prise en charge par Nuxt, selon la contrainte du champ `engines` dans `package.json`.
+- Node.js `22.22.3` ou une version prise en charge par Nuxt, selon la contrainte du champ `engines` dans `packages/web/package.json`.
 - npm.
 - Une instance PostgreSQL accessible.
 
 ## Installation
 
+Le dépôt est un monorepo npm workspaces : la racine (`ccc`) ne porte que des scripts qui délèguent au package `packages/web` (`@ccc/web`, l'application Nuxt). Les commandes `npm run …` se lancent depuis la racine ; `docs/`, `Dockerfile`, `docker/` et `docker-compose.yml` restent à la racine.
+
 ```sh
-npm install
+npm ci
 cp .env.example .env
 ```
 
-Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`. Ne jamais committer ce fichier.
+Renseigner `NUXT_DATABASE_PASSWORD` dans `.env`, à la racine du dépôt. Ne jamais committer ce fichier. Les scripts du package qui en ont besoin le chargent explicitement : `npm run dev` (`nuxt dev --dotenv ../../.env`) et les scripts `db:migration:*`, `user:*`, `db:seed:archives` (`DOTENV_CONFIG_PATH=../../.env`). Un `.env` absent ne fait échouer aucun script (CI, image Docker).
 
 ## Docker
 
@@ -69,12 +71,12 @@ Coolify exclut `SOURCE_COMMIT` du build par défaut « pour que les commits dont
 
 Le build de l'image exécute `npm run test:release` avant `nuxt build` (T-REL-01, décision OPS-3). Le build échoue uniquement si une page **livrée** consomme un endpoint dont la route serveur n'existe pas encore. Il n'y a pas de variable pour désactiver la garde.
 
-- `src/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`src/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
-- `src/consts/api-routes.const.ts` (`API_ROUTES`) associe chaque endpoint à son fichier de route Nitro. Une route pas encore écrite porte le ticket back qui la livre (`pendingTicket`) : l'écran répond en erreur (état AsyncState) jusqu'au merge de ce ticket, sans route provisoire ni fausse donnée (ARCH-11). Un test vérifie que le fichier existe si et seulement si `pendingTicket` est absent : à la livraison d'une route, retirer son `pendingTicket` dans le même commit.
+- `packages/web/src/consts/page-delivery.const.ts` (`PAGE_DELIVERY`) liste chaque route avec `delivered` et les endpoints qu'elle consomme. Ceux de son layout (`packages/web/src/consts/layout-endpoints.const.ts` : `ME` partout, plus `EDITIONS` pour l'admin) s'y ajoutent. Toutes les routes sont pré-déclarées à `delivered: false`.
+- `packages/web/src/consts/api-routes.const.ts` (`API_ROUTES`) associe chaque endpoint à son fichier de route Nitro. Une route pas encore écrite porte le ticket back qui la livre (`pendingTicket`) : l'écran répond en erreur (état AsyncState) jusqu'au merge de ce ticket, sans route provisoire ni fausse donnée (ARCH-11). Un test vérifie que le fichier existe si et seulement si `pendingTicket` est absent : à la livraison d'une route, retirer son `pendingTicket` dans le même commit.
 - Un ticket F-xx passe sa ligne à `delivered: true` quand son écran est branché sur l'API réelle. Un endpoint partagé (`ME`, `EDITIONS`…) bloque la release tant qu'une seule page livrée le consomme sans route.
 - En production, une page non livrée répond **404** (middleware `page-delivery.global.ts`, vrai statut HTTP en SSR) et disparaît de la navigation. En dev et en test, tout reste visible. Les redirections vers une page non livrée se terminent en 404. Le 404 d'une page non livrée n'est pas un contrôle d'accès ; l'autorisation reste portée par le middleware `admin` et par le serveur.
-- Garde-fous toujours actifs (`npm run test:run`) : une page de `src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
-- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Ajouter à `DELIVERED_PAGES` (`tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre ; le test de la page livrée exige une session administrateur (`E2E_ADMIN_SESSION`) et échoue sans elle.
+- Garde-fous toujours actifs (`npm run test:run`) : une page de `packages/web/src/pages` absente de la table, une entrée sans page et un endpoint rattaché à aucune page font échouer les tests.
+- `npm run test:release:e2e` vérifie le masquage sur le **build** (et non sur `nuxt dev`) : lancer `npm run build` puis la commande, ou viser un conteneur de l'image avec `E2E_BASE_URL`. Ajouter à `DELIVERED_PAGES` (`packages/web/tests/e2e-release/page-delivery.spec.ts`) les routes que le ticket livre ; le test de la page livrée exige une session administrateur (`E2E_ADMIN_SESSION`) et échoue sans elle.
 
 ### Variables d'environnement
 
@@ -120,8 +122,8 @@ La CLI (migrations, seed, scripts) ne borne que la connexion : elle n'a ni `stat
 
 | Commande | Rôle | Disponibilité |
 |---|---|---|
-| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration (`src/utils/run-migrations-cli.util.ts`, sans journal des requêtes SQL). | image actuelle |
-| `ccc-ops db:seed:archives` | Applique le dump SQL figé des archives 2012-2026 (`src/assets/seeds/archives.sql`), en une transaction, sur une base migrée et vide. | image actuelle |
+| `ccc-ops migrate` / `ccc-ops migrate:revert` | Applique ou annule la dernière migration (`packages/web/src/utils/run-migrations-cli.util.ts`, sans journal des requêtes SQL). | image actuelle |
+| `ccc-ops db:seed:archives` | Applique le dump SQL figé des archives 2012-2026 (`packages/web/src/assets/seeds/archives.sql`), en une transaction, sur une base migrée et vide. | image actuelle |
 | `ccc-ops user:create-admin` | Crée le premier administrateur. | image actuelle |
 | `ccc-ops user:unlock` | Déverrouille un compte. | image actuelle |
 
@@ -205,7 +207,7 @@ npm run dev
 
 ## Migrations TypeORM
 
-Les migrations sont stockées dans `src/server/db/migrations/`, la configuration TypeORM (DataSource, options, stratégie de nommage, transformer) dans `src/server/db/typeorm/` et les entités dans `src/server/db/typeorm/entities/` (ARCH-6). Le schéma n'est pas synchronisé automatiquement.
+Les migrations sont stockées dans `packages/web/src/server/db/migrations/`, la configuration TypeORM (DataSource, options, stratégie de nommage, transformer) dans `packages/web/src/server/db/typeorm/` et les entités dans `packages/web/src/server/db/typeorm/entities/` (ARCH-6). Le schéma n'est pas synchronisé automatiquement.
 
 ```sh
 npm run db:migration:generate -- src/server/db/migrations/NomMigration
@@ -235,11 +237,11 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_test npm run test:db
 
 La migration `AddMatchWinner` ajoute `matches.winner_participation_id` (clé étrangère composite `(id, winner_participation_id)` vers `match_sides (match_id, participation_id)`, donc le vainqueur est l'un des côtés ; vérifiée à la fin de la transaction ; un vainqueur n'existe que sur un match `VALIDATED`). `up` : pour chaque match `REGULAR` en `RESULT_UNKNOWN`, le vainqueur est le côté `position = 1` (Adv1 du classeur) et le match passe `VALIDATED`, **scores toujours NULL**. Sur une base vide (nouveau déploiement) elle ne change aucune ligne ; le dump `archives.sql` livre déjà ces vainqueurs.
 
-**Retour arrière** : `npm run db:migration:revert` (ou `ccc-ops migrate:revert`) repasse en `RESULT_UNKNOWN` les matchs `VALIDATED` qui ont un vainqueur et aucun score validé, puis supprime la colonne et ses contraintes. Rien d'autre n'est touché ; rejouer `up` redonne les mêmes vainqueurs (`tests/db/match-winner.test.ts`). Ce retour n'a de sens qu'avec le code précédent, qui compte ces matchs à part (`unknownResults`).
+**Retour arrière** : `npm run db:migration:revert` (ou `ccc-ops migrate:revert`) repasse en `RESULT_UNKNOWN` les matchs `VALIDATED` qui ont un vainqueur et aucun score validé, puis supprime la colonne et ses contraintes. Rien d'autre n'est touché ; rejouer `up` redonne les mêmes vainqueurs (`packages/web/tests/db/match-winner.test.ts`). Ce retour n'a de sens qu'avec le code précédent, qui compte ces matchs à part (`unknownResults`).
 
 ### Archives 2012-2026 : dump SQL figé (ARCH-5, ARCH-10)
 
-`src/assets/seeds/archives.sql` contient les archives sous forme d'`INSERT` : 16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score et 175 au vainqueur importé sans score (B-21), et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes). Le dump a été généré une seule fois, le 2026-10-22, depuis une base neuve, par la chaîne de reprise de l'époque (seed du classeur puis reprise B-04). Les contrôles ont été faits avant la génération : Nicolas Deseine à 39/13, 0 écart bloquant entre les classements recalculés et le classeur. Cette chaîne (convertisseur, JSON, scripts de seed et d'import) a ensuite été supprimée. Le fichier ne s'édite pas à la main.
+`packages/web/src/assets/seeds/archives.sql` contient les archives sous forme d'`INSERT` : 16 éditions, 146 compétiteurs, 729 matchs dont 554 avec score et 175 au vainqueur importé sans score (B-21), et la source brute du classeur (`legacy_workbook_imports`, `legacy_workbook_rows`, 2 478 lignes). Le dump a été généré une seule fois, le 2026-10-22, depuis une base neuve, par la chaîne de reprise de l'époque (seed du classeur puis reprise B-04). Les contrôles ont été faits avant la génération : Nicolas Deseine à 39/13, 0 écart bloquant entre les classements recalculés et le classeur. Cette chaîne (convertisseur, JSON, scripts de seed et d'import) a ensuite été supprimée. Le fichier ne s'édite pas à la main.
 
 **Régénération (SEED-1, B-21)** : par export outillé, jamais à la main. Sur une base `_test` jetable : charger le dump actuel sur le schéma d'avant la migration (migrations sauf la nouvelle, puis `db:seed:archives`), appliquer la migration, puis exporter et remettre dans l'ordre du dump actuel (les UUID et les dates sont conservés) :
 
@@ -248,17 +250,17 @@ docker exec ccc-db pg_dump -U ccc -d ccc_<agent>_test --data-only --column-inser
   -t public.competitors -t public.competitor_aliases -t public.editions -t public.rounds -t public.pools \
   -t public.participations -t public.legacy_workbook_imports -t public.legacy_workbook_rows \
   -t public.matches -t public.match_sides \
-  | node scripts/archives-dump-order.mjs src/assets/seeds/archives.sql > nouveau.sql
+  | node packages/web/scripts/archives-dump-order.mjs packages/web/src/assets/seeds/archives.sql > nouveau.sql
 ```
 
-`scripts/archives-dump-order.mjs` ne garde que les `INSERT`, dans l'ordre des tables et des lignes du dump actuel, et échoue si les deux dumps n'ont pas les mêmes lignes. Il faut ensuite remplacer l'en-tête de commentaires du fichier (une ligne « Régénéré le … » de plus) puis remplacer `archives.sql` par `nouveau.sql`.
+`packages/web/scripts/archives-dump-order.mjs` ne garde que les `INSERT`, dans l'ordre des tables et des lignes du dump actuel, et échoue si les deux dumps n'ont pas les mêmes lignes. Il faut ensuite remplacer l'en-tête de commentaires du fichier (une ligne « Régénéré le … » de plus) puis remplacer `archives.sql` par `nouveau.sql`.
 
 ```sh
 npm run db:migration:run    # schéma à jour
 npm run db:seed:archives    # une transaction ; refuse une base qui contient déjà des données
 ```
 
-Le test de non-régression `tests/db/archives-seed.test.ts` applique le dump sur une base neuve. Il revérifie les comptes (729 matchs `VALIDATED`, dont 175 au vainqueur importé et sans score, aucun `RESULT_UNKNOWN`), Deseine 53/18, Fossati 40/10 et le « 0 écart avec le classeur » (`legacy-verification.util`, à partir des lignes brutes en base). Les cas « vraies données » du domaine (`tests/db/archives-*.test.ts`) lisent eux aussi le classeur depuis la base.
+Le test de non-régression `packages/web/tests/db/archives-seed.test.ts` applique le dump sur une base neuve. Il revérifie les comptes (729 matchs `VALIDATED`, dont 175 au vainqueur importé et sans score, aucun `RESULT_UNKNOWN`), Deseine 53/18, Fossati 40/10 et le « 0 écart avec le classeur » (`legacy-verification.util`, à partir des lignes brutes en base). Les cas « vraies données » du domaine (`packages/web/tests/db/archives-*.test.ts`) lisent eux aussi le classeur depuis la base.
 
 ```sh
 # base jetable dont le nom finit par _test, variables en ligne de commande
@@ -291,9 +293,10 @@ Le nom de la base doit se terminer par `_test` : sinon la suite refuse de démar
 
 ### e2e sur les vraies données (ARCH-9)
 
-Avant les e2e Playwright, `tests/e2e/global-setup.ts` remet à neuf la base `NUXT_DATABASE_DATABASE` (suffixe `_test` obligatoire). Il applique les migrations et le dump des archives, puis crée des comptes de test (administrateur, participant) avec une session réelle. Aucun mot de passe utilisable n'est créé. Les specs posent le cookie `ccc_session` avec `signIn(context, role)`. Lancer sur un port libre, avec les seules variables nécessaires :
+Avant les e2e Playwright, `packages/web/tests/e2e/global-setup.ts` remet à neuf la base `NUXT_DATABASE_DATABASE` (suffixe `_test` obligatoire). Il applique les migrations et le dump des archives, puis crée des comptes de test (administrateur, participant) avec une session réelle. Aucun mot de passe utilisable n'est créé. Les specs posent le cookie `ccc_session` avec `signIn(context, role)`. Lancer sur un port libre, avec les seules variables nécessaires :
 
 ```sh
+cd packages/web
 E2E_PORT=3971 NUXT_DATABASE_HOST=127.0.0.1 NUXT_DATABASE_PORT=5544 NUXT_DATABASE_USERNAME=... \
 NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_<agent>_test npx playwright test --config playwright.config.ts
 ```
@@ -304,11 +307,11 @@ NUXT_DATABASE_PASSWORD=... NUXT_DATABASE_DATABASE=ccc_<agent>_test npx playwrigh
 docker exec ccc-db psql -U ccc -d ccc -c "create database ccc_<agent>_test owner ccc"
 ```
 
-Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
+Contrôle visuel : le pixel perfect porte sur les zones fixes (structure, gabarits, en-tête, pied, typographie). Les zones de données (édition choisie, initiales du compte…) sont masquées des deux côtés par un même aplat (`packages/web/tests/e2e/visual.util.ts`). Le seuil est de 1 % par zone, et les images d'écart (`visual-results/`) passent en relecture humaine avant merge. Les tests d'une page qui attend une route serveur portent l'annotation `awaiting-route`, qui nomme le ticket back.
 
 ### Édition en cours dans la base de test (QA-2, T-QA-03)
 
-Le dump `archives.sql` clôture les 16 éditions, 2026 comprise : sans autre étape, aucun écran ne pourrait montrer une édition en cours (accueil, tableau de bord, saisie des scores, tirages). Après le dump, `prepare-database` (`tests/e2e/helpers/in-progress-edition.ts`) remet donc **l'édition 2026 en phase de poules**, une seule fois et pour tous les tests (aucune mutation propre à un test, décision utilisateur QA-2). Ce ne sont pas des données fictives (ARCH-8) : ce sont les lignes de 2026, rembobinées à un moment de sa saison. **Aucune ligne n'est créée ni supprimée** : uniquement des `UPDATE`, dans une transaction.
+Le dump `archives.sql` clôture les 16 éditions, 2026 comprise : sans autre étape, aucun écran ne pourrait montrer une édition en cours (accueil, tableau de bord, saisie des scores, tirages). Après le dump, `prepare-database` (`packages/web/tests/e2e/helpers/in-progress-edition.ts`) remet donc **l'édition 2026 en phase de poules**, une seule fois et pour tous les tests (aucune mutation propre à un test, décision utilisateur QA-2). Ce ne sont pas des données fictives (ARCH-8) : ce sont les lignes de 2026, rembobinées à un moment de sa saison. **Aucune ligne n'est créée ni supprimée** : uniquement des `UPDATE`, dans une transaction.
 
 | Donnée | État produit |
 |---|---|
@@ -321,13 +324,13 @@ Le dump `archives.sql` clôture les 16 éditions, 2026 comprise : sans autre ét
 | Tirages de 2026 | aucun : un brouillon demanderait une insertion, interdite (ARCH-8). Le fil d'activité ne montre donc que des validations de match |
 | Participations de 2026 | statut `IN_POOL`, ni étape finale, ni points, ni rang de poule : pas de champion 2026 |
 
-La règle est la même à chaque exécution : classement des matchs par numéro de séquence décroissant dans chaque poule, valeurs `E2E_IN_PROGRESS_EDITION_CODE`, `E2E_POOL_REWIND_*`, `E2E_POOL_RECORDED_*` et `E2E_POOL_ACTIVITY_*` dans `tests/e2e/helpers/e2e.const.ts`. La sortie JSON de `prepare-database` indique l'état produit (`inProgressEdition`). Les champs `matches` et `validatedMatches` de cette sortie comptent le dump **avant** la remise en phase de poules ; GET /stats en donne les valeurs après (A16 : 729 matchs joués et 554 avec score dans le dump ; 690 et 515 une fois les 39 matchs à jouer retirés).
+La règle est la même à chaque exécution : classement des matchs par numéro de séquence décroissant dans chaque poule, valeurs `E2E_IN_PROGRESS_EDITION_CODE`, `E2E_POOL_REWIND_*`, `E2E_POOL_RECORDED_*` et `E2E_POOL_ACTIVITY_*` dans `packages/web/tests/e2e/helpers/e2e.const.ts`. La sortie JSON de `prepare-database` indique l'état produit (`inProgressEdition`). Les champs `matches` et `validatedMatches` de cette sortie comptent le dump **avant** la remise en phase de poules ; GET /stats en donne les valeurs après (A16 : 729 matchs joués et 554 avec score dans le dump ; 690 et 515 une fois les 39 matchs à jouer retirés).
 
-`tests/db/in-progress-edition.test.ts` vérifie le déterminisme (deux préparations successives, mêmes ids de matchs programmés), l'absence de création ou de suppression, et la cohérence de ce que l'API calcule pour 2026 (statut, avancement des poules, champion, compteurs d'archive). Les zones visuelles qui lisent 2026 se mesurent sur cet état.
+`packages/web/tests/db/in-progress-edition.test.ts` vérifie le déterminisme (deux préparations successives, mêmes ids de matchs programmés), l'absence de création ou de suppression, et la cohérence de ce que l'API calcule pour 2026 (statut, avancement des poules, champion, compteurs d'archive). Les zones visuelles qui lisent 2026 se mesurent sur cet état.
 
 ### Tests d'écriture : une édition créée par le test (QA-3)
 
-Un test qui écrit (ajouter ou retirer un inscrit, saisir un score, tirer les poules…) **crée sa propre édition** par l'API réelle d'administration (`POST /editions`, puis les transitions par les routes réelles), jamais sur les archives (2012 à 2026) ni sur 2026 en phase de poules (QA-2). Les compétiteurs dont il a besoin sont créés de même (`POST /competiteurs`) : un test n'écrit jamais sur un profil partagé. Le helper partagé est `tests/e2e/helpers/edition-write.ts`, ses constantes sont dans `tests/e2e/helpers/e2e.const.ts` :
+Un test qui écrit (ajouter ou retirer un inscrit, saisir un score, tirer les poules…) **crée sa propre édition** par l'API réelle d'administration (`POST /editions`, puis les transitions par les routes réelles), jamais sur les archives (2012 à 2026) ni sur 2026 en phase de poules (QA-2). Les compétiteurs dont il a besoin sont créés de même (`POST /competiteurs`) : un test n'écrit jamais sur un profil partagé. Le helper partagé est `packages/web/tests/e2e/helpers/edition-write.ts`, ses constantes sont dans `packages/web/tests/e2e/helpers/e2e.const.ts` :
 
 | Fonction | Rôle |
 |---|---|
@@ -340,15 +343,15 @@ Un test qui écrit (ajouter ou retirer un inscrit, saisir un score, tirer les po
 
 **Unicité et isolation.** Le serveur génère le code (`2090`, `2090b`… jusqu'à `z`, CE-1) sous verrou (`pg_advisory_xact_lock`) : deux créations simultanées (`fullyParallel`) ne collisionnent jamais, et aucune ne peut reprendre un code d'archive. Seule l'année peut s'épuiser (26 codes par an, 409 `EDITION_CODE_EXHAUSTED`) : elle part d'un hachage du libellé du test dans les années 2050 à 2099 (bornes de l'API : 2000 à 2100 ; archives : 2012 à 2026), soit 1 300 codes par exécution, la base étant remise à neuf à chaque lancement ; une année épuisée passe à la suivante. Donner un libellé distinct à chaque test.
 
-**Ordre d'exécution.** Les éditions créées restent dans la base jusqu'au lancement suivant, et la plus récente devient l'édition active par défaut de l'admin : les specs d'écriture vivent donc dans `tests/e2e/writes/` et forment le projet Playwright `writes`, qui dépend des projets `routes`, `a11y` et `visual` et passe après eux (`--no-deps` pour le lancer seul). Une spec qui lit seulement va dans `a11y/` ou `visual/`. Les zones visuelles qui dépendent d'une écriture (`*.zones.spec.ts`) se mesurent sur l'édition du test, avec les mêmes masques de valeurs que les autres.
+**Ordre d'exécution.** Les éditions créées restent dans la base jusqu'au lancement suivant, et la plus récente devient l'édition active par défaut de l'admin : les specs d'écriture vivent donc dans `packages/web/tests/e2e/writes/` et forment le projet Playwright `writes`, qui dépend des projets `routes`, `a11y` et `visual` et passe après eux (`--no-deps` pour le lancer seul). Une spec qui lit seulement va dans `a11y/` ou `visual/`. Les zones visuelles qui dépendent d'une écriture (`*.zones.spec.ts`) se mesurent sur l'édition du test, avec les mêmes masques de valeurs que les autres.
 
 **Courriels.** Le serveur lancé par Playwright utilise le transport `capture` (`NUXT_MAIL_TRANSPORT`, `NUXT_MAIL_CAPTURE_FILE`) : aucun SMTP, chaque courriel est une ligne JSON de `test-results/e2e-mail.jsonl` (remis à zéro à chaque lancement). `invitationSent: true` se produit donc pour de vrai ; `false` (SMTP injoignable) n'a pas d'équivalent e2e et se teste en test de composant, `null` est le rattachement d'un profil existant.
 
 ### Garde anti-code-serveur dans le navigateur (ARCH-1, ARCH-2, ARCH-12)
 
-`src/utils/` et `src/services/` mêlent code navigateur et code serveur : un service fusionné exporte sa classe `$fetch` et ses fonctions TypeORM. Le build client déclare sans effet de bord les modules serveur (typeorm, pg, reflect-metadata, `src/server/**`, `node:*`), qui sont élagués avec les fonctions serveur inutilisées. Le plugin `clientBundleGuard` fait échouer `nuxt build` si l'un d'eux reste dans un chunk client. `npm run test:bundle` vérifie le résultat octet par octet. Il n'y a aucun scan d'auto-import (`imports.scan: false`) : chaque fichier importe explicitement ce qu'il utilise.
+`packages/web/src/utils/` et `packages/web/src/services/` mêlent code navigateur et code serveur : un service fusionné exporte sa classe `$fetch` et ses fonctions TypeORM. Le build client déclare sans effet de bord les modules serveur (typeorm, pg, reflect-metadata, `packages/web/src/server/**`, `node:*`), qui sont élagués avec les fonctions serveur inutilisées. Le plugin `clientBundleGuard` fait échouer `nuxt build` si l'un d'eux reste dans un chunk client. `npm run test:bundle` vérifie le résultat octet par octet. Il n'y a aucun scan d'auto-import (`imports.scan: false`) : chaque fichier importe explicitement ce qu'il utilise.
 
-Les schémas zod de validation des entrées vivent dans `src/server/schemas/` (ARCH-13) : ils sont couverts par la garde, et un schéma importé par du code navigateur fait échouer le build. Les stores Pinia sont des composables (`src/composables/useAuthStore.ts`, `useAdminEditionStore.ts`, ARCH-14).
+Les schémas zod de validation des entrées vivent dans `packages/web/src/server/schemas/` (ARCH-13) : ils sont couverts par la garde, et un schéma importé par du code navigateur fait échouer le build. Les stores Pinia sont des composables (`packages/web/src/composables/useAuthStore.ts`, `useAdminEditionStore.ts`, ARCH-14).
 
 **Limite acceptée (ARCH-12)** : en `nuxt dev`, Vite ne fait pas de tree-shaking. Un service fusionné charge donc TypeORM et les entités dans le navigateur, environ 5,5 Mo mesurés, sans erreur. Cela ne concerne que le développement : en production, la garde de build interdit tout code serveur dans les chunks client.
 
@@ -382,7 +385,7 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
 
 ## API serveur
 
-- Toutes les routes vivent sous `/api/v1/` (`src/server/api/v1/resource.method.ts`).
+- Toutes les routes vivent sous `/api/v1/` (`packages/web/src/server/api/v1/resource.method.ts`).
 - `GET /api/v1/health` : `200 { "status": "ok" }` si la base répond à `SELECT 1`, `503 { "status": "unavailable" }` sinon. Aucun détail d'infrastructure n'est exposé.
 - Lectures publiques des éditions (`/editions`, `/editions/{id}/…`, `/stats`) : voir `docs/api/editions.md`.
 - Classements publics (B-07), calculés à la lecture à partir de `participations.points` figés ; seules les éditions `CLOSED` comptent (A8), ordonnées par `chronological_rank`. Les participations à `points = null` n'entrent pas dans les sommes. Ex aequo : rang partagé (`1, 2, 2, 4`), ordre d'affichage par `displayName`. Les réponses ne portent que `ICompetitorPublic`.
@@ -390,9 +393,9 @@ Limites connues du limiteur de débit : le plafond `maxKeys` est un LRU en mémo
   - `GET /api/v1/classements/all-time` : `IRankingRow[]`, `points` = somme de toutes les éditions clôturées, `average` = `points` / participations chiffrées.
   - `GET /api/v1/classements/evolution?type=acp|all-time&competiteur={uuid}` : `IRankingEvolutionPoint[]` (RG8, un point par édition clôturée depuis la première participation du joueur ; `[]` s'il n'a aucune participation classée). Sans `competiteur` : `IRankingEvolutionSeries[]` pour tous les joueurs en un seul appel (C5).
   - Erreurs : `type` absent ou hors enum, ou `competiteur` qui n'est pas un UUID : 400 `VALIDATION_FAILED` ; `competiteur` inconnu : 404 `NOT_FOUND`.
-- Toute erreur sous `/api/` a la forme `{ statusCode, code, message, details? }` (`IApiError`, codes dans `src/enums/api-error-code.enum.ts`). Les erreurs 5xx portent un message générique ; le détail est dans les logs.
+- Toute erreur sous `/api/` a la forme `{ statusCode, code, message, details? }` (`IApiError`, codes dans `packages/web/src/enums/api-error-code.enum.ts`). Les erreurs 5xx portent un message générique ; le détail est dans les logs.
 - Chaque réponse porte un en-tête `X-Request-Id` ; les logs sont du JSON en ligne (`event`, `level`, `requestId`, `route`, `durationMs`).
-- Les entités TypeORM vivent dans `src/server/db/typeorm/entities/` et sont déclarées dans `src/consts/entities.const.ts` (`ENTITIES`, registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
+- Les entités TypeORM vivent dans `packages/web/src/server/db/typeorm/entities/` et sont déclarées dans `packages/web/src/consts/entities.const.ts` (`ENTITIES`, registre partagé CLI et runtime). Chaque `@Column` doit déclarer son `type` explicitement : le bundle Nitro (esbuild) n'émet pas `emitDecoratorMetadata`.
 
 ## Architecture
 
@@ -428,7 +431,7 @@ Conséquence pratique : avec 2 calculs simultanés par défaut, une troisième c
 
 **Déploiement (Coolify) : ne jamais positionner `NUXT_AUTH_SECURE_COOKIE=false` sur un déploiement en HTTPS** (ni en production ni en préproduction) ; laisser la variable absente. À reporter dans la documentation de déploiement de T-OPS-01.
 
-**Délai de lecture du corps (T-SEC-04, N3).** Le corps d'une requête JSON doit arriver en `API_BODY_READ_TIMEOUT_MS` (10 s au total, pas un délai d'inactivité) : au-delà, 408 `REQUEST_TIMEOUT` et connexion fermée (anti slowloris). La lecture passe par `readRequestBody(event, { maxBytes, timeoutMs })` (`src/utils/request-body.util.ts`), que le multipart doit réutiliser avec son propre plafond et son propre délai.
+**Délai de lecture du corps (T-SEC-04, N3).** Le corps d'une requête JSON doit arriver en `API_BODY_READ_TIMEOUT_MS` (10 s au total, pas un délai d'inactivité) : au-delà, 408 `REQUEST_TIMEOUT` et connexion fermée (anti slowloris). La lecture passe par `readRequestBody(event, { maxBytes, timeoutMs })` (`packages/web/src/utils/request-body.util.ts`), que le multipart doit réutiliser avec son propre plafond et son propre délai.
 
 Échecs de connexion par compte (SEC-A2, migration M3, colonnes `users.failed_login_count` et `users.throttled_until`) : aucun blocage dur. Jusqu'à 5 échecs consécutifs, aucun délai ; au-delà, un délai de 2^(échecs - 5) secondes, **plafonné à 300 s** (`LOGIN_FREE_FAILURES`, `LOGIN_DELAY_BASE_SECONDS`, `LOGIN_DELAY_MAX_SECONDS`). Pendant le délai, le login répond 429 avec `Retry-After` sans vérifier le mot de passe ; une connexion réussie remet le compteur à zéro. Un email inconnu ne crée aucun état (seule la limite par IP s'applique). **Risque accepté (SEC-A3, décision utilisateur 2026-10-20) : énumération de comptes.** Un 429 de délai ne se produit que pour un compte qui existe. Après 6 échecs sur un même email, un tiers peut donc savoir si cet email a un compte. Aucune parade n'est prévue. Déblocage immédiat par un opérateur : `npm run user:unlock -- <email>`, qui révoque aussi les appareils de confiance du compte.
 
@@ -447,5 +450,5 @@ Contrat complet : [docs/api/avatar.md](docs/api/avatar.md). Routes : `PUT` et `D
 - La photo est stockée en base (`competitor_avatars`, AV-1), au plus 2 Mio envoyés (`AVATAR_MAX_BYTES`), lus en flux. Type vérifié par signature (JPEG, PNG, WebP), puis ré-encodée par `sharp` : orientation appliquée, 512 px au plus, **EXIF, GPS, XMP et IPTC supprimés**.
 - `sharp` est épinglé à `0.35.5` (sans `^` : le binaire natif libvips suit la version). Les binaires sont précompilés par plateforme (`@img/sharp-<os>-<arch>`) : l'image Docker (`node:22-alpine`, musl) installe la variante `linuxmusl`, et Nitro l'embarque dans `.output`.
 - **Rollback de la migration `CreateCompetitorAvatars`** : `down` supprime `competitor_avatars` et recrée `competitors.avatar_url` (vide). **Les images téléversées sont perdues.** `up` refuse de s'exécuter si une `avatar_url` est encore renseignée.
-- Le dump `src/assets/seeds/archives.sql` ne référence plus `avatar_url` (les 146 valeurs étaient NULL).
+- Le dump `packages/web/src/assets/seeds/archives.sql` ne référence plus `avatar_url` (les 146 valeurs étaient NULL).
 - Mentions de licences : `sharp` est sous Apache-2.0 ; `@img/sharp-libvips-*` (libvips) sous LGPL-3.0-or-later, chargée dynamiquement et sans modification (AV-2).

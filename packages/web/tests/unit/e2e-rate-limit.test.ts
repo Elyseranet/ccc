@@ -21,6 +21,6 @@ describe('budget public en lecture (M3, T-QA-09)', () => {
     const command = config.match(/command:\s*`([^`]*)`/)?.[1] ?? ''
     expect(command).toContain('NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS=')
     expect(config.split('NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS').length - 1).toBe(1)
-    expect(read('.env.example')).toContain('NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS=300')
+    expect(read('../../.env.example')).toContain('NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS=300')
   })
 })
