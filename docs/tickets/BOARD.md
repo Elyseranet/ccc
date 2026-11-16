@@ -38,6 +38,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-25](B-25.md) | Rouvrir les qualifications tant que le tirage du premier tour n'est pas validé (F-51) | — | B-13 | — | **Fermé** (2026-11-16) @ `279a681b`, vérifié sur dev |
 | [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | **Fermé** (2026-11-16) @ `ca1795d0`, vérifié sur dev |
 | [B-27](B-27.md) | Tour suivant impossible à tirer après des quarts validés (bloquant) | — | B-26 | — | **Fermé** (2026-11-16) @ `de9890a0`, vérifié sur dev |
+| [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | Ouvert (2026-11-16) |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -275,6 +276,9 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-56](F-56.md) | Finale : « Lancer la finale » avec VS, sans tirage ; espace sous « À placer » | maquette F-25/F-52 | F-52, B-27 | **Fermé** (2026-11-16) @ `0a3390b4`, vérifié sur dev | — |
 | [F-57](F-57.md) | Bracket public : colonne « Vainqueur » (nom + logo CCC) | maquette edition.html mise à jour | F-03 | **Fermé** (2026-11-16) @ `cc344c54`, vérifié sur dev | — |
 | [F-58](F-58.md) | Bracket public sur mobile : tours empilés en vertical | maquette edition.html mise à jour | F-03, F-57 | **Fermé** (2026-11-16) @ `7e970270`, vérifié sur dev | — |
+| [F-59](F-59.md) | Clôture : libellé du champ de confirmation invisible | maquette F-26 | F-26 | Ouvert (2026-11-16) | — |
+| [F-60](F-60.md) | Bouton « Supprimer l'édition… » | maquette F-13 à compléter | B-28, F-13 | Ouvert (2026-11-16) | — |
+| [F-61](F-61.md) | Saisie de score : un seul bouton « Valider » | — | F-18 | Ouvert (2026-11-16) | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
