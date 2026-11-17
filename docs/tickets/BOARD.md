@@ -280,7 +280,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-59](F-59.md) | Clôture : libellé du champ de confirmation invisible | maquette F-26 | F-26 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-60](F-60.md) | Bouton « Supprimer l'édition… » | maquette F-13 à compléter | B-28, F-13 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-61](F-61.md) | Saisie de score : un seul bouton « Valider » | — | F-18 | Ouvert : mergé, contrôle écran en attente | — |
-| [F-62](F-62.md) | Admin : saisir l'email d'un joueur et l'inviter (fiche + inscrits) | à compléter | B-29, F-09 | Ouvert (2026-11-17) | — |
+| [F-62](F-62.md) | Admin : saisir l'email d'un joueur et l'inviter (fiche + inscrits) | à compléter | B-29, F-09 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
