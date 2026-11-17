@@ -26,6 +26,7 @@
     "test:visual": "npm run test:visual --workspace=packages/web",
     "test:writes": "npm run test:writes --workspace=packages/web",
     "test:e2e": "npm run test:e2e --workspace=packages/web",
+    "audit:spacing": "npm run audit:spacing --workspace=packages/web",
     "db:typeorm:build": "npm run db:typeorm:build --workspace=packages/web",
     "db:migration:generate": "npm run db:migration:generate --workspace=packages/web",
     "db:migration:run": "npm run db:migration:run --workspace=packages/web",

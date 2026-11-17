@@ -30,7 +30,8 @@
     "test:a11y": "playwright test --config playwright.config.ts --project=a11y",
     "test:visual": "playwright test --config playwright.config.ts --project=visual",
     "test:writes": "playwright test --config playwright.config.ts --project=writes --no-deps",
-    "test:e2e": "playwright test --config playwright.config.ts"
+    "test:e2e": "playwright test --config playwright.config.ts",
+    "audit:spacing": "playwright test --config playwright.audit.config.ts"
   },
   "dependencies": {
     "@pinia/nuxt": "^1.0.3",
