@@ -3,21 +3,17 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { E2E_ADMIN_EDITION_COOKIE } from '../helpers/e2e.const'
 import { createFinalValidatedEdition, createRegistrationEdition, selectAdminEdition } from '../helpers/edition-write'
-import { markAwaitingRoutes } from '../helpers/pending-routes'
 import { signIn } from '../helpers/session'
 
 /*********************************************************
  * F-60 : admin, suppression d'une édition (écritures sur des éditions créées par le test, jamais une archive ni 2026)
  *
  * @description
- * Le dialogue (libellé visible lié au champ, focus, Échap, code exigé) ne dépend pas de la route serveur : il tourne dès maintenant. Les cas qui
- * suppriment réellement (`DELETE /editions/{id}`) attendent B-28 : tant que `API_ROUTES[EDITION_DELETE].pendingTicket` existe ils sont en
- * `test.fixme`, et ils s'activent seuls quand B-28 retire ce ticket (même commit que la route).
+ * Dialogue de confirmation (libellé visible lié au champ, focus, Échap, code exigé) et suppression réelle par `DELETE /editions/{id}` (B-28).
  ********************************************************/
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const STATUS_NOT_FOUND = 404
 const STATUS_CONFLICT = 409
-const ADMIN_PAGE = '/admin/editions/:code'
 
 const hydrated = async (page: Page) => {
   await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false)
@@ -28,8 +24,6 @@ const violationsOf = async (page: Page) => {
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze()
   return results.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => `${node.target.join(' ')} :: ${node.html.slice(0, 260)}`).join(', ')}`)
 }
-
-const awaitingDeleteRoute = (): boolean => markAwaitingRoutes(ADMIN_PAGE).length > 0
 
 test.describe('admin suppression d’édition : dialogue de confirmation', () => {
   test.beforeEach(async ({ context }) => {
@@ -84,9 +78,8 @@ test.describe('admin suppression d’édition : dialogue de confirmation', () =>
   })
 })
 
-test.describe('admin suppression d’édition : suppression réelle (B-28)', () => {
+test.describe('admin suppression d’édition : suppression réelle', () => {
   test.beforeEach(async ({ context }) => {
-    test.fixme(awaitingDeleteRoute(), 'DELETE /editions/{id} : en attente de B-28')
     await signIn(context, 'admin')
   })
 
