@@ -1,4 +1,5 @@
 import type { EDITION_STATUS } from '../enums/edition.enum.js'
+import type { COMPETITOR_ACCOUNT_STATUS } from '../enums/user.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import type { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
 import type { IMatchRecord } from './stats.interface.js'
@@ -63,7 +64,17 @@ export interface ICompetitorStats {
   titles: number
 }
 
+/** Compte du compétiteur, réservé à l'administrateur (B-29) : porte l'email, jamais exposé publiquement. */
+export interface ICompetitorAccount {
+  status: COMPETITOR_ACCOUNT_STATUS
+  email: string | null
+  /** ISO 8601, expiration de l'invitation la plus récente ; `null` sans compte ou sans invitation. */
+  invitationExpiresAt: string | null
+}
+
 export interface ICompetitorDetail extends ICompetitorPublic {
+  /** Présent seulement pour un administrateur connecté (B-29). */
+  account?: ICompetitorAccount
   /** Version de l'identité (nom affiché, prénom, nom, pseudo) : à renvoyer dans `If-Match` de `PATCH /competiteurs/{id}`. L'avatar ne la fait pas avancer. */
   version: number
   participations: ICompetitorParticipation[]

@@ -1,3 +1,5 @@
+import type { USER_STATUS } from '../enums/user.enum.js'
+
 /** Invitation émise côté serveur : le jeton en clair n'est renvoyé qu'une fois, jamais stocké ni journalisé. */
 export interface IIssuedInvitation {
   invitationToken: string
@@ -34,6 +36,16 @@ export interface IInvitationResent {
   invitationSent: boolean
   /** ISO 8601. */
   invitationExpiresAt: string
+}
+
+/** `PUT /competiteurs/{id}/compte` : l'email est normalisé (espaces, casse) côté serveur. */
+export interface ISetAccountEmailRequest {
+  email: string
+}
+
+/** `PUT /competiteurs/{id}/compte` (200) : le compte est INVITED, l'ancien lien est invalidé ; l'envoi peut échouer sans rien annuler. */
+export interface IAccountEmailSet extends IInvitationResent {
+  accountStatus: USER_STATUS.INVITED
 }
 
 /** `GET /auth/invitation/{jeton}` (200) : seulement de quoi pré-remplir le formulaire de première connexion. */

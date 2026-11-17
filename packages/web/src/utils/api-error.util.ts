@@ -45,6 +45,9 @@ export const conflictWithCode = (code: API_ERROR_CODE, message: string, details?
 export const emailAlreadyUsed = (): H3Error =>
   buildError(409, API_ERROR_CODE.EMAIL_ALREADY_USED, API_ERROR_MESSAGE.EMAIL_ALREADY_USED)
 
+export const accountActive = (): H3Error =>
+  buildError(409, API_ERROR_CODE.ACCOUNT_ACTIVE, API_ERROR_MESSAGE.ACCOUNT_ACTIVE)
+
 export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
