@@ -56,7 +56,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.COMPETITOR_UPDATE]: { file: 'competiteurs/[id].patch.ts' },
   [API_ENDPOINT.EDITION_CREATE]: { file: 'editions/index.post.ts' },
   [API_ENDPOINT.EDITION_UPDATE]: { file: 'editions/[id]/index.patch.ts' },
-  [API_ENDPOINT.EDITION_DELETE]: { file: 'editions/[id]/index.delete.ts', pendingTicket: 'B-28' },
+  [API_ENDPOINT.EDITION_DELETE]: { file: 'editions/[id]/index.delete.ts' },
   [API_ENDPOINT.ADMIN_EDITIONS]: { file: 'admin/editions/index.get.ts' },
   [API_ENDPOINT.ADMIN_QUALIFICATION]: { file: 'admin/editions/[id]/qualification.get.ts' },
   [API_ENDPOINT.QUALIFICATION_FINALIZE]: { file: 'editions/[id]/qualification.post.ts' },
