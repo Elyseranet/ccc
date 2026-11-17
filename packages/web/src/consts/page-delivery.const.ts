@@ -196,7 +196,7 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
   [ROUTES.ADMIN_EDITION]: {
     delivered: true,
     layout: LAYOUT.ADMIN,
-    endpoints: [API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_UPDATE]
+    endpoints: [API_ENDPOINT.EDITION, API_ENDPOINT.EDITION_UPDATE, API_ENDPOINT.EDITION_DELETE]
   },
   [ROUTES.ADMIN_COMPETITORS]: {
     delivered: true,
