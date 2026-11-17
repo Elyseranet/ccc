@@ -47,24 +47,33 @@
         :cancel-label="cancelLabel"
         :confirm-label="confirmLabel"
         cy-prefix="closing"
+        :appearance="dialogAppearance"
         confirm-color="danger"
         :confirm-disabled="!confirmed"
         :focus-cancel="false"
         @cancel="handleCancel"
         @confirm="handleConfirm"
       >
-        <origam-text-field
-          v-model="typed"
-          :label="fieldLabel"
-          autocomplete="off"
-          inputmode="numeric"
-          autofocus
-          single-line
-          hide-details
-          rounded="full"
-          class="closing-confirm__code"
-          data-cy="closing-code"
-        />
+        <div class="closing-confirm__field">
+          <origam-label
+            class="closing-confirm__label"
+            :for="fieldId"
+          >
+            {{ fieldLabel }} <strong>{{ code }}</strong>
+          </origam-label>
+          <origam-text-field
+            :id="fieldId"
+            v-model="typed"
+            autocomplete="off"
+            inputmode="numeric"
+            autofocus
+            single-line
+            hide-details
+            rounded="full"
+            class="closing-confirm__code"
+            data-cy="closing-code"
+          />
+        </div>
       </confirm-dialog>
     </template>
   </origam-card>
@@ -72,9 +81,10 @@
 
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
-import { OrigamBtn, OrigamCard, OrigamTextField } from 'origam/components'
+import { OrigamBtn, OrigamCard, OrigamLabel, OrigamTextField } from 'origam/components'
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import { useT } from '~/composables/useT'
+import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { IClosingConfirmEmits, IClosingConfirmProps } from '~/interfaces/edition-closing-view.interface'
 import { isClosingCodeConfirmed } from '~/utils/edition-closing-view.util'
 
@@ -92,6 +102,8 @@ const props = withDefaults(defineProps<IClosingConfirmProps>(), {})
 const emits = defineEmits<IClosingConfirmEmits>()
 defineSlots<{}>()
 const titleId = useId()
+const fieldId = useId()
+const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const dialogOpen = ref(false)
 const typed = ref('')
 const confirmed = computed(() => isClosingCodeConfirmed(typed.value, props.code))
@@ -102,7 +114,7 @@ const buttonLabel = computed(() => props.busy
 const dialogTitle = computed(() => t('admin.closing.dialog_title', 'Clôturer l’édition {year} ?', { year: props.year }))
 const dialogText = computed(() => t('admin.closing.dialog_text', 'Les points seront figés et l’édition passera en lecture seule.'))
 const dialogWarning = computed(() => t('admin.closing.dialog_warning', 'Cette action est définitive : il n’est pas possible de revenir en arrière, l’édition ne pourra pas être rouverte.'))
-const fieldLabel = computed(() => t('admin.closing.dialog_field', 'Pour confirmer, saisissez le code de l’édition : {code}', { code: props.code }))
+const fieldLabel = computed(() => t('admin.closing.dialog_field', 'Pour confirmer, saisissez le code de l’édition :'))
 const cancelLabel = computed(() => t('admin.closing.dialog_cancel', 'Annuler'))
 const confirmLabel = computed(() => t('admin.closing.dialog_confirm', 'Clôturer définitivement'))
 const handleOpen = () => {
@@ -161,6 +173,19 @@ defineExpose({})
   &__why {
     margin: 0;
     color: var(--origam-color__text---secondary);
+  }
+
+  &__field {
+    display: grid;
+    gap: var(--origam-space---1);
+  }
+
+  &__label {
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    text-transform: uppercase;
+    color: var(--origam-color__text---tertiary);
   }
 
   &__code {

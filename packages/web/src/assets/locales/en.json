@@ -267,7 +267,7 @@
   "admin.closing.confirm_title": "Confirm the closing",
   "admin.closing.dialog_cancel": "Cancel",
   "admin.closing.dialog_confirm": "Close for good",
-  "admin.closing.dialog_field": "To confirm, type the edition code: {code}",
+  "admin.closing.dialog_field": "To confirm, type the edition code:",
   "admin.closing.dialog_text": "Points will be frozen and the edition will become read-only.",
   "admin.closing.dialog_title": "Close edition {year}?",
   "admin.closing.dialog_warning": "This action is final: it cannot be undone and the edition cannot be reopened.",

@@ -146,6 +146,11 @@ defineExpose({})
     padding: 0 var(--origam-space---6) var(--origam-space---6);
   }
 
+  // origam-dialog ajoute un `div` vide après le slot texte : dans la grille il coûte une rangée de plus (gap 12 px), soit 36 px au lieu des 24 px de la maquette entre le dernier contenu et le pied.
+  &--mockup :deep(.origam-card__content > :empty) {
+    display: none;
+  }
+
   &--mockup &__actions {
     margin: 0 var(--confirm-dialog__actions---margin-inline, var(--origam-space---4)) var(--confirm-dialog__actions---margin-bottom, var(--origam-space---4));
   }
