@@ -113,6 +113,15 @@
         :busy-participation-id="busyParticipationId"
         @remove="handleRemove"
         @resend="handleResend"
+        @invite="handleInvite"
+      />
+      <participant-invite-dialog
+        :open="inviteOpen"
+        :name="inviteName"
+        :pending="busy"
+        :failure="inviteFailure"
+        @cancel="handleInviteCancel"
+        @submit="handleInviteSubmit"
       />
     </div>
     <origam-snackbar
@@ -131,10 +140,12 @@
 import { computed, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamSnackbar, OrigamTitle } from 'origam/components'
 import ParticipantCreateForm from '~/components/admin/participants/ParticipantCreateForm.vue'
+import ParticipantInviteDialog from '~/components/admin/participants/ParticipantInviteDialog.vue'
 import ParticipantList from '~/components/admin/participants/ParticipantList.vue'
 import ParticipantSearch from '~/components/admin/participants/ParticipantSearch.vue'
 import { useAdminEdition } from '~/composables/useAdminEdition'
 import { useAdminParticipants } from '~/composables/useAdminParticipants'
+import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useParticipantSearch } from '~/composables/useParticipantSearch'
 import { useSeo } from '~/composables/useSeo'
 import { useT } from '~/composables/useT'
@@ -163,7 +174,7 @@ useSeo({ noindex: true })
 await useAdminEdition()
 const {
   edition, participants, registeredIds, pending, error, refresh, isReadOnly, feedback, busy, busyParticipationId,
-  emailTaken, pendingAvatar, attach, create, retryAvatar, remove, resend, dismissFeedback
+  emailTaken, pendingAvatar, attach, create, retryAvatar, remove, resend, invite, inviteFailure, resetInvite, dismissFeedback
 } = useAdminParticipants()
 const { query, suggestions, pending: searching } = useParticipantSearch(registeredIds)
 
@@ -270,6 +281,35 @@ const handleRemove = (participationId: string) => {
 }
 const handleResend = (competitorId: string) => {
   resend(competitorId)
+}
+
+/*********************************************************
+ * Inviter (F-62)
+ *
+ * @description
+ * « Inviter » sur un joueur sans compte ouvre la boîte de saisie de l'email ; elle se ferme à la réussite, et le focus revient au bouton si
+ * la ligne l'a gardé (`useFocusReturn`).
+ ********************************************************/
+const inviteId = ref<string | null>(null)
+const inviteName = ref('')
+const inviteOpen = computed(() => inviteId.value !== null)
+// Après un envoi réussi, « Inviter » a disparu : le focus va à « Renvoyer » de la même ligne.
+const resendAfterInvite = (): HTMLElement | null => document.querySelector<HTMLElement>(
+  `[data-cy="participant-resend"][aria-label="${CSS.escape(t('admin.participants.resend_for', 'Renvoyer l’invitation à {name}', { name: inviteName.value }))}"]`
+)
+useFocusReturn(inviteOpen, resendAfterInvite)
+const handleInvite = (competitorId: string, displayName: string) => {
+  resetInvite()
+  inviteName.value = displayName
+  inviteId.value = competitorId
+}
+const handleInviteCancel = () => {
+  inviteId.value = null
+}
+const handleInviteSubmit = async (email: string) => {
+  if (inviteId.value && await invite(inviteId.value, email)) {
+    inviteId.value = null
+  }
 }
 const handleReload = () => {
   refresh()

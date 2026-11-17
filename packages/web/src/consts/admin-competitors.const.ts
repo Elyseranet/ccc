@@ -75,3 +75,31 @@ export const ADMIN_COMPETITOR_FAILURE_MESSAGES: IAdminFailureMessages = {
     text: { key: 'admin.competitors.error_unknown_text', fallback: 'L’enregistrement a échoué : réessayez.' }
   }
 }
+
+/** Messages d'alerte de la saisie d'email d'un compte (B-29, F-62) : 409 email pris par un autre compte, 409 compte actif. */
+export const ADMIN_ACCOUNT_FAILURE_MESSAGES: IAdminFailureMessages = {
+  byCode: {
+    [API_ERROR_CODE.EMAIL_ALREADY_USED]: {
+      title: { key: 'admin.account.error_email_used_title', fallback: 'Email déjà utilisé.' },
+      text: { key: 'admin.account.error_email_used_text', fallback: 'Cet email est déjà rattaché à un autre compte : saisissez-en un autre.' }
+    },
+    [API_ERROR_CODE.ACCOUNT_ACTIVE]: {
+      title: { key: 'admin.account.error_active_title', fallback: 'Compte déjà actif.' },
+      text: { key: 'admin.account.error_active_text', fallback: 'Ce joueur a activé son compte : c’est lui qui gère son email.' }
+    },
+    [API_ERROR_CODE.VALIDATION_FAILED]: {
+      title: { key: 'admin.account.error_validation_title', fallback: 'Email invalide.' },
+      text: { key: 'admin.account.error_validation_text', fallback: 'Saisissez une adresse email complète, par exemple prenom@exemple.fr.' }
+    },
+    [API_ERROR_CODE.COMPETITOR_NOT_FOUND]: ADMIN_COMPETITOR_FAILURE_MESSAGES.byCode[API_ERROR_CODE.COMPETITOR_NOT_FOUND]!,
+    [API_ERROR_CODE.UNAUTHORIZED]: ADMIN_COMPETITOR_FAILURE_MESSAGES.byCode[API_ERROR_CODE.UNAUTHORIZED]!,
+    [API_ERROR_CODE.FORBIDDEN]: ADMIN_COMPETITOR_FAILURE_MESSAGES.byCode[API_ERROR_CODE.FORBIDDEN]!,
+    [API_ERROR_CODE.RATE_LIMITED]: ADMIN_COMPETITOR_FAILURE_MESSAGES.byCode[API_ERROR_CODE.RATE_LIMITED]!,
+    [API_ERROR_CODE.REQUEST_TIMEOUT]: ADMIN_COMPETITOR_FAILURE_MESSAGES.byCode[API_ERROR_CODE.REQUEST_TIMEOUT]!
+  },
+  offline: ADMIN_COMPETITOR_FAILURE_MESSAGES.offline,
+  unknown: {
+    title: { key: 'admin.account.error_unknown_title', fallback: 'Une erreur est survenue.' },
+    text: { key: 'admin.account.error_unknown_text', fallback: 'L’invitation n’a pas pu être préparée : réessayez.' }
+  }
+}

@@ -34,7 +34,7 @@ export const PARTICIPANT_ACCOUNT_CHIPS: Record<ACCOUNT_STATE, { text: ITranslata
   [ACCOUNT_STATE.INVITATION_EXPIRED]: { text: { key: 'admin.participants.account_expired', fallback: 'Invitation expirée' }, color: 'error', bgColor: 'var(--origam-color__feedback--danger---bgSubtle)' }
 }
 
-/** Texte d'un compétiteur d'archive, sans compte : il ne peut pas être invité depuis cet écran. */
+/** Texte d'un compétiteur d'archive, sans compte : « Inviter » lui pose un email et envoie l'invitation (F-62). */
 export const PARTICIPANT_NO_ACCOUNT_TEXT: ITranslatableText = { key: 'admin.participants.account_none', fallback: 'Sans compte' }
 
 /** Une clé de traduction par code d'erreur de l'API (B-10, B-16, B-09). */

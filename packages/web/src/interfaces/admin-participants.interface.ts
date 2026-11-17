@@ -83,4 +83,5 @@ export interface IParticipantListProps {
 export interface IParticipantListEmits {
   (event: 'remove', participationId: string): void
   (event: 'resend', competitorId: string): void
+  (event: 'invite', competitorId: string, displayName: string): void
 }
