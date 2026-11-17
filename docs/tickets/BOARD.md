@@ -39,7 +39,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | **Fermé** (2026-11-16) @ `ca1795d0`, vérifié sur dev |
 | [B-27](B-27.md) | Tour suivant impossible à tirer après des quarts validés (bloquant) | — | B-26 | — | **Fermé** (2026-11-16) @ `de9890a0`, vérifié sur dev |
 | [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | **Fermé** (2026-11-17) @ `c8d4389e` |
-| [B-29](B-29.md) | Inviter un joueur sans compte : poser l'email et envoyer l'invitation (F-62) | — | A14 | — | Ouvert (2026-11-17) |
+| [B-29](B-29.md) | Inviter un joueur sans compte : poser l'email et envoyer l'invitation (F-62) | — | A14 | — | **Fermé** (2026-11-17) @ `a66d9529`, vérifié sur dev |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
