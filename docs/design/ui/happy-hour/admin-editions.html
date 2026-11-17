@@ -75,6 +75,18 @@
   </form>
 </section>
 
+<!-- F-60 : zone « danger » en bas de la fiche, absente pour une archive (origine LEGACY_IMPORT) ; présente aussi sur une édition clôturée de l’appli -->
+<section class="card ed-form ed-danger" aria-labelledby="h-del">
+  <header class="ed-form__h"><div><h2 id="h-del" class="h-card">Zone de danger</h2></div></header>
+  <p class="muted">Supprimer l’édition efface définitivement ses participations, ses poules, ses tirages et ses matchs. Les profils des compétiteurs sont conservés.</p>
+  <!-- origam-btn variant="flat" bgColor="danger" aria-haspopup="dialog" -->
+  <div class="q-act"><button class="btn btn--danger" type="button" aria-haspopup="dialog">Supprimer l’édition…</button></div>
+  <!-- origam-dialog (même gabarit que la clôture F-26) : champ de code AVEC libellé visible (origam-label + for, pas la prop label d’origam-text-field) ; focus initial sur le champ ; Échap annule ; « Supprimer définitivement » inactif tant que le code n’est pas saisi ; une édition clôturée ajoute « ses points disparaîtront des classements » -->
+  <section class="odlg" role="alertdialog" aria-labelledby="h-dd" aria-describedby="dd-d"><header class="odlg__h"><h3 id="h-dd" class="odlg__t">Supprimer l’édition 2027 ?</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="dd-d">Seront supprimés : les participants inscrits, les poules, les tirages et les matchs de l’édition 2027. Les profils des compétiteurs sont conservés. <!-- édition clôturée : « Cette édition est clôturée : ses points disparaîtront des classements. » --> <b>Cette action est définitive : il n’est pas possible de revenir en arrière.</b></p>
+    <p class="field c-code"><label for="dc-del">Pour confirmer, saisissez le code de l’édition : <b>2027</b></label><input id="dc-del" class="input" autocomplete="off"></p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--danger" type="button" disabled>Supprimer définitivement</button></div></section>
+</section>
+<!-- origam-snackbar status="success" location="bottom" : sur la liste des éditions après la suppression (retour à /admin/editions) --><div class="snack" role="status"><span class="chip chip--ok">Supprimée</span>Édition 2027 supprimée</div>
+
 <section class="card ed-form ed-form--locked" aria-labelledby="h-closed">
   <header class="ed-form__h"><div><p class="eyebrow">Édition 2025</p><h2 id="h-closed" class="h-card">Édition clôturée · lecture seule</h2></div><span class="chip chip--ok">Clôturée</span></header>
   <!-- origam-alert status="info" title="Édition clôturée" density="compact" rounded="lg" (décision 7dc5286) --><p class="alert alert--info alert--block alert--compact" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Édition clôturée</span><span class="alert__body">Ses résultats et ses points sont figés : elle ne se modifie plus.</span></span></p>

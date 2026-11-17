@@ -16,6 +16,8 @@ export const useFocusReturn = (open: MaybeRefOrGetter<boolean>) => {
       trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null
       return
     }
+    // Deux ticks : le premier laisse `origam-dialog` retirer son piège de focus (`retainFocus`, watcher « pre »), sinon il ramène aussitôt le focus dans le dialogue.
+    await nextTick()
     await nextTick()
     if (trigger?.isConnected) {
       trigger.focus()

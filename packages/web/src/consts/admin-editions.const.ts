@@ -24,6 +24,9 @@ export const ADMIN_EDITIONS_CACHE_KEY = 'editions'
 /** Clé de cache de la liste admin (`GET /admin/editions`, B-20), distincte de `editions` (forme publique, sélecteur de la coque). */
 export const ADMIN_EDITIONS_LIST_CACHE_KEY = 'admin-editions'
 
+/** État partagé (`useState`) qui porte le code de l'édition supprimée jusqu'à la liste, où le snackbar de confirmation l'annonce (F-60). */
+export const ADMIN_EDITION_DELETED_STATE_KEY = 'admin-edition-deleted'
+
 
 export const ADMIN_EDITION_COLUMNS: IAdminEditionColumn[] = [
   { field: 'code', title: { key: 'admin.editions.column_code', fallback: 'Code' }, sortable: false, width: '7.77%', minWidth: '68px' },
@@ -53,6 +56,10 @@ const ADMIN_EDITION_FAILURES: IAdminFailureMessages['byCode'] = {
   [API_ERROR_CODE.EDITION_CLOSED]: {
     title: { key: 'admin.editions.error_closed_title', fallback: 'Modification refusée.' },
     text: { key: 'admin.editions.error_closed_text', fallback: 'L’édition {code} est clôturée. Rechargez la page pour afficher son état actuel.' }
+  },
+  [API_ERROR_CODE.EDITION_LEGACY_PROTECTED]: {
+    title: { key: 'admin.editions.error_legacy_protected_title', fallback: 'Suppression refusée.' },
+    text: { key: 'admin.editions.error_legacy_protected_text', fallback: 'L’édition {code} appartient à l’archive : elle ne peut pas être supprimée.' }
   },
   [API_ERROR_CODE.NOT_FOUND]: {
     title: { key: 'admin.editions.error_not_found_title', fallback: 'Édition introuvable.' },

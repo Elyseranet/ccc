@@ -88,3 +88,16 @@ export interface IEditionReadonlyRow {
 export interface IEditionReadonlyValueProps {
   row: IEditionReadonlyRow
 }
+
+export interface IEditionDeleteZoneProps {
+  /** Édition supprimable (origine `APP`) : son code se saisit pour confirmer, son statut ajoute la mention des classements. */
+  edition: Pick<IEditionSummary, 'code' | 'year' | 'status'>
+  /** Suppression en cours. */
+  busy?: boolean
+  /** Dernier refus du serveur (409 archive, 404, 403…), affiché sous le bouton. */
+  failure?: IAdminFailure | null
+}
+
+export interface IEditionDeleteZoneEmits {
+  (event: 'confirm'): void
+}
