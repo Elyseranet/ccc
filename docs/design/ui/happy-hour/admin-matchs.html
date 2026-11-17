@@ -53,9 +53,9 @@
       <p class="multi__p"><label for="sm3">Noé Garnier</label><input id="sm3" class="score-in font-display" type="number" inputmode="numeric" min="0" max="3" value="0" aria-describedby="sheet-rule"></p>
       <p class="multi__p" hidden><label for="sm4">Adam Morel</label><input id="sm4" class="score-in font-display" type="number" inputmode="numeric" min="0" max="3" value="2" aria-describedby="sheet-rule"></p>
     </div>
-    <!-- origam-alert status="info" title="Cible 5" density="compact" rounded="lg" (variante par défaut : fond info.bg plein) --><p id="sheet-rule" class="alert alert--info alert--block alert--compact"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Cible 5</span><span class="alert__body">En poule, le vainqueur marque exactement 5 (RG22). Saisir n’est pas valider : le classement ne bouge qu’à la validation.</span></span></p>
+    <!-- origam-alert status="info" title="Cible 5" density="compact" rounded="lg" (variante par défaut : fond info.bg plein) --><p id="sheet-rule" class="alert alert--info alert--block alert--compact"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Cible 5</span><span class="alert__body">En poule, le vainqueur marque exactement 5 (RG22). Valider rend le score public et recalcule le classement.</span></span></p>
     <p class="sheet__meta muted">Saisi par l’administrateur · en attente de validation</p>
-    <div class="sheet__cta"><button class="btn btn--outlined" type="button">Enregistrer</button><button class="btn btn--primary" type="submit">Valider 5–1</button></div>
+    <div class="sheet__cta"><button class="btn btn--primary" type="submit">Valider 5–1</button></div>
   </form>
 </section></main>
 </div>
@@ -69,7 +69,7 @@
     const set = (id, name, v) => { const i = document.getElementById(id); i.max = '10'; i.value = v; document.querySelector('label[for="' + id + '"]').textContent = name }
     set('sa', 'Lou Bernard', '10'); set('sb', 'Nina Perrin', '7')
     document.querySelector('#sheet-rule .alert__title').textContent = 'Cible 10'
-    document.querySelector('#sheet-rule .alert__body').textContent = 'En phase finale, le vainqueur marque exactement 10 (RG22). Saisir n’est pas valider : le tableau ne bouge qu’à la validation.'
+    document.querySelector('#sheet-rule .alert__body').textContent = 'En phase finale, le vainqueur marque exactement 10 (RG22). Valider rend le score public et met le tableau à jour.'
     document.querySelector('.sheet__cta [type="submit"]').textContent = 'Valider 10–7'
   }
 </script>
@@ -84,7 +84,7 @@
     if (four) { document.querySelector('label[for="sm1"]').textContent = 'Jade Fontaine'; document.querySelector('label[for="sm2"]').textContent = 'Louis Chevalier'; document.querySelector('label[for="sm3"]').textContent = 'Rose Lefèvre' }
     document.querySelector('.sheet__h .eyebrow').textContent = four ? 'Départage entre poules · match 2026-109' : 'Poule 5 · départage · match 2026-108'
     document.querySelector('#sheet-rule .alert__title').textContent = 'Cible 3'
-    document.querySelector('#sheet-rule .alert__body').textContent = 'Départage à ' + multi + ' joueurs : le vainqueur marque exactement 3, les autres 0, 1 ou 2 (RG19, RG20). Saisir n’est pas valider : le classement ne bouge qu’à la validation.'
+    document.querySelector('#sheet-rule .alert__body').textContent = 'Départage à ' + multi + ' joueurs : le vainqueur marque exactement 3, les autres 0, 1 ou 2 (RG19, RG20). Valider rend le score public et recalcule le classement.'
     document.querySelector('.sheet__cta [type="submit"]').textContent = 'Valider ' + (four ? '3–1–0–2' : '3–1–0')
   }
 </script>

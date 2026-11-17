@@ -1,11 +1,10 @@
-/** Où en est la saisie : repos, enregistrement ou validation en cours (un seul appel à la fois). */
+/** Où en est la saisie : repos ou validation (enregistrement + validation) en cours. */
 export enum SCORE_ENTRY_PHASE {
   IDLE = 'idle',
-  SAVING = 'saving',
   VALIDATING = 'validating'
 }
 
-/** Ce qui vient de réussir (message de confirmation). */
+/** Ce qui vient de réussir : `SAVED` est l'étape intermédiaire de « Valider » (la ligne se met à jour, pas de message), `VALIDATED` la fin. */
 export enum SCORE_ENTRY_SUCCESS {
   SAVED = 'saved',
   VALIDATED = 'validated'

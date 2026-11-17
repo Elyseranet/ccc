@@ -241,14 +241,10 @@ describe('saisie d’un score (F-08)', () => {
     expect(validations).toHaveBeenCalledWith('"3"')
   })
 
-  it('« Enregistrer » n’appelle que la saisie', async () => {
+  it('F-61 : le formulaire ne propose qu’un bouton « Valider », plus d’« Enregistrer »', async () => {
     await openEntry()
-    await type(0, '1')
-    await type(1, '5')
-    body().querySelector<HTMLButtonElement>('[data-cy="admin-score-save"]')!.click()
-    await vi.waitFor(() => expect(recordings).toHaveBeenCalledTimes(1))
-    await flushPromises()
-    expect(validations).not.toHaveBeenCalled()
+    expect(body().querySelector('[data-cy="admin-score-save"]')).toBeNull()
+    expect(body().querySelector('button[data-cy="admin-score-validate"]')).not.toBeNull()
   })
 })
 
