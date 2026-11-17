@@ -38,7 +38,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-25](B-25.md) | Rouvrir les qualifications tant que le tirage du premier tour n'est pas validé (F-51) | — | B-13 | — | **Fermé** (2026-11-16) @ `279a681b`, vérifié sur dev |
 | [B-26](B-26.md) | Tirage au sort par le serveur, poules et phases finales (amende A1, F-52) | — | B-13 | — | **Fermé** (2026-11-16) @ `ca1795d0`, vérifié sur dev |
 | [B-27](B-27.md) | Tour suivant impossible à tirer après des quarts validés (bloquant) | — | B-26 | — | **Fermé** (2026-11-16) @ `de9890a0`, vérifié sur dev |
-| [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | Ouvert (2026-11-16) |
+| [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | **Fermé** (2026-11-17) @ `c8d4389e` |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
 
@@ -270,15 +270,15 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-50](F-50.md) | Participants : espaces de la carte « Ajouter », champ masqué hors inscriptions, bascule sur l'édition créée | maquette F-09 | F-09, F-13 | **Fermé** (2026-11-16) @ `e6b74b28`, vérifié sur dev | — |
 | [F-51](F-51.md) | Bouton « Rouvrir les qualifications » | maquette F-24 à compléter | B-25, F-24 | **Fermé** (2026-11-16) @ `62068c39`, vérifié sur dev | — |
 | [F-52](F-52.md) | Bouton « Tirer au sort » et écran projecteur (VS), pas à pas | maquette validée 2026-11-16 (`9e492a6c`) | B-26 | **Fermé** (2026-11-16) @ `07641649`, vérifié sur dev | — |
-| [F-53](F-53.md) | Boîtes de confirmation : focus non rendu au déclencheur après Échap | — | F-24, F-51 | Ouvert (2026-11-16) | — |
+| [F-53](F-53.md) | Boîtes de confirmation : focus non rendu au déclencheur après Échap | — | F-24, F-51 | Ouvert : partiellement corrigé (F-60) | — |
 | [F-54](F-54.md) | e2e F-09-draw instable (« Les inscriptions sont closes ») | — | F-09, F-50 | Ouvert (2026-11-16) | — |
 | [F-55](F-55.md) | « Phase finale » ouvre l'étape en cours | — | F-24, F-25 | **Fermé** (2026-11-16) @ `ad227c31`, vérifié sur dev | — |
 | [F-56](F-56.md) | Finale : « Lancer la finale » avec VS, sans tirage ; espace sous « À placer » | maquette F-25/F-52 | F-52, B-27 | **Fermé** (2026-11-16) @ `0a3390b4`, vérifié sur dev | — |
 | [F-57](F-57.md) | Bracket public : colonne « Vainqueur » (nom + logo CCC) | maquette edition.html mise à jour | F-03 | **Fermé** (2026-11-16) @ `cc344c54`, vérifié sur dev | — |
 | [F-58](F-58.md) | Bracket public sur mobile : tours empilés en vertical | maquette edition.html mise à jour | F-03, F-57 | **Fermé** (2026-11-16) @ `7e970270`, vérifié sur dev | — |
-| [F-59](F-59.md) | Clôture : libellé du champ de confirmation invisible | maquette F-26 | F-26 | Ouvert (2026-11-16) | — |
-| [F-60](F-60.md) | Bouton « Supprimer l'édition… » | maquette F-13 à compléter | B-28, F-13 | Ouvert (2026-11-16) | — |
-| [F-61](F-61.md) | Saisie de score : un seul bouton « Valider » | — | F-18 | Ouvert (2026-11-16) | — |
+| [F-59](F-59.md) | Clôture : libellé du champ de confirmation invisible | maquette F-26 | F-26 | Ouvert : mergé, contrôle écran en attente | — |
+| [F-60](F-60.md) | Bouton « Supprimer l'édition… » | maquette F-13 à compléter | B-28, F-13 | Ouvert : mergé, contrôle écran en attente | — |
+| [F-61](F-61.md) | Saisie de score : un seul bouton « Valider » | — | F-18 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
