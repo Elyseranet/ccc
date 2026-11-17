@@ -14,6 +14,7 @@ export const API_ERROR_MESSAGE = {
   EDITION_NOT_FOUND: 'Edition not found',
   CONFLICT: 'Conflict',
   EMAIL_ALREADY_USED: 'Email already used',
+  ACCOUNT_ACTIVE: 'This account is already active: its email is managed by the player',
   EDITION_CLOSED: 'The edition is closed',
   FINAL_NOT_VALIDATED: 'The final must be validated before the edition can be closed',
   EDITION_CODE_EXHAUSTED: 'No edition code left for this year',

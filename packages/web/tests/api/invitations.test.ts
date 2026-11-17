@@ -244,4 +244,97 @@ describe('invitations (B-09)', async () => {
       expect((await post(`/api/v1/competiteurs/${participant.competitorId}/invitation`, {}, adminCookie)).status).toBe(409)
     })
   })
+
+  describe('PUT /competiteurs/{id}/compte (B-29)', () => {
+    const put = (id: string, body: unknown, cookie?: string): Promise<Response> =>
+      fetch(`/api/v1/competiteurs/${id}/compte`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) },
+        body: JSON.stringify(body)
+      })
+    const detail = async (id: string): Promise<{ account?: { status: string, email: string | null, invitationExpiresAt: string | null } }> =>
+      (await getWith(`/api/v1/competiteurs/${id}`, adminCookie)).json()
+
+    it('creates an INVITED account for an archive competitor (normalized email) and sends the invitation', async () => {
+      const archive = await dataSource.getRepository(CompetitorEntity).save({ displayName: 'Archive Joueur', firstName: 'Archive' })
+      expect((await detail(archive.id)).account).toEqual({ status: 'NONE', email: null, invitationExpiresAt: null })
+      const sentBefore = (await mails.read()).length
+
+      const response = await put(archive.id, { email: '  Archive.Joueur@CCC.test ' }, adminCookie)
+      expect(response.status).toBe(200)
+      const body = await response.json() as { accountStatus: string, invitationSent: boolean, invitationExpiresAt: string }
+      expect(body).toMatchObject({ accountStatus: 'INVITED', invitationSent: true })
+      expect(new Date(body.invitationExpiresAt).getTime()).toBeGreaterThan(Date.now())
+
+      const sent = (await mails.read()).slice(sentBefore)
+      expect(sent).toHaveLength(1)
+      expect(sent[0]!.to).toBe('archive.joueur@ccc.test')
+      const user = await dataSource.getRepository(UserEntity).findOneByOrFail({ competitorId: archive.id })
+      expect(user).toMatchObject({ email: 'archive.joueur@ccc.test', role: USER_ROLE.PARTICIPANT, status: USER_STATUS.INVITED })
+      expect(await detail(archive.id)).toMatchObject({ account: { status: 'INVITED', email: 'archive.joueur@ccc.test', invitationExpiresAt: body.invitationExpiresAt } })
+      expect((await post(invitationPath(tokenFromMail(sent[0]!)), { password: PASSWORD })).status).toBe(200)
+    })
+
+    it('corrects the email of an INVITED account: new link works, old link is 410', async () => {
+      const created = await post('/api/v1/competiteurs', { ...IDENTITY, email: 'typo@ccc.test' }, adminCookie)
+      const { competitorId } = await created.json() as { competitorId: string }
+      const oldToken = tokenFromMail((await mails.read()).at(-1)!)
+      const sentBefore = (await mails.read()).length
+
+      const response = await put(competitorId, { email: 'fixed@ccc.test' }, adminCookie)
+      expect(response.status).toBe(200)
+      expect(await response.json()).toMatchObject({ accountStatus: 'INVITED', invitationSent: true })
+      const sent = (await mails.read()).slice(sentBefore)
+      expect(sent).toHaveLength(1)
+      expect(sent[0]!.to).toBe('fixed@ccc.test')
+      const newToken = tokenFromMail(sent[0]!)
+
+      expect(await dataSource.getRepository(UserEntity).countBy({ competitorId })).toBe(1)
+      expect((await detail(competitorId)).account).toMatchObject({ status: 'INVITED', email: 'fixed@ccc.test' })
+      expect((await getWith(invitationPath(oldToken))).status).toBe(410)
+      expect((await getWith(invitationPath(newToken))).status).toBe(200)
+    })
+
+    it('refuses an active account (409 ACCOUNT_ACTIVE) and an email held by another account (409 EMAIL_ALREADY_USED), writing nothing', async () => {
+      const active = await put(participant.competitorId!, { email: 'new@ccc.test' }, adminCookie)
+      expect(active.status).toBe(409)
+      expect(await active.json()).toMatchObject({ code: API_ERROR_CODE.ACCOUNT_ACTIVE })
+      expect((await detail(participant.competitorId!)).account).toMatchObject({ status: 'ACTIVE', email: 'player@ccc.test', invitationExpiresAt: null })
+
+      const archive = await dataSource.getRepository(CompetitorEntity).save({ displayName: 'Autre Archive' })
+      const sentBefore = (await mails.read()).length
+      const taken = await put(archive.id, { email: 'PLAYER@ccc.test' }, adminCookie)
+      expect(taken.status).toBe(409)
+      expect(await taken.json()).toMatchObject({ code: API_ERROR_CODE.EMAIL_ALREADY_USED })
+      expect(await dataSource.getRepository(UserEntity).countBy({ competitorId: archive.id })).toBe(0)
+      expect((await mails.read()).length).toBe(sentBefore)
+    })
+
+    it('answers 401 anonymous, 403 participant, 404 unknown, 400 bad id / email / extra field', async () => {
+      const archive = await dataSource.getRepository(CompetitorEntity).save({ displayName: 'Guard Archive' })
+      expect((await put(archive.id, { email: 'guard@ccc.test' })).status).toBe(401)
+      expect((await put(archive.id, { email: 'guard@ccc.test' }, participantCookie)).status).toBe(403)
+      expect((await put('00000000-0000-4000-8000-000000000000', { email: 'guard@ccc.test' }, adminCookie)).status).toBe(404)
+      expect((await put('not-a-uuid', { email: 'guard@ccc.test' }, adminCookie)).status).toBe(400)
+      expect((await put(archive.id, { email: 'not-an-email' }, adminCookie)).status).toBe(400)
+      expect((await put(archive.id, {}, adminCookie)).status).toBe(400)
+      expect((await put(archive.id, { email: 'guard@ccc.test', role: 'ADMIN' }, adminCookie)).status).toBe(400)
+      expect(await dataSource.getRepository(UserEntity).countBy({ competitorId: archive.id })).toBe(0)
+    })
+
+    it('never exposes the email or the account on public routes', async () => {
+      const archive = await dataSource.getRepository(CompetitorEntity).save({ displayName: 'Public Archive' })
+      expect((await put(archive.id, { email: 'secret.leak@ccc.test' }, adminCookie)).status).toBe(200)
+
+      for (const path of [`/api/v1/competiteurs/${archive.id}`, '/api/v1/competiteurs?q=Public', `/api/v1/competiteurs/${archive.id}/face-a-face`, '/api/v1/editions']) {
+        const anonymous = await getWith(path)
+        const text = await anonymous.text()
+        expect(text).not.toContain('secret.leak')
+        expect(text).not.toContain('"account"')
+      }
+      const asParticipant = await (await getWith(`/api/v1/competiteurs/${archive.id}`, participantCookie)).json() as Record<string, unknown>
+      expect(asParticipant).not.toHaveProperty('account')
+      expect((await getWith(`/api/v1/competiteurs/${archive.id}`, adminCookie)).headers.get('cache-control')).toBe('no-store')
+    })
+  })
 })
