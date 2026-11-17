@@ -33,116 +33,118 @@
       @submit="handleSubmit"
       @reset="handleReset"
     >
-      <div class="identity-form__grid">
-        <div class="identity-form__field identity-form__field--full">
-          <origam-label
-            :for="displayNameId"
-            class="identity-form__label"
-          >
-            <template #default>
-              {{ displayNameLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
-            </template>
-          </origam-label>
-          <origam-text-field
-            :id="displayNameId"
-            v-model="draft.displayName"
-            single-line
-            required
-            rounded="full"
-            autocomplete="off"
-            :hint="displayNameHint"
-            persistent-hint
-            hide-details="auto"
-            :rules="displayNameRules"
-            data-cy="competitor-form-display-name"
-          />
+      <div class="identity-form__fields">
+        <div class="identity-form__grid">
+          <div class="identity-form__field identity-form__field--full">
+            <origam-label
+              :for="displayNameId"
+              class="identity-form__label"
+            >
+              <template #default>
+                {{ displayNameLabel }} <span aria-hidden="true">{{ requiredMark }}</span>
+              </template>
+            </origam-label>
+            <origam-text-field
+              :id="displayNameId"
+              v-model="draft.displayName"
+              single-line
+              required
+              rounded="full"
+              autocomplete="off"
+              :hint="displayNameHint"
+              persistent-hint
+              hide-details="auto"
+              :rules="displayNameRules"
+              data-cy="competitor-form-display-name"
+            />
+          </div>
+          <div class="identity-form__field">
+            <origam-label
+              :for="firstNameId"
+              class="identity-form__label"
+              :text="firstNameLabel"
+            />
+            <origam-text-field
+              :id="firstNameId"
+              v-model="draft.firstName"
+              single-line
+              rounded="full"
+              autocomplete="off"
+              hide-details="auto"
+              :rules="partRules"
+              data-cy="competitor-form-first-name"
+            />
+          </div>
+          <div class="identity-form__field">
+            <origam-label
+              :for="lastNameId"
+              class="identity-form__label"
+              :text="lastNameLabel"
+            />
+            <origam-text-field
+              :id="lastNameId"
+              v-model="draft.lastName"
+              single-line
+              rounded="full"
+              autocomplete="off"
+              hide-details="auto"
+              :rules="partRules"
+              data-cy="competitor-form-last-name"
+            />
+          </div>
+          <div class="identity-form__field identity-form__field--full">
+            <origam-label
+              :for="nicknameId"
+              class="identity-form__label"
+              :text="nicknameLabel"
+            />
+            <origam-text-field
+              :id="nicknameId"
+              v-model="draft.nickname"
+              single-line
+              rounded="full"
+              autocomplete="off"
+              hide-details="auto"
+              :rules="partRules"
+              data-cy="competitor-form-nickname"
+            />
+          </div>
         </div>
-        <div class="identity-form__field">
-          <origam-label
-            :for="firstNameId"
-            class="identity-form__label"
-            :text="firstNameLabel"
-          />
-          <origam-text-field
-            :id="firstNameId"
-            v-model="draft.firstName"
-            single-line
-            rounded="full"
-            autocomplete="off"
-            hide-details="auto"
-            :rules="partRules"
-            data-cy="competitor-form-first-name"
-          />
-        </div>
-        <div class="identity-form__field">
-          <origam-label
-            :for="lastNameId"
-            class="identity-form__label"
-            :text="lastNameLabel"
-          />
-          <origam-text-field
-            :id="lastNameId"
-            v-model="draft.lastName"
-            single-line
-            rounded="full"
-            autocomplete="off"
-            hide-details="auto"
-            :rules="partRules"
-            data-cy="competitor-form-last-name"
-          />
-        </div>
-        <div class="identity-form__field identity-form__field--full">
-          <origam-label
-            :for="nicknameId"
-            class="identity-form__label"
-            :text="nicknameLabel"
-          />
-          <origam-text-field
-            :id="nicknameId"
-            v-model="draft.nickname"
-            single-line
-            rounded="full"
-            autocomplete="off"
-            hide-details="auto"
-            :rules="partRules"
-            data-cy="competitor-form-nickname"
-          />
-        </div>
-      </div>
-      <origam-alert
-        v-if="failure"
-        status="error"
-        rounded="lg"
-        font-size="md"
-        font-weight="bold"
-        letter-spacing="normal"
-        line-height="normal"
-        :title="failureTitle"
-        :text="failureText"
-        data-cy="competitor-form-error"
-      />
-      <div class="identity-form__cta">
-        <origam-btn
-          type="reset"
-          variant="outlined"
-          size="x-large"
+        <origam-alert
+          v-if="failure"
+          status="error"
+          rounded="lg"
           font-size="md"
-          :disabled="pending"
-          :text="cancelLabel"
-          data-cy="competitor-form-cancel"
+          font-weight="bold"
+          letter-spacing="normal"
+          line-height="normal"
+          :title="failureTitle"
+          :text="failureText"
+          data-cy="competitor-form-error"
         />
-        <origam-btn
-          type="submit"
-          class="identity-form__submit"
-          variant="flat"
-          :bg-color="buttonColor"
-          :elevation="buttonElevation"
-          size="x-large"
-          font-size="md"
-          :loading="pending"
-          :text="submitLabel"
-          data-cy="competitor-form-submit"
-        />
+        <div class="identity-form__cta">
+          <origam-btn
+            type="reset"
+            variant="outlined"
+            size="x-large"
+            font-size="md"
+            :disabled="pending"
+            :text="cancelLabel"
+            data-cy="competitor-form-cancel"
+          />
+          <origam-btn
+            type="submit"
+            class="identity-form__submit"
+            variant="flat"
+            :bg-color="buttonColor"
+            :elevation="buttonElevation"
+            size="x-large"
+            font-size="md"
+            :loading="pending"
+            :text="submitLabel"
+            data-cy="competitor-form-submit"
+          />
+        </div>
       </div>
     </origam-form>
     <origam-snackbar
@@ -174,6 +176,8 @@ import type { ICompetitorFormValues, ICompetitorIdentityFormEmits, ICompetitorId
  * Correction de l'identité d'un compétiteur (B-10) : nom affiché (obligatoire), prénom, nom et pseudo. La photo se place dans le
  * slot `photo` : elle a son propre flux (B-16) et ne fait pas avancer la version de l'identité. La validation se fait à
  * l'envoi ; le serveur reste l'autorité. La version (`If-Match`) n'est pas un champ : elle est lue sur la fiche par le composable.
+ * shortcut: `.identity-form__fields` porte le `gap` que `origam-form` ne transmet pas à son enveloppe `__content` (F-63), à retirer
+ * quand origam expose `contentDisplay` sur Form (version non publiée au 2026-11-17).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<ICompetitorIdentityFormProps>(), { pending: false, failure: null, saved: false })
@@ -303,7 +307,8 @@ defineExpose({})
     line-height: var(--origam-font__lineHeight---tight);
   }
 
-  &__form {
+  &__form,
+  &__fields {
     display: grid;
     gap: var(--identity-form---gap, var(--origam-space---5));
   }

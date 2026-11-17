@@ -3,7 +3,6 @@
     tag="section"
     rounded="xl"
     border
-    padding="0"
     class="draw-random-band"
     :aria-labelledby="titleId"
     data-cy="draw-random-band"
@@ -142,16 +141,13 @@ defineExpose({})
 <style scoped lang="scss">
 .draw-random-band {
   margin-bottom: var(--origam-space---4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--origam-space---3) var(--origam-space---5);
+  padding: var(--origam-space---4) var(--origam-space---5);
   background-image: radial-gradient(30rem 12rem at 100% 0%, color-mix(in srgb, var(--origam-color__bar---neon) 22%, transparent), transparent 70%);
-
-  :deep(.origam-card__content) {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--origam-space---3) var(--origam-space---5);
-    padding: var(--origam-space---4) var(--origam-space---5);
-  }
 
   &__text {
     display: grid;

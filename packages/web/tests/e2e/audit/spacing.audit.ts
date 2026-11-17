@@ -10,6 +10,7 @@ import {
   SPACING_AUDIT_DEFAULT_OUT,
   SPACING_AUDIT_INVITATION_PLACEHOLDER,
   SPACING_AUDIT_MIN_GAP,
+  SPACING_AUDIT_RULES,
   SPACING_AUDIT_VIEWPORTS
 } from './spacing.const'
 import type { ISpacingAuditCase, TSpacingAuditRole } from './spacing.const'
@@ -24,19 +25,7 @@ import type { ISpacingAuditCase, TSpacingAuditRole } from './spacing.const'
  * propres enfants (ils sont frères dans la mise en page du parent). Sont ignorés : éléments hors flux (absolute, fixed),
  * en ligne (`display: inline`), invisibles ou de 1 px au plus (texte masqué pour lecteur d'écran).
  *
- * Règles d'exclusion (faux positifs par design), comptées dans le rapport :
- * - `tableau` : parent ou enfant de table (`table`, `tr`, `td`…, rôles row / cell / rowgroup) ;
- * - `liste` : deux items de liste (`li`, rôles option / listitem / menuitem / tab / treeitem, `.origam-list-item`) ;
- * - `bracket` : à l'intérieur d'un tableau à élimination (`.origam-bracket`) ;
- * - `interne-origam` : deux parties internes d'un composant Origam (classes BEM `origam-x__y`) ou l'intérieur d'un
- *   contrôle (bouton, lien, label, champ, puce, avatar, squelette) : mise en page du DS, hors périmètre applicatif ;
- * - `typo` : lignes d'un même élément de texte (parent `h1`..`h6`, `p`, `label`, `small`, `b`, `strong`) ;
- * - `coque` : deux repères de la coque hors `main` (`header`, `main`, `footer`, `nav`, `aside`), ex. barre haute admin posée
- *   sur le `main` : bandes pleine largeur, accolées par design ;
- * - `gap-explicite` : le parent déclare un `row-gap` (même 0 ou 2 px, ex. sur-titre collé au titre) : choix de design ;
- * - `padding` : l'écart VISIBLE atteint le seuil. Un bloc non peint (ni fond, ni bordure, ni ombre, ni texte propre, ni
- *   élément remplacé, ni feuille sans enfant comme une icône) n'est pas vu : son bord visible est celui de son premier (dernier) descendant peint. Ex. bandeau
- *   d'en-tête suivi d'un `main` dont le padding haut écarte le contenu. Un titre et un paragraphe collés restent signalés.
+ * Règles d'exclusion (faux positifs par design) : `SPACING_AUDIT_RULES` (`spacing.const.ts`), recopiées et comptées dans le rapport.
  * Les identifiants (uuid) sont retirés des sélecteurs : une même paire répétée par ligne de données compte une fois.
  *
  * Cause attribuée selon le parent direct (celui à qui il manque l'espacement) : `card__content`, `form__content`,
@@ -118,18 +107,47 @@ const collect = (minGap: number): IFinding[] => {
     return !transparent || style.backgroundImage !== 'none' || bordered || style.boxShadow !== 'none'
   }
 
+  const UNPAINTED_CONTROL_SELECTOR = '.origam-btn, button, a'
+  const FORM_CONTROL_SELECTOR = 'input, select, textarea, [role="combobox"], [role="textbox"], .origam-field'
   const REPLACED_TAGS = new Set(['IMG', 'SVG', 'VIDEO', 'CANVAS', 'INPUT', 'TEXTAREA', 'SELECT', 'IFRAME'])
   const hasOwnText = (el: Element): boolean => [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim() !== '')
   const isInk = (el: Element): boolean => isPainted(el) || REPLACED_TAGS.has(el.tagName.toUpperCase()) || hasOwnText(el) || el.children.length === 0
 
   /** Bord visible d'un bloc : sa boîte s'il est peint, sinon celle du premier (ou dernier) descendant visible qui l'est. */
-  const inkEdge = (el: Element, edge: 'top' | 'bottom'): number => {
-    if (isInk(el)) return el.getBoundingClientRect()[edge]
-    const edges = [...el.querySelectorAll('*')]
+  const textEdges = (el: Element, edge: 'top' | 'bottom'): number[] => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+    const edges: number[] = []
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (!(node.textContent ?? '').trim()) continue
+      const range = document.createRange()
+      range.selectNodeContents(node)
+      const rect = range.getBoundingClientRect()
+      if (rect.height > 0) edges.push(rect[edge])
+    }
+    return edges
+  }
+
+  /** Élément qui porte le bord visible (`source`) et la position de ce bord. */
+  const inkFace = (el: Element, edge: 'top' | 'bottom'): { source: Element, at: number } => {
+    if (el.matches(UNPAINTED_CONTROL_SELECTOR) && !isPainted(el)) {
+      const edges = textEdges(el, edge)
+      if (edges.length) return { source: el, at: edge === 'top' ? Math.min(...edges) : Math.max(...edges) }
+    }
+    if (isInk(el)) return { source: el, at: el.getBoundingClientRect()[edge] }
+    const faces = [...el.querySelectorAll('*')]
       .filter(d => isInk(d) && getComputedStyle(d).visibility !== 'hidden' && d.getBoundingClientRect().height > 1)
-      .map(d => d.getBoundingClientRect()[edge])
-    if (!edges.length) return el.getBoundingClientRect()[edge]
-    return edge === 'top' ? Math.min(...edges) : Math.max(...edges)
+      .map(d => ({ source: d, at: d.getBoundingClientRect()[edge] }))
+    if (!faces.length) return { source: el, at: el.getBoundingClientRect()[edge] }
+    return faces.reduce((best, f) => (edge === 'top' ? f.at < best.at : f.at > best.at) ? f : best)
+  }
+
+  const inkEdge = (el: Element, edge: 'top' | 'bottom'): number => inkFace(el, edge).at
+
+  /** Face de texte en ligne : du texte, sans fond de bloc (une puce en ligne est admise), ni contrôle de formulaire. */
+  const isTextFace = (el: Element): boolean => {
+    if (el.matches(FORM_CONTROL_SELECTOR) || el.closest(FORM_CONTROL_SELECTOR) || el.querySelector(FORM_CONTROL_SELECTOR)) return false
+    if (isPainted(el) && !getComputedStyle(el).display.startsWith('inline')) return false
+    return (el.textContent ?? '').trim() !== ''
   }
 
   const visibleGap = (a: Element, b: Element): number => inkEdge(b, 'top') - inkEdge(a, 'bottom')
@@ -143,6 +161,7 @@ const collect = (minGap: number): IFinding[] => {
     if (LANDMARK_TAGS.has(a.tagName) && LANDMARK_TAGS.has(b.tagName) && !parent.closest('main')) return 'coque'
     if (gap >= 0 && getComputedStyle(parent).rowGap !== 'normal') return 'gap-explicite'
     if (gap >= 0 && visibleGap(a, b) >= minGap) return 'padding'
+    if (gap >= 0 && causeOf(parent) === 'local' && isTextFace(inkFace(a, 'bottom').source) && isTextFace(inkFace(b, 'top').source)) return 'texte-interligne'
     return null
   }
 
@@ -210,6 +229,26 @@ const collect = (minGap: number): IFinding[] => {
   return findings
 }
 
+/**
+ * Relevé de mise en page (`SPACING_AUDIT_LAYOUT=<fichier>`) : pour chaque élément visible portant un `data-cy`, sa hauteur et
+ * sa distance verticale au précédent dans l'ordre du document. Deux relevés (avant / après un changement) se comparent sans
+ * effet de cascade : un décalage en haut de page ne change pas les distances plus bas.
+ */
+const layoutOf = (): Record<string, number[]> => {
+  const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g
+  const out: Record<string, number[]> = {}
+  let previousTop: number | null = null
+  for (const el of document.querySelectorAll('[data-cy]')) {
+    const rect = el.getBoundingClientRect()
+    if (rect.height <= 1 || rect.width <= 1) continue
+    let key = (el.getAttribute('data-cy') ?? '').replace(UUID, '*')
+    for (let n = 2; key in out; n++) key = `${key.split('#')[0]}#${n}`
+    out[key] = [Math.round(rect.height), previousTop === null ? 0 : Math.round(rect.top - previousTop)]
+    previousTop = rect.top
+  }
+  return out
+}
+
 const settle = async (page: Page) => {
   await page.waitForLoadState('networkidle')
   await page.locator('[data-cy="async-state-loading"]').first().waitFor({ state: 'detached', timeout: 10000 }).catch(() => undefined)
@@ -249,6 +288,8 @@ const report = (rows: IRow[], unreached: string[], paths: string[]): string => {
   lines.push('', '## Par page', '', '| page | 1440 | 390 |', '|---|---|---|')
   const pages = [...new Set(kept.map(r => r.path))]
   for (const p of pages) lines.push(`| ${md(p)} | ${kept.filter(r => r.path === p && r.width === 1440).length} | ${kept.filter(r => r.path === p && r.width === 390).length} |`)
+  lines.push('', '## Règles d\'exclusion', '')
+  for (const [rule, text] of Object.entries(SPACING_AUDIT_RULES)) lines.push(`- \`${rule}\` : ${text}`)
   lines.push('', '## Exclusions par règle', '', '| règle | cas |', '|---|---|')
   for (const [k, v] of sorted(count(rows.filter(r => r.excluded), 'excluded'))) lines.push(`| ${md(k)} | ${v} |`)
   if (unreached.length) {
@@ -271,6 +312,7 @@ test('audit des espacements (F-63)', async ({ browser }) => {
   await admin.close()
 
   const rows: IRow[] = []
+  const layout: Record<string, Record<string, number[]>> = {}
   const unreached: string[] = []
   const seen = new Set<string>()
   const visited: string[] = []
@@ -283,6 +325,7 @@ test('audit des espacements (F-63)', async ({ browser }) => {
       const page = await context.newPage()
       await page.setViewportSize(viewport)
       const audit = async (state: string) => {
+        if (process.env.SPACING_AUDIT_LAYOUT) layout[`${displayPath} | ${state} | ${viewport.width}`] = await page.evaluate(layoutOf)
         visited.push(`${displayPath} ${state} ${viewport.width}`)
         for (const f of await page.evaluate(collect, SPACING_AUDIT_MIN_GAP)) {
           const key = [viewport.width, displayPath, f.parent, f.a, f.b].join('|')
@@ -335,4 +378,5 @@ test('audit des espacements (F-63)', async ({ browser }) => {
   const out = resolve(process.env.SPACING_AUDIT_OUT ?? SPACING_AUDIT_DEFAULT_OUT)
   writeFileSync(out, report(rows, unreached, visited))
   writeFileSync(resolve('test-results', 'spacing-audit.json'), JSON.stringify(rows, null, 2))
+  if (process.env.SPACING_AUDIT_LAYOUT) writeFileSync(resolve(process.env.SPACING_AUDIT_LAYOUT), JSON.stringify(layout))
 })

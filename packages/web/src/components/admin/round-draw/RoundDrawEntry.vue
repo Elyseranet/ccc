@@ -293,7 +293,7 @@ defineExpose({})
     list-style: none;
   }
 
-  &__card :deep(.origam-card__content) {
+  &__card {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -345,7 +345,7 @@ defineExpose({})
     animation: round-draw-entry-slot var(--origam-motion__duration---xslow) var(--origam-motion__easing---decelerate) both;
   }
 
-  &__card--new :deep(.origam-card__content) > :not(.round-draw-entry__cap) {
+  &__card--new > :not(.round-draw-entry__cap, .origam-card__underlay, .origam-card__overlay, .origam-card__loader) {
     animation: round-draw-entry-in var(--origam-motion__duration---xslow) var(--origam-motion__easing---decelerate) both;
   }
 

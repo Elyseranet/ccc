@@ -281,7 +281,7 @@ npm run test:e2e      # tous les projets Playwright : routes, a11y, visual, puis
 npm run audit:spacing # audit des espacements (F-63) : blocs frères empilés à moins de 4 px, toutes routes, 1440 et 390
 ```
 
-`audit:spacing` (`packages/web/tests/e2e/audit/spacing.audit.ts`, config `playwright.audit.config.ts`) tourne sur le même serveur, la même base `_test` et les mêmes sessions que les e2e (mêmes variables, voir « e2e sur les vraies données »). Il réécrit `docs/audits/F-63-espacements.md` (chemin surchargeable par `SPACING_AUDIT_OUT`) et le détail brut dans `packages/web/test-results/spacing-audit.json`. Il ne fait échouer aucune suite ; les règles d'exclusion sont décrites en tête du script.
+`audit:spacing` (`packages/web/tests/e2e/audit/spacing.audit.ts`, config `playwright.audit.config.ts`) tourne sur le même serveur, la même base `_test` et les mêmes sessions que les e2e (mêmes variables, voir « e2e sur les vraies données »). Il écrit le rapport dans `packages/web/test-results/spacing-audit.md` et le détail brut dans `spacing-audit.json` (un instantané versionné : `SPACING_AUDIT_OUT=<chemin>`, cf. `docs/audits/F-63-espacements-avant.md` et `-apres.md`). `SPACING_AUDIT_LAYOUT=<fichier>` ajoute un relevé de mise en page (hauteur de chaque `data-cy` et distance au précédent) pour comparer deux versions. Il ne fait échouer aucune suite ; les règles d'exclusion (`SPACING_AUDIT_RULES`) sont recopiées dans le rapport.
 
 `test:api` construit l'application puis la lance contre une base de test. Les variables de connexion sont passées par l'environnement, jamais depuis `.env` copié ailleurs :
 

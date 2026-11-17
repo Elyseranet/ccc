@@ -13,14 +13,16 @@
     @update:model-value="handleOpen"
   >
     <template #[textSlot]>
-      <p
-        v-if="hasText"
-        :id="descriptionId"
-        class="confirm-dialog__text"
-      >
-        {{ text }} <strong v-if="warning">{{ warning }}</strong>
-      </p>
-      <slot name="default" />
+      <div class="confirm-dialog__body">
+        <p
+          v-if="hasText"
+          :id="descriptionId"
+          class="confirm-dialog__text"
+        >
+          {{ text }} <strong v-if="warning">{{ warning }}</strong>
+        </p>
+        <slot name="default" />
+      </div>
     </template>
     <template #[footerSlot]>
       <div class="confirm-dialog__actions">
@@ -63,6 +65,8 @@ import type { IConfirmDialogEmits, IConfirmDialogProps } from '~/interfaces/comm
  * extérieur l'annulent (décision ux 0ea5092e), sauf pendant l'envoi (`persistent`) ; le texte dit la conséquence, et que l'action n'est pas annulable ;
  * focus initial sur « Annuler », bouton de confirmation inactif pendant l'envoi. `origam-dialog` piège le focus et le rend au déclencheur à la fermeture.
  * Les `data-cy` partent de `cyPrefix` (`{préfixe}-dialog`, `-cancel`, `-confirm`).
+ * shortcut: `.confirm-dialog__body` porte le `gap` entre le texte et le slot, que le contenu de carte d'`origam-dialog` n'a pas (F-63) ;
+ * à retirer quand origam expose `--origam-card__content---gap` (version non publiée au 2026-11-17).
  ********************************************************/
 const props = withDefaults(defineProps<IConfirmDialogProps>(), {
   warning: '',
@@ -113,6 +117,12 @@ defineExpose({})
 
 <style scoped lang="scss">
 .confirm-dialog {
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--confirm-dialog__body---gap, var(--origam-space---3));
+  }
+
   &__text {
     margin: 0;
     color: var(--origam-color__text---secondary);
@@ -161,5 +171,6 @@ defineExpose({})
 :root {
   --confirm-dialog__actions---margin-inline: var(--origam-space---4);
   --confirm-dialog__actions---margin-bottom: var(--origam-space---4);
+  --confirm-dialog__body---gap: var(--origam-space---3);
 }
 </style>

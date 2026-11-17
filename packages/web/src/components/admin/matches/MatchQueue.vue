@@ -14,7 +14,6 @@
         rounded="xl"
         border
         elevation="sm"
-        padding="0"
         class="match-queue__card"
         :class="card.cardClass"
         :data-cy="card.dataCy"
@@ -205,16 +204,13 @@ defineExpose({})
   }
 
   &__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: 't t chip' 'a s b' 'act act act';
+    align-items: center;
+    gap: var(--match-queue__card---gap, var(--origam-space---3));
     height: 100%;
-
-    :deep(.origam-card__content) {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      grid-template-areas: 't t chip' 'a s b' 'act act act';
-      align-items: center;
-      gap: var(--match-queue__card---gap, var(--origam-space---3));
-      padding: var(--match-queue__card---padding, var(--origam-space---5));
-    }
+    padding: var(--match-queue__card---padding, var(--origam-space---5));
   }
 
   &__title {
@@ -262,7 +258,7 @@ defineExpose({})
     }
   }
 
-  &__card--multi :deep(.origam-card__content) {
+  &__card--multi {
     grid-template-areas: 't t chip' 'sides sides sides' 'act act act';
     grid-template-rows: auto 1fr auto;
   }

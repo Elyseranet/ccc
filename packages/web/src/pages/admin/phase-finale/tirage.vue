@@ -107,7 +107,6 @@
             rounded="xl"
             border
             elevation="md"
-            padding="0"
             class="admin-round-draw__playoff"
             data-cy="round-draw-playoff"
           >
@@ -442,9 +441,6 @@ defineExpose({})
 
   &__playoff {
     margin-bottom: var(--origam-space---5);
-  }
-
-  &__playoff :deep(.origam-card__content) {
     padding: var(--origam-space---6);
 
     @media (max-width: 760px) {

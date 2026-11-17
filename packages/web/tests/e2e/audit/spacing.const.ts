@@ -74,5 +74,18 @@ export const SPACING_AUDIT_CASES: ISpacingAuditCase[] = [
   { route: ROUTES.ADMIN_COMPETITOR, path: `/admin/competiteurs/${SPACING_AUDIT_COMPETITOR_PLACEHOLDER}`, role: 'admin' }
 ]
 
-/** Rapport versionné (Markdown) ; chemin surchargeable par `SPACING_AUDIT_OUT`. */
-export const SPACING_AUDIT_DEFAULT_OUT = '../../docs/audits/F-63-espacements.md'
+/** Règles d'exclusion, recopiées dans le rapport (le code de chaque règle est dans `spacing.audit.ts`, fonction `exclusion`). */
+export const SPACING_AUDIT_RULES: Record<string, string> = {
+  'tableau': 'parent ou enfant de table (`table`, `tr`, `td`…, rôles row / cell / rowgroup).',
+  'liste': 'deux items de liste (`li`, rôles option / listitem / menuitem / tab / treeitem, `.origam-list-item`).',
+  'bracket': 'à l\'intérieur d\'un tableau à élimination (`.origam-bracket`).',
+  'interne-origam': 'deux parties internes d\'un composant Origam (classes `origam-x__y`) ou intérieur d\'un contrôle (bouton, lien, label, champ, puce, avatar, squelette).',
+  'typo': 'lignes d\'un même élément de texte (parent `h1`..`h6`, `p`, `label`, `small`, `b`, `strong`).',
+  'coque': 'deux repères de la coque hors `main` (`header`, `main`, `footer`, `nav`, `aside`), bandes accolées par design.',
+  'gap-explicite': 'le parent déclare un `row-gap` (même 0 ou 2 px) : choix de design.',
+  'padding': 'l\'écart VISIBLE atteint le seuil : un bloc sans fond, bordure, ombre, texte propre ni élément remplacé ne se voit pas, son bord visible est celui de son premier (dernier) descendant visible ; un bouton ou lien sans fond n\'est vu que par son libellé.',
+  'texte-interligne': 'écart de boîtes de 0 à 3 px entre deux faces de texte en ligne (fin de A et début de B : du texte, sans fond de bloc ni contrôle de formulaire, une puce en ligne admise) : l\'interligne fait l\'espacement, écart identique aux maquettes (mesure dev-f63b, 2026-11-17). Jamais appliquée quand la cause est `card__content`, `form__content`, `dialog` ou `async-state`.'
+}
+
+/** Rapport Markdown, hors dépôt par défaut ; un instantané versionné passe par `SPACING_AUDIT_OUT` (ex. `docs/audits/F-63-espacements-apres.md`). */
+export const SPACING_AUDIT_DEFAULT_OUT = 'test-results/spacing-audit.md'
