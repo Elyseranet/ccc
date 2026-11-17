@@ -1,9 +1,9 @@
-import type { ICompetitorDetail, ICompetitorIdentity, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest, ICompetitorWithTitles } from '../interfaces/competitor.interface.js'
+import type { ICompetitorAccount, ICompetitorDetail, ICompetitorIdentity, ICompetitorListItem, ICompetitorCareer, ICompetitorListQuery, IMatchContext, ICompetitorParticipation, ICompetitorPublic, ICompetitorStats, IUpdateCompetitorRequest, ICompetitorWithTitles } from '../interfaces/competitor.interface.js'
 import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../interfaces/head-to-head.interface.js'
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
-import type { IAccountEmailSet, IInvitationResent, ISetAccountEmailRequest } from '../interfaces/invitation.interface.js'
+import type { IInvitationResent, ISetAccountEmailRequest, IAccountEmailSet } from '../interfaces/invitation.interface.js'
 import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
 import { toIfMatchHeaders } from '../utils/if-match-header.util.js'
 import { BaseService } from './base.service.js'
@@ -20,7 +20,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_PURPOSE } from '../enums/match.enum.js'
 import { toMatchRecord } from '../utils/match-record.mapper.util.js'
-import { competitorNotFound, emailAlreadyUsed, versionConflict } from '../utils/api-error.util.js'
+import { accountActive, competitorNotFound, emailAlreadyUsed, versionConflict } from '../utils/api-error.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { countTitles } from '../utils/ranking.util.js'
 import { computeHeadToHead, computePlayerBalance, computeWinLoss, countedOutcomes, countUnknownResults, resolveMatchOutcome } from '../utils/record.util.js'
@@ -28,11 +28,12 @@ import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { buildContainsPattern } from '../utils/competitor-query.util.js'
 import { sortCompetitors } from '../utils/competitor-sort.util.js'
 import { useDataSource } from '../utils/database.util.js'
-import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
+import { COMPETITOR_ACCOUNT_STATUS, USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
 import { LOG_EVENT } from '../consts/log-event.const.js'
+import { InvitationEntity } from '../server/db/typeorm/entities/invitation.entity.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import type { INewCompetitor } from '../interfaces/competitor-creation.interface.js'
-import type { ICompetitorWithAccount } from '../interfaces/invitation.interface.js'
+import type { IIssuedInvitation, ICompetitorWithAccount, IResentInvitation } from '../interfaces/invitation.interface.js'
 import { buildDisplayName } from '../utils/display-name.util.js'
 import { isEmailCollision } from '../utils/email-collision.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
@@ -91,7 +92,7 @@ export class CompetitorService extends BaseService {
     return this.request<IInvitationResent>(`/competiteurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })
   }
 
-  /** Pose ou corrige l'email d'un compétiteur sans compte ou invité et envoie l'invitation (administrateur, B-29) : 409 compte actif ou email pris. */
+  /** Pose ou corrige l'email du compte (administrateur, B-29) : crée le compte INVITED au besoin, invalide l'ancien lien, envoie l'invitation. 409 `EMAIL_ALREADY_USED` / `ACCOUNT_ACTIVE`. */
   setAccountEmail (id: string, email: string): Promise<IAccountEmailSet> {
     const body: ISetAccountEmailRequest = { email }
     return this.request<IAccountEmailSet>(`/competiteurs/${encodeURIComponent(id)}/compte`, { method: 'PUT', body: { ...body } })
@@ -267,7 +268,22 @@ const findPublicCompetitor = async (db: DataSource, id: string): Promise<ICompet
   return toCompetitorPublic(competitor)
 }
 
-export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail> => {
+/** Compte d'un compétiteur pour l'administrateur (B-29) : email et expiration de l'invitation la plus récente. */
+const loadCompetitorAccount = async (db: DataSource, competitorId: string): Promise<ICompetitorAccount> => {
+  const user = await db.getRepository(UserEntity).findOne({ where: { competitorId }, select: { id: true, email: true, status: true } })
+  if (!user) {
+    return { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null }
+  }
+  const latest = await db.getRepository(InvitationEntity).findOne({ where: { userId: user.id }, order: { createdAt: 'DESC', id: 'DESC' }, select: { id: true, expiresAt: true } })
+  return {
+    status: user.status === USER_STATUS.ACTIVE ? COMPETITOR_ACCOUNT_STATUS.ACTIVE : COMPETITOR_ACCOUNT_STATUS.INVITED,
+    email: user.email,
+    invitationExpiresAt: user.status === USER_STATUS.ACTIVE || !latest ? null : latest.expiresAt.toISOString()
+  }
+}
+
+/** `includeAccount` : réservé à l'administrateur (B-29) ; la fiche publique ne porte jamais `account`. */
+export const getCompetitorDetail = async (id: string, includeAccount = false): Promise<ICompetitorDetail> => {
   const db = await useDataSource()
   const competitor = await findPublicCompetitor(db, id)
   // Version de l'identité, à renvoyer dans `If-Match` de `PATCH /competiteurs/{id}`.
@@ -320,7 +336,7 @@ export const getCompetitorDetail = async (id: string): Promise<ICompetitorDetail
     titles: titlesByCompetitor(participationRows.map((row) => ({ competitorId: id, finalStage: row.finalStage, editionStatus: row.edition.status }))).get(id) ?? 0
   }
 
-  return { ...competitor, version, participations, stats }
+  return { ...competitor, version, participations, stats, ...(includeAccount ? { account: await loadCompetitorAccount(db, id) } : {}) }
 }
 
 const toSummary = (
@@ -438,22 +454,86 @@ export const createCompetitorWithAccount = async (
       nickname: toNullable(input.nickname),
       phone: toNullable(input.phone)
     })
-    const user = await users.save({
-      email,
-      role: USER_ROLE.PARTICIPANT,
-      status: USER_STATUS.INVITED,
-      passwordHash: null,
-      competitorId: competitor.id
-    })
-    // Import dynamique : ce service est aussi chargé par le navigateur (classe CompetitorService, ARCH-2). Un import
-    // statique ferait entrer `node:crypto` (invitation-token.util) dans le graphe client, ce qui casse `nuxt dev`
-    // (module externalisé par Vite, export nommé introuvable). Côté serveur, l'appel ne change pas.
-    const { issueInvitation } = await import('../utils/invitation-store.util.js')
-    const invitation = await issueInvitation(manager, user.id, now)
-    logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_CREATED, { competitorId: competitor.id, userId: user.id })
-    return { competitorId: competitor.id, userId: user.id, ...invitation }
+    const { userId, invitation } = await createInvitedAccount(manager, competitor.id, email, now)
+    return { competitorId: competitor.id, userId, ...invitation }
   } catch (error) {
     // Collision concurrente sur l'email entre le contrôle et l'insertion.
+    throw isEmailCollision(error) ? emailAlreadyUsed() : error
+  }
+}
+
+// Import dynamique : ce service est aussi chargé par le navigateur (classe CompetitorService, ARCH-2). Un import
+// statique ferait entrer `node:crypto` (invitation-token.util) dans le graphe client, ce qui casse `nuxt dev`
+// (module externalisé par Vite, export nommé introuvable). Côté serveur, l'appel ne change pas.
+const issueInvitationLazily = async (manager: EntityManager, userId: string, now: Date): Promise<IIssuedInvitation> => {
+  const { issueInvitation } = await import('../utils/invitation-store.util.js')
+  return issueInvitation(manager, userId, now)
+}
+
+/**
+ * Compte `INVITED` (rôle PARTICIPANT, sans mot de passe) lié à un compétiteur, avec sa première invitation. Partagé par la
+ * création d'un compétiteur et par `PUT /competiteurs/{id}/compte` (B-29). `email` est déjà normalisé ; la collision d'email
+ * remonte brute (`isEmailCollision`) à l'appelant, qui la traduit.
+ */
+const createInvitedAccount = async (
+  manager: EntityManager,
+  competitorId: string,
+  email: string,
+  now: Date
+): Promise<{ userId: string, invitation: IIssuedInvitation }> => {
+  const user = await manager.getRepository(UserEntity).save({
+    email,
+    role: USER_ROLE.PARTICIPANT,
+    status: USER_STATUS.INVITED,
+    passwordHash: null,
+    competitorId
+  })
+  const invitation = await issueInvitationLazily(manager, user.id, now)
+  logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_CREATED, { competitorId, userId: user.id })
+  return { userId: user.id, invitation }
+}
+
+/**
+ * `PUT /competiteurs/{id}/compte` (B-29), dans la transaction de l'appelant ; l'email part APRÈS le commit.
+ * Sans compte : crée le compte INVITED. Compte INVITED : remplace l'email et émet une nouvelle invitation (ancien lien 410).
+ * 404 compétiteur inconnu ; 409 `ACCOUNT_ACTIVE` si le compte est actif ; 409 `EMAIL_ALREADY_USED` si l'email appartient à un autre compte.
+ * La ligne du compétiteur est verrouillée : deux PUT concurrents ne créent pas deux comptes.
+ */
+export const setCompetitorAccountEmail = async (
+  manager: EntityManager,
+  competitorId: string,
+  rawEmail: string,
+  now = new Date()
+): Promise<IResentInvitation> => {
+  const email = normalizeEmail(rawEmail)
+  const competitor = await manager.findOne(CompetitorEntity, {
+    where: { id: competitorId },
+    select: { id: true, firstName: true },
+    lock: { mode: 'pessimistic_write' }
+  })
+  if (!competitor) {
+    throw competitorNotFound()
+  }
+  const users = manager.getRepository(UserEntity)
+  const existing = await users.findOne({ where: { competitorId } })
+  if (existing?.status === USER_STATUS.ACTIVE) {
+    throw accountActive()
+  }
+  const owner = await users.findOne({ where: { email }, select: { id: true } })
+  if (owner && owner.id !== existing?.id) {
+    throw emailAlreadyUsed()
+  }
+
+  try {
+    if (existing) {
+      await users.update({ id: existing.id }, { email })
+    }
+    const { userId, invitation } = existing
+      ? { userId: existing.id, invitation: await issueInvitationLazily(manager, existing.id, now) }
+      : await createInvitedAccount(manager, competitorId, email, now)
+    logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_EMAIL_SET, { competitorId, userId, created: !existing })
+    return { ...invitation, userId, email, firstName: competitor.firstName ?? '' }
+  } catch (error) {
     throw isEmailCollision(error) ? emailAlreadyUsed() : error
   }
 }

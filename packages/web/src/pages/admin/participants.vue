@@ -293,7 +293,11 @@ const handleResend = (competitorId: string) => {
 const inviteId = ref<string | null>(null)
 const inviteName = ref('')
 const inviteOpen = computed(() => inviteId.value !== null)
-useFocusReturn(inviteOpen)
+// Après un envoi réussi, « Inviter » a disparu : le focus va à « Renvoyer » de la même ligne.
+const resendAfterInvite = (): HTMLElement | null => document.querySelector<HTMLElement>(
+  `[data-cy="participant-resend"][aria-label="${CSS.escape(t('admin.participants.resend_for', 'Renvoyer l’invitation à {name}', { name: inviteName.value }))}"]`
+)
+useFocusReturn(inviteOpen, resendAfterInvite)
 const handleInvite = (competitorId: string, displayName: string) => {
   resetInvite()
   inviteName.value = displayName

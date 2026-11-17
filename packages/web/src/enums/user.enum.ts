@@ -8,7 +8,7 @@ export enum USER_STATUS {
   ACTIVE = 'ACTIVE'
 }
 
-/** État du compte d'un compétiteur dans son détail admin (B-29) : `NONE` pour un compétiteur sans compte (archive). */
+/** État du compte d'un compétiteur sur sa fiche admin (B-29) : `NONE` pour un compétiteur sans compte (archive). */
 export enum COMPETITOR_ACCOUNT_STATUS {
   NONE = 'NONE',
   INVITED = 'INVITED',

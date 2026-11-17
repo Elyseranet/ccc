@@ -162,7 +162,7 @@ test.describe('admin inscrits : « Inviter » un joueur sans compte', () => {
     await expect(page.getByTestId('participant-feedback')).toContainText(`Invitation envoyée à ${email}`)
     await expect(page.getByTestId('participant-invite-dialog')).toBeHidden()
     await expect(page.getByTestId('participant-account-INVITED').first()).toBeVisible()
-    await expect(page.getByRole('button', { name: `Renvoyer l’invitation à ${player.displayName}` })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Renvoyer l’invitation à ${player.displayName}` })).toBeFocused()
     expect(readCapturedMails().some(mail => mail.to === email)).toBe(true)
   })
 

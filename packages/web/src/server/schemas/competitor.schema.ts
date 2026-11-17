@@ -30,6 +30,11 @@ export const newCompetitorSchema = z.object({
   phone: z.string().trim().regex(PHONE_PATTERN, 'Invalid phone number').nullable().optional()
 }).strict()
 
+/** `PUT /competiteurs/{id}/compte` : l'email est rogné avant validation, puis normalisé comme à la création. */
+export const setAccountEmailSchema = z.object({
+  email: z.string().trim().pipe(z.email().max(EMAIL_MAX_LENGTH))
+}).strict()
+
 const namePart = z.string().trim().min(1).max(COMPETITOR_NAME_PART_MAX_LENGTH).nullable().optional()
 
 /** Identité corrigeable par l'administrateur. Pas d'avatar (B-16) ni de téléphone : `.strict()` les refuse en 400. */
