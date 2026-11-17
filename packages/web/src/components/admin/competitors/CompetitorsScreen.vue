@@ -61,6 +61,16 @@
               />
             </template>
           </competitor-identity-form>
+          <competitor-account-block
+            v-if="competitor"
+            class="competitors-screen__account"
+            :account="competitor.account ?? null"
+            :pending="accountPending"
+            :failure="accountFailure"
+            :feedback="accountFeedback"
+            @submit="handleAccountSubmit"
+            @dismiss="resetAccount"
+          />
         </async-state>
       </div>
     </div>
@@ -68,7 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
+import CompetitorAccountBlock from '~/components/admin/competitors/CompetitorAccountBlock.vue'
 import CompetitorPhoto from '~/components/admin/competitors/CompetitorPhoto.vue'
 import CompetitorIdentityForm from '~/components/admin/competitors/CompetitorIdentityForm.vue'
 import CompetitorsTable from '~/components/admin/competitors/CompetitorsTable.vue'
@@ -76,11 +87,13 @@ import CompetitorsToolbar from '~/components/admin/competitors/CompetitorsToolba
 import ReferenceHead from '~/components/admin/ReferenceHead.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import { useAdminCompetitors } from '~/composables/useAdminCompetitors'
+import { useCompetitorAccount } from '~/composables/useCompetitorAccount'
 import { useCompetitorIdentity } from '~/composables/useCompetitorIdentity'
 import { useCompetitorPhoto } from '~/composables/useCompetitorPhoto'
 import { useT } from '~/composables/useT'
 import { ADMIN_COMPETITORS_PAGE_SIZE } from '~/consts/admin-competitors.const'
 import type { ACCOUNT_ERROR } from '~/enums/account.enum'
+import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
 import type { ICompetitorFormValues, ICompetitorsScreenProps } from '~/interfaces/admin-competitors.interface'
 import { toCompetitorFormValues } from '~/utils/admin-competitors.util'
 
@@ -128,6 +141,25 @@ const handleSubmit = (submitted: ICompetitorFormValues) => {
 }
 
 /*********************************************************
+ * Compte
+ *
+ * @description
+ * Email et invitation (F-62, B-29), indépendants de l'identité. Après un envoi réussi, ou un 409 « compte actif » (l'état affiché était
+ * périmé), la fiche est rechargée. Changer de compétiteur efface le retour précédent.
+ ********************************************************/
+const { submit: submitAccount, reset: resetAccount, pending: accountPending, failure: accountFailure, feedback: accountFeedback } = useCompetitorAccount()
+watch(competitorId, resetAccount)
+const handleAccountSubmit = async (email: string) => {
+  if (!competitorId.value) {
+    return
+  }
+  const done = await submitAccount(competitorId.value, email)
+  if (done || accountFailure.value?.code === API_ERROR_CODE.ACCOUNT_ACTIVE) {
+    await Promise.all([refresh(), refreshList()])
+  }
+}
+
+/*********************************************************
  * Photo
  *
  * @description
@@ -170,6 +202,10 @@ defineExpose({})
   &__list,
   &__panel {
     min-width: 0;
+  }
+
+  &__account {
+    margin-block-start: var(--competitors-screen__grid---gap, var(--origam-space---5));
   }
 
   &__hint {

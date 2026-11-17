@@ -1,4 +1,9 @@
-import { ADMIN_COMPETITOR_FAILURE_MESSAGES, ADMIN_COMPETITORS_PAGE_SIZE, ADMIN_COMPETITORS_QUERY_KEYS } from '../consts/admin-competitors.const.js'
+import { ADMIN_ACCOUNT_FAILURE_MESSAGES, ADMIN_COMPETITOR_FAILURE_MESSAGES, ADMIN_COMPETITORS_PAGE_SIZE, ADMIN_COMPETITORS_QUERY_KEYS } from '../consts/admin-competitors.const.js'
+import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
+import { EMAIL_MAX_LENGTH } from '../consts/auth.const.js'
+import { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
+import type { IParticipantFeedback } from '../interfaces/admin-participants.interface.js'
+import type { IAccountEmailSet } from '../interfaces/invitation.interface.js'
 import { COMPETITOR_DEFAULT_SORT, COMPETITOR_SEARCH_MAX_LENGTH, COMPETITOR_SEARCH_MIN_LENGTH } from '../consts/competitor.const.js'
 import { ROUTES } from '../consts/routes.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
@@ -72,6 +77,23 @@ export const buildAdminCompetitorsLocationQuery = (
 export const buildAdminCompetitorLink = (id: string): string => `${ROUTES.ADMIN_COMPETITORS}/${encodeURIComponent(id)}`
 
 export const toCompetitorFailure = (cause: unknown): IAdminFailure => toAdminFailure(cause, ADMIN_COMPETITOR_FAILURE_MESSAGES)
+
+export const toAccountFailure = (cause: unknown): IAdminFailure => toAdminFailure(cause, ADMIN_ACCOUNT_FAILURE_MESSAGES)
+
+/** Même contrôle que le formulaire de création (F-09) ; le serveur reste l'autorité. */
+export const isAccountEmailValid = (value: string | null | undefined): boolean => {
+  const email = (value ?? '').trim()
+  return email.length > 0 && email.length <= EMAIL_MAX_LENGTH && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+/** Date d'expiration d'une invitation, en toutes lettres (« 24 novembre 2026 »). */
+export const formatInvitationExpiry = (iso: string): string =>
+  new Intl.DateTimeFormat(ADMIN_DATE_LOCALE, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(iso))
+
+/** Retour d'un envoi d'invitation : succès, ou avertissement quand le compte existe mais que le mail n'est pas parti. */
+export const toAccountFeedback = (result: IAccountEmailSet, email: string): IParticipantFeedback => result.invitationSent
+  ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_sent', fallback: 'Invitation envoyée à {email}', params: { email } } }
+  : { status: FEEDBACK_STATUS.WARNING, message: { key: 'admin.account.feedback_not_sent', fallback: 'Compte créé pour {email}, mais l’invitation n’a pas pu être envoyée : renvoyez-la.', params: { email } } }
 
 /** 412 : la fiche a changé depuis sa lecture, l'écran la recharge. */
 export const isVersionConflict = (failure: IAdminFailure | null): boolean => failure?.code === API_ERROR_CODE.VERSION_CONFLICT

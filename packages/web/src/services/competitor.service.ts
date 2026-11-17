@@ -3,7 +3,7 @@ import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../inter
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
-import type { IInvitationResent } from '../interfaces/invitation.interface.js'
+import type { IAccountEmailSet, IInvitationResent, ISetAccountEmailRequest } from '../interfaces/invitation.interface.js'
 import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
 import { toIfMatchHeaders } from '../utils/if-match-header.util.js'
 import { BaseService } from './base.service.js'
@@ -89,6 +89,12 @@ export class CompetitorService extends BaseService {
   /** Renvoie l'invitation (B-09) : l'ancien lien est invalidé. */
   resendInvitation (id: string): Promise<IInvitationResent> {
     return this.request<IInvitationResent>(`/competiteurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })
+  }
+
+  /** Pose ou corrige l'email d'un compétiteur sans compte ou invité et envoie l'invitation (administrateur, B-29) : 409 compte actif ou email pris. */
+  setAccountEmail (id: string, email: string): Promise<IAccountEmailSet> {
+    const body: ISetAccountEmailRequest = { email }
+    return this.request<IAccountEmailSet>(`/competiteurs/${encodeURIComponent(id)}/compte`, { method: 'PUT', body: { ...body } })
   }
 
   /** Corrige l'identité (administrateur, B-10) : `version` est celle lue par `detail`, envoyée en `If-Match` (obligatoire, 428 sans elle, 412 si périmée). */

@@ -87,6 +87,19 @@
                   @click="handleResend(item.competitorId)"
                 />
                 <origam-btn
+                  v-if="canInvite(item.accountState)"
+                  variant="text"
+                  color="primary"
+                  font-size="sm"
+                  padding-inline="4"
+                  aria-haspopup="dialog"
+                  :disabled="isBusy"
+                  :text="inviteLabel"
+                  :aria-label="inviteAria(item.displayName)"
+                  data-cy="participant-invite"
+                  @click="handleInvite(item)"
+                />
+                <origam-btn
                   v-if="editable"
                   variant="text"
                   font-size="sm"
@@ -189,6 +202,10 @@ const chipOf = (state: ACCOUNT_STATE) => {
   return { color: chip.color, bgColor: chip.bgColor, label: t(chip.text.key, chip.text.fallback) }
 }
 const canResend = (state: ACCOUNT_STATE | null): boolean => state === ACCOUNT_STATE.INVITED || state === ACCOUNT_STATE.INVITATION_EXPIRED
+const inviteLabel = computed(() => t('admin.participants.invite', 'Inviter'))
+const inviteAria = (name: string): string => t('admin.participants.invite_for', 'Inviter {name}', { name })
+/** Un joueur sans compte (archive) s’invite en saisissant son email (F-62) ; un invité se renvoie. */
+const canInvite = (state: ACCOUNT_STATE | null): boolean => state === null
 
 /*********************************************************
  * En-têtes
@@ -212,6 +229,9 @@ const headers = computed<IDataTableHeader[]>(() => [
  ********************************************************/
 const handleRemove = (participationId: string) => {
   emits('remove', participationId)
+}
+const handleInvite = (row: IParticipantRow) => {
+  emits('invite', row.competitorId, row.displayName)
 }
 const handleResend = (competitorId: string) => {
   emits('resend', competitorId)

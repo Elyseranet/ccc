@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { useAdminEditionStore } from '~/composables/useAdminEditionStore'
+import { useCompetitorAccount } from '~/composables/useCompetitorAccount'
 import { useEditions } from '~/composables/useEditions'
 import { useT } from '~/composables/useT'
 import { ADMIN_PARTICIPANTS_CACHE_KEY } from '~/consts/admin-participants.const'
@@ -201,6 +202,30 @@ export const useAdminParticipants = () => {
     }
   }
 
+  /**
+   * « Inviter » (F-62) : l'email d'un joueur sans compte, puis l'invitation (`useCompetitorAccount`). Succès : retour en snackbar et liste
+   * rechargée ; refus : `invite.failure` reste affiché dans la boîte, sauf `ACCOUNT_ACTIVE` qui apprend l'état réel (liste rechargée).
+   */
+  const account = useCompetitorAccount()
+  const invite = async (competitorId: string, email: string): Promise<boolean> => {
+    if (busy.value) {
+      return false
+    }
+    busy.value = true
+    try {
+      const done = await account.submit(competitorId, email)
+      if (done) {
+        feedback.value = account.feedback.value
+      }
+      if (done || account.failure.value?.code === API_ERROR_CODE.ACCOUNT_ACTIVE) {
+        await reload()
+      }
+      return done
+    } finally {
+      busy.value = false
+    }
+  }
+
   return {
     edition,
     participants,
@@ -219,6 +244,9 @@ export const useAdminParticipants = () => {
     retryAvatar,
     remove,
     resend,
+    invite,
+    inviteFailure: account.failure,
+    resetInvite: account.reset,
     dismissFeedback
   }
 }
