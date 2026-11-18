@@ -64,5 +64,10 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.QUALIFICATION_FINALIZE]: { file: 'editions/[id]/qualification.post.ts' },
   [API_ENDPOINT.QUALIFICATION_REOPEN]: { file: 'editions/[id]/qualification.delete.ts' },
   [API_ENDPOINT.TIEBREAK_CREATE]: { file: 'editions/[id]/departages.post.ts' },
-  [API_ENDPOINT.TIEBREAK_DELETE]: { file: 'editions/[id]/departages/[matchId].delete.ts' }
+  [API_ENDPOINT.TIEBREAK_DELETE]: { file: 'editions/[id]/departages/[matchId].delete.ts' },
+  [API_ENDPOINT.ADMINS]: { file: 'admin/administrateurs/index.get.ts', pendingTicket: 'B-31' },
+  [API_ENDPOINT.ADMIN_INVITE]: { file: 'admin/administrateurs/index.post.ts', pendingTicket: 'B-31' },
+  [API_ENDPOINT.ADMIN_INVITATION_RESEND]: { file: 'admin/administrateurs/[id]/invitation.post.ts', pendingTicket: 'B-31' },
+  [API_ENDPOINT.ADMIN_EMAIL_UPDATE]: { file: 'admin/administrateurs/[id]/index.patch.ts', pendingTicket: 'B-31' },
+  [API_ENDPOINT.ADMIN_REVOKE]: { file: 'admin/administrateurs/[id]/index.delete.ts', pendingTicket: 'B-31' }
 }

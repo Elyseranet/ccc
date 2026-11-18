@@ -20,6 +20,7 @@ export const ROUTES = {
   ADMIN_EDITION: '/admin/editions/:code',
   ADMIN_COMPETITORS: '/admin/competiteurs',
   ADMIN_COMPETITOR: '/admin/competiteurs/:id',
+  ADMIN_ADMINISTRATORS: '/admin/administrateurs',
   EDITION: '/editions/:id',
   PLAYER: '/joueurs/:id',
   HEAD_TO_HEAD: '/joueurs/face-a-face',

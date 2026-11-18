@@ -17,16 +17,16 @@ import { buildMe } from '../../helpers/me'
 const mountPage = () => mountSuspended(AdminMorePage, { route: ROUTES.ADMIN_MORE, global: { components: { RouterLink } } })
 
 describe('page « Plus » de l’admin (F-12)', () => {
-  it('propose exactement Éditions, Compétiteurs, Phase finale, Participants, site public et Mon compte, sans rien de ce que masque FA-09', () => {
-    expect(ADMIN_MORE_ITEMS.map(item => item.to)).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
+  it('propose exactement Éditions, Compétiteurs, Phase finale, Participants, Administrateurs (F-68), site public et Mon compte, sans rien de ce que masque FA-09', () => {
+    expect(ADMIN_MORE_ITEMS.map(item => item.to)).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.ADMIN_ADMINISTRATORS, ROUTES.HOME, ROUTES.PROFILE])
   })
 
-  it('en production, les six entrées sont visibles : toutes leurs pages sont livrées (PAGE_DELIVERY, F-12b, F-13, F-24, T-REL-05)', () => {
+  it('en production, les sept entrées sont visibles : toutes leurs pages sont livrées (PAGE_DELIVERY, F-12b, F-13, F-24, T-REL-05)', () => {
     const production = ADMIN_MORE_ITEMS.filter(item => isPageAccessible(item.to, false)).map(item => item.to)
-    expect(production).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.HOME, ROUTES.PROFILE])
+    expect(production).toEqual([ROUTES.ADMIN_EDITIONS, ROUTES.ADMIN_COMPETITORS, ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_PARTICIPANTS, ROUTES.ADMIN_ADMINISTRATORS, ROUTES.HOME, ROUTES.PROFILE])
   })
 
-  it('rend un h1 unique, six entrées traduites en test (pages non livrées visibles hors production), le sélecteur d’édition et la déconnexion', async () => {
+  it('rend un h1 unique, sept entrées traduites en test (pages non livrées visibles hors production), le sélecteur d’édition et la déconnexion', async () => {
     const wrapper = await mountPage()
     expect(wrapper.findAll('h1')).toHaveLength(1)
     expect(wrapper.get('h1').text()).toBe('Plus')
@@ -36,9 +36,10 @@ describe('page « Plus » de l’admin (F-12)', () => {
     expect(nav.text()).toContain('Éditions')
     expect(nav.text()).toContain('Compétiteurs')
     expect(nav.text()).toContain('Participants')
+    expect(nav.text()).toContain('Administrateurs')
     expect(nav.text()).toContain('Voir le site public')
     expect(nav.text()).toContain('Mon compte')
-    expect(nav.findAll('a')).toHaveLength(6)
+    expect(nav.findAll('a')).toHaveLength(7)
     expect(wrapper.find('[data-cy="admin-more-edition-select"]').exists()).toBe(true)
     expect(wrapper.get('[data-cy="admin-more-logout"]').text()).toBe('Se déconnecter')
   })

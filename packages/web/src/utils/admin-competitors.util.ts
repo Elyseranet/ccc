@@ -3,7 +3,7 @@ import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
 import { EMAIL_MAX_LENGTH } from '../consts/auth.const.js'
 import { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { IParticipantFeedback } from '../interfaces/admin-participants.interface.js'
-import type { IAccountEmailSet } from '../interfaces/invitation.interface.js'
+import type { IInvitationResent } from '../interfaces/invitation.interface.js'
 import { COMPETITOR_DEFAULT_SORT, COMPETITOR_SEARCH_MAX_LENGTH, COMPETITOR_SEARCH_MIN_LENGTH } from '../consts/competitor.const.js'
 import { ROUTES } from '../consts/routes.const.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
@@ -91,7 +91,7 @@ export const formatInvitationExpiry = (iso: string): string =>
   new Intl.DateTimeFormat(ADMIN_DATE_LOCALE, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(iso))
 
 /** Retour d'un envoi d'invitation : succès, ou avertissement quand le compte existe mais que le mail n'est pas parti. */
-export const toAccountFeedback = (result: IAccountEmailSet, email: string): IParticipantFeedback => result.invitationSent
+export const toAccountFeedback = (result: Pick<IInvitationResent, 'invitationSent'>, email: string): IParticipantFeedback => result.invitationSent
   ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_sent', fallback: 'Invitation envoyée à {email}', params: { email } } }
   : { status: FEEDBACK_STATUS.WARNING, message: { key: 'admin.account.feedback_not_sent', fallback: 'Compte créé pour {email}, mais l’invitation n’a pas pu être envoyée : renvoyez-la.', params: { email } } }
 

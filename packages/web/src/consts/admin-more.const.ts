@@ -1,3 +1,4 @@
+import IconAdmins from '~/components/icons/IconAdmins.vue'
 import IconAccount from '~/components/icons/IconAccount.vue'
 import IconCompetitors from '~/components/icons/IconCompetitors.vue'
 import IconEditions from '~/components/icons/IconEditions.vue'
@@ -35,6 +36,13 @@ export const ADMIN_MORE_ITEMS: IAdminMoreItem[] = [
     description: { key: 'admin.more.participants_description', label: 'Inscrire, inviter, renvoyer une invitation' },
     to: ROUTES.ADMIN_PARTICIPANTS,
     icon: IconParticipants
+  },
+  {
+    key: 'admin.more.administrators',
+    label: 'Administrateurs',
+    description: { key: 'admin.more.administrators_description', label: 'Inviter, corriger, retirer un accès' },
+    to: ROUTES.ADMIN_ADMINISTRATORS,
+    icon: IconAdmins
   },
   {
     key: 'admin.more.public_site',

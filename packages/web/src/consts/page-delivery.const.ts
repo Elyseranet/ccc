@@ -216,6 +216,17 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
       API_ENDPOINT.COMPETITOR_AVATAR_DELETE
     ]
   },
+  [ROUTES.ADMIN_ADMINISTRATORS]: {
+    delivered: true,
+    layout: LAYOUT.ADMIN,
+    endpoints: [
+      API_ENDPOINT.ADMINS,
+      API_ENDPOINT.ADMIN_INVITE,
+      API_ENDPOINT.ADMIN_INVITATION_RESEND,
+      API_ENDPOINT.ADMIN_EMAIL_UPDATE,
+      API_ENDPOINT.ADMIN_REVOKE
+    ]
+  },
   [ROUTES.ADMIN_MORE]: {
     delivered: true,
     layout: LAYOUT.ADMIN,
