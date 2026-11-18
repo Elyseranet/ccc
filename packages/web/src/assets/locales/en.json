@@ -1683,5 +1683,22 @@
   "admin.account.error_validation_title": "Invalid email.",
   "admin.account.error_validation_text": "Enter a complete email address, for example firstname@example.com.",
   "admin.account.error_unknown_title": "Something went wrong.",
-  "admin.account.error_unknown_text": "The invitation could not be prepared: try again."
+  "admin.account.error_unknown_text": "The invitation could not be prepared: try again.",
+  "admin.account.chip_admin": "Administrator",
+  "admin.account.state_linked": "Card linked to the administrator account {email}.",
+  "admin.account.readonly_admin": "Account email: {email}. The administrator manages it themselves, it cannot be changed here.",
+  "admin.account.feedback_linked": "Card linked to the account {email}",
+  "admin.account.error_linked_title": "Administrator already linked.",
+  "admin.account.error_linked_text": "This administrator account is already linked to another card: choose another one.",
+  "admin.account.link_open": "Link to an administrator account…",
+  "admin.account.link_prompt": "Is this player an administrator?",
+  "admin.account.link_blocked_active": "Unavailable: this card has an active player account.",
+  "admin.account.link_blocked_none": "Unavailable: every administrator already has a linked card.",
+  "admin.account.link_title": "Link {name} to an administrator",
+  "admin.account.link_text": "The chosen account gets {name}’s statistics. No invitation is sent.",
+  "admin.account.link_warning": "{name} has a pending player invitation ({email}). Their invited account is deleted and the link that was sent will no longer work.",
+  "admin.account.link_field": "Administrator account",
+  "admin.account.link_confirm": "Link",
+  "admin.account.link_invited_suffix": "invited",
+  "admin.account.link_unavailable": "The administrators list could not be loaded: close the dialog and try again."
 }

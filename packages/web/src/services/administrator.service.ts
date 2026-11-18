@@ -9,11 +9,10 @@ import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import { accountActive, alreadyAdmin, cannotRevokeSelf, emailAlreadyUsed, lastAdmin, notFound, promotionConfirmationRequired } from '../utils/api-error.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
 import { isEmailCollision } from '../utils/email-collision.util.js'
-import { issueInvitation } from '../utils/invitation-store.util.js'
 import { logger } from '../utils/logger.util.js'
-import { revokeAllSessions } from '../utils/session-store.util.js'
+import type { IBaseServiceOptions } from '../interfaces/api-client.interface.js'
+import { BaseService } from './base.service.js'
 import { replaceInvitedAccountEmail } from './competitor.service.js'
-import { sendInvitationEmail } from './invitation.service.js'
 
 /*********************************************************
  * administrator.service
@@ -24,9 +23,33 @@ import { sendInvitationEmail } from './invitation.service.js'
  * Les logs ne portent que des identifiants : jamais d'email, de jeton ni de lien.
  ********************************************************/
 
+/*********************************************************
+ * AdministratorService
+ *
+ * @description
+ * Classe navigateur ($fetch, via BaseService) du domaine « administrateurs » (ARCH-2 : fusionnée avec les fonctions serveur ci-dessous,
+ * jamais référencées par le code navigateur). F-69 y met la lecture `GET /admin/administrateurs` ; F-68 y ajoute invitation, correction,
+ * renvoi et retrait.
+ ********************************************************/
+export class AdministratorService extends BaseService {
+  constructor (options: IBaseServiceOptions = {}) {
+    super(options)
+  }
+
+  list (): Promise<IAdminAccount[]> {
+    return this.request<IAdminAccount[]>('/admin/administrateurs')
+  }
+}
+
+/** Modules serveur (node:crypto, nodemailer) chargés à l'appel : ce fichier porte aussi la classe navigateur, le build de développement ne doit pas les atteindre (comme `competitor.service`). */
+const loadIssueInvitation = async () => (await import('../utils/invitation-store.util.js')).issueInvitation
+const loadRevokeAllSessions = async () => (await import('../utils/session-store.util.js')).revokeAllSessions
+
 /** Envoie le mail d'une écriture déjà validée ; `false` si l'envoi échoue (journalisé sans email par `sendInvitationEmail`). */
-export const sendAdministratorEmail = ({ userId, email, firstName, kind, invitation }: IAdminMailPayload): Promise<boolean> =>
-  sendInvitationEmail({ userId, email, firstName, kind, token: invitation?.invitationToken })
+export const sendAdministratorEmail = async ({ userId, email, firstName, kind, invitation }: IAdminMailPayload): Promise<boolean> => {
+  const { sendInvitationEmail } = await import('./invitation.service.js')
+  return sendInvitationEmail({ userId, email, firstName, kind, token: invitation?.invitationToken })
+}
 
 /** Compte `ADMIN` verrouillé (`FOR UPDATE`), avec sa fiche pour le prénom du mail. 404 s'il n'existe pas ou n'est pas administrateur. */
 const lockAdministrator = async (manager: EntityManager, id: string): Promise<UserEntity> => {
@@ -106,7 +129,7 @@ export const inviteAdministrator = async (
       })
       if (!existing) {
         const created = await users.save({ email, role: USER_ROLE.ADMIN, status: USER_STATUS.INVITED, passwordHash: null, competitorId: null })
-        const invitation = await issueInvitation(manager, created.id, now)
+        const invitation = await (await loadIssueInvitation())(manager, created.id, now)
         return { userId: created.id, email, firstName: '', kind: INVITATION_EMAIL_KIND.ADMIN, invitation, promoted: false, accountStatus: USER_STATUS.INVITED }
       }
       if (existing.role === USER_ROLE.ADMIN) {
@@ -122,7 +145,7 @@ export const inviteAdministrator = async (
         email,
         firstName: existing.competitor?.firstName ?? '',
         kind: invited ? INVITATION_EMAIL_KIND.ADMIN : INVITATION_EMAIL_KIND.ADMIN_PROMOTED,
-        invitation: invited ? await issueInvitation(manager, existing.id, now) : null,
+        invitation: invited ? await (await loadIssueInvitation())(manager, existing.id, now) : null,
         promoted: true,
         accountStatus: existing.status
       }
@@ -142,7 +165,7 @@ export const resendAdministratorInvitation = (dataSource: DataSource, actorUserI
     if (user.status === USER_STATUS.ACTIVE) {
       throw accountActive()
     }
-    const invitation = await issueInvitation(manager, user.id, now)
+    const invitation = await (await loadIssueInvitation())(manager, user.id, now)
     logger.info(LOG_EVENT.ADMIN_INVITATION_RESENT, { actorUserId, targetUserId: user.id })
     return { userId: user.id, email: user.email, firstName: user.competitor?.firstName ?? '', kind: INVITATION_EMAIL_KIND.ADMIN, invitation }
   })
@@ -201,7 +224,7 @@ export const revokeAdministrator = async (dataSource: DataSource, actorUserId: s
         throw lastAdmin()
       }
       await users.update({ id }, { role: USER_ROLE.PARTICIPANT })
-      await revokeAllSessions(manager, id, now)
+      await (await loadRevokeAllSessions())(manager, id, now)
     } else if (target.competitorId === null) {
       await users.delete({ id })
     } else {

@@ -24,6 +24,8 @@
       />
     </header>
     <div
+      ref="stateRef"
+      tabindex="-1"
       class="account-block__state"
       data-cy="competitor-account-state"
       :data-status="status"
@@ -34,10 +36,18 @@
         :bg-color="chip.bgColor"
         :text="chip.label"
       />
+      <origam-chip
+        v-if="linkedAdmin"
+        size="small"
+        :color="adminChip.color"
+        :bg-color="adminChip.bgColor"
+        :text="adminChipLabel"
+        data-cy="competitor-account-admin"
+      />
       <span>{{ stateText }}</span>
     </div>
     <origam-form
-      v-if="!isActive"
+      v-if="!isReadOnly"
       class="account-block__form"
       validate-on="submit"
       :aria-labelledby="titleId"
@@ -52,7 +62,7 @@
           :taken="emailTaken"
         />
         <origam-alert
-          v-if="failure"
+          v-if="failure && !linkOpen"
           status="error"
           rounded="lg"
           font-size="md"
@@ -85,6 +95,51 @@
     >
       {{ readOnlyText }}
     </p>
+    <div
+      v-if="canLink"
+      class="account-block__link"
+      :class="{ 'account-block__link--bare': linkBlocked && isActive }"
+      data-cy="competitor-account-link"
+    >
+      <p
+        v-if="!linkBlocked"
+        class="account-block__prompt"
+      >
+        {{ linkPrompt }}
+      </p>
+      <origam-btn
+        variant="outlined"
+        font-size="sm"
+        padding-inline="4"
+        aria-haspopup="dialog"
+        :disabled="linkBlocked"
+        :aria-describedby="linkBlocked ? linkWhyId : undefined"
+        :text="linkLabel"
+        data-cy="competitor-account-link-open"
+        @click="handleLinkOpen"
+      />
+      <p
+        v-if="linkBlocked"
+        :id="linkWhyId"
+        class="account-block__why"
+        data-cy="competitor-account-link-why"
+      >
+        {{ linkBlockedText }}
+      </p>
+    </div>
+    <admin-link-dialog
+      v-if="canLink"
+      :open="linkOpen"
+      :name="name"
+      :candidates="candidates"
+      :unavailable="listUnavailable"
+      :loading="administratorsPending"
+      :invited-player-email="invitedPlayerEmail"
+      :pending="pending"
+      :failure="failure"
+      @submit="handleLinkSubmit"
+      @cancel="handleLinkCancel"
+    />
     <origam-snackbar
       :model-value="feedback !== null"
       :status="feedback?.status"
@@ -101,14 +156,17 @@
 import { computed, ref, useId, watch } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamCard, OrigamChip, OrigamForm, OrigamSnackbar, OrigamTitle } from 'origam/components'
 import AccountEmailField from '~/components/admin/competitors/AccountEmailField.vue'
+import AdminLinkDialog from '~/components/admin/competitors/AdminLinkDialog.vue'
+import { useFocusReturn } from '~/composables/useFocusReturn'
 import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
+import { ADMIN_ACCOUNT_CHIP } from '~/consts/admin-competitors.const'
 import { PARTICIPANT_ACCOUNT_CHIPS, PARTICIPANT_NO_ACCOUNT_TEXT } from '~/consts/admin-participants.const'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
-import { ACCOUNT_STATE, COMPETITOR_ACCOUNT_STATUS } from '~/enums/user.enum'
+import { ACCOUNT_STATE, COMPETITOR_ACCOUNT_STATUS, USER_ROLE } from '~/enums/user.enum'
 import type { ICompetitorAccountBlockEmits, ICompetitorAccountBlockProps } from '~/interfaces/admin-competitors.interface'
-import { formatInvitationExpiry } from '~/utils/admin-competitors.util'
+import { formatInvitationExpiry, listLinkCandidates } from '~/utils/admin-competitors.util'
 
 /*********************************************************
  * Global
@@ -122,12 +180,14 @@ import { formatInvitationExpiry } from '~/utils/admin-competitors.util'
  * enveloppe `__content` (F-63b) ; à retirer quand origam expose `contentDisplay` sur Form (version non publiée au 2026-11-18).
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<ICompetitorAccountBlockProps>(), { pending: false, failure: null, feedback: null })
+const props = withDefaults(defineProps<ICompetitorAccountBlockProps>(), { administrators: null, administratorsPending: false, pending: false, failure: null, feedback: null })
 const emits = defineEmits<ICompetitorAccountBlockEmits>()
 defineSlots<{}>()
 const titleId = useId()
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
 const fieldRef = ref<{ validate: () => boolean } | null>(null)
+const stateRef = ref<HTMLElement | null>(null)
+const linkWhyId = useId()
 
 /*********************************************************
  * État du compte
@@ -149,6 +209,9 @@ const chip = computed(() => {
 })
 const emailText = computed(() => props.account?.email ?? '')
 const stateText = computed(() => {
+  if (linkedAdmin.value) {
+    return t('admin.account.state_linked', 'Fiche reliée au compte administrateur {email}.', { email: emailText.value })
+  }
   if (isActive.value) {
     return t('admin.account.state_active', 'Le joueur a activé son compte.')
   }
@@ -159,7 +222,58 @@ const stateText = computed(() => {
   }
   return t('admin.account.state_none', 'Ce joueur n’a pas de compte : saisissez son email pour lui envoyer une invitation.')
 })
-const readOnlyText = computed(() => t('admin.account.readonly', 'Email du compte : {email}. Le joueur le gère lui-même, il n’est pas modifiable ici.', { email: emailText.value }))
+const readOnlyText = computed(() => linkedAdmin.value
+  ? t('admin.account.readonly_admin', 'Email du compte : {email}. L’administrateur le gère lui-même, il n’est pas modifiable ici.', { email: emailText.value })
+  : t('admin.account.readonly', 'Email du compte : {email}. Le joueur le gère lui-même, il n’est pas modifiable ici.', { email: emailText.value }))
+const adminChip = ADMIN_ACCOUNT_CHIP
+const adminChipLabel = computed(() => t('admin.account.chip_admin', 'Administrateur'))
+
+/*********************************************************
+ * Compte administrateur (F-69, B-32)
+ *
+ * @description
+ * « Fiche reliée » se lit dans le rôle du compte (`account.role`, B-32). La liste des administrateurs (B-31) ne sert qu'au choix de la boîte, relue à chaque ouverture. Relié, le compte est en lecture
+ * seule (il se gère depuis la page des administrateurs, il n'y a pas de déliaison). Sinon l'action « Relier… » ouvre la boîte de choix ; elle est
+ * refusée d'avance (bouton inactif et raison dite) si le compte joueur est actif ou si aucun administrateur n'est libre ; si la liste n'a pas pu être lue, la boîte le dit. Le compte joueur invité jamais activé n'empêche pas la liaison : la boîte prévient qu'il est supprimé.
+ ********************************************************/
+const linkedAdmin = computed(() => props.account?.role === USER_ROLE.ADMIN)
+const candidates = computed(() => props.administrators ? listLinkCandidates(props.administrators) : [])
+const isReadOnly = computed(() => isActive.value || linkedAdmin.value)
+const canLink = computed(() => !linkedAdmin.value)
+const listUnavailable = computed(() => props.administrators === null && !props.administratorsPending)
+const linkBlocked = computed(() => isActive.value || (props.administrators !== null && candidates.value.length === 0))
+const invitedPlayerEmail = computed(() => isInvited.value ? emailText.value : null)
+const linkOpen = ref(false)
+useFocusReturn(linkOpen, () => stateRef.value)
+const handleLinkOpen = () => {
+  emits('dismiss')
+  emits('prepare')
+  linkOpen.value = true
+}
+const handleLinkCancel = () => {
+  linkOpen.value = false
+  emits('dismiss')
+}
+const handleLinkSubmit = (value: string) => {
+  if (!props.pending) {
+    emits('link', value)
+  }
+}
+watch(() => props.feedback, (feedback) => {
+  if (feedback) {
+    linkOpen.value = false
+  }
+})
+watch(linkBlocked, (blocked) => {
+  if (blocked) {
+    linkOpen.value = false
+  }
+})
+const linkLabel = computed(() => t('admin.account.link_open', 'Relier au compte d’un administrateur…'))
+const linkPrompt = computed(() => t('admin.account.link_prompt', 'Ce joueur est administrateur ?'))
+const linkBlockedText = computed(() => isActive.value
+  ? t('admin.account.link_blocked_active', 'Indisponible : cette fiche a un compte joueur actif.')
+  : t('admin.account.link_blocked_none', 'Indisponible : tous les administrateurs ont déjà une fiche reliée.'))
 
 /*********************************************************
  * Saisie
@@ -243,6 +357,30 @@ defineExpose({})
     margin: 0;
     color: var(--origam-color__text---secondary);
     overflow-wrap: anywhere;
+  }
+
+  &__link {
+    display: grid;
+    justify-items: start;
+    gap: var(--origam-space---2);
+    padding-block-start: var(--origam-space---4);
+    border-block-start: var(--origam-border__width---thin) solid var(--origam-color__border---subtle);
+
+    &--bare {
+      padding-block-start: 0;
+      border-block-start: 0;
+    }
+  }
+
+  &__prompt,
+  &__why {
+    margin: 0;
+    color: var(--origam-color__text---secondary);
+  }
+
+  &__why {
+    margin-block-start: var(--origam-space---2);
+    font-size: var(--origam-font__size---sm);
   }
 
   &__form,
