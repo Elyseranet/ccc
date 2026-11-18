@@ -111,6 +111,9 @@ Corps inchangé `{ "email": string }`. Seul le cas « l'email appartient déjà 
 | compte `ADMIN` sans fiche | `ACTIVE` | rien : fusion de deux comptes actifs hors périmètre **[Q7]** | `409` `ACCOUNT_ACTIVE` |
 | compte `ADMIN` déjà relié à une autre fiche | — | rien | `409` `ACCOUNT_ALREADY_LINKED` |
 | compte `PARTICIPANT` | — | rien (inchangé) | `409` `EMAIL_ALREADY_USED` |
+| n'importe quel email (libre, joueur ou autre admin) | compte `ADMIN` (`INVITED` ou `ACTIVE`) | rien : **fiche verrouillée** **[Q8]**, contrôle fait avant tout autre ; l'email de l'admin n'est pas réécrit, aucune invitation émise | `409` `ACCOUNT_ALREADY_LINKED` |
+
+Une fiche reliée à un administrateur est donc non modifiable par cette route (pas de déliaison, Q8). La correction de l'email d'un admin invité passe par `PATCH /admin/administrateurs/{id}` (B-31).
 
 Changement de contrat : `IAccountEmailSet` gagne `linked: boolean`, `accountStatus` s'élargit à `USER_STATUS` et `invitationExpiresAt` devient nullable. L'écran F-62 doit en tenir compte (ticket front à ouvrir par le frontend-lead).
 

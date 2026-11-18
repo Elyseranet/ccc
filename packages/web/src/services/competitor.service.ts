@@ -499,7 +499,7 @@ const createInvitedAccount = async (
  * Sans compte : crée le compte INVITED. Compte INVITED : remplace l'email et émet une nouvelle invitation (ancien lien 410).
  * 404 compétiteur inconnu ; 409 `ACCOUNT_ACTIVE` si le compte est actif ; 409 `EMAIL_ALREADY_USED` si l'email appartient à un autre compte.
  * La ligne du compétiteur est verrouillée : deux PUT concurrents ne créent pas deux comptes.
- * B-32 : l'email d'un compte ADMIN sans fiche relie ce compte à la fiche (`linked`, aucune invitation) ; le compte INVITED de
+ * B-32 : fiche dont le compte est un ADMIN : 409 `ACCOUNT_ALREADY_LINKED` d'emblée. L'email d'un compte ADMIN sans fiche relie ce compte à la fiche (`linked`, aucune invitation) ; le compte INVITED de
  * la fiche est alors supprimé (ses invitations en cascade). Admin déjà relié ou fiche déjà reliée à un admin : 409 `ACCOUNT_ALREADY_LINKED`.
  */
 export const setCompetitorAccountEmail = async (
@@ -519,6 +519,10 @@ export const setCompetitorAccountEmail = async (
   }
   const users = manager.getRepository(UserEntity)
   const existing = await users.findOne({ where: { competitorId } })
+  // Fiche reliée à un administrateur (INVITED ou ACTIVE) : verrouillée ici, sa correction d'email passe par B-31 (Q8, pas de déliaison).
+  if (existing?.role === USER_ROLE.ADMIN) {
+    throw accountAlreadyLinked()
+  }
   if (existing?.status === USER_STATUS.ACTIVE) {
     throw accountActive()
   }
@@ -527,7 +531,7 @@ export const setCompetitorAccountEmail = async (
     if (owner.role !== USER_ROLE.ADMIN) {
       throw emailAlreadyUsed()
     }
-    if (owner.competitorId || existing?.role === USER_ROLE.ADMIN) {
+    if (owner.competitorId) {
       throw accountAlreadyLinked()
     }
     return linkAdminAccount(manager, { competitorId, ownerId: owner.id, accountStatus: owner.status, replacedInvitedUserId: existing?.id })

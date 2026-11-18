@@ -152,6 +152,29 @@ describe('link an admin account to a player card (B-32)', async () => {
     expect(await users.countBy({ competitorId: a.id }) + await users.countBy({ competitorId: b.id })).toBe(1)
   })
 
+  it('locks a card linked to an admin: any other admin, free email or player email gives 409 ACCOUNT_ALREADY_LINKED, nothing written', async () => {
+    const linkedInvited = await newCard('Fiche Admin Invité')
+    const invited = await seedUser(dataSource, { email: 'locked.invited@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN, status: USER_STATUS.INVITED })
+    await users.update({ id: invited.id }, { competitorId: linkedInvited.id })
+    const linkedActive = await newCard('Fiche Admin Actif')
+    const active = await seedUser(dataSource, { email: 'locked.active@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
+    await users.update({ id: active.id }, { competitorId: linkedActive.id })
+    const freeAdmin = await seedUser(dataSource, { email: 'free.admin@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
+    const sentBefore = (await mails.read()).length
+
+    for (const [card, owner] of [[linkedInvited, invited], [linkedActive, active]] as const) {
+      for (const email of ['free.admin@ccc.test', 'brand.new@ccc.test', participant.email]) {
+        const response = await put(card.id, email, adminCookie)
+        expect(response.status).toBe(409)
+        expect(await response.json()).toMatchObject({ code: API_ERROR_CODE.ACCOUNT_ALREADY_LINKED })
+      }
+      expect(await users.findOneByOrFail({ id: owner.id })).toMatchObject({ email: owner.email, competitorId: card.id })
+    }
+    expect((await users.findOneByOrFail({ id: freeAdmin.id })).competitorId).toBeNull()
+    expect(await users.countBy({ email: 'brand.new@ccc.test' })).toBe(0)
+    expect((await mails.read()).length).toBe(sentBefore)
+  })
+
   it('answers 401 anonymous and 403 participant', async () => {
     const card = await newCard('Garde')
     expect((await put(card.id, 'boss@ccc.test')).status).toBe(401)
