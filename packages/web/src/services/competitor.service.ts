@@ -270,14 +270,15 @@ const findPublicCompetitor = async (db: DataSource, id: string): Promise<ICompet
 
 /** Compte d'un compétiteur pour l'administrateur (B-29) : email et expiration de l'invitation la plus récente. */
 const loadCompetitorAccount = async (db: DataSource, competitorId: string): Promise<ICompetitorAccount> => {
-  const user = await db.getRepository(UserEntity).findOne({ where: { competitorId }, select: { id: true, email: true, status: true } })
+  const user = await db.getRepository(UserEntity).findOne({ where: { competitorId }, select: { id: true, email: true, status: true, role: true } })
   if (!user) {
-    return { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null }
+    return { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, role: null, invitationExpiresAt: null }
   }
   const latest = await db.getRepository(InvitationEntity).findOne({ where: { userId: user.id }, order: { createdAt: 'DESC', id: 'DESC' }, select: { id: true, expiresAt: true } })
   return {
     status: user.status === USER_STATUS.ACTIVE ? COMPETITOR_ACCOUNT_STATUS.ACTIVE : COMPETITOR_ACCOUNT_STATUS.INVITED,
     email: user.email,
+    role: user.role,
     invitationExpiresAt: user.status === USER_STATUS.ACTIVE || !latest ? null : latest.expiresAt.toISOString()
   }
 }

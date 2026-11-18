@@ -51,6 +51,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.ME_AVATAR_DELETE]: { file: 'moi/avatar.delete.ts' },
   [API_ENDPOINT.COMPETITOR_AVATAR_UPLOAD]: { file: 'competiteurs/[id]/avatar.put.ts' },
   [API_ENDPOINT.ADMIN_PARTICIPANTS]: { file: 'admin/editions/[id]/participants.get.ts' },
+  [API_ENDPOINT.ADMINS]: { file: 'admin/administrateurs/index.get.ts', pendingTicket: 'B-31' },
   [API_ENDPOINT.COMPETITOR_INVITATION_RESEND]: { file: 'competiteurs/[id]/invitation.post.ts' },
   [API_ENDPOINT.COMPETITOR_ACCOUNT_EMAIL_SET]: { file: 'competiteurs/[id]/compte.put.ts' },
   [API_ENDPOINT.COMPETITOR_AVATAR_DELETE]: { file: 'competiteurs/[id]/avatar.delete.ts' },

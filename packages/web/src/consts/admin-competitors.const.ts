@@ -9,6 +9,9 @@ export const ADMIN_COMPETITORS_PAGE_SIZE = 10
 /** La recherche attend la frappe avant de requêter (la recherche est limitée en débit). */
 export const ADMIN_COMPETITORS_SEARCH_DEBOUNCE_MS = 300
 
+/** Refus du compte qui disent que l'état affiché est périmé (le compte a été activé, ou l'administrateur relié ailleurs) : l'écran se recharge. */
+export const ACCOUNT_STALE_FAILURE_CODES: ReadonlyArray<API_ERROR_CODE | null> = [API_ERROR_CODE.ACCOUNT_ACTIVE, API_ERROR_CODE.ACCOUNT_ALREADY_LINKED]
+
 /** Portée de la clé de cache de l'annuaire admin (`competitors:admin`), distincte de celle de l'annuaire public. */
 export const ADMIN_COMPETITORS_CACHE_SCOPE = 'admin'
 
@@ -86,6 +89,10 @@ export const ADMIN_ACCOUNT_FAILURE_MESSAGES: IAdminFailureMessages = {
     [API_ERROR_CODE.ACCOUNT_ACTIVE]: {
       title: { key: 'admin.account.error_active_title', fallback: 'Compte déjà actif.' },
       text: { key: 'admin.account.error_active_text', fallback: 'Ce joueur a activé son compte : c’est lui qui gère son email.' }
+    },
+    [API_ERROR_CODE.ACCOUNT_ALREADY_LINKED]: {
+      title: { key: 'admin.account.error_linked_title', fallback: 'Administrateur déjà relié.' },
+      text: { key: 'admin.account.error_linked_text', fallback: 'Ce compte administrateur est déjà relié à une autre fiche : choisissez-en un autre.' }
     },
     [API_ERROR_CODE.VALIDATION_FAILED]: {
       title: { key: 'admin.account.error_validation_title', fallback: 'Email invalide.' },

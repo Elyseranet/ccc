@@ -27,5 +27,5 @@ export default defineEventHandler(async (event): Promise<IAccountEmailSet> => {
     firstName: issued.firstName,
     token: issued.invitationToken
   })
-  return { accountStatus: USER_STATUS.INVITED, invitationSent, invitationExpiresAt: issued.expiresAt.toISOString() }
+  return { accountStatus: USER_STATUS.INVITED, linked: false, invitationSent, invitationExpiresAt: issued.expiresAt.toISOString() }
 })

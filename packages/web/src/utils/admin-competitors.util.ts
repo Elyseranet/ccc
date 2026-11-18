@@ -3,6 +3,7 @@ import { ADMIN_DATE_LOCALE } from '../consts/admin-editions.const.js'
 import { EMAIL_MAX_LENGTH } from '../consts/auth.const.js'
 import { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { IParticipantFeedback } from '../interfaces/admin-participants.interface.js'
+import type { IAdminAccount } from '../interfaces/administrator.interface.js'
 import type { IAccountEmailSet } from '../interfaces/invitation.interface.js'
 import { COMPETITOR_DEFAULT_SORT, COMPETITOR_SEARCH_MAX_LENGTH, COMPETITOR_SEARCH_MIN_LENGTH } from '../consts/competitor.const.js'
 import { ROUTES } from '../consts/routes.const.js'
@@ -90,8 +91,14 @@ export const isAccountEmailValid = (value: string | null | undefined): boolean =
 export const formatInvitationExpiry = (iso: string): string =>
   new Intl.DateTimeFormat(ADMIN_DATE_LOCALE, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(iso))
 
-/** Retour d'un envoi d'invitation : succès, ou avertissement quand le compte existe mais que le mail n'est pas parti. */
-export const toAccountFeedback = (result: IAccountEmailSet, email: string): IParticipantFeedback => result.invitationSent
+/** Administrateurs qu'on peut encore relier à une fiche (un compte ↔ une fiche) : ceux qui n'en ont pas. */
+export const listLinkCandidates = (administrators: IAdminAccount[]): IAdminAccount[] =>
+  administrators.filter(administrator => administrator.competitor === null)
+
+/** Retour d'un envoi d'invitation, ou d'une liaison à un administrateur : succès, ou avertissement quand le compte existe mais que le mail n'est pas parti. */
+export const toAccountFeedback = (result: IAccountEmailSet, email: string): IParticipantFeedback => result.linked
+  ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_linked', fallback: 'Fiche reliée au compte {email}', params: { email } } }
+  : result.invitationSent
   ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_sent', fallback: 'Invitation envoyée à {email}', params: { email } } }
   : { status: FEEDBACK_STATUS.WARNING, message: { key: 'admin.account.feedback_not_sent', fallback: 'Compte créé pour {email}, mais l’invitation n’a pas pu être envoyée : renvoyez-la.', params: { email } } }
 
