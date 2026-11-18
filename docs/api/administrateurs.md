@@ -1,6 +1,6 @@
 # API : administrateurs et lien compte admin / fiche joueur (B-31, B-32)
 
-**Statut : contrat arrêté, non implémenté.** Décisions utilisateur Q1 à Q10 du 2026-11-18 (détail dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md`) ; les marqueurs **[Qx]** renvoient à la décision qui fixe le point.
+**Statut : B-31 implémenté (branche `feature/B-31-admin-invitations`), B-32 non implémenté.** Contrat arrêté. Décisions utilisateur Q1 à Q10 du 2026-11-18 (détail dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md`) ; les marqueurs **[Qx]** renvoient à la décision qui fixe le point.
 
 Routes sous `/api/v1`. Rôle `ADMIN` exigé sur toutes (`requireRole(event, USER_ROLE.ADMIN)`) : **401** `UNAUTHORIZED` sans session, **403** `FORBIDDEN` pour un participant, vérifié avant toute lecture du corps. Réponses en `Cache-Control: no-store`. Erreurs au format `IApiError`. Corps validés par zod `.strict()` (champ inconnu : **400** `VALIDATION_FAILED`), 16 Ko au plus (**413**).
 
@@ -111,6 +111,11 @@ Corps inchangé `{ "email": string }`. Seul le cas « l'email appartient déjà 
 | compte `ADMIN` sans fiche | `ACTIVE` | rien : fusion de deux comptes actifs hors périmètre **[Q7]** | `409` `ACCOUNT_ACTIVE` |
 | compte `ADMIN` déjà relié à une autre fiche | — | rien | `409` `ACCOUNT_ALREADY_LINKED` |
 | compte `PARTICIPANT` | — | rien (inchangé) | `409` `EMAIL_ALREADY_USED` |
+| n'importe quel email (libre, joueur ou autre admin) | compte `ADMIN` (`INVITED` ou `ACTIVE`) | rien : **fiche verrouillée** **[Q8]**, contrôle fait avant tout autre ; l'email de l'admin n'est pas réécrit, aucune invitation émise | `409` `ACCOUNT_ALREADY_LINKED` |
+
+`GET /competiteurs/{id}` : l'objet `account` (déjà réservé aux administrateurs, absent pour le public et les participants) gagne `role: "PARTICIPANT" | "ADMIN"` (`ICompetitorAccount.role`), **absent quand `account.status` vaut `NONE`**. `role: "ADMIN"` signale une fiche reliée à un administrateur (`INVITED` ou `ACTIVE`), non modifiable ici : le front n'a plus à le déduire de `GET /admin/administrateurs`.
+
+Une fiche reliée à un administrateur est donc non modifiable par cette route (pas de déliaison, Q8). La correction de l'email d'un admin invité passe par `PATCH /admin/administrateurs/{id}` (B-31).
 
 Changement de contrat : `IAccountEmailSet` gagne `linked: boolean`, `accountStatus` s'élargit à `USER_STATUS` et `invitationExpiresAt` devient nullable. L'écran F-62 doit en tenir compte (ticket front à ouvrir par le frontend-lead).
 

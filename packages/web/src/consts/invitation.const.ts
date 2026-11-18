@@ -4,6 +4,8 @@ export const INVITATION_TTL_MS = INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000
 
 /** Contrainte d'unicité de l'email : une collision concurrente est traduite en 409. */
 export const USER_EMAIL_UNIQUE_CONSTRAINT = 'uq_users_email'
+/** Contrainte d'unicité fiche/compte (B-32) : une fiche n'a qu'un compte. */
+export const USER_COMPETITOR_UNIQUE_CONSTRAINT = 'uq_users_competitor_id'
 /** Code SQLSTATE PostgreSQL d'une violation d'unicité. */
 export const PG_UNIQUE_VIOLATION = '23505'
 

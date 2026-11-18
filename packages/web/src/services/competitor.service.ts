@@ -3,10 +3,11 @@ import type { IHeadToHead, IHeadToHeadMatch, IHeadToHeadSummary } from '../inter
 import type { IPaginated } from '../interfaces/pagination.interface.js'
 import type { IBaseServiceOptions, ICompetitorsQuery } from '../interfaces/api-client.interface.js'
 import type { IAvatarUploadResponse } from '../interfaces/avatar.interface.js'
-import type { IInvitationResent, ISetAccountEmailRequest, IAccountEmailSet } from '../interfaces/invitation.interface.js'
+import type { IInvitationResent, ISetAccountEmailRequest, IAccountEmailSet, ICompetitorAccountLinked } from '../interfaces/invitation.interface.js'
 import { AVATAR_UPLOAD_FIELD } from '../consts/avatar.const.js'
 import { toIfMatchHeaders } from '../utils/if-match-header.util.js'
 import { BaseService } from './base.service.js'
+import { IsNull } from 'typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
 import { PUBLIC_ROUND_STATUSES } from '../consts/match-score.const.js'
 import { COMPETITOR_PUBLIC_COLUMNS as PUBLIC_COLUMNS, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS, STATS_MATCH_STATUSES } from '../consts/competitor.const.js'
@@ -20,7 +21,7 @@ import { EDITION_STATUS } from '../enums/edition.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import { MATCH_PURPOSE } from '../enums/match.enum.js'
 import { toMatchRecord } from '../utils/match-record.mapper.util.js'
-import { accountActive, competitorNotFound, emailAlreadyUsed, versionConflict } from '../utils/api-error.util.js'
+import { accountActive, accountAlreadyLinked, competitorNotFound, emailAlreadyUsed, versionConflict } from '../utils/api-error.util.js'
 import { buildPaginated } from '../utils/pagination.util.js'
 import { countTitles } from '../utils/ranking.util.js'
 import { computeHeadToHead, computePlayerBalance, computeWinLoss, countedOutcomes, countUnknownResults, resolveMatchOutcome } from '../utils/record.util.js'
@@ -35,7 +36,7 @@ import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import type { INewCompetitor } from '../interfaces/competitor-creation.interface.js'
 import type { IIssuedInvitation, ICompetitorWithAccount, IResentInvitation } from '../interfaces/invitation.interface.js'
 import { buildDisplayName } from '../utils/display-name.util.js'
-import { isEmailCollision } from '../utils/email-collision.util.js'
+import { isCompetitorLinkCollision, isEmailCollision } from '../utils/email-collision.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
 import { logger } from '../utils/logger.util.js'
 
@@ -270,13 +271,14 @@ const findPublicCompetitor = async (db: DataSource, id: string): Promise<ICompet
 
 /** Compte d'un compétiteur pour l'administrateur (B-29) : email et expiration de l'invitation la plus récente. */
 const loadCompetitorAccount = async (db: DataSource, competitorId: string): Promise<ICompetitorAccount> => {
-  const user = await db.getRepository(UserEntity).findOne({ where: { competitorId }, select: { id: true, email: true, status: true } })
+  const user = await db.getRepository(UserEntity).findOne({ where: { competitorId }, select: { id: true, email: true, status: true, role: true } })
   if (!user) {
     return { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null }
   }
   const latest = await db.getRepository(InvitationEntity).findOne({ where: { userId: user.id }, order: { createdAt: 'DESC', id: 'DESC' }, select: { id: true, expiresAt: true } })
   return {
     status: user.status === USER_STATUS.ACTIVE ? COMPETITOR_ACCOUNT_STATUS.ACTIVE : COMPETITOR_ACCOUNT_STATUS.INVITED,
+    role: user.role,
     email: user.email,
     invitationExpiresAt: user.status === USER_STATUS.ACTIVE || !latest ? null : latest.expiresAt.toISOString()
   }
@@ -494,17 +496,32 @@ const createInvitedAccount = async (
 }
 
 /**
+ * Remplace l'email d'un compte INVITED et émet une nouvelle invitation (ancien lien 410). Partagé par `PUT /competiteurs/{id}/compte`
+ * (B-29) et `PATCH /admin/administrateurs/{id}` (B-31). `email` est déjà normalisé ; 409 `EMAIL_ALREADY_USED` sur collision concurrente.
+ */
+export const replaceInvitedAccountEmail = async (manager: EntityManager, userId: string, email: string, now: Date): Promise<IIssuedInvitation> => {
+  try {
+    await manager.getRepository(UserEntity).update({ id: userId }, { email })
+    return await issueInvitationLazily(manager, userId, now)
+  } catch (error) {
+    throw isEmailCollision(error) ? emailAlreadyUsed() : error
+  }
+}
+
+/**
  * `PUT /competiteurs/{id}/compte` (B-29), dans la transaction de l'appelant ; l'email part APRÈS le commit.
  * Sans compte : crée le compte INVITED. Compte INVITED : remplace l'email et émet une nouvelle invitation (ancien lien 410).
  * 404 compétiteur inconnu ; 409 `ACCOUNT_ACTIVE` si le compte est actif ; 409 `EMAIL_ALREADY_USED` si l'email appartient à un autre compte.
  * La ligne du compétiteur est verrouillée : deux PUT concurrents ne créent pas deux comptes.
+ * B-32 : fiche dont le compte est un ADMIN : 409 `ACCOUNT_ALREADY_LINKED` d'emblée. L'email d'un compte ADMIN sans fiche relie ce compte à la fiche (`linked`, aucune invitation) ; le compte INVITED de
+ * la fiche est alors supprimé (ses invitations en cascade). Admin déjà relié ou fiche déjà reliée à un admin : 409 `ACCOUNT_ALREADY_LINKED`.
  */
 export const setCompetitorAccountEmail = async (
   manager: EntityManager,
   competitorId: string,
   rawEmail: string,
   now = new Date()
-): Promise<IResentInvitation> => {
+): Promise<IResentInvitation | ICompetitorAccountLinked> => {
   const email = normalizeEmail(rawEmail)
   const competitor = await manager.findOne(CompetitorEntity, {
     where: { id: competitorId },
@@ -516,26 +533,59 @@ export const setCompetitorAccountEmail = async (
   }
   const users = manager.getRepository(UserEntity)
   const existing = await users.findOne({ where: { competitorId } })
+  // Fiche reliée à un administrateur (INVITED ou ACTIVE) : verrouillée ici, sa correction d'email passe par B-31 (Q8, pas de déliaison).
+  if (existing?.role === USER_ROLE.ADMIN) {
+    throw accountAlreadyLinked()
+  }
   if (existing?.status === USER_STATUS.ACTIVE) {
     throw accountActive()
   }
-  const owner = await users.findOne({ where: { email }, select: { id: true } })
+  const owner = await users.findOne({ where: { email }, select: { id: true, role: true, status: true, competitorId: true } })
   if (owner && owner.id !== existing?.id) {
-    throw emailAlreadyUsed()
+    if (owner.role !== USER_ROLE.ADMIN) {
+      throw emailAlreadyUsed()
+    }
+    if (owner.competitorId) {
+      throw accountAlreadyLinked()
+    }
+    return linkAdminAccount(manager, { competitorId, ownerId: owner.id, accountStatus: owner.status, replacedInvitedUserId: existing?.id })
   }
 
   try {
-    if (existing) {
-      await users.update({ id: existing.id }, { email })
-    }
     const { userId, invitation } = existing
-      ? { userId: existing.id, invitation: await issueInvitationLazily(manager, existing.id, now) }
+      ? { userId: existing.id, invitation: await replaceInvitedAccountEmail(manager, existing.id, email, now) }
       : await createInvitedAccount(manager, competitorId, email, now)
     logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_EMAIL_SET, { competitorId, userId, created: !existing })
     return { ...invitation, userId, email, firstName: competitor.firstName ?? '' }
   } catch (error) {
     throw isEmailCollision(error) ? emailAlreadyUsed() : error
   }
+}
+
+/** Branche « lien » de `setCompetitorAccountEmail` (B-32) : la fiche est verrouillée, son compte INVITED éventuel est supprimé avant la pose du lien. */
+const linkAdminAccount = async (
+  manager: EntityManager,
+  link: { competitorId: string, ownerId: string, accountStatus: USER_STATUS, replacedInvitedUserId?: string }
+): Promise<ICompetitorAccountLinked> => {
+  const users = manager.getRepository(UserEntity)
+  try {
+    if (link.replacedInvitedUserId) {
+      await users.delete({ id: link.replacedInvitedUserId })
+    }
+    // Conditionnel : deux PUT concurrents du même admin vers deux fiches ne peuvent pas réussir tous les deux.
+    const { affected } = await users.update({ id: link.ownerId, competitorId: IsNull() }, { competitorId: link.competitorId })
+    if (!affected) {
+      throw accountAlreadyLinked()
+    }
+  } catch (error) {
+    throw isCompetitorLinkCollision(error) ? accountAlreadyLinked() : error
+  }
+  logger.info(LOG_EVENT.ADMIN_COMPETITOR_LINKED, {
+    targetUserId: link.ownerId,
+    competitorId: link.competitorId,
+    replacedInvitedUserId: link.replacedInvitedUserId ?? null
+  })
+  return { linked: true, accountStatus: link.accountStatus }
 }
 
 /**
