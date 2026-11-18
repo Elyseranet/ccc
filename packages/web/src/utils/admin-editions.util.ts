@@ -5,7 +5,6 @@ import {
   EDITION_YEAR_PATTERN,
   ISO_DATE_PATTERN
 } from '../consts/admin-editions.const.js'
-import { API_BASE_URL } from '../consts/api.const.js'
 import { EDITION_YEAR_MAX, EDITION_YEAR_MIN } from '../consts/edition.const.js'
 import { ROUTES } from '../consts/routes.const.js'
 import { EDITION_YEAR_ISSUE } from '../enums/admin-editions.enum.js'
@@ -124,6 +123,3 @@ export const filterEditions = <T extends IEditionSummary>(editions: T[], query: 
 /** Message d'alerte d'une erreur d'API. `code` est le code de l'édition, repris dans le texte de `EDITION_CLOSED`. */
 export const toEditionFailure = (cause: unknown, code = ''): IAdminFailure =>
   toAdminFailure(cause, ADMIN_EDITION_FAILURE_MESSAGES, { code })
-
-/** URL du fichier Excel d'une édition (B-30) : lien de téléchargement natif, la session suit (cookie). */
-export const buildEditionExportUrl = (editionId: string): string => `${API_BASE_URL}/admin/editions/${encodeURIComponent(editionId)}/export.xlsx`

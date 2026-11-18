@@ -57,7 +57,7 @@ import { useT } from '~/composables/useT'
 import { EDITION_FORM_MODE } from '~/enums/admin-editions.enum'
 import { EDITION_ORIGIN } from '~/enums/edition.enum'
 import type { IEditionFormValues } from '~/interfaces/admin-editions.interface'
-import { buildEditionExportUrl, emptyEditionFormValues, toEditionFormValues } from '~/utils/admin-editions.util'
+import { emptyEditionFormValues, toEditionFormValues } from '~/utils/admin-editions.util'
 import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
@@ -74,12 +74,11 @@ const emits = defineEmits<{}>()
 defineSlots<{}>()
 const route = useRoute()
 const code = computed(() => String(route.params.code ?? ''))
-const { edition, loading, loadFailure, isClosed, update, saving, saved, failure, refresh } = useEditionEdit(code)
+const { edition, loading, loadFailure, isClosed, update, saving, saved, failure, refresh, exportUrl } = useEditionEdit(code)
 const { remove, deleting, failure: deleteFailure } = useEditionDelete()
 // Une archive importée n'est jamais supprimable (B-28) : la zone n'existe pas pour elle, le serveur refuse aussi.
 const canDelete = computed(() => edition.value?.origin === EDITION_ORIGIN.APP)
 const title = computed(() => t('pages.admin_edition.title', 'Édition {code}', { code: code.value }))
-const exportUrl = computed(() => edition.value ? buildEditionExportUrl(edition.value.id) : '')
 const exportLabel = computed(() => t('admin.editions.export_button', 'Exporter (Excel)'))
 useHead({ title })
 useSeo({ noindex: true })

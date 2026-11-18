@@ -56,5 +56,8 @@ export const useEditionEdit = (code: MaybeRefOrGetter<string>) => {
     }
   }
 
-  return { edition, loading, loadFailure, isClosed, update, saving, saved, failure, refresh }
+  /** Lien de téléchargement de l'export Excel de l'édition chargée (B-30, F-65). */
+  const exportUrl = computed(() => edition.value ? service.adminExportUrl(edition.value.id) : '')
+
+  return { edition, loading, loadFailure, isClosed, update, saving, saved, failure, refresh, exportUrl }
 }

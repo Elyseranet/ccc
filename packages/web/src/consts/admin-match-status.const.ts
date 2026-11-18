@@ -1,7 +1,7 @@
 import { EDITION_CHIP_FAMILY } from '../enums/edition-tab.enum.js'
 import { MATCH_ACTION } from '../enums/match-action.enum.js'
 import { MATCH_STATUS } from '../enums/match.enum.js'
-import type { ITranslatableText } from '../interfaces/common-components.interface.js'
+import type { ITranslatableText } from '../interfaces/translatable-text.interface.js'
 
 /** Statut d'un match dans la file, écrit en toutes lettres (jamais porté par la seule couleur). */
 export const ADMIN_MATCH_STATUS_VIEW: Record<MATCH_STATUS, { label: ITranslatableText, family: EDITION_CHIP_FAMILY }> = {

@@ -9,7 +9,7 @@ import { EDITION_ORIGIN, EDITION_STATUS } from '../../../src/enums/edition.enum'
 import { USER_ROLE } from '../../../src/enums/user.enum'
 import type { IEditionDetail } from '../../../src/interfaces/edition.interface'
 import { buildMe } from '../../helpers/me'
-import { buildEditionExportUrl } from '../../../src/utils/admin-editions.util'
+import { EditionService } from '../../../src/services/edition.service'
 import EditionPage from '~/pages/admin/editions/[code].vue'
 
 /*********************************************************
@@ -62,9 +62,9 @@ const mountEdit = async (overrides: Partial<IEditionDetail>) => {
   return wrapper
 }
 
-describe('buildEditionExportUrl', () => {
+describe('EditionService.adminExportUrl', () => {
   it('construit la route de B-30 depuis l’id de l’édition', () => {
-    expect(buildEditionExportUrl(EDITION_ID)).toBe(`/api/v1/admin/editions/${EDITION_ID}/export.xlsx`)
+    expect(new EditionService().adminExportUrl(EDITION_ID)).toBe(`/api/v1/admin/editions/${EDITION_ID}/export.xlsx`)
   })
 })
 
@@ -77,7 +77,7 @@ describe('page de modification : bouton d’export', () => {
     const wrapper = await mountEdit(overrides)
     const link = wrapper.get('[data-cy="edition-export"]')
     expect(link.element.tagName).toBe('A')
-    expect(link.attributes('href')).toBe(buildEditionExportUrl(EDITION_ID))
+    expect(link.attributes('href')).toBe(new EditionService().adminExportUrl(EDITION_ID))
     expect(link.attributes('download')).toBeDefined()
     expect(link.text()).toContain('Exporter (Excel)')
   })

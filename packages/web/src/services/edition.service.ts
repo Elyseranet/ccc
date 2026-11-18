@@ -89,6 +89,11 @@ export class EditionService extends BaseService {
     return this.request<IPaginated<IMatch>>(`/editions/${encodeURIComponent(id)}/matchs`, { query: { ...query, statut: query.statut?.join(',') } })
   }
 
+  /** URL de l'export Excel d'une édition (B-30, administrateur) : un lien de téléchargement, pas un appel `$fetch`. */
+  adminExportUrl (id: string): string {
+    return `${this.baseUrl}/admin/editions/${encodeURIComponent(id)}/export.xlsx`
+  }
+
   /** Inscrits vus par l'administrateur (B-10) : ni email ni téléphone, état du compte compris. */
   adminParticipants (id: string): Promise<IAdminParticipant[]> {
     return this.request<IAdminParticipant[]>(`/admin/editions/${encodeURIComponent(id)}/participants`)
