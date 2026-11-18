@@ -4,7 +4,7 @@ import { ROUND_KIND } from '../enums/round.enum.js'
 import { EDITION_CHIP_FAMILY, EDITION_MATCH_FILTER, EDITION_STEP_STATE, EDITION_TAB } from '../enums/edition-tab.enum.js'
 import { EDITION_STATUS } from '../enums/edition.enum.js'
 import { FINAL_STAGE, PARTICIPATION_STATUS } from '../enums/participation.enum.js'
-import type { ITranslatableText } from '../interfaces/common-components.interface.js'
+import type { ITranslatableText } from '../interfaces/translatable-text.interface.js'
 
 export const EDITION_DEFAULT_TAB = EDITION_TAB.SUMMARY
 export const EDITION_TAB_QUERY = 'onglet'
