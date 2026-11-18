@@ -36,7 +36,7 @@ export const useLegalPage = (content: Ref<ILegalPageContent> | (() => ILegalPage
     isInternalLink: block.kind === LEGAL_BLOCK.LINK && block.link?.to !== undefined,
     text: block.text ? text(block.text) : '',
     items: (block.items ?? []).map((item, itemIndex) => ({ id: itemIndex, text: text(item) })),
-    definitions: (block.definitions ?? []).map(entry => ({ key: text(entry.term), value: text(entry.description) })),
+    definitions: (block.definitions ?? []).filter(entry => entry.hiddenWhenEmpty === undefined || identity[entry.hiddenWhenEmpty]).map(entry => ({ key: text(entry.term), value: text(entry.description) })),
     table: block.table
       ? {
           caption: text(block.table.caption),

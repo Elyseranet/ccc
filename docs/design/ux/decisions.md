@@ -247,7 +247,9 @@ Source : arbitrages A1–A7 de `audit.md`, tranchés par l'utilisateur via le ch
 ## ARCH-15 — `src/server/routes/` autorisé (décision utilisateur 2026-11-12, T-SEO-01)
 - `src/server/routes/` rejoint `api/`, `middleware/` et `plugins/` comme dossier imposé par Nitro (routes hors `/api`, ex. `/robots.txt`, `/sitemap.xml`). À plat, comme les autres. Mis à jour dans `CLAUDE.md` du projet et `tests/unit/architecture.test.ts` par la branche T-SEO-01 back.
 
-## LEGAL-1 — Contenu des pages légales (décisions utilisateur 2026-11-12, F-19)
+## LEGAL-1 — Contenu des pages légales (décisions utilisateur 2026-11-12, F-19) — **remplacée par F-70 (2026-11-18)**
+> **Remplacée par F-70 (décision utilisateur 2026-11-18).** L'éditeur anonyme, l'hébergeur Hetzner et le contact `contact@elysera.net` ne sont plus écrits dans les locales : l'identité de l'éditeur, l'hébergeur (pays compris, `LEGAL_HOST_COUNTRY`) et les contacts viennent des variables serveur Coolify (`NUXT_PUBLIC_LEGAL_*`, README « Identité légale de l'éditeur »). Forme, capital, SIREN, RCS et TVA sont facultatifs : non exigés en production, ligne masquée si vides. Une valeur `A_COMPLETER` (répétée ou non) vaut vide. Ce qui suit reste pour mémoire, sauf ces points ; les durées, la politique des journaux, Origam, le public et les polices ne changent pas.
+
 - **Éditeur** : l'utilisateur, **particulier non professionnel, anonyme** dans les mentions légales (seuls l'hébergeur et un email de contact sont publiés ; régime LCEN art. 6 cité par l'audit, texte non vérifié sur Légifrance : à confirmer par la relecture juridique).
 - **Hébergeur** (dev et production) : **Hetzner Online GmbH**, Industriestr. 25, 91710 Gunzenhausen, Allemagne, tél. +49 9831 505-0 (mentions légales Hetzner). Données dans l'UE. Tranche aussi T-SEC-02 pour le choix de l'hébergeur.
 - **Contact unique** : `contact@elysera.net` (mentions, RGPD, accessibilité).

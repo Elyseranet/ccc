@@ -88,24 +88,28 @@ export const STRICT_CONFIG_VARIABLE = {
 /**
  * Identité légale de l'éditeur (F-70) : une entrée par variable serveur Coolify (`LEGAL_*`, `PRIVACY_*`), reprise par l'application
  * via `NUXT_PUBLIC_LEGAL_*`. `path` est le chemin dans `runtimeConfig.public.legal`, `param` le paramètre `{…}` des textes légaux,
- * `variable` le nom cité par la garde de production (jamais la valeur).
+ * `variable` le nom cité par la garde de production (jamais la valeur), `required` faux pour forme, capital, SIREN, RCS et TVA
+ * (décision utilisateur 2026-11-18 : une personne physique n'en a pas) : ni exigés en production, ni affichés quand vides.
  */
 export const LEGAL_IDENTITY_FIELDS = [
-  { path: ['status'], param: 'status', variable: 'NUXT_PUBLIC_LEGAL_STATUS' },
-  { path: ['name'], param: 'name', variable: 'NUXT_PUBLIC_LEGAL_NAME' },
-  { path: ['form'], param: 'form', variable: 'NUXT_PUBLIC_LEGAL_FORM' },
-  { path: ['capital'], param: 'capital', variable: 'NUXT_PUBLIC_LEGAL_CAPITAL' },
-  { path: ['siren'], param: 'siren', variable: 'NUXT_PUBLIC_LEGAL_SIREN' },
-  { path: ['rcs'], param: 'rcs', variable: 'NUXT_PUBLIC_LEGAL_RCS' },
-  { path: ['vat'], param: 'vat', variable: 'NUXT_PUBLIC_LEGAL_VAT' },
-  { path: ['address'], param: 'address', variable: 'NUXT_PUBLIC_LEGAL_ADDRESS' },
-  { path: ['phone'], param: 'phone', variable: 'NUXT_PUBLIC_LEGAL_PHONE' },
-  { path: ['email'], param: 'email', variable: 'NUXT_PUBLIC_LEGAL_EMAIL' },
-  { path: ['publicationDirector'], param: 'publicationDirector', variable: 'NUXT_PUBLIC_LEGAL_PUBLICATION_DIRECTOR' },
-  { path: ['hostName'], param: 'hostName', variable: 'NUXT_PUBLIC_LEGAL_HOST_NAME' },
-  { path: ['hostAddress'], param: 'hostAddress', variable: 'NUXT_PUBLIC_LEGAL_HOST_ADDRESS' },
-  { path: ['hostPhone'], param: 'hostPhone', variable: 'NUXT_PUBLIC_LEGAL_HOST_PHONE' },
-  { path: ['hostCountry'], param: 'hostCountry', variable: 'NUXT_PUBLIC_LEGAL_HOST_COUNTRY' },
-  { path: ['privacy', 'contactEmail'], param: 'privacyContactEmail', variable: 'NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL' },
-  { path: ['privacy', 'formRetentionDays'], param: 'privacyFormRetentionDays', variable: 'NUXT_PUBLIC_LEGAL_PRIVACY_FORM_RETENTION_DAYS' }
+  { path: ['status'], param: 'status', variable: 'NUXT_PUBLIC_LEGAL_STATUS', required: true },
+  { path: ['name'], param: 'name', variable: 'NUXT_PUBLIC_LEGAL_NAME', required: true },
+  { path: ['form'], param: 'form', variable: 'NUXT_PUBLIC_LEGAL_FORM', required: false },
+  { path: ['capital'], param: 'capital', variable: 'NUXT_PUBLIC_LEGAL_CAPITAL', required: false },
+  { path: ['siren'], param: 'siren', variable: 'NUXT_PUBLIC_LEGAL_SIREN', required: false },
+  { path: ['rcs'], param: 'rcs', variable: 'NUXT_PUBLIC_LEGAL_RCS', required: false },
+  { path: ['vat'], param: 'vat', variable: 'NUXT_PUBLIC_LEGAL_VAT', required: false },
+  { path: ['address'], param: 'address', variable: 'NUXT_PUBLIC_LEGAL_ADDRESS', required: true },
+  { path: ['phone'], param: 'phone', variable: 'NUXT_PUBLIC_LEGAL_PHONE', required: true },
+  { path: ['email'], param: 'email', variable: 'NUXT_PUBLIC_LEGAL_EMAIL', required: true },
+  { path: ['publicationDirector'], param: 'publicationDirector', variable: 'NUXT_PUBLIC_LEGAL_PUBLICATION_DIRECTOR', required: true },
+  { path: ['hostName'], param: 'hostName', variable: 'NUXT_PUBLIC_LEGAL_HOST_NAME', required: true },
+  { path: ['hostAddress'], param: 'hostAddress', variable: 'NUXT_PUBLIC_LEGAL_HOST_ADDRESS', required: true },
+  { path: ['hostPhone'], param: 'hostPhone', variable: 'NUXT_PUBLIC_LEGAL_HOST_PHONE', required: true },
+  { path: ['hostCountry'], param: 'hostCountry', variable: 'NUXT_PUBLIC_LEGAL_HOST_COUNTRY', required: true },
+  { path: ['privacy', 'contactEmail'], param: 'privacyContactEmail', variable: 'NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL', required: true },
+  { path: ['privacy', 'formRetentionDays'], param: 'privacyFormRetentionDays', variable: 'NUXT_PUBLIC_LEGAL_PRIVACY_FORM_RETENTION_DAYS', required: true }
 ] as const
+
+/** Valeur de substitution posée dans Coolify tant qu'une information manque (`A_COMPLETER`, éventuellement répétée) : traitée comme vide. */
+export const LEGAL_PLACEHOLDER_PATTERN = /^(?:A_COMPLETER)+$/i

@@ -15,10 +15,10 @@ export const LEGAL_NOTICE_CONTENT: ILegalPageContent = {
         kind: LEGAL_BLOCK.DEFINITIONS,
         definitions: [
           { term: { key: 'legal.notice.publisher_name_label', fallback: 'Dénomination' }, description: { key: 'legal.notice.publisher_name_value', fallback: '{name} ({status})' } },
-          { term: { key: 'legal.notice.publisher_form_label', fallback: 'Forme juridique' }, description: { key: 'legal.notice.publisher_form_value', fallback: '{form}' } },
-          { term: { key: 'legal.notice.publisher_capital_label', fallback: 'Capital' }, description: { key: 'legal.notice.publisher_capital_value', fallback: '{capital}' } },
+          { term: { key: 'legal.notice.publisher_form_label', fallback: 'Forme juridique' }, description: { key: 'legal.notice.publisher_form_value', fallback: '{form}' }, hiddenWhenEmpty: 'form' },
+          { term: { key: 'legal.notice.publisher_capital_label', fallback: 'Capital' }, description: { key: 'legal.notice.publisher_capital_value', fallback: '{capital}' }, hiddenWhenEmpty: 'capital' },
           { term: { key: 'legal.notice.publisher_seat_label', fallback: 'Siège' }, description: { key: 'legal.notice.publisher_seat_value', fallback: '{address}' } },
-          { term: { key: 'legal.notice.publisher_registry_label', fallback: 'SIREN / RCS / TVA' }, description: { key: 'legal.notice.publisher_registry_value', fallback: 'SIREN {siren} · RCS {rcs} · TVA {vat}' } }
+          { term: { key: 'legal.notice.publisher_registry_label', fallback: 'SIREN / RCS / TVA' }, description: { key: 'legal.notice.publisher_registry_value', fallback: '{registry}' }, hiddenWhenEmpty: 'registry' }
         ]
       }
       ]

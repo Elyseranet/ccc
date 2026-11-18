@@ -1,5 +1,5 @@
 import type { EDITION_STATUS } from '../enums/edition.enum.js'
-import type { COMPETITOR_ACCOUNT_STATUS } from '../enums/user.enum.js'
+import type { COMPETITOR_ACCOUNT_STATUS, USER_ROLE } from '../enums/user.enum.js'
 import type { FINAL_STAGE } from '../enums/participation.enum.js'
 import type { MatchEntity } from '../server/db/typeorm/entities/match.entity.js'
 import type { IMatchRecord } from './stats.interface.js'
@@ -67,6 +67,8 @@ export interface ICompetitorStats {
 /** Compte du compétiteur, réservé à l'administrateur (B-29) : porte l'email, jamais exposé publiquement. */
 export interface ICompetitorAccount {
   status: COMPETITOR_ACCOUNT_STATUS
+  /** Rôle du compte ; absent sans compte (`NONE`). `ADMIN` : fiche reliée à un administrateur, non modifiable (B-32). */
+  role?: USER_ROLE
   email: string | null
   /** ISO 8601, expiration de l'invitation la plus récente ; `null` sans compte ou sans invitation. */
   invitationExpiresAt: string | null

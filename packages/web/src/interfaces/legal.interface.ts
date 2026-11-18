@@ -15,6 +15,8 @@ export interface ILegalTable {
 export interface ILegalDefinition {
   term: ITranslatableText
   description: ITranslatableText
+  /** Paramètre d'identité (`useLegalIdentity`) : s'il est vide, la ligne est masquée (variables facultatives, F-70). */
+  hiddenWhenEmpty?: string
 }
 
 export interface ILegalLink {

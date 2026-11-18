@@ -1,4 +1,8 @@
-/** Gabarit du mail d invitation (F-66), repris de docs/design/ui/happy-hour/mail-invitation.html et .txt. Marqueurs : {{greeting}} {{link}} {{ttl}} {{siteUrl}} {{siteHost}}. */
+import { INVITATION_EMAIL_SUBJECT } from './mail.const.js'
+import { INVITATION_EMAIL_KIND } from '../enums/invitation-email.enum.js'
+import type { IInvitationEmailContent } from '../interfaces/mail.interface.js'
+
+/** Gabarit du mail d invitation (F-66), repris de docs/design/ui/happy-hour/mail-invitation.html et .txt. Marqueurs : {{greeting}} {{link}} {{ttl}} {{siteUrl}} {{siteHost}} ; {{preview}} {{eyebrow}} {{intro}} {{body}} {{activation}} {{closing}} viennent de la variante (INVITATION_EMAIL_CONTENT). */
 export const INVITATION_EMAIL_HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -27,7 +31,7 @@ export const INVITATION_EMAIL_HTML_TEMPLATE = `<!DOCTYPE html>
 <body style="margin:0; padding:0; background-color:#0b1e28;" bgcolor="#0b1e28">
   <!-- Texte d'aperçu (affiché par la boîte de réception sous le sujet), masqué dans le corps. -->
   <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#0b1e28; opacity:0;">
-    L'organisateur de la Cotentin Caps Cup vous a créé un compte. Activez-le en un clic, le lien est valable {{ttl}} jours.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
+    {{preview}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0b1e28" style="background-color:#0b1e28;">
@@ -59,21 +63,72 @@ export const INVITATION_EMAIL_HTML_TEMPLATE = `<!DOCTYPE html>
                 <tr>
                   <td class="px" style="padding:36px 40px 8px 40px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif;">
                     <p style="margin:0 0 12px 0; font-size:13px; line-height:18px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#e2ac65;">
-                      Invitation
+                      {{eyebrow}}
                     </p>
                     <h1 class="h1" style="margin:0 0 20px 0; font-size:30px; line-height:36px; font-weight:800; color:#f3eedd;">
                       {{greeting}}
                     </h1>
                     <p style="margin:0 0 16px 0; font-size:17px; line-height:26px; color:#f3eedd;">
-                      L'organisateur de la <strong style="color:#f3eedd;">Cotentin Caps Cup</strong> vous a inscrit comme participant&nbsp;: un compte vient de vous être créé sur le site du CCC.
+                      {{intro}}
                     </p>
                     <p style="margin:0 0 28px 0; font-size:17px; line-height:26px; color:#f3eedd;">
-                      Activez-le pour définir votre mot de passe, compléter votre profil et retrouver vos résultats et statistiques.
+                      {{body}}
                     </p>
                   </td>
                 </tr>
 
-                <!-- Bouton (« bulletproof » : la couleur est sur la cellule, le lien couvre toute la surface). -->
+{{activation}}
+                <!-- Filet + message de sécurité -->
+                <tr>
+                  <td class="px" style="padding:28px 40px 36px 40px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td height="1" bgcolor="#284758" style="height:1px; line-height:1px; font-size:1px; background-color:#284758;">&nbsp;</td></tr>
+                      <tr>
+                        <td style="padding-top:20px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#a9c3d1;">
+                          {{closing}}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Pied de page : nom du site et adresse, rien d'autre (aucune info légale inventée). -->
+          <tr>
+            <td class="px" align="center" style="padding:28px 32px 0 32px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#a9c3d1;">
+              <p style="margin:0 0 4px 0; font-weight:700; color:#f3eedd;">Cotentin Caps Cup</p>
+              <p style="margin:0;">
+                <a href="{{siteUrl}}" style="color:#a9c3d1; text-decoration:underline;">{{siteHost}}</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+
+export const INVITATION_EMAIL_TEXT_TEMPLATE = `{{greeting}}
+
+{{intro}}
+
+{{body}}{{activation}}
+
+{{closing}}
+
+--
+Cotentin Caps Cup
+{{siteUrl}}`
+
+
+/** Bloc d'activation (bouton, validité, lien brut) : seulement dans les variantes qui portent un lien. Marqueurs : {{link}} {{ttl}}. */
+export const INVITATION_EMAIL_HTML_ACTIVATION = `                <!-- Bouton (« bulletproof » : la couleur est sur la cellule, le lien couvre toute la surface). -->
                 <tr>
                   <td class="px" align="left" style="padding:0 40px 12px 40px;">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="cta-cell">
@@ -111,55 +166,53 @@ export const INVITATION_EMAIL_HTML_TEMPLATE = `<!DOCTYPE html>
                     </p>
                   </td>
                 </tr>
+`
 
-                <!-- Filet + message de sécurité -->
-                <tr>
-                  <td class="px" style="padding:28px 40px 36px 40px;">
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td height="1" bgcolor="#284758" style="height:1px; line-height:1px; font-size:1px; background-color:#284758;">&nbsp;</td></tr>
-                      <tr>
-                        <td style="padding-top:20px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#a9c3d1;">
-                          Si vous n'attendiez pas ce message, ignorez-le.
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- Pied de page : nom du site et adresse, rien d'autre (aucune info légale inventée). -->
-          <tr>
-            <td class="px" align="center" style="padding:28px 32px 0 32px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#a9c3d1;">
-              <p style="margin:0 0 4px 0; font-weight:700; color:#f3eedd;">Cotentin Caps Cup</p>
-              <p style="margin:0;">
-                <a href="{{siteUrl}}" style="color:#a9c3d1; text-decoration:underline;">{{siteHost}}</a>
-              </p>
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`
-
-export const INVITATION_EMAIL_TEXT_TEMPLATE = `{{greeting}}
-
-L'organisateur de la Cotentin Caps Cup vous a inscrit comme participant : un compte vient de vous être créé sur le site du CCC.
-
-Activez-le pour définir votre mot de passe, compléter votre profil et retrouver vos résultats et statistiques :
+/** Suite du corps texte : le « : » prolonge la phrase d'invitation à activer. */
+export const INVITATION_EMAIL_TEXT_ACTIVATION = ` :
 
 {{link}}
 
-Ce lien est valable {{ttl}} jours et ne peut servir qu'une fois.
+Ce lien est valable {{ttl}} jours et ne peut servir qu'une fois.`
 
-Si vous n'attendiez pas ce message, ignorez-le.
+const INTRO_PREFIX_HTML = `L'organisateur de la <strong style="color:#f3eedd;">Cotentin Caps Cup</strong>`
+const ACTIVATION_BODY = 'Activez-le pour définir votre mot de passe, compléter votre profil et retrouver vos résultats et statistiques.'
+const ACTIVATION_PREVIEW = 'Activez-le en un clic, le lien est valable {{ttl}} jours.'
 
---
-Cotentin Caps Cup
-{{siteUrl}}`
+/** Textes fixes de chaque variante du mail (F-66 participant, B-31 administrateur et promotion). Seul `introHtml` est inséré tel quel dans le HTML. */
+export const INVITATION_EMAIL_CONTENT: Record<INVITATION_EMAIL_KIND, IInvitationEmailContent> = {
+  [INVITATION_EMAIL_KIND.PARTICIPANT]: {
+    subject: INVITATION_EMAIL_SUBJECT,
+    eyebrow: 'Invitation',
+    preview: `L'organisateur de la Cotentin Caps Cup vous a créé un compte. ${ACTIVATION_PREVIEW}`,
+    introHtml: `${INTRO_PREFIX_HTML} vous a inscrit comme participant&nbsp;: un compte vient de vous être créé sur le site du CCC.`,
+    introText: "L'organisateur de la Cotentin Caps Cup vous a inscrit comme participant : un compte vient de vous être créé sur le site du CCC.",
+    body: ACTIVATION_BODY,
+    closing: "Si vous n'attendiez pas ce message, ignorez-le.",
+    withActivation: true
+  },
+  // Texte validé mot pour mot (Q10) : seule la phrase « vous a inscrit comme participant » change.
+  [INVITATION_EMAIL_KIND.ADMIN]: {
+    subject: 'Votre accès administrateur à la Cotentin Caps Cup',
+    eyebrow: 'Invitation',
+    preview: `L'organisateur de la Cotentin Caps Cup vous a donné un accès administrateur. ${ACTIVATION_PREVIEW}`,
+    introHtml: `${INTRO_PREFIX_HTML} vous a donné un accès administrateur&nbsp;: un compte vient de vous être créé sur le site du CCC.`,
+    introText: "L'organisateur de la Cotentin Caps Cup vous a donné un accès administrateur : un compte vient de vous être créé sur le site du CCC.",
+    body: ACTIVATION_BODY,
+    closing: "Si vous n'attendiez pas ce message, ignorez-le.",
+    withActivation: true
+  },
+  // Q5 : joueur actif promu. Information seulement, sans lien de connexion (rien à activer).
+  [INVITATION_EMAIL_KIND.ADMIN_PROMOTED]: {
+    subject: 'Vous êtes maintenant administrateur de la Cotentin Caps Cup',
+    eyebrow: 'Information',
+    preview: "L'organisateur de la Cotentin Caps Cup a ajouté un accès administrateur à votre compte. Aucune action n'est nécessaire.",
+    introHtml: `${INTRO_PREFIX_HTML} a ajouté un accès administrateur à votre compte existant sur le site du CCC.`,
+    introText: "L'organisateur de la Cotentin Caps Cup a ajouté un accès administrateur à votre compte existant sur le site du CCC.",
+    body: "Aucune action n'est nécessaire : connectez-vous comme d'habitude avec votre adresse email et votre mot de passe. Vos résultats et vos statistiques ne changent pas.",
+    closing: "Si vous n'attendiez pas ce message, écrivez à {{contactEmail}}.",
+    // Sans adresse de contact configurée (`public.legal.email` vide) : aucune adresse inventée.
+    closingWithoutContact: "Si vous n'attendiez pas ce message, signalez-le à l'organisateur de la Cotentin Caps Cup.",
+    withActivation: false
+  }
+}

@@ -276,11 +276,12 @@ describe('production image marker (T-SEC-06, Q1)', () => {
 })
 
 describe('publisher identity variables (F-70)', () => {
-  it('lists the 17 variables of the global rule', () => {
+  it('lists the 17 variables of the global rule, 12 of them required', () => {
     expect(LEGAL_IDENTITY_FIELDS).toHaveLength(17)
+    expect(LEGAL_IDENTITY_FIELDS.filter(field => field.required)).toHaveLength(12)
   })
 
-  it.each(LEGAL_IDENTITY_FIELDS.map(field => [field.variable, field] as const))('refuses to start when %s is empty, naming it', (variable, field) => {
+  it.each(LEGAL_IDENTITY_FIELDS.filter(field => field.required).map(field => [field.variable, field] as const))('refuses to start when %s is empty, naming it', (variable, field) => {
     const legal = completeLegal()
     const [first, second] = field.path as readonly string[]
     if (second === undefined) {
@@ -289,6 +290,27 @@ describe('publisher identity variables (F-70)', () => {
       legal[first!][second] = '  '
     }
     expect(() => assertStrictRuntimeConfig(configWith({ legal }))).toThrow(variable)
+  })
+
+  it.each(['A_COMPLETER', 'A_COMPLETERA_COMPLETER', ' a_completer '])('treats the placeholder %j as empty', (placeholder) => {
+    const legal = completeLegal()
+    legal.name = placeholder
+    legal.privacy.contactEmail = placeholder
+    expect(() => assertStrictRuntimeConfig(configWith({ legal }))).toThrow(/NUXT_PUBLIC_LEGAL_NAME, NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL/)
+  })
+
+  it.each(['form', 'capital', 'siren', 'rcs', 'vat'])('does not require the optional %s, empty or placeholder', (key) => {
+    for (const value of ['', 'A_COMPLETER']) {
+      const legal = completeLegal()
+      legal[key] = value
+      expect(() => assertStrictRuntimeConfig(configWith({ legal }))).not.toThrow()
+    }
+  })
+
+  it('names no optional variable when the whole block is empty', () => {
+    const call = () => assertStrictRuntimeConfig(configWith({ legal: undefined }))
+    expect(call).toThrow('NUXT_PUBLIC_LEGAL_NAME')
+    expect(call).not.toThrow(/NUXT_PUBLIC_LEGAL_(FORM|CAPITAL|SIREN|RCS|VAT)\b/)
   })
 
   it('names every variable when the whole block is empty, never a value', () => {
