@@ -14,7 +14,6 @@
         rounded="xl"
         border
         elevation="sm"
-        padding="0"
         class="match-queue__card"
         :class="card.cardClass"
         :data-cy="card.dataCy"
@@ -110,6 +109,8 @@ import type { IMatchCard, IMatchQueueEmits, IMatchQueueProps } from '~/interface
  * mapping.md : pas d'`origam-data-table`). Liste ordonnée native (`<ol>`) : c'est du contenu de document, pas un `listbox` applicatif.
  * Le statut est écrit en toutes lettres (« Saisi · à valider »), jamais porté par la seule couleur. Le nom du bouton nomme les deux
  * joueurs (« Valider Clara Lambert contre Paul Girard »). Le bouton contient son libellé visible : « Valider » / « Saisir ».
+ * La grille de la carte est portée par sa racine (contenu aplati par le thème, F-63) ; ses rangées restent tassées en haut
+ * (`align-content: start`) comme quand elle vivait dans l'enveloppe de contenu, de hauteur automatique.
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<IMatchQueueProps>(), {})
@@ -205,16 +206,14 @@ defineExpose({})
   }
 
   &__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: 't t chip' 'a s b' 'act act act';
+    align-content: start;
+    align-items: center;
+    gap: var(--match-queue__card---gap, var(--origam-space---3));
     height: 100%;
-
-    :deep(.origam-card__content) {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      grid-template-areas: 't t chip' 'a s b' 'act act act';
-      align-items: center;
-      gap: var(--match-queue__card---gap, var(--origam-space---3));
-      padding: var(--match-queue__card---padding, var(--origam-space---5));
-    }
+    padding: var(--match-queue__card---padding, var(--origam-space---5));
   }
 
   &__title {
@@ -262,9 +261,8 @@ defineExpose({})
     }
   }
 
-  &__card--multi :deep(.origam-card__content) {
+  &__card--multi {
     grid-template-areas: 't t chip' 'sides sides sides' 'act act act';
-    grid-template-rows: auto 1fr auto;
   }
 
   &__sides {

@@ -127,10 +127,6 @@ defineExpose({})
     display: grid;
   }
 
-  &__card :deep(.origam-card__content) {
-    height: 100%;
-  }
-
   &__figure {
     display: grid;
     height: 100%;

@@ -359,18 +359,15 @@ defineExpose({})
   }
 
   &__card {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--origam-space---2);
     padding: var(--qualification-ties__card---padding, var(--origam-space---6));
 
     @media (max-width: 760px) {
       padding: var(--origam-space---5);
     }
-  }
-
-  &__card :deep(.origam-card__content) {
-    display: grid;
-    align-content: start;
-    justify-items: start;
-    gap: var(--origam-space---2);
   }
 
   &__eyebrow {

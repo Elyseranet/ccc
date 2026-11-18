@@ -53,6 +53,8 @@ import { useSeo } from '~/composables/useSeo'
  *
  * @description
  * Liste des éditions de l'admin (F-13) : recherche par code ou année, « Créer une édition », et l'accès à chaque fiche.
+ * La table et les notes sont dans l'enveloppe d'`async-state`, que le `gap` de la page n'atteint pas : les notes portent leur
+ * marge haute, 16 px comme `.ed-note` de la maquette (F-63).
  ********************************************************/
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { t } = useT()
@@ -92,7 +94,7 @@ defineExpose({})
 
   &__none,
   &__note {
-    margin: 0;
+    margin: var(--admin-editions__note---margin-top, var(--origam-space---4)) 0 0;
     font-size: var(--origam-font__size---sm);
     color: var(--origam-color__text---tertiary);
   }
@@ -107,5 +109,6 @@ defineExpose({})
 :root {
   --admin-editions---gap: var(--origam-space---5);
   --admin-editions---padding-block: var(--origam-space---12) var(--origam-space---10);
+  --admin-editions__note---margin-top: var(--origam-space---4);
 }
 </style>

@@ -77,9 +77,11 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
-    'origam-card': { rounded: 'xl', border: true, borderColor: 'var(--origam-color__border---default)', elevation: 'md', density: 'comfortable' },
+    // F-63 : `contentDisplay: 'contents'` aplatit `.origam-card__content`, le `gap` posé par chaque composant sur sa carte atteint ainsi les blocs du slot.
+    'origam-card': { rounded: 'xl', border: true, borderColor: 'var(--origam-color__border---default)', elevation: 'md', density: 'comfortable', contentDisplay: 'contents' },
     'origam-sheet': { rounded: 'xl', border: true, elevation: 'md' },
-    'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560 },
+    // F-63 : la valeur `contents` des cartes descend dans la carte du dialogue (mesuré) et y annulait le padding du contenu ; `flex` rend le rendu d'origine (flex colonne du dialogue).
+    'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560, contentDisplay: 'flex' },
     'origam-drawer': { elevation: 'none', border: true },
     'origam-toolbar': { flat: true, density: 'default', elevation: 'none' },
     'origam-bottom-nav': { elevation: 'lg', grow: true },
