@@ -1730,5 +1730,6 @@
   "admin.administrators.error_self_text": "Retrait refusé : vous ne pouvez pas retirer votre propre accès.",
   "admin.administrators.error_not_found_title": "Compte introuvable.",
   "admin.administrators.error_not_found_text": "Ce compte n’est plus administrateur : rechargez la liste.",
-  "admin.administrators.error_unknown_text": "L’action n’a pas pu aboutir : réessayez."
+  "admin.administrators.error_unknown_text": "L’action n’a pas pu aboutir : réessayez.",
+  "admin.administrators.list_error": "La liste des administrateurs n’a pas pu être chargée."
 }

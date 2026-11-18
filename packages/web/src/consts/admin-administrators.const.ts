@@ -10,11 +10,11 @@ export const ADMIN_ADMINISTRATORS_CACHE_KEY = 'admin-administrators'
 /** Mots de la partie locale d'un email (« maya.bonnet »), dont l'avatar tire ses initiales quand le compte n'a pas de fiche. */
 export const ADMINISTRATOR_EMAIL_WORD_SEPARATOR = /[._-]+/
 
-/** Largeur de chaque colonne de la table : celles de la maquette à 1440 px (liste 1,6 fr, soit 592 px de table). */
-export const ADMINISTRATOR_COLUMN_WIDTHS = { email: '52%', state: '26%', actions: '22%' } as const
+/** Largeur des colonnes « Administrateur » et « Compte » : celles de la maquette (277,8 et 155,5 px, mesurées à 1440 et à 390 px) ; « Action » prend le reste. */
+export const ADMINISTRATOR_COLUMN_WIDTHS = { email: '277.8px', state: '155.5px' } as const
 
-/** Largeur minimale de chaque colonne : celle de la maquette à 390 px, où la table défile dans son conteneur. */
-export const ADMINISTRATOR_COLUMN_MIN_WIDTHS = { email: '230px', state: '150px', actions: '150px' } as const
+/** Largeur minimale de chaque colonne : celle de la maquette à 390 px, où la table défile dans son conteneur (« Action » : 143,9 px). */
+export const ADMINISTRATOR_COLUMN_MIN_WIDTHS = { email: '277.8px', state: '155.5px', actions: '143.9px' } as const
 
 /** Texte de confirmation du retrait, selon ce que le serveur fait du compte (décisions utilisateur 2026-11-18, B-31 Q1 et Q2). */
 export const ADMIN_REVOKE_TEXTS: Record<ADMIN_REVOKE_CASE, ITranslatableText> = {

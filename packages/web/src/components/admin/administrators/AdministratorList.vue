@@ -48,7 +48,6 @@
         <template #[`item.state`]="{ item }">
           <span class="administrator-list__chips">
             <origam-chip
-              size="small"
               :color="chipOf(item.state).color"
               :bg-color="chipOf(item.state).bgColor"
               :text="chipOf(item.state).label"
@@ -56,7 +55,6 @@
             />
             <origam-chip
               v-if="item.isSelf"
-              size="small"
               color="secondary"
               :text="selfLabel"
               data-cy="administrator-self"
@@ -206,7 +204,7 @@ const chipOf = (state: ACCOUNT_STATE) => {
 const headers = computed<IDataTableHeader[]>(() => [
   { key: ADMINISTRATOR_COLUMN.EMAIL, width: ADMINISTRATOR_COLUMN_WIDTHS.email, minWidth: ADMINISTRATOR_COLUMN_MIN_WIDTHS.email, title: t('admin.administrators.col_administrator', 'Administrateur'), sortable: false, nowrap: true },
   { key: ADMINISTRATOR_COLUMN.STATE, width: ADMINISTRATOR_COLUMN_WIDTHS.state, minWidth: ADMINISTRATOR_COLUMN_MIN_WIDTHS.state, title: t('admin.administrators.col_account', 'Compte'), sortable: false, nowrap: true },
-  { key: ADMINISTRATOR_COLUMN.ACTIONS, width: ADMINISTRATOR_COLUMN_WIDTHS.actions, minWidth: ADMINISTRATOR_COLUMN_MIN_WIDTHS.actions, title: t('admin.administrators.col_action', 'Action'), sortable: false, align: ALIGN.END }
+  { key: ADMINISTRATOR_COLUMN.ACTIONS, minWidth: ADMINISTRATOR_COLUMN_MIN_WIDTHS.actions, title: t('admin.administrators.col_action', 'Action'), sortable: false, align: ALIGN.END }
 ])
 
 /*********************************************************
@@ -297,7 +295,6 @@ defineExpose({})
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--origam-space---1);
   }
 
   &__why {

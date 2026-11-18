@@ -23,7 +23,8 @@ export const ADMIN_PAGES = [
   '/admin/participants',
   '/admin/tirages',
   '/admin/phase-finale',
-  '/admin/plus'
+  '/admin/plus',
+  '/admin/administrateurs'
 ]
 
 export const REDIRECTS: Array<{ from: string, to: string }> = [

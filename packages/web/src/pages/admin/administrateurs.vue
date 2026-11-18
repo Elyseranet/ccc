@@ -19,11 +19,32 @@
     <div class="admin-administrators__grid">
       <div class="admin-administrators__main">
         <async-state
-          v-if="showState"
-          :pending="isLoading"
-          :error="listError"
-          @retry="handleReload"
+          v-if="isLoading"
+          pending
         />
+        <origam-alert
+          v-else-if="listError"
+          status="error"
+          rounded="lg"
+          font-size="md"
+          font-weight="bold"
+          letter-spacing="normal"
+          line-height="normal"
+          :title="listErrorTitle"
+          data-cy="administrator-list-error"
+        >
+          <template #text>
+            {{ listErrorText }}
+            <origam-btn
+              variant="outlined"
+              font-size="sm"
+              padding-inline="4"
+              :text="retryLabel"
+              data-cy="administrator-list-retry"
+              @click="handleReload"
+            />
+          </template>
+        </origam-alert>
         <administrator-list
           v-else
           :administrators="administrators"
@@ -37,14 +58,19 @@
           v-if="actionFailure"
           status="error"
           rounded="lg"
+          font-size="md"
+          font-weight="bold"
+          letter-spacing="normal"
+          line-height="normal"
           density="compact"
-          :text="actionFailureText"
           data-cy="administrator-action-error"
         >
-          <template #close>
+          <template #text>
+            {{ actionFailureText }}
             <origam-btn
               variant="outlined"
-              size="small"
+              font-size="sm"
+              padding-inline="4"
               :text="reloadLabel"
               data-cy="administrator-reload"
               @click="handleActionReload"
@@ -141,6 +167,9 @@ const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const eyebrow = computed(() => t('admin.administrators.eyebrow', 'Organisation'))
 const cancelLabel = computed(() => t('admin.account.dialog_cancel', 'Annuler'))
 const revokeLabel = computed(() => t('admin.administrators.revoke', 'Retirer l’accès'))
+const retryLabel = computed(() => t('components.async_state.retry', 'Réessayer'))
+const listErrorTitle = computed(() => t('admin.account.error_unknown_title', 'Une erreur est survenue.'))
+const listErrorText = computed(() => t('admin.administrators.list_error', 'La liste des administrateurs n’a pas pu être chargée.'))
 const reloadLabel = computed(() => t('admin.administrators.reload', 'Recharger'))
 const actionFailureText = computed(() => actionFailure.value ? t(actionFailure.value.text.key, actionFailure.value.text.fallback, actionFailure.value.text.params) : '')
 
@@ -148,10 +177,9 @@ const actionFailureText = computed(() => actionFailure.value ? t(actionFailure.v
  * Chargement et erreur de liste
  *
  * @description
- * Le squelette ne remplace la liste qu'au premier chargement : un rechargement après une action la laisse affichée.
+ * Le squelette ne remplace la liste qu'au premier chargement : un rechargement après une action la laisse affichée. Une liste en erreur est remplacée par l'alerte et « Réessayer ».
  ********************************************************/
 const isLoading = computed(() => pending.value && administrators.value.length === 0)
-const showState = computed(() => isLoading.value || listError.value !== null)
 const handleReload = () => {
   refresh()
 }
