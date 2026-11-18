@@ -284,7 +284,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-61](F-61.md) | Saisie de score : un seul bouton « Valider » | — | F-18 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-62](F-62.md) | Admin : saisir l'email d'un joueur et l'inviter (fiche + inscrits) | à compléter | B-29, F-09 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-63](F-63.md) | Audit et correction des espacements manquants (toute l'app) | maquettes happy-hour | F-47, F-49, F-50, F-56 | Ouvert : mergé @ `33de7459` + `5d082b58`, contrôle écran en attente | — |
-| [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert (2026-11-18) | — |
+| [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert : mergé @ `43da1d2f`, contrôle écran en attente | — |
 | [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | maquette admin-editions mise à jour | B-30, F-13 | Ouvert : mergé @ `4c5f1f28`, contrôle écran en attente | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
