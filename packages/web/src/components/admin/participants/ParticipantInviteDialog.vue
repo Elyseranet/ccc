@@ -9,6 +9,7 @@
     cy-prefix="participant-invite"
     confirm-color="primary"
     :focus-cancel="false"
+    :appearance="appearance"
     @cancel="emits('cancel')"
     @confirm="handleConfirm"
   >
@@ -42,6 +43,7 @@ import AccountEmailField from '~/components/admin/competitors/AccountEmailField.
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import { useT } from '~/composables/useT'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
+import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { IParticipantInviteDialogEmits, IParticipantInviteDialogProps } from '~/interfaces/admin-competitors.interface'
 
 /*********************************************************
@@ -56,6 +58,7 @@ const { t } = useT()
 const props = withDefaults(defineProps<IParticipantInviteDialogProps>(), { pending: false, failure: null })
 const emits = defineEmits<IParticipantInviteDialogEmits>()
 defineSlots<{}>()
+const appearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const fieldRef = ref<{ validate: () => boolean } | null>(null)
 const email = ref('')
 watch(() => props.open, (open) => {
