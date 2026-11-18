@@ -291,7 +291,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert : mergé @ `43da1d2f`, contrôle écran en attente | — |
 | [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | maquette admin-editions mise à jour | B-30, F-13 | Ouvert : mergé @ `4c5f1f28`, contrôle écran en attente | — |
 | [F-66](F-66.md) | Mail d'invitation aux couleurs de la CCC | maquette mail-invitation.html validée @ `11422b8b` | B-29, F-62 | Ouvert : mergé @ `8d2861a2`, contrôle d'un vrai mail en attente | — |
-| [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | Ouvert : bloqué, Origam 2.39 non publiée | — |
+| [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | En cours : Origam 2.39.0 publiée, + espacements du dialogue de confirmation (capture 2026-11-18) | — |
 | [F-68](F-68.md) | Écran « Administrateurs » | admin-administrateurs.html validée | B-31 | Ouvert : mergé @ `f470d0a0`, contrôle écran en attente | — |
 | [F-69](F-69.md) | Fiche compétiteur : relier au compte d'un administrateur | admin-administrateurs.html#ad-p-link validée | B-31, B-32, F-62 | Ouvert : mergé @ `ab1b7a95`, contrôle écran en attente | — |
 | [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : mergé @ `1800732d`, variables serveur à remplir, pages légales non livrées | — |
