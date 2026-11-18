@@ -203,6 +203,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .admin-closing {
+  --async-state---gap: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-closing---gap, var(--origam-space---5));

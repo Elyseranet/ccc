@@ -440,7 +440,6 @@ defineExpose({})
   }
 
   &__playoff {
-    margin-bottom: var(--origam-space---5);
     padding: var(--origam-space---6);
 
     @media (max-width: 760px) {
@@ -448,9 +447,7 @@ defineExpose({})
     }
   }
 
-  // Entre la grille et le récapitulatif (maquette `admin-tirage-tour.html`, `.q-sec`) : l'enveloppe d'`async-state` n'a pas de gap.
   &__grid {
-    margin-bottom: var(--origam-space---6);
     display: grid;
     grid-template-columns: minmax(0, 1fr) 20rem;
     align-items: start;

@@ -339,6 +339,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .admin-qualification {
+  --async-state---gap: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-qualification---gap, var(--origam-space---5));

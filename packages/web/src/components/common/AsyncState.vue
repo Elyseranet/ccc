@@ -142,3 +142,17 @@ const emptyDescriptionText = computed(() => props.emptyDescription
  ********************************************************/
 defineExpose({})
 </script>
+
+<style lang="scss" scoped>
+.async-state {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--async-state---gap, var(--origam-space---5));
+}
+</style>
+
+<style>
+:root {
+  --async-state---gap: var(--origam-space---5);
+}
+</style>
