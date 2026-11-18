@@ -1378,6 +1378,7 @@
   "admin.editions.code_info_title": "Code",
   "admin.editions.code_info_text": "Vous ne saisissez pas le code : le serveur le génère à la création. 2027 pour la première édition de l’année, puis 2027b, 2027c…",
   "admin.editions.saved_title": "Modifications enregistrées",
+  "admin.editions.export_button": "Exporter (Excel)",
   "admin.editions.delete_title": "Zone de danger",
   "admin.editions.delete_text": "Supprimer l’édition efface définitivement ses participations, ses poules, ses tirages et ses matchs. Les profils des compétiteurs sont conservés.",
   "admin.editions.delete_button": "Supprimer l’édition…",
