@@ -439,6 +439,7 @@ Les décisions sont consignées dans `docs/design/ux/decisions.md`, section « A
 - [T-OPS-02](T-OPS-02.md) : validé en revue par le back-lead (`cc23ed5`), en attente de l'intégration de la vague 3a. La preuve `docker logs` sera rejouée sur l'image intégrée avec PROD-1.
 - [B-21](B-21.md) : **Fermé** (2026-11-13) @ `b062a40f` — 175 matchs d'archives avec leur vainqueur (R-5 bis), Fossati 40/10, Deseine 53/18.
 - [T-QA-12](T-QA-12.md) : **Ouvert** (2026-11-15) — F-11 zone `ti-tetes` instable à 1440 (+8 px intermittent sur develop non modifié) ; cause probable : polices, à prouver avant correction. Assigné dev-f08 après F-30.
+- [T-QA-13](T-QA-13.md) : **Ouvert** (2026-11-18) — `alignToPixel` sans effet quand sa marge fusionne (révélé par F-71) : copie unique du helper, et 3 écarts masqués à traiter (F-03a sélecteur 3,1 %, F-10 profil 6,1 %, F-68 ligne « vous » 3,0 %).
 - [T-QA-11](T-QA-11.md) : **Fermé** (2026-11-13) @ `10d0a42e` — zone publique F-21 : cause tabular-nums du N°, corrigée ; écart dû au mode de lancement expliqué (bordure basse à une fraction de pixel). 0,000 % à 390, 0,461 % max à 1440.
 - [T-QA-10](T-QA-10.md) : **Fermé** (2026-11-13) @ `ac1bb3ec` — défaut de l'app (`watch` de `useScoreEntry`), corrigé ; « 412 » 8/8.
 - [T-OPS-03](T-OPS-03.md) : **Fermé** (2026-11-12) — mergé @ `43462a46` ; la dev affiche sa version (`62ed5a66`) et l'état des migrations.
