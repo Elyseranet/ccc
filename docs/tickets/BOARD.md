@@ -41,8 +41,8 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | **Fermé** (2026-11-17) @ `c8d4389e` |
 | [B-29](B-29.md) | Inviter un joueur sans compte : poser l'email et envoyer l'invitation (F-62) | — | A14 | — | **Fermé** (2026-11-17) @ `a66d9529`, vérifié sur dev |
 | [B-30](B-30.md) | Export Excel (.xlsx) d'une édition, admin (F-65) | — | B-11 | — | **Fermé** (2026-11-18) @ `8d8ec512`, vérifié sur dev |
-| [B-31](B-31.md) | Inviter, gérer et retirer un administrateur depuis l'interface | — | B-09, A14 | — | Ouvert : prêt à implémenter (décisions Q1-Q5, Q9, Q10 du 2026-11-18) |
-| [B-32](B-32.md) | Relier un compte administrateur à sa fiche joueur | — | B-29, B-31 | — | Ouvert : implémenté @ `499acb03`, merge après B-31 |
+| [B-31](B-31.md) | Inviter, gérer et retirer un administrateur depuis l'interface | — | B-09, A14 | — | **Fermé** (2026-11-18) @ `1ffc9544`, déployé sur dev |
+| [B-32](B-32.md) | Relier un compte administrateur à sa fiche joueur | — | B-29, B-31 | — | **Fermé** (2026-11-18) @ `6911bcd9`, déployé sur dev |
 | [T-SEC-23](T-SEC-23.md) | Remédiation npm audit : 11 high, 4 moderate | — | — | — | **Fermé** (2026-11-18) @ `4834c14b`, dérogation SW-1 jusqu'au 2026-12-17 |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
