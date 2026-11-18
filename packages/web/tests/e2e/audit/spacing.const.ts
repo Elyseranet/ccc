@@ -76,8 +76,17 @@ export const SPACING_AUDIT_CASES: ISpacingAuditCase[] = [
   { route: ROUTES.ADMIN_COMPETITOR, path: `/admin/competiteurs/${PLAYER_ID}`, role: 'admin', actions: [{ kind: 'submit', trigger: '[data-cy="competitor-account-submit"]' }] }
 ]
 
+/** Paire de blocs collés À L'IDENTIQUE de la maquette (écart de boîtes mesuré 0 px dans la maquette) : règle `maquette`. */
+export interface ISpacingMockupZero { parent: string, a: string, b: string, source: string }
+
+export const SPACING_AUDIT_MOCKUP_ZERO: ISpacingMockupZero[] = [
+  { parent: '[data-cy="competitor-form-card"]', a: '.identity-form__head', b: '[data-cy="competitor-photo"]', source: 'admin-editions.html#ed-p-comp, `.cp-form` : en-tête → photo 0 px à 1440 et 390 (F-64)' },
+  { parent: '[data-cy="competitor-form-card"]', a: '[data-cy="competitor-photo"]', b: '[data-cy="competitor-form"]', source: 'admin-editions.html#ed-p-comp, `.cp-form` : photo → formulaire 0 px à 1440 et 390 (F-64)' }
+]
+
 /** Règles d'exclusion, recopiées dans le rapport (le code de chaque règle est dans `spacing.audit.ts`, fonction `exclusion`). */
 export const SPACING_AUDIT_RULES: Record<string, string> = {
+  'maquette': 'paire listée dans `SPACING_AUDIT_MOCKUP_ZERO` : blocs accolés à l\'identique de la maquette (écart mesuré 0 px dans la maquette, source citée par paire).',
   'tableau': 'parent ou enfant de table (`table`, `tr`, `td`…, rôles row / cell / rowgroup).',
   'liste': 'deux items de liste (`li`, rôles option / listitem / menuitem / tab / treeitem, `.origam-list-item`).',
   'bracket': 'à l\'intérieur d\'un tableau à élimination (`.origam-bracket`).',

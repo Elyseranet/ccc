@@ -34,6 +34,9 @@ import {
  * application (données, texte reformulé) casse la correspondance de ce bloc ; l'écart entre deux textes inclut leur
  * interligne : une différence de typographie (taille, interligne) apparaît comme une différence d'écart.
  *
+ * Repères manuels (`pairs`, F-64) : pour les écrans où les textes sont surtout des données, séquences de blocs écrites à
+ * la main (sélecteur maquette, sélecteur application) ; écart entre les BOÎTES de deux blocs consécutifs, même seuil.
+ *
  * Cause : composant de l'application qui contient les deux blocs (premier ancêtre commun portant une classe d'application).
  ********************************************************/
 
@@ -60,7 +63,7 @@ interface IDiff {
   appB: string
 }
 
-interface IPageStat { page: string, width: number, appAnchors: number, mockAnchors: number, matched: number, compared: number, flagged: number }
+interface IPageStat { page: string, width: number, appAnchors: number, mockAnchors: number, matched: number, compared: number, flagged: number, manual?: number }
 
 const anchorsOf = (): IAnchor[] => {
   const CONTROL_BOX = 'a, button, label, [role="tab"], .origam-btn, .origam-chip, .origam-tab, .btn, .chip, .tab'
@@ -151,7 +154,38 @@ const compareAnchors = (pageName: string, width: number, app: IAnchor[], mock: I
     diffs.push({ page: pageName, width, a: a.text, b: b.text, mock: mockGap, app: appGap, delta, owner: commonOwner(a.chain, b.chain), appA: a.label, appB: b.label })
   }
   const matched = app.filter(isMatched).length
-  return { diffs, stat: { page: pageName, width, appAnchors: app.length, mockAnchors: mock.length, matched, compared, flagged: diffs.length } }
+  return { diffs, stat: { page: pageName, width, appAnchors: app.length, mockAnchors: mock.length, matched, compared, flagged: diffs.length, manual: 0 } }
+}
+
+/** Boîte (haut, bas) du premier élément visible du sélecteur, en coordonnées de page ; `null` s'il est absent. */
+const boxOf = (page: Page, selector: string) => page.evaluate((sel) => {
+  const el = [...document.querySelectorAll(sel)].find(e => e.getBoundingClientRect().height > 0)
+  if (!el) return null
+  const r = el.getBoundingClientRect()
+  return { top: r.top + window.scrollY, bottom: r.bottom + window.scrollY }
+}, selector)
+
+const comparePairs = async (pageName: string, width: number, page: Page, mockup: Page, sequences: Array<Array<[string, string]>>, missing: string[]): Promise<{ diffs: IDiff[], compared: number }> => {
+  const diffs: IDiff[] = []
+  let compared = 0
+  for (const sequence of sequences) {
+    const boxes = await Promise.all(sequence.map(async ([m, a]) => ({ m, a, mock: await boxOf(mockup, m), app: await boxOf(page, a) })))
+    for (const b of boxes) {
+      if (!b.mock || !b.app) missing.push(`${pageName} @${width} : ${b.mock ? '' : `maquette \`${b.m}\``}${!b.mock && !b.app ? ' et ' : ''}${b.app ? '' : `application \`${b.a}\``}`)
+    }
+    for (let i = 1; i < boxes.length; i++) {
+      const up = boxes[i - 1]!
+      const down = boxes[i]!
+      if (!up.mock || !up.app || !down.mock || !down.app) continue
+      compared++
+      const mockGap = Math.round((down.mock.top - up.mock.bottom) * 10) / 10
+      const appGap = Math.round((down.app.top - up.app.bottom) * 10) / 10
+      const delta = Math.round((appGap - mockGap) * 10) / 10
+      if (Math.abs(delta) <= SPACING_MOCKUP_MAX_DELTA) continue
+      diffs.push({ page: pageName, width, a: up.m, b: down.m, mock: mockGap, app: appGap, delta, owner: 'repères manuels', appA: up.a, appB: down.a })
+    }
+  }
+  return { diffs, compared }
 }
 
 const openMockup = async (mockup: Page, entry: typeof SPACING_MOCKUP_CASES[number]) => {
@@ -163,15 +197,19 @@ const openMockup = async (mockup: Page, entry: typeof SPACING_MOCKUP_CASES[numbe
   await mockup.evaluate(() => document.fonts.ready)
 }
 
-const report = (diffs: IDiff[], stats: IPageStat[]): string => {
+const report = (diffs: IDiff[], stats: IPageStat[], missing: string[]): string => {
   const lines: string[] = []
   const tally = (key: (d: IDiff) => string) => [...diffs.reduce((acc, d) => acc.set(key(d), (acc.get(key(d)) ?? 0) + 1), new Map<string, number>())].sort((x, y) => y[1] - x[1])
   lines.push('# Audit des espacements contre la maquette (F-64)', '')
   lines.push(`Généré par \`npm run audit:spacing\` (\`packages/web/tests/e2e/audit/spacing-mockup.audit.ts\`) le ${new Date().toISOString().slice(0, 10)}.`)
   lines.push(`Écart vertical entre deux blocs correspondants consécutifs (ancres de texte uniques des deux côtés), application − maquette ; signalé au-delà de ${SPACING_MOCKUP_MAX_DELTA} px. Largeurs : ${SPACING_AUDIT_VIEWPORTS.map(v => v.width).join(', ')}. Méthode et limites : en tête du script.`, '')
-  lines.push(`Écarts comparés : ${stats.reduce((s, x) => s + x.compared, 0)}. Différences > ${SPACING_MOCKUP_MAX_DELTA} px : **${diffs.length}** (application plus serrée : ${diffs.filter(d => d.delta < 0).length} ; plus lâche : ${diffs.filter(d => d.delta > 0).length}).`, '')
-  lines.push('## Couverture par écran', '', '| écran | largeur | ancres app | ancres maquette | correspondantes | écarts comparés | signalés |', '|---|---|---|---|---|---|---|')
-  for (const s of stats) lines.push(`| ${s.page} | ${s.width} | ${s.appAnchors} | ${s.mockAnchors} | ${s.matched} | ${s.compared} | ${s.flagged} |`)
+  lines.push(`Écarts comparés : ${stats.reduce((s, x) => s + x.compared, 0)} par ancres de texte, ${stats.reduce((s, x) => s + (x.manual ?? 0), 0)} par repères manuels. Différences > ${SPACING_MOCKUP_MAX_DELTA} px : **${diffs.length}** (application plus serrée : ${diffs.filter(d => d.delta < 0).length} ; plus lâche : ${diffs.filter(d => d.delta > 0).length}).`, '')
+  lines.push('## Couverture par écran', '', '| écran | largeur | ancres app | ancres maquette | correspondantes | écarts comparés (ancres) | écarts comparés (repères) | signalés |', '|---|---|---|---|---|---|---|---|')
+  for (const s of stats) lines.push(`| ${s.page} | ${s.width} | ${s.appAnchors} | ${s.mockAnchors} | ${s.matched} | ${s.compared} | ${s.manual ?? 0} | ${s.flagged} |`)
+  if (missing.length) {
+    lines.push('', '## Repères manuels introuvables', '')
+    for (const m of missing) lines.push(`- ${m}`)
+  }
   lines.push('', '## Par composant (cause)', '', '| composant de l\'application | cas |', '|---|---|')
   for (const [k, v] of tally(d => d.owner || '—')) lines.push(`| ${md(k)} | ${v} |`)
   lines.push('', '## Détail', '', '| écran | largeur | bloc A | bloc B | maquette (px) | app (px) | Δ (px) | composant | sélecteur A | sélecteur B |', '|---|---|---|---|---|---|---|---|---|---|')
@@ -193,6 +231,7 @@ test('audit des espacements contre la maquette (F-64)', async ({ browser }) => {
 
   const diffs: IDiff[] = []
   const stats: IPageStat[] = []
+  const missing: string[] = []
   for (const viewport of SPACING_AUDIT_VIEWPORTS) {
     const mockContext = await browser.newContext({ viewport, reducedMotion: 'reduce' })
     const mockup = await mockContext.newPage()
@@ -205,13 +244,14 @@ test('audit des espacements contre la maquette (F-64)', async ({ browser }) => {
       await settle(page)
       await openMockup(mockup, entry)
       const result = compareAnchors(entry.name, viewport.width, await page.evaluate(anchorsOf), await mockup.evaluate(anchorsOf))
-      diffs.push(...result.diffs)
-      stats.push(result.stat)
+      const manual = await comparePairs(entry.name, viewport.width, page, mockup, entry.pairs ?? [], missing)
+      diffs.push(...result.diffs, ...manual.diffs)
+      stats.push({ ...result.stat, manual: manual.compared, flagged: result.stat.flagged + manual.diffs.length })
       await context.close()
     }
     await mockContext.close()
   }
 
-  writeFileSync(resolve(process.env.SPACING_MOCKUP_AUDIT_OUT ?? SPACING_MOCKUP_DEFAULT_OUT), report(diffs, stats))
+  writeFileSync(resolve(process.env.SPACING_MOCKUP_AUDIT_OUT ?? SPACING_MOCKUP_DEFAULT_OUT), report(diffs, stats, missing))
   writeFileSync(resolve('test-results', 'spacing-mockup-audit.json'), JSON.stringify({ diffs, stats }, null, 2))
 })

@@ -17,7 +17,17 @@ export interface ISpacingMockupCase {
   mockupHash?: string
   mockupTab?: string
   mockupCss?: string
+  /** Repères écrits à la main (F-64) : séquences de blocs empilés `[maquette, application]` ; on compare l'écart entre deux blocs consécutifs d'une séquence. */
+  pairs?: Array<Array<[string, string]>>
 }
+
+/** Étapes de la phase finale puis en-tête de page : mêmes repères sur qualification, tirage de tour et clôture. */
+const phaseHead = (page: string): Array<[string, string]> => [
+  ['.ostep--phase', '[data-cy="phase-steps"]'],
+  ['.adm-head .eyebrow', `.${page}__eyebrow`],
+  ['.adm-head .adm-h1', '[data-cy="page-title"]'],
+  ['.adm-head > p.muted', `.${page}__lead`]
+]
 
 /** Écart (px) au-delà duquel une différence app / maquette est signalée. */
 export const SPACING_MOCKUP_MAX_DELTA = 4
@@ -33,8 +43,38 @@ export const SPACING_MOCKUP_CASES: ISpacingMockupCase[] = [
   { name: 'palmares', mockup: 'palmares.html', path: '/palmares', role: 'anonymous' },
   { name: 'edition', mockup: 'edition.html', path: '/editions/2025', role: 'anonymous' },
   { name: 'joueurs', mockup: 'joueurs.html', path: '/joueurs', role: 'anonymous' },
-  { name: 'joueur', mockup: 'joueur.html', path: '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca', role: 'anonymous' },
-  { name: 'face-a-face', mockup: 'face-a-face.html', path: '{pair}', role: 'anonymous' },
+  {
+    name: 'joueur',
+    mockup: 'joueur.html',
+    path: '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca',
+    role: 'anonymous',
+    pairs: [[
+      ['.pl-hero', '[data-cy="player-header"]'],
+      ['.pl-stats', '.player-stats__grid'],
+      ['section:has(.pchart) > .section__head', '.player-journey__head'],
+      ['.pchart', '[data-cy="player-journey-chart"]'],
+      ['.table-wrap--bare', '[data-cy="player-journey-table"]'],
+      ['section:has(.opps) > .section__head', '.player-opponents__head'],
+      ['.opps', '[data-cy="player-opponents-list"]']
+    ]]
+  },
+  {
+    name: 'face-a-face',
+    mockup: 'face-a-face.html',
+    path: '{pair}',
+    role: 'anonymous',
+    pairs: [[
+      ['.ff-hero .page-hero__title', '[data-cy="page-title"]'],
+      ['.ff-hero .page-hero__lead', '[data-cy="page-hero-lead"]'],
+      ['.ff-pick', '[data-cy="head-to-head-picker"]'],
+      ['.ff-duel', '[data-cy="head-to-head-duel"] .origam-card'],
+      ['section:has(> .ff-players) > .section__head', '.head-to-head-summary__head'],
+      ['.ff-players', '.head-to-head-summary__players'],
+      ['section:has(> .table-wrap) > .section__head', '.head-to-head-history__head'],
+      ['.table-wrap', '[data-cy="head-to-head-scroll"]'],
+      ['.ff-note', '[data-cy="head-to-head-note"]']
+    ]]
+  },
   { name: 'regles', mockup: 'regles.html', path: '/regles', role: 'anonymous' },
   { name: 'connexion', mockup: 'compte.html', path: '/connexion', role: 'anonymous', mockupTab: '#ac-t-login', mockupCss: `${ACCOUNT_TABS_HIDDEN} #login-err { display: none !important; }` },
   { name: 'invitation', mockup: 'compte.html', path: '/invitation/{invitation}', role: 'anonymous', mockupTab: '#ac-t-first', mockupCss: ACCOUNT_TABS_HIDDEN },
@@ -46,13 +86,36 @@ export const SPACING_MOCKUP_CASES: ISpacingMockupCase[] = [
   { name: 'erreur-404', mockup: 'erreur.html', path: '/page-qui-nexiste-pas', role: 'anonymous' },
   { name: 'admin', mockup: 'admin.html', path: '/admin', role: 'admin' },
   { name: 'admin-matchs', mockup: 'admin-matchs.html', path: '/admin/matchs', role: 'admin', mockupCss: '.sheet, .sheet-scrim { display: none !important; }' },
-  { name: 'admin-participants', mockup: 'admin-participants.html', path: '/admin/participants', role: 'admin' },
-  { name: 'admin-tirages', mockup: 'admin-tirages.html', path: '/admin/tirages', role: 'admin' },
-  { name: 'admin-qualification', mockup: 'admin-qualification.html', path: '/admin/phase-finale/qualification', role: 'admin' },
-  { name: 'admin-tirage-tour', mockup: 'admin-tirage-tour.html', path: '/admin/phase-finale/tirage', role: 'admin' },
-  { name: 'admin-cloture', mockup: 'admin-cloture.html', path: '/admin/phase-finale/cloture', role: 'admin' },
+  {
+    name: 'admin-participants',
+    mockup: 'admin-participants.html',
+    path: '/admin/participants',
+    role: 'admin',
+    pairs: [
+      [['.adm-head .eyebrow', '.admin-participants__eyebrow'], ['.adm-head .adm-h1', '[data-cy="page-title"]'], ['.adm-head > p.muted', '[data-cy="participant-summary"]'], ['.pa-grid', '.admin-participants__grid']],
+      [['.pa-add > .h-card', '.admin-participants__card-title'], ['.pa-add > p.muted', '.admin-participants__lead']],
+      [['.pa-list > header', '.participant-list__head'], ['.pa-list .table-wrap', '[data-cy="participant-scroll"]'], ['.pa-list .pager', '[data-cy="participant-pagination"]']]
+    ]
+  },
+  {
+    name: 'admin-tirages',
+    mockup: 'admin-tirages.html',
+    path: '/admin/tirages',
+    role: 'admin',
+    pairs: [[['.adm-head .eyebrow', '.admin-draws__eyebrow'], ['.adm-head .adm-h1', '[data-cy="page-title"]'], ['.adm-head > p.muted', '.admin-draws__lead']]]
+  },
+  { name: 'admin-qualification', mockup: 'admin-qualification.html', path: '/admin/phase-finale/qualification', role: 'admin', pairs: [phaseHead('admin-qualification')] },
+  { name: 'admin-tirage-tour', mockup: 'admin-tirage-tour.html', path: '/admin/phase-finale/tirage', role: 'admin', pairs: [phaseHead('admin-round-draw')] },
+  { name: 'admin-cloture', mockup: 'admin-cloture.html', path: '/admin/phase-finale/cloture', role: 'admin', pairs: [phaseHead('admin-closing')] },
   { name: 'admin-plus', mockup: 'admin-plus.html', path: '/admin/plus', role: 'admin' },
-  { name: 'admin-editions', mockup: 'admin-editions.html', path: '/admin/editions', role: 'admin', mockupHash: 'ed-p-list' },
+  {
+    name: 'admin-editions',
+    mockup: 'admin-editions.html',
+    path: '/admin/editions',
+    role: 'admin',
+    mockupHash: 'ed-p-list',
+    pairs: [[['#ed-p-list .ed-bar', '.editions-toolbar'], ['#ed-p-list .table-wrap', '[data-cy="editions-table"]'], ['#ed-p-list .ed-note', '[data-cy="editions-note"]']]]
+  },
   { name: 'admin-edition-nouvelle', mockup: 'admin-editions.html', path: '/admin/editions/nouvelle', role: 'admin', mockupHash: 'ed-p-new', mockupCss: '#ed-p-new .ed-done, #ed-p-new .alert--error { display: none !important; }' },
   { name: 'admin-edition-2026', mockup: 'admin-editions.html', path: '/admin/editions/2026', role: 'admin', mockupHash: 'ed-p-edit', mockupCss: '#ed-p-edit .ed-form--locked { display: none !important; }' },
   { name: 'admin-edition-2025', mockup: 'admin-editions.html', path: '/admin/editions/2025', role: 'admin', mockupHash: 'ed-p-edit', mockupCss: '#ed-p-edit .ed-form:not(.ed-form--locked), .ed-form--locked > .alert--error { display: none !important; }' },
