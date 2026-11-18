@@ -1,6 +1,6 @@
-# API : administrateurs et lien compte admin / fiche joueur (B-31, B-32) — PROPOSITION
+# API : administrateurs et lien compte admin / fiche joueur (B-31, B-32)
 
-**Statut : contrat proposé, non implémenté.** Les points marqués **[Qx]** dépendent des arbitrages listés dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md` ; la variante décrite ici est la recommandation du backend-lead, à remplacer par la décision utilisateur avant implémentation.
+**Statut : contrat arrêté, non implémenté.** Décisions utilisateur Q1 à Q10 du 2026-11-18 (détail dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md`) ; les marqueurs **[Qx]** renvoient à la décision qui fixe le point.
 
 Routes sous `/api/v1`. Rôle `ADMIN` exigé sur toutes (`requireRole(event, USER_ROLE.ADMIN)`) : **401** `UNAUTHORIZED` sans session, **403** `FORBIDDEN` pour un participant, vérifié avant toute lecture du corps. Réponses en `Cache-Control: no-store`. Erreurs au format `IApiError`. Corps validés par zod `.strict()` (champ inconnu : **400** `VALIDATION_FAILED`), 16 Ko au plus (**413**).
 
@@ -66,8 +66,6 @@ Corps `{ "email": string }` (même règle que `POST /competiteurs` : format, 254
 | email d'un compte `PARTICIPANT` `ACTIVE` **[Q4]** | `role` → `ADMIN`, fiche, mot de passe et sessions conservés ; mail d'information sans lien **[Q5]** | `200` `{ id, accountStatus: "ACTIVE", promoted: true, invitationSent, invitationExpiresAt: null }` |
 | email d'un compte déjà `ADMIN` | rien | `409` `ALREADY_ADMIN` |
 
-Si **[Q4]** est tranché en « refus » : les deux lignes « promotion » deviennent `409` `EMAIL_ALREADY_USED`, comme `POST /competiteurs`.
-
 Échec d'envoi du mail : `invitationSent: false`, rien n'est annulé, le renvoi reste possible (même comportement que `sendInvitationEmail`, A14).
 
 ### `POST /admin/administrateurs/{id}/invitation`
@@ -99,7 +97,7 @@ Retire l'accès administrateur. En une transaction, sous verrou `FOR UPDATE` de 
 
 ## B-32 — Relier un compte administrateur à sa fiche joueur
 
-Variante recommandée **[Q6]** : aucune nouvelle route d'écriture, on étend `PUT /competiteurs/{id}/compte` (B-29), que l'écran F-62 appelle déjà.
+**[Q6]** : n'importe quel administrateur relie depuis la fiche joueur ; aucune nouvelle route d'écriture, on étend `PUT /competiteurs/{id}/compte` (B-29), que l'écran F-62 appelle déjà. Pas de variante « Ma fiche joueur » côté profil (pas de `PUT /moi/fiche`). L'écran choisit l'administrateur dans `GET /admin/administrateurs` (un admin `INVITED` y figure, avec la mention « invité ») et envoie son email.
 
 ### `PUT /competiteurs/{id}/compte` — comportement étendu
 
@@ -109,8 +107,8 @@ Corps inchangé `{ "email": string }`. Seul le cas « l'email appartient déjà 
 |---|---|---|---|
 | aucun / le compte de la fiche | — | inchangé (B-29) | `200` comme aujourd'hui, `linked: false` |
 | compte `ADMIN` sans fiche | aucun | `users.competitor_id` = la fiche | `200` `{ accountStatus: <statut de l'admin>, linked: true, invitationSent: false, invitationExpiresAt: null }` |
-| compte `ADMIN` sans fiche | `INVITED` (joueur jamais connecté) | **[Q7]** recommandé : compte INVITED du joueur supprimé (ses liens 404), puis lien comme ci-dessus | idem |
-| compte `ADMIN` sans fiche | `ACTIVE` | rien : fusion de deux comptes actifs hors périmètre | `409` `ACCOUNT_ACTIVE` |
+| compte `ADMIN` sans fiche | `INVITED` (joueur jamais connecté) | **[Q7]** compte INVITED du joueur supprimé (ses invitations en cascade, ses liens 404), puis lien comme ci-dessus | idem |
+| compte `ADMIN` sans fiche | `ACTIVE` | rien : fusion de deux comptes actifs hors périmètre **[Q7]** | `409` `ACCOUNT_ACTIVE` |
 | compte `ADMIN` déjà relié à une autre fiche | — | rien | `409` `ACCOUNT_ALREADY_LINKED` |
 | compte `PARTICIPANT` | — | rien (inchangé) | `409` `EMAIL_ALREADY_USED` |
 
@@ -118,9 +116,9 @@ Changement de contrat : `IAccountEmailSet` gagne `linked: boolean`, `accountStat
 
 La fiche reste verrouillée (`pessimistic_write`, déjà en place) et `uq_users_competitor_id` garantit l'unicité en cas de course ; une violation de cette contrainte se traduit en `409` `ACCOUNT_ALREADY_LINKED`.
 
-### `DELETE /competiteurs/{id}/compte` — délier **[Q8]**
+### Pas de déliaison **[Q8]**
 
-Uniquement pour un compte `ADMIN` relié à la fiche : `users.competitor_id` → `NULL`, le compte et la fiche restent. `204`. `404` `COMPETITOR_NOT_FOUND` ; `409` `CONFLICT` si la fiche n'a pas de compte ou si son compte est `PARTICIPANT` (on ne délie pas un joueur de sa propre fiche : son compte n'aurait plus d'objet).
+Aucune route ne délie un compte de sa fiche (pas de `DELETE /competiteurs/{id}/compte`). Une erreur de lien se corrige en base par l'exploitant.
 
 ## Nouveaux codes `API_ERROR_CODE` (ajout seul, règle de l'enum)
 
@@ -128,10 +126,10 @@ Uniquement pour un compte `ADMIN` relié à la fiche : `users.competitor_id` →
 |---|---|---|
 | `ALREADY_ADMIN` | 409 | `POST /admin/administrateurs` |
 | `LAST_ADMIN` | 409 | `DELETE /admin/administrateurs/{id}` |
-| `CANNOT_REVOKE_SELF` | 409 | `DELETE /admin/administrateurs/{id}` (si [Q3] = interdit) |
+| `CANNOT_REVOKE_SELF` | 409 | `DELETE /admin/administrateurs/{id}` **[Q3]** |
 | `ACCOUNT_ALREADY_LINKED` | 409 | `PUT /competiteurs/{id}/compte` |
 
-Réutilisés : `VALIDATION_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `COMPETITOR_NOT_FOUND`, `EMAIL_ALREADY_USED`, `ACCOUNT_ACTIVE`, `CONFLICT`, `PAYLOAD_TOO_LARGE`.
+Réutilisés : `VALIDATION_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `COMPETITOR_NOT_FOUND`, `EMAIL_ALREADY_USED`, `ACCOUNT_ACTIVE`, `PAYLOAD_TOO_LARGE`.
 
 ## Entrées `API_ROUTES` prévues (à ajouter par le ticket, avec `pendingTicket` tant que le fichier n'existe pas)
 
@@ -142,7 +140,6 @@ Réutilisés : `VALIDATION_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `C
 | `ADMIN_INVITATION_RESEND` | `admin/administrateurs/[id]/invitation.post.ts` | `B-31` |
 | `ADMIN_EMAIL_UPDATE` | `admin/administrateurs/[id]/index.patch.ts` | `B-31` |
 | `ADMIN_REVOKE` | `admin/administrateurs/[id]/index.delete.ts` | `B-31` |
-| `COMPETITOR_ACCOUNT_UNLINK` | `competiteurs/[id]/compte.delete.ts` | `B-32` (si [Q8] retenu) |
 
 `COMPETITOR_ACCOUNT_EMAIL_SET` existe déjà et ne change pas de fichier.
 
@@ -154,4 +151,4 @@ Réutilisés : `VALIDATION_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `C
 - **CLI** : `npm run user:create-admin` reste la voie du premier administrateur (base vide) et de secours ; même `issueInvitation`, lien affiché une fois, sans mail.
 - **Énumération d'emails** : ces routes ne sont lisibles que par un administrateur, qui voit déjà l'email de chaque compte (`account` de `GET /competiteurs/{id}`, B-29) : `409 EMAIL_ALREADY_USED` / `ALREADY_ADMIN` n'apprend rien de plus. Aucune surface publique n'est ajoutée ; `GET`/`POST /auth/invitation/{jeton}` gardent leur limite de débit.
 - **Limite de débit** : aucune sur les routes admin, comme A14 et B-29 (limite connue, non bloquante).
-- **Journalisation** : logs structurés via `logger` et `LOG_EVENT` (nouveaux `admin_invited`, `admin_promoted`, `admin_invitation_resent`, `admin_email_updated`, `admin_revoked`, `admin_competitor_linked`, `admin_competitor_unlinked`), champs `actorUserId`, `targetUserId`, `competitorId` ; **jamais** d'email, de jeton ni de lien. Pas de table d'audit (A17) **[Q9]**.
+- **Journalisation** : logs structurés via `logger` et `LOG_EVENT` (nouveaux `admin_invited`, `admin_promoted`, `admin_invitation_resent`, `admin_email_updated`, `admin_revoked`, `admin_competitor_linked`), champs `actorUserId`, `targetUserId`, `competitorId` ; **jamais** d'email, de jeton ni de lien. Pas de table d'audit (A17) **[Q9]**.
