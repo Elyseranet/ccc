@@ -1,8 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { BrowserContext, Page } from '@playwright/test'
-import { API_ROUTES } from '../../../src/consts/api-routes.const'
-import { API_ENDPOINT } from '../../../src/enums/api-endpoint.enum'
 import { createCompetitor, readCapturedMails, uniqueEmail } from '../helpers/edition-write'
 import { signIn } from '../helpers/session'
 
@@ -10,15 +8,12 @@ import { signIn } from '../helpers/session'
  * F-68 : écran « Administrateurs » (inviter, promouvoir, corriger, renvoyer, retirer)
  *
  * @description
- * Les écritures sur `/admin/administrateurs` (B-31) sont en `test.fixme` tant que les routes portent un `pendingTicket` : chaque test se
- * réactive seul quand B-31 le retire de `API_ROUTES`. Chaque test invite ses propres comptes (email unique) : aucun test n'écrit sur un
- * compte partagé, et la base de test est remise à neuf à chaque lancement. « Renvoyer » (invitation expirée) n'est pas reproductible sans
- * horloge : couvert par le test de composant (`tests/nuxt/front/admin-administrators.test.ts`). Dernier administrateur actif (409
+ * Routes réelles `/admin/administrateurs` (B-31, B-33). Chaque test invite ses propres comptes (email unique) : aucun test n'écrit sur un
+ * compte partagé, et la base de test est remise à neuf à chaque lancement. « Renvoyer » sur une invitation expirée n'est pas reproductible sans
+ * horloge : couvert par le test de composant (`tests/nuxt/front/admin-administrators.test.ts`) ; sur une invitation en cours il est testé ici. Dernier administrateur actif (409
  * `LAST_ADMIN`) : la base de test porte plusieurs administrateurs actifs, le refus est couvert par les tests d'API de B-31.
  ********************************************************/
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
-const PENDING = Array.from(new Set([API_ENDPOINT.ADMINS, API_ENDPOINT.ADMIN_INVITE, API_ENDPOINT.ADMIN_INVITATION_RESEND, API_ENDPOINT.ADMIN_EMAIL_UPDATE, API_ENDPOINT.ADMIN_REVOKE].flatMap(endpoint => API_ROUTES[endpoint].pendingTicket ?? [])))
-const awaitingRoutes = () => test.fixme(PENDING.length > 0, `en attente de ${PENDING.join(', ')} : /admin/administrateurs`)
 const STATUS_CREATED = 201
 const STATUS_OK = 200
 const STATUS_CONFLICT = 409
@@ -56,7 +51,6 @@ test.describe('admin administrateurs', () => {
   })
 
   test('liste : « Vous » sans action sur sa propre ligne, pastille Actif, 0 violation axe', async ({ page }) => {
-    awaitingRoutes()
     await openPage(page)
     const self = page.getByTestId('administrator-table').locator('tbody tr', { has: page.getByTestId('administrator-self') })
     await expect(self).toHaveCount(1)
@@ -67,7 +61,6 @@ test.describe('admin administrateurs', () => {
   })
 
   test('inviter : email invalide refusé sans appel ; invitation envoyée, courriel capturé, ligne « Invité », snackbar ; même email : refusé', async ({ page }) => {
-    awaitingRoutes()
     const email = uniqueEmail('f68.invite')
     const calls: string[] = []
     page.on('request', request => request.method() === 'POST' && request.url().includes('/admin/administrateurs') && calls.push(request.url()))
@@ -90,18 +83,42 @@ test.describe('admin administrateurs', () => {
     await expect(page.getByTestId('administrator-invite')).toContainText('Cet email est déjà celui d’un administrateur.')
   })
 
-  test('promouvoir : l’email d’un compte joueur le nomme administrateur, il garde sa fiche', async ({ page, context }) => {
-    awaitingRoutes()
+  test('promouvoir : l’email d’un compte joueur demande confirmation (rien n’est modifié), Annuler garde la saisie, Nommer promeut et garde la fiche', async ({ page, context }) => {
     const player = await createCompetitor(context.request, 'f68 promu')
     await openPage(page)
+    const submit = page.getByTestId('administrator-invite-submit')
     await page.getByLabel('Email · privé').fill(player.email)
-    await page.getByTestId('administrator-invite-submit').click()
+    await submit.click()
+    const dialog = page.getByTestId('administrator-promote-dialog')
+    await expect(dialog).toContainText('administrateur ?')
+    await expect(dialog).toContainText(`${player.email} est l’email du compte joueur de`)
+    await expect(page.getByTestId('administrator-promote-cancel')).toBeFocused()
+    await expect(rowOf(page, player.email)).toHaveCount(0)
+    expect(await violationsOf(page)).toEqual([])
+    await page.keyboard.press('Escape')
+    await expect(dialog).toHaveCount(0)
+    await expect(page.getByLabel('Email · privé')).toHaveValue(player.email)
+    await expect(submit).toBeFocused()
+    await submit.click()
+    await page.getByTestId('administrator-promote-confirm').click()
     await expect(page.getByTestId('administrator-feedback')).toContainText('est maintenant administrateur')
-    await expect(rowOf(page, player.email)).toContainText('Fiche joueur')
+    await expect(rowOf(page, player.email).getByTestId('administrator-state-INVITED')).toBeVisible()
+    const promoted = (await (await context.request.get('/api/v1/admin/administrateurs')).json() as Array<{ email: string, competitor: { id: string } | null }>).find(row => row.email === player.email)
+    expect(promoted?.competitor).not.toBeNull()
+    await expect(page.getByLabel('Email · privé')).toHaveValue('')
+  })
+
+  test('renvoyer : une invitation en cours se renvoie, courriel capturé, snackbar', async ({ page, context }) => {
+    const email = uniqueEmail('f68.resend')
+    await inviteByApi(context, email)
+    await openPage(page)
+    const before = readCapturedMails().filter(mail => mail.to === email).length
+    await rowOf(page, email).getByTestId('administrator-resend').click()
+    await expect(page.getByTestId('administrator-feedback')).toContainText('Invitation renvoyée')
+    expect(readCapturedMails().filter(mail => mail.to === email).length).toBe(before + 1)
   })
 
   test('corriger : boîte à libellé visible, focus sur le champ, Échap rend le focus ; nouvel email, nouveau courriel, ancienne ligne remplacée', async ({ page, context }) => {
-    awaitingRoutes()
     const first = uniqueEmail('f68.fix-a')
     const second = uniqueEmail('f68.fix-b')
     await inviteByApi(context, first)
@@ -128,7 +145,6 @@ test.describe('admin administrateurs', () => {
   })
 
   test('retirer un invité : confirmation dite, focus initial sur « Annuler », Échap annule ; confirmer annule l’invitation', async ({ page, context }) => {
-    awaitingRoutes()
     const email = uniqueEmail('f68.revoke')
     await inviteByApi(context, email)
     await openPage(page)
@@ -149,7 +165,6 @@ test.describe('admin administrateurs', () => {
   })
 
   test('retirer son propre accès : refusé par le serveur (409 CANNOT_REVOKE_SELF), le bouton n’existe pas sur sa ligne', async ({ page, context }) => {
-    awaitingRoutes()
     const list = await (await context.request.get('/api/v1/admin/administrateurs')).json() as IAdminRow[]
     const self = list.find(row => row.isSelf)!
     const response = await context.request.delete(`/api/v1/admin/administrateurs/${self.id}`)
@@ -160,7 +175,6 @@ test.describe('admin administrateurs', () => {
   })
 
   test('un participant n’a pas accès à la liste (403)', async ({ context }) => {
-    awaitingRoutes()
     await signIn(context, 'member')
     expect((await context.request.get('/api/v1/admin/administrateurs')).status()).not.toBe(STATUS_OK)
   })

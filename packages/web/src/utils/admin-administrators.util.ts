@@ -6,6 +6,8 @@ import type { IAdminFailure } from '../interfaces/admin-failure.interface.js'
 import type { IParticipantFeedback } from '../interfaces/admin-participants.interface.js'
 import type { IAdminAccount, IAdminInvited, IAdministratorRow } from '../interfaces/administrator.interface.js'
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
+import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
+import { ApiRequestError } from './api-request-error.util.js'
 import { toAdminFailure } from './admin-failure.util.js'
 import { formatInvitationExpiry, toAccountFeedback } from './admin-competitors.util.js'
 
@@ -52,7 +54,7 @@ export const toAdministratorRows = (accounts: IAdminAccount[]): IAdministratorRo
       state,
       isSelf: account.isSelf,
       detail: toAdministratorDetail(account, state),
-      canResend: state === ACCOUNT_STATE.INVITATION_EXPIRED,
+      canResend: state !== ACCOUNT_STATE.ACTIVE,
       canFix: state !== ACCOUNT_STATE.ACTIVE,
       lastActive: state === ACCOUNT_STATE.ACTIVE && activeCount <= 1
     }
@@ -65,6 +67,16 @@ export const toRevokeCase = (account: IAdminAccount): ADMIN_REVOKE_CASE => {
     return active ? ADMIN_REVOKE_CASE.ACTIVE_WITH_COMPETITOR : ADMIN_REVOKE_CASE.INVITED_WITH_COMPETITOR
   }
   return active ? ADMIN_REVOKE_CASE.ACTIVE_WITHOUT_COMPETITOR : ADMIN_REVOKE_CASE.INVITED_WITHOUT_COMPETITOR
+}
+
+/** Nom du joueur d'un 409 `PROMOTION_CONFIRMATION_REQUIRED` (B-33, `details.displayName`) ; `null` pour toute autre erreur. */
+export const toPromotionDisplayName = (cause: unknown): string | null => {
+  if (!(cause instanceof ApiRequestError) || cause.error.code !== API_ERROR_CODE.PROMOTION_CONFIRMATION_REQUIRED) {
+    return null
+  }
+  const details = cause.error.details
+  const name = details && !Array.isArray(details) ? details.displayName : undefined
+  return typeof name === 'string' ? name : ''
 }
 
 export const toAdministratorFailure = (cause: unknown): IAdminFailure => toAdminFailure(cause, ADMINISTRATOR_FAILURE_MESSAGES)

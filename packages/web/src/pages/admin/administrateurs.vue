@@ -38,7 +38,7 @@
             <origam-btn
               variant="outlined"
               font-size="sm"
-              padding-inline="4"
+              class="admin-administrators__alert-btn"
               :text="retryLabel"
               data-cy="administrator-list-retry"
               @click="handleReload"
@@ -70,7 +70,7 @@
             <origam-btn
               variant="outlined"
               font-size="sm"
-              padding-inline="4"
+              class="admin-administrators__alert-btn"
               :text="reloadLabel"
               data-cy="administrator-reload"
               @click="handleActionReload"
@@ -85,6 +85,12 @@
         @submit="handleInvite"
       />
     </div>
+    <administrator-promote-dialog
+      :promotion="promotion"
+      :pending="promoting"
+      @cancel="handlePromoteCancel"
+      @confirm="handlePromoteConfirm"
+    />
     <administrator-fix-dialog
       :open="fixOpen"
       :account="fixAccount"
@@ -122,6 +128,7 @@ import { computed, ref } from 'vue'
 import { OrigamAlert, OrigamBtn, OrigamSnackbar, OrigamTitle } from 'origam/components'
 import AdministratorFixDialog from '~/components/admin/administrators/AdministratorFixDialog.vue'
 import AdministratorInviteCard from '~/components/admin/administrators/AdministratorInviteCard.vue'
+import AdministratorPromoteDialog from '~/components/admin/administrators/AdministratorPromoteDialog.vue'
 import AdministratorList from '~/components/admin/administrators/AdministratorList.vue'
 import AsyncState from '~/components/common/AsyncState.vue'
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
@@ -153,7 +160,7 @@ useSeo({ noindex: true })
 
 const {
   administrators, pending, listError, refresh, feedback, busy, inviteFailure, fixFailure, actionFailure,
-  invite, correct, resend, revoke, resetInvite, resetFix, dismissAction, dismissFeedback
+  invite, promotion, confirmPromotion, cancelPromotion, correct, resend, revoke, resetInvite, resetFix, dismissAction, dismissFeedback
 } = useAdminAdministrators()
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
 const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
@@ -216,6 +223,31 @@ const handleInvite = async () => {
   resetInvite()
   if (await invite(inviteEmail.value)) {
     inviteEmail.value = ''
+  }
+}
+
+/*********************************************************
+ * Nommer un compte joueur (B-33)
+ *
+ * @description
+ * L'email d'un compte joueur met la promotion en attente : la boîte demande confirmation, puis l'envoi est renouvelé avec `confirmPromotion`.
+ * L'email saisi n'est vidé qu'à la promotion faite ; annuler le garde. Le focus revient au bouton « Envoyer l'invitation » (`useFocusReturn`).
+ ********************************************************/
+const promoteOpen = computed(() => promotion.value !== null)
+useFocusReturn(promoteOpen)
+const handlePromoteCancel = () => {
+  cancelPromotion()
+}
+// `busy` couvre aussi l'envoi qui vient d'ouvrir la boîte : « Annuler » serait inactif et ne pourrait pas recevoir le focus. Seul l'envoi confirmé bloque la boîte.
+const promoting = ref(false)
+const handlePromoteConfirm = async () => {
+  promoting.value = true
+  try {
+    if (await confirmPromotion()) {
+      inviteEmail.value = ''
+    }
+  } finally {
+    promoting.value = false
   }
 }
 
@@ -339,6 +371,11 @@ defineExpose({})
     @media (max-width: 1200px) {
       grid-template-columns: minmax(0, 1fr);
     }
+  }
+
+  // Le bouton de la maquette n'a pas de bordure propre (89,7 px) : l'outlined d'Origam a 2 px de bordure, retirés du remplissage de 16 px.
+  &__alert-btn {
+    padding-inline: calc(var(--origam-space---4) - var(--origam-border__width---2));
   }
 
   &__main {

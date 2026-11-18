@@ -100,3 +100,25 @@ export interface IAdministratorFixDialogEmits {
   (event: 'submit', email: string): void
   (event: 'cancel'): void
 }
+
+/** Corps de `POST /admin/administrateurs` (strict) : `confirmPromotion: true` confirme la promotion d'un compte joueur (B-33). */
+export interface IInviteAdministratorRequest {
+  email: string
+  confirmPromotion?: boolean
+}
+
+/** Promotion en attente de confirmation : l'email saisi et le nom du joueur renvoyé par le 409 (nom de la fiche, sinon l'email). */
+export interface IAdministratorPromotion {
+  email: string
+  displayName: string
+}
+
+export interface IAdministratorPromoteDialogProps {
+  promotion: IAdministratorPromotion | null
+  pending: boolean
+}
+
+export interface IAdministratorPromoteDialogEmits {
+  (event: 'confirm'): void
+  (event: 'cancel'): void
+}

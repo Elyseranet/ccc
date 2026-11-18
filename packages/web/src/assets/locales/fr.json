@@ -1731,5 +1731,8 @@
   "admin.administrators.error_not_found_title": "Compte introuvable.",
   "admin.administrators.error_not_found_text": "Ce compte n’est plus administrateur : rechargez la liste.",
   "admin.administrators.error_unknown_text": "L’action n’a pas pu aboutir : réessayez.",
-  "admin.administrators.list_error": "La liste des administrateurs n’a pas pu être chargée."
+  "admin.administrators.list_error": "La liste des administrateurs n’a pas pu être chargée.",
+  "admin.administrators.promote_title": "Nommer {name} administrateur ?",
+  "admin.administrators.promote_text": "{email} est l’email du compte joueur de {name}. Ce compte deviendra administrateur : il garde sa fiche et son mot de passe. Il est prévenu par mail.",
+  "admin.administrators.promote_confirm": "Nommer administrateur"
 }

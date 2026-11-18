@@ -14,6 +14,7 @@ import { toAdministratorAvatarName, toAdministratorFailure, toAdministratorRows,
 import { ApiRequestError } from '../../../src/utils/api-request-error.util'
 import AdministratorFixDialog from '~/components/admin/administrators/AdministratorFixDialog.vue'
 import AdministratorInviteCard from '~/components/admin/administrators/AdministratorInviteCard.vue'
+import AdministratorPromoteDialog from '~/components/admin/administrators/AdministratorPromoteDialog.vue'
 import AdministratorList from '~/components/admin/administrators/AdministratorList.vue'
 
 /*********************************************************
@@ -71,8 +72,8 @@ describe('lignes de la table', () => {
     expect(rows[3]?.detail).toMatchObject({ key: 'admin.administrators.detail_expired', params: { date: '10 novembre 2026' } })
   })
 
-  it('« Renvoyer » seulement si l’invitation est expirée, « Corriger » tant que le compte n’est pas activé', () => {
-    expect(rows.map(row => row.canResend)).toEqual([false, false, false, true])
+  it('« Renvoyer » et « Corriger » tant que le compte n’est pas activé (comme F-62)', () => {
+    expect(rows.map(row => row.canResend)).toEqual([false, false, true, true])
     expect(rows.map(row => row.canFix)).toEqual([false, false, true, true])
   })
 
@@ -130,6 +131,32 @@ describe('useAdminAdministrators', () => {
     expect(seen).toHaveBeenCalledWith('DELETE', `${BASE}/id-1`, null)
   })
 
+  it('email d’un compte joueur : 409 PROMOTION_CONFIRMATION_REQUIRED = promotion en attente, rien n’est affiché comme refus ; confirmer renvoie confirmPromotion', async () => {
+    const bodies: unknown[] = []
+    reply('GET', BASE, [SELF])
+    registerEndpoint(BASE, { method: 'POST', handler: defineEventHandler(async (event) => {
+      const body = await readBody(event) as { confirmPromotion?: boolean }
+      bodies.push(body)
+      if (!body.confirmPromotion) {
+        setResponseStatus(event, 409)
+        return { statusCode: 409, code: API_ERROR_CODE.PROMOTION_CONFIRMATION_REQUIRED, message: 'x', details: { displayName: 'Simon Vaur' } }
+      }
+      return { id: 'simon', accountStatus: USER_STATUS.ACTIVE, promoted: true, invitationSent: true, invitationExpiresAt: null }
+    }) })
+    const api = await mountComposable()
+    await flushPromises()
+    expect(await api.invite('simon.vaur@exemple.fr')).toBe(false)
+    expect(api.promotion.value).toEqual({ email: 'simon.vaur@exemple.fr', displayName: 'Simon Vaur' })
+    expect(api.inviteFailure.value).toBeNull()
+    expect(api.feedback.value).toBeNull()
+    expect(await api.confirmPromotion()).toBe(true)
+    expect(bodies).toEqual([{ email: 'simon.vaur@exemple.fr' }, { email: 'simon.vaur@exemple.fr', confirmPromotion: true }])
+    expect(api.promotion.value).toBeNull()
+    expect(api.feedback.value?.message).toMatchObject({ key: 'admin.administrators.feedback_promoted', params: { name: 'Simon Vaur' } })
+    api.cancelPromotion()
+    expect(api.promotion.value).toBeNull()
+  })
+
   it('invitation d’un email de compte joueur : retour nommé d’après la fiche, liste rechargée', async () => {
     reply('GET', BASE, [SELF, account({ id: 'simon', email: 'simon.vaur@exemple.fr', competitor: { id: 'c2', displayName: 'Simon Vaur' } })])
     reply('POST', BASE, { id: 'simon', accountStatus: USER_STATUS.ACTIVE, promoted: true, invitationSent: true, invitationExpiresAt: null })
@@ -174,8 +201,8 @@ describe('composants', () => {
     expect(wrapper.findAll('[data-cy="administrator-no-action"]')).toHaveLength(1)
     expect(wrapper.findAll('[data-cy="administrator-revoke"]')).toHaveLength(3)
     expect(wrapper.findAll('[data-cy="administrator-fix"]')).toHaveLength(2)
-    expect(wrapper.findAll('[data-cy="administrator-resend"]')).toHaveLength(1)
-    expect(wrapper.get('[data-cy="administrator-resend"]').attributes('aria-label')).toBe('Renvoyer l’invitation à anna.chevalier@exemple.fr')
+    expect(wrapper.findAll('[data-cy="administrator-resend"]')).toHaveLength(2)
+    expect(wrapper.findAll('[data-cy="administrator-resend"]')[1]!.attributes('aria-label')).toBe('Renvoyer l’invitation à anna.chevalier@exemple.fr')
     await wrapper.findAll('[data-cy="administrator-revoke"]')[0]!.trigger('click')
     expect(wrapper.emitted('revoke')![0]).toEqual(['sam'])
     expect(wrapper.find('[data-cy="administrator-alone"]').exists()).toBe(false)
@@ -221,6 +248,19 @@ describe('composants', () => {
     ;(document.body.querySelector('[data-cy="administrator-fix-confirm"]') as HTMLElement).click()
     await flushPromises()
     expect(wrapper.emitted('submit')![0]).toEqual(['maya.bonnet@exemple.org'])
+    wrapper.unmount()
+  })
+
+  it('boîte « Nommer » : titre et texte du joueur, Annuler émet cancel, Nommer émet confirm', async () => {
+    const wrapper = await mountSuspended(AdministratorPromoteDialog, { props: { promotion: { email: 'simon.vaur@exemple.fr', displayName: 'Simon Vaur' }, pending: false }, attachTo: document.body })
+    await flushPromises()
+    expect(document.body.textContent).toContain('Nommer Simon Vaur administrateur ?')
+    expect(document.body.textContent).toContain('simon.vaur@exemple.fr est l’email du compte joueur de Simon Vaur. Ce compte deviendra administrateur : il garde sa fiche et son mot de passe. Il est prévenu par mail.')
+    ;(document.body.querySelector('[data-cy="administrator-promote-confirm"]') as HTMLElement).click()
+    ;(document.body.querySelector('[data-cy="administrator-promote-cancel"]') as HTMLElement).click()
+    await flushPromises()
+    expect(wrapper.emitted('confirm')).toHaveLength(1)
+    expect(wrapper.emitted('cancel')).toHaveLength(1)
     wrapper.unmount()
   })
 })

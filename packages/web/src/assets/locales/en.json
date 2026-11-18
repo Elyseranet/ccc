@@ -1731,5 +1731,8 @@
   "admin.administrators.error_not_found_title": "Account not found.",
   "admin.administrators.error_not_found_text": "This account is no longer an administrator: reload the list.",
   "admin.administrators.error_unknown_text": "The action could not be completed: try again.",
-  "admin.administrators.list_error": "The list of administrators could not be loaded."
+  "admin.administrators.list_error": "The list of administrators could not be loaded.",
+  "admin.administrators.promote_title": "Make {name} an administrator?",
+  "admin.administrators.promote_text": "{email} is the email of {name}'s player account. This account will become an administrator: it keeps its profile and its password. It is notified by email.",
+  "admin.administrators.promote_confirm": "Make administrator"
 }

@@ -48,6 +48,7 @@
         <template #[`item.state`]="{ item }">
           <span class="administrator-list__chips">
             <origam-chip
+              size="small"
               :color="chipOf(item.state).color"
               :bg-color="chipOf(item.state).bgColor"
               :text="chipOf(item.state).label"
@@ -55,7 +56,7 @@
             />
             <origam-chip
               v-if="item.isSelf"
-              color="secondary"
+              size="small"
               :text="selfLabel"
               data-cy="administrator-self"
             />
@@ -98,6 +99,7 @@
             />
             <origam-btn
               variant="text"
+              color="primary"
               font-size="sm"
               padding-inline="4"
               aria-haspopup="dialog"
@@ -149,9 +151,8 @@ import { toAdministratorRows } from '~/utils/admin-administrators.util'
  * Global
  *
  * @description
- * Administrateurs (F-68) : email avec, dessous, la fiche reliée ou la validité de l'invitation ; état du compte (pastilles de F-62, plus « Vous »
- * sur sa propre ligne) ; actions. Aucune action sur sa propre ligne (pas d'auto-retrait) ; « Renvoyer » seulement pour une invitation expirée,
- * « Corriger » tant que le compte n'est pas activé ; « Retirer l'accès » est inactif, avec sa raison, pour le dernier administrateur actif. Le
+ * Administrateurs (F-68) : email avec, dessous, la fiche reliée ou la validité de l'invitation ; état du compte (pastilles de F-62, plus « Vous » (pastille neutre)
+ * sur sa propre ligne) ; actions. Aucune action sur sa propre ligne (pas d'auto-retrait) ; « Renvoyer » et « Corriger » tant que le compte n'est pas activé ; « Retirer l'accès » est inactif, avec sa raison, pour le dernier administrateur actif. Le
  * parent exécute l'action et recharge la liste.
  ********************************************************/
 const { t } = useT()
@@ -268,6 +269,7 @@ defineExpose({})
 
   &__who {
     display: grid;
+    white-space: normal;
     gap: var(--origam-space---0-5, 2px);
   }
 
@@ -287,7 +289,9 @@ defineExpose({})
   &__chips {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--origam-space---1);
+    // Maquette : deux pastilles côte à côte, séparées par l'espace d'un texte (3,4 px à 12,8 px) ; un gap de 4 px les écartait de 0,6 px.
+    column-gap: 0.27em;
+    row-gap: var(--origam-space---1);
   }
 
   &__actions {
