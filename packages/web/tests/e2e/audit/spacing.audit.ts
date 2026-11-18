@@ -1,19 +1,19 @@
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { test } from '@playwright/test'
-import type { Browser, BrowserContext, Page } from '@playwright/test'
-import { E2E_BASE_URL } from '../helpers/e2e.const'
-import { e2eSecrets, signIn } from '../helpers/session'
+import { e2eSecrets } from '../helpers/session'
+import { md, newContext, open, settle } from './audit.util'
 import {
   SPACING_AUDIT_CASES,
   SPACING_AUDIT_COMPETITOR_PLACEHOLDER,
   SPACING_AUDIT_DEFAULT_OUT,
   SPACING_AUDIT_INVITATION_PLACEHOLDER,
   SPACING_AUDIT_MIN_GAP,
+  SPACING_AUDIT_MOCKUP_ZERO,
   SPACING_AUDIT_RULES,
   SPACING_AUDIT_VIEWPORTS
 } from './spacing.const'
-import type { ISpacingAuditCase, TSpacingAuditRole } from './spacing.const'
+import type { ISpacingAuditCase, ISpacingMockupZero } from './spacing.const'
 
 /*********************************************************
  * Audit des espacements (F-63) — `npm run audit:spacing`
@@ -51,7 +51,7 @@ interface IRow extends IFinding {
   width: number
 }
 
-const collect = (minGap: number): IFinding[] => {
+const collect = ({ minGap, mockupZero }: { minGap: number, mockupZero: ISpacingMockupZero[] }): IFinding[] => {
   const TABLE_TAGS = new Set(['TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TD', 'TH', 'CAPTION', 'COLGROUP'])
   const TABLE_ROLES = new Set(['row', 'cell', 'rowgroup', 'columnheader', 'rowheader', 'gridcell', 'table', 'grid'])
   const ITEM_ROLES = new Set(['option', 'listitem', 'menuitem', 'tab', 'treeitem'])
@@ -153,6 +153,7 @@ const collect = (minGap: number): IFinding[] => {
   const visibleGap = (a: Element, b: Element): number => inkEdge(b, 'top') - inkEdge(a, 'bottom')
 
   const exclusion = (parent: Element, a: Element, b: Element, gap: number): string | null => {
+    if (mockupZero.some(z => parent.matches(z.parent) && a.matches(z.a) && b.matches(z.b))) return 'maquette'
     if (isTable(parent) || isTable(a) || isTable(b)) return 'tableau'
     if (isItem(a) && isItem(b)) return 'liste'
     if (parent.closest('.origam-bracket')) return 'bracket'
@@ -249,24 +250,6 @@ const layoutOf = (): Record<string, number[]> => {
   return out
 }
 
-const settle = async (page: Page) => {
-  await page.waitForLoadState('networkidle')
-  await page.locator('[data-cy="async-state-loading"]').first().waitFor({ state: 'detached', timeout: 10000 }).catch(() => undefined)
-}
-
-const open = async (page: Page, path: string) => {
-  await page.goto(path)
-  await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false, undefined, { timeout: 30000 }).catch(() => undefined)
-  await settle(page)
-}
-
-const newContext = async (browser: Browser, role: TSpacingAuditRole): Promise<BrowserContext> => {
-  const context = await browser.newContext({ baseURL: E2E_BASE_URL, reducedMotion: 'reduce', locale: 'fr-FR' })
-  if (role !== 'anonymous') await signIn(context, role)
-  return context
-}
-
-const md = (value: string | number) => String(value).replaceAll('|', '\\|')
 
 const report = (rows: IRow[], unreached: string[], paths: string[]): string => {
   const kept = rows.filter(r => !r.excluded)
@@ -327,7 +310,7 @@ test('audit des espacements (F-63)', async ({ browser }) => {
       const audit = async (state: string) => {
         if (process.env.SPACING_AUDIT_LAYOUT) layout[`${displayPath} | ${state} | ${viewport.width}`] = await page.evaluate(layoutOf)
         visited.push(`${displayPath} ${state} ${viewport.width}`)
-        for (const f of await page.evaluate(collect, SPACING_AUDIT_MIN_GAP)) {
+        for (const f of await page.evaluate(collect, { minGap: SPACING_AUDIT_MIN_GAP, mockupZero: SPACING_AUDIT_MOCKUP_ZERO })) {
           const key = [viewport.width, displayPath, f.parent, f.a, f.b].join('|')
           if (seen.has(key)) continue
           seen.add(key)

@@ -33,57 +33,59 @@
         </p>
       </div>
     </div>
-    <ol
-      class="rules-game__steps"
-      :aria-label="stepsLabel"
-      data-cy="rules-steps"
-    >
-      <li
-        v-for="step in steps"
-        :key="step.id"
-        class="rules-game__step-item"
+    <div class="rules-game__play">
+      <ol
+        class="rules-game__steps"
+        :aria-label="stepsLabel"
+        data-cy="rules-steps"
       >
-        <origam-card
-          rounded="xl"
-          border
-          padding="6"
-          class="rules-game__step"
-          :data-cy="step.dataCy"
+        <li
+          v-for="step in steps"
+          :key="step.id"
+          class="rules-game__step-item"
         >
-          <div class="rules-game__step-body">
-            <span
-              class="rules-game__step-number font-display"
-              aria-hidden="true"
-            >{{ step.number }}</span>
-            <origam-title
-              tag="h3"
-              font-size="xl"
-              font-weight="bold"
-              line-height="tight"
-              letter-spacing="normal"
-              :text="step.title"
-            />
-            <p class="rules-game__step-text">
-              {{ step.text }}
-            </p>
-          </div>
-        </origam-card>
-      </li>
-    </ol>
-    <origam-card
-      tag="aside"
-      rounded="xl"
-      border
-      elevation="md"
-      padding="6"
-      class="rules-game__note"
-      data-cy="rules-note"
-    >
-      <p class="rules-game__note-text">
-        <strong>{{ noteLead }}</strong>
-        {{ noteText }}
-      </p>
-    </origam-card>
+          <origam-card
+            rounded="xl"
+            border
+            padding="6"
+            class="rules-game__step"
+            :data-cy="step.dataCy"
+          >
+            <div class="rules-game__step-body">
+              <span
+                class="rules-game__step-number font-display"
+                aria-hidden="true"
+              >{{ step.number }}</span>
+              <origam-title
+                tag="h3"
+                font-size="xl"
+                font-weight="bold"
+                line-height="tight"
+                letter-spacing="normal"
+                :text="step.title"
+              />
+              <p class="rules-game__step-text">
+                {{ step.text }}
+              </p>
+            </div>
+          </origam-card>
+        </li>
+      </ol>
+      <origam-card
+        tag="aside"
+        rounded="xl"
+        border
+        elevation="md"
+        padding="6"
+        class="rules-game__note"
+        data-cy="rules-note"
+      >
+        <p class="rules-game__note-text">
+          <strong>{{ noteLead }}</strong>
+          {{ noteText }}
+        </p>
+      </origam-card>
+    </div>
     <origam-title
       tag="h2"
       font-size="4xl"
@@ -109,6 +111,7 @@ import { GOLDEN_RULES_VARIANT } from '~/enums/golden-rules-variant.enum'
  * @description
  * Onglet « Le jeu » : principe, déroulé d'un point, règle du bûcheron et règles d'or (RG25 à RG32).
  * Le titre visible « Les huit règles d'or » est masqué aux lecteurs d'écran : GoldenRules porte déjà son propre h2.
+ * `.rules-game__play` groupe les étapes et la note : 20 px entre elles (`.rules-note` de la maquette), 40 px entre les sections (F-64).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<{}>(), {})
@@ -190,6 +193,11 @@ defineExpose({})
     color: var(--origam-color__bar---amber);
   }
 
+  &__play {
+    display: grid;
+    gap: var(--rules-game__play---gap, var(--origam-space---5));
+  }
+
   &__steps {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -268,5 +276,6 @@ defineExpose({})
 <style>
 :root {
   --rules-game---gap: var(--origam-space---10);
+  --rules-game__play---gap: var(--origam-space---5);
 }
 </style>

@@ -26,6 +26,8 @@ import type { IPhaseStepsProps } from '~/interfaces/phase.interface'
  * Navigation de la « Phase finale » : une seule entrée de tiroir, trois pages liées par ce stepper (décision c9790abd (1)). Une étape
  * dont la route n'existe pas encore (`to` nul : tirage de tour, clôture) n'est pas cliquable ; l'étape courante est inerte (`aria-current="step"`).
  * Les autres étapes mènent à leur page : une étape dont les conditions ne sont pas remplies reste atteignable, l'écran dit ce qui manque.
+ * Écart avec l'en-tête : 16 px (`.ostep--phase` de la maquette). Les trois pages qui l'affichent sont des grilles à `gap` de 20 px :
+ * la marge basse vaut donc 16 − 20 px (F-64, mesuré 36 px avant).
  * Les étapes avant la page courante sont faites (coche, mockup F-25). Le nom accessible d'une étape est son numéro puis son titre, comme le texte visible : `origam-stepper-item` pose sinon « Step 2: Titre » (anglais, sans le texte visible), que axe refuse sur une étape cliquable (`label-content-name-mismatch`, WCAG 2.5.3) ; fiche `docs/tickets/origam/stepper-item-cliquable-nom-accessible-anglais.md`.
  ********************************************************/
 const { t } = useT()
@@ -76,7 +78,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .phase-steps-nav {
-  margin-bottom: var(--phase-steps-nav---margin-bottom, var(--origam-space---4));
+  margin-bottom: var(--phase-steps-nav---margin-bottom, calc(var(--origam-space---4) - var(--origam-space---5)));
 
   :deep(.origam-stepper-item__title) {
     white-space: normal;
@@ -86,6 +88,6 @@ defineExpose({})
 
 <style>
 :root {
-  --phase-steps-nav---margin-bottom: var(--origam-space---4);
+  --phase-steps-nav---margin-bottom: calc(var(--origam-space---4) - var(--origam-space---5));
 }
 </style>

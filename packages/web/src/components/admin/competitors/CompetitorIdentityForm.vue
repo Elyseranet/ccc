@@ -178,6 +178,7 @@ import type { ICompetitorFormValues, ICompetitorIdentityFormEmits, ICompetitorId
  * l'envoi ; le serveur reste l'autorité. La version (`If-Match`) n'est pas un champ : elle est lue sur la fiche par le composable.
  * shortcut: `.identity-form__fields` porte le `gap` que `origam-form` ne transmet pas à son enveloppe `__content` (F-63), à retirer
  * quand origam expose `contentDisplay` sur Form (version non publiée au 2026-11-17).
+ * La carte n'a pas de `gap` : en-tête, photo et formulaire s'enchaînent sans écart, comme `.cp-form` de la maquette (F-64, mesuré 0 px).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<ICompetitorIdentityFormProps>(), { pending: false, failure: null, saved: false })
@@ -283,7 +284,6 @@ defineExpose({})
 <style scoped lang="scss">
 .identity-form {
   display: grid;
-  gap: var(--identity-form---gap, var(--origam-space---5));
   padding: var(--identity-form---padding, var(--origam-space---6));
 
   &__head {
