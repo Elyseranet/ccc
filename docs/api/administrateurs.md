@@ -113,6 +113,8 @@ Corps inchangé `{ "email": string }`. Seul le cas « l'email appartient déjà 
 | compte `PARTICIPANT` | — | rien (inchangé) | `409` `EMAIL_ALREADY_USED` |
 | n'importe quel email (libre, joueur ou autre admin) | compte `ADMIN` (`INVITED` ou `ACTIVE`) | rien : **fiche verrouillée** **[Q8]**, contrôle fait avant tout autre ; l'email de l'admin n'est pas réécrit, aucune invitation émise | `409` `ACCOUNT_ALREADY_LINKED` |
 
+`GET /competiteurs/{id}` : l'objet `account` (déjà réservé aux administrateurs, absent pour le public et les participants) gagne `role: "PARTICIPANT" | "ADMIN"` (`ICompetitorAccount.role`), **absent quand `account.status` vaut `NONE`**. `role: "ADMIN"` signale une fiche reliée à un administrateur (`INVITED` ou `ACTIVE`), non modifiable ici : le front n'a plus à le déduire de `GET /admin/administrateurs`.
+
 Une fiche reliée à un administrateur est donc non modifiable par cette route (pas de déliaison, Q8). La correction de l'email d'un admin invité passe par `PATCH /admin/administrateurs/{id}` (B-31).
 
 Changement de contrat : `IAccountEmailSet` gagne `linked: boolean`, `accountStatus` s'élargit à `USER_STATUS` et `invitationExpiresAt` devient nullable. L'écran F-62 doit en tenir compte (ticket front à ouvrir par le frontend-lead).

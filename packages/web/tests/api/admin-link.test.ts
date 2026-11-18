@@ -175,6 +175,26 @@ describe('link an admin account to a player card (B-32)', async () => {
     expect((await mails.read()).length).toBe(sentBefore)
   })
 
+  it('GET /competiteurs/{id} gives the account role to admins only', async () => {
+    const detail = async (id: string, cookie?: string): Promise<{ account?: { status: string, role?: string } }> =>
+      (await getWith(`/api/v1/competiteurs/${id}`, cookie)).json()
+    const invitedCard = await newCard('Role Invité')
+    const invited = await seedUser(dataSource, { email: 'role.invited@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN, status: USER_STATUS.INVITED })
+    await users.update({ id: invited.id }, { competitorId: invitedCard.id })
+    const activeCard = await newCard('Role Actif')
+    const active = await seedUser(dataSource, { email: 'role.active@ccc.test', password: PASSWORD, role: USER_ROLE.ADMIN })
+    await users.update({ id: active.id }, { competitorId: activeCard.id })
+    const noAccount = await newCard('Role Aucun')
+
+    expect((await detail(participant.competitorId!, adminCookie)).account).toMatchObject({ status: 'ACTIVE', role: USER_ROLE.PARTICIPANT })
+    expect((await detail(invitedCard.id, adminCookie)).account).toMatchObject({ status: 'INVITED', role: USER_ROLE.ADMIN })
+    expect((await detail(activeCard.id, adminCookie)).account).toMatchObject({ status: 'ACTIVE', role: USER_ROLE.ADMIN })
+    expect((await detail(noAccount.id, adminCookie)).account).toEqual({ status: 'NONE', email: null, invitationExpiresAt: null })
+    for (const cookie of [undefined, participantCookie]) {
+      expect(await detail(activeCard.id, cookie)).not.toHaveProperty('account')
+    }
+  })
+
   it('answers 401 anonymous and 403 participant', async () => {
     const card = await newCard('Garde')
     expect((await put(card.id, 'boss@ccc.test')).status).toBe(401)
