@@ -40,7 +40,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-27](B-27.md) | Tour suivant impossible à tirer après des quarts validés (bloquant) | — | B-26 | — | **Fermé** (2026-11-16) @ `de9890a0`, vérifié sur dev |
 | [B-28](B-28.md) | Supprimer une édition créée dans l'appli (F-60) | — | B-11 | — | **Fermé** (2026-11-17) @ `c8d4389e` |
 | [B-29](B-29.md) | Inviter un joueur sans compte : poser l'email et envoyer l'invitation (F-62) | — | A14 | — | **Fermé** (2026-11-17) @ `a66d9529`, vérifié sur dev |
-| [B-30](B-30.md) | Export Excel (.xlsx) d'une édition, admin (F-65) | — | B-11 | — | Ouvert (2026-11-18) |
+| [B-30](B-30.md) | Export Excel (.xlsx) d'une édition, admin (F-65) | — | B-11 | — | **Fermé** (2026-11-18) @ `8d8ec512`, vérifié sur dev |
 | [T-SEC-23](T-SEC-23.md) | Remédiation npm audit : 11 high, 4 moderate | — | — | — | Ouvert (2026-11-18) |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
@@ -285,7 +285,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-62](F-62.md) | Admin : saisir l'email d'un joueur et l'inviter (fiche + inscrits) | à compléter | B-29, F-09 | Ouvert : mergé, contrôle écran en attente | — |
 | [F-63](F-63.md) | Audit et correction des espacements manquants (toute l'app) | maquettes happy-hour | F-47, F-49, F-50, F-56 | Ouvert : mergé @ `33de7459` + `5d082b58`, contrôle écran en attente | — |
 | [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert (2026-11-18) | — |
-| [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | à compléter | B-30, F-13 | Ouvert (2026-11-18) | — |
+| [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | maquette admin-editions mise à jour | B-30, F-13 | Ouvert : mergé @ `4c5f1f28`, contrôle écran en attente | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
