@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--
+  F-66 — Maquette du mail d'invitation (seul mail de l'application).
+  C'est un MAIL, pas une page : tableaux de mise en page, CSS en ligne, 600 px max, aucun JS.
+  Le <style> ci-dessous ne porte que des améliorations (police, mobile, liens) : sans lui, le mail reste complet.
+  Couleurs : palette happy-hour mode sombre (tokens.css, [data-theme="ccc"][data-mode="dark"]) recopiée en hex,
+  les clients mail ne lisant pas les variables CSS :
+    #0b1e28 bar---night (fond)      #112631 surface---default (carte)   #284758 surface---overlay (filet)
+    #1c3745 surface---raised (encart) #f3eedd text---primary            #a9c3d1 text---secondary
+    #e2ac65 action--primary---bg     #0e242f action--primary---fg       #c17825 bar---neon
+  Valeurs d'exemple : prénom « Camille », lien https://ccc.dev.elysera.net/invitation/<jeton 43 caractères>.
+  À l'intégration : prénom et lien échappés (escapeHtml), « 7 » = INVITATION_TTL_DAYS,
+  « https://ccc.dev.elysera.net » = NUXT_PUBLIC_SITE_URL (logo, pied de page, polices).
+-->
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Votre invitation au CCC</title>
+  <style>
+    /* Amélioration seulement : les clients qui chargent les polices distantes affichent Gabarito, les autres la pile de secours. */
+    @font-face { font-family: 'Gabarito'; font-style: normal; font-weight: 400 900; src: url('https://ccc.dev.elysera.net/gabarito-latin.woff2') format('woff2'); }
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    .cta:hover { background-color: #e7b16a !important; }
+    @media (max-width: 480px) {
+      .px { padding-left: 20px !important; padding-right: 20px !important; }
+      .h1 { font-size: 26px !important; line-height: 32px !important; }
+      .cta-cell { width: 100% !important; }
+      .cta { display: block !important; padding-left: 0 !important; padding-right: 0 !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#0b1e28;" bgcolor="#0b1e28">
+  <!-- Texte d'aperçu (affiché par la boîte de réception sous le sujet), masqué dans le corps. -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#0b1e28; opacity:0;">
+    L'organisateur de la Cotentin Caps Cup vous a créé un compte. Activez-le en un clic, le lien est valable 7 jours.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0b1e28" style="background-color:#0b1e28;">
+    <tr>
+      <td align="center" style="padding:32px 12px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px;">
+
+          <!-- En-tête : logo (PNG hébergé par le site). Images bloquées : l'alt « Cotentin Caps Cup » s'affiche en ambre, gras. -->
+          <tr>
+            <td class="px" align="left" style="padding:0 32px 24px 32px;">
+              <a href="https://ccc.dev.elysera.net" style="text-decoration:none; color:#e2ac65;">
+                <img src="https://ccc.dev.elysera.net/logo-ccc-email.png" width="141" height="58" alt="Cotentin Caps Cup"
+                     style="display:block; border:0; outline:none; text-decoration:none; height:auto; max-width:141px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:22px; font-weight:800; line-height:28px; color:#e2ac65;">
+              </a>
+            </td>
+          </tr>
+
+          <!-- Carte -->
+          <tr>
+            <td bgcolor="#112631" style="background-color:#112631; border:1px solid #284758; border-radius:16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                <!-- Liseré ambre, rappel de la capsule -->
+                <tr>
+                  <td height="6" bgcolor="#e2ac65" style="height:6px; line-height:6px; font-size:6px; background-color:#e2ac65; border-radius:16px 16px 0 0;">&nbsp;</td>
+                </tr>
+
+                <tr>
+                  <td class="px" style="padding:36px 40px 8px 40px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif;">
+                    <p style="margin:0 0 12px 0; font-size:13px; line-height:18px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#e2ac65;">
+                      Invitation
+                    </p>
+                    <h1 class="h1" style="margin:0 0 20px 0; font-size:30px; line-height:36px; font-weight:800; color:#f3eedd;">
+                      Bonjour Camille,
+                    </h1>
+                    <p style="margin:0 0 16px 0; font-size:17px; line-height:26px; color:#f3eedd;">
+                      L'organisateur de la <strong style="color:#f3eedd;">Cotentin Caps Cup</strong> vous a inscrit comme participant&nbsp;: un compte vient de vous être créé sur le site du CCC.
+                    </p>
+                    <p style="margin:0 0 28px 0; font-size:17px; line-height:26px; color:#f3eedd;">
+                      Activez-le pour définir votre mot de passe et compléter votre profil.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Bouton (« bulletproof » : la couleur est sur la cellule, le lien couvre toute la surface). -->
+                <tr>
+                  <td class="px" align="left" style="padding:0 40px 12px 40px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="cta-cell">
+                      <tr>
+                        <td align="center" bgcolor="#e2ac65" style="background-color:#e2ac65; border-radius:9999px;">
+                          <a class="cta" href="https://ccc.dev.elysera.net/invitation/Xq7p2Lw9Zr4tYb1mNc8vKd3sHf6gJe0aUo5iPy2wQxT"
+                             style="display:inline-block; padding:16px 36px; border-radius:9999px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:18px; line-height:24px; font-weight:800; color:#0e242f; text-decoration:none; text-align:center;">
+                            Activer mon compte
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Validité -->
+                <tr>
+                  <td class="px" style="padding:16px 40px 0 40px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td bgcolor="#1c3745" style="background-color:#1c3745; border-left:4px solid #e2ac65; border-radius:8px; padding:14px 18px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; line-height:22px; color:#f3eedd;">
+                          Ce lien est valable <strong style="color:#f3eedd;">7&nbsp;jours</strong> et ne peut servir qu'une fois.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Lien brut en secours, en petit -->
+                <tr>
+                  <td class="px" style="padding:24px 40px 0 40px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#a9c3d1;">
+                    <p style="margin:0 0 4px 0;">Le bouton ne fonctionne pas&nbsp;? Copiez ce lien dans votre navigateur&nbsp;:</p>
+                    <p style="margin:0; word-break:break-all;">
+                      <a href="https://ccc.dev.elysera.net/invitation/Xq7p2Lw9Zr4tYb1mNc8vKd3sHf6gJe0aUo5iPy2wQxT" style="color:#a9c3d1; text-decoration:underline;">https://ccc.dev.elysera.net/invitation/Xq7p2Lw9Zr4tYb1mNc8vKd3sHf6gJe0aUo5iPy2wQxT</a>
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Filet + message de sécurité -->
+                <tr>
+                  <td class="px" style="padding:28px 40px 36px 40px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td height="1" bgcolor="#284758" style="height:1px; line-height:1px; font-size:1px; background-color:#284758;">&nbsp;</td></tr>
+                      <tr>
+                        <td style="padding-top:20px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#a9c3d1;">
+                          Si vous n'attendiez pas ce message, ignorez-le.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Pied de page : nom du site et adresse, rien d'autre (aucune info légale inventée). -->
+          <tr>
+            <td class="px" align="center" style="padding:28px 32px 0 32px; font-family:'Gabarito','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#a9c3d1;">
+              <p style="margin:0 0 4px 0; font-weight:700; color:#f3eedd;">Cotentin Caps Cup</p>
+              <p style="margin:0;">
+                <a href="https://ccc.dev.elysera.net" style="color:#a9c3d1; text-decoration:underline;">ccc.dev.elysera.net</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
