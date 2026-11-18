@@ -3,7 +3,7 @@
  * tout `src/server/` (entités et DataSource TypeORM compris, ARCH-6) et modules natifs Node. Le build navigateur les déclare sans effet de bord (ils disparaissent
  * quand plus rien ne les référence) et échoue si l'un d'eux reste malgré tout dans un chunk client.
  */
-export const SERVER_ONLY_MODULE_PATTERN = /node_modules\/(typeorm|pg|pg-[a-z-]+|pgpass|reflect-metadata)\/|\/src\/server\/|^node:/
+export const SERVER_ONLY_MODULE_PATTERN = /node_modules\/(typeorm|pg|pg-[a-z-]+|pgpass|reflect-metadata|write-excel-file)\/|\/src\/server\/|^node:/
 
 /**
  * Empreintes recherchées dans les chunks client par `tests/build/client-bundle.test.ts` : chaînes que la
