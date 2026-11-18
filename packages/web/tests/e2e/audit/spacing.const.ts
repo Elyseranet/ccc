@@ -71,7 +71,9 @@ export const SPACING_AUDIT_CASES: ISpacingAuditCase[] = [
   { route: ROUTES.ADMIN_EDITION, path: '/admin/editions/2026', role: 'admin', actions: [{ kind: 'dialog', trigger: '[data-cy="edition-delete-open"]' }] },
   { route: ROUTES.ADMIN_EDITION, path: '/admin/editions/2025', role: 'admin' },
   { route: ROUTES.ADMIN_COMPETITORS, path: '/admin/competiteurs', role: 'admin' },
-  { route: ROUTES.ADMIN_COMPETITOR, path: `/admin/competiteurs/${SPACING_AUDIT_COMPETITOR_PLACEHOLDER}`, role: 'admin' }
+  { route: ROUTES.ADMIN_COMPETITOR, path: `/admin/competiteurs/${SPACING_AUDIT_COMPETITOR_PLACEHOLDER}`, role: 'admin' },
+  // F-63b : fiche d'un compétiteur SANS compte (Deseine, hors comptes de test) : le formulaire d'invitation n'est rendu que là.
+  { route: ROUTES.ADMIN_COMPETITOR, path: `/admin/competiteurs/${PLAYER_ID}`, role: 'admin', actions: [{ kind: 'submit', trigger: '[data-cy="competitor-account-submit"]' }] }
 ]
 
 /** Règles d'exclusion, recopiées dans le rapport (le code de chaque règle est dans `spacing.audit.ts`, fonction `exclusion`). */
