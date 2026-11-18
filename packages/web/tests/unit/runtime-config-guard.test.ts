@@ -322,6 +322,26 @@ describe('publisher identity variables (F-70)', () => {
   })
 })
 
+describe('publisher identity guard applies to production only (F-70)', () => {
+  it.each(['https://ccc.dev.elysera.net', 'https://CCC.DEV.ELYSERA.NET:443/', 'https://a.b.dev.elysera.net'])('dev host %s: starts with empty identity', (siteUrl) => {
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl, legal: undefined }))).not.toThrow()
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl, legal: { name: 'A_COMPLETER' } }))).not.toThrow()
+  })
+
+  it.each(['https://ccc.elysera.net', 'https://dev.elysera.net', 'https://ccc.dev.elysera.net.evil.example', 'https://evil-dev.elysera.net.example', 'https://notdev.elysera.net'])('production host %s: refuses empty and A_COMPLETER, naming the variables', (siteUrl) => {
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl, legal: undefined }))).toThrow('NUXT_PUBLIC_LEGAL_NAME')
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl, legal: { ...completeLegal(), name: 'A_COMPLETERA_COMPLETER' } }))).toThrow('NUXT_PUBLIC_LEGAL_NAME')
+  })
+
+  it.each([undefined, '', 'not a url', 'ccc.dev.elysera.net'])('invalid site URL %j: refused, no bypass of the legal check', (siteUrl) => {
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl, legal: undefined }))).toThrow(/NUXT_PUBLIC_LEGAL_NAME/)
+  })
+
+  it('dev host does not relax the other strict variables', () => {
+    expect(() => assertStrictRuntimeConfig(configWith({ siteUrl: 'https://ccc.dev.elysera.net', legal: undefined, deviceSecret: 'short' }))).toThrow('NUXT_AUTH_DEVICE_COOKIE_SECRET')
+  })
+})
+
 describe('what net.BlockList does by itself on IPv6 forms that embed an IPv4 (T-SEC-06 review L2)', () => {
   const blockList = new BlockList()
   for (const { network, prefix, family } of LOCAL_ADDRESS_RANGES) {

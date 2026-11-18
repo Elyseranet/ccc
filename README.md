@@ -56,7 +56,7 @@ L'image pose `NUXT_STRICT_RUNTIME_CONFIG=true` (étage runner du `Dockerfile`) *
 
 ### Identité légale de l'éditeur (F-70)
 
-Les mentions légales et la politique de confidentialité lisent l'éditeur, l'hébergeur et les contacts dans `runtimeConfig.public.legal`, jamais en dur. Les valeurs vivent dans les **variables partagées de portée serveur** de Coolify (règle globale du 2026-11-15, communes à tous les projets) ; Coolify ne les propage pas seul : dans l'application, chaque `NUXT_PUBLIC_LEGAL_*` référence la variable serveur correspondante (`{{server.…}}`). Aucune valeur n'est dans le dépôt. Hors production, une valeur vide s'affiche « [À COMPLÉTER] » ; dans l'image de production, la garde PROD-1 refuse de démarrer. Une valeur `A_COMPLETER` (éventuellement répétée), posée comme substitut dans Coolify, vaut vide partout (affichage, garde, courriel de promotion).
+Les mentions légales et la politique de confidentialité lisent l'éditeur, l'hébergeur et les contacts dans `runtimeConfig.public.legal`, jamais en dur. Les valeurs vivent dans les **variables partagées de portée serveur** de Coolify (règle globale du 2026-11-15, communes à tous les projets) ; Coolify ne les propage pas seul : dans l'application, chaque `NUXT_PUBLIC_LEGAL_*` référence la variable serveur correspondante (`{{server.…}}`). Aucune valeur n'est dans le dépôt. Hors production, une valeur vide s'affiche « [À COMPLÉTER] » ; dans l'image de production, la garde PROD-1 refuse de démarrer, **sauf sur un site de dev** : si l'hôte de `NUXT_PUBLIC_SITE_URL` se termine par `.dev.elysera.net` (règle d'environnement), le contrôle des variables légales est sauté, l'image démarre et les pages affichent « [À COMPLÉTER] ». Tout autre hôte, ou une URL invalide, est traité comme la production. Les autres variables strictes (T-SEC-06) ne changent pas. Une valeur `A_COMPLETER` (éventuellement répétée), posée comme substitut dans Coolify, vaut vide partout (affichage, garde, courriel de promotion).
 
 | Variable de l'application | Variable serveur Coolify |
 |---|---|
@@ -78,7 +78,7 @@ Les mentions légales et la politique de confidentialité lisent l'éditeur, l'h
 | `NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL` | `PRIVACY_CONTACT_EMAIL` |
 | `NUXT_PUBLIC_LEGAL_PRIVACY_FORM_RETENTION_DAYS` | `PRIVACY_FORM_RETENTION_DAYS` |
 
-Douze variables sont exigées non vides en production. **`LEGAL_FORM`, `LEGAL_CAPITAL`, `LEGAL_SIREN`, `LEGAL_RCS` et `LEGAL_VAT` sont facultatives** (décision du 2026-11-18) : la garde ne les contrôle pas, et la ligne correspondante des mentions légales est masquée si elles sont vides. `PRIVACY_FORM_RETENTION_DAYS` est lue et contrôlée mais pas encore affichée : le site n'a pas de formulaire de contact.
+Douze variables sont exigées non vides en production (hors site de dev, voir ci-dessus). **`LEGAL_FORM`, `LEGAL_CAPITAL`, `LEGAL_SIREN`, `LEGAL_RCS` et `LEGAL_VAT` sont facultatives** (décision du 2026-11-18) : la garde ne les contrôle pas, et la ligne correspondante des mentions légales est masquée si elles sont vides. `PRIVACY_FORM_RETENTION_DAYS` est lue et contrôlée mais pas encore affichée : le site n'a pas de formulaire de contact.
 
 Hors de l'image (poste de développement, build des tests d'API), l'indicateur est faux par défaut, ne dépend pas de `NODE_ENV`, et rien n'est contrôlé. Le fichier `.ccc-production-image` est exclu du dépôt et du contexte de build (`.gitignore`, `.dockerignore`) : un fichier homonyme ne peut pas faire basculer un poste ou un build.
 

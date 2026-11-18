@@ -113,3 +113,6 @@ export const LEGAL_IDENTITY_FIELDS = [
 
 /** Valeur de substitution posée dans Coolify tant qu'une information manque (`A_COMPLETER`, éventuellement répétée) : traitée comme vide. */
 export const LEGAL_PLACEHOLDER_PATTERN = /^(?:A_COMPLETER)+$/i
+
+/** Les sites `*.dev.elysera.net` sont l'environnement de dev (règle d'environnement) : la garde de l'identité légale n'y s'applique pas. */
+export const DEV_SITE_HOST_SUFFIX = '.dev.elysera.net'
