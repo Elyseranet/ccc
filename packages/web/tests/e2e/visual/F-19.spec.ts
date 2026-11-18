@@ -7,7 +7,7 @@ import { box, compare, open } from '../visual.util'
  * F-19 : pages légales et pied de page contre les maquettes de ui
  *
  * @description
- * Les textes de l'application (marqueurs `[À FOURNIR : …]`, durées, listes de défauts) diffèrent de ceux de la maquette :
+ * Les textes de l'application (marqueurs `[À FOURNIR : …]` et `[À COMPLÉTER]` des variables d'identité vides, F-70, durées, listes de défauts) diffèrent de ceux de la maquette :
  * avant la capture, le texte de chaque section de l'application est écrit dans le DOM de la maquette (marqueurs mis en
  * forme comme `.todo`), pour que la comparaison ne porte que sur le gabarit. Une section dont la structure diffère
  * (nombre de nœuds de texte) n'est pas alignée : son écart est alors réel et relu à la main.
@@ -43,7 +43,7 @@ const alignSectionText = async (mockup: Page, page: Page, id: string) => {
     }
     const escape = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
     nodes.forEach((node, index) => {
-      const html = escape((values as string[])[index]!).replace(/(\[À (?:FOURNIR|CONFIRMER) : [^\]]*\])/g, '<span class="todo">$1</span>')
+      const html = escape((values as string[])[index]!).replace(/(\[(?:À (?:FOURNIR|CONFIRMER) : [^\]]*|À COMPLÉTER|TO BE COMPLETED)\])/g, '<span class="todo">$1</span>')
       node.innerHTML = html
     })
   }, [TEXT_NODES, texts] as [string, string[]])

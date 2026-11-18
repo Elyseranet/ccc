@@ -14,11 +14,11 @@ export const LEGAL_NOTICE_CONTENT: ILegalPageContent = {
         {
         kind: LEGAL_BLOCK.DEFINITIONS,
         definitions: [
-          { term: { key: 'legal.notice.publisher_name_label', fallback: 'Dénomination' }, description: { key: 'legal.notice.publisher_name_value', fallback: 'Elysera (éditeur déclaré) [À FOURNIR : dénomination exacte]' } },
-          { term: { key: 'legal.notice.publisher_form_label', fallback: 'Forme juridique' }, description: { key: 'legal.notice.publisher_form_value', fallback: '[À FOURNIR : forme juridique]' } },
-          { term: { key: 'legal.notice.publisher_capital_label', fallback: 'Capital' }, description: { key: 'legal.notice.publisher_capital_value', fallback: '[À FOURNIR : capital]' } },
-          { term: { key: 'legal.notice.publisher_seat_label', fallback: 'Siège' }, description: { key: 'legal.notice.publisher_seat_value', fallback: '[À FOURNIR : adresse du siège]' } },
-          { term: { key: 'legal.notice.publisher_registry_label', fallback: 'RCS / SIREN' }, description: { key: 'legal.notice.publisher_registry_value', fallback: '[À FOURNIR : SIREN ou RCS]' } }
+          { term: { key: 'legal.notice.publisher_name_label', fallback: 'Dénomination' }, description: { key: 'legal.notice.publisher_name_value', fallback: '{name} ({status})' } },
+          { term: { key: 'legal.notice.publisher_form_label', fallback: 'Forme juridique' }, description: { key: 'legal.notice.publisher_form_value', fallback: '{form}' }, hiddenWhenEmpty: 'form' },
+          { term: { key: 'legal.notice.publisher_capital_label', fallback: 'Capital' }, description: { key: 'legal.notice.publisher_capital_value', fallback: '{capital}' }, hiddenWhenEmpty: 'capital' },
+          { term: { key: 'legal.notice.publisher_seat_label', fallback: 'Siège' }, description: { key: 'legal.notice.publisher_seat_value', fallback: '{address}' } },
+          { term: { key: 'legal.notice.publisher_registry_label', fallback: 'SIREN / RCS / TVA' }, description: { key: 'legal.notice.publisher_registry_value', fallback: '{registry}' }, hiddenWhenEmpty: 'registry' }
         ]
       }
       ]
@@ -27,21 +27,21 @@ export const LEGAL_NOTICE_CONTENT: ILegalPageContent = {
       id: 'directeur',
       title: { key: 'legal.notice.director_title', fallback: 'Directeur de la publication' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.director_text', fallback: '[À FOURNIR : nom du directeur de la publication]' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.director_text', fallback: '{publicationDirector}' } }
       ]
     },
     {
       id: 'hebergeur',
       title: { key: 'legal.notice.host_title', fallback: 'Hébergeur' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.host_text', fallback: '[À FOURNIR : société de l’hébergeur du serveur] · [À FOURNIR : adresse] · [À FOURNIR : téléphone]' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.host_text', fallback: '{hostName} · {hostAddress} · {hostPhone} · {hostCountry}' } }
       ]
     },
     {
       id: 'contact',
       title: { key: 'legal.notice.contact_title', fallback: 'Contact' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.contact_text', fallback: '[À FOURNIR : email de contact] · [À FOURNIR : téléphone de contact]' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.notice.contact_text', fallback: '{email} · {phone}' } }
       ]
     },
     {

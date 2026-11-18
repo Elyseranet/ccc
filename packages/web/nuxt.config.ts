@@ -138,9 +138,26 @@ export default defineNuxtConfig({
       siteOgImage: '',
       // Indexation par les moteurs (NUXT_PUBLIC_SITE_INDEXABLE, T-SEO-01) : faux par défaut, seule la production la pose à `true`.
       siteIndexable: DEFAULT_SITE_INDEXABLE,
-      // Identité légale de l'éditeur (F-70 ajoutera les autres clés). `email` : NUXT_PUBLIC_LEGAL_EMAIL, référencé vers la variable serveur LEGAL_EMAIL dans Coolify.
+      // Identité légale de l'éditeur (F-70) : NUXT_PUBLIC_LEGAL_<CLÉ> = {{server.LEGAL_<CLÉ>}} dans Coolify (règle globale du 2026-11-15).
+      // Toutes vides par défaut : hors production les pages légales affichent « à compléter », l'image de production refuse de démarrer.
       legal: {
-        email: ''
+        status: '',
+        name: '',
+        form: '',
+        capital: '',
+        siren: '',
+        rcs: '',
+        vat: '',
+        address: '',
+        phone: '',
+        email: '',
+        publicationDirector: '',
+        hostName: '',
+        hostAddress: '',
+        hostPhone: '',
+        hostCountry: '',
+        // PRIVACY_CONTACT_EMAIL et PRIVACY_FORM_RETENTION_DAYS : NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL, _FORM_RETENTION_DAYS.
+        privacy: { contactEmail: '', formRetentionDays: '' }
       }
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).

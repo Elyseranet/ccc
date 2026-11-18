@@ -12,6 +12,7 @@ import { buildDisplayName } from '../utils/display-name.util.js'
 import { buildInvitationEmail } from '../utils/invitation-email.util.js'
 import { buildInvitationLink } from '../utils/invitation-link.util.js'
 import { issueInvitation } from '../utils/invitation-store.util.js'
+import { legalValue } from '../utils/legal-identity.util.js'
 import { hashInvitationToken } from '../utils/invitation-token.util.js'
 import { logger } from '../utils/logger.util.js'
 import { hashPassword } from '../utils/password.util.js'
@@ -138,7 +139,7 @@ export const sendInvitationEmail = async (input: ISendInvitationInput): Promise<
   try {
     const siteUrl = String(useRuntimeConfig().public.siteUrl)
     const link = input.token ? buildInvitationLink(siteUrl, input.token) : undefined
-    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link, kind: input.kind, contactEmail: String(useRuntimeConfig().public.legal?.email ?? ''), siteUrl }) })
+    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link, kind: input.kind, contactEmail: legalValue(useRuntimeConfig().public.legal, 'email'), siteUrl }) })
     logger.info(LOG_EVENT.INVITATION_SENT, { userId: input.userId })
     return true
   } catch (error) {

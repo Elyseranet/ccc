@@ -5,6 +5,7 @@ import {
   DEFAULT_MAIL_FROM_DOMAIN,
   EMBEDDED_IPV4_FORMS,
   IPV6_BYTE_LENGTH,
+  DEV_SITE_HOST_SUFFIX,
   LOCAL_ADDRESS_RANGES,
   LOCAL_HOSTNAME,
   LOCAL_HOSTNAME_SUFFIX,
@@ -15,6 +16,7 @@ import {
   STRICT_RUNTIME_CONFIG_OFF_VALUES
 } from '../consts/runtime-config.const.js'
 import type { IStrictRuntimeConfigInput } from '../interfaces/runtime-config.interface.js'
+import { missingLegalVariables } from './legal-identity.util.js'
 import { resolveSecureCookie } from './cookie-config.util.js'
 
 const asText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '')
@@ -102,6 +104,15 @@ export const isStrictRuntimeConfig = (value: unknown): boolean => {
   return Boolean(value)
 }
 
+/** Site de dev (`*.dev.elysera.net`) ? Une URL invalide ou vide n'en est pas un : pas de contournement de la garde légale. */
+const isDevSite = (value: unknown): boolean => {
+  try {
+    return normalizeHostname(new URL(asText(value)).host).endsWith(DEV_SITE_HOST_SUFFIX)
+  } catch {
+    return false
+  }
+}
+
 const siteUrlViolation = (value: unknown): boolean => {
   try {
     const url = new URL(asText(value))
@@ -151,7 +162,8 @@ const mailFromViolation = (value: unknown): boolean => {
  * - En mode strict, l'erreur nomme chaque variable fautive, JAMAIS sa valeur : site (`NUXT_PUBLIC_SITE_URL`) pas en
  *   https ou sur une machine locale ; transport d'email différent de `smtp` ; hôte SMTP vide ou local ;
  *   expéditeur vide ou resté à la valeur par défaut ; cookies sans `Secure` ; secret du cookie d'appareil absent ou
- *   trop court.
+ *   trop court ; une variable d'identité légale de l'éditeur (`NUXT_PUBLIC_LEGAL_*`, F-70) vide,
+ *   sauf sur un site `*.dev.elysera.net` (dev : l'image démarre, les pages affichent « à compléter »).
  * - Les identifiants SMTP (`NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD`) ne sont pas exigés : le fournisseur n'est pas choisi
  *   et certains relais n'authentifient pas.
  */
@@ -181,6 +193,10 @@ export const assertStrictRuntimeConfig = (config: IStrictRuntimeConfigInput): vo
   }
   if (asText(config.auth?.deviceCookieSecret).length < DEVICE_SECRET_MIN_LENGTH) {
     problems.push(`${STRICT_CONFIG_VARIABLE.DEVICE_COOKIE_SECRET} is required (at least ${DEVICE_SECRET_MIN_LENGTH} characters)`)
+  }
+  const missingLegal = isDevSite(config.public?.siteUrl) ? [] : missingLegalVariables(config.public?.legal)
+  if (missingLegal.length > 0) {
+    problems.push(`${missingLegal.join(', ')} must be set (publisher identity, F-70)`)
   }
   if (problems.length > 0) {
     throw new Error(`Invalid production configuration (${STRICT_CONFIG_VARIABLE.STRICT} is on): ${problems.join('; ')}`)

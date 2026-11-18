@@ -23,7 +23,7 @@ export default defineConfig({
     // Les courriels d'invitation sont capturés dans un fichier (aucun SMTP en e2e). Un serveur déjà lancé (reuseExistingServer)
     // doit l'avoir été avec les mêmes valeurs.
     // Les e2e partagent une seule IP : les budgets par IP des routes à jeton d'invitation et d'avatar (30 par 15 min, 10 par 10 min) sont relevés (F-10), ainsi que le budget public en lecture (300 par min) : la recherche d'une paire du face-à-face (F-05) en consomme jusqu'à une centaine par worker (T-QA-09).
-    command: `E2E=true NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE} NUXT_MAIL_TRANSPORT=capture NUXT_MAIL_CAPTURE_FILE=${E2E_MAIL_CAPTURE_FILE} NUXT_RATE_LIMIT_INVITATION_TOKEN_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} NUXT_RATE_LIMIT_AVATAR_UPLOAD_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} npx nuxt dev --port ${PORT}`,
+    command: `E2E=true NUXT_PUBLIC_LEGAL_FORM=SAS NUXT_PUBLIC_LEGAL_CAPITAL=1000 NUXT_PUBLIC_LEGAL_SIREN=123456789 NUXT_AUTH_SECURE_COOKIE=${E2E_SECURE_COOKIE} NUXT_MAIL_TRANSPORT=capture NUXT_MAIL_CAPTURE_FILE=${E2E_MAIL_CAPTURE_FILE} NUXT_RATE_LIMIT_INVITATION_TOKEN_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} NUXT_RATE_LIMIT_AVATAR_UPLOAD_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} NUXT_RATE_LIMIT_PUBLIC_READ_MAX_REQUESTS=${E2E_RATE_LIMIT_MAX_REQUESTS} npx nuxt dev --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: true,
     timeout: 120000
