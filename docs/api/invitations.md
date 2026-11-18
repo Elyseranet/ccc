@@ -62,6 +62,8 @@ En une transaction : le jeton est consommé (un seul gagnant sous deux requêtes
 
 `npm run user:create-admin` (email lu sur l'entrée standard, `NUXT_PUBLIC_SITE_URL` requis) crée l'administrateur `INVITED` et affiche **une fois** son lien de première connexion sur la sortie standard. Même jeton, même durée de 7 jours, usage unique. Le jeton n'est jamais journalisé.
 
+Invitation d'un administrateur depuis l'interface : proposition B-31, `docs/api/administrateurs.md`.
+
 ## Configuration de l'envoi
 
 `runtimeConfig.mail` : `NUXT_MAIL_HOST`, `NUXT_MAIL_PORT`, `NUXT_MAIL_SECURE`, `NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD`, `NUXT_MAIL_FROM`. Les défauts visent Mailpit en local (`localhost:1025`, sans authentification). En production : fournisseur SMTP et `NUXT_PUBLIC_SITE_URL` à renseigner (les défauts pointent vers `localhost`). `NUXT_MAIL_TRANSPORT=capture` avec `NUXT_MAIL_CAPTURE_FILE` est réservé aux tests d'API : aucun email n'est envoyé.
