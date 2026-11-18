@@ -291,11 +291,12 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert : mergé @ `43da1d2f`, contrôle écran en attente | — |
 | [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | maquette admin-editions mise à jour | B-30, F-13 | Ouvert : mergé @ `4c5f1f28`, contrôle écran en attente | — |
 | [F-66](F-66.md) | Mail d'invitation aux couleurs de la CCC | maquette mail-invitation.html validée @ `11422b8b` | B-29, F-62 | Ouvert : mergé @ `8d2861a2`, contrôle d'un vrai mail en attente | — |
-| [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | En cours : Origam 2.39.0 publiée, + espacements du dialogue de confirmation (capture 2026-11-18) | — |
+| [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | **Fermé** (2026-11-18) @ `c885af62`, déployé sur dev | — |
 | [F-68](F-68.md) | Écran « Administrateurs » | admin-administrateurs.html validée | B-31 | Ouvert : mergé @ `f470d0a0`, contrôle écran en attente | — |
 | [F-69](F-69.md) | Fiche compétiteur : relier au compte d'un administrateur | admin-administrateurs.html#ad-p-link validée | B-31, B-32, F-62 | Ouvert : mergé @ `ab1b7a95`, contrôle écran en attente | — |
 | [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : mergé @ `1800732d`, variables serveur à remplir, pages légales non livrées | — |
 | [F-71](F-71.md) | AsyncState n'espace pas ses blocs : espacement à la racine (fiche édition, « Exporter (Excel) ») | — | F-13 | **Fermé** (2026-11-18) @ `bb99befe`, déployé sur dev | — |
+| [F-72](F-72.md) | Admin « Plus » @390 : écarts plus-liens (6,2 %) et plus-edition (16,5 %) | — | F-12, F-68 | À faire | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
