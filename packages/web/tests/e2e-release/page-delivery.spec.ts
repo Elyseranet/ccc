@@ -11,6 +11,7 @@ import { ADMIN_PAGES, PUBLIC_PAGES, REDIRECTS } from '../e2e/pages.const'
  * @description
  * Tant qu'une page n'est pas `delivered` dans `PAGE_DELIVERY`, elle répond 404 (vrai statut HTTP en SSR),
  * sans lien dans la navigation, même avec un cookie de session présenté.
+ * T-REL-06 : plus aucune page n'est non livrée, donc plus de sonde « cookie de session sur une page masquée » (elle utilisait `LEGAL_NOTICE`) ; le masquage reste couvert par `tests/nuxt/front/page-delivery.test.ts` (tables synthétiques).
  * Quand un ticket F-xx livre sa page, il **ajoute** sa route à `DELIVERED_PAGES` ci-dessous : elle n'est alors plus attendue en 404.
  ********************************************************/
 const EDITION_PAGE = '/editions/2025'
@@ -18,11 +19,13 @@ const EDITIONS_INDEX = '/editions'
 const PLAYER_PAGE = '/joueurs/b20dfa9e-222d-46cf-a229-8fd77cc2edca'
 const INVITATION_PAGE = '/invitation/jeton-de-test'
 /** Pages livrées, sauf l'admin et le profil : publiques, 200 sans session (`/editions` renvoie vers l'édition en cours, A5 ; un jeton d'invitation inconnu donne l'état « lien inconnu »). */
-const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE, ROUTES.HALL_OF_FAME]
+/** Les quatre pages légales sont livrées pour relecture (T-REL-06). */
+const LEGAL_PAGES: string[] = [ROUTES.LEGAL_NOTICE, ROUTES.PRIVACY, ROUTES.TERMS, ROUTES.ACCESSIBILITY]
+const DELIVERED_PUBLIC_PAGES: string[] = ['/', EDITIONS_INDEX, EDITION_PAGE, ROUTES.PLAYERS, PLAYER_PAGE, ROUTES.HEAD_TO_HEAD, ROUTES.RULES, ROUTES.LOGIN, INVITATION_PAGE, ROUTES.HALL_OF_FAME, ...LEGAL_PAGES]
 /** Phase finale livrée (F-24, F-25, F-26) : l'entrée du tiroir (qui ouvre la qualification), la qualification, le tirage du tour et la clôture. */
 const PHASE_FINALE_PAGES: string[] = [ROUTES.ADMIN_FINAL_PHASE, ROUTES.ADMIN_FINAL_PHASE_QUALIFICATION, ROUTES.ADMIN_FINAL_PHASE_ROUND_DRAW, ROUTES.ADMIN_FINAL_PHASE_CLOSING]
 /** `/profil` est livré mais réservé à un compte : sans session il redirige vers `/connexion` (testé plus bas). */
-const DELIVERED_PAGES: string[] = [ROUTES.ADMIN, ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...PHASE_FINALE_PAGES, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
+const DELIVERED_PAGES: string[] = [ROUTES.ADMIN, ROUTES.ADMIN_ADMINISTRATORS, ROUTES.ADMIN_DRAWS, ROUTES.ADMIN_MATCHES, ROUTES.ADMIN_MORE, ROUTES.ADMIN_PARTICIPANTS, ...PHASE_FINALE_PAGES, ...DELIVERED_PUBLIC_PAGES, ROUTES.PROFILE]
 const ADMIN_MORE_NAV_DATA_CY = 'admin-more-nav'
 const ADMIN_PARTICIPANTS_DATA_CY = 'admin-participants'
 const ADMIN_DASHBOARD_DATA_CY = 'admin-dashboard'
@@ -48,14 +51,6 @@ test.describe('pages non livrées', () => {
       expect(html).toContain(`data-cy="${dataCy}"`)
     }
     expect(html).toContain('data-cy="home-tile-champion"')
-  })
-
-  test('un cookie de session présenté ne rend pas visible une page non livrée', async ({ request }) => {
-    const response = await request.get(ROUTES.LEGAL_NOTICE, {
-      maxRedirects: 0,
-      headers: { cookie: `${SESSION_COOKIE_NAME_PRODUCTION}=${'x'.repeat(43)}` }
-    })
-    expect(response.status()).toBe(404)
   })
 
   for (const { from } of REDIRECTS.filter(redirect => !DELIVERED_PAGES.includes(redirect.to.split('#')[0] as string))) {

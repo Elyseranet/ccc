@@ -245,6 +245,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-12b](F-12b.md) | Admin « Plus » : entrée « Phase finale » pilotée par PAGE_DELIVERY | `admin-plus.html` (491ecd55) | F-12, T-QA-09 | **Fermé** — mergé dans `develop` @ `3dd0ca0c` ; tiroir reporté dans F-24 | `.claude/worktrees/fl-qa09` |
 | [F-13](F-13.md) | Admin : créer et modifier une édition, corriger l'identité d'un compétiteur | validée, **bb6f998** | F-00, B-10, B-16 (photo) | **Fermé** (2026-11-12) @ `bd2e62ff` | à créer |
 | [T-REL-05](T-REL-05.md) | Livrer les écrans de F-13 (éditions, compétiteurs) dans `PAGE_DELIVERY` | — | F-13 | **Fermé** (2026-11-16) @ `7234fd67`, vérifié sur dev | — |
+| [T-REL-06](T-REL-06.md) | Livrer les quatre pages légales pour relecture sur dev (`PAGE_DELIVERY`) | — | F-19, F-70 | Ouvert (2026-11-18), en attente de merge | — |
 | [T-ARCH-04](T-ARCH-04.md) | Passer CCC en monorepo npm workspaces (`packages/web`) | — | F-48 | **Fermé** (2026-11-16) @ `afd19b80`, dev redéployé sain | — |
 | [T-ARCH-05](T-ARCH-05.md) | Rebaser les branches gelées (lot 3 a11y, F-30, maquette F-18) sur le monorepo | — | T-ARCH-04 | À faire (à la reprise de chaque chantier) | — |
 | [T-LIVE-01](T-LIVE-01.md) | Première bascule LIVE : ME, EDITIONS et AUTH_LOGOUT ; `/admin/plus` livrée ; garde OPS-3 en conditions réelles | — | F-12 mergé, B-04, B-08, T-OPS-01 | **Fermé** (2026-10-28) : mergé @ `88da4af` (branche 7ef01ec) ; preuve conteneur 200/302/404 | à créer |

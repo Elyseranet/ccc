@@ -84,22 +84,22 @@ export const PAGE_DELIVERY: Record<string, IPageDelivery> = {
     ]
   },
   [ROUTES.LEGAL_NOTICE]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: []
   },
   [ROUTES.PRIVACY]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: []
   },
   [ROUTES.TERMS]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: []
   },
   [ROUTES.ACCESSIBILITY]: {
-    delivered: false,
+    delivered: true,
     layout: LAYOUT.DEFAULT,
     endpoints: []
   },

@@ -1,0 +1,7 @@
+# T-REL-06 — Livrer les quatre pages légales pour relecture sur dev
+
+- **Statut** : Ouvert (2026-11-18), en attente de merge.
+- **Constat** : F-19 et F-70 sont mergés (identité de l'éditeur lue dans les variables serveur Coolify), mais les quatre pages légales restaient `delivered: false` dans `PAGE_DELIVERY` (garde OPS-3) : 404 en production et pied de page sans leurs liens. Décision utilisateur 2026-11-18 : les livrer pour relecture sur dev.
+- **Fait** : `LEGAL_NOTICE`, `PRIVACY`, `TERMS` et `ACCESSIBILITY` passent à `delivered: true`. Les liens du pied de page (`LEGAL_NAVIGATION`) et de l'écran d'invitation (`INVITATION_LEGAL_ITEMS`) filtrent déjà par `PAGE_DELIVERY` : ils réapparaissent d'eux-mêmes. Les textes juridiques restant « [À FOURNIR] » (F-19) sont livrés tels quels, mis en évidence, pour relecture.
+- **Tests mis à jour** : `tests/nuxt/front/page-delivery.test.ts` (liste des pages livrées), `tests/nuxt/front/legal.test.ts` (les quatre pages livrées, liens du pied de page présents), `tests/e2e-release/page-delivery.spec.ts` (les quatre routes dans `DELIVERED_PAGES`, 200 sans session). **Plus aucune page n'est non livrée** : la sonde « cookie de session sur une page masquée » (elle utilisait `LEGAL_NOTICE`) est retirée ; le masquage reste couvert par les tables synthétiques de `page-delivery.test.ts`. `/admin/administrateurs` (F-68), livrée mais absente de `DELIVERED_PAGES`, y est ajoutée (le test la voulait en 404).
+- **Critères** : typecheck, `test:run`, `test:release` verts ; `test:release:e2e` sur le build.

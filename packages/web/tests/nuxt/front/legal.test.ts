@@ -23,15 +23,15 @@ describe('pages légales (F-19)', () => {
     expect(LEGAL_ROUTES).toEqual(['/mentions-legales', '/confidentialite', '/cgu', '/accessibilite'])
   })
 
-  it('les quatre pages restent non livrées tant que le ticket n’est pas complet', () => {
+  it('les quatre pages sont livrées pour relecture (T-REL-06)', () => {
     for (const route of LEGAL_ROUTES) {
-      expect(PAGE_DELIVERY[route]?.delivered).toBe(false)
+      expect(PAGE_DELIVERY[route]?.delivered).toBe(true)
     }
   })
 
   it('le pied de page lie les quatre pages, filtrées par la règle de livraison', () => {
     expect(LEGAL_NAVIGATION.map(item => item.to)).toEqual(LEGAL_ROUTES)
-    expect(filterDeliveredItems(LEGAL_NAVIGATION, false)).toEqual([])
+    expect(filterDeliveredItems(LEGAL_NAVIGATION, false).map(item => item.to)).toEqual(LEGAL_ROUTES)
     expect(filterDeliveredItems(LEGAL_NAVIGATION, true)).toHaveLength(4)
   })
 
