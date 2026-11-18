@@ -4,6 +4,8 @@ Une dérogation est une exception à la règle « zéro vulnérabilité `high` o
 
 ## SW-1 — picomatch, ReDoS sur extglobs (GHSA-fc5q-39xc-vjpf)
 
+> **Close le 2026-11-18** : l'avis a été **retiré** par GitHub (`gh api /advisories/GHSA-fc5q-39xc-vjpf` : `withdrawn_at` 2026-11-18T15:38:56Z). Sur develop @ `eddc53f7`, `npm audit --omit=dev` : 0 vulnérabilité (info 0, low 0, moderate 0, high 0, critical 0), avec les mêmes versions installées (picomatch 2.3.2 et 4.0.7). La dérogation n'a plus d'objet ; le contenu ci-dessous est conservé comme archive.
+
 | Champ | Valeur |
 |---|---|
 | Avis | [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) : picomatch vulnérable à un ReDoS par extglobs à branche unique répétée |

@@ -6,7 +6,7 @@ import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
 import type { IAdminAccount, IAdminInviteResult, IAdminMailPayload } from '../interfaces/administrator.interface.js'
 import { InvitationEntity } from '../server/db/typeorm/entities/invitation.entity.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
-import { accountActive, alreadyAdmin, cannotRevokeSelf, emailAlreadyUsed, lastAdmin, notFound } from '../utils/api-error.util.js'
+import { accountActive, alreadyAdmin, cannotRevokeSelf, emailAlreadyUsed, lastAdmin, notFound, promotionConfirmationRequired } from '../utils/api-error.util.js'
 import { normalizeEmail } from '../utils/email.util.js'
 import { isEmailCollision } from '../utils/email-collision.util.js'
 import { issueInvitation } from '../utils/invitation-store.util.js'
@@ -83,12 +83,14 @@ export const listAdministrators = async (dataSource: DataSource, currentUserId: 
 /**
  * `POST /admin/administrateurs` : crée un administrateur INVITED sans fiche, ou promeut le compte joueur de cet email (Q4) :
  * INVITED, même compte, nouvelle invitation (variante administrateur) ; ACTIVE, mot de passe, fiche et sessions conservés, mail
- * d'information sans lien (Q5). 409 `ALREADY_ADMIN` si le compte est déjà administrateur.
+ * d'information sans lien (Q5). 409 `ALREADY_ADMIN` si le compte est déjà administrateur ; 409 `PROMOTION_CONFIRMATION_REQUIRED`
+ * (B-33) si l'email est celui d'un compte joueur et que `confirmPromotion` n'est pas vrai : rien n'est écrit, aucun mail.
  */
 export const inviteAdministrator = async (
   dataSource: DataSource,
   actorUserId: string,
   rawEmail: string,
+  confirmPromotion = false,
   now = new Date()
 ): Promise<IAdminInviteResult> => {
   const email = normalizeEmail(rawEmail)
@@ -109,6 +111,9 @@ export const inviteAdministrator = async (
       }
       if (existing.role === USER_ROLE.ADMIN) {
         throw alreadyAdmin()
+      }
+      if (!confirmPromotion) {
+        throw promotionConfirmationRequired(existing.competitor?.displayName ?? existing.email)
       }
       await users.update({ id: existing.id }, { role: USER_ROLE.ADMIN })
       const invited = existing.status === USER_STATUS.INVITED
