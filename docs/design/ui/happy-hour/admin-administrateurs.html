@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrateurs · Organisation CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="admin-editions.css">
+<link rel="stylesheet" href="admin-administrateurs.css">
+</head>
+<body class="adm">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-layout : origam-drawer permanent (≥ 1000 px) · origam-bottom-nav (< 1000 px, 4 entrées, décision A7) -->
+<aside class="adm-side" aria-label="Organisation">
+  <a class="hh-brand font-display" href="admin.html"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <p class="eyebrow adm-side__t">Organisation</p>
+  <nav aria-label="Administration"><ul class="adm-nav"><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg>Tableau de bord</a></li><li><a href="admin-participants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Participants</a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>Tirages</a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg>Poules et matchs</a></li><li><a href="admin-qualification.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z"/></svg>Phase finale</a></li></ul>
+  <p class="eyebrow adm-side__t">Référentiel</p>
+  <ul class="adm-nav"><li><a href="admin-editions.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16M8 3v4M16 3v4"/></svg>Éditions</a></li><li><a href="admin-editions.html#ed-p-comp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6M19 8v6M16 11h6"/></svg>Compétiteurs</a></li><li><a href="admin-administrateurs.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/></svg>Administrateurs</a></li></ul></nav>
+  <a class="btn btn--outlined btn--sm adm-side__pub" href="index.html">Voir le site public ↗</a>
+</aside>
+<div class="adm-main">
+  <!-- origam-toolbar : sélecteur d'édition global (origam-select) -->
+  <header class="adm-top">
+    <p class="field adm-top__ed"><label for="aed">Édition active</label><select id="aed" class="input"><option>Édition 2026 · phase de poules</option><option>2025 · archive (lecture seule)</option></select></p>
+    <span class="avatar" aria-label="Administrateur">AD</span>
+  </header>
+  <main id="contenu" class="adm-content">
+<div class="adm-head"><div><p class="eyebrow">Organisation</p><h1 class="adm-h1 font-display neon--sm">Administrateurs</h1></div><p class="muted">Maquette F-68 · à valider avant intégration</p></div>
+<!-- Navigation de la maquette entre écrans (hors produit) : dans l’application, la liste est une page et le bloc de la fiche compétiteur est dans /admin/competiteurs/{id} -->
+<nav class="tabs screens" aria-label="Écrans de la maquette F-68"><a href="#ad-p-list" aria-current="page">Administrateurs <span class="screens__r">/admin/administrateurs</span></a><a href="#ad-p-states">États</a><a href="#ad-p-link">Fiche joueur <span class="screens__r">/admin/competiteurs/{id}</span></a></nav>
+
+<section class="screen" id="ad-p-list" aria-label="Page des administrateurs">
+<div class="ad-grid">
+  <!-- origam-data-table : headers, items, density="compact" (gabarit de la table des inscrits F-09) ; colonnes : administrateur (email + fiche reliée ou date d’invitation), compte (pastilles F-62 PARTICIPANT_ACCOUNT_CHIPS : Actif / Invité / Invitation expirée), action -->
+  <section class="ad-list" aria-labelledby="h-adl">
+    <header class="adm-card-h"><h2 id="h-adl" class="h-card">Administrateurs</h2><span class="chip chip--neon num">4</span></header>
+    <div class="table-wrap"><table class="table"><caption class="sr-only">Comptes administrateurs</caption>
+      <thead><tr><th scope="col">Administrateur</th><th scope="col">Compte</th><th scope="col" class="r">Action</th></tr></thead>
+      <tbody>
+        <!-- Administrateur connecté : pastille neutre « Vous », pas de retrait de soi-même (décision utilisateur 2026-11-18) -->
+        <tr><td><span class="pl-cell"><span class="avatar">LB</span><span class="ad-who"><b>lou.bernard@exemple.fr</b><small class="muted">Fiche joueur : Lou Bernard</small></span></span></td><td><span class="chip chip--ok">Actif</span> <span class="chip">Vous</span></td><td class="r"><span class="muted">—</span></td></tr>
+        <tr><td><span class="pl-cell"><span class="avatar">SD</span><span class="ad-who"><b>sam.dupont@exemple.fr</b><small class="muted">Aucune fiche joueur reliée</small></span></span></td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Retirer l’accès<span class="sr-only"> de sam.dupont@exemple.fr</span></button></td></tr>
+        <tr><td><span class="pl-cell"><span class="avatar">MB</span><span class="ad-who"><b>maya.bonnet@exemple.fr</b><small class="muted">Valable jusqu’au 25 novembre 2026</small></span></span></td><td><span class="chip chip--warn">Invité</span></td><td class="r"><span class="ad-acts"><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Corriger<span class="sr-only"> l’invitation de maya.bonnet@exemple.fr</span></button><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Retirer l’accès<span class="sr-only"> de maya.bonnet@exemple.fr</span></button></span></td></tr>
+        <tr><td><span class="pl-cell"><span class="avatar">AC</span><span class="ad-who"><b>anna.chevalier@exemple.fr</b><small class="muted">Expirée le 10 novembre 2026</small></span></span></td><td><span class="chip chip--danger">Invitation expirée</span></td><td class="r"><span class="ad-acts"><button class="btn btn--text btn--sm" type="button">Renvoyer<span class="sr-only"> l’invitation à anna.chevalier@exemple.fr</span></button><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Corriger<span class="sr-only"> l’invitation de anna.chevalier@exemple.fr</span></button><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Retirer l’accès<span class="sr-only"> de anna.chevalier@exemple.fr</span></button></span></td></tr>
+      </tbody></table></div>
+  </section>
+  <!-- origam-card + origam-form + AccountEmailField (origam-label + for : libellé visible) + origam-alert info (réglages A14) + origam-btn primaire x-large -->
+  <section class="card ad-invite" aria-labelledby="h-adi">
+    <h2 id="h-adi" class="h-card">Inviter un administrateur</h2>
+    <form class="ad-invite" action="#" aria-labelledby="h-adi">
+      <p class="field"><label for="ai-em">Email · privé</label><input id="ai-em" class="input" type="email" autocomplete="off" value="camille@exemple.fr"></p>
+      <p class="alert alert--info alert--block" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__title">Invitation</span><span class="alert__body">Un email d’invitation part aussitôt. Le lien est valable 7 jours ; un renvoi annule l’ancien.</span></span></p>
+      <div class="ad-cta"><button class="btn btn--primary" type="submit">Envoyer l’invitation</button></div>
+    </form>
+  </section>
+</div>
+<!-- origam-snackbar status="success" location="bottom" timeout=4000 (masquée dans la mesure, vérifiée en e2e) --><div class="snack" role="status"><span class="chip chip--ok">Invitation envoyée</span>Invitation envoyée à camille@exemple.fr</div>
+</section>
+
+<section class="screen" id="ad-p-states" aria-label="États de la page des administrateurs" hidden>
+<div class="ad-variants">
+  <div>
+    <p class="eyebrow ad-tag">Chargement (AsyncState · origam-skeleton-group)</p>
+    <div class="table-wrap"><div class="skel" role="status" aria-label="Chargement des administrateurs"><span></span><span></span><span></span><span></span></div></div>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Erreur (AsyncState · origam-alert error + « Réessayer »)</p>
+    <p class="alert alert--error alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__title">Une erreur est survenue.</span><span class="alert__body">La liste des administrateurs n’a pas pu être chargée. <button class="btn btn--outlined btn--sm" type="button">Réessayer</button></span></span></p>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Vide : un seul administrateur, vous</p>
+    <div class="table-wrap"><table class="table"><caption class="sr-only">Comptes administrateurs</caption>
+      <thead><tr><th scope="col">Administrateur</th><th scope="col">Compte</th><th scope="col" class="r">Action</th></tr></thead>
+      <tbody><tr><td><span class="pl-cell"><span class="avatar">LB</span><span class="ad-who"><b>lou.bernard@exemple.fr</b><small class="muted">Fiche joueur : Lou Bernard</small></span></span></td><td><span class="chip chip--ok">Actif</span> <span class="chip">Vous</span></td><td class="r"><span class="muted">—</span></td></tr></tbody></table></div>
+    <p class="ad-why">Vous êtes le seul administrateur. Invitez-en un autre pour partager l’organisation.</p>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Dernier administrateur actif (action refusée d’avance)</p>
+    <div class="table-wrap"><table class="table"><caption class="sr-only">Comptes administrateurs</caption>
+      <thead><tr><th scope="col">Administrateur</th><th scope="col">Compte</th><th scope="col" class="r">Action</th></tr></thead>
+      <tbody><tr><td><span class="pl-cell"><span class="avatar">SD</span><span class="ad-who"><b>sam.dupont@exemple.fr</b><small class="muted">Aucune fiche joueur reliée</small></span></span></td><td><span class="chip chip--ok">Actif</span></td><td class="r"><button class="btn btn--text btn--sm" type="button" disabled aria-describedby="why-last">Retirer l’accès<span class="sr-only"> de sam.dupont@exemple.fr</span></button></td></tr>
+      <tr><td><span class="pl-cell"><span class="avatar">MB</span><span class="ad-who"><b>maya.bonnet@exemple.fr</b><small class="muted">Valable jusqu’au 25 novembre 2026</small></span></span></td><td><span class="chip chip--warn">Invité</span></td><td class="r"><button class="btn btn--text btn--sm" type="button" aria-haspopup="dialog">Retirer l’accès<span class="sr-only"> de maya.bonnet@exemple.fr</span></button></td></tr></tbody></table></div>
+    <p id="why-last" class="ad-why">Indisponible : il doit toujours rester au moins un administrateur actif.</p>
+    <!-- 409 au retrait (deux administrateurs en même temps) -->
+    <p class="alert alert--error alert--block alert--compact" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__body">Retrait refusé : c’est le dernier administrateur actif. <button class="btn btn--outlined btn--sm" type="button">Recharger</button></span></span></p>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Retirer l’accès d’un administrateur actif sans fiche reliée (ConfirmDialog, bouton danger, focus initial sur « Annuler »)</p>
+    <!-- Décision utilisateur 2026-11-18 : le compte redevient un compte joueur (même compte), il garde sa fiche et ses statistiques -->
+    <section class="odlg" role="alertdialog" aria-labelledby="h-rm" aria-describedby="rm-d"><header class="odlg__h"><h3 id="h-rm" class="odlg__t">Retirer l’accès de sam.dupont@exemple.fr ?</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="rm-d">Ce compte perd l’accès à l’espace d’organisation et redevient un compte joueur, sans fiche reliée.</p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--danger" type="button">Retirer l’accès</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Retirer l’accès d’un administrateur actif avec fiche reliée (ConfirmDialog, bouton danger, focus initial sur « Annuler »)</p>
+    <!-- Décision utilisateur 2026-11-18 : le compte redevient un compte joueur (même compte), il garde sa fiche et ses statistiques -->
+    <section class="odlg" role="alertdialog" aria-labelledby="h-rmf" aria-describedby="rmf-d"><header class="odlg__h"><h3 id="h-rmf" class="odlg__t">Retirer l’accès de lisa.andre@exemple.fr ?</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="rmf-d">Ce compte perd l’accès à l’espace d’organisation et redevient un compte joueur. Il garde sa fiche et ses statistiques.</p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--danger" type="button">Retirer l’accès</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Retirer l’accès d’un invité jamais activé (ConfirmDialog, bouton danger)</p>
+    <!-- Décision utilisateur 2026-11-18 : l’invitation est annulée, le lien ne fonctionne plus -->
+    <section class="odlg" role="alertdialog" aria-labelledby="h-rmi" aria-describedby="rmi-d"><header class="odlg__h"><h3 id="h-rmi" class="odlg__t">Retirer l’accès de maya.bonnet@exemple.fr ?</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="rmi-d">Cette invitation n’a jamais été activée : elle est annulée et le lien envoyé ne fonctionnera plus.</p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--danger" type="button">Retirer l’accès</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Corriger l’invitation (champ partagé F-62, focus initial sur le champ)</p>
+    <section class="odlg" role="dialog" aria-labelledby="h-fix" aria-describedby="fix-d"><header class="odlg__h"><h3 id="h-fix" class="odlg__t">Corriger l’invitation</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="fix-d">Invitation envoyée à maya.bonnet@exemple.fr, valable jusqu’au 25 novembre 2026.</p>
+      <p class="field"><label for="fx-em">Email · privé</label><input id="fx-em" class="input is-error" type="email" value="maya.bonet@exemple" aria-invalid="true" aria-describedby="fx-em-err"><span id="fx-em-err" class="field-msg"><span class="field-msg__text">Adresse email invalide</span></span></p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="button">Corriger et renvoyer</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Inviter l’email d’un compte joueur : confirmation de la promotion (ConfirmDialog)</p>
+    <!-- Décision utilisateur 2026-11-18 : même compte, il garde sa fiche et son mot de passe ; prévenu par mail. Focus initial sur « Annuler ». -->
+    <section class="odlg" role="alertdialog" aria-labelledby="h-pr" aria-describedby="pr-d"><header class="odlg__h"><h3 id="h-pr" class="odlg__t">Nommer Simon Vaur administrateur ?</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="pr-d">simon.vaur@exemple.fr est l’email du compte joueur de Simon Vaur. Ce compte deviendra administrateur : il garde sa fiche et son mot de passe. Il est prévenu par mail.</p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="button">Nommer administrateur</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Invitation : email déjà administrateur (409)</p>
+    <form class="card ad-invite" action="#" aria-label="Inviter un administrateur : email déjà administrateur">
+      <p class="field"><label for="ai-em2">Email · privé</label><input id="ai-em2" class="input is-error" type="email" value="sam.dupont@exemple.fr" aria-invalid="true" aria-describedby="ai-em2-err"><span id="ai-em2-err" class="field-msg"><span class="field-msg__text">Cet email est déjà celui d’un administrateur.</span></span></p>
+      <p class="alert alert--error alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__title">Email déjà utilisé.</span><span class="alert__body">Cet email est déjà celui d’un administrateur : saisissez-en un autre.</span></span></p>
+      <div class="ad-cta"><button class="btn btn--primary" type="submit">Envoyer l’invitation</button></div>
+    </form>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Retours (origam-snackbar)</p>
+    <div class="snack snack--demo" role="status"><span class="chip chip--ok">Administrateur</span>Simon Vaur est maintenant administrateur</div>
+    <div class="snack snack--demo" role="status"><span class="chip chip--ok">Accès retiré</span>Accès retiré pour sam.dupont@exemple.fr</div>
+    <div class="snack snack--demo" role="status"><span class="chip chip--ok">Invitation annulée</span>Invitation annulée pour maya.bonnet@exemple.fr</div>
+    <div class="snack snack--demo" role="status"><span class="chip chip--warn">Invitation non envoyée</span>Compte créé pour camille@exemple.fr, mais l’invitation n’a pas pu être envoyée : renvoyez-la.</div>
+  </div>
+</div>
+</section>
+
+<section class="screen" id="ad-p-link" aria-label="Fiche compétiteur, bloc Compte et invitation" hidden>
+<p class="muted ed-note">On relie la fiche depuis la fiche compétiteur ; n’importe quel administrateur peut le faire (décision utilisateur 2026-11-18). Le bloc « Compte et invitation » (F-62) gagne un état et une action. Une liaison ne se défait pas : aucune action « Délier ».</p>
+<div class="ad-variants">
+  <div>
+    <p class="eyebrow ad-tag">Fiche reliée au compte d’un administrateur</p>
+    <!-- CompetitorAccountBlock : origam-card rounded="xl" border elevation="md" ; pastille F-62 « Actif » + pastille neutre « Administrateur » ; lecture seule, comme un compte actif -->
+    <section class="card acb" aria-labelledby="h-acb1">
+      <header><p class="eyebrow acb__eyebrow">Compte</p><h2 id="h-acb1" class="h-card">Compte et invitation</h2></header>
+      <div class="acb__state"><span class="chip chip--ok">Actif</span><span class="chip">Administrateur</span><span>Fiche reliée au compte administrateur sam.dupont@exemple.fr.</span></div>
+      <p class="acb__ro">Email du compte : sam.dupont@exemple.fr. L’administrateur le gère lui-même, il n’est pas modifiable ici.</p>
+    </section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Sans compte : relier à un administrateur</p>
+    <section class="card acb" aria-labelledby="h-acb2">
+      <header><p class="eyebrow acb__eyebrow">Compte</p><h2 id="h-acb2" class="h-card">Compte et invitation</h2></header>
+      <div class="acb__state"><span class="chip chip--neon">Sans compte</span><span>Ce joueur n’a pas de compte : saisissez son email pour lui envoyer une invitation.</span></div>
+      <form class="acb acb--flat" action="#" aria-labelledby="h-acb2">
+        <p class="field"><label for="acb-em">Email · privé</label><input id="acb-em" class="input" type="email"></p>
+        <div class="acb__cta"><button class="btn btn--primary" type="submit">Envoyer l’invitation</button></div>
+      </form>
+      <!-- Action ajoutée, secondaire : origam-btn variant="outlined" size="small" aria-haspopup="dialog" -->
+      <div class="acb__or"><p class="muted">Ce joueur est administrateur ?</p><button class="btn btn--outlined btn--sm" type="button" aria-haspopup="dialog">Relier au compte d’un administrateur…</button></div>
+    </section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Boîte « Relier » (origam-dialog · origam-select, libellé visible)</p>
+    <!-- Choix = administrateurs sans fiche reliée (un compte ↔ une fiche : uq_users_competitor_id). Focus initial sur le champ, Échap annule, focus rendu au bouton (useFocusReturn). -->
+    <section class="odlg" role="dialog" aria-labelledby="h-lk" aria-describedby="lk-d"><header class="odlg__h"><h3 id="h-lk" class="odlg__t">Relier Lou Bernard à un administrateur</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="lk-d">Le compte choisi retrouve les statistiques de Lou Bernard. Aucune invitation n’est envoyée.</p>
+      <p class="field"><label for="lk-sel">Compte administrateur</label><select id="lk-sel" class="input"><option>sam.dupont@exemple.fr</option><option>maya.bonnet@exemple.fr · invité</option></select></p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="button">Relier</button></div></section>
+    <div class="snack snack--demo" role="status"><span class="chip chip--ok">Fiche reliée</span>Fiche reliée au compte sam.dupont@exemple.fr</div>
+    <p class="eyebrow ad-tag">Boîte « Relier » : la fiche a un compte joueur invité, jamais activé</p>
+    <!-- Décision utilisateur 2026-11-18 : liaison permise ; le compte invité est supprimé, son lien ne fonctionne plus. origam-alert status="warning" dans la boîte. -->
+    <section class="odlg" role="dialog" aria-labelledby="h-lk2" aria-describedby="lk2-d lk2-w"><header class="odlg__h"><h3 id="h-lk2" class="odlg__t">Relier Chloé Dumont à un administrateur</h3><button class="btn odlg__x" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></button></header><div class="odlg__txt"><p id="lk2-d">Le compte choisi retrouve les statistiques de Chloé Dumont. Aucune invitation n’est envoyée.</p>
+      <p id="lk2-w" class="alert alert--warning alert--block alert--compact" role="status"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><span><span class="alert__body">Chloé Dumont a une invitation de joueur en attente (chloe.dumont@exemple.fr). Son compte invité est supprimé et le lien envoyé ne fonctionnera plus.</span></span></p>
+      <p class="field"><label for="lk2-sel">Compte administrateur</label><select id="lk2-sel" class="input"><option>sam.dupont@exemple.fr</option><option>maya.bonnet@exemple.fr · invité</option></select></p></div><div class="odlg__f"><button class="btn btn--outlined" type="button">Annuler</button><button class="btn btn--primary" type="button">Relier</button></div></section>
+  </div>
+  <div>
+    <p class="eyebrow ad-tag">Cas limites (actions refusées d’avance)</p>
+    <!-- Fiche dont le compte joueur est ACTIF : refusée (décision utilisateur 2026-11-18) ; un compte invité jamais activé ne bloque pas (boîte ci-contre) -->
+    <div class="acb__or acb__or--bare"><button class="btn btn--outlined btn--sm" type="button" disabled aria-describedby="lk-why1">Relier au compte d’un administrateur…</button><p id="lk-why1" class="ad-why">Indisponible : cette fiche a un compte joueur actif.</p></div>
+    <div class="acb__or"><button class="btn btn--outlined btn--sm" type="button" disabled aria-describedby="lk-why2">Relier au compte d’un administrateur…</button><p id="lk-why2" class="ad-why">Indisponible : tous les administrateurs ont déjà une fiche reliée.</p></div>
+  </div>
+</div>
+</section>
+</main>
+<script>
+  // Maquette : navigation entre écrans par l’ancre (une page = une route). Aucune animation pilotée en JS.
+  const screens = [...document.querySelectorAll('.screen')]
+  const links = [...document.querySelectorAll('.screens a[href^="#"]')]
+  const route = () => { const id = (location.hash || '#ad-p-list').slice(1); const target = screens.some((x) => x.id === id) ? id : 'ad-p-list'
+    screens.forEach((x) => { x.hidden = x.id !== target })
+    links.forEach((a) => { if (a.getAttribute('href') === '#' + target) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current') }) }
+  window.addEventListener('hashchange', route); route()
+</script>
+</div>
+<nav class="adm-bottom" aria-label="Administration (mobile)"><ul><li><a href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 10h7v11h-7zM3 13h7v8H3z"/></svg><span>Tableau</span></a></li><li><a href="admin-matchs.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4"/></svg><span>Matchs</span></a></li><li><a href="admin-tirages.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg><span>Tirages</span></a></li><li><a href="admin-plus.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><span>Plus</span></a></li></ul></nav>
+</body>
+</html>
