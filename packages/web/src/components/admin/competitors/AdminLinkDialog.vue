@@ -41,6 +41,8 @@
         autofocus
         :items="items"
         :loading="loading"
+        :open-text="fieldLabel"
+        :close-text="fieldLabel"
         :disabled="unavailable"
         :menu-icon="CaretDown"
         data-cy="admin-link-select"
@@ -86,7 +88,7 @@ import type { IAdminLinkDialogEmits, IAdminLinkDialogProps } from '~/interfaces/
  *
  * @description
  * Boîte « Relier à un administrateur » de la fiche compétiteur (F-69, B-32) : un choix parmi les administrateurs sans fiche (un administrateur
- * invité y figure, suffixé « invité »), libellé visible lié au champ. Le premier est présélectionné à l'ouverture. Si la fiche a un compte
+ * invité y figure, suffixé « invité »), libellé visible lié au champ. Le premier est présélectionné à l'ouverture. `open-text` / `close-text` portent le libellé du champ : `origam-select` en fait l'`aria-label` de sa saisie (« Ouvrir » par défaut), qui l'emporte sur le `<label for>` et laisserait le champ sans nom. Si la fiche a un compte
  * joueur invité jamais activé, l'avertissement dit qu'il sera supprimé (le serveur le fait). Le parent rend le focus au déclencheur
  * (`useFocusReturn`) et ferme la boîte quand la liaison a réussi.
  ********************************************************/

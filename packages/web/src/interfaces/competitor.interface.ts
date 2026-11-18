@@ -67,9 +67,9 @@ export interface ICompetitorStats {
 /** Compte du compétiteur, réservé à l'administrateur (B-29) : porte l'email, jamais exposé publiquement. */
 export interface ICompetitorAccount {
   status: COMPETITOR_ACCOUNT_STATUS
-  email: string | null
-  /** Rôle du compte (B-32) ; absent sans compte. `ADMIN` : la fiche est reliée à un compte administrateur. */
+  /** Rôle du compte ; absent sans compte (`NONE`). `ADMIN` : fiche reliée à un administrateur, non modifiable (B-32). */
   role?: USER_ROLE
+  email: string | null
   /** ISO 8601, expiration de l'invitation la plus récente ; `null` sans compte ou sans invitation. */
   invitationExpiresAt: string | null
 }

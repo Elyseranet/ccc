@@ -1,6 +1,6 @@
 import { QueryFailedError } from 'typeorm'
 import { describe, expect, it } from 'vitest'
-import { isEmailCollision } from '../../src/utils/email-collision.util'
+import { isCompetitorLinkCollision, isEmailCollision } from '../../src/utils/email-collision.util'
 
 const queryError = (driverError: Record<string, unknown>): QueryFailedError =>
   new QueryFailedError('INSERT', [], Object.assign(new Error('duplicate key'), driverError))
@@ -10,6 +10,12 @@ describe('isEmailCollision (T-SEC-12, L8)', () => {
     expect(isEmailCollision(queryError({ code: '23505', constraint: 'uq_users_email' }))).toBe(true)
     expect(isEmailCollision(queryError({ code: '23505', constraint: 'uq_users_competitor_id' }))).toBe(false)
     expect(isEmailCollision(queryError({ code: '23503', constraint: 'uq_users_email' }))).toBe(false)
+  })
+
+  it('recognizes the unique violation of users.competitor_id only (B-32)', () => {
+    expect(isCompetitorLinkCollision(queryError({ code: '23505', constraint: 'uq_users_competitor_id' }))).toBe(true)
+    expect(isCompetitorLinkCollision(queryError({ code: '23505', constraint: 'uq_users_email' }))).toBe(false)
+    expect(isCompetitorLinkCollision(new Error('x'))).toBe(false)
   })
 
   it('ignores anything that is not a query error', () => {
