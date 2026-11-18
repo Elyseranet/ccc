@@ -1,6 +1,6 @@
 # API : administrateurs et lien compte admin / fiche joueur (B-31, B-32)
 
-**Statut : contrat arrêté, non implémenté.** Décisions utilisateur Q1 à Q10 du 2026-11-18 (détail dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md`) ; les marqueurs **[Qx]** renvoient à la décision qui fixe le point.
+**Statut : B-31 implémenté (branche `feature/B-31-admin-invitations`), B-32 non implémenté.** Contrat arrêté. Décisions utilisateur Q1 à Q10 du 2026-11-18 (détail dans `docs/tickets/B-31.md` et `docs/tickets/B-32.md`) ; les marqueurs **[Qx]** renvoient à la décision qui fixe le point.
 
 Routes sous `/api/v1`. Rôle `ADMIN` exigé sur toutes (`requireRole(event, USER_ROLE.ADMIN)`) : **401** `UNAUTHORIZED` sans session, **403** `FORBIDDEN` pour un participant, vérifié avant toute lecture du corps. Réponses en `Cache-Control: no-store`. Erreurs au format `IApiError`. Corps validés par zod `.strict()` (champ inconnu : **400** `VALIDATION_FAILED`), 16 Ko au plus (**413**).
 

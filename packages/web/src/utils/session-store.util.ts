@@ -68,6 +68,11 @@ export const revokeOtherSessions = async (
   )
 }
 
+/** Révoque toutes les sessions d'un compte (retrait d'un accès administrateur, B-31). */
+export const revokeAllSessions = async (manager: EntityManager, userId: string, now = new Date()): Promise<void> => {
+  await manager.getRepository(SessionEntity).update({ userId, revokedAt: IsNull() }, { revokedAt: now })
+}
+
 /** Purge les sessions expirées depuis plus d'un jour ; appelée au login pour borner la table. */
 export const purgeExpiredSessions = async (dataSource: DataSource, now = new Date()): Promise<void> => {
   await dataSource.getRepository(SessionEntity).delete({ expiresAt: LessThan(new Date(now.getTime() - SESSION_PURGE_GRACE_MS)) })

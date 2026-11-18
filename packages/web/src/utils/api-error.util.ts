@@ -48,6 +48,15 @@ export const emailAlreadyUsed = (): H3Error =>
 export const accountActive = (): H3Error =>
   buildError(409, API_ERROR_CODE.ACCOUNT_ACTIVE, API_ERROR_MESSAGE.ACCOUNT_ACTIVE)
 
+export const alreadyAdmin = (): H3Error =>
+  buildError(409, API_ERROR_CODE.ALREADY_ADMIN, API_ERROR_MESSAGE.ALREADY_ADMIN)
+
+export const lastAdmin = (): H3Error =>
+  buildError(409, API_ERROR_CODE.LAST_ADMIN, API_ERROR_MESSAGE.LAST_ADMIN)
+
+export const cannotRevokeSelf = (): H3Error =>
+  buildError(409, API_ERROR_CODE.CANNOT_REVOKE_SELF, API_ERROR_MESSAGE.CANNOT_REVOKE_SELF)
+
 export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
