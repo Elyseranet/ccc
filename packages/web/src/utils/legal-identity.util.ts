@@ -1,13 +1,13 @@
 import { LEGAL_IDENTITY_FIELDS, LEGAL_PLACEHOLDER_PATTERN } from '../consts/runtime-config.const.js'
 import type { TLegalIdentityField } from '../types/legal-identity.type.js'
 
-/** Valeur d'une variable d'identité dans `runtimeConfig.public.legal`, rognée ; vide si absente, pas une chaîne ou `A_COMPLETER`. */
+/** Valeur d'une variable d'identité dans `runtimeConfig.public.legal`, rognée ; vide si absente, ni chaîne ni nombre (Nuxt convertit « 1000 » en nombre) ou `A_COMPLETER`. */
 export const legalFieldValue = (legal: unknown, field: TLegalIdentityField): string => {
   let node: unknown = legal
   for (const key of field.path) {
     node = node !== null && typeof node === 'object' ? (node as Record<string, unknown>)[key] : undefined
   }
-  const value = typeof node === 'string' ? node.trim() : ''
+  const value = typeof node === 'string' || typeof node === 'number' ? String(node).trim() : ''
   return LEGAL_PLACEHOLDER_PATTERN.test(value) ? '' : value
 }
 

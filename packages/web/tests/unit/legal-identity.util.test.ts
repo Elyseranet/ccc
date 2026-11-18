@@ -14,6 +14,10 @@ describe('legalParams (F-70)', () => {
     expect(legalParams({ form: 'A_COMPLETER', capital: '' }, TO_COMPLETE)).toMatchObject({ form: '', capital: '', siren: '', rcs: '', vat: '' })
   })
 
+  it('keeps a numeric value: Nuxt converts NUXT_PUBLIC_LEGAL_CAPITAL=1000 and PRIVACY_FORM_RETENTION_DAYS=365 to numbers', () => {
+    expect(legalParams({ capital: 1000, siren: 123456789, privacy: { formRetentionDays: 365 } }, TO_COMPLETE)).toMatchObject({ capital: '1000', siren: '123456789', privacyFormRetentionDays: '365' })
+  })
+
   it('legalValue reads by parameter, placeholder as empty', () => {
     expect(legalValue({ email: ' a@b.fr ' }, 'email')).toBe('a@b.fr')
     expect(legalValue({ email: 'A_COMPLETER' }, 'email')).toBe('')
