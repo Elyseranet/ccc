@@ -37,7 +37,7 @@
     "@pinia/nuxt": "^1.0.3",
     "dotenv": "^16.6.1",
     "nodemailer": "^10.2.0",
-    "origam": "^2.37.3",
+    "origam": "^2.39.0",
     "pg": "^8.16.3",
     "pinia": "^4.1.0",
     "reflect-metadata": "^0.2.2",

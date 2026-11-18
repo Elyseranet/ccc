@@ -186,10 +186,8 @@ defineExpose({})
 
 <style scoped lang="scss">
 .score-entry-form {
-  :deep(.origam-form__content) {
-    display: grid;
-    gap: var(--score-entry-form---gap, var(--origam-space---5));
-  }
+  display: grid;
+  gap: var(--score-entry-form---gap, var(--origam-space---5));
 
   &__duel {
     display: grid;

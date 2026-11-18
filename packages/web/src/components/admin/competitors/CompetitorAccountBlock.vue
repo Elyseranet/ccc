@@ -54,38 +54,36 @@
       data-cy="competitor-account-form"
       @submit="handleSubmit"
     >
-      <div class="account-block__fields">
-        <account-email-field
-          ref="fieldRef"
-          v-model="email"
-          cy-prefix="competitor-account"
-          :taken="emailTaken"
-        />
-        <origam-alert
-          v-if="failure && !linkOpen"
-          status="error"
-          rounded="lg"
+      <account-email-field
+        ref="fieldRef"
+        v-model="email"
+        cy-prefix="competitor-account"
+        :taken="emailTaken"
+      />
+      <origam-alert
+        v-if="failure && !linkOpen"
+        status="error"
+        rounded="lg"
+        font-size="md"
+        font-weight="bold"
+        letter-spacing="normal"
+        line-height="normal"
+        :title="failureTitle"
+        :text="failureText"
+        data-cy="competitor-account-error"
+      />
+      <div class="account-block__cta">
+        <origam-btn
+          type="submit"
+          variant="flat"
+          :bg-color="buttonColor"
+          :elevation="buttonElevation"
+          size="x-large"
           font-size="md"
-          font-weight="bold"
-          letter-spacing="normal"
-          line-height="normal"
-          :title="failureTitle"
-          :text="failureText"
-          data-cy="competitor-account-error"
+          :loading="pending"
+          :text="submitLabel"
+          data-cy="competitor-account-submit"
         />
-        <div class="account-block__cta">
-          <origam-btn
-            type="submit"
-            variant="flat"
-            :bg-color="buttonColor"
-            :elevation="buttonElevation"
-            size="x-large"
-            font-size="md"
-            :loading="pending"
-            :text="submitLabel"
-            data-cy="competitor-account-submit"
-          />
-        </div>
       </div>
     </origam-form>
     <p
@@ -176,8 +174,6 @@ import { formatInvitationExpiry, listLinkCandidates } from '~/utils/admin-compet
  * la saisie de l'email et « Envoyer l'invitation » (sans compte) ou « Corriger et renvoyer » (invité ; l'ancien lien est annulé).
  * Un compte actif est en lecture seule : c'est le joueur qui gère son email (409 côté serveur). Retours : snackbar (envoyée, ou compte créé
  * mais mail non parti) et alerte sous le champ (email pris, compte actif…).
- * shortcut: `.account-block__fields` porte le `gap` (16 px, celui du reste de la carte) que `origam-form` ne transmet pas à son
- * enveloppe `__content` (F-63b) ; à retirer quand origam expose `contentDisplay` sur Form (version non publiée au 2026-11-18).
  ********************************************************/
 const { t } = useT()
 const props = withDefaults(defineProps<ICompetitorAccountBlockProps>(), { administrators: null, administratorsPending: false, pending: false, failure: null, feedback: null })
@@ -383,8 +379,7 @@ defineExpose({})
     font-size: var(--origam-font__size---sm);
   }
 
-  &__form,
-  &__fields {
+  &__form {
     display: grid;
     gap: var(--account-block---gap, var(--origam-space---4));
   }

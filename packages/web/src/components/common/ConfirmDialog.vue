@@ -5,6 +5,8 @@
     :max-width="560"
     scrim
     :padding="padding"
+    content-display="grid"
+    :content-gap="CONFIRM_DIALOG_CONTENT_GAP"
     :class="dialogClass"
     :title="title"
     role="alertdialog"
@@ -13,16 +15,14 @@
     @update:model-value="handleOpen"
   >
     <template #[textSlot]>
-      <div class="confirm-dialog__body">
-        <p
-          v-if="hasText"
-          :id="descriptionId"
-          class="confirm-dialog__text"
-        >
-          {{ text }} <strong v-if="warning">{{ warning }}</strong>
-        </p>
-        <slot name="default" />
-      </div>
+      <p
+        v-if="hasText"
+        :id="descriptionId"
+        class="confirm-dialog__text"
+      >
+        {{ text }} <strong v-if="warning">{{ warning }}</strong>
+      </p>
+      <slot name="default" />
     </template>
     <template #[footerSlot]>
       <div class="confirm-dialog__actions">
@@ -54,6 +54,7 @@
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { OrigamBtn, OrigamDialog } from 'origam/components'
 import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
+import { CONFIRM_DIALOG_CONTENT_GAP } from '~/consts/confirm-dialog.const'
 import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import type { IConfirmDialogEmits, IConfirmDialogProps } from '~/interfaces/common-components.interface'
 
@@ -65,8 +66,7 @@ import type { IConfirmDialogEmits, IConfirmDialogProps } from '~/interfaces/comm
  * extérieur l'annulent (décision ux 0ea5092e), sauf pendant l'envoi (`persistent`) ; le texte dit la conséquence, et que l'action n'est pas annulable ;
  * focus initial sur « Annuler », bouton de confirmation inactif pendant l'envoi. `origam-dialog` piège le focus et le rend au déclencheur à la fermeture.
  * Les `data-cy` partent de `cyPrefix` (`{préfixe}-dialog`, `-cancel`, `-confirm`).
- * shortcut: `.confirm-dialog__body` porte le `gap` entre le texte et le slot, que le contenu de carte d'`origam-dialog` n'a pas (F-63) ;
- * à retirer quand origam expose `--origam-card__content---gap` (version non publiée au 2026-11-17).
+ * L'empilement texte / contenu (grille, 12 px) passe par les props `contentDisplay` et `contentGap` d'`origam-dialog` (Origam 2.39, F-67), posées ici et non par le thème : un réglage au thème toucherait tous les dialogues (ScoreEntryDialog compris).
  ********************************************************/
 const props = withDefaults(defineProps<IConfirmDialogProps>(), {
   warning: '',
@@ -117,12 +117,6 @@ defineExpose({})
 
 <style scoped lang="scss">
 .confirm-dialog {
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--confirm-dialog__body---gap, var(--origam-space---3));
-  }
-
   &__text {
     margin: 0;
     color: var(--origam-color__text---secondary);
@@ -151,13 +145,11 @@ defineExpose({})
   }
 
   &--mockup :deep(.origam-card__content) {
-    display: grid;
-    gap: var(--origam-space---3);
     padding: 0 var(--origam-space---6) var(--origam-space---6);
   }
 
   // origam-dialog ajoute un `div` vide après le slot texte : dans la grille il coûte une rangée de plus (gap 12 px), soit 36 px au lieu des 24 px de la maquette entre le dernier contenu et le pied.
-  &--mockup :deep(.origam-card__content > :empty) {
+  &:deep(.origam-card__content > :empty) {
     display: none;
   }
 
@@ -171,6 +163,5 @@ defineExpose({})
 :root {
   --confirm-dialog__actions---margin-inline: var(--origam-space---4);
   --confirm-dialog__actions---margin-bottom: var(--origam-space---4);
-  --confirm-dialog__body---gap: var(--origam-space---3);
 }
 </style>

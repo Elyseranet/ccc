@@ -57,6 +57,7 @@
       confirm-color="danger"
       :confirm-disabled="!confirmed"
       :focus-cancel="false"
+      :appearance="dialogAppearance"
       @cancel="handleCancel"
       @confirm="handleConfirm"
     >
@@ -88,6 +89,7 @@ import { OrigamAlert, OrigamBtn, OrigamCard, OrigamLabel, OrigamTextField } from
 import ConfirmDialog from '~/components/common/ConfirmDialog.vue'
 import { useFocusReturn } from '~/composables/useFocusReturn'
 import { useT } from '~/composables/useT'
+import { CONFIRM_DIALOG_APPEARANCE } from '~/enums/confirm-dialog.enum'
 import { EDITION_STATUS } from '~/enums/edition.enum'
 import type { IEditionDeleteZoneEmits, IEditionDeleteZoneProps } from '~/interfaces/admin-editions.interface'
 import { isClosingCodeConfirmed } from '~/utils/edition-closing-view.util'
@@ -107,6 +109,7 @@ const emits = defineEmits<IEditionDeleteZoneEmits>()
 defineSlots<{}>()
 const titleId = useId()
 const fieldId = useId()
+const dialogAppearance = CONFIRM_DIALOG_APPEARANCE.MOCKUP
 const dialogOpen = ref(false)
 useFocusReturn(dialogOpen)
 const typed = ref('')

@@ -77,10 +77,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
-    // F-63 : `contentDisplay: 'contents'` aplatit `.origam-card__content`, le `gap` posé par chaque composant sur sa carte atteint ainsi les blocs du slot.
+    // F-63 / F-67 : `contentDisplay: 'contents'` aplatit `.origam-card__content` et `.origam-form__content` : le `display` et le `gap` posés par chaque composant sur sa carte ou son formulaire atteignent directement leurs blocs.
     'origam-card': { rounded: 'xl', border: true, borderColor: 'var(--origam-color__border---default)', elevation: 'md', density: 'comfortable', contentDisplay: 'contents' },
     'origam-sheet': { rounded: 'xl', border: true, elevation: 'md' },
-    // F-63 : la valeur `contents` des cartes descend dans la carte du dialogue (mesuré) et y annulait le padding du contenu ; `flex` rend le rendu d'origine (flex colonne du dialogue).
+    // F-63 : la valeur `contents` des cartes descend dans la carte du dialogue (mesuré) et y annulait le padding du contenu ; `flex` rend le rendu d'origine. L'empilement en grille de `ConfirmDialog` est posé par ses propres props (`contentDisplay`, `contentGap`, F-67).
     'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560, contentDisplay: 'flex' },
     'origam-drawer': { elevation: 'none', border: true },
     'origam-toolbar': { flat: true, density: 'default', elevation: 'none' },
@@ -144,6 +144,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
 
     // Saisie
+    'origam-form': { contentDisplay: 'contents' },
     'origam-text-field': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-select': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-number-field': { variant: 'outlined', rounded: 'lg', density: 'default', hideSpinButtons: false },
