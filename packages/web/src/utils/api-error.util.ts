@@ -60,6 +60,10 @@ export const cannotRevokeSelf = (): H3Error =>
 export const accountAlreadyLinked = (): H3Error =>
   buildError(409, API_ERROR_CODE.ACCOUNT_ALREADY_LINKED, API_ERROR_MESSAGE.ACCOUNT_ALREADY_LINKED)
 
+/** 409 : l'email est celui d'un compte joueur ; `details.displayName` (nom de la fiche, sinon email) sert à la confirmation. */
+export const promotionConfirmationRequired = (displayName: string): H3Error =>
+  buildError(409, API_ERROR_CODE.PROMOTION_CONFIRMATION_REQUIRED, API_ERROR_MESSAGE.PROMOTION_CONFIRMATION_REQUIRED, { displayName })
+
 export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 
