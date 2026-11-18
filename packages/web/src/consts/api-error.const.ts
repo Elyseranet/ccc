@@ -18,6 +18,7 @@ export const API_ERROR_MESSAGE = {
   ALREADY_ADMIN: 'This account is already an administrator',
   LAST_ADMIN: 'The last active administrator cannot be removed',
   CANNOT_REVOKE_SELF: 'You cannot remove your own administrator access',
+  ACCOUNT_ALREADY_LINKED: 'This account is already linked to a player card',
   EDITION_CLOSED: 'The edition is closed',
   FINAL_NOT_VALIDATED: 'The final must be validated before the edition can be closed',
   EDITION_CODE_EXHAUSTED: 'No edition code left for this year',

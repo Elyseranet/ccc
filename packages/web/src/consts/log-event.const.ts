@@ -44,6 +44,7 @@ export const LOG_EVENT = {
   DRAW_VALIDATED: 'draw_validated',
   COMPETITOR_ACCOUNT_CREATED: 'competitor_account_created',
   COMPETITOR_ACCOUNT_EMAIL_SET: 'competitor_account_email_set',
+  ADMIN_COMPETITOR_LINKED: 'admin_competitor_linked',
   INVITATION_ISSUED: 'invitation_issued',
   INVITATION_SENT: 'invitation_sent',
   INVITATION_SEND_FAILED: 'invitation_send_failed',

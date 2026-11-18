@@ -43,9 +43,20 @@ export interface ISetAccountEmailRequest {
   email: string
 }
 
-/** `PUT /competiteurs/{id}/compte` (200) : le compte est INVITED, l'ancien lien est invalidé ; l'envoi peut échouer sans rien annuler. */
-export interface IAccountEmailSet extends IInvitationResent {
-  accountStatus: USER_STATUS.INVITED
+/** `PUT /competiteurs/{id}/compte` (200) : compte INVITED créé ou corrigé (l'ancien lien est invalidé, l'envoi peut échouer sans rien annuler), ou compte administrateur relié (`linked`, B-32). */
+export interface IAccountEmailSet {
+  accountStatus: USER_STATUS
+  /** B-32 : vrai quand l'email était celui d'un compte administrateur, relié à la fiche (aucun mail envoyé). */
+  linked: boolean
+  invitationSent: boolean
+  /** ISO 8601 ; `null` quand un compte a été relié (`linked`). */
+  invitationExpiresAt: string | null
+}
+
+/** Résultat de service d'un lien admin/fiche (B-32), sans invitation à envoyer. */
+export interface ICompetitorAccountLinked {
+  linked: true
+  accountStatus: USER_STATUS
 }
 
 /** `GET /auth/invitation/{jeton}` (200) : seulement de quoi pré-remplir le formulaire de première connexion. */
