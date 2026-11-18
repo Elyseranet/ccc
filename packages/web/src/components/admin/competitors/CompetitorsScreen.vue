@@ -211,10 +211,6 @@ defineExpose({})
     min-width: 0;
   }
 
-  &__account {
-    margin-block-start: var(--competitors-screen__grid---gap, var(--origam-space---5));
-  }
-
   &__hint {
     margin: 0;
     color: var(--competitors-screen__hint---color, var(--origam-color__text---tertiary));

@@ -406,6 +406,7 @@ defineExpose({})
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-round-draw---gap, var(--origam-space---5));
+  --async-state---gap: var(--admin-round-draw__body---gap, var(--origam-space---6));
 
   &__head {
     display: flex;
@@ -440,7 +441,6 @@ defineExpose({})
   }
 
   &__playoff {
-    margin-bottom: var(--origam-space---5);
     padding: var(--origam-space---6);
 
     @media (max-width: 760px) {
@@ -448,9 +448,7 @@ defineExpose({})
     }
   }
 
-  // Entre la grille et le récapitulatif (maquette `admin-tirage-tour.html`, `.q-sec`) : l'enveloppe d'`async-state` n'a pas de gap.
   &__grid {
-    margin-bottom: var(--origam-space---6);
     display: grid;
     grid-template-columns: minmax(0, 1fr) 20rem;
     align-items: start;
@@ -466,5 +464,6 @@ defineExpose({})
 <style>
 :root {
   --admin-round-draw---gap: var(--origam-space---5);
+  --admin-round-draw__body---gap: var(--origam-space---6);
 }
 </style>

@@ -192,6 +192,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .edition-page {
+  --async-state---gap: 0;
   --page-hero__breadcrumb---padding-top: var(--origam-space---12);
   --page-hero---padding-block: 0 var(--origam-space---10);
 

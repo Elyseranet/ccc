@@ -116,6 +116,8 @@ defineExpose({})
 
 <style scoped lang="scss">
 .palmares-page {
+  --async-state---gap: 0;
+
   &__hero {
     position: relative;
     isolation: isolate;

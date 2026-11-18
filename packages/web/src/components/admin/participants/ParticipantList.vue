@@ -248,6 +248,7 @@ defineExpose({})
 
 <style scoped lang="scss">
 .participant-list {
+  --async-state---gap: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--participant-list---gap, var(--origam-space---4));
