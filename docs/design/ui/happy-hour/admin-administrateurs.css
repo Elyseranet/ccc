@@ -1,4 +1,4 @@
-/* CCC · Happy Hour — F-68 : administrateurs et fiche joueur d'un administrateur (admin, CSS seul).
+/* CCC · Happy Hour — F-68 : administrateurs et fiche compétiteur reliée à un administrateur (admin, CSS seul).
    Fichier propre à cette maquette : les feuilles validées (hh.css, admin.css, pages.css) ne sont pas modifiées.
    Uniquement des var(--origam-*) issues de tokens.css. */
 
@@ -34,18 +34,6 @@
 .acb__cta { display: flex; justify-content: flex-end; }
 .ad-variants .snack--demo { margin-top: var(--origam-space---3); max-width: 100%; }
 .acb .input { width: 100%; }
-
-/* Variante B (/profil) : pile de la colonne latérale ; le menu de suggestions reste dans le flux pour la revue */
-.acc-side-stack { display: grid; gap: var(--origam-space---4); }
-.acc-card .combo__list { position: static; }
-.acc-prof-h > div { min-width: 0; }
-.acc-prof-h .h-card { overflow-wrap: anywhere; }
-@media (max-width: 760px) {
-  .acc-card .acb { padding: var(--origam-space---4); }
-  .acc-card .acb--flat { padding: 0; }
-  .acc-card .sug { grid-template-columns: auto minmax(0, 1fr); }
-  .acc-card .sug .chip { grid-column: 2; justify-self: start; }
-}
 
 /* Variantes empilées pour la revue (hors produit) */
 .ad-variants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---5); align-items: start; }
