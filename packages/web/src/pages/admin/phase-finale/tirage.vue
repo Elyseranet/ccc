@@ -406,6 +406,7 @@ defineExpose({})
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--admin-round-draw---gap, var(--origam-space---5));
+  --async-state---gap: var(--admin-round-draw__body---gap, var(--origam-space---6));
 
   &__head {
     display: flex;
@@ -463,5 +464,6 @@ defineExpose({})
 <style>
 :root {
   --admin-round-draw---gap: var(--origam-space---5);
+  --admin-round-draw__body---gap: var(--origam-space---6);
 }
 </style>

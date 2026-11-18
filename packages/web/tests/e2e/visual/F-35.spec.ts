@@ -43,7 +43,13 @@ const alignToPixel = async (target: import('@playwright/test').Page, selector: s
     const element = document.querySelector(value) as HTMLElement
     const top = element.getBoundingClientRect().top + window.scrollY
     const delta = Math.ceil(top) - top
-    element.style.marginTop = `calc(${getComputedStyle(element).marginTop} + ${delta}px)`
+    // Sans effet sur la mise en page (une marge haute fusionnerait avec celle du frère) ; une surcouche (absolute, fixed) garde sa position.
+    if (!['absolute', 'fixed'].includes(getComputedStyle(element).position)) {
+      element.style.position = 'relative'
+      element.style.top = `${delta}px`
+    } else {
+      element.style.transform = `translateY(${delta}px)`
+    }
   }, selector)
 }
 
