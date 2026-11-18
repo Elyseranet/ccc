@@ -1,9 +1,8 @@
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { test } from '@playwright/test'
-import type { Browser, BrowserContext, Page } from '@playwright/test'
-import { E2E_BASE_URL } from '../helpers/e2e.const'
-import { e2eSecrets, signIn } from '../helpers/session'
+import { e2eSecrets } from '../helpers/session'
+import { md, newContext, open, settle } from './audit.util'
 import {
   SPACING_AUDIT_CASES,
   SPACING_AUDIT_COMPETITOR_PLACEHOLDER,
@@ -13,7 +12,7 @@ import {
   SPACING_AUDIT_RULES,
   SPACING_AUDIT_VIEWPORTS
 } from './spacing.const'
-import type { ISpacingAuditCase, TSpacingAuditRole } from './spacing.const'
+import type { ISpacingAuditCase } from './spacing.const'
 
 /*********************************************************
  * Audit des espacements (F-63) — `npm run audit:spacing`
@@ -249,24 +248,6 @@ const layoutOf = (): Record<string, number[]> => {
   return out
 }
 
-const settle = async (page: Page) => {
-  await page.waitForLoadState('networkidle')
-  await page.locator('[data-cy="async-state-loading"]').first().waitFor({ state: 'detached', timeout: 10000 }).catch(() => undefined)
-}
-
-const open = async (page: Page, path: string) => {
-  await page.goto(path)
-  await page.waitForFunction(() => (window as unknown as { useNuxtApp?: () => { isHydrating: boolean } }).useNuxtApp?.().isHydrating === false, undefined, { timeout: 30000 }).catch(() => undefined)
-  await settle(page)
-}
-
-const newContext = async (browser: Browser, role: TSpacingAuditRole): Promise<BrowserContext> => {
-  const context = await browser.newContext({ baseURL: E2E_BASE_URL, reducedMotion: 'reduce', locale: 'fr-FR' })
-  if (role !== 'anonymous') await signIn(context, role)
-  return context
-}
-
-const md = (value: string | number) => String(value).replaceAll('|', '\\|')
 
 const report = (rows: IRow[], unreached: string[], paths: string[]): string => {
   const kept = rows.filter(r => !r.excluded)
