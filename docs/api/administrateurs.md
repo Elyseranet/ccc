@@ -66,6 +66,19 @@ Corps `{ "email": string }` (même règle que `POST /competiteurs` : format, 254
 | email d'un compte `PARTICIPANT` `ACTIVE` **[Q4]** | `role` → `ADMIN`, fiche, mot de passe et sessions conservés ; mail d'information sans lien **[Q5]** | `200` `{ id, accountStatus: "ACTIVE", promoted: true, invitationSent, invitationExpiresAt: null }` |
 | email d'un compte déjà `ADMIN` | rien | `409` `ALREADY_ADMIN` |
 
+**Confirmation de promotion (B-33).** Corps `{ "email": string, "confirmPromotion"?: boolean }` (`.strict()`, `confirmPromotion` booléen strict). Pour un email de compte `PARTICIPANT` (lignes `INVITED` et `ACTIVE` ci-dessus), sans `confirmPromotion: true` : **409** `PROMOTION_CONFIRMATION_REQUIRED`, rien n'est écrit, aucun mail. Avec : comportement des lignes ci-dessus, inchangé. Email inconnu ou déjà `ADMIN` : inchangés (`ALREADY_ADMIN` prime, aucune confirmation demandée). Forme exacte du 409 :
+
+```json
+{
+  "statusCode": 409,
+  "message": "This email belongs to a player account: confirm to make it an administrator",
+  "code": "PROMOTION_CONFIRMATION_REQUIRED",
+  "details": { "displayName": "Camille Dupont" }
+}
+```
+
+`details.displayName` : nom de la fiche reliée (`competitor.displayName`), sinon l'email normalisé du compte. L'écran affiche « Nommer {displayName} administrateur ? » puis renvoie le même corps avec `"confirmPromotion": true`.
+
 Échec d'envoi du mail : `invitationSent: false`, rien n'est annulé, le renvoi reste possible (même comportement que `sendInvitationEmail`, A14).
 
 ### `POST /admin/administrateurs/{id}/invitation`
@@ -130,6 +143,7 @@ Aucune route ne délie un compte de sa fiche (pas de `DELETE /competiteurs/{id}/
 | Code | Statut | Route |
 |---|---|---|
 | `ALREADY_ADMIN` | 409 | `POST /admin/administrateurs` |
+| `PROMOTION_CONFIRMATION_REQUIRED` | 409 | `POST /admin/administrateurs` (B-33) |
 | `LAST_ADMIN` | 409 | `DELETE /admin/administrateurs/{id}` |
 | `CANNOT_REVOKE_SELF` | 409 | `DELETE /admin/administrateurs/{id}` **[Q3]** |
 | `ACCOUNT_ALREADY_LINKED` | 409 | `PUT /competiteurs/{id}/compte` |

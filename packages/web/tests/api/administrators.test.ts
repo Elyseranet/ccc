@@ -177,7 +177,7 @@ describe('administrators (B-31)', async () => {
       const { invitationToken: oldToken } = await issueInvitation(dataSource.manager, invited.id)
       const before = (await mails.read()).length
 
-      const response = await call('POST', ADMINS, { email: 'promo.invited@ccc.test' }, bossCookie)
+      const response = await call('POST', ADMINS, { email: 'promo.invited@ccc.test', confirmPromotion: true }, bossCookie)
       expect(response.status).toBe(200)
       expect(await response.json()).toMatchObject({ id: invited.id, accountStatus: USER_STATUS.INVITED, promoted: true, invitationSent: true })
       expect(await userByEmail('promo.invited@ccc.test')).toMatchObject({ id: invited.id, role: USER_ROLE.ADMIN, status: USER_STATUS.INVITED, competitorId: card.id })
@@ -199,7 +199,7 @@ describe('administrators (B-31)', async () => {
       expect((await call('GET', ADMINS, undefined, cookie)).status).toBe(403)
       const before = (await mails.read()).length
 
-      const response = await call('POST', ADMINS, { email: 'promo.active@ccc.test' }, bossCookie)
+      const response = await call('POST', ADMINS, { email: 'promo.active@ccc.test', confirmPromotion: true }, bossCookie)
       expect(response.status).toBe(200)
       expect(await response.json()).toEqual({ id: promoted.id, accountStatus: USER_STATUS.ACTIVE, promoted: true, invitationSent: true, invitationExpiresAt: null })
       expect(await userByEmail('promo.active@ccc.test')).toMatchObject({ role: USER_ROLE.ADMIN, status: USER_STATUS.ACTIVE, competitorId: promoted.competitorId })
@@ -218,6 +218,54 @@ describe('administrators (B-31)', async () => {
       expect(mail.text).not.toContain('Ce lien')
       // Le contact vient de `public.legal.email` (NUXT_PUBLIC_LEGAL_EMAIL).
       expect(mail.text).toContain("Si vous n'attendiez pas ce message, écrivez à contact@ccc.test.")
+    })
+
+    it('answers 409 PROMOTION_CONFIRMATION_REQUIRED for a player account without confirmation: displayName in details, nothing written, no mail (B-33)', async () => {
+      const card = await dataSource.getRepository(CompetitorEntity).save({ displayName: 'Camille Confirmée' })
+      const withCard = await dataSource.getRepository(UserEntity).save({
+        email: 'confirm.card@ccc.test', role: USER_ROLE.PARTICIPANT, status: USER_STATUS.INVITED, passwordHash: null, competitorId: card.id
+      })
+      await issueInvitation(dataSource.manager, withCard.id)
+      const withoutCard = await seedUser(dataSource, { email: 'confirm.nocard@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT })
+      const invitationsBefore = await dataSource.getRepository(InvitationEntity).count()
+      const before = (await mails.read()).length
+
+      const expectations: Array<[string, unknown, string]> = [
+        ['confirm.card@ccc.test', {}, 'Camille Confirmée'],
+        ['CONFIRM.card@ccc.test', { confirmPromotion: false }, 'Camille Confirmée'],
+        ['confirm.nocard@ccc.test', {}, 'confirm.nocard@ccc.test']
+      ]
+      for (const [email, extra, displayName] of expectations) {
+        const response = await call('POST', ADMINS, { email, ...(extra as object) }, bossCookie)
+        expect(response.status).toBe(409)
+        expect(await response.json()).toEqual({
+          statusCode: 409,
+          code: API_ERROR_CODE.PROMOTION_CONFIRMATION_REQUIRED,
+          message: 'This email belongs to a player account: confirm to make it an administrator',
+          details: { displayName }
+        })
+      }
+      expect(await userByEmail('confirm.card@ccc.test')).toMatchObject({ role: USER_ROLE.PARTICIPANT, status: USER_STATUS.INVITED })
+      expect((await dataSource.getRepository(UserEntity).findOneByOrFail({ id: withoutCard.id })).role).toBe(USER_ROLE.PARTICIPANT)
+      expect(await dataSource.getRepository(InvitationEntity).count()).toBe(invitationsBefore)
+      expect(await mailsSince(before)).toHaveLength(0)
+
+      // Avec la confirmation : comportement B-31.
+      const confirmed = await call('POST', ADMINS, { email: 'confirm.nocard@ccc.test', confirmPromotion: true }, bossCookie)
+      expect(confirmed.status).toBe(200)
+      expect(await confirmed.json()).toMatchObject({ id: withoutCard.id, promoted: true, accountStatus: USER_STATUS.ACTIVE })
+      expect((await dataSource.getRepository(UserEntity).findOneByOrFail({ id: withoutCard.id })).role).toBe(USER_ROLE.ADMIN)
+      expect(await mailsSince(before)).toHaveLength(1)
+    })
+
+    it('needs no confirmation for an unknown email or an existing admin (ALREADY_ADMIN wins), and keeps a strict body', async () => {
+      expect((await call('POST', ADMINS, { email: 'brand.new@ccc.test', confirmPromotion: true }, bossCookie)).status).toBe(201)
+      const already = await call('POST', ADMINS, { email: 'second@ccc.test' }, bossCookie)
+      expect(already.status).toBe(409)
+      expect(await already.json()).toMatchObject({ code: API_ERROR_CODE.ALREADY_ADMIN })
+      for (const body of [{ email: 'x@ccc.test', confirmPromotion: 'true' }, { email: 'x@ccc.test', confirmPromotion: 1 }, { email: 'x@ccc.test', confirm: true }]) {
+        expect((await call('POST', ADMINS, body, bossCookie)).status).toBe(400)
+      }
     })
 
     it('answers 400 for a bad email, a missing email or an extra field, writing nothing', async () => {
@@ -340,7 +388,7 @@ describe('administrators (B-31)', async () => {
         email: 'invited.card@ccc.test', role: USER_ROLE.PARTICIPANT, status: USER_STATUS.INVITED, passwordHash: null, competitorId: card.id
       })
       await issueInvitation(dataSource.manager, invited.id)
-      expect((await call('POST', ADMINS, { email: 'invited.card@ccc.test' }, bossCookie)).status).toBe(200)
+      expect((await call('POST', ADMINS, { email: 'invited.card@ccc.test', confirmPromotion: true }, bossCookie)).status).toBe(200)
       const before = await dataSource.getRepository(InvitationEntity).countBy({ userId: invited.id })
       expect(before).toBeGreaterThan(0)
 
@@ -400,7 +448,7 @@ describe('administrators (B-31)', async () => {
         await resendAdministratorInvitation(dataSource, boss.id, created.userId)
         await updateAdministratorEmail(dataSource, boss.id, created.userId, 'log.check2@ccc.test')
         const promotable = await seedUser(dataSource, { email: 'log.promo@ccc.test', password: PASSWORD, role: USER_ROLE.PARTICIPANT })
-        await inviteAdministrator(dataSource, boss.id, 'log.promo@ccc.test')
+        await inviteAdministrator(dataSource, boss.id, 'log.promo@ccc.test', true)
         await revokeAdministrator(dataSource, boss.id, created.userId)
         await revokeAdministrator(dataSource, boss.id, promotable.id)
       } finally {
