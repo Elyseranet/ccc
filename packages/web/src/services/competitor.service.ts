@@ -494,6 +494,19 @@ const createInvitedAccount = async (
 }
 
 /**
+ * Remplace l'email d'un compte INVITED et émet une nouvelle invitation (ancien lien 410). Partagé par `PUT /competiteurs/{id}/compte`
+ * (B-29) et `PATCH /admin/administrateurs/{id}` (B-31). `email` est déjà normalisé ; 409 `EMAIL_ALREADY_USED` sur collision concurrente.
+ */
+export const replaceInvitedAccountEmail = async (manager: EntityManager, userId: string, email: string, now: Date): Promise<IIssuedInvitation> => {
+  try {
+    await manager.getRepository(UserEntity).update({ id: userId }, { email })
+    return await issueInvitationLazily(manager, userId, now)
+  } catch (error) {
+    throw isEmailCollision(error) ? emailAlreadyUsed() : error
+  }
+}
+
+/**
  * `PUT /competiteurs/{id}/compte` (B-29), dans la transaction de l'appelant ; l'email part APRÈS le commit.
  * Sans compte : crée le compte INVITED. Compte INVITED : remplace l'email et émet une nouvelle invitation (ancien lien 410).
  * 404 compétiteur inconnu ; 409 `ACCOUNT_ACTIVE` si le compte est actif ; 409 `EMAIL_ALREADY_USED` si l'email appartient à un autre compte.
@@ -525,11 +538,8 @@ export const setCompetitorAccountEmail = async (
   }
 
   try {
-    if (existing) {
-      await users.update({ id: existing.id }, { email })
-    }
     const { userId, invitation } = existing
-      ? { userId: existing.id, invitation: await issueInvitationLazily(manager, existing.id, now) }
+      ? { userId: existing.id, invitation: await replaceInvitedAccountEmail(manager, existing.id, email, now) }
       : await createInvitedAccount(manager, competitorId, email, now)
     logger.info(LOG_EVENT.COMPETITOR_ACCOUNT_EMAIL_SET, { competitorId, userId, created: !existing })
     return { ...invitation, userId, email, firstName: competitor.firstName ?? '' }

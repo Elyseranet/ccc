@@ -1,3 +1,5 @@
+import type { INVITATION_EMAIL_KIND } from '../enums/invitation-email.enum.js'
+
 export interface IMailMessage {
   to: string
   subject: string
@@ -26,9 +28,25 @@ export interface IMailConfig {
 
 export interface IInvitationEmailInput {
   firstName: string
-  link: string
+  /** Absent pour la variante `ADMIN_PROMOTED`, qui ne porte aucun lien. */
+  link?: string
+  /** `PARTICIPANT` par défaut. */
+  kind?: INVITATION_EMAIL_KIND
   /** `runtimeConfig.public.siteUrl` : origine du logo et du pied de page du mail. */
   siteUrl: string
+}
+
+/** Textes d'une variante du mail (`INVITATION_EMAIL_CONTENT`). `{{ttl}}` est accepté dans `preview`. */
+export interface IInvitationEmailContent {
+  subject: string
+  eyebrow: string
+  preview: string
+  introHtml: string
+  introText: string
+  body: string
+  closing: string
+  /** Bouton, validité et lien brut : faux pour un mail d'information. */
+  withActivation: boolean
 }
 
 export interface IInvitationEmail {
@@ -41,5 +59,8 @@ export interface ISendInvitationInput {
   userId: string
   email: string
   firstName: string
-  token: string
+  /** Absent pour la variante `ADMIN_PROMOTED` (aucun lien émis). */
+  token?: string
+  /** `PARTICIPANT` par défaut. */
+  kind?: INVITATION_EMAIL_KIND
 }
