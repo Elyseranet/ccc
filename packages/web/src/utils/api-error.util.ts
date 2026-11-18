@@ -48,6 +48,9 @@ export const emailAlreadyUsed = (): H3Error =>
 export const accountActive = (): H3Error =>
   buildError(409, API_ERROR_CODE.ACCOUNT_ACTIVE, API_ERROR_MESSAGE.ACCOUNT_ACTIVE)
 
+export const accountAlreadyLinked = (): H3Error =>
+  buildError(409, API_ERROR_CODE.ACCOUNT_ALREADY_LINKED, API_ERROR_MESSAGE.ACCOUNT_ALREADY_LINKED)
+
 export const gone = (message: string = API_ERROR_MESSAGE.GONE): H3Error =>
   buildError(410, API_ERROR_CODE.GONE, message)
 

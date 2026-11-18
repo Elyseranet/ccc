@@ -12,6 +12,7 @@ import { getParamsWithSchema, readBodyWithSchema } from '../../../../../utils/va
  * PUT /api/v1/competiteurs/{id}/compte (administrateur, B-29) : pose l'email d'un compétiteur sans compte (crée le compte
  * INVITED) ou corrige celui d'un compte INVITED (nouveau jeton, ancien lien 410). L'email part après le commit ; un échec
  * d'envoi n'annule rien (`invitationSent: false`, le renvoi A14 reste possible). Compte actif : 409 `ACCOUNT_ACTIVE`.
+ * B-32 : l'email d'un administrateur sans fiche relie son compte à la fiche (`linked: true`, aucun mail).
  */
 export default defineEventHandler(async (event): Promise<IAccountEmailSet> => {
   requireRole(event, USER_ROLE.ADMIN)
@@ -21,11 +22,14 @@ export default defineEventHandler(async (event): Promise<IAccountEmailSet> => {
 
   const dataSource = await useDataSource()
   const issued = await dataSource.transaction((manager) => setCompetitorAccountEmail(manager, id, email))
+  if ('linked' in issued) {
+    return { accountStatus: issued.accountStatus, linked: true, invitationSent: false, invitationExpiresAt: null }
+  }
   const invitationSent = await sendInvitationEmail({
     userId: issued.userId,
     email: issued.email,
     firstName: issued.firstName,
     token: issued.invitationToken
   })
-  return { accountStatus: USER_STATUS.INVITED, invitationSent, invitationExpiresAt: issued.expiresAt.toISOString() }
+  return { accountStatus: USER_STATUS.INVITED, linked: false, invitationSent, invitationExpiresAt: issued.expiresAt.toISOString() }
 })
