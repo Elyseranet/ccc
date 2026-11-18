@@ -286,7 +286,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-63](F-63.md) | Audit et correction des espacements manquants (toute l'app) | maquettes happy-hour | F-47, F-49, F-50, F-56 | Ouvert : mergé @ `33de7459` + `5d082b58`, contrôle écran en attente | — |
 | [F-64](F-64.md) | Audit des espacements contre la maquette | maquettes happy-hour | F-63 | Ouvert : mergé @ `43da1d2f`, contrôle écran en attente | — |
 | [F-65](F-65.md) | Bouton « Exporter (Excel) » sur la fiche d'édition | maquette admin-editions mise à jour | B-30, F-13 | Ouvert : mergé @ `4c5f1f28`, contrôle écran en attente | — |
-| [F-66](F-66.md) | Mail d'invitation aux couleurs de la CCC | maquette mail-invitation.html validée @ `11422b8b` | B-29, F-62 | Ouvert : intégration en cours | — |
+| [F-66](F-66.md) | Mail d'invitation aux couleurs de la CCC | maquette mail-invitation.html validée @ `11422b8b` | B-29, F-62 | Ouvert : mergé @ `8d2861a2`, contrôle d'un vrai mail en attente | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
