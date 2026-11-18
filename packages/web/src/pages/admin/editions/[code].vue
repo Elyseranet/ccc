@@ -7,6 +7,15 @@
       @retry="refresh"
     >
       <template v-if="edition">
+        <div class="admin-edition__tools">
+          <origam-btn
+            variant="outlined"
+            :href="exportUrl"
+            download
+            :text="exportLabel"
+            data-cy="edition-export"
+          />
+        </div>
         <edition-closed
           v-if="isClosed"
           :edition="edition"
@@ -36,6 +45,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { OrigamBtn } from 'origam/components'
 import EditionClosed from '~/components/admin/editions/EditionClosed.vue'
 import EditionDeleteZone from '~/components/admin/editions/EditionDeleteZone.vue'
 import EditionForm from '~/components/admin/editions/EditionForm.vue'
@@ -47,7 +57,7 @@ import { useT } from '~/composables/useT'
 import { EDITION_FORM_MODE } from '~/enums/admin-editions.enum'
 import { EDITION_ORIGIN } from '~/enums/edition.enum'
 import type { IEditionFormValues } from '~/interfaces/admin-editions.interface'
-import { emptyEditionFormValues, toEditionFormValues } from '~/utils/admin-editions.util'
+import { buildEditionExportUrl, emptyEditionFormValues, toEditionFormValues } from '~/utils/admin-editions.util'
 import { useSeo } from '~/composables/useSeo'
 
 /*********************************************************
@@ -69,6 +79,8 @@ const { remove, deleting, failure: deleteFailure } = useEditionDelete()
 // Une archive importée n'est jamais supprimable (B-28) : la zone n'existe pas pour elle, le serveur refuse aussi.
 const canDelete = computed(() => edition.value?.origin === EDITION_ORIGIN.APP)
 const title = computed(() => t('pages.admin_edition.title', 'Édition {code}', { code: code.value }))
+const exportUrl = computed(() => edition.value ? buildEditionExportUrl(edition.value.id) : '')
+const exportLabel = computed(() => t('admin.editions.export_button', 'Exporter (Excel)'))
 useHead({ title })
 useSeo({ noindex: true })
 const mode = EDITION_FORM_MODE.EDIT
@@ -104,6 +116,11 @@ defineExpose({})
   display: grid;
   gap: var(--admin-edition---gap, var(--origam-space---5));
   padding-block: var(--admin-edition---padding-block, var(--origam-space---12) var(--origam-space---10));
+
+  &__tools {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 </style>
 

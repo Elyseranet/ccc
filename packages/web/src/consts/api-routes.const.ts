@@ -59,6 +59,7 @@ export const API_ROUTES: Record<API_ENDPOINT, IApiRoute> = {
   [API_ENDPOINT.EDITION_UPDATE]: { file: 'editions/[id]/index.patch.ts' },
   [API_ENDPOINT.EDITION_DELETE]: { file: 'editions/[id]/index.delete.ts' },
   [API_ENDPOINT.ADMIN_EDITIONS]: { file: 'admin/editions/index.get.ts' },
+  [API_ENDPOINT.ADMIN_EDITION_EXPORT]: { file: 'admin/editions/[id]/export.xlsx.get.ts', pendingTicket: 'B-30' },
   [API_ENDPOINT.ADMIN_QUALIFICATION]: { file: 'admin/editions/[id]/qualification.get.ts' },
   [API_ENDPOINT.QUALIFICATION_FINALIZE]: { file: 'editions/[id]/qualification.post.ts' },
   [API_ENDPOINT.QUALIFICATION_REOPEN]: { file: 'editions/[id]/qualification.delete.ts' },
