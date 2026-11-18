@@ -293,7 +293,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | Ouvert : bloqué, Origam 2.39 non publiée | — |
 | [F-68](F-68.md) | Écran « Administrateurs » | admin-administrateurs.html validée | B-31 | Ouvert : en cours | — |
 | [F-69](F-69.md) | Fiche compétiteur : relier au compte d'un administrateur | admin-administrateurs.html#ad-p-link validée | B-31, B-32, F-62 | Ouvert : mergé @ `ab1b7a95`, contrôle écran en attente | — |
-| [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : bloquant livraison client | — |
+| [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : mergé @ `1800732d`, variables serveur à remplir, pages légales non livrées | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
