@@ -4,9 +4,6 @@ import type { IAdminFailureMessages } from '../interfaces/admin-failure.interfac
 import type { ITranslatableText } from '../interfaces/common-components.interface.js'
 import { ADMIN_ACCOUNT_FAILURE_MESSAGES } from './admin-competitors.const.js'
 
-/** Clé de cache de la liste des administrateurs (B-31). */
-export const ADMIN_ADMINISTRATORS_CACHE_KEY = 'admin-administrators'
-
 /** Mots de la partie locale d'un email (« maya.bonnet »), dont l'avatar tire ses initiales quand le compte n'a pas de fiche. */
 export const ADMINISTRATOR_EMAIL_WORD_SEPARATOR = /[._-]+/
 

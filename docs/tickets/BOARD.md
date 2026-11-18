@@ -43,7 +43,7 @@ Mis à jour par `backend-lead` le 2026-10-22, après T-ARCH-01 (`src/` à plat, 
 | [B-30](B-30.md) | Export Excel (.xlsx) d'une édition, admin (F-65) | — | B-11 | — | **Fermé** (2026-11-18) @ `8d8ec512`, vérifié sur dev |
 | [B-31](B-31.md) | Inviter, gérer et retirer un administrateur depuis l'interface | — | B-09, A14 | — | **Fermé** (2026-11-18) @ `1ffc9544`, déployé sur dev |
 | [B-32](B-32.md) | Relier un compte administrateur à sa fiche joueur | — | B-29, B-31 | — | **Fermé** (2026-11-18) @ `6911bcd9`, déployé sur dev |
-| [B-33](B-33.md) | Promotion d'un joueur en admin : confirmation avant d'agir | — | B-31 | — | Ouvert : en cours |
+| [B-33](B-33.md) | Promotion d'un joueur en admin : confirmation avant d'agir | — | B-31 | — | **Fermé** (2026-11-18) @ `eddc53f7`, déployé sur dev |
 | [T-SEC-23](T-SEC-23.md) | Remédiation npm audit : 11 high, 4 moderate | — | — | — | **Fermé** (2026-11-18) @ `4834c14b`, dérogation SW-1 jusqu'au 2026-12-17 |
 
 Hors produit : **cotes** (RG33 à RG35, A12 tranché le 2026-10-20). En attente : **cuillère de bois** (RG38, non affichée selon la décision E-g). Aucun ticket ouvert pour ces deux sujets.
@@ -292,7 +292,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-66](F-66.md) | Mail d'invitation aux couleurs de la CCC | maquette mail-invitation.html validée @ `11422b8b` | B-29, F-62 | Ouvert : mergé @ `8d2861a2`, contrôle d'un vrai mail en attente | — |
 | [F-67](F-67.md) | Passer à Origam 2.39, retirer les contournements d'espacement | — | F-63, F-64 | Ouvert : bloqué, Origam 2.39 non publiée | — |
 | [F-68](F-68.md) | Écran « Administrateurs » | admin-administrateurs.html validée | B-31 | Ouvert : en cours | — |
-| [F-69](F-69.md) | Fiche compétiteur : relier au compte d'un administrateur | admin-administrateurs.html#ad-p-link validée | B-31, B-32, F-62 | Ouvert : implémenté @ `dfa27dbb`, attend B-31/B-32 | — |
+| [F-69](F-69.md) | Fiche compétiteur : relier au compte d'un administrateur | admin-administrateurs.html#ad-p-link validée | B-31, B-32, F-62 | Ouvert : mergé @ `ab1b7a95`, contrôle écran en attente | — |
 | [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : bloquant livraison client | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |

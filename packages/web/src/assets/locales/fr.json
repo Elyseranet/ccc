@@ -1734,5 +1734,22 @@
   "admin.administrators.list_error": "La liste des administrateurs n’a pas pu être chargée.",
   "admin.administrators.promote_title": "Nommer {name} administrateur ?",
   "admin.administrators.promote_text": "{email} est l’email du compte joueur de {name}. Ce compte deviendra administrateur : il garde sa fiche et son mot de passe. Il est prévenu par mail.",
-  "admin.administrators.promote_confirm": "Nommer administrateur"
+  "admin.administrators.promote_confirm": "Nommer administrateur",
+  "admin.account.chip_admin": "Administrateur",
+  "admin.account.state_linked": "Fiche reliée au compte administrateur {email}.",
+  "admin.account.readonly_admin": "Email du compte : {email}. L’administrateur le gère lui-même, il n’est pas modifiable ici.",
+  "admin.account.feedback_linked": "Fiche reliée au compte {email}",
+  "admin.account.error_linked_title": "Administrateur déjà relié.",
+  "admin.account.error_linked_text": "Ce compte administrateur est déjà relié à une autre fiche : choisissez-en un autre.",
+  "admin.account.link_open": "Relier au compte d’un administrateur…",
+  "admin.account.link_prompt": "Ce joueur est administrateur ?",
+  "admin.account.link_blocked_active": "Indisponible : cette fiche a un compte joueur actif.",
+  "admin.account.link_blocked_none": "Indisponible : tous les administrateurs ont déjà une fiche reliée.",
+  "admin.account.link_title": "Relier {name} à un administrateur",
+  "admin.account.link_text": "Le compte choisi retrouve les statistiques de {name}. Aucune invitation n’est envoyée.",
+  "admin.account.link_warning": "{name} a une invitation de joueur en attente ({email}). Son compte invité est supprimé et le lien envoyé ne fonctionnera plus.",
+  "admin.account.link_field": "Compte administrateur",
+  "admin.account.link_confirm": "Relier",
+  "admin.account.link_invited_suffix": "invité",
+  "admin.account.link_unavailable": "La liste des administrateurs n’a pas pu être chargée : fermez la boîte et réessayez."
 }

@@ -1,20 +1,20 @@
 import { computed, ref } from 'vue'
-import { ADMIN_ADMINISTRATORS_CACHE_KEY, ADMIN_REVOKE_FEEDBACK } from '~/consts/admin-administrators.const'
+import { ADMIN_REVOKE_FEEDBACK } from '~/consts/admin-administrators.const'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
 import { FEEDBACK_STATUS } from '~/enums/feedback.enum'
 import type { IAdminFailure } from '~/interfaces/admin-failure.interface'
 import type { IAdministratorPromotion } from '~/interfaces/administrator.interface'
 import type { IParticipantFeedback } from '~/interfaces/admin-participants.interface'
+import { useAdministrators } from '~/composables/useAdministrators'
 import { AdministratorService } from '~/services/administrator.service'
 import { toAccountFeedback } from '~/utils/admin-competitors.util'
 import { toAdministratorFailure, toInviteFeedback, toPromotionDisplayName, toRevokeCase } from '~/utils/admin-administrators.util'
-import { fromAsyncDataError } from '~/utils/async-data-error.util'
 
 /*********************************************************
  * useAdminAdministrators
  *
  * @description
- * Comptes administrateurs de l'écran F-68 (B-31) : liste, invitation (ou promotion d'un compte joueur), correction de l'email d'un compte
+ * Comptes administrateurs de l'écran F-68 (B-31) : liste (`useAdministrators`, F-69), invitation (ou promotion d'un compte joueur), correction de l'email d'un compte
  * non activé, renvoi, retrait de l'accès. Un seul envoi à la fois. Le refus d'une écriture se range selon l'endroit où l'écran l'affiche :
  * `inviteFailure` (carte ; `promotion` : confirmation d'un compte joueur, B-33), `fixFailure` (boîte « Corriger »), `actionFailure` (sous la table : renvoi, retrait). Succès : `feedback` (snackbar)
  * et liste rechargée. `ACCOUNT_ACTIVE` apprend à l'écran que le compte a changé d'état : la liste est rechargée. Les autres refus (dernier administrateur,
@@ -22,9 +22,12 @@ import { fromAsyncDataError } from '~/utils/async-data-error.util'
  ********************************************************/
 export const useAdminAdministrators = () => {
   const service = new AdministratorService({ fetcher: useRequestFetch() })
-  const { data, pending, error, refresh } = useAsyncData(ADMIN_ADMINISTRATORS_CACHE_KEY, () => service.list(), { default: () => [] })
+  // La lecture est celle de F-69 (`useAdministrators`) : une panne rend `null` une fois le chargement fini, ce que l'écran dit comme une erreur de liste.
+  const { administrators: data, status, refresh } = useAdministrators()
   const administrators = computed(() => data.value ?? [])
-  const listError = computed(() => error.value ? fromAsyncDataError(error.value) : null)
+  // `null` avant la première lecture (rendu serveur compris, la lecture est côté navigateur) et après une panne : seul `status` les distingue.
+  const listFailed = computed(() => data.value === null && status.value === 'success')
+  const pending = computed(() => data.value === null && !listFailed.value)
 
   const feedback = ref<IParticipantFeedback | null>(null)
   const busy = ref(false)
@@ -135,7 +138,7 @@ export const useAdminAdministrators = () => {
   return {
     administrators,
     pending,
-    listError,
+    listFailed,
     refresh,
     feedback,
     busy,

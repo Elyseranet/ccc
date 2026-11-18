@@ -57,6 +57,8 @@
             <origam-chip
               v-if="item.isSelf"
               size="small"
+              :color="selfChip.color"
+              :bg-color="selfChip.bgColor"
               :text="selfLabel"
               data-cy="administrator-self"
             />
@@ -141,6 +143,7 @@ import AppDataTable from '~/components/common/AppDataTable.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { useT } from '~/composables/useT'
 import { ADMINISTRATOR_COLUMN_MIN_WIDTHS, ADMINISTRATOR_COLUMN_WIDTHS } from '~/consts/admin-administrators.const'
+import { ADMIN_ACCOUNT_CHIP } from '~/consts/admin-competitors.const'
 import { PARTICIPANT_ACCOUNT_CHIPS } from '~/consts/admin-participants.const'
 import { ADMINISTRATOR_COLUMN } from '~/enums/administrator.enum'
 import type { ACCOUNT_STATE } from '~/enums/user.enum'
@@ -160,6 +163,7 @@ const props = withDefaults(defineProps<IAdministratorListProps>(), {})
 const emits = defineEmits<IAdministratorListEmits>()
 defineSlots<{}>()
 const titleId = useId()
+const selfChip = ADMIN_ACCOUNT_CHIP
 const lastActiveId = useId()
 
 /*********************************************************

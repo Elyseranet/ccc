@@ -23,7 +23,7 @@
           pending
         />
         <origam-alert
-          v-else-if="listError"
+          v-else-if="listFailed"
           status="error"
           rounded="lg"
           font-size="md"
@@ -159,7 +159,7 @@ useHead({ title })
 useSeo({ noindex: true })
 
 const {
-  administrators, pending, listError, refresh, feedback, busy, inviteFailure, fixFailure, actionFailure,
+  administrators, pending, listFailed, refresh, feedback, busy, inviteFailure, fixFailure, actionFailure,
   invite, promotion, confirmPromotion, cancelPromotion, correct, resend, revoke, resetInvite, resetFix, dismissAction, dismissFeedback
 } = useAdminAdministrators()
 const snackbarTimeout = ADMIN_SNACKBAR_TIMEOUT_MS
@@ -186,7 +186,7 @@ const actionFailureText = computed(() => actionFailure.value ? t(actionFailure.v
  * @description
  * Le squelette ne remplace la liste qu'au premier chargement : un rechargement après une action la laisse affichée. Une liste en erreur est remplacée par l'alerte et « Réessayer ».
  ********************************************************/
-const isLoading = computed(() => pending.value && administrators.value.length === 0)
+const isLoading = pending
 const handleReload = () => {
   refresh()
 }

@@ -1,7 +1,7 @@
 import type { INVITATION_EMAIL_KIND } from '../enums/invitation-email.enum.js'
 import type { ACCOUNT_STATE, USER_STATUS } from '../enums/user.enum.js'
 import type { IAdminFailure } from './admin-failure.interface.js'
-import type { ITranslatableText } from './common-components.interface.js'
+import type { ITranslatableText } from './translatable-text.interface.js'
 import type { IIssuedInvitation } from './invitation.interface.js'
 
 /** Fiche joueur liée à un compte administrateur (absente d'un administrateur créé par invitation). */

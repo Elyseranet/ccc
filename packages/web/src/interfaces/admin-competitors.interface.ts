@@ -3,6 +3,7 @@ import type { ACCOUNT_ERROR } from '../enums/account.enum.js'
 import type { IAdminFailure } from './admin-failure.interface.js'
 import type { ITranslatableText } from './common-components.interface.js'
 import type { IParticipantFeedback } from './admin-participants.interface.js'
+import type { IAdminAccount } from './administrator.interface.js'
 import type { ICompetitorAccount, ICompetitorDetail, ICompetitorListItem } from './competitor.interface.js'
 
 /** Valeurs saisies de la correction d'identité ; un champ vide (hors nom affiché) efface la valeur. */
@@ -101,6 +102,13 @@ export interface IAccountEmailFieldEmits {
 
 export interface ICompetitorAccountBlockProps {
   account: ICompetitorAccount | null
+  competitorId: string
+  /** Nom affiché de la fiche (titre de la boîte « Relier »). */
+  name: string
+  /** Comptes administrateurs (B-31) ; `null` quand la liste n'a pas pu être lue : l'action « Relier » disparaît. */
+  administrators?: IAdminAccount[] | null
+  /** La liste est en cours de lecture. */
+  administratorsPending?: boolean
   pending?: boolean
   failure?: IAdminFailure | null
   feedback?: IParticipantFeedback | null
@@ -108,6 +116,10 @@ export interface ICompetitorAccountBlockProps {
 
 export interface ICompetitorAccountBlockEmits {
   (event: 'submit', email: string): void
+  /** Relie la fiche au compte administrateur d'email `email` (`PUT /competiteurs/{id}/compte`, B-32). */
+  (event: 'link', email: string): void
+  /** La boîte « Relier » s'ouvre : l'écran relit la liste des administrateurs. */
+  (event: 'prepare'): void
   (event: 'dismiss'): void
 }
 
@@ -120,6 +132,26 @@ export interface IParticipantInviteDialogProps {
 }
 
 export interface IParticipantInviteDialogEmits {
+  (event: 'submit', email: string): void
+  (event: 'cancel'): void
+}
+
+export interface IAdminLinkDialogProps {
+  open: boolean
+  /** Nom affiché de la fiche à relier. */
+  name: string
+  /** Administrateurs sans fiche reliée, parmi lesquels choisir. */
+  candidates: IAdminAccount[]
+  /** La liste n'a pas pu être lue : la boîte le dit, au lieu d'un choix vide. */
+  unavailable?: boolean
+  loading?: boolean
+  /** Email du compte joueur invité jamais activé de la fiche (il sera supprimé), ou `null`. */
+  invitedPlayerEmail?: string | null
+  pending?: boolean
+  failure?: IAdminFailure | null
+}
+
+export interface IAdminLinkDialogEmits {
   (event: 'submit', email: string): void
   (event: 'cancel'): void
 }
