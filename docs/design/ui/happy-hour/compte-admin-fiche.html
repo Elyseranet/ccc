@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr" data-theme="ccc" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma fiche joueur · CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&amp;family=Gabarito:wght@400..900&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="hh.css">
+<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="admin-administrateurs.css">
+</head>
+<body class="">
+<div class="ambient" aria-hidden="true"></div>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<!-- origam-toolbar tag="header" flat · nav = origam-btn (to) · pas d'avatar ni de « Connexion » en en-tête (décision A3/E-d) -->
+<header class="hh-header"><div class="wrap hh-header__bar">
+  <a class="hh-brand font-display" href="index.html" aria-label="CCC, accueil"><svg class="" viewBox="0 0 100 100" aria-hidden="true"><polygon class="cap-fill" points="50,2 56.3,8.5 64.1,4.1 68.2,12.2 77,10.3 78.6,19.2 87.5,20.1 86.4,29 94.7,32.5 90.9,40.7 97.9,46.4 91.9,53.1 96.8,60.7 89.1,65.3 91.6,74 82.8,76.2 82.6,85.2 73.7,84.7 70.8,93.2 62.4,90.1 57.2,97.5 50,92 42.8,97.5 37.6,90.1 29.2,93.2 26.3,84.7 17.4,85.2 17.2,76.2 8.4,74 10.9,65.3 3.2,60.7 8.1,53.1 2.1,46.4 9.1,40.7 5.3,32.5 13.6,29 12.5,20.1 21.4,19.2 23,10.3 31.8,12.2 35.9,4.1 43.7,8.5"/><circle class="cap-inner" cx="50" cy="50" r="31"/></svg><span>CCC</span></a>
+  <nav class="hh-nav" aria-label="Navigation principale"><ul><li><a href="edition.html">Éditions</a></li><li><a href="joueurs.html">Joueurs</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="regles.html">Règles</a></li></ul></nav>
+  <span class="hh-header__end" aria-hidden="true"></span>
+</div></header>
+<main id="contenu">
+<section class="page-hero" aria-labelledby="h-acc"><div class="wrap"><p class="eyebrow">Compte administrateur · variante B (F-68, à arbitrer)</p><h1 id="h-acc" class="page-hero__title font-display neon">Mon compte</h1><p class="page-hero__lead">L’administrateur relie lui-même son compte à sa fiche joueur, depuis « Mon compte ». Variante A : depuis la fiche joueur, dans <a href="admin-administrateurs.html#ad-p-link">l’administration</a>.</p></div></section>
+<section class="wrap" aria-label="États de « Ma fiche joueur »"><div class="acc-grid">
+  <section class="card acc-card" aria-labelledby="h-prof">
+    <!-- ProfileForm existant, compte sans fiche : titre = email, phrase « Compte sans fiche de joueur » (account.profile.no_competitor_*) -->
+    <div class="acc-prof-h"><span class="avatar avatar--xl font-display" aria-hidden="true">LO</span><div><p class="eyebrow">Mon profil · /profil</p><h2 id="h-prof" class="h-card">lou.bernard@exemple.fr</h2></div></div>
+    <p class="muted"><strong>Compte sans fiche de joueur</strong> Ce compte n’est lié à aucune fiche de joueur : seul le mot de passe peut être modifié ici.</p>
+    <!-- Bloc ajouté (variante B), administrateur seulement : origam-card + origam-select autocomplete (motif de la recherche Participants) + origam-btn primaire -->
+    <section class="card acb" aria-labelledby="h-mine">
+      <header><p class="eyebrow acb__eyebrow">Joueur</p><h3 id="h-mine" class="h-card">Ma fiche joueur</h3></header>
+      <p class="muted">Vous jouez aussi ? Reliez votre compte à votre fiche pour retrouver vos statistiques.</p>
+      <form class="acb acb--flat" action="#" aria-labelledby="h-mine">
+        <div class="combo">
+          <p class="field"><label for="mf-q">Nom, prénom ou pseudo</label><input id="mf-q" class="input" type="search" value="Ber" role="combobox" aria-expanded="true" aria-controls="mf-list" aria-autocomplete="list" autocomplete="off"></p>
+          <ul id="mf-list" class="combo__list" role="listbox" aria-label="Fiches correspondantes">
+            <li role="option" aria-selected="true" class="sug is-active"><span class="avatar">LB</span><span><b>Lou Bernard</b><small class="muted">« La Mousse » · 10 éditions</small></span><span class="chip">Profil existant</span></li>
+            <li role="option" aria-selected="false" aria-disabled="true" class="sug"><span class="avatar">AB</span><span><b>Anna Bernard</b><small class="muted">Indisponible : cette fiche a déjà un compte joueur.</small></span><span class="chip chip--ok">Actif</span></li>
+          </ul>
+        </div>
+        <div class="acb__cta"><button class="btn btn--primary" type="submit">Relier à ma fiche</button></div>
+      </form>
+    </section>
+    <!-- Suite du profil existant (mot de passe, déconnexion) : inchangée, non redessinée ici -->
+  </section>
+  <div class="acc-side-stack">
+    <!-- Après liaison : même bloc, lecture seule ; le profil redevient celui d’un joueur (photo, téléphone : comportement existant de ProfileForm) -->
+    <section class="card acb" aria-labelledby="h-mine2">
+      <header><p class="eyebrow acb__eyebrow">Joueur</p><h3 id="h-mine2" class="h-card">Ma fiche joueur</h3></header>
+      <div class="acb__state"><span class="chip chip--ok">Fiche reliée</span><span>Votre compte est relié à la fiche Lou Bernard.</span></div>
+      <a class="btn btn--outlined" href="joueur.html">Voir ma fiche publique</a>
+    </section>
+    <!-- Erreur 409 : la fiche a été reliée à un autre compte entre-temps -->
+    <p class="alert alert--error alert--block" role="alert"><svg class="alert__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg><span><span class="alert__title">Liaison refusée.</span><span class="alert__body">Cette fiche est déjà reliée à un autre compte.</span></span></p>
+  </div>
+</div></section>
+</main>
+<!-- Pied de page F-19 : liens filtrés par livraison (PAGE_DELIVERY) comme la navigation ; nav vide = non rendu ; © et crédit toujours présents -->
+<footer class="hh-footer"><div class="wrap">
+  <div class="hh-footer__grid">
+    <p class="hh-footer__brand font-display neon--sm">CCC</p>
+    <nav aria-label="Pied de page"><ul><li><a href="regles.html">Règles</a></li><li><a href="palmares.html">Palmarès</a></li><li><a href="compte.html">Connexion</a></li></ul></nav>
+  </div>
+  <div class="hh-footer__legal">
+    <nav aria-label="Informations légales"><ul><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cgu.html">Conditions d’utilisation</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul></nav>
+    <div class="hh-footer__meta"><p>© 2026 Cotentin Caps Cup</p><p>Site réalisé par <a class="hh-footer__credit" href="https://elysera.net" rel="noopener">Elysera</a> avec <a class="hh-footer__credit" href="https://github.com/Elyseranet/origam" rel="noopener">Origam</a></p></div>
+  </div>
+</div></footer>
+</body>
+</html>

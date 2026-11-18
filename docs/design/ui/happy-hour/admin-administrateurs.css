@@ -1,0 +1,61 @@
+/* CCC · Happy Hour — F-68 : administrateurs et fiche joueur d'un administrateur (admin, CSS seul).
+   Fichier propre à cette maquette : les feuilles validées (hh.css, admin.css, pages.css) ne sont pas modifiées.
+   Uniquement des var(--origam-*) issues de tokens.css. */
+
+.adm .tabs { margin-bottom: var(--origam-space---2); }
+.screen { margin-top: var(--origam-space---4); }
+
+/* Liste + invitation : même grille que Participants, inversée (la liste d'abord) */
+.ad-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--origam-space---5); align-items: start; }
+.ad-grid > * { min-width: 0; }
+.ad-list .table td:last-child { white-space: normal; }
+.ad-who { display: grid; gap: 2px; }
+.ad-who b { overflow-wrap: anywhere; }
+.ad-who small { font-size: var(--origam-font__size---sm); }
+.ad-acts { display: inline-flex; flex-wrap: wrap; justify-content: end; }
+.ad-invite { display: grid; gap: var(--origam-space---4); }
+.ad-invite .input { width: 100%; }
+.ad-cta { display: flex; justify-content: flex-end; }
+.ad-why { margin-top: var(--origam-space---2); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---secondary); }
+
+/* Chargement (origam-skeleton-group, AsyncState) */
+.skel { display: grid; gap: var(--origam-space---3); padding: var(--origam-space---5); }
+.skel span { display: block; height: var(--origam-space---4); border-radius: var(--origam-radius---full); background: var(--origam-color__surface---overlay); }
+.skel span:nth-child(2n) { width: 72%; }
+
+/* Bloc « Compte et invitation » de la fiche compétiteur (F-62) */
+.acb { display: grid; gap: var(--origam-space---4); padding: var(--origam-space---6); }
+.acb__eyebrow { margin: 0; }
+.acb__state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2); }
+.acb__ro { color: var(--origam-color__text---secondary); overflow-wrap: anywhere; }
+.acb__or { display: grid; gap: var(--origam-space---2); justify-items: start; padding-top: var(--origam-space---4); border-top: 1px solid var(--origam-color__border---subtle); }
+.acb__or--bare { padding-top: 0; border-top: 0; }
+.acb--flat { padding: 0; }
+.acb__cta { display: flex; justify-content: flex-end; }
+.ad-variants .snack--demo { margin-top: var(--origam-space---3); max-width: 100%; }
+.acb .input { width: 100%; }
+
+/* Variante B (/profil) : pile de la colonne latérale ; le menu de suggestions reste dans le flux pour la revue */
+.acc-side-stack { display: grid; gap: var(--origam-space---4); }
+.acc-card .combo__list { position: static; }
+.acc-prof-h > div { min-width: 0; }
+.acc-prof-h .h-card { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .acc-card .acb { padding: var(--origam-space---4); }
+  .acc-card .acb--flat { padding: 0; }
+  .acc-card .sug { grid-template-columns: auto minmax(0, 1fr); }
+  .acc-card .sug .chip { grid-column: 2; justify-self: start; }
+}
+
+/* Variantes empilées pour la revue (hors produit) */
+.ad-variants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--origam-space---5); align-items: start; }
+.ad-variants > * { min-width: 0; }
+.ad-tag { margin-bottom: var(--origam-space---2); }
+
+@media (max-width: 1200px) {
+  .ad-grid, .ad-variants { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .acb { padding: var(--origam-space---5); }
+  .ad-cta .btn, .acb__cta .btn { width: 100%; }
+}
