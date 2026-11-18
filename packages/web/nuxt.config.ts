@@ -137,7 +137,28 @@ export default defineNuxtConfig({
       // Image de partage Open Graph et Twitter (NUXT_PUBLIC_SITE_OG_IMAGE : chemin ou URL absolue). Vide tant que l'image 1200 x 630 n'est pas dessinée (T-SEO-01).
       siteOgImage: '',
       // Indexation par les moteurs (NUXT_PUBLIC_SITE_INDEXABLE, T-SEO-01) : faux par défaut, seule la production la pose à `true`.
-      siteIndexable: DEFAULT_SITE_INDEXABLE
+      siteIndexable: DEFAULT_SITE_INDEXABLE,
+      // Identité légale de l'éditeur (F-70) : NUXT_PUBLIC_LEGAL_<CLÉ> = {{server.LEGAL_<CLÉ>}} dans Coolify (règle globale du 2026-11-15).
+      // Toutes vides par défaut : hors production les pages légales affichent « à compléter », l'image de production refuse de démarrer.
+      legal: {
+        status: '',
+        name: '',
+        form: '',
+        capital: '',
+        siren: '',
+        rcs: '',
+        vat: '',
+        address: '',
+        phone: '',
+        email: '',
+        publicationDirector: '',
+        hostName: '',
+        hostAddress: '',
+        hostPhone: '',
+        hostCountry: '',
+        // PRIVACY_CONTACT_EMAIL et PRIVACY_FORM_RETENTION_DAYS : NUXT_PUBLIC_LEGAL_PRIVACY_CONTACT_EMAIL, _FORM_RETENTION_DAYS.
+        privacy: { contactEmail: '', formRetentionDays: '' }
+      }
     },
     // Surcharge : NUXT_AUTH_LOGIN_RATE_LIMIT_* et NUXT_AUTH_ALLOWED_ORIGINS (liste séparée par des virgules).
     auth: {

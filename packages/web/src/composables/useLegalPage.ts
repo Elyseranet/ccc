@@ -1,5 +1,6 @@
 import { computed, onMounted, ref } from 'vue'
 import type { Ref } from 'vue'
+import { useLegalIdentity } from '~/composables/useLegalIdentity'
 import { useT } from '~/composables/useT'
 import { LEGAL_TOC_COLLAPSE_QUERY } from '~/consts/legal.const'
 import { ROUTES } from '~/consts/routes.const'
@@ -12,7 +13,7 @@ import type { ILegalBlock, ILegalPageContent } from '~/interfaces/legal.interfac
  *
  * @description
  * Traduit le contenu d'une page légale (`ILegalPageContent`, décrit par des clés) en modèle prêt à afficher :
- * le gabarit n'a ni comparaison ni appel à `t()`. Les marqueurs `[À FOURNIR : …]` restent dans les textes, c'est
+ * le gabarit n'a ni comparaison ni appel à `t()`. L'identité de l'éditeur (`useLegalIdentity`) alimente les paramètres `{…}` de tous les textes. Les marqueurs `[À FOURNIR : …]` restent dans les textes, c'est
  * `LegalText` qui les met en évidence.
  *
  * Le sommaire est ouvert au rendu serveur, puis replié au montage sous 1000 px : un état initial, sans animation,
@@ -21,7 +22,8 @@ import type { ILegalBlock, ILegalPageContent } from '~/interfaces/legal.interfac
 export const useLegalPage = (content: Ref<ILegalPageContent> | (() => ILegalPageContent)) => {
   const { t } = useT()
   const source = computed(() => typeof content === 'function' ? content() : content.value)
-  const text = (entry: ITranslatableText): string => t(entry.key, entry.fallback, entry.params)
+  const { params: identity } = useLegalIdentity()
+  const text = (entry: ITranslatableText): string => t(entry.key, entry.fallback, { ...identity, ...entry.params })
 
   const blockOf = (block: ILegalBlock, index: number) => ({
     id: index,

@@ -12,7 +12,7 @@ export const LEGAL_PRIVACY_CONTENT: ILegalPageContent = {
       id: 'responsable',
       title: { key: 'legal.privacy.controller_title', fallback: 'Responsable de traitement et contact' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.privacy.controller_text', fallback: 'Elysera [À FOURNIR : dénomination] · [À FOURNIR : adresse email de contact RGPD]' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.privacy.controller_text', fallback: '{name} · {privacyContactEmail}' } }
       ]
     },
     {
@@ -29,7 +29,7 @@ export const LEGAL_PRIVACY_CONTENT: ILegalPageContent = {
         ]
       },
         { kind: LEGAL_BLOCK.SUBHEADING, text: { key: 'legal.privacy.archives_title', fallback: 'Archives 2012-2026' } },
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.privacy.archives_text', fallback: 'Les noms de personnes ayant joué avant la création des comptes sont conservés (intérêt légitime). Droit d’opposition : demande de retrait ou de pseudonyme à [À FOURNIR : adresse email de contact RGPD], traitée à la main par un administrateur.' } }
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.privacy.archives_text', fallback: 'Les noms de personnes ayant joué avant la création des comptes sont conservés (intérêt légitime). Droit d’opposition : demande de retrait ou de pseudonyme à {privacyContactEmail}, traitée à la main par un administrateur.' } }
       ]
     },
     {
@@ -79,7 +79,7 @@ export const LEGAL_PRIVACY_CONTENT: ILegalPageContent = {
         {
         kind: LEGAL_BLOCK.LIST,
         items: [
-          { key: 'legal.privacy.recipients_host', fallback: 'Hébergeur : [À FOURNIR : société]' },
+          { key: 'legal.privacy.recipients_host', fallback: 'Hébergeur : {hostName}' },
           { key: 'legal.privacy.recipients_mail', fallback: 'Envoi d’emails : [À FOURNIR : fournisseur SMTP de production, quand choisi]' }
         ]
       },

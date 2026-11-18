@@ -4,7 +4,7 @@ export interface IStrictRuntimeConfigInput {
   strictRuntimeConfig?: unknown
   /** Vrai dans l'image de production (marqueur du Dockerfile) : le mode strict ne peut alors pas être éteint. */
   productionImage?: boolean
-  public?: { siteUrl?: unknown }
+  public?: { siteUrl?: unknown, legal?: unknown }
   mail?: { transport?: unknown, host?: unknown, from?: unknown }
   auth?: { secureCookie?: unknown, deviceCookieSecret?: unknown }
 }

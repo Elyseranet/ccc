@@ -15,6 +15,7 @@ import {
   STRICT_RUNTIME_CONFIG_OFF_VALUES
 } from '../consts/runtime-config.const.js'
 import type { IStrictRuntimeConfigInput } from '../interfaces/runtime-config.interface.js'
+import { missingLegalVariables } from './legal-identity.util.js'
 import { resolveSecureCookie } from './cookie-config.util.js'
 
 const asText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '')
@@ -151,7 +152,7 @@ const mailFromViolation = (value: unknown): boolean => {
  * - En mode strict, l'erreur nomme chaque variable fautive, JAMAIS sa valeur : site (`NUXT_PUBLIC_SITE_URL`) pas en
  *   https ou sur une machine locale ; transport d'email différent de `smtp` ; hôte SMTP vide ou local ;
  *   expéditeur vide ou resté à la valeur par défaut ; cookies sans `Secure` ; secret du cookie d'appareil absent ou
- *   trop court.
+ *   trop court ; une variable d'identité légale de l'éditeur (`NUXT_PUBLIC_LEGAL_*`, F-70) vide.
  * - Les identifiants SMTP (`NUXT_MAIL_USER`, `NUXT_MAIL_PASSWORD`) ne sont pas exigés : le fournisseur n'est pas choisi
  *   et certains relais n'authentifient pas.
  */
@@ -181,6 +182,10 @@ export const assertStrictRuntimeConfig = (config: IStrictRuntimeConfigInput): vo
   }
   if (asText(config.auth?.deviceCookieSecret).length < DEVICE_SECRET_MIN_LENGTH) {
     problems.push(`${STRICT_CONFIG_VARIABLE.DEVICE_COOKIE_SECRET} is required (at least ${DEVICE_SECRET_MIN_LENGTH} characters)`)
+  }
+  const missingLegal = missingLegalVariables(config.public?.legal)
+  if (missingLegal.length > 0) {
+    problems.push(`${missingLegal.join(', ')} must be set (publisher identity, F-70)`)
   }
   if (problems.length > 0) {
     throw new Error(`Invalid production configuration (${STRICT_CONFIG_VARIABLE.STRICT} is on): ${problems.join('; ')}`)

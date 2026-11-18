@@ -1,6 +1,7 @@
 import { BlockList } from 'node:net'
 import { describe, expect, it } from 'vitest'
 import { LOCAL_ADDRESS_RANGES } from '../../src/consts/runtime-config.const'
+import { LEGAL_IDENTITY_FIELDS } from '../../src/consts/runtime-config.const'
 import { DEFAULT_MAIL_FROM, DEFAULT_MAIL_HOST, DEFAULT_MAIL_TRANSPORT, DEFAULT_SITE_URL } from '../../src/consts/runtime-config.const'
 import { assertStrictRuntimeConfig, isStrictRuntimeConfig } from '../../src/utils/runtime-config-guard.util'
 
@@ -13,14 +14,29 @@ interface IPatch {
   secureCookie?: unknown
   deviceSecret?: unknown
   productionImage?: boolean
+  legal?: unknown
 }
 
 const SECRET = 's'.repeat(32)
 
+/** Identité de l'éditeur complète (F-70) : chaque variable posée, au chemin de `runtimeConfig.public.legal`. */
+const completeLegal = () => {
+  const legal: Record<string, any> = { privacy: {} }
+  for (const field of LEGAL_IDENTITY_FIELDS) {
+    const [first, second] = field.path as readonly string[]
+    if (second === undefined) {
+      legal[first!] = 'value'
+    } else {
+      legal[first!][second] = 'value'
+    }
+  }
+  return legal
+}
+
 const configWith = (patch: IPatch = {}) => ({
   strictRuntimeConfig: 'strict' in patch ? patch.strict : true,
   productionImage: patch.productionImage,
-  public: { siteUrl: 'siteUrl' in patch ? patch.siteUrl : 'https://ccc.example.org' },
+  public: { siteUrl: 'siteUrl' in patch ? patch.siteUrl : 'https://ccc.example.org', legal: 'legal' in patch ? patch.legal : completeLegal() },
   mail: {
     transport: 'transport' in patch ? patch.transport : 'smtp',
     host: 'host' in patch ? patch.host : 'smtp.example.org',
@@ -256,6 +272,31 @@ describe('production image marker (T-SEC-06, Q1)', () => {
   it.each([false, 'false', 'FALSE', '0', '', ' ', undefined, null])('marker present, flag off (%j): refuses to start, naming the variable only', (strict) => {
     const call = () => assertStrictRuntimeConfig(configWith({ strict, productionImage: true }))
     expect(call).toThrow('NUXT_STRICT_RUNTIME_CONFIG cannot be turned off in the production image')
+  })
+})
+
+describe('publisher identity variables (F-70)', () => {
+  it('lists the 17 variables of the global rule', () => {
+    expect(LEGAL_IDENTITY_FIELDS).toHaveLength(17)
+  })
+
+  it.each(LEGAL_IDENTITY_FIELDS.map(field => [field.variable, field] as const))('refuses to start when %s is empty, naming it', (variable, field) => {
+    const legal = completeLegal()
+    const [first, second] = field.path as readonly string[]
+    if (second === undefined) {
+      legal[first!] = ''
+    } else {
+      legal[first!][second] = '  '
+    }
+    expect(() => assertStrictRuntimeConfig(configWith({ legal }))).toThrow(variable)
+  })
+
+  it('names every variable when the whole block is empty, never a value', () => {
+    expect(() => assertStrictRuntimeConfig(configWith({ legal: undefined }))).toThrow(/NUXT_PUBLIC_LEGAL_NAME.*NUXT_PUBLIC_LEGAL_PRIVACY_FORM_RETENTION_DAYS/)
+  })
+
+  it('does not block when the guard is off (development)', () => {
+    expect(() => assertStrictRuntimeConfig(configWith({ strict: false, legal: undefined }))).not.toThrow()
   })
 })
 

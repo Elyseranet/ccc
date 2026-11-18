@@ -64,7 +64,7 @@ export const LEGAL_ACCESSIBILITY_CONTENT: ILegalPageContent = {
       id: 'contact',
       title: { key: 'legal.accessibility.contact_title', fallback: 'Contact et voies de recours' },
       blocks: [
-        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.accessibility.contact_text', fallback: 'Signaler un problème : [À FOURNIR : adresse email de contact accessibilité]' } },
+        { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.accessibility.contact_text', fallback: 'Signaler un problème : {email}' } },
         { kind: LEGAL_BLOCK.PARAGRAPH, text: { key: 'legal.accessibility.contact_remedies', fallback: '[À FOURNIR : voies de recours, à confirmer avec le statut de l’éditeur]' } }
       ]
     }
