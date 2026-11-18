@@ -27,6 +27,8 @@ export interface IMailConfig {
 export interface IInvitationEmailInput {
   firstName: string
   link: string
+  /** `runtimeConfig.public.siteUrl` : origine du logo et du pied de page du mail. */
+  siteUrl: string
 }
 
 export interface IInvitationEmail {

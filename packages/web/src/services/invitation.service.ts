@@ -136,8 +136,9 @@ export const resendInvitation = async (dataSource: DataSource, competitorId: str
  */
 export const sendInvitationEmail = async (input: ISendInvitationInput): Promise<boolean> => {
   try {
-    const link = buildInvitationLink(String(useRuntimeConfig().public.siteUrl), input.token)
-    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link }) })
+    const siteUrl = String(useRuntimeConfig().public.siteUrl)
+    const link = buildInvitationLink(siteUrl, input.token)
+    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link, siteUrl }) })
     logger.info(LOG_EVENT.INVITATION_SENT, { userId: input.userId })
     return true
   } catch (error) {
