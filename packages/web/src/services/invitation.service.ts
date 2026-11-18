@@ -138,7 +138,7 @@ export const sendInvitationEmail = async (input: ISendInvitationInput): Promise<
   try {
     const siteUrl = String(useRuntimeConfig().public.siteUrl)
     const link = input.token ? buildInvitationLink(siteUrl, input.token) : undefined
-    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link, kind: input.kind, siteUrl }) })
+    await useMailPort().send({ to: input.email, ...buildInvitationEmail({ firstName: input.firstName, link, kind: input.kind, contactEmail: String(useRuntimeConfig().public.legal?.email ?? ''), siteUrl }) })
     logger.info(LOG_EVENT.INVITATION_SENT, { userId: input.userId })
     return true
   } catch (error) {

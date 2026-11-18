@@ -209,8 +209,10 @@ export const INVITATION_EMAIL_CONTENT: Record<INVITATION_EMAIL_KIND, IInvitation
     preview: "L'organisateur de la Cotentin Caps Cup a ajouté un accès administrateur à votre compte. Aucune action n'est nécessaire.",
     introHtml: `${INTRO_PREFIX_HTML} a ajouté un accès administrateur à votre compte existant sur le site du CCC.`,
     introText: "L'organisateur de la Cotentin Caps Cup a ajouté un accès administrateur à votre compte existant sur le site du CCC.",
-    body: "Aucune action n'est nécessaire : connectez-vous comme d'habitude avec votre adresse email et votre mot de passe. Votre fiche joueur, vos résultats et vos statistiques ne changent pas.",
-    closing: "Si vous n'attendiez pas ce message, contactez l'organisateur.",
+    body: "Aucune action n'est nécessaire : connectez-vous comme d'habitude avec votre adresse email et votre mot de passe. Vos résultats et vos statistiques ne changent pas.",
+    closing: "Si vous n'attendiez pas ce message, écrivez à {{contactEmail}}.",
+    // Sans adresse de contact configurée (`public.legal.email` vide) : aucune adresse inventée.
+    closingWithoutContact: "Si vous n'attendiez pas ce message, signalez-le à l'organisateur de la Cotentin Caps Cup.",
     withActivation: false
   }
 }

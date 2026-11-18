@@ -45,6 +45,32 @@ describe('buildInvitationEmail, variantes (B-31)', () => {
     expect(email.text).not.toMatch(/\{\{\w+\}\}/)
   })
 
+  it('promotion mail closes with the configured contact email, HTML-escaped', () => {
+    const email = buildInvitationEmail({ firstName: 'Jeanne', kind: INVITATION_EMAIL_KIND.ADMIN_PROMOTED, contactEmail: ' contact@ccc.example ', siteUrl: SITE })
+    expect(email.text).toContain("Si vous n'attendiez pas ce message, écrivez à contact@ccc.example.")
+    expect(email.html).toContain('Si vous n&#39;attendiez pas ce message, écrivez à contact@ccc.example.')
+    expect(email.text).toContain('Vos résultats et vos statistiques ne changent pas.')
+    expect(email.text).not.toContain('fiche joueur')
+    const hostile = buildInvitationEmail({ firstName: 'Jeanne', kind: INVITATION_EMAIL_KIND.ADMIN_PROMOTED, contactEmail: '"><img src=x>@ccc.test', siteUrl: SITE })
+    expect(hostile.html).not.toContain('<img src=x>')
+    expect(hostile.html).toContain('&quot;&gt;&lt;img src=x&gt;@ccc.test')
+  })
+
+  it('promotion mail without a configured contact invents no address', () => {
+    for (const contactEmail of [undefined, '', '   ']) {
+      const email = buildInvitationEmail({ firstName: 'Jeanne', kind: INVITATION_EMAIL_KIND.ADMIN_PROMOTED, contactEmail, siteUrl: SITE })
+      expect(email.text).toContain("Si vous n'attendiez pas ce message, signalez-le à l'organisateur de la Cotentin Caps Cup.")
+      expect(email.html).toContain('signalez-le à l&#39;organisateur de la Cotentin Caps Cup.')
+      expect(`${email.text}${email.html}`).not.toContain('écrivez à')
+      expect(email.text).not.toMatch(/\{\{\w+\}\}/)
+    }
+  })
+
+  it('other variants ignore the contact email', () => {
+    const email = buildInvitationEmail({ firstName: 'Jeanne', link: LINK, kind: INVITATION_EMAIL_KIND.ADMIN, contactEmail: 'contact@ccc.example', siteUrl: SITE })
+    expect(`${email.text}${email.html}`).not.toContain('contact@ccc.example')
+  })
+
   it('refuses to build a link variant without a link', () => {
     expect(() => buildInvitationEmail({ firstName: 'Jeanne', kind: INVITATION_EMAIL_KIND.ADMIN, siteUrl: SITE })).toThrow(/needs a link/)
   })

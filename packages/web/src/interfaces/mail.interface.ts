@@ -32,6 +32,8 @@ export interface IInvitationEmailInput {
   link?: string
   /** `PARTICIPANT` par défaut. */
   kind?: INVITATION_EMAIL_KIND
+  /** `runtimeConfig.public.legal.email` : contact de la variante `ADMIN_PROMOTED` ; vide, la phrase n'en cite aucune. */
+  contactEmail?: string
   /** `runtimeConfig.public.siteUrl` : origine du logo et du pied de page du mail. */
   siteUrl: string
 }
@@ -45,6 +47,8 @@ export interface IInvitationEmailContent {
   introText: string
   body: string
   closing: string
+  /** Remplace `closing` quand aucune adresse de contact n'est configurée ; `closing` porte alors `{{contactEmail}}`. */
+  closingWithoutContact?: string
   /** Bouton, validité et lien brut : faux pour un mail d'information. */
   withActivation: boolean
 }

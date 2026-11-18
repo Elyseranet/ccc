@@ -36,7 +36,7 @@ describe('administrators (B-31)', async () => {
     rootDir: fileURLToPath(new URL('../..', import.meta.url)),
     setupTimeout: API_TEST_SETUP_TIMEOUT_MS,
     server: true,
-    env: { ...env, ...mails.env, NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_IP_ATTEMPTS: '1000', NUXT_RATE_LIMIT_INVITATION_TOKEN_MAX_REQUESTS: '1000' }
+    env: { ...env, ...mails.env, NUXT_PUBLIC_LEGAL_EMAIL: 'contact@ccc.test', NUXT_AUTH_LOGIN_RATE_LIMIT_MAX_IP_ATTEMPTS: '1000', NUXT_RATE_LIMIT_INVITATION_TOKEN_MAX_REQUESTS: '1000' }
   })
 
   afterAll(async () => {
@@ -216,6 +216,8 @@ describe('administrators (B-31)', async () => {
       expect(`${mail.text}${mail.html}`).not.toContain('/invitation/')
       expect(mail.html).not.toContain('class="cta"')
       expect(mail.text).not.toContain('Ce lien')
+      // Le contact vient de `public.legal.email` (NUXT_PUBLIC_LEGAL_EMAIL).
+      expect(mail.text).toContain("Si vous n'attendiez pas ce message, écrivez à contact@ccc.test.")
     })
 
     it('answers 400 for a bad email, a missing email or an extra field, writing nothing', async () => {
