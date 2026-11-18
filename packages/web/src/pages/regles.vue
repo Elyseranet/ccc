@@ -21,7 +21,6 @@
         v-model="activeTab"
         variant="pills"
         rounded="full"
-        color="primary"
         class="rules-page__tabs"
         :aria-label="tabsLabel"
         data-cy="rules-tabs"

@@ -28,6 +28,7 @@ import type { IOrigamTheme } from 'origam/interfaces'
  *   - `.origam-stepper .origam-stepper-item__subtitle…` (sous-titre d'étape en `white-space: nowrap`, il déborde à 390 px) :
  *     Elyseranet/origam#1340 ;
  *   - `.origam-field.origam-field.origam-field` (corner-clearance des champs pilule) : Elyseranet/origam#1254 ;
+ *   - `.origam-btn.origam-btn.origam-btn--variant-outlined, … --variant-ghost` (`--origam-btn---border-compensation: 0px` : depuis Origam 2.37.20 (#1261) les boutons outlined et ghost rétrécissent de 2 × le filet ; la maquette les garde à la largeur d'avant ; jeton interne, aucune prop) : à déposer chez Origam ;
  *   - `.origam-btn.origam-btn--variant-outlined.origam-btn--size-x-large` (filet compté dans le padding) :
  *     Elyseranet/origam#1261 ;
  *   - `.origam-table.origam-table[tabindex="0"]` et son `.origam-table__wrapper` (la racine focalisable devient le conteneur qui défile : le wrapper
@@ -77,10 +78,10 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-btn-group': { rounded: 'full' },
 
     // Surfaces
-    // F-63 : `contentDisplay: 'contents'` aplatit `.origam-card__content`, le `gap` posé par chaque composant sur sa carte atteint ainsi les blocs du slot.
+    // F-63 / F-67 : `contentDisplay: 'contents'` aplatit `.origam-card__content` et `.origam-form__content` : le `display` et le `gap` posés par chaque composant sur sa carte ou son formulaire atteignent directement leurs blocs.
     'origam-card': { rounded: 'xl', border: true, borderColor: 'var(--origam-color__border---default)', elevation: 'md', density: 'comfortable', contentDisplay: 'contents' },
     'origam-sheet': { rounded: 'xl', border: true, elevation: 'md' },
-    // F-63 : la valeur `contents` des cartes descend dans la carte du dialogue (mesuré) et y annulait le padding du contenu ; `flex` rend le rendu d'origine (flex colonne du dialogue).
+    // F-63 : la valeur `contents` des cartes descend dans la carte du dialogue (mesuré) et y annulait le padding du contenu ; `flex` rend le rendu d'origine. L'empilement en grille de `ConfirmDialog` est posé par ses propres props (`contentDisplay`, `contentGap`, F-67).
     'origam-dialog': { rounded: 'xl', elevation: 'xl', scrim: true, maxWidth: 560, contentDisplay: 'flex' },
     'origam-drawer': { elevation: 'none', border: true },
     'origam-toolbar': { flat: true, density: 'default', elevation: 'none' },
@@ -144,6 +145,7 @@ export const CCC_HH_BASE: IOrigamTheme = {
     'origam-chart': { rounded: 'lg', showGrid: true, showLegend: true, showTooltip: true, animated: false },
 
     // Saisie
+    'origam-form': { contentDisplay: 'contents' },
     'origam-text-field': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-select': { variant: 'outlined', rounded: 'full', density: 'default' },
     'origam-number-field': { variant: 'outlined', rounded: 'lg', density: 'default', hideSpinButtons: false },
@@ -168,6 +170,9 @@ export const CCC_HH_BASE: IOrigamTheme = {
     // Texte des tableaux : taille « sm » (12,8 px) comme la maquette.
     '--origam-table---font-size': 'var(--origam-font__size---sm)',
     // En-têtes : 700, tertiaire, filet de 1 px, sans fond propre. Densité « default » (props) = cellules de 12 px / 16 px.
+    // En-têtes en capitales (maquette) : jetons de Origam 2.37.33 (#1245), qui remplacent la règle `:where(.origam-table) th` de main.css (F-67).
+    '--origam-table__header-cell---text-transform': 'uppercase',
+    '--origam-table__header-cell---letter-spacing': 'var(--origam-font__letterSpacing---wide)',
     '--origam-table__header-cell---font-weight': 'var(--origam-font__weight---bold)',
     '--origam-table__header-cell---color': 'var(--origam-color__text---tertiary)',
     '--origam-table__header-cell---background-color': 'transparent',
@@ -200,8 +205,8 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-data-table-row--hover---background-color': 'var(--origam-color__action--ghost---bgHover)',
     // Onglets en pilule (F-00l) : ni une prop ni un token sémantique n'expriment ces valeurs ; l'onglet actif du DS est
     // `action.primary` en dur, la maquette le veut en `action.secondary`. Chaque entrée pointe vers un token existant.
-    // Les deux cssVars `--origam-tabs__item--pills--active---*` contournent Elyseranet/origam#1253 (prop color ignorée sur
-    // l'onglet actif en pilule) : à retirer quand Origam honore `color`.
+    // L'onglet actif en pilule suit la prop `color` du thème (`secondary`) depuis Origam 2.37.19 (#1253) : les deux cssVars
+    // `--origam-tabs__item--pills--active---*` qui la contournaient sont retirées (F-67).
     '--origam-tabs---border-width': 'var(--origam-border__width---thin)',
     '--origam-tabs---border-color': 'var(--origam-color__border---default)',
     '--origam-tabs---border-radius': 'var(--origam-radius---full)',
@@ -217,8 +222,6 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--hover---color': 'var(--origam-color__text---primary)',
     '--origam-tabs__item--hover---background-color': 'transparent',
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
-    '--origam-tabs__item--pills--active---color': 'var(--origam-color__action--secondary---fg)',
-    '--origam-tabs__item--pills--active---background-color': 'var(--origam-color__action--secondary---bg)',
     // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, page courante
     // en text.tertiary sans soulignement (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
     // Le séparateur d'Origam porte déjà 8 px de chaque côté : la maquette (8 px entre l'élément et le séparateur, 8 px après) n'en veut pas de plus.
