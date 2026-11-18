@@ -1,4 +1,5 @@
 import IconDashboard from '~/components/icons/IconDashboard.vue'
+import IconAdmins from '~/components/icons/IconAdmins.vue'
 import IconCompetitors from '~/components/icons/IconCompetitors.vue'
 import IconFinalPhase from '~/components/icons/IconFinalPhase.vue'
 import IconEditions from '~/components/icons/IconEditions.vue'
@@ -27,7 +28,8 @@ export const ADMIN_NAVIGATION: INavigationGroup[] = filterDeliveredGroups([
     label: 'Référentiel',
     items: [
       { key: 'layout.admin.nav_editions', label: 'Éditions', to: ROUTES.ADMIN_EDITIONS, icon: IconEditions },
-      { key: 'layout.admin.nav_competitors', label: 'Compétiteurs', to: ROUTES.ADMIN_COMPETITORS, icon: IconCompetitors }
+      { key: 'layout.admin.nav_competitors', label: 'Compétiteurs', to: ROUTES.ADMIN_COMPETITORS, icon: IconCompetitors },
+      { key: 'layout.admin.nav_administrators', label: 'Administrateurs', to: ROUTES.ADMIN_ADMINISTRATORS, icon: IconAdmins }
     ]
   }
 ])

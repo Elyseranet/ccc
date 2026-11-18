@@ -1,5 +1,7 @@
 import type { INVITATION_EMAIL_KIND } from '../enums/invitation-email.enum.js'
-import type { USER_STATUS } from '../enums/user.enum.js'
+import type { ACCOUNT_STATE, USER_STATUS } from '../enums/user.enum.js'
+import type { IAdminFailure } from './admin-failure.interface.js'
+import type { ITranslatableText } from './translatable-text.interface.js'
 import type { IIssuedInvitation } from './invitation.interface.js'
 
 /** Fiche joueur liée à un compte administrateur (absente d'un administrateur créé par invitation). */
@@ -45,4 +47,78 @@ export interface IAdminMailPayload {
 export interface IAdminInviteResult extends IAdminMailPayload {
   promoted: boolean
   accountStatus: USER_STATUS
+}
+
+/** Une ligne de la table, prête à afficher. */
+export interface IAdministratorRow {
+  id: string
+  email: string
+  /** Nom dont l'avatar tire ses initiales. */
+  avatarName: string
+  state: ACCOUNT_STATE
+  isSelf: boolean
+  /** Phrase sous l'email : fiche reliée, ou validité de l'invitation. */
+  detail: ITranslatableText
+  canResend: boolean
+  canFix: boolean
+  /** Retrait refusé d'avance : dernier administrateur actif. */
+  lastActive: boolean
+}
+
+export interface IAdministratorListProps {
+  administrators: IAdminAccount[]
+  pending: boolean
+  busy: boolean
+}
+
+export interface IAdministratorListEmits {
+  (event: 'resend', id: string): void
+  (event: 'fix', id: string): void
+  (event: 'revoke', id: string): void
+}
+
+export interface IAdministratorInviteCardProps {
+  modelValue: string
+  pending: boolean
+  failure: IAdminFailure | null
+}
+
+export interface IAdministratorInviteCardEmits {
+  (event: 'update:modelValue', value: string): void
+  (event: 'submit'): void
+}
+
+export interface IAdministratorFixDialogProps {
+  open: boolean
+  /** Le compte corrigé ; `null` quand la boîte est fermée. */
+  account: IAdminAccount | null
+  pending: boolean
+  failure: IAdminFailure | null
+}
+
+export interface IAdministratorFixDialogEmits {
+  (event: 'submit', email: string): void
+  (event: 'cancel'): void
+}
+
+/** Corps de `POST /admin/administrateurs` (strict) : `confirmPromotion: true` confirme la promotion d'un compte joueur (B-33). */
+export interface IInviteAdministratorRequest {
+  email: string
+  confirmPromotion?: boolean
+}
+
+/** Promotion en attente de confirmation : l'email saisi et le nom du joueur renvoyé par le 409 (nom de la fiche, sinon l'email). */
+export interface IAdministratorPromotion {
+  email: string
+  displayName: string
+}
+
+export interface IAdministratorPromoteDialogProps {
+  promotion: IAdministratorPromotion | null
+  pending: boolean
+}
+
+export interface IAdministratorPromoteDialogEmits {
+  (event: 'confirm'): void
+  (event: 'cancel'): void
 }

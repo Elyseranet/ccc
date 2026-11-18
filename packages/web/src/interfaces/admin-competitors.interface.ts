@@ -88,6 +88,8 @@ export interface IAccountEmailFieldProps {
   modelValue: string
   /** Email refusé par le serveur (déjà pris) : le champ passe en erreur. */
   taken?: boolean
+  /** Message du champ quand l'email est refusé : celui de F-62 (« déjà rattaché à un autre compte ») par défaut. */
+  takenText?: ITranslatableText
   /** Focus initial sur le champ : dans une boîte de dialogue, pas sur la fiche. */
   autofocus?: boolean
   /** Préfixe des `data-cy`. */

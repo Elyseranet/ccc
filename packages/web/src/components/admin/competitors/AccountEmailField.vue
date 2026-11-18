@@ -39,7 +39,7 @@ import { isAccountEmailValid } from '~/utils/admin-competitors.util'
  * apparaît alors, et s'efface à la frappe. « Email déjà pris » vient du serveur (`taken`). Le serveur reste l'autorité.
  ********************************************************/
 const { t } = useT()
-const props = withDefaults(defineProps<IAccountEmailFieldProps>(), { taken: false, autofocus: false })
+const props = withDefaults(defineProps<IAccountEmailFieldProps>(), { taken: false, takenText: undefined, autofocus: false })
 const emits = defineEmits<IAccountEmailFieldEmits>()
 defineSlots<{}>()
 const fieldId = useId()
@@ -48,7 +48,8 @@ const label = computed(() => t('admin.account.field_email', 'Email · privé'))
 const invalid = computed(() => attempted.value && !isAccountEmailValid(props.modelValue))
 const errors = computed(() => {
   if (props.taken) {
-    return [t('admin.account.error_email_used_text', 'Cet email est déjà rattaché à un autre compte : saisissez-en un autre.')]
+    const text = props.takenText ?? { key: 'admin.account.error_email_used_text', fallback: 'Cet email est déjà rattaché à un autre compte : saisissez-en un autre.' }
+    return [t(text.key, text.fallback)]
   }
   return invalid.value ? [t('admin.account.rule_email', 'Adresse email invalide')] : []
 })

@@ -1,5 +1,5 @@
 import type { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
-import type { ITranslatableText } from './common-components.interface.js'
+import type { ITranslatableText } from './translatable-text.interface.js'
 
 /** Texte d'une alerte d'erreur : un titre et un texte traduisibles. */
 export interface IAdminFailureText {

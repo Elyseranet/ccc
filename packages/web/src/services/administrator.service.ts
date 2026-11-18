@@ -3,7 +3,8 @@ import type { DataSource, EntityManager } from 'typeorm'
 import { LOG_EVENT } from '../consts/log-event.const.js'
 import { INVITATION_EMAIL_KIND } from '../enums/invitation-email.enum.js'
 import { USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
-import type { IAdminAccount, IAdminInviteResult, IAdminMailPayload } from '../interfaces/administrator.interface.js'
+import type { IAdminAccount, IAdminInvited, IAdminInviteResult, IAdminMailPayload, IInviteAdministratorRequest } from '../interfaces/administrator.interface.js'
+import type { IInvitationResent, ISetAccountEmailRequest } from '../interfaces/invitation.interface.js'
 import { InvitationEntity } from '../server/db/typeorm/entities/invitation.entity.js'
 import { UserEntity } from '../server/db/typeorm/entities/user.entity.js'
 import { accountActive, alreadyAdmin, cannotRevokeSelf, emailAlreadyUsed, lastAdmin, notFound, promotionConfirmationRequired } from '../utils/api-error.util.js'
@@ -28,8 +29,7 @@ import { replaceInvitedAccountEmail } from './competitor.service.js'
  *
  * @description
  * Classe navigateur ($fetch, via BaseService) du domaine « administrateurs » (ARCH-2 : fusionnée avec les fonctions serveur ci-dessous,
- * jamais référencées par le code navigateur). F-69 y met la lecture `GET /admin/administrateurs` ; F-68 y ajoute invitation, correction,
- * renvoi et retrait.
+ * jamais référencées par le code navigateur). lecture (F-69), invitation ou promotion, correction, renvoi et retrait (F-68).
  ********************************************************/
 export class AdministratorService extends BaseService {
   constructor (options: IBaseServiceOptions = {}) {
@@ -38,6 +38,31 @@ export class AdministratorService extends BaseService {
 
   list (): Promise<IAdminAccount[]> {
     return this.request<IAdminAccount[]>('/admin/administrateurs')
+  }
+
+  /**
+   * 201 compte créé, 200 `promoted: true` compte joueur promu ; 409 `ALREADY_ADMIN` ; 409 `PROMOTION_CONFIRMATION_REQUIRED` (B-33) quand l'email
+   * est celui d'un compte joueur et que `confirmPromotion` n'est pas posé : rien n'est modifié, `details.displayName` nomme le joueur.
+   */
+  invite (email: string, confirmPromotion = false): Promise<IAdminInvited> {
+    const body: IInviteAdministratorRequest = confirmPromotion ? { email, confirmPromotion } : { email }
+    return this.request<IAdminInvited>('/admin/administrateurs', { method: 'POST', body: { ...body } })
+  }
+
+  /** Nouvelle invitation, ancien lien annulé ; 409 `ACCOUNT_ACTIVE`. */
+  resendInvitation (id: string): Promise<IInvitationResent> {
+    return this.request<IInvitationResent>(`/admin/administrateurs/${encodeURIComponent(id)}/invitation`, { method: 'POST' })
+  }
+
+  /** Corrige l'email d'un compte non activé et renvoie l'invitation ; 409 `ACCOUNT_ACTIVE` / `EMAIL_ALREADY_USED`. */
+  correctEmail (id: string, email: string): Promise<IInvitationResent> {
+    const body: ISetAccountEmailRequest = { email }
+    return this.request<IInvitationResent>(`/admin/administrateurs/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...body } })
+  }
+
+  /** 204 ; 409 `LAST_ADMIN` / `CANNOT_REVOKE_SELF`. */
+  revoke (id: string): Promise<void> {
+    return this.request<void>(`/admin/administrateurs/${encodeURIComponent(id)}`, { method: 'DELETE' })
   }
 }
 

@@ -96,7 +96,7 @@ export const listLinkCandidates = (administrators: IAdminAccount[]): IAdminAccou
   administrators.filter(administrator => administrator.competitor === null)
 
 /** Retour d'un envoi d'invitation, ou d'une liaison à un administrateur : succès, ou avertissement quand le compte existe mais que le mail n'est pas parti. */
-export const toAccountFeedback = (result: IAccountEmailSet, email: string): IParticipantFeedback => result.linked
+export const toAccountFeedback = (result: Partial<IAccountEmailSet> & Pick<IAccountEmailSet, 'invitationSent'>, email: string): IParticipantFeedback => result.linked
   ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_linked', fallback: 'Fiche reliée au compte {email}', params: { email } } }
   : result.invitationSent
   ? { status: FEEDBACK_STATUS.SUCCESS, message: { key: 'admin.account.feedback_sent', fallback: 'Invitation envoyée à {email}', params: { email } } }
