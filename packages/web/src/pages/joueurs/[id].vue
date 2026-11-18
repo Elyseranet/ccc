@@ -148,6 +148,8 @@ defineExpose({})
 
 <style scoped lang="scss">
 .player-page {
+  --async-state---gap: 0;
+
   padding-bottom: var(--origam-space---10);
 
   &__crumbs {

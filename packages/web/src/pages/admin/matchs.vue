@@ -231,6 +231,8 @@ defineExpose({})
 
 <style scoped lang="scss">
 .admin-matches {
+  --async-state---gap: 0;
+
   &__head {
     margin-bottom: var(--admin-matches__head---margin-bottom, var(--origam-space---6));
   }

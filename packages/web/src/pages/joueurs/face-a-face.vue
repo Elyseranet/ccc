@@ -152,6 +152,8 @@ defineExpose({})
 
 <style scoped lang="scss">
 .head-to-head-page {
+  --async-state---gap: 0;
+
   &__hero {
     --page-hero---padding-block: var(--head-to-head-page__hero---padding-block, var(--origam-space---6) var(--origam-space---8));
   }
