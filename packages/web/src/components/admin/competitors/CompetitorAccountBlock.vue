@@ -39,8 +39,8 @@
       <origam-chip
         v-if="linkedAdmin"
         size="small"
-        color="secondary"
-        bg-color="secondary"
+        :color="adminChip.color"
+        :bg-color="adminChip.bgColor"
         :text="adminChipLabel"
         data-cy="competitor-account-admin"
       />
@@ -109,7 +109,8 @@
       </p>
       <origam-btn
         variant="outlined"
-        size="small"
+        font-size="sm"
+        padding-inline="4"
         aria-haspopup="dialog"
         :disabled="linkBlocked"
         :aria-describedby="linkBlocked ? linkWhyId : undefined"
@@ -160,6 +161,7 @@ import { useFocusReturn } from '~/composables/useFocusReturn'
 import { usePrimaryActionButton } from '~/composables/usePrimaryActionButton'
 import { useT } from '~/composables/useT'
 import { ADMIN_SNACKBAR_TIMEOUT_MS } from '~/consts/admin-feedback.const'
+import { ADMIN_ACCOUNT_CHIP } from '~/consts/admin-competitors.const'
 import { PARTICIPANT_ACCOUNT_CHIPS, PARTICIPANT_NO_ACCOUNT_TEXT } from '~/consts/admin-participants.const'
 import { API_ERROR_CODE } from '~/enums/api-error-code.enum'
 import { ACCOUNT_STATE, COMPETITOR_ACCOUNT_STATUS, USER_ROLE } from '~/enums/user.enum'
@@ -223,6 +225,7 @@ const stateText = computed(() => {
 const readOnlyText = computed(() => linkedAdmin.value
   ? t('admin.account.readonly_admin', 'Email du compte : {email}. L’administrateur le gère lui-même, il n’est pas modifiable ici.', { email: emailText.value })
   : t('admin.account.readonly', 'Email du compte : {email}. Le joueur le gère lui-même, il n’est pas modifiable ici.', { email: emailText.value }))
+const adminChip = ADMIN_ACCOUNT_CHIP
 const adminChipLabel = computed(() => t('admin.account.chip_admin', 'Administrateur'))
 
 /*********************************************************

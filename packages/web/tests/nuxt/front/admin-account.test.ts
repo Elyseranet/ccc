@@ -103,7 +103,7 @@ describe('useCompetitorAccount', () => {
 
 describe('bloc « Compte » de la fiche', () => {
   it('sans compte : état « Sans compte », champ à libellé visible, « Envoyer l’invitation »', async () => {
-    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, role: null, invitationExpiresAt: null } } })
+    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null } } })
     expect(wrapper.get('[data-cy="competitor-account-state"]').attributes('data-status')).toBe('NONE')
     expect(wrapper.get('[data-cy="competitor-account-submit"]').text()).toBe('Envoyer l’invitation')
     const input = wrapper.get('input[type="email"]')
@@ -126,7 +126,7 @@ describe('bloc « Compte » de la fiche', () => {
   })
 
   it('un email invalide n’émet rien et montre l’erreur ; un email valide émet submit', async () => {
-    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, role: null, invitationExpiresAt: null } } })
+    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null } } })
     await wrapper.get('input[type="email"]').setValue('pas-un-email')
     await wrapper.get('[data-cy="competitor-account-form"]').trigger('submit')
     await flushPromises()
@@ -140,7 +140,7 @@ describe('bloc « Compte » de la fiche', () => {
 
   it('refus 409 email pris : alerte et champ en erreur', async () => {
     const failure = toAccountFailure(new ApiRequestError(apiError(409, API_ERROR_CODE.EMAIL_ALREADY_USED)))
-    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, role: null, invitationExpiresAt: null }, failure } })
+    const wrapper = await mountSuspended(CompetitorAccountBlock, { props: { ...CARD, account: { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null }, failure } })
     expect(wrapper.get('[data-cy="competitor-account-error"]').text()).toContain('Email déjà utilisé.')
     expect(wrapper.get('input[type="email"]').attributes('aria-invalid')).toBe('true')
   })
@@ -170,7 +170,7 @@ const admin = (patch: Partial<IAdminAccount>): IAdminAccount => ({
   id: 'u1', email: 'sam@exemple.fr', status: USER_STATUS.ACTIVE, invitationExpiresAt: null, invitationExpired: false,
   competitor: null, lastLoginAt: null, createdAt: '2026-11-01T10:00:00.000Z', isSelf: false, ...patch
 })
-const NO_ACCOUNT = { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, role: null, invitationExpiresAt: null }
+const NO_ACCOUNT = { status: COMPETITOR_ACCOUNT_STATUS.NONE, email: null, invitationExpiresAt: null }
 
 describe('relier la fiche à un administrateur (F-69, B-32)', () => {
   it('lit la liste : administrateurs libres', () => {

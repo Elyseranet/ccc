@@ -9,6 +9,9 @@ export const ADMIN_COMPETITORS_PAGE_SIZE = 10
 /** La recherche attend la frappe avant de requêter (la recherche est limitée en débit). */
 export const ADMIN_COMPETITORS_SEARCH_DEBOUNCE_MS = 300
 
+/** Pastille neutre « Administrateur » du bloc Compte (F-69) : fond de surface, texte secondaire (maquette `.chip`). */
+export const ADMIN_ACCOUNT_CHIP = { color: 'var(--origam-color__text---secondary)', bgColor: 'var(--origam-color__surface---overlay)' }
+
 /** Refus du compte qui disent que l'état affiché est périmé (le compte a été activé, ou l'administrateur relié ailleurs) : l'écran se recharge. */
 export const ACCOUNT_STALE_FAILURE_CODES: ReadonlyArray<API_ERROR_CODE | null> = [API_ERROR_CODE.ACCOUNT_ACTIVE, API_ERROR_CODE.ACCOUNT_ALREADY_LINKED]
 

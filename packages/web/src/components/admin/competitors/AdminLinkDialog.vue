@@ -29,6 +29,7 @@
     <div class="admin-link-dialog__field">
       <origam-label
         :for="fieldId"
+        class="admin-link-dialog__label"
         :text="fieldLabel"
       />
       <origam-select
@@ -149,7 +150,15 @@ defineExpose({})
 .admin-link-dialog {
   &__field {
     display: grid;
-    gap: var(--origam-space---2);
+    gap: var(--origam-space---1);
+  }
+
+  &__label {
+    font-size: var(--origam-font__size---xs);
+    font-weight: var(--origam-font__weight---bold);
+    letter-spacing: var(--origam-font__letterSpacing---wide);
+    text-transform: uppercase;
+    color: var(--origam-color__text---tertiary);
   }
 }
 </style>

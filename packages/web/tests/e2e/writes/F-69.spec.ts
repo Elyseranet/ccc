@@ -42,7 +42,7 @@ const archivePlayerWithoutAccount = async (request: APIRequestContext, index: nu
     throw new Error(`Édition d'archive ${LEGACY_EDITION_CODE} introuvable`)
   }
   const rows = await (await request.get(`/api/v1/admin/editions/${legacy.id}/participants`)).json() as Array<{ competitor: IArchivePlayer, account: unknown }>
-  const player = rows.filter(row => row.account === null)[index + 10]?.competitor
+  const player = rows.filter(row => row.account === null)[index + 6]?.competitor
   if (!player) {
     throw new Error(`Pas de joueur d'archive sans compte n°${index}`)
   }
@@ -68,12 +68,14 @@ test.describe('admin fiche compétiteur : relier à un administrateur', () => {
     await signIn(context, 'admin')
   })
 
-  test('liste des administrateurs non livrée : le bloc F-62 reste entier, sans action « Relier »', async ({ page, context }) => {
+  test('liste des administrateurs non livrée : le bloc F-62 reste entier, la boîte dit que la liste manque', async ({ page, context }) => {
     test.skip(!ADMINS_PENDING, 'B-31 livré : couvert par les tests suivants')
     const player = await archivePlayerWithoutAccount(context.request, 0)
     await openCompetitor(page, player.id)
     await expect(page.getByTestId('competitor-account-submit')).toBeVisible()
-    await expect(page.getByTestId('competitor-account-link')).toHaveCount(0)
+    await page.getByTestId('competitor-account-link-open').click()
+    await expect(page.getByTestId('admin-link-unavailable')).toBeVisible()
+    await expect(page.getByTestId('admin-link-confirm')).toBeDisabled()
   })
 
   test('une fiche sans compte : l’action ouvre la boîte (libellé visible, focus, Échap rend le focus), 0 violation axe', async ({ page, context }) => {
