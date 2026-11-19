@@ -1,4 +1,6 @@
-import { PLAYERS_EDITION_SUFFIX_LABELS } from '~/consts/players.const'
+import { COMPETITOR_SORT } from '~/enums/competitor-sort.enum'
+import type { ICompetitorListItem } from '~/interfaces/competitor.interface'
+import { PERCENT, PLAYERS_AVERAGE_DECIMALS, PLAYERS_EDITION_SUFFIX_LABELS, PLAYERS_SCORED_COLUMNS } from '~/consts/players.const'
 import { useT } from '~/composables/useT'
 import { splitEditionCode } from '~/utils/player.util'
 
@@ -18,5 +20,29 @@ export const usePlayerFormat = () => {
     return rank ? `${year} · ${t(rank.key, rank.fallback)}` : year
   }
 
-  return { editionLabel }
+  /** F-73 : texte d'une colonne de bilan, ou null quand le joueur n'a aucun match avec score (l'appelant affiche « — »). */
+  const scoredStat = (item: ICompetitorListItem, key: (typeof PLAYERS_SCORED_COLUMNS)[number]): string | null => {
+    if (item.matchesPlayed === 0) {
+      return null
+    }
+    switch (key) {
+      case COMPETITOR_SORT.WIN_RATE:
+        return t('players.percent', '{percent} %', { percent: Math.round((item.winRate ?? 0) * PERCENT) })
+      case COMPETITOR_SORT.CAPS_FOR:
+        return String(item.capsFor ?? 0)
+      case COMPETITOR_SORT.CAPS_AGAINST:
+        return String(item.capsAgainst ?? 0)
+      case COMPETITOR_SORT.CAPS_DIFF:
+        return `${(item.capsDiff ?? 0) > 0 ? '+' : ''}${item.capsDiff ?? 0}`
+      case COMPETITOR_SORT.LOSSES:
+        return String(item.losses)
+      default:
+        return String(item.wins)
+    }
+  }
+
+  const averageText = (item: ICompetitorListItem): string | null =>
+    item.averagePoints === null ? null : item.averagePoints.toFixed(PLAYERS_AVERAGE_DECIMALS)
+
+  return { editionLabel, scoredStat, averageText }
 }

@@ -41,6 +41,13 @@ const listItem = (index: number, overrides: Partial<ICompetitorListItem> = {}): 
   unknownResults: 0,
   titles: 0,
   firstEditionCode: '2020',
+  acpPoints: 12,
+  allTimePoints: 30,
+  averagePoints: 7.5,
+  winRate: 0.6,
+  capsFor: 50,
+  capsAgainst: 40,
+  capsDiff: 10,
   ...overrides
 })
 
@@ -135,7 +142,7 @@ describe('recherche des joueurs : accents et casse', () => {
 })
 
 describe('état de la recherche dans l’URL', () => {
-  const base = { q: '', edition: '', sort: COMPETITOR_SORT.DISPLAY_NAME, order: SORT_ORDER.ASC, page: 1 }
+  const base = { q: '', edition: '', sort: COMPETITOR_SORT.ACP_POINTS, order: SORT_ORDER.DESC, page: 1 }
 
   it('relit l’état depuis la query, avec des valeurs par défaut sûres', () => {
     expect(parsePlayersState({ q: 'dup', edition: 'abc', tri: COMPETITOR_SORT.WINS, ordre: SORT_ORDER.ASC, page: '3' })).toEqual({ q: 'dup', edition: 'abc', sort: COMPETITOR_SORT.WINS, order: SORT_ORDER.ASC, page: 3 })
@@ -200,6 +207,24 @@ describe('R-5 : bilan sur les seuls matchs avec score', () => {
     expect(row.get('[data-cy="players-unknown-results"]').text()).toBe('2 matchs au résultat inconnu')
     expect(row.text()).toContain('8')
     expect(wrapper.find('[data-cy="players-career-note"]').exists()).toBe(false)
+  })
+
+  it('F-73 : sans match avec score, « — » avec explication accessible au lieu de 0 ; sinon les valeurs', async () => {
+    const empty = listItem(600, { matchesPlayed: 0, wins: 0, losses: 0, winRate: null, capsFor: null, capsAgainst: null, capsDiff: null })
+    const wrapper = await mountSuspended(PlayersDirectory, {
+      ...withRouterLink,
+      props: { items: [empty, MIXED_ITEM], total: 2, page: 1, pageSize: 20, sort: COMPETITOR_SORT.ACP_POINTS, order: SORT_ORDER.DESC, editionFiltered: false }
+    })
+    const [first, second] = wrapper.findAll('tbody tr')
+    const dashes = first!.findAll('[data-cy="players-not-recorded"]')
+    expect(dashes).toHaveLength(7)
+    expect(dashes[0]!.get('[aria-hidden="true"]').text()).toBe('—')
+    expect(dashes[0]!.get('.sr-only').text()).toBe('non renseigné dans les archives')
+    expect(second!.findAll('[data-cy="players-not-recorded"]')).toHaveLength(0)
+    expect(second!.text()).toContain('60 %')
+    expect(second!.findAll('td')[7]!.text()).toBe('3')
+    expect(second!.text()).toContain('+10')
+    expect(second!.text()).toContain('7.50')
   })
 
   it('quand l’annuaire est filtré par édition, il précise que les statistiques sont celles de la carrière', async () => {
@@ -287,7 +312,7 @@ describe('pages', () => {
     await flushPromises()
     expect(wrapper.findAll('h1')).toHaveLength(1)
     expect(wrapper.get('[data-cy="players-count"]').attributes('role')).toBe('status')
-    expect(wrapper.get('[data-cy="players-count"]').text()).toBe('145 joueurs · tri par nom')
+    expect(wrapper.get('[data-cy="players-count"]').text()).toBe('145 joueurs · tri par points ACP')
     expect(wrapper.findAll('tbody tr')).toHaveLength(20)
     expect(wrapper.get('[data-cy="pagination-range"]').text()).toBe('1–20 sur 145')
     expect(wrapper.find('form[role="search"]').exists()).toBe(true)

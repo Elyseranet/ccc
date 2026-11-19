@@ -89,10 +89,26 @@ export const usePlayerSearch = () => {
         return t('players.sort.matches_played', 'matchs')
       case COMPETITOR_SORT.WINS:
         return t('players.sort.wins', 'victoires')
+      case COMPETITOR_SORT.LOSSES:
+        return t('players.sort.losses', 'défaites')
       case COMPETITOR_SORT.TITLES:
         return t('players.sort.titles', 'titres')
       case COMPETITOR_SORT.FIRST_EDITION:
         return t('players.sort.first_edition', 'première édition')
+      case COMPETITOR_SORT.ACP_POINTS:
+        return t('players.sort.acp_points', 'points ACP')
+      case COMPETITOR_SORT.ALL_TIME_POINTS:
+        return t('players.sort.all_time_points', 'points All Time')
+      case COMPETITOR_SORT.AVERAGE_POINTS:
+        return t('players.sort.average_points', 'moyenne')
+      case COMPETITOR_SORT.WIN_RATE:
+        return t('players.sort.win_rate', '% de victoires')
+      case COMPETITOR_SORT.CAPS_FOR:
+        return t('players.sort.caps_for', 'caps marqués')
+      case COMPETITOR_SORT.CAPS_AGAINST:
+        return t('players.sort.caps_against', 'caps encaissés')
+      case COMPETITOR_SORT.CAPS_DIFF:
+        return t('players.sort.caps_diff', 'différentiel de caps')
       default:
         return t('players.sort.display_name', 'nom')
     }

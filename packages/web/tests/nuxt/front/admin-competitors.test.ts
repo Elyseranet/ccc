@@ -42,6 +42,13 @@ const item = (id: string, displayName: string, overrides: Partial<ICompetitorLis
   losses: 0,
   unknownResults: 0,
   firstEditionCode: null,
+  acpPoints: 0,
+  allTimePoints: 0,
+  averagePoints: null,
+  winRate: null,
+  capsFor: null,
+  capsAgainst: null,
+  capsDiff: null,
   ...overrides
 })
 
