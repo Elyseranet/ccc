@@ -297,6 +297,12 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-70](F-70.md) | Pages légales et mails : identité de l'éditeur depuis les variables serveur Coolify | — | F-19, F-40 | Ouvert : mergé @ `1800732d`, variables serveur à remplir, pages légales non livrées | — |
 | [F-71](F-71.md) | AsyncState n'espace pas ses blocs : espacement à la racine (fiche édition, « Exporter (Excel) ») | — | F-13 | **Fermé** (2026-11-18) @ `bb99befe`, déployé sur dev | — |
 | [F-72](F-72.md) | Admin « Plus » @390 : écarts plus-liens (6,2 %) et plus-edition (16,5 %) | — | F-12, F-68 | À faire | — |
+| [F-73](F-73.md) | Liste publique des joueurs : tri ACP et statistiques complètes | — | — | **Fermé — annulé** (2026-11-19) : mergé @ `f7ad09f9` puis revert `4415a0ec` (décision utilisateur, classements déjà au Palmarès) | — |
+| [F-74](F-74.md) | Favicon de la marque CCC | — | F-23 | **Fermé** (2026-11-19) @ `14974b41`, déployé sur dev, vérifié par l'utilisateur | — |
+| [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | En cours | — |
+| [F-73](F-73.md) | Liste publique des joueurs : tri ACP et statistiques complètes | — | — | **Fermé — annulé** (2026-11-19) : mergé @ `f7ad09f9` puis revert `4415a0ec` (décision utilisateur, classements déjà au Palmarès) | — |
+| [F-74](F-74.md) | Favicon de la marque CCC | — | F-23 | **Fermé** (2026-11-19) @ `14974b41`, déployé sur dev, vérifié par l'utilisateur | — |
+| [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | En cours | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
