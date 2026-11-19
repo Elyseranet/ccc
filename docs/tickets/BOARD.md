@@ -302,7 +302,6 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | **Fermé** (2026-11-19) @ `32037946`, déployé et vérifié sur dev | — |
 | [F-73](F-73.md) | Liste publique des joueurs : tri ACP et statistiques complètes | — | — | **Fermé — annulé** (2026-11-19) : mergé @ `f7ad09f9` puis revert `4415a0ec` (décision utilisateur, classements déjà au Palmarès) | — |
 | [F-74](F-74.md) | Favicon de la marque CCC | — | F-23 | **Fermé** (2026-11-19) @ `14974b41`, déployé sur dev, vérifié par l'utilisateur | — |
-| [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | En cours | — |
 | [F-23](F-23.md) | Capsule décorative : un seul composant `CapBadge` (5 copies supprimées) | — | F-19 | **Fermé** (2026-11-14) @ `88211e30` | à créer |
 | [F-24](F-24.md) | Admin : qualification, barrages, départages | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `1f4a360f` |
 | [F-25](F-25.md) | Admin : tirage du tableau final et des tours suivants | validée @ `6e09fd68` | B-13 | **Fermé** (2026-11-13) @ `b05d1121` |
