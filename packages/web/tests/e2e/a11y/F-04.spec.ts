@@ -86,6 +86,7 @@ test.describe('joueurs : accessibilité et recherche', () => {
     await page.waitForLoadState('networkidle')
     await expect(page.getByTestId('players-count')).toContainText('tri par points ACP')
     await expect(page.getByRole('columnheader', { name: /Points ACP/ })).toHaveAttribute('aria-sort', 'descending')
+    await expect(page.getByRole('columnheader', { name: /Défaites/ })).toBeVisible()
     await page.getByRole('columnheader', { name: /% de victoires/ }).click()
     await expect(page).toHaveURL(/tri=winRate/)
     await page.goto('/joueurs?tri=winRate&ordre=asc&page=8')

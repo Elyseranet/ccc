@@ -89,6 +89,8 @@ export const usePlayerSearch = () => {
         return t('players.sort.matches_played', 'matchs')
       case COMPETITOR_SORT.WINS:
         return t('players.sort.wins', 'victoires')
+      case COMPETITOR_SORT.LOSSES:
+        return t('players.sort.losses', 'défaites')
       case COMPETITOR_SORT.TITLES:
         return t('players.sort.titles', 'titres')
       case COMPETITOR_SORT.FIRST_EDITION:

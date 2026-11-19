@@ -34,6 +34,8 @@ export const usePlayerFormat = () => {
         return String(item.capsAgainst ?? 0)
       case COMPETITOR_SORT.CAPS_DIFF:
         return `${(item.capsDiff ?? 0) > 0 ? '+' : ''}${item.capsDiff ?? 0}`
+      case COMPETITOR_SORT.LOSSES:
+        return String(item.losses)
       default:
         return String(item.wins)
     }

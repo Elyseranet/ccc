@@ -50,6 +50,7 @@ export const PLAYERS_COLUMNS: IPlayersColumn[] = [
   { key: COMPETITOR_SORT.EDITIONS_PLAYED, title: { key: 'players.column.editions', fallback: 'Éditions' }, align: ALIGN.END, width: '7%' },
   { key: COMPETITOR_SORT.MATCHES_PLAYED, title: { key: 'players.column.matches', fallback: 'Matchs' }, align: ALIGN.END, width: '6%' },
   { key: COMPETITOR_SORT.WINS, title: { key: 'players.column.wins', fallback: 'Victoires' }, align: ALIGN.END, width: '7%' },
+  { key: COMPETITOR_SORT.LOSSES, title: { key: 'players.column.losses', fallback: 'Défaites' }, align: ALIGN.END, width: '6%' },
   { key: COMPETITOR_SORT.WIN_RATE, title: { key: 'players.column.win_rate', fallback: '% de victoires' }, align: ALIGN.END, width: '7%' },
   { key: COMPETITOR_SORT.CAPS_FOR, title: { key: 'players.column.caps_for', fallback: 'Caps marqués' }, align: ALIGN.END, width: '6%' },
   { key: COMPETITOR_SORT.CAPS_AGAINST, title: { key: 'players.column.caps_against', fallback: 'Caps encaissés' }, align: ALIGN.END, width: '6%' },
@@ -61,6 +62,7 @@ export const PLAYERS_COLUMNS: IPlayersColumn[] = [
 /** Colonnes dont la valeur n'existe que s'il y a au moins un match avec score : « — » sinon (F-73). */
 export const PLAYERS_SCORED_COLUMNS = [
   COMPETITOR_SORT.WINS,
+  COMPETITOR_SORT.LOSSES,
   COMPETITOR_SORT.WIN_RATE,
   COMPETITOR_SORT.CAPS_FOR,
   COMPETITOR_SORT.CAPS_AGAINST,
