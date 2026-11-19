@@ -5,6 +5,8 @@
   >
     <app-data-table
       class="players-directory__table"
+      tabindex="0"
+      :aria-label="caption"
       hide-default-footer
       :caption="caption"
       :headers="headers"
@@ -33,19 +35,54 @@
           </span>
         </span>
       </template>
+      <template #[`item.acpPoints`]="{ item }">
+        <span class="players-directory__num">{{ item.acpPoints }}</span>
+      </template>
+      <template #[`item.allTimePoints`]="{ item }">
+        <span class="players-directory__num">{{ item.allTimePoints }}</span>
+      </template>
+      <template #[`item.averagePoints`]="{ item }">
+        <span class="players-directory__num">{{ averageText(item) ?? noValue }}</span>
+      </template>
       <template #[`item.editionsPlayed`]="{ item }">
         <span class="players-directory__num">{{ item.editionsPlayed }}</span>
       </template>
       <template #[`item.matchesPlayed`]="{ item }">
-        <span class="players-directory__num">{{ item.matchesPlayed }}</span>
+        <span
+          v-if="item.matchesPlayed > 0"
+          class="players-directory__num"
+        >{{ item.matchesPlayed }}</span>
+        <span
+          v-else
+          class="players-directory__num"
+          data-cy="players-not-recorded"
+        >
+          <span aria-hidden="true">{{ noValue }}</span>
+          <span class="sr-only">{{ notRecordedText }}</span>
+        </span>
         <small
           v-if="item.unknownResults > 0"
           class="players-directory__unknown"
           data-cy="players-unknown-results"
         >{{ unknownText(item.unknownResults) }}</small>
       </template>
-      <template #[`item.wins`]="{ item }">
-        <span class="players-directory__num">{{ item.wins }}</span>
+      <template
+        v-for="key in scoredColumns"
+        :key="key"
+        #[`item.${key}`]="{ item }"
+      >
+        <span
+          v-if="scoredStat(item, key) !== null"
+          class="players-directory__num"
+        >{{ scoredStat(item, key) }}</span>
+        <span
+          v-else
+          class="players-directory__num"
+          data-cy="players-not-recorded"
+        >
+          <span aria-hidden="true">{{ noValue }}</span>
+          <span class="sr-only">{{ notRecordedText }}</span>
+        </span>
       </template>
       <template #[`item.titles`]="{ item }">
         <span class="players-directory__num">{{ item.titles > 0 ? item.titles : noValue }}</span>
@@ -78,7 +115,7 @@ import PlayerLink from '~/components/common/PlayerLink.vue'
 import PlayerAvatar from '~/components/players/PlayerAvatar.vue'
 import { usePlayerFormat } from '~/composables/usePlayerFormat'
 import { useT } from '~/composables/useT'
-import { PLAYERS_COLUMN_VALUES, PLAYERS_COLUMNS, PLAYERS_KEEP_SERVER_ORDER, PLAYERS_SORT_DEFAULT_ORDER } from '~/consts/players.const'
+import { PLAYERS_COLUMN_VALUES, PLAYERS_COLUMNS, PLAYERS_SCORED_COLUMNS, PLAYERS_KEEP_SERVER_ORDER, PLAYERS_SORT_DEFAULT_ORDER } from '~/consts/players.const'
 import { COMPETITOR_SORT, SORT_ORDER } from '~/enums/competitor-sort.enum'
 import type { IPlayersDirectoryEmits, IPlayersDirectoryProps } from '~/interfaces/players.interface'
 
@@ -92,7 +129,7 @@ import type { IPlayersDirectoryEmits, IPlayersDirectoryProps } from '~/interface
  * sont annoncés à côté. Les statistiques sont celles de la carrière, quel que soit le filtre d'édition.
  ********************************************************/
 const { t } = useT()
-const { editionLabel } = usePlayerFormat()
+const { editionLabel, scoredStat, averageText } = usePlayerFormat()
 const props = withDefaults(defineProps<IPlayersDirectoryProps>(), {})
 const emits = defineEmits<IPlayersDirectoryEmits>()
 defineSlots<{}>()
@@ -131,6 +168,8 @@ const handleSortBy = (value: Array<{ key: string, order?: boolean | string }>) =
  * L'avatar est décoratif (le nom est à côté) ; sans photo, les initiales.
  ********************************************************/
 const noValue = computed(() => t('players.no_value', '—'))
+const scoredColumns = PLAYERS_SCORED_COLUMNS
+const notRecordedText = computed(() => t('players.not_recorded', 'non renseigné dans les archives'))
 const nicknameOf = (item: ICompetitorListItem): string => t('players.nickname', ' « {nickname} »', { nickname: item.nickname ?? '' })
 const firstEditionOf = (item: ICompetitorListItem): string => item.firstEditionCode ? editionLabel(item.firstEditionCode) : noValue.value
 const unknownText = (count: number): string => count === 1

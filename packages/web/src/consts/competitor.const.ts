@@ -11,7 +11,7 @@ export const SEARCH_FOLDED_CHARACTERS = [...SEARCH_ACCENTED_CHARACTERS]
   .map((character) => character.normalize('NFD')[0]!)
   .join('')
 
-export const COMPETITOR_DEFAULT_SORT = COMPETITOR_SORT.DISPLAY_NAME
+export const COMPETITOR_DEFAULT_SORT = COMPETITOR_SORT.ACP_POINTS
 
 /** Sens par défaut : alphabétique pour le nom, décroissant pour une statistique (les plus forts d'abord). */
 export const COMPETITOR_DEFAULT_ORDER: Record<COMPETITOR_SORT, SORT_ORDER> = {
@@ -21,7 +21,14 @@ export const COMPETITOR_DEFAULT_ORDER: Record<COMPETITOR_SORT, SORT_ORDER> = {
   [COMPETITOR_SORT.WINS]: SORT_ORDER.DESC,
   [COMPETITOR_SORT.LOSSES]: SORT_ORDER.DESC,
   [COMPETITOR_SORT.TITLES]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.FIRST_EDITION]: SORT_ORDER.ASC
+  [COMPETITOR_SORT.FIRST_EDITION]: SORT_ORDER.ASC,
+  [COMPETITOR_SORT.ACP_POINTS]: SORT_ORDER.DESC,
+  [COMPETITOR_SORT.ALL_TIME_POINTS]: SORT_ORDER.DESC,
+  [COMPETITOR_SORT.WIN_RATE]: SORT_ORDER.DESC,
+  [COMPETITOR_SORT.CAPS_FOR]: SORT_ORDER.DESC,
+  [COMPETITOR_SORT.CAPS_AGAINST]: SORT_ORDER.ASC,
+  [COMPETITOR_SORT.CAPS_DIFF]: SORT_ORDER.DESC,
+  [COMPETITOR_SORT.AVERAGE_POINTS]: SORT_ORDER.DESC
 }
 
 export const LIKE_SPECIAL_CHARACTERS = /[\\%_]/g
@@ -47,7 +54,14 @@ export const COMPETITOR_SORT_KEY: Record<COMPETITOR_SORT, TCompetitorSortKeyRead
   [COMPETITOR_SORT.WINS]: (item) => item.wins,
   [COMPETITOR_SORT.LOSSES]: (item) => item.losses,
   [COMPETITOR_SORT.TITLES]: (item) => item.titles,
-  [COMPETITOR_SORT.FIRST_EDITION]: (_item, career) => career?.firstEditionRank ?? null
+  [COMPETITOR_SORT.FIRST_EDITION]: (_item, career) => career?.firstEditionRank ?? null,
+  [COMPETITOR_SORT.ACP_POINTS]: (item) => item.acpPoints,
+  [COMPETITOR_SORT.ALL_TIME_POINTS]: (item) => item.allTimePoints,
+  [COMPETITOR_SORT.WIN_RATE]: (item) => item.winRate,
+  [COMPETITOR_SORT.CAPS_FOR]: (item) => item.capsFor,
+  [COMPETITOR_SORT.CAPS_AGAINST]: (item) => item.capsAgainst,
+  [COMPETITOR_SORT.CAPS_DIFF]: (item) => item.capsDiff,
+  [COMPETITOR_SORT.AVERAGE_POINTS]: (item) => item.averagePoints
 }
 
 /** Longueur maximale d'un nom, d'un prénom ou d'un pseudo (colonnes `varchar(80)`). */

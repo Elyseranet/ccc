@@ -67,6 +67,32 @@ describe('public competitor routes', async () => {
       expect(lonely).toMatchObject({ wins: 0, losses: 0, matchesPlayed: 0, unknownResults: 1 })
     })
 
+    it('F-73: defaults to ACP descending and exposes ranking points, win rate and caps', async () => {
+      const { body } = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?pageSize=100')
+      expect(body.items[0]!.id).toBe(ids.nicolas)
+      expect(body.items[1]!.id).toBe(ids.remi)
+      const acp = body.items.map((item) => item.acpPoints)
+      expect(acp).toEqual([...acp].sort((a, b) => b - a))
+      const nicolas = body.items[0]!
+      expect(nicolas).toMatchObject({ acpPoints: 42.5, allTimePoints: 42.5, winRate: 0.75 })
+      const detail = await json<ICompetitorDetail>(`/api/v1/competiteurs/${ids.nicolas}`)
+      expect(nicolas.capsFor).toBe(detail.body.stats.pointsFor)
+      expect(nicolas.capsAgainst).toBe(detail.body.stats.pointsAgainst)
+      expect(nicolas.capsDiff).toBe(detail.body.stats.pointsFor - detail.body.stats.pointsAgainst)
+      const lonely = body.items.find((item) => item.id === ids.lonely)!
+      expect(lonely).toMatchObject({ winRate: null, capsFor: null, capsAgainst: null, capsDiff: null })
+    })
+
+    it('F-73: keeps career values under the edition filter and sorts on the new columns, nulls last', async () => {
+      const filtered = await json<IPaginated<ICompetitorListItem>>(`/api/v1/competiteurs?edition=${ids.editionB}`)
+      expect(filtered.body.items.find((item) => item.id === ids.nicolas)!.acpPoints).toBe(42.5)
+      const byRate = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?sort=winRate&pageSize=100')
+      expect(byRate.body.items.at(-1)!.winRate).toBeNull()
+      const byDiff = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?sort=capsDiff&order=asc&pageSize=100')
+      const diffs = byDiff.body.items.map((item) => item.capsDiff).filter((value): value is number => value !== null)
+      expect(diffs).toEqual([...diffs].sort((a, b) => a - b))
+    })
+
     it('sorts by a statistic column and rejects an unknown sort', async () => {
       const wins = await json<IPaginated<ICompetitorListItem>>('/api/v1/competiteurs?sort=wins')
       expect(wins.body.items[0]!.id).toBe(ids.nicolas)

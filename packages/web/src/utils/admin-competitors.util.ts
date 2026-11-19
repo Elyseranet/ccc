@@ -5,8 +5,9 @@ import { FEEDBACK_STATUS } from '../enums/feedback.enum.js'
 import type { IParticipantFeedback } from '../interfaces/admin-participants.interface.js'
 import type { IAdminAccount } from '../interfaces/administrator.interface.js'
 import type { IAccountEmailSet } from '../interfaces/invitation.interface.js'
-import { COMPETITOR_DEFAULT_SORT, COMPETITOR_SEARCH_MAX_LENGTH, COMPETITOR_SEARCH_MIN_LENGTH } from '../consts/competitor.const.js'
+import { COMPETITOR_SEARCH_MAX_LENGTH, COMPETITOR_SEARCH_MIN_LENGTH } from '../consts/competitor.const.js'
 import { ROUTES } from '../consts/routes.const.js'
+import { COMPETITOR_SORT } from '../enums/competitor-sort.enum.js'
 import { API_ERROR_CODE } from '../enums/api-error-code.enum.js'
 import type { ICompetitorFormValues } from '../interfaces/admin-competitors.interface.js'
 import type { IAdminFailure } from '../interfaces/admin-failure.interface.js'
@@ -46,7 +47,7 @@ export const toAdminCompetitorsQuery = (search: string, page: number): ICompetit
     ...(q.length >= COMPETITOR_SEARCH_MIN_LENGTH ? { q } : {}),
     page,
     pageSize: ADMIN_COMPETITORS_PAGE_SIZE,
-    sort: COMPETITOR_DEFAULT_SORT
+    sort: COMPETITOR_SORT.DISPLAY_NAME
   }
 }
 

@@ -18,8 +18,8 @@ Réponse : `IPaginated<ICompetitorListItem>`.
 | Paramètre | Règle |
 |---|---|
 | `page`, `pageSize` | entiers, `page >= 1`, `1 <= pageSize <= 100` (défaut 1 et 20) ; sinon 400 |
-| `sort` | `displayName` (défaut), `editionsPlayed`, `matchesPlayed`, `wins`, `losses`, `titles`, `firstEdition` ; sinon 400 |
-| `order` | `asc` ou `desc` ; défaut `asc` pour `displayName` et `firstEdition`, `desc` pour les statistiques |
+| `sort` | `acpPoints` (défaut, F-73), `displayName`, `editionsPlayed`, `matchesPlayed`, `wins`, `losses`, `titles`, `firstEdition`, `allTimePoints`, `winRate`, `capsFor`, `capsAgainst`, `capsDiff`, `averagePoints` ; sinon 400. Valeur absente (`null`) toujours en dernier ; égalité : `displayName` croissant |
+| `order` | `asc` ou `desc` ; défaut `asc` pour `displayName`, `firstEdition` et `capsAgainst`, `desc` pour les autres |
 | `edition` | UUID. Ne garde que les compétiteurs inscrits à cette édition ; les statistiques restent celles de leur carrière entière |
 | `q` | recherche, voir ci-dessous |
 
@@ -53,7 +53,14 @@ GET /api/v1/competiteurs?q=dese&sort=wins
       "losses": 1,
       "unknownResults": 1,
       "titles": 1,
-      "firstEditionCode": "2020"
+      "firstEditionCode": "2020",
+      "acpPoints": 42.5,
+      "allTimePoints": 42.5,
+      "averagePoints": 21.25,
+      "winRate": 0.75,
+      "capsFor": 30,
+      "capsAgainst": 18,
+      "capsDiff": 12
     }
   ],
   "total": 1,
@@ -61,6 +68,8 @@ GET /api/v1/competiteurs?q=dese&sort=wins
   "pageSize": 20
 }
 ```
+
+F-73 : `acpPoints`, `allTimePoints` et `averagePoints` viennent des classements (RG4, RG5 ; 0 ou `null` sans point classé). `winRate` (0..1) et `caps*` (RG37, mêmes totaux que `stats` de la fiche) valent `null` sans match avec score, jamais 0. Toutes ces valeurs sont celles de la carrière : le filtre `edition` ne restreint que les joueurs.
 
 ## `GET /competiteurs/{id}`
 
