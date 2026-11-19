@@ -34,6 +34,9 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'fr' },
       link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'preload', href: '/gabarito-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
         { rel: 'preload', href: '/bagel-fat-one-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
         { rel: 'stylesheet', href: '/fonts.css' }
