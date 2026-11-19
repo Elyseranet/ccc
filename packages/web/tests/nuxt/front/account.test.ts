@@ -296,18 +296,18 @@ describe('formulaires du compte', () => {
     expect(wrapper.text()).not.toContain('characters')
   })
 
-  it('le profil accepte un nouveau mot de passe vide (facultatif) et refuse 14 caractères avec notre message', async () => {
+  it('le profil accepte un nouveau mot de passe vide (facultatif) et refuse 7 caractères avec notre message', async () => {
     const wrapper = await mountSuspended(ProfileForm, { ...withRouterLink, props: { me: buildMeWithCompetitor() } })
     await wrapper.get('[data-cy="profile-form"]').trigger('submit')
     await flushPromises()
     expect(wrapper.emitted('submit')).toHaveLength(1)
     await wrapper.get('#profile-current-password').setValue('actuel')
-    await wrapper.get('#profile-new-password').setValue('x'.repeat(14))
-    await wrapper.get('#profile-confirm-password').setValue('x'.repeat(14))
+    await wrapper.get('#profile-new-password').setValue('x'.repeat(7))
+    await wrapper.get('#profile-confirm-password').setValue('x'.repeat(7))
     await wrapper.get('[data-cy="profile-form"]').trigger('submit')
     await flushPromises()
     expect(wrapper.emitted('submit')).toHaveLength(1)
-    expect(wrapper.text()).toContain('au moins 15 caractères')
+    expect(wrapper.text()).toContain('au moins 8 caractères')
     expect(wrapper.text()).not.toContain('characters')
   })
 
@@ -459,7 +459,7 @@ describe('useSessionGuard : une session expirée remet l’état à zéro (revue
   })
 })
 
-describe('règles de mot de passe : 15 caractères au moins, 128 au plus (B-08, validées côté navigateur par `rules`)', () => {
+describe('règles de mot de passe : 8 caractères au moins, 128 au plus (B-08, validées côté navigateur par `rules`)', () => {
   const rules = useAccountRules()
 
   it('refuse sous le minimum avec un message qui dit le minimum, accepte au minimum et au maximum', () => {
@@ -481,7 +481,7 @@ describe('règles de mot de passe : 15 caractères au moins, 128 au plus (B-08, 
     expect(rules.currentPasswordRequired(() => '')('')).toBe(true)
   })
 
-  it('un mot de passe de 14 caractères refusé par le serveur (400) est traduit en erreur de validation', async () => {
+  it('un mot de passe de 7 caractères refusé par le serveur (400) est traduit en erreur de validation', async () => {
     registerEndpoint('/api/v1/auth/invitation/jeton-court', { method: 'POST', handler: defineEventHandler(event => failWith(event, 400, API_ERROR_CODE.VALIDATION_FAILED)) })
     await expect(new AuthService().acceptInvitation('jeton-court', { password: 'x'.repeat(PASSWORD_MIN_LENGTH - 1) })).rejects.toMatchObject({ error: { statusCode: 400 } })
     expect(toAccountError(apiError(400, API_ERROR_CODE.VALIDATION_FAILED))).toBe(ACCOUNT_ERROR.VALIDATION_FAILED)

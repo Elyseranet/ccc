@@ -8,7 +8,7 @@ import type { TAccountRule } from '~/types/account.type'
  *
  * @description
  * Règles de validation des formulaires du compte, au format des `rules` d'Origam (`true` ou le message). Le mot de passe suit
- * le serveur (B-08) : 15 caractères au moins (OWASP, sans MFA), 128 au plus ; le serveur reste l'autorité. Un champ vide n'est
+ * le serveur (B-08) : 8 caractères au moins (F-76), 128 au plus ; le serveur reste l'autorité. Un champ vide n'est
  * refusé que s'il est obligatoire, pour que le mot de passe facultatif du profil puisse rester vide.
  ********************************************************/
 export const useAccountRules = () => {
