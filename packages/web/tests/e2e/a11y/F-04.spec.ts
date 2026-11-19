@@ -77,23 +77,6 @@ test.describe('joueurs : accessibilité et recherche', () => {
     await expect(page).toHaveURL(/tri=wins/)
   })
 
-  test('F-73 : tri par défaut ACP décroissant, nouvelles colonnes triables, « — » expliqué sans match avec score', async ({ page }) => {
-    const first = await (await page.request.get('/api/v1/competiteurs?pageSize=100')).json() as { items: Array<{ acpPoints: number, matchesPlayed: number, winRate: number | null, capsFor: number | null }> }
-    const acp = first.items.map(item => item.acpPoints)
-    expect(acp).toEqual([...acp].sort((a, b) => b - a))
-    expect(first.items.some(item => item.matchesPlayed === 0 && item.winRate === null && item.capsFor === null)).toBe(true)
-    await page.goto('/joueurs')
-    await page.waitForLoadState('networkidle')
-    await expect(page.getByTestId('players-count')).toContainText('tri par points ACP')
-    await expect(page.getByRole('columnheader', { name: /Points ACP/ })).toHaveAttribute('aria-sort', 'descending')
-    await expect(page.getByRole('columnheader', { name: /Défaites/ })).toBeVisible()
-    await page.getByRole('columnheader', { name: /% de victoires/ }).click()
-    await expect(page).toHaveURL(/tri=winRate/)
-    await page.goto('/joueurs?tri=winRate&ordre=asc&page=8')
-    await expect(page.getByTestId('players-not-recorded').first()).toBeVisible()
-    await expect(page.getByTestId('players-not-recorded').first()).toContainText('non renseigné dans les archives')
-  })
-
   test('la pagination se parcourt au clavier (un bouton de page prend le focus, Entrée change de page)', async ({ page }) => {
     await page.goto('/joueurs')
     await page.waitForLoadState('networkidle')

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COMPETITOR_SORT, SORT_ORDER } from '../../src/enums/competitor-sort.enum'
-import { COMPETITOR_DEFAULT_ORDER, SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS } from '../../src/consts/competitor.const'
+import { SEARCH_ACCENTED_CHARACTERS, SEARCH_FOLDED_CHARACTERS } from '../../src/consts/competitor.const'
 import {
   buildContainsPattern,
   escapeLikePattern,
@@ -34,8 +34,7 @@ describe('competitor search helpers', () => {
 
 const item = (id: string, displayName: string, wins: number): ICompetitorListItem => ({
   id, displayName, firstName: null, lastName: null, nickname: null, avatarUrl: null,
-  editionsPlayed: 0, matchesPlayed: wins, wins, losses: 0, unknownResults: 0, titles: 0, firstEditionCode: null,
-  acpPoints: 0, allTimePoints: 0, averagePoints: null, winRate: null, capsFor: null, capsAgainst: null, capsDiff: null
+  editionsPlayed: 0, matchesPlayed: wins, wins, losses: 0, unknownResults: 0, titles: 0, firstEditionCode: null
 })
 
 describe('sortCompetitors', () => {
@@ -43,24 +42,6 @@ describe('sortCompetitors', () => {
 
   it('sorts descending on a statistic and breaks ties alphabetically', () => {
     expect(sortCompetitors(items, new Map(), COMPETITOR_SORT.WINS, SORT_ORDER.DESC).map((i) => i.id)).toEqual(['c', 'b', 'a'])
-  })
-
-  it('F-73: sorts on the new columns, nulls last, ties by name', () => {
-    const rows = [
-      { ...item('a', 'Bob', 2), acpPoints: 10, winRate: 0.5, capsDiff: -3 },
-      { ...item('b', 'Alice', 2), acpPoints: 10, winRate: null, capsDiff: null },
-      { ...item('c', 'Carl', 5), acpPoints: 25, winRate: 1, capsDiff: 7 }
-    ]
-    const ids = (sort: COMPETITOR_SORT, order: SORT_ORDER) => sortCompetitors(rows, new Map(), sort, order).map((i) => i.id)
-    expect(ids(COMPETITOR_SORT.ACP_POINTS, SORT_ORDER.DESC)).toEqual(['c', 'b', 'a'])
-    expect(ids(COMPETITOR_SORT.WIN_RATE, SORT_ORDER.DESC)).toEqual(['c', 'a', 'b'])
-    expect(ids(COMPETITOR_SORT.WIN_RATE, SORT_ORDER.ASC)).toEqual(['a', 'c', 'b'])
-    expect(ids(COMPETITOR_SORT.CAPS_DIFF, SORT_ORDER.DESC)).toEqual(['c', 'a', 'b'])
-  })
-
-  it('F-73: defaults to ACP descending', () => {
-    expect(competitorListQuerySchema.parse({}).sort).toBe(COMPETITOR_SORT.ACP_POINTS)
-    expect(COMPETITOR_DEFAULT_ORDER[COMPETITOR_SORT.ACP_POINTS]).toBe(SORT_ORDER.DESC)
   })
 
   it('puts players without a first edition last in either direction', () => {

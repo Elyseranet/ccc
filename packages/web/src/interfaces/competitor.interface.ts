@@ -31,18 +31,6 @@ export interface ICompetitorListItem extends ICompetitorWithTitles {
   /** R-5 : matchs REGULAR au résultat inconnu, ni victoire ni défaite. */
   unknownResults: number
   firstEditionCode: string | null
-  /** RG4 : points ACP (5 dernières éditions clôturées) ; 0 sans point classé. */
-  acpPoints: number
-  /** RG4 : points All Time ; 0 sans point classé. */
-  allTimePoints: number
-  /** RG5 : All Time ÷ éditions jouées ; null sans participation classée. */
-  averagePoints: number | null
-  /** RG37 : victoires ÷ matchs avec score (0..1) ; null sans match avec score. */
-  winRate: number | null
-  /** RG37 : caps marqués, encaissés et différentiel sur les matchs avec score ; null sans match avec score (≠ 0). */
-  capsFor: number | null
-  capsAgainst: number | null
-  capsDiff: number | null
 }
 
 export interface ICompetitorParticipation {

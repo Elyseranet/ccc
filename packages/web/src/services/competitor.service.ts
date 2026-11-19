@@ -27,8 +27,6 @@ import { countTitles } from '../utils/ranking.util.js'
 import { computeHeadToHead, computePlayerBalance, computeWinLoss, countedOutcomes, countUnknownResults, resolveMatchOutcome } from '../utils/record.util.js'
 import { toCompetitorPublic } from '../utils/competitor-public.mapper.util.js'
 import { buildContainsPattern } from '../utils/competitor-query.util.js'
-import { getRanking } from './ranking.service.js'
-import { RANKING_KIND } from '../enums/ranking-kind.enum.js'
 import { sortCompetitors } from '../utils/competitor-sort.util.js'
 import { useDataSource } from '../utils/database.util.js'
 import { COMPETITOR_ACCOUNT_STATUS, USER_ROLE, USER_STATUS } from '../enums/user.enum.js'
@@ -226,29 +224,23 @@ const findCompetitors = async (db: DataSource, query: Pick<ICompetitorListQuery,
 
 /**
  * Liste paginée avec statistiques de carrière (R-5 : victoires et défaites sur les matchs avec score
- * seulement). Le filtre `edition` ne restreint que l'ensemble des compétiteurs ; les statistiques (y compris
- * ACP, All Time, % et caps, F-73) restent celles de toute leur carrière. L'archive est petite (centaines de joueurs) : tri et
+ * seulement). Le filtre `edition` ne restreint que l'ensemble des compétiteurs ; les statistiques
+ * restent celles de toute leur carrière. L'archive est petite (centaines de joueurs) : tri et
  * pagination se font en mémoire, ce qui permet de trier sur une statistique calculée.
  */
 export const listCompetitors = async (query: ICompetitorListQuery): Promise<IPaginated<ICompetitorListItem>> => {
   const db = await useDataSource()
-  // F-73 : mêmes calculs que les classements (RG4, RG5) et que la fiche (RG37), pas de second calcul.
-  const [competitors, careers, matches, acpRows, allTimeRows] = await Promise.all([
+  const [competitors, careers, matches] = await Promise.all([
     findCompetitors(db, query),
     loadCareers(db),
-    loadRegularMatches(db),
-    getRanking(RANKING_KIND.ACP),
-    getRanking(RANKING_KIND.ALL_TIME)
+    loadRegularMatches(db)
   ])
-  const acp = new Map(acpRows.map((row) => [row.competitor.id, row]))
-  const allTime = new Map(allTimeRows.map((row) => [row.competitor.id, row]))
 
   const balances = new Map(computePlayerBalance(matches.map(({ record }) => record)).map((balance) => [balance.playerId, balance]))
 
   const items = competitors.map((competitor): ICompetitorListItem => {
     const career = careers.get(competitor.id)
     const balance = balances.get(competitor.id)
-    const hasScoredMatch = (balance?.played ?? 0) > 0
     return {
       ...toCompetitorPublic(competitor),
       editionsPlayed: career?.editionsPlayed ?? 0,
@@ -257,14 +249,7 @@ export const listCompetitors = async (query: ICompetitorListQuery): Promise<IPag
       losses: balance?.losses ?? 0,
       unknownResults: balance?.unknownResults ?? 0,
       titles: career?.titles ?? 0,
-      firstEditionCode: career?.firstEditionCode ?? null,
-      acpPoints: acp.get(competitor.id)?.points ?? 0,
-      allTimePoints: allTime.get(competitor.id)?.points ?? 0,
-      averagePoints: allTime.get(competitor.id)?.average ?? null,
-      winRate: hasScoredMatch ? balance!.winRatio : null,
-      capsFor: hasScoredMatch ? balance!.pointsFor : null,
-      capsAgainst: hasScoredMatch ? balance!.pointsAgainst : null,
-      capsDiff: hasScoredMatch ? balance!.differential : null
+      firstEditionCode: career?.firstEditionCode ?? null
     }
   })
 

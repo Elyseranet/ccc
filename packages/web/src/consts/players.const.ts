@@ -23,7 +23,7 @@ export const PLAYERS_QUERY_KEYS = {
   PAGE: 'page'
 } as const
 
-export const PLAYERS_DEFAULT_SORT = COMPETITOR_SORT.ACP_POINTS
+export const PLAYERS_DEFAULT_SORT = COMPETITOR_SORT.DISPLAY_NAME
 
 export const PLAYERS_SORT_DEFAULT_ORDER: Record<COMPETITOR_SORT, SORT_ORDER> = {
   [COMPETITOR_SORT.DISPLAY_NAME]: SORT_ORDER.ASC,
@@ -32,44 +32,17 @@ export const PLAYERS_SORT_DEFAULT_ORDER: Record<COMPETITOR_SORT, SORT_ORDER> = {
   [COMPETITOR_SORT.WINS]: SORT_ORDER.DESC,
   [COMPETITOR_SORT.LOSSES]: SORT_ORDER.DESC,
   [COMPETITOR_SORT.TITLES]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.FIRST_EDITION]: SORT_ORDER.ASC,
-  [COMPETITOR_SORT.ACP_POINTS]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.ALL_TIME_POINTS]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.WIN_RATE]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.CAPS_FOR]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.CAPS_AGAINST]: SORT_ORDER.ASC,
-  [COMPETITOR_SORT.CAPS_DIFF]: SORT_ORDER.DESC,
-  [COMPETITOR_SORT.AVERAGE_POINTS]: SORT_ORDER.DESC
+  [COMPETITOR_SORT.FIRST_EDITION]: SORT_ORDER.ASC
 }
 
 export const PLAYERS_COLUMNS: IPlayersColumn[] = [
-  { key: COMPETITOR_SORT.DISPLAY_NAME, title: { key: 'players.column.player', fallback: 'Joueur' }, align: ALIGN.START, width: '19%' },
-  { key: COMPETITOR_SORT.ACP_POINTS, title: { key: 'players.column.acp', fallback: 'Points ACP' }, align: ALIGN.END, width: '8%' },
-  { key: COMPETITOR_SORT.ALL_TIME_POINTS, title: { key: 'players.column.all_time', fallback: 'Points All Time' }, align: ALIGN.END, width: '8%' },
-  { key: COMPETITOR_SORT.AVERAGE_POINTS, title: { key: 'players.column.average', fallback: 'Moyenne' }, align: ALIGN.END, width: '7%' },
-  { key: COMPETITOR_SORT.EDITIONS_PLAYED, title: { key: 'players.column.editions', fallback: 'Éditions' }, align: ALIGN.END, width: '7%' },
-  { key: COMPETITOR_SORT.MATCHES_PLAYED, title: { key: 'players.column.matches', fallback: 'Matchs' }, align: ALIGN.END, width: '6%' },
-  { key: COMPETITOR_SORT.WINS, title: { key: 'players.column.wins', fallback: 'Victoires' }, align: ALIGN.END, width: '7%' },
-  { key: COMPETITOR_SORT.LOSSES, title: { key: 'players.column.losses', fallback: 'Défaites' }, align: ALIGN.END, width: '6%' },
-  { key: COMPETITOR_SORT.WIN_RATE, title: { key: 'players.column.win_rate', fallback: '% de victoires' }, align: ALIGN.END, width: '7%' },
-  { key: COMPETITOR_SORT.CAPS_FOR, title: { key: 'players.column.caps_for', fallback: 'Caps marqués' }, align: ALIGN.END, width: '6%' },
-  { key: COMPETITOR_SORT.CAPS_AGAINST, title: { key: 'players.column.caps_against', fallback: 'Caps encaissés' }, align: ALIGN.END, width: '6%' },
-  { key: COMPETITOR_SORT.CAPS_DIFF, title: { key: 'players.column.caps_diff', fallback: 'Différentiel' }, align: ALIGN.END, width: '6%' },
-  { key: COMPETITOR_SORT.TITLES, title: { key: 'players.column.titles', fallback: 'Titres' }, align: ALIGN.END, width: '5%' },
-  { key: COMPETITOR_SORT.FIRST_EDITION, title: { key: 'players.column.first', fallback: 'Première' }, align: ALIGN.START, width: '8%' }
+  { key: COMPETITOR_SORT.DISPLAY_NAME, title: { key: 'players.column.player', fallback: 'Joueur' }, align: ALIGN.START, width: '37.81%' },
+  { key: COMPETITOR_SORT.EDITIONS_PLAYED, title: { key: 'players.column.editions', fallback: 'Éditions' }, align: ALIGN.END, width: '12.78%' },
+  { key: COMPETITOR_SORT.MATCHES_PLAYED, title: { key: 'players.column.matches', fallback: 'Matchs' }, align: ALIGN.END, width: '12%' },
+  { key: COMPETITOR_SORT.WINS, title: { key: 'players.column.wins', fallback: 'Victoires' }, align: ALIGN.END, width: '13.79%' },
+  { key: COMPETITOR_SORT.TITLES, title: { key: 'players.column.titles', fallback: 'Titres' }, align: ALIGN.END, width: '10.49%' },
+  { key: COMPETITOR_SORT.FIRST_EDITION, title: { key: 'players.column.first', fallback: 'Première' }, align: ALIGN.START, width: '13.13%' }
 ]
-
-/** Colonnes dont la valeur n'existe que s'il y a au moins un match avec score : « — » sinon (F-73). */
-export const PLAYERS_SCORED_COLUMNS = [
-  COMPETITOR_SORT.WINS,
-  COMPETITOR_SORT.LOSSES,
-  COMPETITOR_SORT.WIN_RATE,
-  COMPETITOR_SORT.CAPS_FOR,
-  COMPETITOR_SORT.CAPS_AGAINST,
-  COMPETITOR_SORT.CAPS_DIFF
-] as const
-
-export const PLAYERS_AVERAGE_DECIMALS = 2
 
 export const PLAYERS_EDITION_SUFFIX_LABELS: Record<string, { key: string, fallback: string }> = {
   a: { key: 'players.edition_first', fallback: '1re' },
@@ -121,14 +94,7 @@ export const PLAYERS_COLUMN_VALUES: Record<COMPETITOR_SORT, string> = {
   [COMPETITOR_SORT.WINS]: 'wins',
   [COMPETITOR_SORT.LOSSES]: 'losses',
   [COMPETITOR_SORT.TITLES]: 'titles',
-  [COMPETITOR_SORT.FIRST_EDITION]: 'firstEditionCode',
-  [COMPETITOR_SORT.ACP_POINTS]: 'acpPoints',
-  [COMPETITOR_SORT.ALL_TIME_POINTS]: 'allTimePoints',
-  [COMPETITOR_SORT.WIN_RATE]: 'winRate',
-  [COMPETITOR_SORT.CAPS_FOR]: 'capsFor',
-  [COMPETITOR_SORT.CAPS_AGAINST]: 'capsAgainst',
-  [COMPETITOR_SORT.CAPS_DIFF]: 'capsDiff',
-  [COMPETITOR_SORT.AVERAGE_POINTS]: 'averagePoints'
+  [COMPETITOR_SORT.FIRST_EDITION]: 'firstEditionCode'
 }
 
 export const PLAYER_POINTS_DECIMALS = 2
