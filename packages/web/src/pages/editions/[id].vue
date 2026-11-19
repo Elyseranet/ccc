@@ -202,7 +202,7 @@ defineExpose({})
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--edition-page---gap, var(--origam-space---5));
-    margin-top: var(--origam-space---5);
+    margin-top: var(--origam-space---6);
   }
 
   &__meta {

@@ -153,25 +153,7 @@ defineExpose({})
   padding-bottom: var(--origam-space---10);
 
   &__crumbs {
-    --origam-breadcrumb---gap: 0;
-    --origam-breadcrumb-item---color: var(--origam-color__text---secondary);
-    --origam-breadcrumb-divider---color: var(--origam-color__text---tertiary);
     padding-top: var(--origam-space---8);
-    font-size: var(--origam-font__size---sm);
-    line-height: var(--origam-font__lineHeight---normal);
-
-    :deep(.origam-breadcrumb__items) {
-      line-height: inherit;
-    }
-
-    :deep(.origam-breadcrumb-item--link) {
-      text-decoration: underline;
-    }
-
-    :deep(.origam-breadcrumb-item--disabled) {
-      opacity: 1;
-      color: var(--origam-color__text---tertiary);
-    }
   }
 }
 </style>

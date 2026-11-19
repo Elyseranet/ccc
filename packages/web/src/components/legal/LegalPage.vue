@@ -324,11 +324,11 @@ defineExpose({})
   }
 
   &__title {
-    margin-top: var(--origam-space---4);
+    margin-top: calc(var(--origam-space---6) - var(--origam-space---8));
   }
 
   &__meta {
-    margin: calc(-1 * var(--origam-space---4)) 0 0;
+    margin: calc(var(--origam-space---6) - var(--origam-space---8)) 0 0;
     color: var(--origam-color__text---secondary);
     font-size: var(--origam-font__size---sm);
   }

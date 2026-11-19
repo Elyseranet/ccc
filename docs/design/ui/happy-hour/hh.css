@@ -128,7 +128,8 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 /* ── origam-breadcrumb / origam-pagination ────────────────────────────── */
 .crumbs ol { display: flex; flex-wrap: wrap; gap: var(--origam-space---2); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---tertiary); }
 .crumbs li + li::before { content: '›'; margin-right: var(--origam-space---2); }
-.crumbs a { color: var(--origam-color__text---secondary); }
+.crumbs a { color: var(--origam-color__action--primary---fgSubtle); font-weight: var(--origam-font__weight---semibold); text-decoration: none; }
+.crumbs a:is(:hover, :focus-visible) { text-decoration: underline; }
 .pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--origam-space---3); margin-top: var(--origam-space---5); font-size: var(--origam-font__size---sm); color: var(--origam-color__text---secondary); }
 .pager ol { display: flex; flex-wrap: wrap; gap: var(--origam-space---1); }
 .pager a { display: grid; place-items: center; min-width: var(--origam-space---11); min-height: var(--origam-space---11); border-radius: var(--origam-radius---full); text-decoration: none; font-weight: var(--origam-font__weight---bold); }
@@ -140,9 +141,9 @@ select.input { padding-right: var(--origam-space---10); appearance: none; backgr
 
 /* ── Page header (pages internes) ─────────────────────────────────────── */
 .page-hero { position: relative; padding-block: var(--origam-space---12) var(--origam-space---10); }
-.page-hero__title { margin-top: var(--origam-space---4); font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); }
+.page-hero__title { margin-top: var(--origam-space---6); font-size: var(--origam-font__size---5xl); line-height: var(--origam-font__lineHeight---none); }
 .page-hero__lead { margin-top: var(--origam-space---6); max-width: 40rem; font-size: var(--origam-font__size---xl); color: var(--origam-color__text---secondary); }
-.meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---4); margin-top: var(--origam-space---5); }
+.meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--origam-space---2) var(--origam-space---4); margin-top: var(--origam-space---6); }
 
 /* ── Footer ───────────────────────────────────────────────────────────── */
 .hh-footer { margin-top: var(--origam-space---20); padding-block: var(--origam-space---10) var(--origam-space---8); border-top: 1px solid var(--origam-color__border---default); background: var(--origam-color__surface---sunken); }

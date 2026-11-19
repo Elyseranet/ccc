@@ -222,12 +222,13 @@ export const CCC_HH_BASE: IOrigamTheme = {
     '--origam-tabs__item--hover---color': 'var(--origam-color__text---primary)',
     '--origam-tabs__item--hover---background-color': 'transparent',
     '--origam-tabs__item--active---font-weight': 'var(--origam-font__weight---bold)',
-    // Fil d'Ariane (F-00p) : séparateur › via la prop `divider` du thème ; liens text.secondary soulignés, séparateur › en text.tertiary, page courante
-    // en text.tertiary sans soulignement (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
+    // Fil d'Ariane (F-00p, F-75) : séparateur › via la prop `divider` du thème ; liens en ambre (action.primary.fgSubtle) semi-gras, sans soulignement au repos
+    // (soulignés au survol et au focus clavier, règle `.origam-breadcrumb-item--link` de main.css), séparateur › en text.tertiary, page courante en
+    // text.tertiary graisse normale (règle `.origam-breadcrumb-item--disabled` de main.css). Chaque entrée pointe vers un token existant.
     // Le séparateur d'Origam porte déjà 8 px de chaque côté : la maquette (8 px entre l'élément et le séparateur, 8 px après) n'en veut pas de plus.
     '--origam-breadcrumb---gap': '0px',
-    '--origam-breadcrumb-item---color': 'var(--origam-color__text---secondary)',
-    '--origam-breadcrumb-item---text-decoration': 'underline',
+    '--origam-breadcrumb-item---color': 'var(--origam-color__action--primary---fgSubtle)',
+    '--origam-breadcrumb-item---text-decoration': 'none',
     '--origam-breadcrumb-item---opacity-disabled': '1',
     '--origam-breadcrumb-divider---color': 'var(--origam-color__text---tertiary)',
     '--origam-breadcrumb-divider---opacity': '1',
