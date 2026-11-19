@@ -299,7 +299,7 @@ Mis à jour le 2026-10-22 par `frontend-lead`, après T-ARCH-01 (arborescence `s
 | [F-72](F-72.md) | Admin « Plus » @390 : écarts plus-liens (6,2 %) et plus-edition (16,5 %) | — | F-12, F-68 | À faire | — |
 | [F-73](F-73.md) | Liste publique des joueurs : tri ACP et statistiques complètes | — | — | **Fermé — annulé** (2026-11-19) : mergé @ `f7ad09f9` puis revert `4415a0ec` (décision utilisateur, classements déjà au Palmarès) | — |
 | [F-74](F-74.md) | Favicon de la marque CCC | — | F-23 | **Fermé** (2026-11-19) @ `14974b41`, déployé sur dev, vérifié par l'utilisateur | — |
-| [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | En cours | — |
+| [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | **Fermé** (2026-11-19) @ `32037946`, déployé et vérifié sur dev | — |
 | [F-73](F-73.md) | Liste publique des joueurs : tri ACP et statistiques complètes | — | — | **Fermé — annulé** (2026-11-19) : mergé @ `f7ad09f9` puis revert `4415a0ec` (décision utilisateur, classements déjà au Palmarès) | — |
 | [F-74](F-74.md) | Favicon de la marque CCC | — | F-23 | **Fermé** (2026-11-19) @ `14974b41`, déployé sur dev, vérifié par l'utilisateur | — |
 | [F-75](F-75.md) | Hero : espacement fil d'Ariane / titre / sous-titre, style du fil d'Ariane | maquettes happy-hour | — | En cours | — |
