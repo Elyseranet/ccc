@@ -23,8 +23,8 @@ describe('fil d’Ariane (F-00p) : thème', () => {
       expect(cssVars[name], name).toBeDefined()
     }
     expect(cssVars['--origam-breadcrumb---gap']).toBe('0px')
-    expect(cssVars['--origam-breadcrumb-item---color']).toBe('var(--origam-color__text---secondary)')
-    expect(cssVars['--origam-breadcrumb-item---text-decoration']).toBe('underline')
+    expect(cssVars['--origam-breadcrumb-item---color']).toBe('var(--origam-color__action--primary---fgSubtle)')
+    expect(cssVars['--origam-breadcrumb-item---text-decoration']).toBe('none')
     expect(cssVars['--origam-breadcrumb-divider---color']).toBe('var(--origam-color__text---tertiary)')
   })
 })

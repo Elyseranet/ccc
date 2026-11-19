@@ -31,7 +31,9 @@ button, input, select, textarea { font: inherit; }
 .origam-table[tabindex="0"] .origam-table__wrapper.origam-table__wrapper { overflow-x: visible; }
 :where(.origam-breadcrumb) { font-size: var(--origam-font__size---sm); }
 .origam-breadcrumb .origam-breadcrumb__items.origam-breadcrumb__items { line-height: var(--origam-font__lineHeight---normal); }
-.origam-breadcrumb-item--disabled { --origam-breadcrumb-item---color: var(--origam-color__text---tertiary); --origam-breadcrumb-item---text-decoration: none; }
+.origam-breadcrumb-item--link { font-weight: var(--origam-font__weight---semibold); }
+.origam-breadcrumb-item--link:is(:hover, :focus-visible) { --origam-breadcrumb-item---text-decoration: underline; }
+.origam-breadcrumb-item--disabled { --origam-breadcrumb-item---color: var(--origam-color__text---tertiary); }
 .origam-btn.origam-btn.origam-btn--variant-outlined, .origam-btn.origam-btn.origam-btn--variant-ghost { --origam-btn---border-compensation: 0px; }
 .neon { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon), 0 6px 0 var(--origam-color__bar---neon), 0 8px 0 var(--origam-color__bar---neon), 0 22px 40px color-mix(in srgb, var(--origam-color__bar---neon) 45%, transparent); }
 .neon--sm { text-shadow: 0 2px 0 var(--origam-color__bar---neon), 0 4px 0 var(--origam-color__bar---neon); }

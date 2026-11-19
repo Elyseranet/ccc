@@ -94,7 +94,7 @@ defineExpose({})
   }
 
   &__title {
-    margin-top: var(--origam-space---4);
+    margin-top: var(--origam-space---6);
   }
 
   &__lead {
