@@ -176,7 +176,7 @@ defineExpose({})
     flex-wrap: wrap;
     align-items: center;
     gap: var(--origam-space---2) var(--origam-space---4);
-    margin-top: var(--origam-space---5);
+    margin-top: var(--origam-space---6);
   }
 
   &__stars {
