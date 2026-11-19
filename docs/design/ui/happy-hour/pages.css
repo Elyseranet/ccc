@@ -283,7 +283,7 @@
 }
 
 /* ═══ FACE-À-FACE ═══════════════════════════════════════════════════════ */
-.ff-hero { padding-block: var(--origam-space---6) var(--origam-space---8); }
+.ff-hero { padding-block: 0 var(--origam-space---8); }
 .ff-pick { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: var(--origam-space---4); padding: var(--origam-space---5); }
 .ff-pick .input { width: 100%; }
 .ff-swap { width: var(--origam-space---12); padding-inline: 0; font-size: var(--origam-font__size---lg); }
