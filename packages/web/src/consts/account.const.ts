@@ -82,6 +82,6 @@ export const PROFILE_FIELD_MESSAGES: Record<PROFILE_FIELD, IAccountMessage> = {
 /**
  * Longueur minimale passée à `origam-password-field` : 0. Origam construit toujours une règle de longueur (8 par défaut), même champ
  * vide et sans `requirements` (docs/tickets/origam/password-field-regle-longueur-forcee.md) ; 0 la neutralise, et la longueur
- * (15 à 128, B-08) passe alors uniquement par nos `rules` (`useAccountRules`), avec des messages traduits.
+ * (8 à 128, B-08, F-76) passe alors uniquement par nos `rules` (`useAccountRules`), avec des messages traduits.
  */
 export const ACCOUNT_PASSWORD_FIELD_MIN_LENGTH = 0

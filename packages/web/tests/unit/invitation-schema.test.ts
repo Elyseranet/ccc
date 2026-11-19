@@ -32,16 +32,16 @@ describe('newCompetitorSchema', () => {
 })
 
 describe('acceptInvitationSchema', () => {
-  it('requires a 15 to 128 character password and nothing else', () => {
-    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(15) }).success).toBe(true)
-    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(14) }).success).toBe(false)
+  it('requires an 8 to 128 character password and nothing else', () => {
+    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(8) }).success).toBe(true)
+    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(7) }).success).toBe(false)
     expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(129) }).success).toBe(false)
     expect(acceptInvitationSchema.safeParse({}).success).toBe(false)
   })
 
   it('refuses unknown fields, avatar included', () => {
-    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(15), avatar: 'x' }).success).toBe(false)
-    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(15), email: 'x@y.test' }).success).toBe(false)
+    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(8), avatar: 'x' }).success).toBe(false)
+    expect(acceptInvitationSchema.safeParse({ password: 'a'.repeat(8), email: 'x@y.test' }).success).toBe(false)
   })
 })
 

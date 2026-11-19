@@ -8,7 +8,7 @@ import type { IPasswordRequirementRule } from '~/interfaces/account.interface'
  *
  * @description
  * La liste d'exigences affichée sous un champ de mot de passe (`requirement-rules` d'`origam-password-field`, présentée en liste
- * sous le champ). Une seule exigence : 15 caractères au moins (B-08, OWASP sans MFA), sans règle de composition. Les exigences
+ * sous le champ). Une seule exigence : 8 caractères au moins (B-08, F-76), sans règle de composition. Les exigences
  * par défaut d'Origam (majuscule, chiffre, caractère spécial) ne sont pas les nôtres : elles ne doivent jamais s'afficher.
  ********************************************************/
 export const usePasswordRequirements = () => {

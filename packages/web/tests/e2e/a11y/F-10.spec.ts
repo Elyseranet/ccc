@@ -81,19 +81,19 @@ test.describe('accessibilité des trois écrans et de leurs états', () => {
     const { invitations } = e2eSecrets()
     await hydrated(page, `/invitation/${invitations.valid}`)
     expect(await violations(page)).toEqual([])
-    await expect(page.getByText('Au moins 15 caractères')).toBeVisible()
+    await expect(page.getByText('Au moins 8 caractères')).toBeVisible()
     for (const label of ['Mot de passe', 'Confirmer le mot de passe', 'Avatar', 'Téléphone · facultatif, jamais public']) {
       await expect(page.getByLabel(label, { exact: true })).toBeVisible()
     }
   })
 
-  test('/invitation/{jeton} : autocomplete jusqu’au champ natif, et le serveur refuse 14 caractères sans consommer le lien', async ({ page, request }) => {
+  test('/invitation/{jeton} : autocomplete jusqu’au champ natif, et le serveur refuse 7 caractères sans consommer le lien', async ({ page, request }) => {
     const { invitations } = e2eSecrets()
     await hydrated(page, `/invitation/${invitations.valid}`)
     await expect(page.locator('#invitation-password')).toHaveAttribute('autocomplete', 'new-password')
     await expect(page.locator('#invitation-confirm')).toHaveAttribute('autocomplete', 'new-password')
     await expect(page.locator('#invitation-phone')).toHaveAttribute('autocomplete', 'tel')
-    const refused = await request.post(`/api/v1/auth/invitation/${invitations.valid}`, { data: { password: 'x'.repeat(14) } })
+    const refused = await request.post(`/api/v1/auth/invitation/${invitations.valid}`, { data: { password: 'x'.repeat(7) } })
     expect(refused.status()).toBe(400)
     expect((await refused.json() as { code: string }).code).toBe('VALIDATION_FAILED')
     expect((await request.get(`/api/v1/auth/invitation/${invitations.valid}`)).status()).toBe(200)
@@ -212,10 +212,10 @@ test.describe('première connexion par invitation', () => {
       called = true
       return route.continue()
     })
-    await page.locator('#invitation-password').fill('trop-court')
+    await page.locator('#invitation-password').fill('court')
     await page.locator('#invitation-confirm').fill('autre-chose')
     await page.getByTestId('invitation-submit').click()
-    await expect(page.getByText('au moins 15 caractères').first()).toBeVisible()
+    await expect(page.getByText('au moins 8 caractères').first()).toBeVisible()
     expect(called).toBe(false)
   })
 

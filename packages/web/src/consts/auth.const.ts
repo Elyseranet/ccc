@@ -31,11 +31,12 @@ export const PASSWORD_HASH = {
 } as const
 
 /**
- * Minimum 15 : l'OWASP Authentication Cheat Sheet juge faible un mot de passe de moins de 15 caractères sans MFA
- * (https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), et la Spec ne prévoit pas de MFA.
+ * Minimum 8 : choix de l'utilisateur du 2026-11-19 (F-76). C'est en dessous de la recommandation de l'OWASP Authentication
+ * Cheat Sheet et du NIST SP 800-63B rév. 4 (15 caractères pour un mot de passe seul facteur, 8 avec double authentification),
+ * et CCC n'a pas de double authentification : risque accepté, documenté dans F-76.
  * Maximum 128 (OWASP demande au moins 64).
  */
-export const PASSWORD_MIN_LENGTH = 15
+export const PASSWORD_MIN_LENGTH = 8
 export const PASSWORD_MAX_LENGTH = 128
 
 export const EMAIL_MAX_LENGTH = 254

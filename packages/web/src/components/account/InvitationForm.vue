@@ -177,7 +177,7 @@ import type { IFormSubmitEvent, IInvitationFormEmits, IInvitationFormProps } fro
  * Global
  *
  * @description
- * Première connexion depuis l'invitation (A14, B-09) : mot de passe (15 caractères au moins, avec barre de force et exigences
+ * Première connexion depuis l'invitation (A14, B-09) : mot de passe (8 caractères au moins, avec barre de force et exigences
  * toujours visibles), confirmation, avatar et téléphone facultatifs. Le lien ne sert qu'une fois. L'avatar choisi n'est pas
  * envoyé ici : il part avec l'activation, par le parent, une fois le compte ouvert. Le composant émet `submit` et ne connaît
  * ni l'API ni la navigation.
